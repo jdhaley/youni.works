@@ -13,7 +13,7 @@
     </init-param>
   </servlet>
   <servlet-mapping>
-    <servlet-name>youni</servlet-name>
+    <servlet-name>fs</servlet-name>
     <url-pattern>/file</url-pattern>
   </servlet-mapping>
   <mime-mapping>
