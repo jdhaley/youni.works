@@ -19,45 +19,45 @@ export default {
 				Save: {
 					"title": "Save",
 					"shortcut": "Control+S",
-					"image": "icons/save.png"					
+					"icon": "save.png"					
 				},
 				Bold: {
 					"title": "Bold",
 					"shortcut": "Control+B",
-					"image": "icons/bold.gif"
+					"icon": "bold.gif"
 				},
 				Italic: {
 					"title": "Italic",
 					"shortcut": "Control+I",
-					"image": "icons/italic.gif"
+					"icon": "italic.gif"
 				},
 				Underline: {
 					"title": "Underline",
 					"shortcut": "Control+U",
-					"image": "icons/underline.gif"
+					"icon": "underline.gif"
 				},
 				UnorderedList: {
 					"title": "Bullets",
-					"image": "icons/dottedlist.gif"
+					"icon": "dottedlist.gif"
 				},
 				OrderedList: {
 					"title": "Numbered list",
 					"shortcut": "Control+L",
-					"image": "icons/numberedlist.gif"
+					"icon": "numberedlist.gif"
 				},
 				Heading: {
 					"title": "Heading",
-					"image": "icons/heading.png"
+					"icon": "heading.png"
 				},
 				Promote: {
 					"title": "Promote",
 					"shortcut": "Control+Backspace",
-					"image": "icons/outdent.gif"
+					"icon": "outdent.gif"
 				},
 				Demote: {
 					"title": "Demote",
 					"shortcut": "Control+Space",
-					"image": "icons/indent.gif"
+					"icon": "indent.gif"
 				}
 			}
 		}

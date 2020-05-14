@@ -23,9 +23,6 @@ export default {
 			}
 		},
 		after$initializePlatform: function(conf) {
-			this.sys.implement(window.Range.prototype, conf.range);
-			this.sys.implement(window.Element.prototype, conf.element);
-			this.device = this.sys.extend(null, conf.devices);
 //			document.execCommand("styleWithCSS", true);
 //			document.execCommand("defaultParagraphSeparator", "P");
 			this.window.document.execCommand("defaultParagraphSeparator", "P");
@@ -215,7 +212,7 @@ export default {
 				let command = view.model[name];
 				let title = command.title;
 				if (command.shortcut) title += "\n" + command.shortcut;
-				markup += `<button title='${title}' data-command='${name}'><img src='${command.image}'></img></button>`;
+				markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${command.icon}'></img></button>`;
 			}
 			view.innerHTML = markup;
 		}

@@ -1,15 +1,14 @@
-import system		from "../sys/config/system-20056.mjs";
-import component	from "../base/package/component.mjs";
-import client		from "../base/package/client.mjs";
-import ui			from "../base/package/ui.mjs";
+import system 	from "../system/main.mjs";
+import platform	from "../browser/conf/platform.mjs";
+import main		from "./main.mjs";
 
-const sys = system.packages.boot.Booter.boot(system);
-sys.load({
-	component: component,
-	client: client,
-	ui: ui
-});
+const conf = {
+	platform: platform,
+	ui: "youniworks.com/editor",
+	window: window
+}
+const sys = system();
+const frame = main(sys, conf);
 
-import conf from "./ui/conf.mjs";
-import main	from "./app/main.mjs";
-main(sys, conf);
+console.info(frame);
+frame.activate();
