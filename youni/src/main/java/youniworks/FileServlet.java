@@ -36,6 +36,7 @@ public class FileServlet extends HttpServlet {
 		Map<String, Object> pack = gson.fromJson(req.getReader(), TYPE);
 		for (String name : pack.keySet()) {
 			File f = new File(directory, name);
+			f.getParentFile().mkdirs();
 			Writer w = new FileWriter(f);
 			w.write(pack.get(name).toString());
 			w.close();
