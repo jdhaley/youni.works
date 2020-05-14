@@ -1,7 +1,7 @@
-import system		from "../config/system-20056.mjs";
-import component	from "../package/component.mjs";
-import client		from "../package/client.mjs";
-import ui			from "../package/ui.mjs";
+import system		from "../sys/config/system-20056.mjs";
+import component	from "../base/package/component.mjs";
+import client		from "../base/package/client.mjs";
+import ui			from "../base/package/ui.mjs";
 
 const sys = system.packages.boot.Booter.boot(system);
 sys.load({
