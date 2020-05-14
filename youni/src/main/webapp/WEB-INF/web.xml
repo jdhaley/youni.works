@@ -9,7 +9,7 @@
     <servlet-class>youniworks.FileServlet</servlet-class>
     <init-param>
        <param-name>directory</param-name>
-       <param-value>/web/repositories/youni.works/youni/src/main/webapp/fs</param-value>
+       <param-value>/web/repositories/youni.works/fs</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>
