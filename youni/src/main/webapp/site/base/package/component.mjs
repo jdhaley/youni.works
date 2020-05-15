@@ -1,6 +1,6 @@
 let PART_NUMBER = 0;
 const NIL = () => undefined;
-Symbol.Message = Symbol("Message");
+Symbol.Signal = Symbol("signal");
 
 export default {
 	package$: "youniworks.com/component",
@@ -83,11 +83,11 @@ export default {
 		},
 		content: null,
 		receive: function(action, message) {
-			if (!(message && message[Symbol.Message])) {
+			if (!(message && message[Symbol.Signal])) {
 				message = this.sys.extend(null, {
 					content: message
 				});
-				message[Symbol.Message] = "Message";
+				message[Symbol.Signal] = "Message";
 			}
 			if (message.selector) {
 				this.propagate.broadcast(this.content, action, message);
@@ -97,9 +97,11 @@ export default {
 		},
 		sense: {
 			event: function(target, action) {
-				let up = target.controller.owner.propagate.up;
+				let owner = target.controller.owner;
+				let up = owner.propagate.up;
 				target.addEventListener(action.toLowerCase(), event => {
-					event[Symbol.Message] = "Event";
+					event[Symbol.Signal] = "Event";
+					event.owner = owner;
 					if (!up(event.target, action, event)) {
 						event.preventDefault();
 					}

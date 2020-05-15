@@ -38,16 +38,17 @@ export default {
 			this.device = this.sys.extend(null, conf.platform.devices);
 		},
 		extend$sense: {
+			//Sense on the selection container rather than the event target:
 			selection: function(target, action) {
-				let owner = target.controller.owner;
+				const owner = target.controller.owner;
 				target.addEventListener(action.toLowerCase(), event => {
-					event[Symbol.Message] = "Event";
-					event.range = owner.selection;
-					if (!owner.propagate.up(event.range.commonAncestorContainer, action, event)) {
+					event[Symbol.Signal] = "Event";
+					event.owner = owner;
+					if (!owner.propagate.up(owner.selection.commonAncestorContainer, action, event)) {
 						event.preventDefault();
 					}
 				});
-			}
+			},
 		}
 	},
 	Viewer: {
