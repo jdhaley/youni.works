@@ -40,7 +40,8 @@ export default {
 		extend$sense: {
 			//Sense on the selection container rather than the event target:
 			selection: function(target, action) {
-				const owner = target.controller.owner;
+				//target.owner is allow document.selectionChange 
+				const owner = target.owner || target.controller.owner;
 				target.addEventListener(action.toLowerCase(), event => {
 					event[Symbol.Signal] = "Event";
 					event.owner = owner;

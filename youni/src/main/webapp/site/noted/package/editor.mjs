@@ -4,7 +4,9 @@ export default {
 	Frame: {
 		super$: "ui.Frame",
 		after$initializePlatform: function(conf) {
-			//this.window.document.sense("selection", "SelectionChange");
+			let doc = this.window.document;
+			doc.controller = 
+			this.sense.selection(this.window.document, "SelectionChange");
 			this.window.document.execCommand("styleWithCSS", true);
 			this.window.document.execCommand("defaultParagraphSeparator", "BR");
 		},
@@ -116,6 +118,9 @@ export default {
 			KeyDown: function(event) {
 				event.device = this.owner.device.keyboard;
 				event.action = this.getShortcut(event) || this.getAction(event);
+			},
+			SelectionChange: function(event) {
+				console.log("selection");
 			},
 			Input: DEFAULT,
 			Cut: DEFAULT,
