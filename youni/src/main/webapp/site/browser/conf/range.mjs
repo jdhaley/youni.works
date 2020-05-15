@@ -136,9 +136,6 @@ export default {
 		});
 	}
 }
-function getOffset(path) {
-	return path.substring(path.indexOf("+") + 1);
-}
 function next(node) {
 	if (node.firstChild) return node.firstChild;
 	if (node.nextSibling) return node.nextSibling;

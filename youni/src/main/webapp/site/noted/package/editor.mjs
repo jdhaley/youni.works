@@ -20,6 +20,7 @@ export default {
 				this.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
 				this.service.get.service(this, "load", location.search.substring(1));
 			}
+			this.commands = [];
 		}
 	},
 	Editor: {
@@ -29,8 +30,11 @@ export default {
 			view.append(view.ribbon);
 			view.body = this.part.body.createView(view.model);
 			view.body.model = view.model;
-			view.body.contentEditable = true;
+			//view.body.contentEditable = true;
 			view.append(view.body);
+			view.body.tabIndex = 1;
+			view.caret = this.owner.createView("blink");
+			view.body.focus();
 		},
 		edit: function(command, argument) {
 			try {
@@ -39,8 +43,6 @@ export default {
 				console.error("Command error", command, argument);
 				throw error;
 			}
-		},
-		commands: {
 		},
 		after$control: function(view) {
 			view.sense("event", "Click");
@@ -111,16 +113,29 @@ export default {
 					[file]: event.on.body.outerHTML
 				}));
 			},
-			Click: function(event) {
-				let action = event.target.parentNode.dataset.command;
-				if (action) event.action = action;
-			},
 			KeyDown: function(event) {
 				event.device = this.owner.device.keyboard;
 				event.action = this.getShortcut(event) || this.getAction(event);
 			},
+			Click: function(event) {
+				console.log("click");
+				let action = event.target.parentNode.dataset.command;
+				if (action) event.action = action;
+			},
 			SelectionChange: function(event) {
-				console.log("selection");
+				let range = event.owner.selection;
+				let caret = event.on.caret;
+				if (!caret.parentNode) event.on.body.append(caret);
+				console.log(range.commonAncestorContainer.nodeName);
+				if (range.collapsed) {
+					let rect = range.getBoundingClientRect();
+					caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
+					caret.style.left = rect.left + "px";
+					caret.style.height = rect.height + "px";
+					caret.style.width = "2px";
+				} else {
+					caret.style.width = "0px";
+				}
 			},
 			Input: DEFAULT,
 			Cut: DEFAULT,
@@ -132,21 +147,26 @@ export default {
 			Erase: DEFAULT,
 			Split: DEFAULT,
 			Join: DEFAULT,
-			Character: function(event) {
+			Character: function(event) {				
 				let range = event.owner.selection;
-				if (range.collapsed && range.container.nodeName == "LI" && range.startOffset == 0) {
-					if (event.key == ":") {
-						range.selectNodeContents(range.container)
-						let exist = range.container.innerHTML;
-						if (exist == "" || exist == "<br>") exist = "\u200a";
-						console.log(range.container.innerHTML);
-						this.edit("insertHtml", "<dt class=term>name</dt>" + exist);
-						range.selectNodeContents(range.container.firstChild);
-						this.owner.selection = range;
-						event.action = "";
-						return;
-					}
+				let node = range.commonAncestorContainer;
+				let command = this.sys.extend(null, {
+					type: "insertText",
+					start: range.start,
+					text: event.key
+				});
+				if (node.nodeType == Node.TEXT_NODE) {
+					let command = range.position;
+					let newOffset = range.startOffset + 1;
+					let text = node.textContent;
+					node.textContent = text.substring(0, range.startOffset) + event.key + text.substring(range.endOffset);
+					range.setStart(node, newOffset);
+					console.log(range.start, range.end);
+					range.collapse(true);
+					range.position = command;
+					this.owner.selection = range;
 				}
+				event.action = "";
 			},
 			Promote: function(event) {
 				let node = event.owner.selection.container;
