@@ -3,13 +3,10 @@ export default {
 	package$ui: "youniworks.com/ui",
 	Frame: {
 		super$: "ui.Frame",
-		execute: function(command, argument) {
-			try {
-				this.window.document.execCommand(command, false, argument || "");   				
-			} catch (error) {
-				console.error("Command error", command, argument);
-				throw error;
-			}
+		after$initializePlatform: function(conf) {
+			//this.sense.selection(this.window.document, "SelectionChange");
+			this.window.document.execCommand("styleWithCSS", true);
+			this.window.document.execCommand("defaultParagraphSeparator", "BR");
 		},
 		activate: function() {
 			let controller = this.part.Editor;
@@ -21,10 +18,6 @@ export default {
 				this.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
 				this.service.get.service(this, "load", location.search.substring(1));
 			}
-		},
-		after$initializePlatform: function(conf) {
-			this.window.document.execCommand("styleWithCSS", true);
-			this.window.document.execCommand("defaultParagraphSeparator", "BR");
 		}
 	},
 	Editor: {
@@ -37,18 +30,23 @@ export default {
 			view.body.contentEditable = true;
 			view.append(view.body);
 		},
+		edit: function(command, argument) {
+			try {
+				this.owner.window.document.execCommand(command, false, argument || "");   				
+			} catch (error) {
+				console.error("Command error", command, argument);
+				throw error;
+			}
+		},
 		commands: {
 		},
-		activate: function(view) {
+		after$control: function(view) {
 			this.owner.sense.event(view, "Click");
 			this.owner.sense.event(view, "KeyDown");
 			this.owner.sense.event(view, "Input");
 			this.owner.sense.event(view, "Cut");
 			this.owner.sense.event(view, "Copy");
 			this.owner.sense.event(view, "Paste");
-		},
-		after$control: function(view) {
-			this.activate(view);
 		},
 		shortcut: {
 			"Control+S": "Save",
@@ -112,13 +110,11 @@ export default {
 				}));
 			},
 			Click: function(event) {
-				event.range = this.owner.selection;
 				let action = event.target.parentNode.dataset.command;
 				if (action) event.action = action;
 			},
 			KeyDown: function(event) {
 				event.device = this.owner.device.keyboard;
-				event.range = this.owner.selection;
 				event.action = this.getShortcut(event) || this.getAction(event);
 			},
 			Input: DEFAULT,
@@ -132,14 +128,14 @@ export default {
 			Split: DEFAULT,
 			Join: DEFAULT,
 			Character: function(event) {
-				let range = event.range;
+				let range = event.owner.selection;
 				if (range.collapsed && range.container.nodeName == "LI" && range.startOffset == 0) {
 					if (event.key == ":") {
 						range.selectNodeContents(range.container)
 						let exist = range.container.innerHTML;
 						if (exist == "" || exist == "<br>") exist = "\u200a";
 						console.log(range.container.innerHTML);
-						this.owner.execute("insertHtml", "<dt class=term>name</dt>" + exist);
+						this.edit("insertHtml", "<dt class=term>name</dt>" + exist);
 						range.selectNodeContents(range.container.firstChild);
 						this.owner.selection = range;
 						event.action = "";
@@ -148,54 +144,54 @@ export default {
 				}
 			},
 			Promote: function(event) {
-				let node = event.range.container;
+				let node = event.owner.selection.container;
 				let level = this.getHeadingLevel(node.nodeName);
 				if (level > 1) {
-					this.owner.execute("formatBlock", "H" + --level);
+					this.edit("formatBlock", "H" + --level);
 					event.action = "";
 				} else if (node.nodeName == "LI") {
-					this.owner.execute("outdent");
+					this.edit("outdent");
 					event.action = "";
 				} else {
 					event.action = "Join";
 				}
 			},
 			Demote: function(event) {
-				let node = event.range.container;
+				let node = event.owner.selection.container;
 				let level = this.getHeadingLevel(node.nodeName);
 				if (level && level < 6) {
-					this.owner.execute("formatBlock", "H" + ++level);
+					this.edit("formatBlock", "H" + ++level);
 					event.action = "";
 				} else if (node.nodeName == "LI") {
-					this.owner.execute("indent");
+					this.edit("indent");
 					event.action = "";
 				} else {
-					this.owner.execute("insertUnorderedList");
+					this.edit("insertUnorderedList");
 					event.action = "";
 				}
 			},
 			UnorderedList: function(event) {
-				this.owner.execute("insertUnorderedList");
+				this.edit("insertUnorderedList");
 				event.action = "";
 			},
 			OrderedList: function(event) {
-				this.owner.execute("insertOrderedList");
+				this.edit("insertOrderedList");
 				event.action = "";
 			},
 			Heading: function(event) {
-				this.owner.execute("formatBlock", "H1");
+				this.edit("formatBlock", "H1");
 				event.action = "";
 			},
 			Bold: function(event) {
-				this.owner.execute("bold");
+				this.edit("bold");
 				event.action = "";
 			},
 			Italic: function(event) {
-				this.owner.execute("italic");
+				this.edit("italic");
 				event.action = "";
 			},
 			Underline: function(event) {
-				this.owner.execute("underline");
+				this.edit("underline");
 				event.action = "";
 			},
 		},
@@ -225,7 +221,7 @@ function DEFAULT(event) {
 }
 
 function getAction(event) {
-	const range = event.range;
+	const range = event.owner.selection;
 	const isCollapsed = range && range.collapsed;
 	switch (event.device.getKey(event)) {
 		case "Insert":
