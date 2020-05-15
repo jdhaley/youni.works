@@ -4,7 +4,7 @@ export default {
 	Frame: {
 		super$: "ui.Frame",
 		after$initializePlatform: function(conf) {
-			//this.sense.selection(this.window.document, "SelectionChange");
+			//this.window.document.sense("selection", "SelectionChange");
 			this.window.document.execCommand("styleWithCSS", true);
 			this.window.document.execCommand("defaultParagraphSeparator", "BR");
 		},
@@ -41,12 +41,12 @@ export default {
 		commands: {
 		},
 		after$control: function(view) {
-			this.owner.sense.event(view, "Click");
-			this.owner.sense.event(view, "KeyDown");
-			this.owner.sense.event(view, "Input");
-			this.owner.sense.event(view, "Cut");
-			this.owner.sense.event(view, "Copy");
-			this.owner.sense.event(view, "Paste");
+			view.sense("event", "Click");
+			view.sense("event", "KeyDown");
+			view.sense("event", "Input");
+			view.sense("event", "Cut");
+			view.sense("event", "Copy");
+			view.sense("event", "Paste");
 		},
 		shortcut: {
 			"Control+S": "Save",
