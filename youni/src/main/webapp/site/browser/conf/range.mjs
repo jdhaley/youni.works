@@ -4,6 +4,9 @@ const ITERATE = {
 }
 
 export default {
+	get$owner: function() {
+		return this.commonAncestorContainer.ownerDocument.owner;
+	},
 	get$container: function() {
 		let node = this.commonAncestorContainer;
 		while (node && node.nodeType != Node.ELEMENT_NODE) node = node.parentNode;
@@ -117,9 +120,25 @@ export default {
 			if (result) return result;
 			if (end && end == node) return;			
 		}
+	},
+	virtual$position: function() {
+		if (arguments.length) {
+			let pos = arguments[0];
+			this.setStart(this.owner.getNode(pos.startPath), pos.startOffset);
+			this.setEnd(this.owner.getNode(pos.endPath), pos.endOffset);
+			return;
+		}
+		return this.owner.sys.extend(null, {
+			startPath: this.startContainer.path,
+			startOffset: this.startOffset,
+			endPath: this.endContainer.path,
+			endOffset: this.endOffset
+		});
 	}
 }
-
+function getOffset(path) {
+	return path.substring(path.indexOf("+") + 1);
+}
 function next(node) {
 	if (node.firstChild) return node.firstChild;
 	if (node.nextSibling) return node.nextSibling;

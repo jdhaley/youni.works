@@ -33,8 +33,8 @@ export default {
 			ele.type = "text/css";
 			document.head.appendChild(ele);
 			this.$style = ele.sheet;
+			this.sys.implement(window.Node.prototype, conf.platform.node);
 			this.sys.implement(window.Range.prototype, conf.platform.range);
-			this.sys.implement(window.Element.prototype, conf.platform.element);
 			this.device = this.sys.extend(null, conf.platform.devices);
 		},
 		extend$sense: {
@@ -50,6 +50,15 @@ export default {
 					}
 				});
 			},
+		},
+		getNode: function(path) {
+			path = path.split("/");
+			let node = this.window.document;
+			for (let i = 0 ; i < path.length; i++) {
+				node = node.childNodes[1 * path[i]];
+				if (!node) throw new Error("Invalid Path.");
+			}
+			return node;
 		}
 	},
 	Viewer: {
