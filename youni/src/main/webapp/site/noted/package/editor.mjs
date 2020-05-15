@@ -23,9 +23,8 @@ export default {
 			}
 		},
 		after$initializePlatform: function(conf) {
-//			document.execCommand("styleWithCSS", true);
-//			document.execCommand("defaultParagraphSeparator", "P");
-			this.window.document.execCommand("defaultParagraphSeparator", "P");
+			this.window.document.execCommand("styleWithCSS", true);
+			this.window.document.execCommand("defaultParagraphSeparator", "BR");
 		}
 	},
 	Editor: {
@@ -138,7 +137,9 @@ export default {
 					if (event.key == ":") {
 						range.selectNodeContents(range.container)
 						let exist = range.container.innerHTML;
-						this.owner.execute("insertHtml", "<dt class=term>name</dt>-" + exist);
+						if (exist == "" || exist == "<br>") exist = "\u200a";
+						console.log(range.container.innerHTML);
+						this.owner.execute("insertHtml", "<dt class=term>name</dt>" + exist);
 						range.selectNodeContents(range.container.firstChild);
 						this.owner.selection = range;
 						event.action = "";
