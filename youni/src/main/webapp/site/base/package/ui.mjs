@@ -26,6 +26,14 @@ export default {
 		createView: function(name) {
 			return this.window.document.createElement(name);
 		},
+		createFragment: function(markup) {
+			let frag = this.window.document.createDocumentFragment();
+			let nodes = this.createView("div");
+			nodes.innerHTML = markup;
+			nodes = nodes.childNodes;
+			for (let i = 0; i < nodes.length; i++) frag.append(nodes[i]);
+			return frag;
+		},
 		initializePlatform: function(conf) {
 			let document = this.window.document;
 			document.owner = this;
