@@ -21,6 +21,23 @@ export default {
 				this.service.get.service(this, "load", location.search.substring(1));
 			}
 			this.lastCommand = this.sys.extend();
+		},
+		undo: function undo() {
+			let range = this.selection;
+			let command = this.lastCommand;
+			if (!command.before) return;
+			range.position = command.after;
+			range.replace(command.before.markup);
+			this.lastCommand = command.prior;
+		},
+		redo: function redo() {
+			let range = this.selection;
+			let command = this.lastCommand;
+			if (!command.next) return;
+			command = command.next;
+			range.position = command.before;
+			range.replace(command.after.markup);
+			this.lastCommand = command;
 		}
 	},
 	Editor: {
@@ -54,12 +71,14 @@ export default {
 		},
 		shortcut: {
 			"Control+S": "Save",
-			"Control+B": "Bold",
-			"Control+I": "Italic",
-			"Control+U": "Underline",
-			"Control+Backspace": "Promote",
-			"Control+Space": "Demote",
-			"Control+L": "OrderedList",
+//			"Control+B": "Bold",
+//			"Control+I": "Italic",
+//			"Control+U": "Underline",
+//			"Control+Backspace": "Promote",
+//			"Control+Space": "Demote",
+//			"Control+L": "OrderedList",
+			"Control+Z": "Undo",
+			"Control+Y": "Redo"
 		},
 		getType: function(node) {
 			if (node.nodeType != Node.ELEMENT_NODE) return node.nodeName;
@@ -112,6 +131,12 @@ export default {
 				this.owner.service.save.service(this.owner, "saved", JSON.stringify({
 					[file]: event.on.body.outerHTML
 				}));
+			},
+			Undo: function(event) {
+				this.owner.undo();
+			},
+			Redo: function(event) {
+				this.owner.redo();
 			},
 			KeyDown: function(event) {
 				event.device = this.owner.device.keyboard;
@@ -231,14 +256,19 @@ export default {
 
 function replace(event, markup) {
 	let range = event.owner.selection;
-	let command = range.position;
+	let command = this.sys.extend();
 	command.type = "replace";
-	command.markup = markup;
+	command.before = range.position;
+	command.before.markup = range.markup;
+
+	range.replace(markup);
+
+	command.after = range.position;
+	command.after.markup = range.markup;
+	
 	command.prior = this.owner.lastCommand;
 	this.owner.lastCommand.next = command;
 	this.owner.lastCommand = command;
-	range.replace(markup);
-	this.owner.selection = range;
 }
 
 function DEFAULT(event) {
