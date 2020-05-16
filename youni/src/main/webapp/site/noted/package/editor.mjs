@@ -237,7 +237,9 @@ function replace(event, markup) {
 	command.prior = this.owner.lastCommand;
 	this.owner.lastCommand.next = command;
 	this.owner.lastCommand = command;
-	range.replace(markup);
+	range.deleteContents();
+	range.insertNode(this.owner.createFragment(markup));
+	this.owner.selection = range;
 }
 
 function DEFAULT(event) {
