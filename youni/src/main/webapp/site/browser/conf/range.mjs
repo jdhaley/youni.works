@@ -135,8 +135,17 @@ export default {
 			endOffset: this.endOffset
 		});
 	},
-	replace: replace
+	replace: replace,
+	insert: function(markup) {
+		let frag = this.owner.createView();
+		let nodes = this.owner.createView("div");
+		nodes.innerHTML = markup;
+		nodes = nodes.childNodes;
+		for (let i = 0; i < nodes.length; i++) frag.append(nodes[i]);
+		this.insertNode(frag);
+	}
 }
+
 function next(node) {
 	if (node.firstChild) return node.firstChild;
 	if (node.nextSibling) return node.nextSibling;
@@ -172,7 +181,7 @@ function replace(markup) {
 	}
 	let save = this.cloneRange();
 	this.deleteContents();
-	this.insertNode(this.owner.createFragment(markup));
+	this.insert(markup);
 	if (startText) {
 		let start = save.startContainer.childNodes[save.startOffset];
 		if (start.nodeType != Node.TEXT_NODE) throw new Error("Replace Error")
