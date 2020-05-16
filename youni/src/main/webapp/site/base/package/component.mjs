@@ -95,19 +95,6 @@ export default {
 				this.propagate.down(this.content, action, message);
 			}
 		},
-		sense: {
-			event: function(target, action) {
-				let owner = target.controller.owner;
-				let up = owner.propagate.up;
-				target.addEventListener(action.toLowerCase(), event => {
-					event[Symbol.Signal] = "Event";
-					event.owner = owner;
-					if (!up(event.target, action, event)) {
-						event.preventDefault();
-					}
-				});
-			}
-		},
 		propagate: {
 			up: up,
 			down: down,

@@ -6,7 +6,22 @@ export default {
 		before$initialize: function(conf) {
 			this.initializePlatform(conf);
 		},
+		initializePlatform: function(conf) {
+			let document = this.window.document;
+			document.owner = this;
+			let ele = document.createElement("style");
+			ele.type = "text/css";
+			document.head.appendChild(ele);
+			this.$style = ele.sheet;
+			this.sys.implement(window.Node.prototype, conf.platform.node);
+			this.sys.implement(window.Range.prototype, conf.platform.range);
+			this.device = this.sys.extend(null, conf.platform.devices);
+		},
 		activate: function() {
+		},
+		createView: function(name) {
+			let doc = this.window.document;
+			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
 		},
 		virtual$selection: function() {
 			let selection = this.window.getSelection();
@@ -23,30 +38,19 @@ export default {
 				return range;
 			}
 		},
-		createView: function(name) {
-			return this.window.document.createElement(name);
-		},
-		createFragment: function(markup) {
-			let frag = this.window.document.createDocumentFragment();
-			let nodes = this.createView("div");
-			nodes.innerHTML = markup;
-			nodes = nodes.childNodes;
-			for (let i = 0; i < nodes.length; i++) frag.append(nodes[i]);
-			return frag;
-		},
-		initializePlatform: function(conf) {
-			let document = this.window.document;
-			document.owner = this;
-			let ele = document.createElement("style");
-			ele.type = "text/css";
-			document.head.appendChild(ele);
-			this.$style = ele.sheet;
-			this.sys.implement(window.Node.prototype, conf.platform.node);
-			this.sys.implement(window.Range.prototype, conf.platform.range);
-			this.device = this.sys.extend(null, conf.platform.devices);
-		},
-		extend$sense: {
-			//Sense on the selection container rather than the event target:
+		sense: {
+			event: function(target, action) {
+				let owner = target.controller.owner;
+				let up = owner.propagate.up;
+				target.addEventListener(action.toLowerCase(), event => {
+					event[Symbol.Signal] = "Event";
+					event.owner = owner;
+					if (!up(event.target, action, event)) {
+						event.preventDefault();
+					}
+				});
+			},
+			//Propagate from the selection container rather than the event target:
 			selection: function(target, action) {
 				//target.owner is allow document.selectionChange 
 				const owner = target.owner || target.controller.owner;
@@ -57,7 +61,7 @@ export default {
 						event.preventDefault();
 					}
 				});
-			},
+			}
 		},
 		getNode: function(path) {
 			path = path.split("/");
