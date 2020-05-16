@@ -34,7 +34,7 @@ Declaration.define = function(object) {
 }
 
 export default {
-	package$: "youniworks.com/system",
+	package$: "youni.works/system",
 	Object: Object,
 	Declaration: Declaration,
 	System: {

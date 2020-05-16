@@ -1,6 +1,6 @@
 export default {
-	package$: "youniworks.com/ui",
-	package$component: "youniworks.com/component",
+	package$: "youni.works/ui",
+	package$component: "youni.works/component",
 	Frame: {
 		super$: "component.Owner",
 		before$initialize: function(conf) {

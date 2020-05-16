@@ -1,7 +1,7 @@
 export default {
 	package$: "youni.works/noted",
-	package$ui: "youniworks.com/ui",
-	package$editor: "youniworks.com/editor",
+	package$ui: "youni.works/ui",
+	package$editor: "youni.works/editor",
 	public: {
 		Editor: {
 			type$: "editor.Editor",

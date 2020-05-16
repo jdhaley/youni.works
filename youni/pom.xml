@@ -6,7 +6,7 @@
 	<packaging>war</packaging>
 	<version>20130-owneditor</version>
 	<name>youni Webapp</name>
-	<url>http://youniworks.com/youni.works</url>
+	<url>http://youni.works</url>
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>

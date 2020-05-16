@@ -1,6 +1,6 @@
 export default {
-	package$: "youniworks.com/editor",
-	package$ui: "youniworks.com/ui",
+	package$: "youni.works/editor",
+	package$ui: "youni.works/ui",
 	package$cmd: "youni.works/cmd",
 	Frame: {
 		super$: "ui.Frame",

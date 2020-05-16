@@ -32,7 +32,7 @@ export default {
 	package: function(prop) {
 		let source = prop.source;
 		let priorContent = this.content;
-		let pkg = this.sys.extend(this.sys.packages["youniworks.com/system"] || null);
+		let pkg = this.sys.extend(this.sys.packages["youni.works/system"] || null);
 		if (prop.component) prop.component[prop.name] = pkg;
 		let pkgName = "";
 		for (let decl in source) {

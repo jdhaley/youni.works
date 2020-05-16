@@ -4,7 +4,7 @@ import main		from "./main.mjs";
 
 const conf = {
 	platform: platform,
-	ui: "youniworks.com/editor",
+	ui: "youni.works/editor",
 	window: window
 }
 const sys = system();

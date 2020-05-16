@@ -1,5 +1,5 @@
 export default {
-	package$: "youniworks.com/boot",
+	package$: "youni.works/boot",
 	Booter: {
 		type$: "Object",
 		boot: function(config) {

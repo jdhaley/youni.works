@@ -3,7 +3,7 @@ const NIL = () => undefined;
 Symbol.Signal = Symbol("signal");
 
 export default {
-	package$: "youniworks.com/component",
+	package$: "youni.works/component",
 	Content: {
 		super$: "Object",
 		type: "",	
