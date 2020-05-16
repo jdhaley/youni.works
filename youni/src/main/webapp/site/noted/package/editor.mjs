@@ -20,7 +20,7 @@ export default {
 				this.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
 				this.service.get.service(this, "load", location.search.substring(1));
 			}
-			this.commands = [];
+			this.lastCommand = this.sys.extend();
 		}
 	},
 	Editor: {
@@ -132,7 +132,7 @@ export default {
 					caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
 					caret.style.left = rect.left + "px";
 					caret.style.height = rect.height + "px";
-					caret.style.width = "2px";
+					caret.style.width = "1px";
 				} else {
 					caret.style.width = "0px";
 				}
@@ -149,22 +149,10 @@ export default {
 			Join: DEFAULT,
 			Character: function(event) {				
 				let range = event.owner.selection;
-				let node = range.commonAncestorContainer;
-				let command = this.sys.extend(null, {
-					type: "insertText",
-					start: range.start,
-					text: event.key
-				});
-				if (node.nodeType == Node.TEXT_NODE) {
-					let command = range.position;
-					let newOffset = range.startOffset + 1;
-					let text = node.textContent;
-					node.textContent = text.substring(0, range.startOffset) + event.key + text.substring(range.endOffset);
-					range.setStart(node, newOffset);
-					console.log(range.start, range.end);
-					range.collapse(true);
-					range.position = command;
-					this.owner.selection = range;
+				if (range.collapsed) {
+					insert.call(this, event, event.device.getCharacter(event));
+				} else {
+					replace.call(this, event, event.device.getCharacter(event));
 				}
 				event.action = "";
 			},
@@ -239,6 +227,19 @@ export default {
 			view.innerHTML = markup;
 		}
 	}
+}
+
+function replace(event, markup) {
+	let range = event.owner.selection;
+	let command = range.position;
+	command.type = "replace";
+	command.markup = markup;
+	command.prior = this.owner.lastCommand;
+	this.owner.lastCommand.next = command;
+	this.owner.lastCommand = command;
+	range.deleteContents();
+	range.insertNode(this.owner.createFragment(markup));
+	this.owner.selection = range;
 }
 
 function DEFAULT(event) {

@@ -134,7 +134,16 @@ export default {
 			endPath: this.endContainer.path,
 			endOffset: this.endOffset
 		});
-	}
+	},
+//	replace: replace,
+//	insert: function(markup) {
+//		let nodes = this.owner.createView("div");
+//		nodes.innerHTML = markup;
+//		nodes = nodes.chidNodes;
+//		let frag = new DocumentFragment();
+//		for (let node of nodes) frag.append(node);
+//		this.insertNode(frag);
+//	}
 }
 function next(node) {
 	if (node.firstChild) return node.firstChild;
@@ -152,4 +161,23 @@ function prior(fn, node, end) {
 	for (node = node.parentNode; node; node = node.parentNode) {
 		if (node.previousSibling) return backward.call(fn, node.previousSibling, end);
 	}
+}
+
+function replace(markup) {
+//	let startText = 0;
+//	if (this.startContainer.nodeType == Node.TEXT_NODE) {
+//		startText = this.startOffset
+//		markup = this.startContainer.textContent.substring(0, startText) + markup;
+//		this.setStartBefore(this.startContainer);
+//		if (this.startContainer.nodeType != Node.ELEMENT_NODE) throw new Error("Range Error");
+//	}
+//	let endText = 0;
+//	if (this.endContainer.nodeType == Node.TEXT_NODE) {
+//		endText = this.endOffset;
+//		markup += this.endContainer.textContent.substring(endText);
+//		this.setEndAfter(this.endContainer);
+//		if (this.endContainer.nodeType != Node.ELEMENT_NODE) throw new Error("Range Error");
+//	}
+//	let save = this.cloneRange();
+//	
 }
