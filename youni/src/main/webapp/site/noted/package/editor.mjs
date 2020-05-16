@@ -112,7 +112,7 @@ export default {
 				let model = "";
 				switch (message.content.status) {
 					case 200:
-						model = this.owner.createView();
+						model = this.owner.createView("div");
 						model.innerHTML = message.content.response;
 						model = model.firstChild.innerHTML;
 						break;
@@ -131,16 +131,7 @@ export default {
 				caret.style.width = "0px";				
 			},
 			MouseUp: function(event) {
-				let range = event.owner.selection;
-				if (range.collapsed) {
-					let caret = event.on.caret;
-					if (!caret.parentNode) event.on.body.append(caret);
-					let rect = range.getBoundingClientRect();
-					caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
-					caret.style.left = rect.left + "px";
-					caret.style.height = rect.height + "px";
-					caret.style.width = "1px";
-				}
+				checkCaret(event);
 			},
 			Save: function(event) {
 				event.action = ""; //Don't save locally.
@@ -165,19 +156,7 @@ export default {
 				if (action) event.action = action;
 			},
 			SelectionChange: function(event) {
-//				let range = event.owner.selection;
-//				let caret = event.on.caret;
-//				if (!caret.parentNode) event.on.body.append(caret);
-//				console.log(range.commonAncestorContainer.nodeName);
-//				if (range.collapsed) {
-//					let rect = range.getBoundingClientRect();
-//					caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
-//					caret.style.left = rect.left + "px";
-//					caret.style.height = rect.height + "px";
-//					caret.style.width = "1px";
-//				} else {
-//					caret.style.width = "0px";
-//				}
+				checkCaret(event);
 			},
 			Input: DEFAULT,
 			Cut: DEFAULT,
@@ -197,6 +176,7 @@ export default {
 					replace.call(this, event, event.device.getCharacter(event));
 				}
 				range.collapse();
+				this.owner.selection = range;
 				event.action = "";
 			},
 			Promote: function(event) {
@@ -272,6 +252,20 @@ export default {
 	}
 }
 
+function checkCaret(event) {
+	let range = event.owner.selection;
+	let caret = event.on.caret;
+	if (range.collapsed) {
+		if (!caret.parentNode) event.on.body.append(caret);
+		let rect = range.getBoundingClientRect();
+		caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
+		caret.style.left = rect.left + "px";
+		caret.style.height = rect.height + "px";
+		caret.style.width = "1px";
+	} else {
+		caret.style.width = "0px";									
+	}
+}
 function replace(event, markup) {
 	let range = event.owner.selection;
 	let command = this.sys.extend();
