@@ -1,14 +1,14 @@
 export default {
 	package$: "youniworks.com/editor",
 	package$ui: "youniworks.com/ui",
+	package$cmd: "youni.works/cmd",
 	Frame: {
 		super$: "ui.Frame",
 		after$initializePlatform: function(conf) {
 			let doc = this.window.document;
-			doc.controller = 
-			this.sense.selection(this.window.document, "SelectionChange");
-			this.window.document.execCommand("styleWithCSS", true);
-			this.window.document.execCommand("defaultParagraphSeparator", "BR");
+			this.sense.selection(doc, "SelectionChange");
+			doc.execCommand("styleWithCSS", true);
+			doc.execCommand("defaultParagraphSeparator", "BR");
 		},
 		activate: function() {
 			let controller = this.part.Editor;
@@ -21,29 +21,43 @@ export default {
 				this.service.get.service(this, "load", location.search.substring(1));
 			}
 			this.lastCommand = this.sys.extend();
+		}
+	},
+	Ribbon: {
+		super$: "ui.Viewer",
+		draw: function(view) {
+			let markup = "";
+			for (let name in this.buttons) {
+				let command = this.buttons[name];
+				let title = command.title;
+				if (command.shortcut) title += "\n" + command.shortcut;
+				markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${command.icon}'></img></button>`;
+			}
+			view.innerHTML = markup;
+		}
+	},
+	Edit: {
+		super$: "cmd.Command",
+		var$prior: null,
+		var$next: null,
+		var$owner: null,
+		var$before: null,
+		var$after: null,
+		undo: function() {
+			let range = this.owner.selection;
+			range.position = this.after;
+			range.replace(this.before.markup);
 		},
-		undo: function undo() {
-			let range = this.selection;
-			let command = this.lastCommand;
-			if (!command.before) return;
-			range.position = command.after;
-			range.replace(command.before.markup);
-			this.lastCommand = command.prior;
-		},
-		redo: function redo() {
-			let range = this.selection;
-			let command = this.lastCommand;
-			if (!command.next) return;
-			command = command.next;
-			range.position = command.before;
-			range.replace(command.after.markup);
-			this.lastCommand = command;
+		redo: function() {
+			let range = this.owner.selection;
+			range.position = this.before;
+			range.replace(this.after.markup);
 		}
 	},
 	Editor: {
 		super$: "ui.Viewer",
 		draw: function(view) {
-			view.ribbon = this.part.ribbon.createView(this.commands);
+			view.ribbon = this.part.ribbon.createView();
 			view.append(view.ribbon);
 			view.body = this.part.body.createView(view.model);
 			view.body.model = view.model;
@@ -237,19 +251,6 @@ export default {
 		},
 		getAction: getAction
 	},
-	Ribbon: {
-		super$: "ui.Viewer",
-		draw: function(view) {
-			let markup = "";
-			for (let name in view.model) {
-				let command = view.model[name];
-				let title = command.title;
-				if (command.shortcut) title += "\n" + command.shortcut;
-				markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${command.icon}'></img></button>`;
-			}
-			view.innerHTML = markup;
-		}
-	}
 }
 
 function checkCaret(event) {
@@ -268,7 +269,8 @@ function checkCaret(event) {
 }
 function replace(event, markup) {
 	let range = event.owner.selection;
-	let command = this.sys.extend();
+	let command = this.sys.extend(this.command.Edit);
+	command.owner = this.owner;
 	command.type = "replace";
 	command.before = range.position;
 	command.before.markup = range.markup;
@@ -277,10 +279,7 @@ function replace(event, markup) {
 
 	command.after = range.position;
 	command.after.markup = range.markup;
-	
-	command.prior = this.owner.lastCommand;
-	this.owner.lastCommand.next = command;
-	this.owner.lastCommand = command;
+	this.owner.addCommand(command);
 }
 
 function DEFAULT(event) {

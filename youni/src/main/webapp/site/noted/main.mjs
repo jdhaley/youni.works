@@ -1,6 +1,7 @@
 import component	from "../base/package/component.mjs";
 import client		from "../base/package/client.mjs";
 import ui			from "../base/package/ui.mjs";
+import cmd			from "../base/package/cmd.mjs";
 
 import editor		from "./package/editor.mjs";
 import services		from "./conf/services.mjs";
@@ -10,6 +11,7 @@ let packages = {
 	component: component,
 	client: client,
 	ui: ui,
+	cmd: cmd,
 	editor: editor,
 	services: services,
 	parts: parts		
@@ -26,6 +28,7 @@ export default function main(sys, conf) {
 		controller: {
 		}
 	});
+	sys.implement(frame, packages.cmd.Commander);
 	frame.initialize(conf);
 	return frame;
 }
