@@ -64,6 +64,7 @@ export default {
 		after$control: function(view) {
 			view.sense("event", "Click");
 			view.sense("event", "KeyDown");
+			view.sense("event", "MouseUp");
 			view.sense("event", "Input");
 			view.sense("event", "Cut");
 			view.sense("event", "Copy");
@@ -125,6 +126,22 @@ export default {
 				message.on.model = model;
 				message.action = "draw";
 			},
+			MouseDown: function(event) {
+				let caret = event.on.caret;
+				caret.style.width = "0px";				
+			},
+			MouseUp: function(event) {
+				let range = event.owner.selection;
+				if (range.collapsed) {
+					let caret = event.on.caret;
+					if (!caret.parentNode) event.on.body.append(caret);
+					let rect = range.getBoundingClientRect();
+					caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
+					caret.style.left = rect.left + "px";
+					caret.style.height = rect.height + "px";
+					caret.style.width = "1px";
+				}
+			},
 			Save: function(event) {
 				event.action = ""; //Don't save locally.
 				let file = this.owner.window.location.search.substring(1);
@@ -148,19 +165,19 @@ export default {
 				if (action) event.action = action;
 			},
 			SelectionChange: function(event) {
-				let range = event.owner.selection;
-				let caret = event.on.caret;
-				if (!caret.parentNode) event.on.body.append(caret);
-				console.log(range.commonAncestorContainer.nodeName);
-				if (range.collapsed) {
-					let rect = range.getBoundingClientRect();
-					caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
-					caret.style.left = rect.left + "px";
-					caret.style.height = rect.height + "px";
-					caret.style.width = "1px";
-				} else {
-					caret.style.width = "0px";
-				}
+//				let range = event.owner.selection;
+//				let caret = event.on.caret;
+//				if (!caret.parentNode) event.on.body.append(caret);
+//				console.log(range.commonAncestorContainer.nodeName);
+//				if (range.collapsed) {
+//					let rect = range.getBoundingClientRect();
+//					caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
+//					caret.style.left = rect.left + "px";
+//					caret.style.height = rect.height + "px";
+//					caret.style.width = "1px";
+//				} else {
+//					caret.style.width = "0px";
+//				}
 			},
 			Input: DEFAULT,
 			Cut: DEFAULT,
@@ -175,10 +192,11 @@ export default {
 			Character: function(event) {				
 				let range = event.owner.selection;
 				if (range.collapsed) {
-					insert.call(this, event, event.device.getCharacter(event));
+					replace.call(this, event, event.device.getCharacter(event));
 				} else {
 					replace.call(this, event, event.device.getCharacter(event));
 				}
+				range.collapse();
 				event.action = "";
 			},
 			Promote: function(event) {
