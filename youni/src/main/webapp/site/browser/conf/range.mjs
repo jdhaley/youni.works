@@ -135,15 +135,7 @@ export default {
 			endOffset: this.endOffset
 		});
 	},
-//	replace: replace,
-//	insert: function(markup) {
-//		let nodes = this.owner.createView("div");
-//		nodes.innerHTML = markup;
-//		nodes = nodes.chidNodes;
-//		let frag = new DocumentFragment();
-//		for (let node of nodes) frag.append(node);
-//		this.insertNode(frag);
-//	}
+	replace: replace
 }
 function next(node) {
 	if (node.firstChild) return node.firstChild;
@@ -164,20 +156,35 @@ function prior(fn, node, end) {
 }
 
 function replace(markup) {
-//	let startText = 0;
-//	if (this.startContainer.nodeType == Node.TEXT_NODE) {
-//		startText = this.startOffset
-//		markup = this.startContainer.textContent.substring(0, startText) + markup;
-//		this.setStartBefore(this.startContainer);
-//		if (this.startContainer.nodeType != Node.ELEMENT_NODE) throw new Error("Range Error");
-//	}
-//	let endText = 0;
-//	if (this.endContainer.nodeType == Node.TEXT_NODE) {
-//		endText = this.endOffset;
-//		markup += this.endContainer.textContent.substring(endText);
-//		this.setEndAfter(this.endContainer);
-//		if (this.endContainer.nodeType != Node.ELEMENT_NODE) throw new Error("Range Error");
-//	}
-//	let save = this.cloneRange();
-//	
+	let startText = 0;
+	if (this.startContainer.nodeType == Node.TEXT_NODE) {
+		startText = this.startOffset
+		markup = this.startContainer.textContent.substring(0, startText) + markup;
+		this.setStartBefore(this.startContainer);
+		if (this.startContainer.nodeType != Node.ELEMENT_NODE) throw new Error("Replace Error");
+	}
+	let endText = 0;
+	if (this.endContainer.nodeType == Node.TEXT_NODE) {
+		endText = this.endContainer.textContent.length - this.endOffset;
+		markup += this.endContainer.textContent.substring(this.endOffset);
+		this.setEndAfter(this.endContainer);
+		if (this.endContainer.nodeType != Node.ELEMENT_NODE) throw new Error("Replace Error");
+	}
+	let save = this.cloneRange();
+	this.deleteContents();
+	this.insertNode(this.owner.createFragment(markup));
+	if (startText) {
+		let start = save.startContainer.childNodes[save.startOffset];
+		if (start.nodeType != Node.TEXT_NODE) throw new Error("Replace Error")
+		this.setStart(start, startText);
+	} else {
+		this.setStart(save.startContainer, save.startOffset);
+	}
+	if (endText) {
+		let end = save.endContainer.childNodes[save.endOffset];
+		if (end.nodeType != Node.TEXT_NODE) throw new Error("Replace Error")
+		this.setEnd(end, end.textContent.length - endText);
+	} else {
+		this.setEnd(save.endContainer, save.endOffset);
+	}
 }

@@ -12,15 +12,19 @@ export default {
 	},
 	get$path: function() {
 		let path = "";
+		let delim = "";
 		for (let node = this; node.parentNode; node = node.parentNode) {
-			let nodes = node.parentNode.childNodes;
-			for (let i = 0; i < nodes.length; i++) {
-				if (node == nodes[i]) {
-					path = i + (path ? "/" : "") + path;
-					break;
-				}
-			}
+			path = node.index + delim + path;
+			delim = "/";
 		}
 		return path;
+	},
+	get$index: function() {
+		if (this.parentNode) {
+			let nodes = this.parentNode.childNodes;
+			for (let i = 0; i < nodes.length; i++) {
+				if (this == nodes[i]) return i;
+			}
+		}
 	}
 }
