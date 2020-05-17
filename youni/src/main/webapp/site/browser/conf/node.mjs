@@ -15,14 +15,24 @@ export default {
 			this.owner.sense[sensorType](this, action);
 		}
 	},
-	get$path: function() {
+	getPath: function(ancestor) {
+		if (!arguments.length) ancestor = this.ownerDocument;
 		let path = "";
 		let delim = "";
-		for (let node = this; node.parentNode; node = node.parentNode) {
+		for (let node = this; node; node = node.parentNode) {
+			if (node == ancestor) return path;
 			path = node.index + delim + path;
 			delim = "/";
 		}
-		return path;
+	},
+	getChild: function(path) {
+		path = path.split("/");
+		let node = this;
+		for (let i = 0 ; i < path.length; i++) {
+			node = node.childNodes[1 * path[i]];
+			if (!node) throw new Error("Invalid Path.");
+		}
+		return node;
 	},
 	get$index: function() {
 		if (this.parentNode) {

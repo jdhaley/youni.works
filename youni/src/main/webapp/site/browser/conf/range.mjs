@@ -98,35 +98,22 @@ export default {
 		}
 	},
 	virtual$position: function() {
-		let pos;
+		let container = this.container;
 		if (arguments.length) {
-			pos = arguments[0];
-			let doc = this.commonAncestorContainer.ownerDocument;
-			let range = advance(doc.getElementById(pos.start), pos.startCount);
-			this.setStart(range.endContainer, range.endOffset);
-			range = advance(doc.getElementById(pos.end), pos.endCount);
-			this.setEnd(range.endContainer, range.endOffset);
+			let pos = arguments[0];
+			container = container.ownerDocument.getElementById(pos.container);
+			this.setStart(container.getChild(pos.startPath), pos.startOffset);
+			this.setEnd(container.getChild(pos.endPath), pos.endOffset);
 			return;
 		}
-
-		pos = this.owner.sys.extend();
-		let range = this.cloneRange();
-		
-		let node = getElement(this.startContainer);
-		node.id = node.nodeId;
-		range.selectNodeContents(node);
-		range.setEnd(this.startContainer, this.startOffset);
-		pos.start = node.id;
-		pos.prefix = range.markup;
-
-		node = getElement(this.endContainer);
-		node.id = node.nodeId;
-		range.selectNodeContents(node);
-		range.setStart(this.endContainer, this.endOffset);
-		pos.end = node.id;
-		pos.suffix = range.markup;
-		return pos;
-		
+		container.id = container.nodeId;
+		return this.owner.sys.extend(null, {
+			container: container.id,
+			startPath: this.startContainer.getPath(container),
+			startOffset: this.startOffset,
+			endPath: this.endContainer.getPath(container),
+			endOffset: this.endOffset
+		});
 	},
 	replace: replace,
 	insert: function(markup) {
