@@ -25,13 +25,18 @@ export default {
 		super$: "ui.Viewer",
 		after$initialize: function(conf) {
 			let actions = conf.actions;
+			let group = this.sys.extend();
 			for (let name in actions) {
 				conf = actions[name];
 				this.action[name] = conf.action;
 				if (conf.shortcut) this.shortcut[conf.shortcut] = name;
+				if (conf.group) {
+					if (!group[conf.group]) group[conf.group] = this.sys.extend();
+					group[conf.group][name] = conf;
+				}
 				//we don't have a view so we can't create buttons yet.
 			}
-			this.actions = actions;
+			this.group = group;
 		},
 //		part: {
 //			type$ribbon: "ui.Viewer",
@@ -55,13 +60,18 @@ export default {
 		drawRibbon: function(view) {
 			view.ribbon = this.part.ribbon.createView();
 			let markup = "";
-			for (let name in this.actions) {
-				let conf = this.actions[name];
-				if (conf.icon) {
-					let title = conf.title;
-					if (conf.shortcut) title += "\n" + conf.shortcut;
-					markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${conf.icon}'></img></button>`;
+			for (let groupName in this.group) {
+				let group = this.group[groupName];
+				markup += `<div class='actions' title='${groupName}'>`
+				for (let name in group) {
+					let action = group[name];
+					if (action.icon) {
+						let title = action.title;
+						if (action.shortcut) title += "\n" + action.shortcut;
+						markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${action.icon}'></img></button>`;
+					}
 				}
+				markup += "</div>";
 			}
 			view.ribbon.innerHTML = markup;
 			view.append(view.ribbon);

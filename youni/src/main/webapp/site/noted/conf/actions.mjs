@@ -1,5 +1,6 @@
 export default {
 	Save: {
+		group: "File",
 		title: "Save",
 		shortcut: "Control+S",
 		icon: "save.png",
@@ -12,6 +13,7 @@ export default {
 		}
 	},
 	Strong: {
+		group: "Tag",
 		title: "Strong",
 		shortcut: "Control+B",
 		icon: "bold.gif",
@@ -21,6 +23,7 @@ export default {
 		}
 	},
 	Emphasis: {
+		group: "Tag",
 		title: "Emphasis",
 		shortcut: "Control+I",
 		icon: "italic.gif",
@@ -30,6 +33,7 @@ export default {
 		}
 	},
 	Term: {
+		group: "Tag",
 		title: "Term",
 		shortcut: "Control+U",
 		icon: "underline.gif",
@@ -39,6 +43,7 @@ export default {
 		}
 	},
 	Heading: {
+		group: "Outline",
 		title: "Heading",
 		icon: "heading.png",
 		action: function(event) {
@@ -47,6 +52,7 @@ export default {
 		}
 	},
 	Items: {
+		group: "Outline",
 		title: "Items",
 		icon: "dottedlist.gif",
 		action: function(event) {
@@ -55,6 +61,7 @@ export default {
 		}
 	},
 	List: {
+		group: "Outline",
 		title: "List",
 		shortcut: "Control+L",
 		icon: "numberedlist.gif",
@@ -64,6 +71,7 @@ export default {
 		}
 	},
 	Promote: {
+		group: "Outline",
 		title: "Promote",
 		shortcut: "Control+Backspace",
 		icon: "outdent.gif",
@@ -82,6 +90,7 @@ export default {
 		}
 	},
 	Demote: {
+		group: "Outline",
 		title: "Demote",
 		shortcut: "Control+Space",
 		icon: "indent.gif",
