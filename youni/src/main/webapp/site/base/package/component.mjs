@@ -4,36 +4,6 @@ Symbol.Signal = Symbol("signal");
 
 export default {
 	package$: "youni.works/component",
-	Content: {
-		super$: "Object",
-		type: "",	
-		content: null
-		//label
-	},
-	Article: {
-		super$: "Content",
-		id: "",
-		title: "",
-		revision: Date.prototype,
-		editor: ""
-	},
-	Link: {
-		/*
-		 * A Link is an Article reference that can appear within Content.  A Link's content is simply a cache/embed
-		 * of the Article.
-		 */
-		super$: "Article"
-	},
-	Receiver:{
-		super$: "Object",
-		receive: function(action, message) {
-			if (arguments.length === 1) message = [];
-			if (typeof this[action] != "function" || message.length === undefined) {
-				throw new Error("Invalid message");
-			}
-			return this[action].apply(this, message);
-		}
-	},
 	Part: {
 		super$: "Object",
 		type$of: "Part",
@@ -60,23 +30,8 @@ export default {
 			}
 		}
 	},
-	Component: {
-		super$: "Part",
-		part: {
-		},
-//		super: function(type) {
-//			let value = this;
-//			while (value) {
-//				value = this.sys.interfaceOf(value);
-//				if (value) {
-//					if (type == "" + value) return value;
-//					value = this.sys.prototypeOf(value);				
-//				}
-//			}
-//		}
-	},
 	Owner: {
-		super$: "Component",
+		super$: "Part",
 		of: null,
 		get$owner: function() {
 			return this;
@@ -102,7 +57,7 @@ export default {
 		}
 	},
 	Controller: {
-		super$: "Component",
+		super$: "Part",
 		control: function(control) {
 			control.controller = this;
 		},
@@ -169,6 +124,36 @@ function broadcast(on, action, signal) {
 	return action;
 }
 
+//Content: {
+//	super$: "Object",
+//	type: "",	
+//	content: null
+//	//label
+//},
+//Article: {
+//	super$: "Content",
+//	id: "",
+//	title: "",
+//	revision: Date.prototype,
+//	editor: ""
+//},
+//Link: {
+//	/*
+//	 * A Link is an Article reference that can appear within Content.  A Link's content is simply a cache/embed
+//	 * of the Article.
+//	 */
+//	super$: "Article"
+//},
+//Receiver:{
+//	super$: "Object",
+//	receive: function(action, message) {
+//		if (arguments.length === 1) message = [];
+//		if (typeof this[action] != "function" || message.length === undefined) {
+//			throw new Error("Invalid message");
+//		}
+//		return this[action].apply(this, message);
+//	}
+//},
 
 
 //processException: function(on, error) {
