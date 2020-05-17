@@ -18,7 +18,7 @@ export default {
 			let location = this.window.location;
 			if (location.search) {
 				this.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
-				this.service.get.service(this, "load", location.search.substring(1));
+				this.service.get.service(this, "load", location.search.substring(1) + ".view");
 			}
 			this.lastCommand = this.sys.extend();
 		}
@@ -56,6 +56,15 @@ export default {
 	},
 	Editor: {
 		super$: "ui.Viewer",
+		after$control: function(view) {
+			view.sense("event", "Click");
+			view.sense("event", "KeyDown");
+			view.sense("event", "MouseUp");
+			view.sense("event", "Input");
+			view.sense("event", "Cut");
+			view.sense("event", "Copy");
+			view.sense("event", "Paste");
+		},
 		draw: function(view) {
 			view.ribbon = this.part.ribbon.createView();
 			view.append(view.ribbon);
@@ -74,15 +83,6 @@ export default {
 				console.error("Command error", command, argument);
 				throw error;
 			}
-		},
-		after$control: function(view) {
-			view.sense("event", "Click");
-			view.sense("event", "KeyDown");
-			view.sense("event", "MouseUp");
-			view.sense("event", "Input");
-			view.sense("event", "Cut");
-			view.sense("event", "Copy");
-			view.sense("event", "Paste");
 		},
 		shortcut: {
 			"Control+S": "Save",
@@ -148,42 +148,16 @@ export default {
 //			MouseUp: function(event) {
 //				checkCaret(event);
 //			},
-			Save: function(event) {
-				event.action = ""; //Don't save locally.
-				let file = this.owner.window.location.search.substring(1);
-				this.owner.service.save.service(this.owner, "saved", JSON.stringify({
-					[file]: event.on.body.outerHTML
-				}));
-			},
-			Undo: function(event) {
-				this.owner.undo();
-			},
-			Redo: function(event) {
-				this.owner.redo();
-			},
-			KeyDown: function(event) {
-				event.device = this.owner.device.keyboard;
-				event.action = this.getShortcut(event) || this.getAction(event);
-			},
-			Click: function(event) {
-				console.log("click");
-				let action = event.target.parentNode.dataset.command;
-				if (action) event.action = action;
-			},
 //			SelectionChange: function(event) {
-//				checkCaret(event);
+//			checkCaret(event);
+//		},
+//			Undo: function(event) {
+//				this.owner.undo();
 //			},
-			Input: DEFAULT,
-			Cut: DEFAULT,
-			Copy: DEFAULT,
-			Paste: DEFAULT,
-			Delete: DEFAULT,
-
-			Insert: DEFAULT,
-			Erase: DEFAULT,
-			Split: DEFAULT,
-			Join: DEFAULT,
-			Character: function(event) {				
+//			Redo: function(event) {
+//				this.owner.redo();
+//			},
+//			Character: function(event) {				
 //				let range = event.owner.selection;
 //				if (range.collapsed) {
 //					replace.call(this, event, event.device.getCharacter(event));
@@ -193,6 +167,58 @@ export default {
 //				range.collapse();
 //				this.owner.selection = range;
 //				event.action = "";
+//			},
+
+			KeyDown: function(event) {
+				event.device = this.owner.device.keyboard;
+				event.action = this.getShortcut(event) || this.getAction(event);
+			},
+			Click: function(event) {
+				console.log("click");
+				let action = event.target.parentNode.dataset.command;
+				if (action) event.action = action;
+			},
+			Input: DEFAULT,
+			Cut: DEFAULT,
+			Copy: DEFAULT,
+			Paste: DEFAULT,
+			Delete: DEFAULT,
+			Insert: DEFAULT,
+			Erase: DEFAULT,
+			Split: DEFAULT,
+			Join: DEFAULT,
+			Character: DEFAULT,
+			
+			Save: function(event) {
+				event.action = ""; //Don't save locally.
+				let file = this.owner.window.location.search.substring(1) + ".view";
+				this.owner.service.save.service(this.owner, "saved", JSON.stringify({
+					[file]: event.on.body.outerHTML
+				}));
+			},
+			Heading: function(event) {
+				this.edit("formatBlock", "H1");
+				event.action = "";
+			},
+			Strong: function(event) {
+				this.edit("bold");
+				event.action = "";
+			},
+			Emphasis: function(event) {
+				this.edit("italic");
+				event.action = "";
+			},
+			Term: function(event) {
+				this.edit("underline");
+				event.action = "";
+			},
+			Items: function(event) {
+				this.edit("insertUnorderedList");
+				event.action = "";
+			},
+			List: function(event) {
+				this.edit("insertOrderedList");
+				event.action = "";
 			},
 			Promote: function(event) {
 				let node = event.owner.selection.container;
@@ -220,30 +246,6 @@ export default {
 					this.edit("insertUnorderedList");
 					event.action = "";
 				}
-			},
-			UnorderedList: function(event) {
-				this.edit("insertUnorderedList");
-				event.action = "";
-			},
-			OrderedList: function(event) {
-				this.edit("insertOrderedList");
-				event.action = "";
-			},
-			Heading: function(event) {
-				this.edit("formatBlock", "H1");
-				event.action = "";
-			},
-			Bold: function(event) {
-				this.edit("bold");
-				event.action = "";
-			},
-			Italic: function(event) {
-				this.edit("italic");
-				event.action = "";
-			},
-			Underline: function(event) {
-				this.edit("underline");
-				event.action = "";
 			},
 		},
 		getShortcut: function(event) {

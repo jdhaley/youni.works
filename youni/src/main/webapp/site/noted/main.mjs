@@ -1,9 +1,9 @@
 import component	from "../base/package/component.mjs";
 import client		from "../base/package/client.mjs";
-import ui			from "../base/package/ui.mjs";
 import cmd			from "../base/package/cmd.mjs";
+import ui			from "../browser/package/ui.mjs";
+import editor		from "../browser/package/editor.mjs";
 
-import editor		from "./package/editor.mjs";
 import services		from "./conf/services.mjs";
 import parts		from "./conf/parts.mjs";
 

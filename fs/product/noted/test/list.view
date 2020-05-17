@@ -1,4 +1,4 @@
-<article data-view="I4" tabindex="1">
+<article data-view="I4" contenteditable="true" tabindex="1">
 	<h1>list.view</h1>
 	<ul>
 		<li>item one</li>

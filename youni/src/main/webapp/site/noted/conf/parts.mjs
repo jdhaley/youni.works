@@ -18,33 +18,33 @@ export default {
 							"shortcut": "Control+S",
 							"icon": "save.png"					
 						},
-						Bold: {
+						Strong: {
 							"title": "Strong",
 							"shortcut": "Control+B",
 							"icon": "bold.gif"
 						},
-						Italic: {
+						Emphasis: {
 							"title": "Emphasis",
 							"shortcut": "Control+I",
 							"icon": "italic.gif"
 						},
-						Underline: {
+						Term: {
 							"title": "Term",
 							"shortcut": "Control+U",
 							"icon": "underline.gif"
 						},
-						UnorderedList: {
-							"title": "Itemize",
-							"icon": "dottedlist.gif"
-						},
-						OrderedList: {
-							"title": "List",
-							"shortcut": "Control+L",
-							"icon": "numberedlist.gif"
-						},
 						Heading: {
 							"title": "Heading",
 							"icon": "heading.png"
+						},
+						Items: {
+							"title": "Items",
+							"icon": "dottedlist.gif"
+						},
+						List: {
+							"title": "List",
+							"shortcut": "Control+L",
+							"icon": "numberedlist.gif"
 						},
 						Promote: {
 							"title": "Promote",
