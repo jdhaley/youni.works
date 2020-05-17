@@ -97,6 +97,8 @@ export default {
 		model: function(view) {
 			return view.textContent;
 		},
+		shortcut: {
+		},
 		action: {
 			draw: function(signal) {
 				this.draw(signal.on);
