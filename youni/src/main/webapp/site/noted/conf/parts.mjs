@@ -19,26 +19,26 @@ export default {
 							"icon": "save.png"					
 						},
 						Bold: {
-							"title": "Bold",
+							"title": "Strong",
 							"shortcut": "Control+B",
 							"icon": "bold.gif"
 						},
 						Italic: {
-							"title": "Italic",
+							"title": "Emphasis",
 							"shortcut": "Control+I",
 							"icon": "italic.gif"
 						},
 						Underline: {
-							"title": "Underline",
+							"title": "Term",
 							"shortcut": "Control+U",
 							"icon": "underline.gif"
 						},
 						UnorderedList: {
-							"title": "Bullets",
+							"title": "Itemize",
 							"icon": "dottedlist.gif"
 						},
 						OrderedList: {
-							"title": "Numbered list",
+							"title": "List",
 							"shortcut": "Control+L",
 							"icon": "numberedlist.gif"
 						},
