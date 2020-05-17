@@ -11,10 +11,8 @@ export default {
 			doc.execCommand("defaultParagraphSeparator", "BR");
 		},
 		activate: function() {
-			let controller = this.part.Editor;
-			let control = this.createView("main");
+			let control = this.part.Editor.createView();
 			this.content.append(control);
-			controller.control(control);
 			let location = this.window.location;
 			if (location.search) {
 				this.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
@@ -25,6 +23,16 @@ export default {
 	},
 	Editor: {
 		super$: "ui.Viewer",
+		after$initialize: function(conf) {
+			let actions = conf.actions;
+			for (let name in actions) {
+				conf = actions[name];
+				this.action[name] = conf.action;
+				if (conf.shortcut) this.shortcut[conf.shortcut] = name;
+				//we don't have a view so we can't create buttons yet.
+			}
+			this.actions = actions;
+		},
 //		part: {
 //			type$ribbon: "ui.Viewer",
 //			type$body: "ui.Viewer"
@@ -39,15 +47,32 @@ export default {
 			view.sense("event", "Paste");
 		},
 		draw: function(view) {
+			this.drawRibbon(view);
+			this.drawBody(view);
+			view.body.focus();	
+
+		},
+		drawRibbon: function(view) {
 			view.ribbon = this.part.ribbon.createView();
+			let markup = "";
+			for (let name in this.actions) {
+				let conf = this.actions[name];
+				if (conf.icon) {
+					let title = conf.title;
+					if (conf.shortcut) title += "\n" + conf.shortcut;
+					markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${conf.icon}'></img></button>`;
+				}
+			}
+			view.ribbon.innerHTML = markup;
 			view.append(view.ribbon);
+		},
+		drawBody: function(view) {
 			view.body = this.part.body.createView(view.model);
 			view.body.model = view.model;
 			view.body.contentEditable = true;
-			view.append(view.body);
 			view.body.tabIndex = 1;
-			view.caret = this.owner.createView("blink");
-			view.body.focus();
+//			view.caret = this.owner.createView("blink");
+			view.append(view.body);
 		},
 		extend$action: {
 			load: function(message) {

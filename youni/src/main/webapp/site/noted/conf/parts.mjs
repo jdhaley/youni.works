@@ -3,21 +3,28 @@ export default {
 	package$ui: "youni.works/ui",
 	package$editor: "youni.works/editor",
 	public: {
-		Ribbon: {
-			type$: "ui.Viewer",
-			draw: function(view) {
-				let markup = "";
-				for (let name in this.buttons) {
-					let command = this.buttons[name];
-					let title = command.title;
-					if (command.shortcut) title += "\n" + command.shortcut;
-					markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${command.icon}'></img></button>`;
-				}
-				view.innerHTML = markup;
-			}
-		},
 		Editor: {
 			type$: "editor.Editor",
+			controlName: "main",
+			part: {
+				ribbon: {
+					type$: "ui.Viewer",
+					controlName: "nav",
+					draw: function() {
+						//TODO the default viewer draws on a model.  The ribbon isn't a model view but a component.
+					}
+				},
+				body: {
+					type$: "ui.Viewer",
+					controlName: "article"
+				}
+			},
+			extend$shortcut: {
+			},
+			extend$action: {
+			}
+		}
+			/*
 			extend$shortcut: {
 				"Control+S": "Save",
 				"Control+B": "Bold",
@@ -57,124 +64,12 @@ export default {
 //					this.owner.selection = range;
 //					event.action = "";
 //				},
-				Save: function(event) {
-					event.action = ""; //Don't save locally.
-					let file = this.owner.window.location.search.substring(1) + ".view";
-					this.owner.service.save.service(this.owner, "saved", JSON.stringify({
-						[file]: event.on.body.outerHTML
-					}));
-				},
-				Heading: function(event) {
-					this.edit("formatBlock", "H1");
-					event.action = "";
-				},
-				Strong: function(event) {
-					this.edit("bold");
-					event.action = "";
-				},
-				Emphasis: function(event) {
-					this.edit("italic");
-					event.action = "";
-				},
-				Term: function(event) {
-					this.edit("underline");
-					event.action = "";
-				},
-				Items: function(event) {
-					this.edit("insertUnorderedList");
-					event.action = "";
-				},
-				List: function(event) {
-					this.edit("insertOrderedList");
-					event.action = "";
-				},
-				Promote: function(event) {
-					let node = event.owner.selection.container;
-					let level = this.getHeadingLevel(node.nodeName);
-					if (level > 1) {
-						this.edit("formatBlock", "H" + --level);
-						event.action = "";
-					} else if (node.nodeName == "LI") {
-						this.edit("outdent");
-						event.action = "";
-					} else {
-						event.action = "Join";
-					}
-				},
-				Demote: function(event) {
-					let node = event.owner.selection.container;
-					let level = this.getHeadingLevel(node.nodeName);
-					if (level && level < 6) {
-						this.edit("formatBlock", "H" + ++level);
-						event.action = "";
-					} else if (node.nodeName == "LI") {
-						this.edit("indent");
-						event.action = "";
-					} else {
-						this.edit("insertUnorderedList");
-						event.action = "";
-					}
-				},
 			},
 //			command: {
 //				type$Edit: "editor.Edit"
 //			},
-			part: {
-				ribbon: {
-					type$: "public.Ribbon",
-					controlName: "nav",
-					buttons: {
-						Save: {
-							"title": "Save",
-							"shortcut": "Control+S",
-							"icon": "save.png"					
-						},
-						Strong: {
-							"title": "Strong",
-							"shortcut": "Control+B",
-							"icon": "bold.gif"
-						},
-						Emphasis: {
-							"title": "Emphasis",
-							"shortcut": "Control+I",
-							"icon": "italic.gif"
-						},
-						Term: {
-							"title": "Term",
-							"shortcut": "Control+U",
-							"icon": "underline.gif"
-						},
-						Heading: {
-							"title": "Heading",
-							"icon": "heading.png"
-						},
-						Items: {
-							"title": "Items",
-							"icon": "dottedlist.gif"
-						},
-						List: {
-							"title": "List",
-							"shortcut": "Control+L",
-							"icon": "numberedlist.gif"
-						},
-						Promote: {
-							"title": "Promote",
-							"shortcut": "Control+Backspace",
-							"icon": "outdent.gif"
-						},
-						Demote: {
-							"title": "Demote",
-							"shortcut": "Control+Space",
-							"icon": "indent.gif"
-						}
-					}
-				},
-				body: {
-					type$: "ui.Viewer",
-					controlName: "article"
-				}
-			}
 		}
+		*/
 	}
 }
 

@@ -3,6 +3,14 @@ export default {
 	package$component: "youni.works/component",
 	Frame: {
 		super$: "component.Owner",
+		window: null,
+		get$content: function() {
+			return this.window.document.body;
+		},
+		var$controller: {
+		},
+		var$device: {
+		},
 		before$initialize: function(conf) {
 			this.initializePlatform(conf);
 		},
@@ -62,15 +70,6 @@ export default {
 					}
 				});
 			}
-		},
-		getNode: function(path) {
-			path = path.split("/");
-			let node = this.window.document;
-			for (let i = 0 ; i < path.length; i++) {
-				node = node.childNodes[1 * path[i]];
-				if (!node) throw new Error("Invalid Path.");
-			}
-			return node;
 		}
 	},
 	Viewer: {
