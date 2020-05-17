@@ -16,7 +16,7 @@ export default {
 		shortcut: "Control+B",
 		icon: "bold.gif",
 		action: function(event) {
-			this.edit("bold");
+			edit.call(this, "bold");
 			event.action = "";
 		}
 	},
@@ -25,7 +25,7 @@ export default {
 		shortcut: "Control+I",
 		icon: "italic.gif",
 		action: function(event) {
-			this.edit("italic");
+			edit.call(this, "italic");
 			event.action = "";
 		}
 	},
@@ -34,7 +34,7 @@ export default {
 		shortcut: "Control+U",
 		icon: "underline.gif",
 		action: function(event) {
-			this.edit("underline");
+			edit.call(this, "underline");
 			event.action = "";
 		}
 	},
@@ -42,7 +42,7 @@ export default {
 		title: "Heading",
 		icon: "heading.png",
 		action: function(event) {
-			this.edit("formatBlock", "H1");
+			edit.call(this, "formatBlock", "H1");
 			event.action = "";
 		}
 	},
@@ -50,7 +50,7 @@ export default {
 		title: "Items",
 		icon: "dottedlist.gif",
 		action: function(event) {
-			this.edit("insertUnorderedList");
+			edit.call(this, "insertUnorderedList");
 			event.action = "";
 		}
 	},
@@ -59,7 +59,7 @@ export default {
 		shortcut: "Control+L",
 		icon: "numberedlist.gif",
 		action: function(event) {
-			this.edit("insertOrderedList");
+			edit.call(this, "insertOrderedList");
 			event.action = "";
 		}
 	},
@@ -69,12 +69,12 @@ export default {
 		icon: "outdent.gif",
 		action: function(event) {
 			let node = event.owner.selection.container;
-			let level = this.getHeadingLevel(node.nodeName);
+			let level = getHeadingLevel(node.nodeName);
 			if (level > 1) {
-				this.edit("formatBlock", "H" + --level);
+				edit.call(this, "formatBlock", "H" + --level);
 				event.action = "";
 			} else if (node.nodeName == "LI") {
-				this.edit("outdent");
+				edit.call(this, "outdent");
 				event.action = "";
 			} else {
 				event.action = "Join";
@@ -87,17 +87,55 @@ export default {
 		icon: "indent.gif",
 		action: function(event) {
 			let node = event.owner.selection.container;
-			let level = this.getHeadingLevel(node.nodeName);
+			let level = getHeadingLevel(node.nodeName);
 			if (level && level < 6) {
-				this.edit("formatBlock", "H" + ++level);
+				edit.call(this, "formatBlock", "H" + ++level);
 				event.action = "";
 			} else if (node.nodeName == "LI") {
-				this.edit("indent");
+				edit.call(this, "indent");
 				event.action = "";
 			} else {
-				this.edit("insertUnorderedList");
+				edit.call(this, "insertUnorderedList");
 				event.action = "";
 			}
 		}
 	}
 }
+
+function edit(command, argument) {
+	try {
+		this.owner.window.document.execCommand(command, false, argument || "");   				
+	} catch (error) {
+		console.error("Command error", command, argument);
+		throw error;
+	}
+}
+
+function getHeadingLevel(name) {
+	if (name.length == 2 && name.charAt(0) == "H") {
+		let level = "123456".indexOf(name.charAt(1))
+		if (level >= 0) return level + 1;
+	}
+	return 0;
+}
+
+//getType: function(node) {
+//if (node.nodeType != Node.ELEMENT_NODE) return node.nodeName;
+//if (this.getHeadingLevel) return "heading";
+//switch (node.nodeName) {
+//	case "UL":
+//	case "OL":
+//		return "list";
+//	case "LI":
+//		return "item";
+//	case "A":
+//	case "B":
+//	case "I":
+//	case "U":
+//	case "Q":
+//	case "EM":
+//	case "STRONG":
+//		return "tag";
+//}
+//return "";
+//},
