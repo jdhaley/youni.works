@@ -61,7 +61,7 @@ export default {
 			view.append(view.ribbon);
 			view.body = this.part.body.createView(view.model);
 			view.body.model = view.model;
-			//view.body.contentEditable = true;
+			view.body.contentEditable = true;
 			view.append(view.body);
 			view.body.tabIndex = 1;
 			view.caret = this.owner.createView("blink");
@@ -86,14 +86,14 @@ export default {
 		},
 		shortcut: {
 			"Control+S": "Save",
-//			"Control+B": "Bold",
-//			"Control+I": "Italic",
-//			"Control+U": "Underline",
-//			"Control+Backspace": "Promote",
-//			"Control+Space": "Demote",
-//			"Control+L": "OrderedList",
-			"Control+Z": "Undo",
-			"Control+Y": "Redo"
+			"Control+B": "Bold",
+			"Control+I": "Italic",
+			"Control+U": "Underline",
+			"Control+Backspace": "Promote",
+			"Control+Space": "Demote",
+			"Control+L": "OrderedList",
+//			"Control+Z": "Undo",
+//			"Control+Y": "Redo"
 		},
 		getType: function(node) {
 			if (node.nodeType != Node.ELEMENT_NODE) return node.nodeName;
@@ -141,13 +141,13 @@ export default {
 				message.on.model = model;
 				message.action = "draw";
 			},
-			MouseDown: function(event) {
-				let caret = event.on.caret;
-				caret.style.width = "0px";				
-			},
-			MouseUp: function(event) {
-				checkCaret(event);
-			},
+//			MouseDown: function(event) {
+//				let caret = event.on.caret;
+//				caret.style.width = "0px";				
+//			},
+//			MouseUp: function(event) {
+//				checkCaret(event);
+//			},
 			Save: function(event) {
 				event.action = ""; //Don't save locally.
 				let file = this.owner.window.location.search.substring(1);
@@ -170,9 +170,9 @@ export default {
 				let action = event.target.parentNode.dataset.command;
 				if (action) event.action = action;
 			},
-			SelectionChange: function(event) {
-				checkCaret(event);
-			},
+//			SelectionChange: function(event) {
+//				checkCaret(event);
+//			},
 			Input: DEFAULT,
 			Cut: DEFAULT,
 			Copy: DEFAULT,
@@ -184,15 +184,15 @@ export default {
 			Split: DEFAULT,
 			Join: DEFAULT,
 			Character: function(event) {				
-				let range = event.owner.selection;
-				if (range.collapsed) {
-					replace.call(this, event, event.device.getCharacter(event));
-				} else {
-					replace.call(this, event, event.device.getCharacter(event));
-				}
-				range.collapse();
-				this.owner.selection = range;
-				event.action = "";
+//				let range = event.owner.selection;
+//				if (range.collapsed) {
+//					replace.call(this, event, event.device.getCharacter(event));
+//				} else {
+//					replace.call(this, event, event.device.getCharacter(event));
+//				}
+//				range.collapse();
+//				this.owner.selection = range;
+//				event.action = "";
 			},
 			Promote: function(event) {
 				let node = event.owner.selection.container;
