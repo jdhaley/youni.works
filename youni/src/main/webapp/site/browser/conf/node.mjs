@@ -1,4 +1,9 @@
+let LAST_NODE_ID = 0;
+
 export default {
+	once$nodeId: function() {
+		return ++LAST_NODE_ID;
+	},
 	get$owner: function() {
 		return this.ownerDocument.owner;
 	},
