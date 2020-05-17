@@ -4,7 +4,7 @@
 	<groupId>youniworks</groupId>
 	<artifactId>youni</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.2</version>
+	<version>20138-0.0.3-candidate</version>
 	<name>youni Webapp</name>
 	<url>http://youni.works</url>
 	<dependencies>
