@@ -1,1 +1,17 @@
-<article data-view="I4" tabindex="1"><h1>list.vieadsfasdfa sdfasdaf asdfaw</h1><ul><li>sddfdsasfdsafdsafdsfdsadsafsfdfdafsddd</li>one dfasdfa sfasdf- the firsafasdfas sfaasddof the list<li>fsdafdsafdsafdfdsafssd</li><ol><li>safdsafdsafda items</li><li>sfdfdssssssssssfsfsfddsbb itema</li></ol><li>dsadsfafdends</li></ul></article>
+<article data-view="I4" tabindex="1">
+	<h1>list.view</h1>
+	<ul>
+		<li>item one</li>
+		<li>item two
+			<ol>
+				<li>item
+					<ol>
+						<li>nested item</li>
+					</ol>
+				</li>
+				<li>item</li>
+			</ol>
+		</li>
+		<li>last item</li>
+	</ul>
+</article>

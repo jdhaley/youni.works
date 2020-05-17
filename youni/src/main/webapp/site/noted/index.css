@@ -1,3 +1,16 @@
+ul {
+	padding-left: 1.5em;
+}
+ol {
+  counter-reset: section;
+  list-style-type: none;
+  padding-left: 1.5em;
+}
+ol>li::before {
+  counter-increment: section;
+  content: counters(section,".") ". ";
+}
+
 html, body, main {
 	display: flex;
 	flex: 1;

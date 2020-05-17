@@ -99,15 +99,16 @@ export default {
 			if (node.nodeType != Node.ELEMENT_NODE) return node.nodeName;
 			if (this.getHeadingLevel) return "heading";
 			switch (node.nodeName) {
-				case "LI":
-				case "P":
-					return "item";
 				case "UL":
 				case "OL":
 					return "list";
+				case "LI":
+					return "item";
+				case "A":
 				case "B":
 				case "I":
 				case "U":
+				case "Q":
 				case "EM":
 				case "STRONG":
 					return "tag";
