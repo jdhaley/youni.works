@@ -1,14 +1,13 @@
 ul {
-	padding-left: 1.5em;
+	display: span;
+	padding-left: 1em;
+	font-size: 10pt;
 }
-ol {
-  counter-reset: section;
-  list-style-type: none;
-  padding-left: 1.5em;
-}
-ol>li::before {
-  counter-increment: section;
-  content: counters(section,".") ". ";
+li {
+	list-style: none;
+	margin-left: -1em;
+	padding-left: 1em;
+	border-bottom: .5px dashed lightsteelblue;
 }
 
 html, body, main {
@@ -74,6 +73,7 @@ button>img {
 	width: 24px;
 	height: 24px;
 }
+/*
 p, ul, ol {
 	padding-top: 2px;
 	padding-bottom: 0;
@@ -83,3 +83,4 @@ p, ul, ol {
 p {
 	border-top: 1px dotted silver;
 }
+*/
