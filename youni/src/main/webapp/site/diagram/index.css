@@ -1,0 +1,53 @@
+* {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+main {
+	padding: 0;
+	margin: 0;
+	overflow: auto;
+}
+
+main>nav {
+	display: flex;
+	background: black;
+}
+.actions {
+	padding-left: 4px;
+	padding-right: 4px;
+	border-right: 1px solid darkgray;
+}
+button {
+	padding: 0;
+	margin: 1px;
+	border: 0;
+	width: 24px;
+	height: 24px;
+}
+button>img {
+	width: 100%;
+	height: 100%;
+}
+dt {
+	font-weight: bold;
+	color: steelblue;
+	display: inline;
+}
+dt:after {
+	content: ": ";
+}
+button>img {
+	margin: 1px;
+	width: 24px;
+	height: 24px;
+}
+p, ul, ol {
+	padding-top: 2px;
+	padding-bottom: 0;
+	margin: 0;
+	font-family: sans-serif;
+}
+p {
+	border-top: 1px dotted silver;
+}
