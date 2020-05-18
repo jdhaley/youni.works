@@ -54,8 +54,8 @@ export default {
 		draw: function(view) {
 			this.drawRibbon(view);
 			this.drawBody(view);
+			//view.caret = this.owner.createView("blink");
 			view.body.focus();	
-
 		},
 		drawRibbon: function(view) {
 			view.ribbon = this.part.ribbon.createView();
@@ -81,7 +81,6 @@ export default {
 			view.body.model = view.model;
 			view.body.contentEditable = true;
 			view.body.tabIndex = 1;
-//			view.caret = this.owner.createView("blink");
 			view.append(view.body);
 		},
 		extend$action: {
@@ -158,10 +157,10 @@ function getAction(event) {
 			return "Delete";
 		case "Backspace":
 			event.back = true;
-			if (range.collapsed && range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset) return "Erase";
+			if (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset) return "Erase";
 			return "Promote";
 		case " ":
-			if (range.collapsed && range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset) return "Character";
+			if (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset) return "Character";
 			return "Demote";
 		case "Enter":
 			if (isCollapsed) {
