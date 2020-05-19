@@ -144,13 +144,6 @@ export default {
 			}
 			this.group = group;
 		},
-		open: function() {
-			let location = this.owner.window.location;
-			if (location.search) {
-				this.owner.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
-				this.owner.service.get.service(this.owner, "load", location.search.substring(1) + ".view");
-			}
-		},
 		getShortcut: function(event) {
 			let shortcut = event.device.getShortcut(event);
 			return this.shortcut[shortcut];
@@ -160,7 +153,11 @@ export default {
 		},
 		extend$action: {
 			open: function(on, message) {
-				this.open();				
+				let location = this.owner.window.location;
+				if (location.search) {
+					this.owner.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
+					this.owner.service.get.service(this.owner, "load", location.search.substring(1) + ".view");
+				}
 			},
 			load: function(on, message) {
 				let model = "";

@@ -8,6 +8,7 @@ export default {
 		super$: "Object",
 		var$action: ""
 	},
+		
 	Receiver: {
 		super$: "Object",
 		receive: function(message) {
@@ -61,13 +62,13 @@ export default {
 				this.part[name].initialize(config);
 			}
 		},
-		initialize__action: function(event) {
+		initialize__action: function(message) {
 			this.sys.implement(this, {
 				id: ++LAST_PART_NO,
-				of: event.component,
+				of: message.component,
 				initialize: NIL
 			});
-			event.component = this;
+			message.component = this;
 		},
 	},
 	Owner: {
