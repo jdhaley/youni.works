@@ -1,15 +1,32 @@
-let PART_NUMBER = 0;
+let LAST_PART_NUMBER = 0;
 const NIL = () => undefined;
 Symbol.Signal = Symbol("signal");
 
 export default {
 	package$: "youni.works/component",
-	Part: {
+	Event: {
 		super$: "Object",
+		var$action: ""
+	},
+	Receiver: {
+		super$: "Object",
+		receive: function(event) {
+		}
+	},
+	Part: {
+		super$: "Receiver",
+		id: 0,
 		type$of: "Part",
-		name: "",
-		get$owner: function() {
+		part: {
+		},
+		once$owner: function() {
 			return this.of && this.of != this && this.of.owner;
+		},
+		once$name: function() {
+			if (this.of) for (let name in this.of.part) {
+				if (this.part[name] == this) return name;
+			}
+			return "";
 		},
 		get$pathname: function() {
 			if (this.name) {
@@ -18,15 +35,33 @@ export default {
 			}
 			return "";
 		},
+		get$log: function() {
+			return this.of && this.of.log;
+		},
 		initialize: function(config) {
 			this.sys.define(this, "initialize", NIL);
-			this.sys.define(this, "id", ++PART_NUMBER, "const");
+			this.sys.define(this, "id", ++LAST_PART_NUMBER, "const");
 			this.sys.define(this, "of", config.component, "const");
 			this.sys.define(this, "name", config.name, "const");
 			config.component = this;
 			for (let name in this.part) {
 				config.name = name;
 				this.part[name].initialize(config);
+			}
+		},
+		initialize__action: function(event) {
+			this.sys.implement(this, {
+				id: ++LAST_PART_NO,
+				of: event.component,
+				initialize: NIL
+			});
+			event.component = this;
+		},
+		receive: function(event) {
+			if (typeof this[event.action] == "function") this[event.action](event);
+			for (let name in this.part) {
+				if (!event.action) return;
+				this.part[name].receive(event);
 			}
 		}
 	},
@@ -36,24 +71,19 @@ export default {
 		get$owner: function() {
 			return this;
 		},
+		log: console,
 		content: null,
-		receive: function(action, message) {
-			if (!(message && message[Symbol.Signal])) {
-				message = this.sys.extend(null, {
-					content: message
-				});
-				message[Symbol.Signal] = "Message";
-			}
-			if (message.selector) {
-				this.propagate.broadcast(this.content, action, message);
+		receive: function(signal) {
+			if (signal.selector) {
+				this.propagate.broadcast(this.content, signal);
 			} else {
-				this.propagate.down(this.content, action, message);
+				this.propagate.down(this.content, signal);
 			}
 		},
 		propagate: {
-			up: up,
-			down: down,
-			broadcast: broadcast
+			up: (on, event) => undefined,
+			down: (on, message) => undefined,
+			broadcast: (on, signal) => undefined
 		}
 	},
 	Controller: {
@@ -61,67 +91,27 @@ export default {
 		control: function(control) {
 			control.controller = this;
 		},
-		process: function(on, action, message) {
-			if (message == undefined) message = this.sys.extend();
-			message.action = action;
+		process: function(on, event) {
+			let action = event.action;
 			while (action && this.action[action]) try {
-				message.on = on;
-				message.action = action;
-				this.action[action].call(this, message);
-				action = message.action == action ? "" : message.action;
+				this.action[action].call(this, on, event);
+				action = (event.action == action ? "" : event.action);
 			} catch (error) {
-				error.message = `Error processing action "${action}": ` + error.message;
-				error.source = message;
-				if (message instanceof Error) {
-					console.error(error);
-					return;
-				}
-				return this.process(on, "error", error);
+				error.message = `Error processing action "${event.action}": ` + error.message;
+				/* Stop the event if the exception action threw an error */
+				if (event.action == "exception") throw error;
+				event.error = error;
+				event.action = "exception";
+				return this.process(on, event);
 			}
-			return message.action;
-		},
-		exception: function(on, error) {
-			console.error(on, error);
 		},
 		action: {
-			error: function(signal) {
-				console.error(signal);
+			exception: function(on, event) {
+				this.log.error(event.error);
+				event.action = "";
 			}
 		}
 	}
-}
-
-function up(on, action, message) {
-	while (action && on) {
-		if (on.controller) action = on.controller.process(on, action, message);
-		on = on.parentNode;
-	}
-	return action;
-}
-
-function down(on, action, message) {
-	if (on && on.controller && action) {
-		action = on.controller.process(on, action, message);
-	}
-	if (action) for (on of on.childNodes) {
-		action = down(on, action, message);
-		if (!action) break;
-	}
-	return action;
-}
-
-function broadcast(on, action, signal) {
-	let list = [];
-	if (action) try {
-		list = on.querySelectorAll(signal.selector);
-	} catch (e) {
-		console.err(e);
-	}
-	for (let on of list) if (action) {
-		if (on.controller) action = on.controller.process(on, action, signal);
-		if (!action) break;
-	}
-	return action;
 }
 
 //Content: {
@@ -154,18 +144,3 @@ function broadcast(on, action, signal) {
 //		return this[action].apply(this, message);
 //	}
 //},
-
-
-//processException: function(on, error) {
-////If an exception occurs processing exceptions, throw
-////as we don't want exception cycles to occur.
-//if (error.action == "error") throw error;
-//error.sourceAction = error.action;
-//error = new CustomEvent("error", {
-//	bubbles: true,
-//	detail: error
-//});
-//on.dispatchEvent(e);
-//},
-
-

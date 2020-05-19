@@ -1,22 +1,22 @@
 //EDITOR:
 extend$action: {
-	MouseDown: function(event) {
-		let caret = event.on.caret;
+	MouseDown: function(on, event) {
+		let caret = on.caret;
 		caret.style.width = "0px";				
 	},
-	MouseUp: function(event) {
+	MouseUp: function(on, event) {
 		checkCaret(event);
 	},
-	SelectionChange: function(event) {
+	SelectionChange: function(on, event) {
 		checkCaret(event);
 	},
-	Undo: function(event) {
+	Undo: function(on, event) {
 		this.owner.undo();
 	},
-	Redo: function(event) {
+	Redo: function(on, event) {
 		this.owner.redo();
 	},
-	Character: function(event) {				
+	Character: function(on, event) {				
 		let range = event.owner.selection;
 		if (range.collapsed) {
 			replace.call(this, event, event.device.getCharacter(event));
@@ -34,11 +34,11 @@ command: {
 
 function checkCaret(event) {
 	let range = event.owner.selection;
-	let caret = event.on.caret;
+	let caret = on.caret;
 	if (range.collapsed) {
-		if (!caret.parentNode) event.on.body.append(caret);
+		if (!caret.parentNode) on.body.append(caret);
 		let rect = range.getBoundingClientRect();
-		caret.style.top = rect.top - event.on.body.getBoundingClientRect().top + "px";
+		caret.style.top = rect.top - on.body.getBoundingClientRect().top + "px";
 		caret.style.left = rect.left + "px";
 		caret.style.height = rect.height + "px";
 		caret.style.width = "1px";

@@ -9,8 +9,6 @@ export default {
 		},
 		var$controller: {
 		},
-		var$device: {
-		},
 		before$initialize: function(conf) {
 			this.initializePlatform(conf);
 		},
@@ -46,28 +44,54 @@ export default {
 				return range;
 			}
 		},
+		var$device: {
+		},
+		propagate: {
+			up: function(on, event) {
+				while (on && event.action) {
+					event[Symbol.Signal] = "event";
+					on.receive && on.receive(event);
+					on = on.parentNode;
+				}
+			},
+			down: function down(on, message) {
+				message[Symbol.Signal] = "message";
+				if (message.action) on.receive && on.receive(message);
+				if (message.action) for (on of on.childNodes) {
+					down(on, message);
+					if (!message.action) break;
+				}
+			},
+			broadcast: function(on, signal) {
+				if (!signal.action) return;
+				let list = on.querySelectorAll(signal.selector);
+				for (let on of list) {
+					signal[Symbol.Signal] = "broadcast";
+					on.receive && on.receive(signal);
+					if (!signal.action) break;
+				}
+			}
+		},
 		sense: {
 			event: function(target, action) {
-				let owner = target.controller.owner;
-				let up = owner.propagate.up;
+				const owner = target.owner;
+				const up = owner.propagate.up;
 				target.addEventListener(action.toLowerCase(), event => {
-					event[Symbol.Signal] = "Event";
 					event.owner = owner;
-					if (!up(event.target, action, event)) {
-						event.preventDefault();
-					}
+					event.action = action;
+					up(event.target, event);
+					if (!event.action) event.preventDefault();
 				});
 			},
 			//Propagate from the selection container rather than the event target:
 			selection: function(target, action) {
-				//target.owner is allow document.selectionChange 
-				const owner = target.owner || target.controller.owner;
+				const owner = target.owner;
+				const up = owner.propagate.up;
 				target.addEventListener(action.toLowerCase(), event => {
-					event[Symbol.Signal] = "Event";
 					event.owner = owner;
-					if (!owner.propagate.up(owner.selection.commonAncestorContainer, action, event)) {
-						event.preventDefault();
-					}
+					event.action = action;
+					up(owner.selection.commonAncestorContainer, event);
+					if (!event.action) event.preventDefault();
 				});
 			}
 		}
@@ -96,15 +120,11 @@ export default {
 		model: function(view) {
 			return view.textContent;
 		},
-		shortcut: {
+		extend$shortcut: {
 		},
-		action: {
-			draw: function(signal) {
-				this.draw(signal.on);
-			},
-			error: function(error) {
-				console.log(error);
-				error.action = "";
+		extend$action: {
+			draw: function(on, signal) {
+				this.draw(on);
 			}
 		}
 	}

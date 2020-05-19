@@ -25,26 +25,16 @@ export default {
 				case 3:	// LOADING Downloading; responseText holds partial data.
 					break;
 				case 4: // DONE The operation is complete.
-//					let action = "Response";
-//					if (xhr.status != 200) {
-//						action = "Error";
-//						if (xhr.status == 341 && xhr.responseText == "AUTHENTICATE") {
-//							action = "Authenticate";
-//						}
-//					}
 					xhr.message.status = xhr.status;
-					xhr.message.response = xhr.responseText;
-					this.respond(xhr.receiver, xhr.message);
+					xhr.message.content = xhr.responseText;
+					xhr.receiver.receive(xhr.message);
 			}
-		},
-		respond: function(receiver, message) {
-			receiver.receive(message.subject, message);
 		},
 		createMessage: function(receiver, subject, request) {
 			let message = this.sys.extend();
-			message.subject = subject;
-			message.request = this.getRequest(receiver, subject, request);
+			message.action = subject;
 			message.url = this.getUrl(receiver, subject, request);
+			message.request = this.getRequest(receiver, subject, request);
 			return message;
 		},
 		getRequest: function(receiver, subject, request) {

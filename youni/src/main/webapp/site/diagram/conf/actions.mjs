@@ -4,11 +4,11 @@ export default {
 		title: "Save",
 		shortcut: "Control+S",
 		icon: "save.png",
-		action: function(event) {
+		action: function(on, event) {
 			event.action = ""; //Don't save locally.
 			let file = this.owner.window.location.search.substring(1) + ".view";
 			this.owner.service.save.service(this.owner, "saved", JSON.stringify({
-				[file]: event.on.body.outerHTML
+				[file]: on.body.outerHTML
 			}));
 		}
 	},
@@ -16,7 +16,7 @@ export default {
 		group: "Edit",
 		shortcut: "Control+Z",
 		icon: "undo.gif",
-		action: function(event) {
+		action: function(on, event) {
 			this.owner.undo();
 		}
 	},
@@ -24,7 +24,7 @@ export default {
 		group: "Edit",
 		shortcut: "Control+Y",
 		icon: "redo.gif",
-		action: function(event) {
+		action: function(on, event) {
 			this.owner.redo();
 		}
 	},
@@ -33,7 +33,7 @@ export default {
 		title: "Strong",
 		shortcut: "Control+B",
 		icon: "bold.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "bold");
 			event.action = "";
 		}
@@ -43,7 +43,7 @@ export default {
 		title: "Emphasis",
 		shortcut: "Control+I",
 		icon: "italic.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "italic");
 			event.action = "";
 		}
@@ -53,7 +53,7 @@ export default {
 		title: "Term",
 		shortcut: "Control+U",
 		icon: "underline.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "underline");
 			event.action = "";
 		}
@@ -62,7 +62,7 @@ export default {
 		group: "Outline",
 		title: "Heading",
 		icon: "heading.png",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "formatBlock", "H1");
 			event.action = "";
 		}
@@ -71,7 +71,7 @@ export default {
 		group: "Outline",
 		title: "Items",
 		icon: "dottedlist.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "insertUnorderedList");
 			event.action = "";
 		}
@@ -81,7 +81,7 @@ export default {
 		title: "List",
 		shortcut: "Control+L",
 		icon: "numberedlist.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "insertOrderedList");
 			event.action = "";
 		}
@@ -91,7 +91,7 @@ export default {
 		title: "Promote",
 		shortcut: "Control+Backspace",
 		icon: "outdent.gif",
-		action: function(event) {
+		action: function(on, event) {
 			let node = event.owner.selection.container;
 			let level = getHeadingLevel(node.nodeName);
 			if (level > 1) {
@@ -110,7 +110,7 @@ export default {
 		title: "Demote",
 		shortcut: "Control+Space",
 		icon: "indent.gif",
-		action: function(event) {
+		action: function(on, event) {
 			let node = event.owner.selection.container;
 			let level = getHeadingLevel(node.nodeName);
 			if (level && level < 6) {

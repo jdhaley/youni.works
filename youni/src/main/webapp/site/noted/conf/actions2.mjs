@@ -4,7 +4,7 @@ export default {
 		title: "Save",
 		shortcut: "Control+S",
 		icon: "save.png",
-		action: function(event) {
+		action: function(on, event) {
 			event.action = ""; //Don't save locally.
 			let file = this.owner.window.location.search.substring(1) + ".view";
 			this.owner.service.save.service(this.owner, "saved", JSON.stringify({
@@ -17,7 +17,7 @@ export default {
 		title: "Strong",
 		shortcut: "Control+B",
 		icon: "bold.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "bold");
 			event.action = "";
 		}
@@ -27,7 +27,7 @@ export default {
 		title: "Emphasis",
 		shortcut: "Control+I",
 		icon: "italic.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "italic");
 			event.action = "";
 		}
@@ -37,7 +37,7 @@ export default {
 		title: "Term",
 		shortcut: "Control+U",
 		icon: "underline.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "underline");
 			event.action = "";
 		}
@@ -46,7 +46,7 @@ export default {
 		group: "Outline",
 		title: "Heading",
 		icon: "heading.png",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "formatBlock", "H1");
 			event.action = "";
 		}
@@ -55,7 +55,7 @@ export default {
 		group: "Outline",
 		title: "Items",
 		icon: "dottedlist.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "insertUnorderedList");
 			event.action = "";
 		}
@@ -65,7 +65,7 @@ export default {
 		title: "List",
 		shortcut: "Control+L",
 		icon: "numberedlist.gif",
-		action: function(event) {
+		action: function(on, event) {
 			edit.call(this, "insertOrderedList");
 			event.action = "";
 		}
@@ -75,7 +75,7 @@ export default {
 		title: "Promote",
 		shortcut: "Control+Backspace",
 		icon: "outdent.gif",
-		action: function(event) {
+		action: function(on, event) {
 			let node = event.owner.selection.container;
 			let type = getContainerType(node);
 			switch (type) {
@@ -98,7 +98,7 @@ export default {
 		title: "Demote",
 		shortcut: "Control+Space",
 		icon: "indent.gif",
-		action: function(event) {
+		action: function(on, event) {
 			let node = event.owner.selection.container;
 			let type = getContainerType(node);
 			switch (type) {

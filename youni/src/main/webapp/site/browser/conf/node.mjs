@@ -10,6 +10,9 @@ export default {
 	once$controller: function() {
 		if (this.nodeType == Node.ELEMENT_NODE) return this.owner.controller[this.dataset.view];
 	},
+	receive: function(message) {
+		this.controller && this.controller.process(this, message);
+	},
 	sense: function(sensorType, action) {
 		if (this.nodeType == Node.ELEMENT_NODE || this.nodeType == Node.DOCUMENT_NODE) {
 			this.owner.sense[sensorType](this, action);

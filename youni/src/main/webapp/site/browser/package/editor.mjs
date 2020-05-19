@@ -84,29 +84,29 @@ export default {
 			view.append(view.body);
 		},
 		extend$action: {
-			load: function(message) {
+			load: function(on, message) {
 				let model = "";
-				switch (message.content.status) {
+				switch (message.status) {
 					case 200:
 						model = this.owner.createView("div");
-						model.innerHTML = message.content.response;
+						model.innerHTML = message.content;
 						model = model.firstChild.innerHTML;
 						break;
 					case 404:
 						model = "<h1>" + this.owner.window.document.title + " (New)</h1>";
 						break;
 					default:
-						model = "<font color=red>" + message.content.response + "</font>";
+						model = "<font color=red>" + message.content + "</font>";
 						break;
 				}
-				message.on.model = model;
+				on.model = model;
 				message.action = "draw";
 			},
-			KeyDown: function(event) {
+			KeyDown: function(on, event) {
 				event.device = this.owner.device.keyboard;
 				event.action = this.getShortcut(event) || this.getAction(event);
 			},
-			Click: function(event) {
+			Click: function(on, event) {
 				console.log("click");
 				let action = event.target.parentNode.dataset.command;
 				if (action) event.action = action;
@@ -144,7 +144,7 @@ function getAction(event) {
 				/* Shift+Insert is an alternate binding to Paste, on Windows at least.
 				 * We use this fact to event an alternate *trusted* paste.
 				 */
-				event.on.pasteSpecial = true;
+				//////////////on.pasteSpecial = true;
 				event.action = "DEFAULT";
 				//////////////this.turn.end(event, "Default");
 			} else {
