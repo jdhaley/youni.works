@@ -1,47 +1,16 @@
 export default {
 	package$: "youni.works/editor",
 	package$ui: "youni.works/ui",
-	package$cmd: "youni.works/cmd",
-	Frame: {
-		super$: "ui.Frame",
-		after$initializePlatform: function(conf) {
-			let doc = this.window.document;
-			this.sense.selection(doc, "SelectionChange");
+	Editor: {
+		super$: "ui.Main",
+		after$initialize: function(conf) {
+			let doc = this.owner.window.document;
+			this.owner.sense.selection(doc, "SelectionChange");
 			doc.execCommand("styleWithCSS", true);
 			doc.execCommand("defaultParagraphSeparator", "BR");
+			//	sys.implement(this, cmd.Commander);
+			//this.lastCommand = this.sys.extend();
 		},
-		activate: function() {
-			let control = this.part.Editor.createView();
-			this.content.append(control);
-			let location = this.window.location;
-			if (location.search) {
-				this.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
-				this.service.get.service(this, "load", location.search.substring(1) + ".view");
-			}
-			this.lastCommand = this.sys.extend();
-		}
-	},
-	Editor: {
-		super$: "ui.Viewer",
-		after$initialize: function(conf) {
-			let actions = conf.actions;
-			let group = this.sys.extend();
-			for (let name in actions) {
-				conf = actions[name];
-				this.action[name] = conf.action;
-				if (conf.shortcut) this.shortcut[conf.shortcut] = name;
-				if (conf.group) {
-					if (!group[conf.group]) group[conf.group] = this.sys.extend();
-					group[conf.group][name] = conf;
-				}
-				//we don't have a view so we can't create buttons yet.
-			}
-			this.group = group;
-		},
-//		part: {
-//			type$ribbon: "ui.Viewer",
-//			type$body: "ui.Viewer"
-//		},
 		after$control: function(view) {
 			view.sense("event", "Click");
 			view.sense("event", "KeyDown");
@@ -83,34 +52,8 @@ export default {
 			view.body.tabIndex = 1;
 			view.append(view.body);
 		},
+		getAction: getAction,
 		extend$action: {
-			load: function(on, message) {
-				let model = "";
-				switch (message.status) {
-					case 200:
-						model = this.owner.createView("div");
-						model.innerHTML = message.content;
-						model = model.firstChild.innerHTML;
-						break;
-					case 404:
-						model = "<h1>" + this.owner.window.document.title + " (New)</h1>";
-						break;
-					default:
-						model = "<font color=red>" + message.content + "</font>";
-						break;
-				}
-				on.model = model;
-				message.action = "draw";
-			},
-			KeyDown: function(on, event) {
-				event.device = this.owner.device.keyboard;
-				event.action = this.getShortcut(event) || this.getAction(event);
-			},
-			Click: function(on, event) {
-				console.log("click");
-				let action = event.target.parentNode.dataset.command;
-				if (action) event.action = action;
-			},
 			Input: DEFAULT,
 			Cut: DEFAULT,
 			Copy: DEFAULT,
@@ -123,13 +66,8 @@ export default {
 			Promote: DEFAULT,
 			Demote: DEFAULT,
 			Character: DEFAULT,
-		},
-		getShortcut: function(event) {
-			let shortcut = event.device.getShortcut(event);
-			return this.shortcut[shortcut];
-		},
-		getAction: getAction
-	},
+		}
+	}
 }
 function DEFAULT(event) {
 	

@@ -80,27 +80,27 @@ export default {
 			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
 		},
 		before$initialize: function(conf) {
+			this.window.document.owner = this;
 			this.initializePlatform(conf);
+			createStyleSheet(this);
 		},
 		initializePlatform: function(conf) {
-			let document = this.window.document;
-			document.owner = this;
-			let ele = document.createElement("style");
-			ele.type = "text/css";
-			document.head.appendChild(ele);
-			this.$style = ele.sheet;
-			this.sys.implement(window.Node.prototype, conf.platform.node);
-			this.sys.implement(window.Range.prototype, conf.platform.range);
+			this.sys.implement(this.window.Node.prototype, conf.platform.node);
+			this.sys.implement(this.window.Range.prototype, conf.platform.range);
 			this.device = this.sys.extend(null, conf.platform.devices);
 		},
 		activate: function() {
+			this.part.main && this.content.append(this.part.main.createView());
+			let message = this.sys.extend();
+			message.action = "open";
+			this.receive(message);
 		}
 	},
 	Viewer: {
 		super$: "component.Controller",
 		after$initialize: function(conf) {
 			this.owner.viewer["I" + this.id] = this;
-			if (this.style) addStyle(this, conf);
+			if (this.style) this.style = defineRule(this, conf);
 		},
 		createView: function(model) {
 			let view = this.owner.createView(this.controlName || "div");
@@ -127,15 +127,86 @@ export default {
 				this.draw(on);
 			}
 		}
+	},
+	Main: {
+		super$: "Viewer",
+		after$initialize: function(conf) {
+			let actions = conf.actions;
+			let group = this.sys.extend();
+			for (let name in actions) {
+				conf = actions[name];
+				this.action[name] = conf.action;
+				if (conf.shortcut) this.shortcut[conf.shortcut] = name;
+				if (conf.group) {
+					if (!group[conf.group]) group[conf.group] = this.sys.extend();
+					group[conf.group][name] = conf;
+				}
+			}
+			this.group = group;
+		},
+		open: function() {
+			let location = this.owner.window.location;
+			if (location.search) {
+				this.owner.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
+				this.owner.service.get.service(this.owner, "load", location.search.substring(1) + ".view");
+			}
+		},
+		getShortcut: function(event) {
+			let shortcut = event.device.getShortcut(event);
+			return this.shortcut[shortcut];
+		},
+		getAction: function(event) {
+			return event.device.getCharacter(event) ? "Character" : event.device.getKey(event);
+		},
+		extend$action: {
+			open: function(on, message) {
+				this.open();				
+			},
+			load: function(on, message) {
+				let model = "";
+				switch (message.status) {
+					case 200:
+						model = this.owner.createView("div");
+						model.innerHTML = message.content;
+						model = model.firstChild.innerHTML;
+						break;
+					case 404:
+						model = "<h1>" + this.owner.window.document.title + " (New)</h1>";
+						break;
+					default:
+						model = "<font color=red>" + message.content + "</font>";
+						break;
+				}
+				on.model = model;
+				message.action = "draw";
+			},
+			KeyDown: function(on, event) {
+				event.device = this.owner.device.keyboard;
+				event.action = this.getShortcut(event) || this.getAction(event);
+			},
+			//move to & use devices, etc... ribbon actions need a controller.
+			Click: function(on, event) {
+				console.log("click");
+				let action = event.target.parentNode.dataset.command;
+				if (action) event.action = action;
+			}
+		}		
 	}
 }
 
-function addStyle(viewer) {
+function createStyleSheet(owner) {
+	let ele = owner.window.document.createElement("style");
+	ele.type = "text/css";
+	owner.window.document.head.appendChild(ele);
+	owner.sheet = ele.sheet;
+}
+
+function defineRule(viewer) {
 	let out = `[data-view=I${viewer.id}] {`;
 	for (let name in viewer.style) {
 		out += name + ":" + viewer.style[name] + ";"
 	}
 	out += "}";
-	let index = viewer.owner.$style.insertRule(out);
-	viewer.style = viewer.owner.$style.cssRules[index];
+	let index = viewer.owner.sheet.insertRule(out);
+	viewer.style = viewer.owner.sheet.cssRules[index];
 }

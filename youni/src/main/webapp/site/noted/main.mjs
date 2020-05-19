@@ -22,13 +22,11 @@ let packages = {
 
 export default function main(sys) {
 	packages = sys.load(packages);	
-	let ui = packages.editor;
-	let frame = sys.extend(ui.Frame, {
+	let frame = sys.extend(packages.ui.Frame, {
 		window: window,
 		part: packages.parts.public,
 		service: packages.services.public,
 	});
-	sys.implement(frame, packages.cmd.Commander);
 	frame.initialize({
 		platform: platform,
 		actions: actions

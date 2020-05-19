@@ -3,7 +3,7 @@ export default {
 	package$ui: "youni.works/ui",
 	package$editor: "youni.works/editor",
 	public: {
-		Editor: {
+		main: {
 			type$: "editor.Editor",
 			controlName: "main",
 			part: {
