@@ -4,14 +4,26 @@ Symbol.Signal = Symbol("signal");
 
 export default {
 	package$: "youni.works/component",
-	Event: {
+	Message: {
 		super$: "Object",
 		var$action: ""
 	},
 	Receiver: {
 		super$: "Object",
-		receive: function(event) {
-		}
+		receive: function(message) {
+			let action;
+			switch (message[Symbol.Signal]) {
+				case "Apply":
+					action = this[message.action];
+					return typeof action == "function"? action.apply(this, message) : undefined;
+				case "Call":
+					action = this[message.action];
+					return typeof action == "function" ? action.call(this, message) : undefined;
+				default:
+					this.controller && this.controller.process(this, message);
+					return;
+			}
+		},
 	},
 	Part: {
 		super$: "Receiver",
@@ -57,13 +69,6 @@ export default {
 			});
 			event.component = this;
 		},
-		receive: function(event) {
-			if (typeof this[event.action] == "function") this[event.action](event);
-			for (let name in this.part) {
-				if (!event.action) return;
-				this.part[name].receive(event);
-			}
-		}
 	},
 	Owner: {
 		super$: "Part",
@@ -73,17 +78,19 @@ export default {
 		},
 		log: console,
 		content: null,
-		receive: function(signal) {
-			if (signal.selector) {
-				this.propagate.broadcast(this.content, signal);
-			} else {
-				this.propagate.down(this.content, signal);
-			}
+		after$receive: function(message) {
+			if (!message.action) return;
+			let type = message[Symbol.Signal];
+			if (!type) type = message.selector ? "Broadcast" : "Message";
+			this.signal[type](this.content, message);
+			return Function.RETURNED;
 		},
-		propagate: {
-			up: (on, event) => undefined,
-			down: (on, message) => undefined,
-			broadcast: (on, signal) => undefined
+		signal: {
+			Apply: invoke,
+			Call: invoke,
+			Message: (on, event) => undefined,
+			Event: (on, event) => undefined,
+			Broadcast: (on, message) => undefined
 		}
 	},
 	Controller: {
@@ -114,33 +121,11 @@ export default {
 	}
 }
 
-//Content: {
-//	super$: "Object",
-//	type: "",	
-//	content: null
-//	//label
-//},
-//Article: {
-//	super$: "Content",
-//	id: "",
-//	title: "",
-//	revision: Date.prototype,
-//	editor: ""
-//},
-//Link: {
-//	/*
-//	 * A Link is an Article reference that can appear within Content.  A Link's content is simply a cache/embed
-//	 * of the Article.
-//	 */
-//	super$: "Article"
-//},
-//Receiver:{
-//	super$: "Object",
-//	receive: function(action, message) {
-//		if (arguments.length === 1) message = [];
-//		if (typeof this[action] != "function" || message.length === undefined) {
-//			throw new Error("Invalid message");
-//		}
-//		return this[action].apply(this, message);
-//	}
-//},
+function invoke(on, message) {
+	if (!(on && message.action)) return;
+	on.receive && on.receive(message);
+	for (let name in on.part) {
+		if (!message.action) return;
+		invoke(on, message);
+	}
+}

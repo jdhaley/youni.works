@@ -8,7 +8,7 @@ export default {
 		return this.ownerDocument.owner;
 	},
 	once$controller: function() {
-		if (this.nodeType == Node.ELEMENT_NODE) return this.owner.controller[this.dataset.view];
+		if (this.nodeType == Node.ELEMENT_NODE) return this.owner.viewer[this.dataset.view];
 	},
 	receive: function(message) {
 		this.controller && this.controller.process(this, message);
