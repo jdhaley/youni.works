@@ -4,13 +4,6 @@ export default {
 		title: "Save",
 		shortcut: "Control+S",
 		icon: "save.png",
-		action: function(on, event) {
-			event.action = ""; //Don't save locally.
-			let file = this.owner.window.location.search.substring(1) + ".view";
-			this.owner.service.save.service(this.owner, "saved", JSON.stringify({
-				[file]: on.body.outerHTML
-			}));
-		}
 	},
 	Strong: {
 		group: "Tag",

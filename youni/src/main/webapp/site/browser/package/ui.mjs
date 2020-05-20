@@ -98,12 +98,13 @@ export default {
 	},
 	Viewer: {
 		super$: "component.Controller",
+		controlName: "div",
 		after$initialize: function(conf) {
 			this.owner.viewer["I" + this.id] = this;
 			if (this.style) this.style = defineRule(this, conf);
 		},
 		createView: function(model) {
-			let view = this.owner.createView(this.controlName || "div");
+			let view = this.owner.createView(this.controlName);
 			view.model = model;
 			this.control(view);
 			return view;
@@ -130,19 +131,27 @@ export default {
 	},
 	Main: {
 		super$: "Viewer",
+		controlName: "main",
+		var$group: {
+		},
 		after$initialize: function(conf) {
-			let actions = conf.actions;
-			let group = this.sys.extend();
-			for (let name in actions) {
-				conf = actions[name];
-				this.action[name] = conf.action;
-				if (conf.shortcut) this.shortcut[conf.shortcut] = name;
-				if (conf.group) {
-					if (!group[conf.group]) group[conf.group] = this.sys.extend();
-					group[conf.group][name] = conf;
+			for (let name in conf.actions) this.initializeAction(name, conf.actions[name]);
+		},
+		initializeAction: function(name, conf) {
+			if (conf.group) {
+				for (let group of conf.group.split()) {
+					if (!this.group[group]) this.group[group] = this.sys.extend();
+					this.group[group][name] = conf;					
 				}
 			}
-			this.group = group;
+			if (conf.action) {
+				this.action[name] = conf.action;
+			} else if (!this.action[name]) {
+				this.log.warn(`Main viewer: Action "${name}" is not handled.`);
+			}
+			if (conf.shortcut) {
+				this.shortcut[conf.shortcut] = name;
+			}
 		},
 		getShortcut: function(event) {
 			let shortcut = event.device.getShortcut(event);
@@ -160,35 +169,55 @@ export default {
 				}
 			},
 			load: function(on, message) {
-				let model = "";
-				switch (message.status) {
-					case 200:
-						model = this.owner.createView("div");
-						model.innerHTML = message.content;
-						model = model.firstChild.innerHTML;
-						break;
-					case 404:
-						model = "<h1>" + this.owner.window.document.title + " (New)</h1>";
-						break;
-					default:
-						model = "<font color=red>" + message.content + "</font>";
-						break;
+				if (message.status == 200) {
+					let model = this.owner.createView("div");
+					model.innerHTML = message.content;
+					model = model.firstChild.innerHTML;
+					on.model = model;
+					message.action = "draw";
+				} else if (message.status == 404) {
+					on.model = "<h1>" + this.owner.window.document.title + "</h1>";
+					this.owner.window.document.title += " (New)";
+					message.action = "draw";
+				} else {
+					message.action = "altStatus";
 				}
-				on.model = model;
+			},
+			altStatus: function(on, message) {
+				let level = message.status >= 400 ? "Error" : "Note";
+				let color = message.status >= 400 ? "red" : "blue";
+				on.model = `<h1>${level}</h1><font color=${color}>${message.content}</font>`;
 				message.action = "draw";
+			},
+			saved: function(on, event) {
+				let title = this.owner.window.document.title;
+				if (title.endsWith(" (New)")) {
+					title = title.substring(0, title.indexOf(" (New)"));
+					this.owner.window.document.title = title;
+				}
+			},
+			Save: function(on, event) {
+				event.action = ""; //Stop Control+S to save on client.
+				let file = this.owner.window.location.search.substring(1) + ".view";
+				this.owner.service.save.service(this.owner, "saved", JSON.stringify({
+					[file]: on.body.outerHTML
+				}));
 			},
 			KeyDown: function(on, event) {
 				event.device = this.owner.device.keyboard;
 				event.action = this.getShortcut(event) || this.getAction(event);
 			},
-			//move to & use devices, etc... ribbon actions need a controller.
 			Click: function(on, event) {
-				console.log("click");
+				//move to & use devices, etc... ribbon actions need a controller.
+				//click is on the button img, parentNode is the button...
 				let action = event.target.parentNode.dataset.command;
 				if (action) event.action = action;
 			}
 		}		
-	}
+	},
+//	Action: {
+//		super$: "Part"
+//	}
 }
 
 function createStyleSheet(owner) {
