@@ -6,8 +6,8 @@ export default {
 		after$initialize: function(conf) {
 			let doc = this.owner.window.document;
 			this.owner.sense.selection(doc, "SelectionChange");
-			doc.execCommand("styleWithCSS", true);
-			doc.execCommand("defaultParagraphSeparator", "BR");
+			doc.execCommand("styleWithCSS", false, false);
+			doc.execCommand("defaultParagraphSeparator", false, "P");
 			//	sys.implement(this, cmd.Commander);
 			//this.lastCommand = this.sys.extend();
 		},
