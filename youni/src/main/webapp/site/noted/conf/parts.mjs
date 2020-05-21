@@ -5,7 +5,6 @@ export default {
 	public: {
 		main: {
 			type$: "editor.Editor",
-			controlName: "main",
 			part: {
 				ribbon: {
 					type$: "ui.Viewer",
