@@ -42,8 +42,13 @@ export default {
 		prototypeOf: function(value) {
 			if (value && typeof value == "object") return OBJECT.getPrototypeOf(value);
 		},
-		interfaceOf: function(value) {
-			return value && value[INTERFACE];
+		interfaceOf: function(value, name) {
+			while (value) {
+				value = value && value[INTERFACE];
+				if (!name) return value;
+				if (name == value[Symbol.toStringTag]) return value;
+				value = this.prototypeOf(value);
+			}
 		},
 		isPrototypeOf: function(object, value) {
 			return typeof object == "object" 
@@ -120,6 +125,7 @@ export default {
 			//TODO could add a debugger statement when environment is development.
 			throw error;
 		},
+		//TODO follow the standard: package NOT packages.
 		packages: {
 		}
 	}

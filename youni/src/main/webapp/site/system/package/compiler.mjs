@@ -36,6 +36,10 @@ export default {
 	},
 	Constructor: {
 		super$: "Context",
+		type$sys: "System",
+		get$log: function() {
+			return this.sys.log;
+		},
 		constructors: {},
 		facets: {},
 		compile: function(prop) {

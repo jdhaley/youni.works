@@ -1,21 +1,17 @@
-import boot			from "./package/boot.mjs";
-import system		from "./package/system.mjs";
-import compiler		from "./package/compiler.mjs";
-
-import constructors	from "./conf/constructors.mjs";
-import facets		from "./conf/facets.mjs";
-
-let conf = {
-	constructors: constructors,
-	facets: facets,
-	log: console,
-	packages: {
-		system: system,
-		compiler: compiler,
-		boot: boot
-	}
-}
-
-export default function main() {
-	return boot.Booter.boot(conf);
+export default function main(sys, conf) {
+	let system = conf.packages.system;
+	sys = system.System;
+	sys = sys.extend(sys, {
+		packages: sys.extend(),
+		log: conf.log
+	});
+	let pkg = conf.packages.compiler;
+	let constr = sys.extend(pkg.Context, pkg.Constructor);
+	sys.implement(constr, {
+		sys: sys,
+		constructors: conf.constructors,
+		facets: conf.facets,
+	});
+	sys = constr.loader();
+	return conf.packages.boot.Booter.boot(sys, conf);
 }
