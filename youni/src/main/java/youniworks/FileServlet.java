@@ -52,7 +52,7 @@ public class FileServlet extends HttpServlet {
 		try {
 			i = new FileInputStream(f);			
 		} catch (FileNotFoundException e) {
-			resp.setStatus(404);
+			resp.setStatus(204); //No Content
 			return;
 		}
 		OutputStream o = resp.getOutputStream();
