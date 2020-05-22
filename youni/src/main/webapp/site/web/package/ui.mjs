@@ -1,9 +1,17 @@
 export default {
 	package$: "youni.works/ui",
-	package$component: "youni.works/component",
+	package$signal: "youni.works/signal",
+	package$platform: "youni.works/platform",
+	package$part: "youni.works/part",
 	Frame: {
-		super$: "component.Owner",
+		super$: "platform.Sensor",
+		log: console,
 		window: null,
+		var$device: {
+		},
+		var$viewer: {
+		},
+		//TODO rename to view.
 		get$content: function() {
 			return this.window.document.body;
 		},
@@ -22,64 +30,12 @@ export default {
 				return range;
 			}
 		},
-		var$device: {
-		},
-		var$viewer: {
-		},
-		extend$signal: {
-			Event: function(on, event) {
-				while (on && event.action) {
-					event[Symbol.Signal] = "Event";
-					on.receive && on.receive(event);
-					on = on.parentNode;
-				}
-			},
-			Message: function signal(on, message) {
-				message[Symbol.Signal] = "Message";
-				if (message.action) on.receive && on.receive(message);
-				if (message.action) for (on of on.childNodes) {
-					signal(on, message);
-					if (!message.action) break;
-				}
-			},
-			Broadcast: function(on, signal) {
-				if (!signal.action) return;
-				let list = on.querySelectorAll(signal.selector);
-				for (let on of list) {
-					signal[Symbol.Signal] = "Broadcast";
-					on.receive && on.receive(signal);
-					if (!signal.action) break;
-				}
-			}
-		},
-		extend$sense: {
-			event: function(target, action) {
-				const owner = target.owner;
-				const signal = owner.signal.Event;
-				target.addEventListener(action.toLowerCase(), event => {
-					event.owner = owner;
-					event.action = action;
-					signal(event.target, event);
-					if (!event.action) event.preventDefault();
-				});
-			},
-			//Propagate from the selection container rather than the event target:
-			selection: function(target, action) {
-				const owner = target.owner;
-				const signal = owner.signal.Event;
-				target.addEventListener(action.toLowerCase(), event => {
-					event.owner = owner;
-					event.action = action;
-					signal(owner.selection.commonAncestorContainer, event);
-					if (!event.action) event.preventDefault();
-				});
-			}
-		},
 		createView: function(name) {
 			let doc = this.window.document;
 			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
 		},
 		before$initialize: function(conf) {
+			this.part.main.owner = this;
 			this.window.document.owner = this;
 			this.initializePlatform(conf);
 			createStyleSheet(this);
@@ -90,18 +46,28 @@ export default {
 			this.device = this.sys.extend(null, conf.platform.devices);
 		},
 		activate: function() {
-			this.part.main && this.content.append(this.part.main.createView());
+			let main = this.part.main;
+			if (!main) this.log.error("No main Viewer");
+			main.owner = this;
+			this.content.append(main.createView());
 			let message = this.sys.extend();
 			message.action = "open";
 			this.receive(message);
 		}
 	},
 	Viewer: {
-		super$: "component.Controller",
+		super$: "part.Component",
 		controlName: "div",
-		after$initialize: function(conf) {
-			this.owner.viewer["I" + this.id] = this;
-			if (this.style) this.style = defineRule(this, conf);
+		view: "text",
+		get$render: function() {
+			return this.of && this.of.render;
+		},
+		extend$shortcut: {
+		},
+		extend$action: {
+			draw: function(on, signal) {
+				this.draw(on, this.view);
+			}
 		},
 		createView: function(model) {
 			let view = this.owner.createView(this.controlName);
@@ -115,26 +81,25 @@ export default {
 			if (this.name) control.dataset.view = "I" + this.id;
 			if (this.classes) control.className = this.classes;
 		},
-		draw: function(view) {
-			view.innerHTML = "" + view.model;
+		draw: function(view, render) {
+			render = this.render[render];
+			render && render.call(this, view);
 		},
-		model: function(view) {
-			return view.textContent;
-		},
-		extend$shortcut: {
-		},
-		extend$action: {
-			draw: function(on, signal) {
-				this.draw(on);
-			}
+		after$initialize: function(conf) {
+			this.owner.viewer["I" + this.id] = this;
+			if (this.style) this.style = defineRule(this, conf);
 		}
 	},
 	Main: {
 		super$: "Viewer",
+		view: "composite",
 		controlName: "main",
+		var$render: {
+		},
 		var$group: {
 		},
 		after$initialize: function(conf) {
+			this.render = conf.platform.renders;
 			for (let name in conf.actions) this.initializeAction(name, conf.actions[name]);
 		},
 		initializeAction: function(name, conf) {
@@ -175,7 +140,7 @@ export default {
 					model = model.firstChild.innerHTML;
 					on.model = model;
 					message.action = "draw";
-				} else if (message.status == 404) {
+				} else if (message.status == 204) {
 					on.model = "<h1>" + this.owner.window.document.title + "</h1>";
 					this.owner.window.document.title += " (New)";
 					message.action = "draw";
@@ -200,7 +165,7 @@ export default {
 				event.action = ""; //Stop Control+S to save on client.
 				let file = this.owner.window.location.search.substring(1) + ".view";
 				this.owner.service.save.service(this.owner, "saved", JSON.stringify({
-					[file]: on.body.outerHTML
+					[file]: on.parts.body.outerHTML
 				}));
 			},
 			KeyDown: function(on, event) {
@@ -215,6 +180,38 @@ export default {
 			}
 		}		
 	},
+	Ribbon: {
+		super$: "Viewer",
+		controlName: "nav",
+		extend$action: {
+			draw: function(on) {
+				let markup = "";
+				for (let groupName in this.of.group) {
+					let group = this.of.group[groupName];
+					markup += `<div class='actions' title='${groupName}'>`
+					for (let name in group) {
+						let action = group[name];
+						if (action.icon) {
+							let title = action.title;
+							if (action.shortcut) title += "\n" + action.shortcut;
+							markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${action.icon}'></img></button>`;
+						}
+					}
+					markup += "</div>";
+				}
+				on.innerHTML = markup;
+				on.parentNode.ribbon = on;
+			}			
+		}
+	},
+	Article: {
+		super$: "Viewer",
+		view: "markup",
+		after$control: function(view) {
+			view.contentEditable = true;
+			view.tabIndex = 1;
+		}
+	}
 //	Action: {
 //		super$: "Part"
 //	}
