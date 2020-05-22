@@ -1,0 +1,248 @@
+{
+	"facet": "",
+	"constructor": "package",
+	"part": {
+		"": {
+			"name": "",
+			"facet": "package",
+			"constructor": "",
+			"source": "youni.works/member"
+		},
+		"part": {
+			"name": "part",
+			"facet": "package",
+			"constructor": "",
+			"source": "youni.works/part"
+		},
+		"Member": {
+			"name": "Member",
+			"facet": "",
+			"constructor": "super",
+			"part": {
+				"": {
+					"name": "",
+					"facet": "super",
+					"constructor": "",
+					"source": "part.Part"
+				},
+				"facet": {
+					"name": "facet",
+					"facet": "",
+					"constructor": "",
+					"source": ""
+				},
+				"constructor": {
+					"name": "constructor",
+					"facet": "",
+					"constructor": "",
+					"source": ""
+				},
+				"source": {
+					"name": "source",
+					"facet": "",
+					"constructor": ""
+				}
+			}
+		},
+		"Loader": {
+			"name": "Loader",
+			"facet": "",
+			"constructor": "super",
+			"part": {
+				"": {
+					"name": "",
+					"facet": "super",
+					"constructor": "",
+					"source": "part.Component"
+				},
+				"use": {
+					"name": "use",
+					"facet": "",
+					"constructor": "type",
+					"part": {
+						"Member": {
+							"name": "Member",
+							"facet": "type",
+							"constructor": "",
+							"source": "Member"
+						}
+					}
+				},
+				"symbol": {
+					"name": "symbol",
+					"facet": "",
+					"constructor": "type",
+					"part": {
+						
+					}
+				},
+				"constructor": {
+					"name": "constructor",
+					"facet": "",
+					"constructor": "type",
+					"part": {
+						"default": {
+							"name": "default",
+							"facet": "",
+							"constructor": "type",
+							"part": {
+								"compile": {
+									"name": "compile",
+									"facet": "",
+									"constructor": "",
+									"source": "function(member) {\r\n\t\t\t\t\tmember.value = member.source;\r\n\t\t\t\t}"
+								}
+							}
+						},
+						"array": {
+							"name": "array",
+							"facet": "",
+							"constructor": "type",
+							"part": {
+								"compile": {
+									"name": "compile",
+									"facet": "",
+									"constructor": "",
+									"source": "function(member) {\r\n\t\t\t\t\tmember.value = member.source;\r\n\t\t\t\t}"
+								}
+							}
+						},
+						"product": {
+							"name": "product",
+							"facet": "",
+							"constructor": "type",
+							"part": {
+								"compile": {
+									"name": "compile",
+									"facet": "",
+									"constructor": "",
+									"source": "function(member) {\r\n\t\t\t\t\tmember.value = member.source;\r\n\t\t\t\t}"
+								}
+							}
+						},
+						"type": {
+							"name": "type",
+							"facet": "",
+							"constructor": "type",
+							"part": {
+								"compile": {
+									"name": "compile",
+									"facet": "",
+									"constructor": "",
+									"source": "function(member) {\r\n\t\t\t\t\tfor (let name in member.part) {\r\n\t\t\t\t\t\tlet prop = member.part[name];\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t}\r\n\t\t\t\t\tmember.value = member.source;\r\n\t\t\t\t}"
+								}
+							}
+						},
+						"super": {
+							"name": "super",
+							"facet": "",
+							"constructor": "type",
+							"part": {
+								"compile": {
+									"name": "compile",
+									"facet": "",
+									"constructor": "",
+									"source": "function(member) {\r\n\t\t\t\t\tmember.value = member.source;\r\n\t\t\t\t}"
+								}
+							}
+						},
+						"package": {
+							"name": "package",
+							"facet": "",
+							"constructor": "type",
+							"part": {
+								"compile": {
+									"name": "compile",
+									"facet": "",
+									"constructor": "",
+									"source": "function(member) {\r\n\t\t\t\t\tmember.value = member.source;\r\n\t\t\t\t}"
+								}
+							}
+						}
+					}
+				},
+				"facet": {
+					"name": "facet",
+					"facet": "",
+					"constructor": "type",
+					"part": {
+						"default": {
+							"name": "default",
+							"facet": "",
+							"constructor": "",
+							"source": "function(member) {\r\n\t\t\t\tmember.configurable = true;\r\n\t\t\t\tmember.enumerable = true;\r\n\t\t\t\tmember.writable = true;\r\n\t\t\t\tmember.value = member.source;\r\n\t\t\t}"
+						},
+						"const": {
+							"name": "const",
+							"facet": "",
+							"constructor": "",
+							"source": "function(member) {\r\n\t\t\t\tmember.value = member.source;\r\n\t\t\t}"
+						},
+						"method": {
+							"name": "method",
+							"facet": "",
+							"constructor": "",
+							"source": "function(member) {\r\n\t\t\t\tmember.value = this.compileFunction(member.source);\r\n\t\t\t}"
+						},
+						"get": {
+							"name": "get",
+							"facet": "",
+							"constructor": "",
+							"source": "function(member) {\r\n\t\t\t\tmember.get = this.compileFunction(member.source)\r\n\t\t\t}"
+						}
+					}
+				},
+				"log": {
+					"name": "log",
+					"facet": "",
+					"constructor": "",
+					"part": {
+						
+					}
+				},
+				"compile": {
+					"name": "compile",
+					"facet": "",
+					"constructor": "",
+					"source": "function(source) {\r\n\t\t\tlet member = this.load(source);\r\n\t\t\tthis.construct(member);\r\n\t\t\tthis.constructor[member.constructor || \"default\"].compile(member);\r\n\t\t}"
+				},
+				"load": {
+					"name": "load",
+					"facet": "",
+					"constructor": "",
+					"source": "function load(source, decl) {\r\n\t\t\tlet member = this.sys.extend(this.use.Member, {\r\n//\t\t\t\towner: this,\r\n//\t\t\t\tof: null,\r\n\t\t\t\tname: this.nameOf(decl),\r\n\t\t\t\tfacet: this.facetOf(decl),\r\n\t\t\t\tconstructor: \"\",\r\n\t\t\t\tsource: undefined,\r\n\t\t\t\tpart: undefined\r\n\t\t\t});\r\n\t\t\tif (typeof source == \"object\") {\r\n\t\t\t\tthis.loadParts(member, source);\r\n\t\t\t} else if (typeof source == \"function\") {\r\n\t\t\t\tmember.source = source.toString();\r\n\t\t\t} else {\r\n\t\t\t\tmember.source = source;\r\n\t\t\t}\r\n\t\t\treturn member;\r\n\t\t}"
+				},
+				"loadParts": {
+					"name": "loadParts",
+					"facet": "",
+					"constructor": "",
+					"source": "function(member, source) {\r\n\t\t\tmember.part = this.sys.extend();\r\n\t\t\tif (this.sys.prototypeOf(source) == Object.prototype) {\r\n\t\t\t\tfor (let decl in source) {\r\n\t\t\t\t\tlet prop = this.load(source[decl], decl);\r\n\t//\t\t\t\tprop.of = member;\r\n\t\t\t\t\tmember.part[prop.name] = prop;\r\n\t\t\t\t}\r\n\t\t\t\tmember.constructor = member.part[\"\"] && member.part[\"\"].facet || \"type\";\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tif (this.sys.prototypeOf(source) == Array.prototype) {\r\n\t\t\t\tlet i = 0;\r\n\t\t\t\tfor (ele of source) {\r\n\t\t\t\t\tlet prop = this.load(ele);\r\n\t\t\t\t\tprop.of = member;\r\n\t\t\t\t\tmember.part[i++] = prop;\r\n\t\t\t\t}\r\n\t\t\t\tmember.constructor = \"array\";\r\n\t\t\t\treturn;\t\r\n\t\t\t}\r\n\t\t}"
+				},
+				"facetOf": {
+					"name": "facetOf",
+					"facet": "",
+					"constructor": "",
+					"source": "function(declaration) {\r\n\t\t\tif (typeof declaration == \"string\") {\r\n\t\t\t\tlet index = declaration.indexOf(\"$\");\r\n\t\t\t\tif (index < 0) index = declaration.indexOf(\"@\");\r\n\t\t\t\treturn index < 0 ? \"\" : declaration.substr(0, index);\r\n\t\t\t}\r\n\t\t\treturn \"\";\r\n\t\t}"
+				},
+				"nameOf": {
+					"name": "nameOf",
+					"facet": "",
+					"constructor": "",
+					"source": "function(declaration) {\r\n\t\t\tif (typeof declaration == \"string\") {\r\n\t\t\t\tif (declaration.indexOf(\"$\") >= 0) {\r\n\t\t\t\t\tdeclaration = declaration.substr(declaration.indexOf(\"$\") + 1);\r\n\t\t\t\t} else if (declaration.indexOf(\"@\") >= 0) {\r\n\t\t\t\t\tdeclaration = declaration.substr(declaration.indexOf(\"@\") + 1);\r\n\t\t\t\t\tif (!this.symbol[declaration]) {\r\n\t\t\t\t\t\tthis.symbol[declaration] = Symbol(declaration);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tdeclaration = this.symbol[declaration];\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\treturn declaration;\r\n\t\t}"
+				},
+				"resolve": {
+					"name": "resolve",
+					"facet": "",
+					"constructor": "",
+					"source": "function(component, name) {\r\n\t\t\tlet value = component[name];\r\n\t\t\tif (this.sys.isDeclaration(value)) {\r\n\t\t\t\tthis.compile(value);\r\n\t\t\t\tObject.defineProperty(component, name, value);\r\n\t\t\t\tvalue = component[name];\r\n\t\t\t}\r\n\t\t\treturn value;\r\n\t\t}"
+				},
+				"typeOf": {
+					"name": "typeOf",
+					"facet": "",
+					"constructor": "",
+					"source": "function(member) {\r\n\t\t\tlet type = member.part[\"\"].source;\r\n\t\t\tmember = member.context.forName(type);\r\n\t\t\treturn type;\r\n\t\t}"
+				}
+			}
+		}
+	}
+}

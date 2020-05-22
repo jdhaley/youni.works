@@ -4,5 +4,6 @@ export default function main(sys, conf) {
 	let loader = Loader.sys.extend(Loader);
 	let member = loader.load(conf.test);
 	console.log(member);
+	console.log(JSON.stringify(member));
 	return member;
 }
