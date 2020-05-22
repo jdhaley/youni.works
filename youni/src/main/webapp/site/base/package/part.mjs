@@ -9,9 +9,11 @@ export default {
 		type$of: "Part",
 		part: {
 		},
+		once$context: function() {
+			return this.of ? this.of != this && this.of.context : this;
+		},
 		once$owner: function() {
-			//owner is optional.
-			return this.of && this.of != this && this.of.owner;
+			return this.context && this.context.owner;
 		},
 		once$name: function() {
 			if (this.of) for (let name in this.of.part) {
