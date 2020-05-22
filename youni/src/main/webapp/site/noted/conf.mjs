@@ -1,4 +1,3 @@
-
 import signal		from "../base/package/signal.mjs";
 import part			from "../base/package/part.mjs";
 import platform		from "../web/package/platform.mjs";
