@@ -1,14 +1,14 @@
 export default {
 	package$: "youni.works/noted/service",
-	package$client: "youni.works/client",
+	package$platform: "youni.works/platform",
 	public: {
 		get: {
-			type$: "client.Service",
+			type$: "platform.Remote",
 			url: "/youni/file",
 			method: "GET"
 		},
 		save: {
-			type$: "client.Service",
+			type$: "platform.Remote",
 			url: "/youni/file",
 			method: "POST"			
 		}

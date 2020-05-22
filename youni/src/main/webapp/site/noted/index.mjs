@@ -1,5 +1,5 @@
-import system 	from "../system/main.mjs";
+import sys 		from "../system/index.mjs";
+import conf		from "./conf.mjs";
 import main		from "./main.mjs";
 
-const sys = system();
-main(sys);
+export default main(sys, conf);
