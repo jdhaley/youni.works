@@ -45,6 +45,7 @@ export default {
 		type$receive: "signal.Controller.receive",
 		type$control: "signal.Controller.control",
 		type$process: "signal.Controller.process",
+		type$execute: "signal.Controller.execute",
 		type$action: "signal.Controller.action"
 	},
 	Service: {

@@ -42,15 +42,12 @@ export default {
 			}
 		}
 	},
-	Controller: {
+	Processor: {
 		super$: "Receiver",
-		control: function(control) {
-			control.controller = this;
-		},
 		process: function(on, message) {
 			let action = message.action;
-			while (action && this.action[action]) try {
-				this.action[action].call(this, on, message);
+			while (action) try {
+				this.execute(on, message);
 				action = (message.action == action ? "" : message.action);
 			} catch (error) {
 				error.message = `Error processing action "${message.action}": ` + error.message;
@@ -61,11 +58,29 @@ export default {
 				return this.process(on, message);
 			}
 		},
+		execute: function(on, message) {
+			let action = on[message.action];
+			if (typeof action == "function") {
+				return message.length
+					? action.apply(this, message)
+					: action.call(this, message);
+			}
+		}
+	},
+	Controller: {
+		super$: "Processor",
 		action: {
 			exception: function(on, message) {
 				this.log.error(message.error);
 				message.action = "";
 			}
+		},
+		control: function(control) {
+			control.controller = this;
+		},
+		execute: function(on, message) {
+			let action = this.action[message.action];
+			action && action.call(this, on, message);			
 		}
 	}
 }
