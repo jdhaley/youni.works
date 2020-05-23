@@ -15,7 +15,6 @@ export default {
 					return message.apply
 						? action.apply(this, message)
 						: action.call(this, message);
-
 				}
 			} else {
 				this.controller && this.controller.process(this, message);
@@ -26,7 +25,7 @@ export default {
 		super$: "Receiver",
 		after$receive: function(message) {
 			this.send(this, message);
-			return Function.RETURNED;
+			return Function.returned;
 		},
 		send: function send(to, message) {
 			let signal = message[Symbol.Signal] || "Call";
