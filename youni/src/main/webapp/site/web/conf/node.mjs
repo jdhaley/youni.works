@@ -15,7 +15,7 @@ export default {
 	},
 	sense: function(sensorType, action) {
 		if (this.nodeType == Node.ELEMENT_NODE || this.nodeType == Node.DOCUMENT_NODE) {
-			this.owner.sense[sensorType](this, action);
+			this.owner.controller.sense[sensorType](this, action);
 		}
 	},
 	getPath: function(ancestor) {

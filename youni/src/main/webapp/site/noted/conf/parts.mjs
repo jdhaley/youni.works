@@ -37,10 +37,10 @@ export default {
 				view.sense("event", "Cut");
 				view.sense("event", "Copy");
 				view.sense("event", "Paste");
+				view.ownerDocument.sense("selection", "SelectionChange");
 			},
 			after$initialize: function(conf) {
 				let doc = this.owner.window.document;
-				this.owner.sense.selection(doc, "SelectionChange");
 				doc.execCommand("styleWithCSS", false, false);
 				doc.execCommand("defaultParagraphSeparator", false, "P");
 				//	sys.implement(this, cmd.Commander);

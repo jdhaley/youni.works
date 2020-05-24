@@ -5,15 +5,25 @@ export default {
 	Sensor: {
 		super$: "signal.Sender",
 		content: null,
-		send: function send(to, message) {
-			let signal = message[Symbol.Signal] || (message.selector ? "Broadcast" : "Message");
-			this.signal[signal].call(this, to, message);
+		before$send: function send(to, message) {
+			if (!message[Symbol.Signal]) {
+				message[Symbol.Signal] = message.selector ? "Broadcast" : "Message";
+			}
 		},
-		extend$signal: {
+		extend$sender: {
+			Call: function signal(on, message) {
+				for (let name in on.part) {
+					if (!message.action) return;
+					let part = on.part[name];
+					message.of = on;
+					part.receive && part.receive(message);
+					message.of = on;
+					signal(part, message);
+				}
+			},
 			Event: function(on, event) {
-				while (on && event.action) {
+				for (on = event.source; on && event.action; on = on.parentNode) {
 					on.receive && on.receive(event);
-					on = on.parentNode;
 				}
 			},
 			Message: function signal(on, message) {
@@ -37,24 +47,24 @@ export default {
 		extend$sense: {
 			event: function(target, action) {
 				const owner = target.owner;
-				const signal = owner.signal.Event;
 				target.addEventListener(action.toLowerCase(), event => {
 					event[Symbol.Signal] = "Event";
-					event.owner = owner;
 					event.action = action;
-					owner.send(event.target, event);
+					event.owner = owner;
+					event.source = event.target;
+					owner.receive(event);
 					if (!event.action) event.preventDefault();
 				});
 			},
 			//Propagate from the selection container rather than the event target:
 			selection: function(target, action) {
 				const owner = target.owner;
-				const signal = owner.signal.Event;
 				target.addEventListener(action.toLowerCase(), event => {
 					event[Symbol.Signal] = "Event";
-					event.owner = owner;
 					event.action = action;
-					owner.send(owner.selection.commonAncestorContainer, event);
+					event.owner = owner;
+					event.source = owner.selection.container
+					owner.receive(event);
 					if (!event.action) event.preventDefault();
 				});
 			}

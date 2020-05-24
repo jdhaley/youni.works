@@ -4,7 +4,8 @@ export default {
 	package$platform: "youni.works/platform",
 	package$part: "youni.works/part",
 	Frame: {
-		super$: "platform.Sensor",
+		super$: "signal.Receiver",
+		type$controller: "platform.Sensor",
 		log: console,
 		window: null,
 		var$device: {
@@ -48,7 +49,6 @@ export default {
 		activate: function() {
 			let main = this.part.main;
 			if (!main) this.log.error("No main Viewer");
-			main.owner = this;
 			this.content.append(main.createView());
 			let message = this.sys.extend();
 			message.action = "open";
@@ -56,7 +56,12 @@ export default {
 		}
 	},
 	Viewer: {
-		super$: "part.Component",
+		super$: "part.Part",
+		//TODO super$: "Part Controller" - true implement
+		type$controller: "signal.Receiver.controller",
+		type$receive: "signal.Receiver.receive",
+		type$process: "signal.Processor.process",
+		type$execute: "signal.Processor.execute",
 		controlName: "div",
 		view: "text",
 		get$render: function() {
