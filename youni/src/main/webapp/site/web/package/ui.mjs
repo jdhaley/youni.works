@@ -211,6 +211,7 @@ export default {
 	},
 	Article: {
 		super$: "Viewer",
+		controlName: "article",
 		view: "markup",
 		after$control: function(view) {
 			view.contentEditable = true;

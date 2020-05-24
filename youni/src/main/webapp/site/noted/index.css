@@ -2,17 +2,38 @@
 	margin: 0;
 	padding: 0;
 	border: 0;
-	font-size: 14px;
-}
-p, ul, ol {
-	margin: 4px 4px 0px 2px;
-	padding: 0 0 0 4px;
-	border-right: 2px solid silver;
-}
-ul, ol {
-	border-right: 2px solid gainsboro;
 }
 
+article {
+	padding: 8px 8px 8px 16px;
+}
+article *:hover {
+	background: pink;
+}
+
+ul, ol {
+	padding: 0 4px 0 0;
+	border-right: 1.5px solid silver;
+	background: window;
+}
+ul:hover, ol:hover, h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover
+{
+	background: rgba(127, 127, 127, .1);
+}
+ul:hover li, ol:hover li, p:hover {
+	background: window;
+}
+b:hover, i:hover,  u:hover {
+	background: rgba(127, 127, 127, .05);
+}
+p {
+	padding: 0 4px 0 0;
+	border-right: 1.5px solid gainsboro;
+	background: window;
+}
+u {
+	text-decoration: underline silver;
+}
 html, body, main {
 	display: flex;
 	flex: 1;
@@ -28,23 +49,22 @@ h1 {
 	color: steelBlue;
 	margin: 2px 0 2px 0;
 	padding-top: 2px;
-	font-size: 24px;
+	font-size: large;
 }
 h2 {
 	margin: 8px 0 2px 0;
 	font-style: italic;
-	font-size: 20px;
-	color: darkslategray;
+	font-size: large;
+	color: darkSlateGray;
 }
 h3 {
 	margin: 4px 0 2px 0;
-	font-size: 16px;
-	color: darkslategray;
+	color: darkSlateGray;
 }
 h4 {
 	margin: 2px 0 2px 0;
 	font-size: 14px;
-	color: darkslategray;
+	color: darkSlateGray;
 }
 h4:before {
 	content: " . ";
@@ -52,7 +72,7 @@ h4:before {
 h5 {
 	margin: 2px 0 2px 0;
 	font-size: 14px;
-	color: darkslategray;
+	color: darkSlateGray;
 }
 h5:before {
 	content: " .. ";
@@ -60,7 +80,7 @@ h5:before {
 h6 {
 	margin: 2px 0 2px 0;
 	font-size: 14px;
-	color: darkslategray;
+	color: darkSlateGray;
 }
 h6:before {
 	content: " ... ";
@@ -104,7 +124,7 @@ main>nav {
 .actions {
 	padding-left: 4px;
 	padding-right: 4px;
-	border-right: 1px solid darkgray;
+	border-right: 2px solid rgba(128, 128, 128, .5);
 }
 
 button {
