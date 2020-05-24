@@ -9,7 +9,7 @@ Declaration.define = function(object) {
 }
 
 export default {
-	package$: "youni.works/system/sys",
+	package$: "youni.works/base/system",
 	Object: Object,
 	Declaration: Declaration,
 	System: {
