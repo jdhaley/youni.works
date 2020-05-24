@@ -1,11 +1,13 @@
 export default {
 	package$: "youni.works/ui",
-	package$signal: "youni.works/signal",
-	package$platform: "youni.works/platform",
-	package$part: "youni.works/part",
+	use: {
+		package$signal: "youni.works/signal",
+		package$platform: "youni.works/platform",
+		package$part: "youni.works/part"
+	},
 	Frame: {
-		super$: "signal.Receiver",
-		type$controller: "platform.Sensor",
+		super$: "use.signal.Receiver",
+		type$controller: "use.platform.Sensor",
 		log: console,
 		window: null,
 		var$device: {
@@ -56,12 +58,12 @@ export default {
 		}
 	},
 	Viewer: {
-		super$: "part.Part",
-		//TODO super$: "Part Controller" - true implement
-		type$controller: "signal.Receiver.controller",
-		type$receive: "signal.Receiver.receive",
-		type$process: "signal.Processor.process",
-		type$execute: "signal.Processor.execute",
+		super$: "use.part.Component",
+		//TODO implement: super$: "Component Processor"
+		type$process: "use.signal.Processor.process",
+		type$execute: "use.signal.Processor.execute",
+		type$trap: "use.signal.Processor.trap",
+		
 		controlName: "div",
 		view: "text",
 		get$render: function() {

@@ -9,8 +9,10 @@ Symbol.Signal = Symbol("signal");
  */
 export default {
 	package$: "youni.works/signal",
+	Signal: Symbol.Signal,
 	Message: {
 		super$: "Object",
+		[Symbol.Signal]: "Message",
 		var$action: ""
 	},
 	Receiver: {
@@ -22,6 +24,13 @@ export default {
 	},
 	Controller: {
 		super$: "Object",
+//		use: {
+//			type$Signal: "Signal",
+//			type$Message: "Message"
+//		},
+//		getSignal: function(message) {
+//			return message[Symbol.signal];
+//		},
 		log: console,
 		process: function(on, message) {
 			let action = typeof message == "string" ? message : message.action;
@@ -55,12 +64,12 @@ export default {
 			let action = this.action[message.action];
 			action && action.call(this, on, message);
 		},
-		action: {
-			exception: function(on, message) {
-				this.log.error(message.error);
-				message.action = "";
-			}
-		}
+//		action: {
+//			exception: function(on, message) {
+//				this.log.error(message.error);
+//				message.action = "";
+//			}
+//		}
 	},
 	Sender: {
 		super$: "Controller",
