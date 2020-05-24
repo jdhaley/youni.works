@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/boot",
+	package$: "youni.works/system/boot",
 	Booter: {
 		type$: "Object",
 		boot: function(sys, conf) {		

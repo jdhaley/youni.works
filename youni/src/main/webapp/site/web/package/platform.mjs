@@ -1,8 +1,8 @@
 export default {
-	package$: "youni.works/platform",
+	package$: "youni.works/web/platform",
 	use: {
-		package$signal: "youni.works/signal",
-		package$part: "youni.works/part"
+		package$signal: "youni.works/base/signal",
+		package$part: "youni.works/base/part"
 	},
 	Sensor: {
 		super$: "use.signal.Sender",

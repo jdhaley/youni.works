@@ -8,7 +8,7 @@ Symbol.Signal = Symbol("signal");
  * - we would need to return the action on receive().
  */
 export default {
-	package$: "youni.works/signal",
+	package$: "youni.works/base/signal",
 	Signal: Symbol.Signal,
 	Message: {
 		super$: "Object",

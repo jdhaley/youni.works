@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/cmd",
+	package$: "youni.works/base/cmd",
 	Command: {
 		super$: "Object",
 		type$prior: "Command",

@@ -1,9 +1,9 @@
 let LAST_ID = 0;
 
 export default {
-	package$: "youni.works/part",
+	package$: "youni.works/base/part",
 	use: {
-		package$signal: "youni.works/signal"
+		package$signal: "youni.works/base/signal"
 	},
 	Part: {
 		super$: "Object",

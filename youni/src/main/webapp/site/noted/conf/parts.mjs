@@ -1,7 +1,7 @@
 export default {
-	package$: "youni.works/noted",
+	package$: "youni.works/noted/parts",
 	use: {
-		package$ui: "youni.works/ui"
+		package$ui: "youni.works/web/ui"
 	},
 	public: {
 		main: {

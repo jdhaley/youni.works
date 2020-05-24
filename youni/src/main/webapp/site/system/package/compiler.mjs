@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/compiler",
+	package$: "youni.works/system/compiler",
 	Log: {
 		info: (/* arguments */) => undefined,
 		warn: (/* arguments */) => undefined,

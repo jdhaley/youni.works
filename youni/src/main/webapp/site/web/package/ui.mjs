@@ -1,9 +1,9 @@
 export default {
-	package$: "youni.works/ui",
+	package$: "youni.works/web/ui",
 	use: {
-		package$signal: "youni.works/signal",
-		package$platform: "youni.works/platform",
-		package$part: "youni.works/part"
+		package$signal: "youni.works/base/signal",
+		package$part: "youni.works/base/part",
+		package$platform: "youni.works/web/platform"
 	},
 	Frame: {
 		super$: "use.signal.Receiver",
