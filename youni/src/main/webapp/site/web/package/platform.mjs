@@ -1,9 +1,11 @@
 export default {
 	package$: "youni.works/platform",
-	package$signal: "youni.works/signal",
-	package$part: "youni.works/part",
+	use: {
+		package$signal: "youni.works/signal",
+		package$part: "youni.works/part"
+	},
 	Sensor: {
-		super$: "signal.Sender",
+		super$: "use.signal.Sender",
 		content: null,
 		before$send: function send(to, message) {
 			if (!message[Symbol.Signal]) {
@@ -71,7 +73,7 @@ export default {
 		}
 	},
 	Remote: {
-		super$: "part.Service",
+		super$: "use.part.Service",
 		method: "HEAD",
 		url: "",
 		process: function(receiver, message) {

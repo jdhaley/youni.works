@@ -1,15 +1,17 @@
 export default {
 	package$: "youni.works/noted",
-	package$ui: "youni.works/ui",
+	use: {
+		package$ui: "youni.works/ui"
+	},
 	public: {
 		main: {
-			type$: "ui.Main",
+			type$: "use.ui.Main",
 			part: {
 				ribbon: {
-					type$: "ui.Ribbon",
+					type$: "use.ui.Ribbon",
 				},
 				body: {
-					type$: "ui.Article",
+					type$: "use.ui.Article",
 				}
 			},
 			extend$shortcut: {
