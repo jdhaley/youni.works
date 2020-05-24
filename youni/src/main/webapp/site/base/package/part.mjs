@@ -5,9 +5,16 @@ export default {
 	use: {
 		package$signal: "youni.works/base/signal"
 	},
+	Sequence: {
+		super$: "Object",
+		"@iterator": function* iterate() {
+			for (let i = 0, len = this.length; i < len; i++) yield this.at(i);
+		}
+	},
 	Part: {
 		super$: "Object",
-		use: {
+		"@iterator": function* iterate() {
+			for (let name in this.part) yield this.part[name];
 		},
 		once$id: () => ++LAST_ID,
 		type$of: "Part",

@@ -14,9 +14,8 @@ export default {
 		},
 		extend$sender: {
 			Call: function signal(on, message) {
-				for (let name in on.part) {
+				if (on[Symbol.iterator]) for (let part of on) {
 					if (!message.action) return;
-					let part = on.part[name];
 					message.of = on;
 					part.receive && part.receive(message);
 					message.of = on;

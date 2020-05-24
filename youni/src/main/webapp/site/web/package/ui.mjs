@@ -8,6 +8,9 @@ export default {
 	Frame: {
 		super$: "use.signal.Receiver",
 		type$controller: "use.platform.Sensor",
+		"@iterator": function* iterate() {
+			for (let name in this.part) yield this.part[name];
+		},
 		log: console,
 		window: null,
 		var$device: {
