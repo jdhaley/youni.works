@@ -7,12 +7,13 @@ export default {
 	},
 	Compiler: {
 		super$: "Object",
-		type$log: "Log",
+		log: "Log",
 		compile: function(node) {
 		}
 	},
 	Context: {
-		super$: "Compiler",
+		super$: "Object",
+		log: console,
 		content: {},
 		forName: function(componentName) {
 			let component = this.content;
@@ -124,7 +125,7 @@ export default {
 							compiler.compile(decl);
 							this.define(object, name, decl);
 						} catch (error) {
-							compiler.log.error(error);
+							this.log.error(error);
 						}
 					}
 					return object;
