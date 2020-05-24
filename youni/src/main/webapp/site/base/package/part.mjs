@@ -2,18 +2,15 @@ let LAST_ID = 0;
 
 export default {
 	package$: "youni.works/part",
-	package$signal: "youni.works/signal",
 	Part: {
 		super$: "Object",
 		once$id: () => ++LAST_ID,
 		type$of: "Part",
 		part: {
 		},
-		once$context: function() {
-			return this.of ? this.of != this && this.of.context : this;
-		},
 		once$owner: function() {
-			return this.context && this.context.owner;
+			if (this.of) return this.of != this && this.of.owner;
+			return this;
 		},
 		once$name: function() {
 			if (this.of) for (let name in this.of.part) {
@@ -32,21 +29,12 @@ export default {
 			return this.owner ? this.owner.log : console;
 		},
 		initialize: function(conf) {
+			console.debug("init", this, conf.of);
 			if (this.of != this.sys.interfaceOf(this, "Part")) {
 				throw new Error("Component is already initialized.");
 			}
-			this.sys.define(this, "of", conf.component, "const");
-			conf.component = this;
+			this.sys.define(this, "of", conf.of, "const");
 		}
-	},
-	Component: {
-		super$: "Part",
-		//TODO super$: "Part Controller" - true implement
-		type$receive: "signal.Controller.receive",
-		type$control: "signal.Controller.control",
-		type$process: "signal.Controller.process",
-		type$execute: "signal.Controller.execute",
-		type$action: "signal.Controller.action"
 	},
 	Service: {
 		super$: "Object",
