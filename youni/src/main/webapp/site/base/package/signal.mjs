@@ -60,16 +60,12 @@ export default {
 	},
 	Processor: {
 		super$: "Controller",
+		action: {
+		},
 		execute: function(on, message) {
 			let action = this.action[message.action];
 			action && action.call(this, on, message);
-		},
-//		action: {
-//			exception: function(on, message) {
-//				this.log.error(message.error);
-//				message.action = "";
-//			}
-//		}
+		}
 	},
 	Sender: {
 		super$: "Controller",
@@ -80,6 +76,8 @@ export default {
 			let signal = message[Symbol.Signal];
 			let sender = this.sender[signal];
 			if (!sender) throw new TypeError(`Signal "${signal}" cannot be sent.`);
+			//The call allows the sender function to handle the first send edge case.
+			//See platform Sensor.
 			sender.call(to, to, message);
 		},
 		sender: {

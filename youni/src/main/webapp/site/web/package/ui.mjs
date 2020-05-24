@@ -59,11 +59,6 @@ export default {
 	},
 	Viewer: {
 		super$: "use.part.Component",
-		//TODO implement: super$: "Component Processor"
-		type$process: "use.signal.Processor.process",
-		type$execute: "use.signal.Processor.execute",
-		type$trap: "use.signal.Processor.trap",
-		
 		controlName: "div",
 		view: "text",
 		get$render: function() {

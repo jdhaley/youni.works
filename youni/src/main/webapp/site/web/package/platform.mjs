@@ -74,9 +74,9 @@ export default {
 		super$: "part.Service",
 		method: "HEAD",
 		url: "",
-		service: function(receiver, subject, request) {
+		process: function(receiver, message) {
 			let xhr = new XMLHttpRequest();
-			xhr.message = this.createMessage(receiver, subject, request);
+			xhr.message = message;
 			xhr.receiver = receiver;
 			this.prepare(xhr);
 			xhr.send(xhr.message.request);
