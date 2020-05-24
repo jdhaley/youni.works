@@ -69,7 +69,7 @@ export default {
 		},
 		extend$shortcut: {
 		},
-		extend$action: {
+		extend$instruction: {
 			draw: function(on, signal) {
 				this.draw(on, this.view);
 			}
@@ -105,19 +105,19 @@ export default {
 		},
 		after$initialize: function(conf) {
 			this.render = conf.platform.renders;
-			for (let name in conf.actions) this.initializeAction(name, conf.actions[name]);
+			for (let name in conf.actions) this.initializeInstruction(name, conf.actions[name]);
 		},
-		initializeAction: function(name, conf) {
+		initializeInstruction: function(name, conf) {
 			if (conf.group) {
 				for (let group of conf.group.split()) {
 					if (!this.group[group]) this.group[group] = this.sys.extend();
 					this.group[group][name] = conf;					
 				}
 			}
-			if (conf.action) {
-				this.action[name] = conf.action;
-			} else if (!this.action[name]) {
-				this.log.warn(`Main viewer: Action "${name}" is not handled.`);
+			if (conf.instruction) {
+				this.instruction[name] = conf.instruction;
+			} else if (!this.instruction[name]) {
+				this.log.warn(`Main viewer: Instruction "${name}" is not handled.`);
 			}
 			if (conf.shortcut) {
 				this.shortcut[conf.shortcut] = name;
@@ -130,7 +130,7 @@ export default {
 		getAction: function(event) {
 			return event.device.getCharacter(event) ? "Character" : event.device.getKey(event);
 		},
-		extend$action: {
+		extend$instruction: {
 			open: function(on, message) {
 				let location = this.owner.window.location;
 				if (location.search) {
@@ -188,7 +188,7 @@ export default {
 	Ribbon: {
 		super$: "Viewer",
 		controlName: "nav",
-		extend$action: {
+		extend$instruction: {
 			draw: function(on) {
 				let markup = "";
 				for (let groupName in this.of.group) {

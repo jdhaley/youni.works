@@ -49,22 +49,18 @@ export default {
 		},
 		trap: function(error, on, processing) {
 			error.message = `Error processing action "${processing.action}": ` + error.message;
-			this.log.error(error, on, processing);
-			processing.action = "";
-//			/* Stop the message if the exception action threw an error */
-//			if (message.action == "exception") throw error;
-//			message.error = error;
-//			message.action = "exception";
-//			return this.process(on, message);
+			error.processing = processing;
+			error.on = on;
+			throw error;
 		}
 	},
 	Processor: {
 		super$: "Controller",
-		action: {
+		instruction: {
 		},
 		execute: function(on, message) {
-			let action = this.action[message.action];
-			action && action.call(this, on, message);
+			let instruction = this.instruction[message.action];
+			instruction && instruction.call(this, on, message);
 		}
 	},
 	Sender: {

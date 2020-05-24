@@ -57,8 +57,7 @@ export default {
 		type$process: "use.signal.Processor.process",
 		type$execute: "use.signal.Processor.execute",
 		type$trap: "use.signal.Processor.trap",
-		action: {
-			
+		instruction: {	
 		}
 	},
 	Service: {

@@ -16,7 +16,7 @@ export default {
 			},
 			extend$shortcut: {
 			},
-			extend$action: {
+			extend$instruction: {
 				Input: DEFAULT,
 				Cut: DEFAULT,
 				Copy: DEFAULT,

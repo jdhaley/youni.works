@@ -10,7 +10,7 @@ export default {
 		title: "Strong",
 		shortcut: "Control+B",
 		icon: "bold.gif",
-		action: function(on, event) {
+		instruction: function(on, event) {
 			edit.call(this, "bold");
 			event.action = "";
 		}
@@ -20,7 +20,7 @@ export default {
 		title: "Emphasis",
 		shortcut: "Control+I",
 		icon: "italic.gif",
-		action: function(on, event) {
+		instruction: function(on, event) {
 			edit.call(this, "italic");
 			event.action = "";
 		}
@@ -30,7 +30,7 @@ export default {
 		title: "Term",
 		shortcut: "Control+U",
 		icon: "underline.gif",
-		action: function(on, event) {
+		instruction: function(on, event) {
 			edit.call(this, "underline");
 			event.action = "";
 		}
@@ -39,7 +39,7 @@ export default {
 		group: "Outline",
 		title: "Items",
 		icon: "dottedlist.gif",
-		action: function(on, event) {
+		instruction: function(on, event) {
 			edit.call(this, "insertUnorderedList");
 			event.action = "";
 		}
@@ -49,7 +49,7 @@ export default {
 		title: "List",
 		shortcut: "Control+L",
 		icon: "numberedlist.gif",
-		action: function(on, event) {
+		instruction: function(on, event) {
 			edit.call(this, "insertOrderedList");
 			event.action = "";
 		}
@@ -58,21 +58,21 @@ export default {
 		group: "Outline",
 		title: "Heading",
 		icon: "heading.png",
-		action: Heading
+		instruction: Heading
 	},
 	Promote: {
 		group: "Outline",
 		title: "Promote",
 		shortcut: "Control+Backspace",
 		icon: "outdent.gif",
-		action: Promote
+		instruction: Promote
 	},
 	Demote: {
 		group: "Outline",
 		title: "Demote",
 		shortcut: "Control+Space",
 		icon: "indent.gif",
-		action: Demote
+		instruction: Demote
 	}
 }
 
