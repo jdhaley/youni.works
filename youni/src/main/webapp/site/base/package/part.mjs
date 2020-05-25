@@ -41,7 +41,6 @@ export default {
 			return this.owner ? this.owner.log : console;
 		},
 		initialize: function(conf) {
-			console.debug("init", this, conf.of);
 			if (this.of != this.sys.interfaceOf(this, "Part")) {
 				throw new Error("Component is already initialized.");
 			}

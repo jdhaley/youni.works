@@ -5,6 +5,46 @@ export default {
 		shortcut: "Control+S",
 		icon: "save.png",
 	},
+	Promote: {
+		group: "Outline",
+		title: "Promote",
+		shortcut: "Control+Backspace",
+		icon: "outdent.gif",
+		instruction: Promote
+	},
+	Demote: {
+		group: "Outline",
+		title: "Demote",
+		shortcut: "Control+Space",
+		icon: "indent.gif",
+		instruction: Demote
+	},
+	Heading: {
+		group: "Section",
+		title: "Toggle Section",
+		shortcut: "Control+H",
+		icon: "heading.png",
+		instruction: Heading
+	},
+	Items: {
+		group: "Section",
+		title: "Tree",
+		icon: "dottedlist.gif",
+		instruction: function(on, event) {
+			edit.call(this, "insertUnorderedList");
+			event.action = "";
+		}
+	},
+	List: {
+		group: "Section",
+		title: "List",
+		shortcut: "Control+L",
+		icon: "numberedlist.gif",
+		instruction: function(on, event) {
+			edit.call(this, "insertOrderedList");
+			event.action = "";
+		}
+	},
 	Strong: {
 		group: "Tag",
 		title: "Strong",
@@ -34,45 +74,6 @@ export default {
 			edit.call(this, "underline");
 			event.action = "";
 		}
-	},
-	Items: {
-		group: "Outline",
-		title: "Items",
-		icon: "dottedlist.gif",
-		instruction: function(on, event) {
-			edit.call(this, "insertUnorderedList");
-			event.action = "";
-		}
-	},
-	List: {
-		group: "Outline",
-		title: "List",
-		shortcut: "Control+L",
-		icon: "numberedlist.gif",
-		instruction: function(on, event) {
-			edit.call(this, "insertOrderedList");
-			event.action = "";
-		}
-	},
-	Heading: {
-		group: "Outline",
-		title: "Heading",
-		icon: "heading.png",
-		instruction: Heading
-	},
-	Promote: {
-		group: "Outline",
-		title: "Promote",
-		shortcut: "Control+Backspace",
-		icon: "outdent.gif",
-		instruction: Promote
-	},
-	Demote: {
-		group: "Outline",
-		title: "Demote",
-		shortcut: "Control+Space",
-		icon: "indent.gif",
-		instruction: Demote
 	}
 }
 
@@ -87,6 +88,7 @@ function Heading(on, event) {
 			edit.call(this, "formatBlock", "P").collapse(true);
 			break;
 		case "paragraph":
+		case "item":
 			let p = getContainer(node, "paragraph");
 			let level = getSectionLevel(p);
 			edit.call(this, "formatBlock", "H" + level).collapse(true);
@@ -142,11 +144,12 @@ function Demote(on, event) {
 				edit.call(this, "formatBlock", "H" + level).collapse(true);
 			}
 			break;
+		case "paragraph":
 		case "item":
 		case "tag":
-			let i = getContainer(node, "item");
+			let i = getContainer(node, "item") || getContainer(node, "paragraph");
 			range.selectNodeContents(i);
-			edit.call(this, "indent").collapse(true);
+			edit.call(this, i.nodeName == "LI" ? "indent" : "insertUnorderedList").collapse(true);
 			break;
 		case "list":
 			let l = getContainer(node, "list");
@@ -155,7 +158,7 @@ function Demote(on, event) {
 			edit.call(this, "indent");
 			break;
 		case "article":
-			edit.call(this, "insertUnorderedList");
+			//edit.call(this, "insertUnorderedList");
 			break;
 	}
 }
@@ -177,13 +180,16 @@ function getHeadingLevel(node) {
 	}
 	return 0;
 }
-
 function getSectionLevel(node) {
 	let level = getHeadingLevel(node);
 	if (level) return level - 1;
-	for (; node; node = node.previousNode) {
+	while (node.parentNode.nodeName != "ARTICLE") {
+		node = node.parentNode;
+	}
+	while (node) {
 		level = getHeadingLevel(node);
 		if (level) return level;
+		node = node.previousSibling;
 	}
 	return -1;
 }

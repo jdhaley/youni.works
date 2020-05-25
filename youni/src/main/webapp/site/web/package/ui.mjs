@@ -193,7 +193,7 @@ export default {
 				let markup = "";
 				for (let groupName in this.of.group) {
 					let group = this.of.group[groupName];
-					markup += `<div class='actions' title='${groupName}'>`
+					markup += `<menu title='${groupName}'>`
 					for (let name in group) {
 						let action = group[name];
 						if (action.icon) {
@@ -202,7 +202,7 @@ export default {
 							markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${action.icon}'></img></button>`;
 						}
 					}
-					markup += "</div>";
+					markup += "</menu>";
 				}
 				on.innerHTML = markup;
 				on.parentNode.ribbon = on;
