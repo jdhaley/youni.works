@@ -10,6 +10,14 @@ export default {
 		},
 		var$symbol: {
 		},
+		save: function(source) {
+			let member = this.parse(source);
+			let pathname = "compiler/package/" + member.part[""].source + "/source.json"
+			this.service.save.service(this, "saved", JSON.stringify({
+				[pathname]: JSON.stringify(member, null, "\t")
+			}));
+			return member;
+		},
 		parse: function load(source, decl) {
 			let member = this.sys.extend(this.use.Member, {
 				name: this.nameOf(decl),
