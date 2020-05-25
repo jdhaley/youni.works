@@ -1,12 +1,14 @@
 import signal		from "../base/package/signal.mjs";
 import part			from "../base/package/part.mjs";
-import member		from "./package/member.mjs";
-import test			from "./test.mjs";
+import parser		from "./package/parser.mjs";
+import loader		from "./package/loader.mjs";
+
 export default {
 	packages: {
 		signal: signal,
 		part: part,
-		member: member,
+		parser: parser,
+		loader: loader
 	},
-	test: test
+	test: part
 }

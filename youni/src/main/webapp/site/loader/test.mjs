@@ -2,42 +2,6 @@ export default {
 	package$: "youni.works/base/system",
 	use: {
 	},
-	private: function() {
-		const OBJECT = window.Object;
-		const INTERFACE = Symbol("interface");
-
-		const Object = OBJECT.create(null);
-		Object[Symbol.toPrimitive] = function(hint) {
-			let value = this.valueOf(hint);
-			/*
-			 	The primitive value is determined recursively via '+value' and '"" + value'
-			 	when "value" is an object, unless "value === this" in which case we return 
-			 	1 ("truth") or "". There is a small risk of an endless loop when this.valueOf()
-			 	returns another object whose value cycles back to this.
-			 */
-			if (hint == "number") return value === this ? 1 : +value;
-			if (hint == "string") return value === this ? "" : "" + value;
-			return value[Symbol.toStringTag];
-		}
-		Object.valueOf = function(type) {
-			return type == "function" ? this.apply.bind(this) : this;
-		}
-		Object.apply = function apply() {
-			let value = arguments.length ? this[arguments[0]] : this;
-			if (arguments.length > 1) {
-				if (typeof value != "function") {
-					throw new TypeError(`"${arguments[0]}" is not a function.`);
-				}
-				value = value.apply(this, arguments[1]);
-			}
-			return value;
-		}
-
-		const Declaration = OBJECT.create(Object);
-		Declaration.define = function(object) {
-			return OBJECT.defineProperty(object, this.name, this);
-		}		
-	},
 	type$Object: "Object",
 	type$Declaration: "Declaration",
 	System: {

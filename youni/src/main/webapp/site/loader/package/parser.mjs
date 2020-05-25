@@ -1,29 +1,18 @@
 export default {
-	package$: "youni.works/member",
-	package$part: "youni.works/part",
-	Package: {
-		name: "",
-		use: {
-		},
-		main: () => undefined,
-		public: {
-		}
+	package$: "youni.works/loader/parser",
+	use: {
+		package$part: "youni.works/base/part",		
 	},
-	Loader: {
-		super$: "part.Component",
+	Parser: {
+		super$: "use.part.Component",
 		use: {
-			type$Member: "part.Part"
+			type$Member: "use.part.Part"
 		},
-		symbol: {
+		var$symbol: {
 		},
-		compile: function(source) {
-			let member = this.load(source);
-			this.construct(member);
-			this.constructor[member.constructor || "default"].compile(member);
-		},
-		load: function load(source, decl) {
+		parse: function load(source, decl) {
 			let member = this.sys.extend(this.use.Member, {
-				name: this.nameOf(decl) || undefined,
+				name: this.nameOf(decl),
 				facet: this.facetOf(decl) || undefined,
 				type: typeof source,
 				source: undefined,
@@ -54,7 +43,7 @@ export default {
 			if (this.sys.prototypeOf(source) == Object.prototype) {
 				member.part = this.sys.extend();
 				for (let decl in source) {
-					let prop = this.load(source[decl], decl);
+					let prop = this.parse(source[decl], decl);
 					member.part[prop.name] = prop;
 					delete prop.name;
 				}
@@ -65,7 +54,7 @@ export default {
 				member.part = this.sys.extend();
 				let i = 0;
 				for (ele of source) {
-					let prop = this.load(ele);
+					let prop = this.parse(ele);
 					member.part[i++] = prop;
 				}
 				member.constructor = "array";
@@ -100,76 +89,3 @@ export default {
 		}
 	}
 }
-/*
-constructor: {
-default: {
-	compile: function(member) {
-		member.value = member.source;
-	}
-},
-array: {
-	compile: function(member) {
-		member.value = member.source;
-	}				
-},
-product: {
-	compile: function(member) {
-		member.value = member.source;
-	}				
-},
-type: {
-	compile: function(member) {
-		for (let name in member.part) {
-			let prop = member.part[name];
-			
-		}
-		member.value = member.source;
-	}
-},
-super: {
-	compile: function(member) {
-		member.value = member.source;
-	}				
-},
-package: {
-	compile: function(member) {
-		member.value = member.source;
-	}				
-}
-
-
-},
-facet: {
-default: function(member) {
-	member.configurable = true;
-	member.enumerable = true;
-	member.writable = true;
-	member.value = member.source;
-},
-const: function(member) {
-	member.value = member.source;
-},
-method: function(member) {
-	member.value = this.compileFunction(member.source);
-},
-get: function(member) {
-	member.get = this.compileFunction(member.source)
-}
-},
-log: console,
-resolve: function(component, name) {
-let value = component[name];
-if (this.sys.isDeclaration(value)) {
-	this.compile(value);
-	Object.defineProperty(component, name, value);
-	value = component[name];
-}
-return value;
-},
-
-typeOf: function(member) {
-let type = member.part[""].source;
-member = member.context.forName(type);
-return type;
-},
-*/

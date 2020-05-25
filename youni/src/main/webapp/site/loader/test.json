@@ -1,111 +1,158 @@
 {
 	"type": "object",
 	"part": {
-		"name": {
+		"": {
+			"facet": "package",
 			"type": "string",
-			"source": "youni.works/base/system"
+			"source": "youni.works/base/part"
 		},
 		"use": {
 			"type": "object",
 			"part": {
-				
+				"signal": {
+					"facet": "package",
+					"type": "string",
+					"source": "youni.works/base/signal"
+				}
 			},
 			"constructor": "type"
 		},
-		"main": {
-			"type": "function",
-			"source": "function() {\r\n\t\tconst OBJECT = window.Object;\r\n\t\tconst INTERFACE = Symbol(\"interface\");\r\n\r\n\t\tconst Object = OBJECT.create(null);\r\n\t\tObject[Symbol.toPrimitive] = function(hint) {\r\n\t\t\tlet value = this.valueOf(hint);\r\n\t\t\t/*\r\n\t\t\t \tThe primitive value is determined recursively via '+value' and '\"\" + value'\r\n\t\t\t \twhen \"value\" is an object, unless \"value === this\" in which case we return \r\n\t\t\t \t1 (\"truth\") or \"\". There is a small risk of an endless loop when this.valueOf()\r\n\t\t\t \treturns another object whose value cycles back to this.\r\n\t\t\t */\r\n\t\t\tif (hint == \"number\") return value === this ? 1 : +value;\r\n\t\t\tif (hint == \"string\") return value === this ? \"\" : \"\" + value;\r\n\t\t\treturn value[Symbol.toStringTag];\r\n\t\t}\r\n\t\tObject.valueOf = function(type) {\r\n\t\t\treturn type == \"function\" ? this.apply.bind(this) : this;\r\n\t\t}\r\n\t\tObject.apply = function apply() {\r\n\t\t\tlet value = arguments.length ? this[arguments[0]] : this;\r\n\t\t\tif (arguments.length > 1) {\r\n\t\t\t\tif (typeof value != \"function\") {\r\n\t\t\t\t\tthrow new TypeError(`\"${arguments[0]}\" is not a function.`);\r\n\t\t\t\t}\r\n\t\t\t\tvalue = value.apply(this, arguments[1]);\r\n\t\t\t}\r\n\t\t\treturn value;\r\n\t\t}\r\n\r\n\t\tconst Declaration = OBJECT.create(Object);\r\n\t\tDeclaration.define = function(object) {\r\n\t\t\treturn OBJECT.defineProperty(object, this.name, this);\r\n\t\t}\t\t\r\n\t}"
-		},
-		"public": {
+		"Sequence": {
 			"type": "object",
 			"part": {
-				"Object": {
-					"facet": "type",
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Object"
+				}
+			},
+			"constructor": "super"
+		},
+		"Part": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
 					"type": "string",
 					"source": "Object"
 				},
-				"Declaration": {
+				"id": {
+					"facet": "once",
+					"type": "function",
+					"source": "() => ++LAST_ID"
+				},
+				"of": {
 					"facet": "type",
 					"type": "string",
-					"source": "Declaration"
+					"source": "Part"
 				},
-				"System": {
+				"part": {
 					"type": "object",
 					"part": {
-						"undefined": {
-							"facet": "super",
-							"type": "string",
-							"source": "Object"
-						},
-						"prototypeOf": {
-							"type": "function",
-							"source": "function(value) {\r\n\t\t\t\tif (value && typeof value == \"object\") return OBJECT.getPrototypeOf(value);\r\n\t\t\t}"
-						},
-						"interfaceOf": {
-							"type": "function",
-							"source": "function(value, name) {\r\n\t\t\t\twhile (value) {\r\n\t\t\t\t\tvalue = value && value[INTERFACE];\r\n\t\t\t\t\tif (!name) return value;\r\n\t\t\t\t\tif (name == value[Symbol.toStringTag]) return value;\r\n\t\t\t\t\tvalue = this.prototypeOf(value);\r\n\t\t\t\t}\r\n\t\t\t}"
-						},
-						"isPrototypeOf": {
-							"type": "function",
-							"source": "function(object, value) {\r\n\t\t\t\treturn typeof object == \"object\" \r\n\t\t\t\t\t? OBJECT.isPrototypeOf.call(object, value)\r\n\t\t\t\t\t: false;\r\n\t\t\t}"
-						},
-						"isInterface": {
-							"type": "function",
-							"source": "function(object) {\r\n\t\t\t\treturn this.hasOwn(object, INTERFACE) || object === Object;\r\n\t\t\t}"
-						},
-						"isDeclaration": {
-							"type": "function",
-							"source": "function(value) {\r\n\t\t\t\treturn this.isPrototypeOf(Declaration, value);\r\n\t\t\t}"
-						},
-						"isPublic": {
-							"type": "function",
-							"source": "function(object, key) {\r\n\t\t\t\tfor (; object; object = this.prototypeOf(object)) {\r\n\t\t\t\t\tlet descriptor = Reflect.getOwnPropertyDescriptor(object, key);\r\n\t\t\t\t\tif (descriptor) return descriptor.enumerable ? true : false;\r\n\t\t\t\t}\r\n\t\t\t\treturn undefined;\r\n\t\t\t}"
-						},
-						"describe": {
-							"type": "function",
-							"source": "function(object, key) {\r\n\t\t\t\twhile (object) {\r\n\t\t\t\t\tlet descriptor = Reflect.getOwnPropertyDescriptor(object, key);\r\n\t\t\t\t\tif (descriptor) {\r\n\t\t\t\t\t\tdescriptor.name = key;\r\n\t\t\t\t\t\tdescriptor.definedOn = object;\r\n\t\t\t\t\t\treturn this.extend(Declaration, descriptor);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tobject = this.prototypeOf(object);\r\n\t\t\t\t}\r\n\t\t\t\treturn Declaration;\r\n\t\t\t}"
-						},
-						"hasOwn": {
-							"type": "function",
-							"source": "function(object, key) {\r\n\t\t\t\treturn object && typeof object == \"object\" && OBJECT.hasOwnProperty.call(object, key);\r\n\t\t\t}"
-						},
-						"extend": {
-							"type": "function",
-							"source": "function(object, declarations) {\r\n\t\t\t\tif (!arguments.length) object = null;\r\n\t\t\t\treturn this.implement(OBJECT.create(object), declarations);\r\n\t\t\t}"
-						},
-						"implement": {
-							"type": "function",
-							"source": "function(object, declarations) {\r\n\t\t\t\tfor (let name in declarations) {\r\n\t\t\t\t\tthis.define(object, name, declarations[name]);\r\n\t\t\t\t}\r\n\t\t\t\treturn object;\r\n\t\t\t}"
-						},
-						"define": {
-							"type": "function",
-							"source": "function(object, name, decl) {\r\n\t\t\t\tif (!this.isDeclaration(decl)) {\r\n\t\t\t\t\tdecl = this.declare(decl, name);\r\n\t\t\t\t\tdecl.enumerable = true;\r\n\t\t\t\t\tdecl.writable = true;\r\n\t\t\t\t\tdecl.value = decl.source;\r\n\t\t\t\t}\r\n\t\t\t\ttry {\r\n\t\t\t\t\tdecl.define(object);\r\n\t\t\t\t} catch (error) {\r\n\t\t\t\t\tthis.error(error);\r\n\t\t\t\t}\r\n\t\t\t\treturn decl;\r\n\t\t\t}"
-						},
-						"defineInterface": {
-							"type": "function",
-							"source": "function(object, name) {\r\n\t\t\t\tif (!object.sys) object.sys = this;\r\n\t\t\t\tif (name) OBJECT.defineProperty(object, Symbol.toStringTag, {value: name});\r\n\t\t\t\tif (this.isInterface(this.prototypeOf(object))) {\r\n\t\t\t\t\tOBJECT.defineProperty(object, INTERFACE, {value: object});\r\n\t\t\t\t}\r\n\t\t\t}"
-						},
-						"declare": {
-							"type": "function",
-							"source": "function(source, name, facet) {\r\n\t\t\t\tlet prop = this.extend(Declaration);\r\n\t\t\t\tif (name) prop.name = name;\r\n\t\t\t\tif (facet) prop.facet = facet;\r\n\t\t\t\tprop.source = source;\r\n\t\t\t\treturn prop;\r\n\t\t\t}"
-						},
-						"error": {
-							"type": "function",
-							"source": "function(error) {\r\n\t\t\t\t//TODO could add a debugger statement when environment is development.\r\n\t\t\t\tthrow error;\r\n\t\t\t}"
-						},
-						"packages": {
-							"type": "object",
-							"part": {
-								
-							},
-							"constructor": "type"
-						}
+						
+					},
+					"constructor": "type"
+				},
+				"owner": {
+					"facet": "once",
+					"type": "function",
+					"source": "function() {\r\n\t\t\tif (this.of) return this.of != this && this.of.owner;\r\n\t\t\treturn this;\r\n\t\t}"
+				},
+				"name": {
+					"facet": "once",
+					"type": "function",
+					"source": "function() {\r\n\t\t\tif (this.of) for (let name in this.of.part) {\r\n\t\t\t\tif (this.part[name] == this) return name;\r\n\t\t\t}\r\n\t\t\treturn \"\";\r\n\t\t}"
+				},
+				"pathname": {
+					"facet": "get",
+					"type": "function",
+					"source": "function() {\r\n\t\t\tif (this.name) {\r\n\t\t\t\tlet path = this.of && this.of.pathname || \"\";\r\n\t\t\t\treturn path + \"/\" + this.name;\r\n\t\t\t}\r\n\t\t\treturn \"\";\r\n\t\t}"
+				},
+				"log": {
+					"facet": "get",
+					"type": "function",
+					"source": "function() {\r\n\t\t\treturn this.owner ? this.owner.log : console;\r\n\t\t}"
+				},
+				"initialize": {
+					"type": "function",
+					"source": "function(conf) {\r\n\t\t\tif (this.of != this.sys.interfaceOf(this, \"Part\")) {\r\n\t\t\t\tthrow new Error(\"Component is already initialized.\");\r\n\t\t\t}\r\n\t\t\tthis.sys.define(this, \"of\", conf.of, \"const\");\r\n\t\t}"
+				}
+			},
+			"constructor": "super"
+		},
+		"Component": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Part"
+				},
+				"controller": {
+					"facet": "type",
+					"type": "string",
+					"source": "use.signal.Receiver.controller"
+				},
+				"receive": {
+					"facet": "type",
+					"type": "string",
+					"source": "use.signal.Receiver.receive"
+				},
+				"process": {
+					"facet": "type",
+					"type": "string",
+					"source": "use.signal.Processor.process"
+				},
+				"execute": {
+					"facet": "type",
+					"type": "string",
+					"source": "use.signal.Processor.execute"
+				},
+				"trap": {
+					"facet": "type",
+					"type": "string",
+					"source": "use.signal.Processor.trap"
+				},
+				"instruction": {
+					"type": "object",
+					"part": {
+						
 					},
 					"constructor": "type"
 				}
 			},
-			"constructor": "type"
+			"constructor": "super"
+		},
+		"Service": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Component"
+				},
+				"use": {
+					"type": "object",
+					"part": {
+						"Message": {
+							"facet": "type",
+							"type": "string",
+							"source": "use.signal.Message"
+						}
+					},
+					"constructor": "type"
+				},
+				"service": {
+					"type": "function",
+					"source": "function(receiver, subject, request) {\r\n\t\t\tlet message = this.createMessage(receiver, subject, request);\r\n\t\t\tthis.process(receiver, message);\r\n\t\t}"
+				},
+				"createMessage": {
+					"type": "function",
+					"source": "createMessage(receiver, subject, request) {\r\n\t\t\tlet message = this.sys.extend(this.use.Message);\r\n\t\t\tmessage.action = subject;\r\n\t\t\tmessage.request = request;\r\n\t\t\tmessage.status = 0;\r\n\t\t\treturn message;\r\n\t\t}"
+				}
+			},
+			"constructor": "super"
 		}
 	},
-	"constructor": "type"
+	"constructor": "package"
 }
