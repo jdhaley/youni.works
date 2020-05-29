@@ -1,9 +1,19 @@
+const fs = require('fs');
+const https = require('https');
+
 const express = require("express");
+
+const credentials = {
+	key: fs.readFileSync('ssl/my.key', 'utf8'),
+	cert: fs.readFileSync('ssl/my.crt', 'utf8')
+};
 const app = express();
-const port = 3000;
+const httpsServer = https.createServer(credentials, app);
+const port = 443;
+
+httpsServer.listen(port);
 
 app.use("/prd", express.static("site"));
 app.use("/file", express.static("../fs"));
-//app.get('/', (req, res) => res.send('Hello World!'))
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+//app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
