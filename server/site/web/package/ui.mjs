@@ -135,7 +135,9 @@ export default {
 				let location = this.owner.window.location;
 				if (location.search) {
 					this.owner.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
-					this.owner.service.get.service(this.owner, "load", location.search.substring(1) + ".view");
+					this.owner.service.open.service(this.owner, "load", {
+						url: this.owner.window.location.search + ".view",
+					});
 				}
 			},
 			load: function(on, message) {
@@ -168,10 +170,10 @@ export default {
 			},
 			Save: function(on, event) {
 				event.action = ""; //Stop Control+S to save on client.
-				let file = this.owner.window.location.search.substring(1) + ".view";
-				this.owner.service.save.service(this.owner, "saved", JSON.stringify({
-					[file]: on.parts.body.outerHTML
-				}));
+				this.owner.service.save.service(this.owner, "saved", {
+					url: this.owner.window.location.search + ".view",
+					content: on.parts.body.outerHTML
+				});
 			},
 			KeyDown: function(on, event) {
 				event.device = this.owner.device.keyboard;

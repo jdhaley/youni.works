@@ -4,7 +4,7 @@ export default {
 		package$platform: "youni.works/web/platform"
 	},
 	public: {
-		get: {
+		open: {
 			type$: "use.platform.Remote",
 			url: "/file",
 			method: "GET"
@@ -12,7 +12,7 @@ export default {
 		save: {
 			type$: "use.platform.Remote",
 			url: "/file",
-			method: "POST"			
+			method: "PUT"
 		}
 	}
 }

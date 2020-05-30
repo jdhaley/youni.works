@@ -76,21 +76,25 @@ export default {
 		method: "HEAD",
 		url: "",
 		process: function(receiver, message) {
-			let xhr = new XMLHttpRequest();
-			xhr.message = message;
-			xhr.receiver = receiver;
+			let xhr = this.createRequest(receiver, message);
+
+			let method = this.getMethod(receiver, message);
+			let url = this.getUrl(receiver, message);
+			xhr.open(method, url);
+			
 			this.prepare(xhr);
-			xhr.send(xhr.message.request);
+			
+			let content = this.getContent(receiver, message);
+			xhr.send(content);
 		},
-		after$createMessage: function(receiver, subject, request) {
-			let message = Function.returned;
-			message.url = this.getUrl(receiver, message);
-			message.request = this.getRequest(receiver, message);
-			return message;
+		createRequest: function(receiver, message) {
+			let xhr = new XMLHttpRequest();
+			xhr.receiver = receiver;
+			xhr.message = message;
+			xhr.onreadystatechange = () => this.monitor(xhr);
+			return xhr;
 		},
 		prepare: function(xhr) {
-			xhr.onreadystatechange = () => this.monitor(xhr);
-			xhr.open(this.method, xhr.message.url);
 			let header = this.getHeader(xhr.receiver, xhr.message);
 			for (let name in header) {
 				let value = header[name];
@@ -110,21 +114,21 @@ export default {
 					xhr.receiver.receive(xhr.message);
 			}
 		},
-		getUrl: function(on, message) {
-			return this.method == "GET" || this.method == "HEAD"
-				? this.url + "/" + message.request
-				: this.url;
+		getMethod: function(on, message) {
+			return this.method;
 		},
-		getRequest: function(on, message) {
-			return this.method == "GET" || this.method == "HEAD"
-				? null
-				: message.request
-		},		
+		getUrl: function(on, message) {
+			let requestUrl = message.request.url || "";
+			return this.url + requestUrl;
+		},
 		getHeader: function(on, message) {
 			return null;
 //			{
 //				"Session-Id": this.session.id
 //			}
+		},
+		getContent: function(on, message) {
+			return message.request.content || null;
 		}
 	}
 }
