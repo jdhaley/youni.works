@@ -1,7 +1,7 @@
 h1 {
 	border-top: 1px solid steelblue;
 	color: steelBlue;
-	margin-top: 8px;
+	padding-top: 8px;
 	padding-top: 2px;
 	font-size: large;
 }
@@ -14,7 +14,7 @@ h1:hover:after {
 	margin-left: 4px;
 }
 h2 {
-	margin-top: 8px;
+	padding-top: 8px;
 	font-style: italic;
 	font-size: large;
 	font-weight: normal;
@@ -29,7 +29,7 @@ h2:hover:after {
 	margin-left: 4px;
 }
 h3 {
-	margin-top: 8px;
+	padding-top: 8px;
 	font-size: medium;
 	color: darkSlateGray;
 }
@@ -43,7 +43,7 @@ h3:hover:after {
 }
 
 h4 {
-	margin-top: 8px;
+	padding-top: 8px;
 	color: steelBlue;
 	font-size: medium;
 	font-weight: normal;
@@ -58,7 +58,7 @@ h4:hover:after {
 }
 
 h5 {
-	margin-top: 4px;
+	padding-top: 4px;
 	color: slateGray;
 	font-size: medium;
 	font-weight: normal;
@@ -73,7 +73,7 @@ h5:hover:after {
 }
 
 h6 {
-	margin-top: 4px;
+	padding-top: 4px;
 	color: slateGray;
 	font-size: smaller;
 	font-weight: lighter;
@@ -87,10 +87,6 @@ h6:hover:after {
 	margin-left: 4px;
 }
 
-ul, ol {
-	padding: 0 3px 0 0;
-	border-right: 1.5px solid gainsboro;
-}
 ul {
 	padding-left: 1.5em;
 }
@@ -108,14 +104,17 @@ ol>li:before {
 }
 
 li, p {
-	margin: 4px 0 0 0;
+	padding-top: 6px;
 }
-
-p {
-	padding: 0 3px 0 0;
-	border-right: 1.5px solid silver;
-}
-
 u {
 	text-decoration: underline silver;
 }
+/*
+ul, ol {
+	padding-right: 4px;
+	border-right: 1px dashed lightSteelBlue;
+}
+li, p {
+	border-right: 1px solid lightSteelBlue;
+}
+*/
