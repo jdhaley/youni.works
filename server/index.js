@@ -23,7 +23,7 @@ function filer(req, res) {
 		res.send(file);
 		res.end();
 	} else if (req.method == "PUT") {
-		fs.writeFileSync(path, req.body);
+		req.pipe(fs.createWriteStream(path));
 		res.end();
 	} else {
 		res.end(400);
