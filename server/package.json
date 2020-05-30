@@ -2,14 +2,13 @@
   "name": "server",
   "version": "0.1.0",
   "description": "youni server",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
-    "url": "\\web\\repositories\\youni.works"
+    "url": "/web/repositories/youni.works"
   },
   "author": "jdhaley@gmail.com",
   "license": "UNLICENSED",
