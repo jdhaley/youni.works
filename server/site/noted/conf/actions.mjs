@@ -3,33 +3,33 @@ export default {
 		group: "File",
 		title: "Save",
 		shortcut: "Control+S",
-		icon: "save.png",
+		icon: "<i class='material-icons'>cloud_upload</i>",
 	},
 	Promote: {
 		group: "Outline",
 		title: "Promote",
 		shortcut: "Control+Backspace",
-		icon: "outdent.gif",
+		icon: "<i class='material-icons'>format_indent_decrease</i>",
 		instruction: Promote
 	},
 	Demote: {
 		group: "Outline",
 		title: "Demote",
 		shortcut: "Control+Space",
-		icon: "indent.gif",
+		icon: "<i class='material-icons'>format_indent_increase</i>",
 		instruction: Demote
 	},
 	Heading: {
 		group: "Section",
 		title: "Toggle Section",
 		shortcut: "Control+H",
-		icon: "heading.png",
+		icon: "<i class='material-icons'>title</i>",
 		instruction: Heading
 	},
 	Items: {
 		group: "Section",
 		title: "Tree",
-		icon: "dottedlist.gif",
+		icon: "<i class='material-icons'>format_list_bulleted</i>",
 		instruction: function(on, event) {
 			edit.call(this, "insertUnorderedList");
 			event.action = "";
@@ -39,7 +39,7 @@ export default {
 		group: "Section",
 		title: "List",
 		shortcut: "Control+L",
-		icon: "numberedlist.gif",
+		icon: "<i class='material-icons'>format_list_numbered</i>",
 		instruction: function(on, event) {
 			edit.call(this, "insertOrderedList");
 			event.action = "";
@@ -49,7 +49,7 @@ export default {
 		group: "Tag",
 		title: "Strong",
 		shortcut: "Control+B",
-		icon: "bold.gif",
+		icon: "<i class='material-icons'>format_bold</i>",
 		instruction: function(on, event) {
 			edit.call(this, "bold");
 			event.action = "";
@@ -59,7 +59,7 @@ export default {
 		group: "Tag",
 		title: "Emphasis",
 		shortcut: "Control+I",
-		icon: "italic.gif",
+		icon: "<i class='material-icons'>format_italic</i>",
 		instruction: function(on, event) {
 			edit.call(this, "italic");
 			event.action = "";
@@ -69,7 +69,7 @@ export default {
 		group: "Tag",
 		title: "Term",
 		shortcut: "Control+U",
-		icon: "underline.gif",
+		icon: "<i class='material-icons'>format_underline</i>",
 		instruction: function(on, event) {
 			edit.call(this, "underline");
 			event.action = "";
@@ -86,7 +86,7 @@ function Heading(on, event) {
 			let h = getContainer(node, "heading");
 			range.selectNodeContents(h);
 			edit.call(this, "formatBlock", "P").collapse(true);
-			break;
+			break;s
 		case "paragraph":
 		case "item":
 			let p = getContainer(node, "paragraph");

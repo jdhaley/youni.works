@@ -201,7 +201,7 @@ export default {
 						if (action.icon) {
 							let title = action.title;
 							if (action.shortcut) title += "\n" + action.shortcut;
-							markup += `<button title='${title}' data-command='${name}'><img src='conf/icons/${action.icon}'></img></button>`;
+							markup += `<button title='${title}' data-command='${name}'>${action.icon}</button>`;
 						}
 					}
 					markup += "</menu>";
