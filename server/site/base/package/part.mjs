@@ -5,25 +5,9 @@ export default {
 	use: {
 		package$signal: "youni.works/base/signal"
 	},
-	Sequence: {
-		super$: "Object",
-		"@iterator": function* iterate() {
-			for (let i = 0, len = this.length; i < len; i++) yield this.at(i);
-		}
-	},
 	Part: {
-		super$: "Object",
-		"@iterator": function* iterate() {
-			for (let name in this.part) yield this.part[name];
-		},
+		super$: "use.signal.Node",
 		once$id: () => ++LAST_ID,
-		type$of: "Part",
-		part: {
-		},
-		once$owner: function() {
-			if (this.of) return this.of != this && this.of.owner;
-			return this;
-		},
 		once$name: function() {
 			if (this.of) for (let name in this.of.part) {
 				if (this.part[name] == this) return name;
@@ -37,15 +21,14 @@ export default {
 			}
 			return "";
 		},
-		get$log: function() {
-			return this.owner ? this.owner.log : console;
-		},
 		initialize: function(conf) {
-			if (this.of != this.sys.interfaceOf(this, "Part")) {
-				throw new Error("Component is already initialized.");
-			}
 			this.sys.define(this, "of", conf.of, "const");
-		}
+		},
+		part: {
+		},
+		"@iterator": function* iterate() {
+			for (let name in this.part) yield this.part[name];
+		},
 	},
 	Component: {
 		super$: "Part",

@@ -22,23 +22,30 @@ export default {
 			this.controller && this.controller.process(this, message);		
 		}
 	},
+	Node: {
+		super$: "Receiver",
+		type$of: "Node",
+		once$owner: function() {
+			if (this.of) return this.of != this && this.of.owner;
+			return this;
+		},
+		get$log: function() {
+			return this.owner ? this.owner.log : console;
+		},
+		"@iterator": function* iterate() {
+			for (let i = 0, len = this.length; i < len; i++) yield this[i];
+		}
+	},
 	Controller: {
 		super$: "Object",
-//		use: {
-//			type$Signal: "Signal",
-//			type$Message: "Message"
-//		},
-//		getSignal: function(message) {
-//			return message[Symbol.signal];
-//		},
-		log: console,
+//		log: console,
 		process: function(on, message) {
 			let action = typeof message == "string" ? message : message.action;
 			while (action) try {
 				this.execute(on, message);
 				action = (message.action == action ? "" : message.action);
-			} catch (error) {
-				this.trap(error, on, message);
+			} catch (fault) {
+				this.trap(on, message, fault);
 			}
 		},
 		execute: function(on, message) {
@@ -47,11 +54,11 @@ export default {
 				method[message.length ? "apply" : "call"](on, message);
 			}
 		},
-		trap: function(error, on, processing) {
-			error.message = `Error processing action "${processing.action}": ` + error.message;
-			error.processing = processing;
-			error.on = on;
-			throw error;
+		trap: function(on, message, fault) {
+			fault.message = `Error processing action "${message.action}": ` + fault.message;
+			fault.processing = message;
+			fault.on = on;
+			throw fault;
 		}
 	},
 	Processor: {
