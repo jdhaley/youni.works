@@ -2,17 +2,8 @@ export default function main(sys, conf) {
 	const pkg = conf.packages;
 	
 	const app = pkg.express();
-	app.use("/prd", pkg.express.static("site"));
+	app.use("/prd", pkg.express.static(conf.site));
 	app.use("/file", filer);
-	
-	const credentials = {
-		key: pkg.fs.readFileSync(conf.key, "utf8"),
-		cert: pkg.fs.readFileSync(conf.cert, "utf8")
-	};
-	const httpsServer = pkg.https.createServer(credentials, app);
-
-	httpsServer.listen(conf.port, () => console.log(`NEW HTTPS Server listening on port "${conf.port}"`));
-	return httpsServer;
 	
 	function filer(req, res) {
 		let path = conf.files + req.url.substring(req.url.indexOf("?") + 1);
@@ -27,5 +18,14 @@ export default function main(sys, conf) {
 			res.end(400);
 		}
 	}
+	
+	const credentials = {
+		key: pkg.fs.readFileSync(conf.key),
+		cert: pkg.fs.readFileSync(conf.cert)
+	};
+	const httpsServer = pkg.https.createServer(credentials, app);
+
+	httpsServer.listen(conf.port, () => console.log(`NEW HTTPS Server listening on port "${conf.port}"`));
+	return httpsServer;
 }
 

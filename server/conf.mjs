@@ -7,6 +7,7 @@ export default {
 	key: "ssl/my.key",
 	cert: "ssl/my.crt",
 	files: "/web/repositories/youni.works/fs/",
+	site: "site",
 	packages: {
 		express: express,
 		fs: fs,

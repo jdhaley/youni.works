@@ -1,4 +1,4 @@
-import sys 		from "../site/sys/index.mjs";
+const sys = null;
 import conf		from "./conf.mjs";
 import main		from "./main.mjs";
 
