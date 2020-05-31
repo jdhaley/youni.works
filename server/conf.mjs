@@ -6,7 +6,7 @@ export default {
 	port: 443,
 	key: "ssl/my.key",
 	cert: "ssl/my.crt",
-	files: "/web/repositories/youni.works/fs/",
+	files: "/web/repositories/fs/fs/",
 	site: "site",
 	packages: {
 		express: express,
