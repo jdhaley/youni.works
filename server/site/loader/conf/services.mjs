@@ -1,18 +1,18 @@
 export default {
-	package$: "youni.works/noted/service",
+	package$: "youni.works/compiler/service",
 	use: {
 		package$platform: "youni.works/web/platform"
 	},
 	public: {
-		get: {
+		open: {
 			type$: "use.platform.Remote",
-			url: "/youni/file",
+			url: "/file",
 			method: "GET"
 		},
 		save: {
 			type$: "use.platform.Remote",
-			url: "/youni/file",
-			method: "POST"			
+			url: "/file",
+			method: "PUT"
 		}
 	}
 }

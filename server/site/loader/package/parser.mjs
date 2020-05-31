@@ -12,10 +12,11 @@ export default {
 		},
 		save: function(source) {
 			let member = this.parse(source);
-			let pathname = "compiler/package/" + member.part[""].source + "/source.json"
-			this.service.save.service(this, "saved", JSON.stringify({
-				[pathname]: JSON.stringify(member, null, "\t")
-			}));
+			let pathname = "?compiler/package/" + member.part[""].source + "/source.json";
+			this.service.save.service(this, "saved", {
+				url: pathname,
+				content: JSON.stringify(member, null, "\t")
+			});
 			return member;
 		},
 		parse: function load(source, decl) {
