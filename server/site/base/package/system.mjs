@@ -1,8 +1,8 @@
-const OBJECT = window.Object;
+const OBJECT = Object;
 const INTERFACE = Symbol("interface");
 
-const Object = OBJECT.create(null);
-const Declaration = OBJECT.create(Object);
+const ObjectInterface = OBJECT.create(null);
+const Declaration = OBJECT.create(ObjectInterface);
 
 Declaration.define = function(object) {
 	return OBJECT.defineProperty(object, this.name, this);
@@ -10,7 +10,7 @@ Declaration.define = function(object) {
 
 export default {
 	package$: "youni.works/base/system",
-	Object: Object,
+	Object: ObjectInterface,
 	Declaration: Declaration,
 	System: {
 		super$: "Object",
