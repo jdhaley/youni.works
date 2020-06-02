@@ -17,44 +17,18 @@
 			},
 			"constructor": "type"
 		},
-		"Sequence": {
-			"type": "object",
-			"part": {
-				"": {
-					"facet": "super",
-					"type": "string",
-					"source": "Object"
-				}
-			},
-			"constructor": "super"
-		},
 		"Part": {
 			"type": "object",
 			"part": {
 				"": {
 					"facet": "super",
 					"type": "string",
-					"source": "Object"
+					"source": "use.signal.Node"
 				},
 				"id": {
 					"facet": "once",
 					"type": "function",
 					"source": "() => ++LAST_ID"
-				},
-				"of": {
-					"facet": "type",
-					"type": "string",
-					"source": "Part"
-				},
-				"part": {
-					"type": "object",
-					"part": {},
-					"constructor": "type"
-				},
-				"owner": {
-					"facet": "once",
-					"type": "function",
-					"source": "function() {\r\n\t\t\tif (this.of) return this.of != this && this.of.owner;\r\n\t\t\treturn this;\r\n\t\t}"
 				},
 				"name": {
 					"facet": "once",
@@ -66,14 +40,14 @@
 					"type": "function",
 					"source": "function() {\r\n\t\t\tif (this.name) {\r\n\t\t\t\tlet path = this.of && this.of.pathname || \"\";\r\n\t\t\t\treturn path + \"/\" + this.name;\r\n\t\t\t}\r\n\t\t\treturn \"\";\r\n\t\t}"
 				},
-				"log": {
-					"facet": "get",
-					"type": "function",
-					"source": "function() {\r\n\t\t\treturn this.owner ? this.owner.log : console;\r\n\t\t}"
-				},
 				"initialize": {
 					"type": "function",
-					"source": "function(conf) {\r\n\t\t\tif (this.of != this.sys.interfaceOf(this, \"Part\")) {\r\n\t\t\t\tthrow new Error(\"Component is already initialized.\");\r\n\t\t\t}\r\n\t\t\tthis.sys.define(this, \"of\", conf.of, \"const\");\r\n\t\t}"
+					"source": "function(conf) {\r\n\t\t\tthis.sys.define(this, \"of\", conf.of, \"const\");\r\n\t\t}"
+				},
+				"part": {
+					"type": "object",
+					"part": {},
+					"constructor": "type"
 				}
 			},
 			"constructor": "super"

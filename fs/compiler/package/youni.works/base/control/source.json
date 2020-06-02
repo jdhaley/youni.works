@@ -1,0 +1,154 @@
+{
+	"type": "object",
+	"part": {
+		"": {
+			"facet": "package",
+			"type": "string",
+			"source": "youni.works/base/control"
+		},
+		"Control": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Object"
+				},
+				"controller": {
+					"facet": "type",
+					"type": "string",
+					"source": "Controller"
+				},
+				"owner": {
+					"facet": "once",
+					"type": "function",
+					"source": "function() {\r\n\t\t\tif (this.of) return this.of != this && this.of.owner;\r\n\t\t\treturn this;\r\n\t\t}"
+				},
+				"receive": {
+					"type": "function",
+					"source": "function(message) {\r\n\t\t\tthis.controller && this.controller.process(this, message);\r\n\t\t}"
+				}
+			},
+			"constructor": "super"
+		},
+		"Controller": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Object"
+				},
+				"action": {
+					"type": "object",
+					"part": {},
+					"constructor": "type"
+				},
+				"process": {
+					"type": "function",
+					"source": "function(on, message) {\r\n\t\t\tlet action = message.action;\r\n\t\t\twhile (action) try {\r\n\t\t\t\tthis.execute(on, message);\r\n\t\t\t\taction = (message.action == action ? \"\" : message.action);\r\n\t\t\t} catch (fault) {\r\n\t\t\t\tthis.trap(on, message, fault);\r\n\t\t\t}\r\n\t\t}"
+				},
+				"execute": {
+					"type": "function",
+					"source": "function(on, message) {\r\n\t\t\tlet action = this.action[message.action];\r\n\t\t\taction && action.call(this, on, message);\r\n\t\t}"
+				},
+				"trap": {
+					"type": "function",
+					"source": "function(on, message, fault) {\r\n\t\t\tfault.message = `Error processing action \"${message.action}\": ` + fault.message;\r\n\t\t\tfault.processing = message;\r\n\t\t\tfault.on = on;\r\n\t\t\tthrow fault;\r\n\t\t}"
+				}
+			},
+			"constructor": "super"
+		},
+		"Transmitter": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "object"
+				},
+				"up": {
+					"type": "function",
+					"source": "function(on, signal) {\r\n\t\t\tsignal = messageFor.call(this, signal);\r\n\t\t\twhile (signal.action && on) {\r\n\t\t\t\ton.receive && on.receive(signal);\r\n\t\t\t\ton = on.of;\r\n\t\t\t}\r\n\t\t}"
+				},
+				"down": {
+					"type": "function",
+					"source": "function down(on, signal) {\r\n\t\t\tif (!signal.action) {\r\n\t\t\t\tsignal = messageFor.call(this, signal);\r\n\t\t\t\tif (signal.action) on.receive && on.receive(signal);\r\n\t\t\t}\r\n\t\t\tif (signal.action) for (on of on.childNodes) {\r\n\t\t\t\tdown(on, signal);\r\n\t\t\t\tif (!signal.action) return;\r\n\t\t\t}\r\n\t\t}"
+				}
+			},
+			"constructor": "super"
+		},
+		"Processor": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Controller"
+				},
+				"execute": {
+					"type": "function",
+					"source": "function(on, message) {\r\n\t\t\tlet method = on[message.action];\r\n\t\t\tif (typeof method == \"function\") {\r\n\t\t\t\tmethod[message.length ? \"apply\" : \"call\"](on, message);\r\n\t\t\t}\r\n\t\t}"
+				}
+			},
+			"constructor": "super"
+		},
+		"Part": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Control"
+				},
+				"id": {
+					"facet": "once",
+					"type": "function",
+					"source": "() => ++LAST_ID"
+				},
+				"name": {
+					"facet": "once",
+					"type": "function",
+					"source": "function() {\r\n\t\t\tif (this.of) for (let name in this.of.part) {\r\n\t\t\t\tif (this.part[name] == this) return name;\r\n\t\t\t}\r\n\t\t\treturn \"\";\r\n\t\t}"
+				},
+				"pathname": {
+					"facet": "get",
+					"type": "function",
+					"source": "function() {\r\n\t\t\tif (this.name) {\r\n\t\t\t\tlet path = this.of && this.of.pathname || \"\";\r\n\t\t\t\treturn path + \"/\" + this.name;\r\n\t\t\t}\r\n\t\t\treturn \"\";\r\n\t\t}"
+				},
+				"part": {
+					"type": "object",
+					"part": {},
+					"constructor": "type"
+				},
+				"initialize": {
+					"type": "function",
+					"source": "function(conf) {\r\n\t\t\tthis.sys.define(this, \"of\", conf.of, \"const\");\r\n\t\t}"
+				}
+			},
+			"constructor": "super"
+		},
+		"Node": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Control"
+				}
+			},
+			"constructor": "super"
+		},
+		"Record": {
+			"type": "object",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "Control"
+				}
+			},
+			"constructor": "super"
+		}
+	},
+	"constructor": "package"
+}
