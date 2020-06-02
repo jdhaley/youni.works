@@ -5,13 +5,8 @@ export default {
 	},
 	Parser: {
 		super$: "Object",
-		receive: function(message) {
-			if (message.action != "saved") console.log("save error.");
-		},
 		use: {
 			type$Member: "use.control.Part"
-		},
-		var$symbol: {
 		},
 		save: function(source) {
 			let member = this.parse(source);
@@ -22,60 +17,79 @@ export default {
 			});
 			return member;
 		},
+		receive: function(message) {
+			if (message.action != "saved") console.log("save error.");
+		},
 		parse: function(source, decl) {
 			let member = this.sys.extend(this.use.Member, {
-				name: this.nameOf(decl),
+				name: decl === undefined ? undefined : this.nameOf(decl),
 				facet: this.facetOf(decl) || undefined,
 				type: typeof source,
+				constructor: undefined,
 				source: undefined,
 				part: undefined
 			});
-			//don't put in extend above - it will compile the source.
-			member.source = source;
+			this.parseValue(source, member);
+			return member;
+		},
+		parseValue: function(source, member) {
 			switch (typeof source) {
 				case "undefined":
 				case "boolean":
 				case "number":
 				case "string":
-					break;
+					member.source = source;
+					return;
 				case "bigint":
 				case "symbol":
 				case "function":
 					member.source = source.toString();
-					break;
+					return;
 				default:
-					this.loadObject(member);
-					break;
+					if (source) {
+						this.parseObject(source, member);
+						return;
+					} 
+					member.source = source;
+					return;
 			}
-			return member;
 		},
-		loadObject: function(member) {
-			let source = member.source;
+		parseObject: function(source, member) {
+			let prototype = this.sys.prototypeOf(source);
+			switch (prototype) {
+				case Object.prototype:
+					this.parseRecord(source, member);
+					return;
+				case Array.prototype:
+					this.parseArray(source, member);
+					return;
+				case Date.prototype:
+					member.type = "date";
+					member.source = source.toISOString();
+					return;
+				default:
+					this.parseOther(source, member)
+					return;
+			}
+		},
+		parseRecord: function(source, member) {
+			member.part = this.sys.extend();
+			for (let decl in source) {
+				let prop = this.parse(source[decl], decl);
+				member.part[prop.name] = prop;
+				delete prop.name;
+			}
+			member.constructor = member.part[""] && member.part[""].facet || "type";
+		},
+		parseArray: function(source, member) {
 			delete member.source;
-			if (this.sys.prototypeOf(source) == Object.prototype) {
-				member.part = this.sys.extend();
-				for (let decl in source) {
-					let prop = this.parse(source[decl], decl);
-					member.part[prop.name] = prop;
-					delete prop.name;
-				}
-				member.constructor = member.part[""] && member.part[""].facet || "type";
-				return;
+			member.part = this.sys.extend();
+			let i = 0;
+			for (ele of source) {
+				let prop = this.parse(ele);
+				member.part[i++] = prop;
 			}
-			if (this.sys.prototypeOf(source) == Array.prototype) {
-				member.part = this.sys.extend();
-				let i = 0;
-				for (ele of source) {
-					let prop = this.parse(ele);
-					member.part[i++] = prop;
-				}
-				member.constructor = "array";
-				return;	
-			}
-			if (this.sys.prototypeOf(source) == Date.prototype) {
-				member.type = "date";
-				member.source = source.toISOString();
-			}
+			member.constructor = "array";
 		},
 		facetOf: function(declaration) {
 			if (typeof declaration == "string") {
@@ -98,6 +112,8 @@ export default {
 				}
 			}
 			return declaration;
+		},
+		var$symbol: {
 		}
 	}
 }
