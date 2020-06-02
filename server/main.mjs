@@ -8,15 +8,40 @@ export default function main(sys, conf) {
 	function filer(req, res) {
 		let path = conf.files + req.url.substring(req.url.indexOf("?") + 1);
 		if (req.method == "GET") {
-			let file = pkg.fs.readFileSync(path);
+			let file;
+			try {
+				file = pkg.fs.readFileSync(path);
+			} catch (error) {
+			//	console.log("GET:", error);
+				res.status(204);
+				res.end();
+				return;
+			}
 			res.send(file);
-			res.end();
 		} else if (req.method == "PUT") {
-			req.pipe(pkg.fs.createWriteStream(path));
-			res.end();
+			let pathnameIdx = path.lastIndexOf("/");
+			let dir = path.substring(0, pathnameIdx);
+			pkg.fs.mkdir(dir, {
+				recursive: true
+			}, err => {
+				if (err) throw err;
+			});
+			try {
+				let stream = pkg.fs.createWriteStream(path);
+				stream.on("error", err => console.log(err));
+				req.pipe(stream);
+			} catch (error) {
+				if (error.code == "ENOENT") {
+					res.status(404);
+				} else {
+					console.warn(error);
+					res.status(500);
+				}
+			}
 		} else {
-			res.end(400);
+			res.status(400);
 		}
+		res.end();
 	}
 	
 	const credentials = {

@@ -1,12 +1,15 @@
 export default {
 	package$: "youni.works/loader/parser",
 	use: {
-		package$part: "youni.works/base/part",		
+		package$control: "youni.works/base/control",		
 	},
 	Parser: {
-		super$: "use.part.Component",
+		super$: "Object",
+		receive: function(message) {
+			if (message.action != "saved") console.log("save error.");
+		},
 		use: {
-			type$Member: "use.part.Part"
+			type$Member: "use.control.Part"
 		},
 		var$symbol: {
 		},
@@ -19,7 +22,7 @@ export default {
 			});
 			return member;
 		},
-		parse: function load(source, decl) {
+		parse: function(source, decl) {
 			let member = this.sys.extend(this.use.Member, {
 				name: this.nameOf(decl),
 				facet: this.facetOf(decl) || undefined,

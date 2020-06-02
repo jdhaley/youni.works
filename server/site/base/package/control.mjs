@@ -65,7 +65,7 @@ export default {
 				method[message.length ? "apply" : "call"](on, message);
 			}
 		}
-	}
+	},
 	Part: {
 		super$: "Control",
 		once$id: () => ++LAST_ID,
@@ -89,6 +89,18 @@ export default {
 		},
 		initialize: function(conf) {
 			this.sys.define(this, "of", conf.of, "const");
+		}
+	},
+	Node: {
+		super$: "Control",
+		"@iterator": function* iterate() {
+			for (let i = 0; i < this.length; i++) yield this[i];
+		}
+	},
+	Record: {
+		super$: "Control",
+		"@iterator": function* iterate() {
+			for (let name in this) yield this[name];
 		}
 	}
 }
