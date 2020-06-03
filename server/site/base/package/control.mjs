@@ -1,3 +1,4 @@
+let LAST_ID = 0;
 export default {
 	package$: "youni.works/base/control",
 	Control: {
@@ -35,6 +36,12 @@ export default {
 			fault.processing = message;
 			fault.on = on;
 			throw fault;
+		},
+		receive: function(message) {
+			let method = this[message.action];
+			if (typeof method == "function") {
+				method[message.length ? "apply" : "call"](this, message);
+			}
 		}
 	},
 	Transmitter: {
@@ -47,11 +54,10 @@ export default {
 			}
 		},
 		down: function down(on, signal) {
-			if (!signal.action) {
-				signal = messageFor.call(this, signal);
-				if (signal.action) on.receive && on.receive(signal);
-			}
-			if (signal.action) for (on of on.childNodes) {
+			if (!signal.action) signal = messageFor.call(this, signal);
+				
+			signal.action && on.receive && on.receive(signal);
+			if (signal.action) for (on of on) {
 				down(on, signal);
 				if (!signal.action) return;
 			}
