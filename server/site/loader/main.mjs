@@ -1,14 +1,20 @@
 export default function main(sys, conf) {
 	const pkg = sys.load(conf.packages);
 	let service = pkg.services.public;
-	let parser = sys.extend(pkg.parser.Parser, {
-		service: service
-	});
-	parser.save(conf.test);
-	let loader = sys.extend(pkg.loader.Loader, {
-		service: service,
-		package: {}
-	});
-	let source = loader.open("youni.works/base/control");
-	//return member;
+	if (window.location.search == "?parse") {
+		let parser = sys.extend(pkg.parser.Parser, {
+			service: service
+		});
+		for (let name in conf.packages) {
+			parser.save(conf.packages[name]);
+		}
+	} else {
+		let loader = sys.extend(pkg.loader.Loader, {
+			service: service,
+			package: {}
+		});
+		loader.forName("youni.works/web/platform");
+		console.log(loader.package);
+		//return member;
+	}
 }

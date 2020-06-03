@@ -6,47 +6,62 @@ export default {
 	Loader: {
 		super$: "use.control.Controller",
 		use: {
-			type$Member: "use.control.Part"
+			type$Member: "use.control.Part",
+			type$Transmitter: "use.control.Transmitter"
 		},
 		file: "/source.json",
-		open: function(name) {
+		forName: function(name) {
+			let pkg = this.package[name];
+			if (pkg !== undefined) return pkg;
 			this.package[name] = null;
-			"?compiler/package/" + name + this.file;
 			this.service.open.service(this, "load", {
+				pkgName: name,
 				url: name + this.file
 			});
 		},
-		receive: function(message) {
-			if (message.action == "load") this.load(message);
-		},
 		load: function(message) {
+			let pkg = this.loadPackage(message);
+			let pkgName = message.request.pkgName;
+			if (pkg.name != pkgName) {
+				console.warn(`Package name "${pkg.name}" does not match package path "${pkgName}"`)
+			}
+			if (this.package[pkgName] === null) {
+				this.package[pkgName] = pkg;
+				this.send(pkg, {
+					action: "openDependencies"
+				});
+			}
+		},
+		loadPackage: function(message) {
 			let response = message.content;
 			if (message.status != 200) {
 				this.log.error(message.status, message.content);
 				response = "{}";
 			}
-			let name = message.request.url;
-			name = name.substring(0, name.length - this.file.length);
 			let pkg = JSON.parse(response);
 			pkg = this.createMember(pkg);
-			if (this.package[name] === null) {
-				this.package[name] = pkg;
-				pkg.receive({
-					action: "openDependencies"
-				});
-			}
+			pkg.name = pkg.part[""].source;
+			return pkg;
 		},
 		createMember: function createMember(member) {
+			let part = member.part;
+			
+			member.part = this.sys.extend();
 			member.controller = this;
 			member = this.sys.extend(this.use.Member, member);
-			for (let name in member.part) {
-				member.part[name] = this.createMember(member.part[name]);
+			for (let name in part) {
+				part[name].name = name;
+				member.part[name] = this.createMember(part[name]);
 			}
+			return member;
 		},
-		instruction: {
+		send: function(to, message) {
+			this.use.Transmitter.down(to, message);
+		},
+		action: {
 			openDependencies: function(on, message) {
-				if (part.name && part.facet == "use" && part.source.indexOf("/") >= 0) {
-					if (this.package[part.source] === undefined) this.open(part.source);
+				if (on.name && on.facet == "package" && on.source.indexOf("/") >= 0) {
+					this.forName(on.source);
 				}
 			}
 		}

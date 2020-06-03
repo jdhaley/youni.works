@@ -4,7 +4,7 @@ export default {
 		package$control: "youni.works/base/control",		
 	},
 	Parser: {
-		super$: "Object",
+		super$: "use.control.Controller",
 		file: "/source.json",
 		use: {
 			type$Member: "use.control.Part"
@@ -18,8 +18,8 @@ export default {
 			});
 			return member;
 		},
-		receive: function(message) {
-			if (message.action != "saved") console.log("save error.");
+		saved: function(message) {
+			console.log("Saved " + message.request.url);
 		},
 		parse: function(source, decl) {
 			let member = this.sys.extend(this.use.Member, {
@@ -91,6 +91,9 @@ export default {
 				member.part[i++] = prop;
 			}
 			member.constructor = "array";
+		},
+		parseOther: function(source, member) {
+			console.log("Other: ", source);
 		},
 		facetOf: function(declaration) {
 			if (typeof declaration == "string") {
