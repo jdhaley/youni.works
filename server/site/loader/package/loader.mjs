@@ -1,26 +1,32 @@
 export default {
 	package$: "youni.works/compiler/loader",
 	use: {
-		package$part: "youni.works/base/part",		
-		package$signal: "youni.works/base/signal",		
+		package$control: "youni.works/base/control",		
 	},
 	Loader: {
-		super$: "use.signal.Processor",
+		super$: "use.control.Controller",
 		use: {
-			type$Member: "use.part.Part"
+			type$Member: "use.control.Part"
 		},
 		file: "/source.json",
 		open: function(name) {
 			this.package[name] = null;
-			this.service.get.service(this, "load", name + this.file);
+			"?compiler/package/" + name + this.file;
+			this.service.open.service(this, "load", {
+				url: name + this.file
+			});
+		},
+		receive: function(message) {
+			if (message.action == "load") this.load(message);
 		},
 		load: function(message) {
-			let response = message.response;
+			let response = message.content;
 			if (message.status != 200) {
-				this.log.error(message.status, message.response);
+				this.log.error(message.status, message.content);
 				response = "{}";
 			}
-			let name = message.request.substring(0, -this.file.length);
+			let name = message.request.url;
+			name = name.substring(0, name.length - this.file.length);
 			let pkg = JSON.parse(response);
 			pkg = this.createMember(pkg);
 			if (this.package[name] === null) {

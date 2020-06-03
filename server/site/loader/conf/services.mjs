@@ -6,12 +6,12 @@ export default {
 	public: {
 		open: {
 			type$: "use.platform.Remote",
-			url: "/file",
+			url: "/file?compiler/package/",
 			method: "GET"
 		},
 		save: {
 			type$: "use.platform.Remote",
-			url: "/file",
+			url: "/file?compiler/package/",
 			method: "PUT"
 		}
 	}

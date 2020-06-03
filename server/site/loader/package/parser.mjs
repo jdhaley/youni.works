@@ -5,12 +5,13 @@ export default {
 	},
 	Parser: {
 		super$: "Object",
+		file: "/source.json",
 		use: {
 			type$Member: "use.control.Part"
 		},
 		save: function(source) {
 			let member = this.parse(source);
-			let pathname = "?compiler/package/" + member.part[""].source + "/source.json";
+			let pathname = member.part[""].source + this.file;
 			this.service.save.service(this, "saved", {
 				url: pathname,
 				content: JSON.stringify(member, null, "\t")
