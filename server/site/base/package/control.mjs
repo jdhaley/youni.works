@@ -11,7 +11,7 @@ export default {
 		"@iterator": function* iterate() {
 		},
 		receive: function(message) {
-			this.controller && this.controller.process(this, message);
+			this.controller.process(this, message);
 		}
 	},
 	Controller: {
