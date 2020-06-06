@@ -50,6 +50,20 @@ export default {
 			}
 		}		
 	},
+	Service: {
+		super$: "Object",
+		service: function(receiver, subject, request) {
+			let message = this.createMessage(receiver, subject, request);
+			this.process(receiver, message);
+		},
+		createMessage(receiver, subject, request) {
+			let message = this.sys.extend();
+			message.action = subject;
+			message.request = request;
+			message.status = 0;
+			return message;
+		}
+	},
 	Transmitter: {
 		super$: null,
 		up: function(on, signal) {

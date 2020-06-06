@@ -117,7 +117,7 @@ export default {
 		}
 	},
 	Remote: {
-		//super$: "use.part.Service",
+		super$: "use.control.Service",
 		method: "HEAD",
 		url: "",
 		process: function(receiver, message) {
