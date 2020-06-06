@@ -12,8 +12,6 @@ export default {
 	},
 	Controller: {
 		super$: "Part",
-		action: {
-		},
 		process: function(on, message) {
 			let action = message.action;
 			while (action) try {
@@ -24,8 +22,10 @@ export default {
 			}
 		},
 		execute: function(on, message) {
-			let action = this.action[message.action];
-			action && action.call(this, on, message);
+			let method = on[message.action];
+			if (typeof method == "function") {
+				method[message.length ? "apply" : "call"](on, message);
+			}
 		},
 		trap: function(on, message, fault) {
 			fault.message = `Error processing action "${message.action}": ` + fault.message;
@@ -36,12 +36,12 @@ export default {
 	},
 	Processor: {
 		super$: "Controller",
+		action: {
+		},
 		execute: function(on, message) {
-			let method = on[message.action];
-			if (typeof method == "function") {
-				method[message.length ? "apply" : "call"](on, message);
-			}
-		}		
+			let op = this.action[message.action];
+			op && op.call(this, on, message);
+		}
 	},
 	Service: {
 		super$: "Object",
@@ -90,37 +90,11 @@ export default {
 	},
 	Part: {
 		super$: "Control",
-		type$controller: "Processor",
 		"@iterator": function* iterate() {
 			for (let name in this.part) yield this.part[name];
 		},
 		initialize: function(conf) {
 			this.sys.define(this, "controller", conf.controller, "const");
-		}
-	},
-	OLD_Part: {
-		super$: "Control",
-		once$id: () => ++LAST_ID,
-		once$name: function() {
-			if (this.of) for (let name in this.of.part) {
-				if (this.part[name] == this) return name;
-			}
-			return "";
-		},
-		get$pathname: function() {
-			if (this.name) {
-				let path = this.of && this.of.pathname || "";
-				return path + "/" + this.name;
-			}
-			return "";
-		},
-		part: {
-		},
-		"@iterator": function* iterate() {
-			for (let name in this.part) yield this.part[name];
-		},
-		initialize: function(conf) {
-			this.sys.define(this, "of", conf.of, "const");
 		}
 	}
 }

@@ -4,7 +4,7 @@ export default {
 		package$control: "youni.works/base/control",		
 	},
 	Loader: {
-		super$: "use.control.Controller",
+		super$: "use.control.Processor",
 		use: {
 			type$Member: "use.control.Part",
 			type$Transmitter: "use.control.Transmitter"

@@ -24,7 +24,7 @@ export default {
 		}
 	},
 	Frame: {
-		super$: "use.control.Processor",
+		super$: "use.control.Controller",
 		use: {
 			type$Control: "Control",
 			type$Transmitter: "use.control.Transmitter"
@@ -83,7 +83,7 @@ export default {
 		}
 	},
 	Viewer: {
-		super$: "use.control.Controller",
+		super$: "use.control.Processor",
 		viewName: "div",
 		viewType: "text",
 		get$owner: function() {
