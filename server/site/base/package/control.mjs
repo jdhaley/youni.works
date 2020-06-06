@@ -11,11 +11,7 @@ export default {
 		}
 	},
 	Controller: {
-		super$: "Control",
-		type$controller: "Processor",
-		"@iterator": function* iterate() {
-			for (let name in this.part) yield this.part[name];
-		},
+		super$: "Part",
 		action: {
 		},
 		process: function(on, message) {
@@ -36,9 +32,6 @@ export default {
 			fault.processing = message;
 			fault.on = on;
 			throw fault;
-		},
-		initialize: function(conf) {
-			this.sys.define(this, "controller", conf.controller, "const");
 		}
 	},
 	Processor: {
@@ -83,7 +76,29 @@ export default {
 			}
 		}
 	},
+	Node: {
+		super$: "Control",
+		"@iterator": function* iterate() {
+			for (let i = 0; i < this.length; i++) yield this[i];
+		}
+	},
+	Record: {
+		super$: "Control",
+		"@iterator": function* iterate() {
+			for (let name in this) yield this[name];
+		}
+	},
 	Part: {
+		super$: "Control",
+		type$controller: "Processor",
+		"@iterator": function* iterate() {
+			for (let name in this.part) yield this.part[name];
+		},
+		initialize: function(conf) {
+			this.sys.define(this, "controller", conf.controller, "const");
+		}
+	},
+	OLD_Part: {
 		super$: "Control",
 		once$id: () => ++LAST_ID,
 		once$name: function() {
@@ -106,18 +121,6 @@ export default {
 		},
 		initialize: function(conf) {
 			this.sys.define(this, "of", conf.of, "const");
-		}
-	},
-	Node: {
-		super$: "Control",
-		"@iterator": function* iterate() {
-			for (let i = 0; i < this.length; i++) yield this[i];
-		}
-	},
-	Record: {
-		super$: "Control",
-		"@iterator": function* iterate() {
-			for (let name in this) yield this[name];
 		}
 	}
 }
