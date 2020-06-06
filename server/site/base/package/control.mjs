@@ -4,10 +4,6 @@ export default {
 	Control: {
 		super$: "Object",
 		type$controller: "Controller",
-		once$owner: function() {
-			if (this.of) return this.of != this && this.of.owner;
-			return this;
-		},
 		"@iterator": function* iterate() {
 		},
 		receive: function(message) {
@@ -15,7 +11,11 @@ export default {
 		}
 	},
 	Controller: {
-		super$: "Object",
+		super$: "Control",
+		type$controller: "Processor",
+		"@iterator": function* iterate() {
+			for (let name in this.part) yield this.part[name];
+		},
 		action: {
 		},
 		process: function(on, message) {
@@ -37,12 +37,18 @@ export default {
 			fault.on = on;
 			throw fault;
 		},
-		receive: function(message) {
-			let method = this[message.action];
-			if (typeof method == "function") {
-				method[message.length ? "apply" : "call"](this, message);
-			}
+		initialize: function(conf) {
+			this.sys.define(this, "controller", conf.controller, "const");
 		}
+	},
+	Processor: {
+		super$: "Controller",
+		execute: function(on, message) {
+			let method = on[message.action];
+			if (typeof method == "function") {
+				method[message.length ? "apply" : "call"](on, message);
+			}
+		}		
 	},
 	Transmitter: {
 		super$: null,
@@ -57,18 +63,9 @@ export default {
 			if (!signal.action) signal = messageFor.call(this, signal);
 				
 			signal.action && on.receive && on.receive(signal);
-			if (signal.action) for (on of on) {
+			if (signal.action && on[Symbol.iterator]) for (on of on) {
 				down(on, signal);
 				if (!signal.action) return;
-			}
-		}
-	},
-	Processor: {
-		super$: "Controller",
-		execute: function(on, message) {
-			let method = on[message.action];
-			if (typeof method == "function") {
-				method[message.length ? "apply" : "call"](on, message);
 			}
 		}
 	},
