@@ -9,7 +9,7 @@ export default {
 			return this.documentOwner.owner.control(this);
 		}
 	},
-	Control: {
+	ViewControl: {
 		super$: "use.control.Control",
 		get$of: function() {
 			return this.view.parentNode && this.view.parentNode.control;
@@ -26,7 +26,6 @@ export default {
 	Frame: {
 		super$: "use.control.Controller",
 		use: {
-			type$Control: "Control",
 			type$Transmitter: "use.control.Transmitter"
 		},
 		window: null,
@@ -53,13 +52,8 @@ export default {
 			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
 		},
 		control: function(view) {
-			return this.sys.extend(this.use.Control, {
-				view: view,
-				controller: this.controllerFor(view)
-			});
-		},
-		controllerFor: function(view) {
-			return this.part[view.nodeName];
+			let viewer = this.part[view.nodeName];
+			if (viewer) return viewer.control(view);
 		},
 		send: function(to, message) {
 			this.use.Transmitter.down(to, message);
@@ -84,6 +78,9 @@ export default {
 	},
 	Viewer: {
 		super$: "use.control.Processor",
+		use: {
+			type$Control: "ViewControl",
+		},
 		viewName: "div",
 		viewType: "text",
 		get$owner: function() {
@@ -101,16 +98,17 @@ export default {
 		},
 		createView: function(model) {
 			let view = this.owner.createView(this.viewName);
+			view.control = this.control(view);
 			view.control.model = model;
-		//	this.control(view);
 			return view;
 		},
-//		control: function(control) {
-//			if (control.controller == this) return;
-//			control.controller = this;
-//			if (this.name) control.dataset.view = "I" + this.id;
-//			if (this.classes) control.className = this.classes;
-//		},
+		control: function(view) {
+			if (view.control) console.log("Changing a view control.");
+			return this.sys.extend(this.use.Control, {
+				view: view,
+				controller: this
+			});
+		},
 		draw: function(view, render) {
 			render = this.render[render];
 			render && render.call(this, view);
