@@ -1,5 +1,7 @@
 export default {
 	once$control: function() {
-		return this.ownerDocument.owner.control(this);
-	}		
+		this.control = null;
+		this.ownerDocument.owner.control(this);
+		return this.control;
+	}
 }

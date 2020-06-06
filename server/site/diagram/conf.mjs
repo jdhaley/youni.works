@@ -7,6 +7,8 @@ import parts		from "./conf/parts.mjs";
 import actions		from "./conf/actions.mjs";
 import platform		from "../web/conf/browser.mjs";
 
+const document = window.document;
+
 export default {
 	packages: {
 		control: control,
@@ -15,6 +17,7 @@ export default {
 		services: services,
 		parts: parts		
 	},
+	document: document,
 	actions: actions,
 	platform: platform
 }
