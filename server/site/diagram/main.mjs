@@ -5,7 +5,7 @@ export default function main(sys, conf) {
 		service: pkg.services.public,
 		part: pkg.parts.public,
 		
-		sense: conf.platform.sensors,
+		sensor: conf.platform.sensors,
 		render: conf.platform.renders,
 		device: conf.platform.devices
 	});

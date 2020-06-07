@@ -23,7 +23,7 @@ export default {
 			for (let i = 0; i < length; i++) yield this.view.children[i].control;
 		},
 		sense: function(sensorType, signal) {
-			this.owner.sense[sensorType](this, signal);
+			this.owner.sensor[sensorType](this, signal);
 		}
 	},
 	Viewer: {

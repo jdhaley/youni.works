@@ -2,19 +2,16 @@ export default {
 	event: function(control, signal) {
 		control.view.addEventListener(signal.toLowerCase(), event => {
 			event.action = signal;
-			control.owner.transmit.up(event.target, event);
+			control.owner.sense(event.target.control, event);
 			if (!event.signal) event.preventDefault();
 		});
 	},
 	//Propagate from the selection container rather than the event target:
-	selection: function(target, signal) {
-		const owner = target.owner;
-		target.addEventListener(signal.toLowerCase(), event => {
-			event[Symbol.Signal] = "Event";
+	selection: function(control, signal) {
+		const owner = control.owner;
+		control.addEventListener(signal.toLowerCase(), event => {
 			event.action = signal;
-			event.owner = owner;
-			event.source = owner.selection.container
-			owner.transmit.up(event);
+			control.owner.sense(control.owner.selection.container.control, event);
 			if (!event.signal) event.preventDefault();
 		});
 	}

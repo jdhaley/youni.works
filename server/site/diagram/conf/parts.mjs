@@ -4,16 +4,16 @@ export default {
 		package$view: "youni.works/web/view"
 	},
 	public: {
+//		view: {
+//			type$: "use.view.Viewer",
+//			viewName: "div",
+//			viewType: "text",					
+//		},
 		body: {
 			type$: "use.view.Viewer",
 			viewName: "body",
 			viewType: "composite",
 			part: {
-				view: {
-					type$: "use.view.Viewer",
-					viewName: "div",
-					viewType: "text",					
-				},
 				main: {
 					type$: "use.view.Viewer",
 					viewName: "main",
