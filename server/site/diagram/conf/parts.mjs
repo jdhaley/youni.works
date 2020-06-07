@@ -1,21 +1,31 @@
 export default {
 	package$: "youni.works/diagram/parts",
 	use: {
-		package$ui: "youni.works/web/control"
+		package$view: "youni.works/web/view"
 	},
 	public: {
 		body: {
-			type$: "use.ui.Viewer",
+			type$: "use.view.Viewer",
+			viewName: "body",
 			viewType: "composite",
 			part: {
+				view: {
+					type$: "use.view.Viewer",
+					viewName: "div",
+					viewType: "text",					
+				},
 				main: {
-					type$: "use.ui.Viewer",
+					type$: "use.view.Viewer",
+					viewName: "main",
+					viewType: "composite",
 					part: {
 						ribbon: {
-							type$: "use.ui.Viewer",
+							type$: "use.view.Viewer",
+							viewName: "nav"
 						},
-						body: {
-							type$: "use.ui.Viewer",
+						article: {
+							type$: "use.view.Viewer",
+							viewName: "article"
 						}
 					},
 					after$control: function(view) {

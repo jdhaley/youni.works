@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/web/control",
+	package$: "youni.works/web/view",
 	use: {
 		package$control: "youni.works/base/control"
 	},
@@ -23,7 +23,7 @@ export default {
 			for (let i = 0; i < length; i++) yield this.view.children[i].control;
 		},
 		sense: function(sensorType, signal) {
-			this.owner.sense[sensorType](this.view, signal);
+			this.owner.sense[sensorType](this, signal);
 		}
 	},
 	Viewer: {
@@ -35,6 +35,7 @@ export default {
 			return this.controller;
 		},
 		viewName: "div",
+		viewType: "text",
 		view: function(model) {
 			let view = this.owner.view(this.viewName);
 			this.control(view, model);
@@ -47,26 +48,36 @@ export default {
 				controller: this
 			});
 			this.sys.define(view, "control", control, "const");
+		},
+		action: {
+			draw: function(on, signal) {
+				let render = this.owner.render[this.viewType];
+				render && render.call(this, on.view);
+			}
 		}
 	},
 	Owner: {
 		super$: "use.control.Controller",
 		type$content: "View",
-		extend$sense: {
+		extend$render: {
 		},
 		type$send: "use.control.Transmitter.down",
+		type$sense: "use.control.Transmitter.up",
 		view: function(name) {
 			let doc = this.content.ownerDocument;
 			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
 		},
 		control: function(view) {
-			let viewer = this.part[view.nodeName.toLowerCase()];
-			if (viewer) viewer.control(view);
+			let viewer = this.part[view.nodeName.toLowerCase()] || this.part["view"];
+			viewer.control(view);
 		},
 		initialize: function(conf) {
 			this.sys.define(this, "content", conf.document.body);
 			conf.controller = this;
 			conf.document.owner = this;
+		},
+		open: function() {
+			this.send(this.content.control, "draw");
 		}
 	},
 	Remote: {
@@ -128,68 +139,5 @@ export default {
 		getContent: function(on, message) {
 			return message.request.content || null;
 		}
-	},
-	Frame: {
-		super$: "Owner",
-		once$window: function() {
-			return this.content.ownerDocument.defaultView;
-		},
-		virtual$selection: function() {
-			let selection = this.window.getSelection();
-			if (arguments.length) {
-					selection.removeAllRanges();
-					selection.addRange(arguments[0]);
-					return;
-			}
-			if (selection && selection.rangeCount) {
-				return selection.getRangeAt(0);
-			} else {
-				let range = this.window.document.createRange();
-				range.collapse();
-				return range;
-			}
-		},
-		after$initialize: function(conf) {
-			this.sys.implement(this.window.Element.prototype, conf.platform.view);
-			this.sys.implement(this.window.Range.prototype, conf.platform.range);
-			this.device = this.sys.extend(null, conf.platform.devices);
-			createStyleSheet(this);
-		},
-		activate: function() {
-			let control = this.content.control;
-			this.send(control, "draw");
-		}
-	},
-	Render: {
-		super$: "Viewer",
-		viewType: "text",
-		get$render: function() {
-			return this.owner.render;
-		},
-		extend$shortcut: {
-		},
-		extend$action: {
-			draw: function(on, signal) {
-				render = this.render[this.viewName];
-				render && render.call(this, view);
-			}
-		}
 	}
-}
-
-function createStyleSheet(owner) {
-	let ele = owner.window.document.createElement("style");
-	ele.type = "text/css";
-	owner.window.document.head.appendChild(ele);
-	owner.sheet = ele.sheet;
-}
-
-function defineRule(viewer) {
-	let out = `[data-view=I${viewer.id}] {`;
-	for (let name in viewer.style) {
-		out += name + ":" + viewer.style[name] + ";"
-	}
-	out += "}";
-	let index = viewer.owner.sheet.insertRule(out);
-	viewer.style = viewer.owner.sheet.cssRules[index];
 }

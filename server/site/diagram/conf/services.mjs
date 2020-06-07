@@ -1,7 +1,7 @@
 export default {
 	package$: "youni.works/diagram/service",
 	use: {
-		package$web: "youni.works/web/control"
+		package$web: "youni.works/web/view"
 	},
 	public: {
 		open: {
