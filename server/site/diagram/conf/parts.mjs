@@ -29,11 +29,10 @@ export default {
 						}
 					},
 					after$control: function(view) {
-						let control = view.control;
-						control.sense("event", "Click");
-						control.sense("event", "KeyDown");
-						control.sense("event", "MouseDown");
-						control.sense("event", "MouseUp");
+						view.sense("event", "Click");
+						view.sense("event", "KeyDown");
+						view.sense("event", "MouseDown");
+						view.sense("event", "MouseUp");
 					//	view.ownerDocument.sense("selection", "SelectionChange");
 					},
 					after$initialize: function(conf) {

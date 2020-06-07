@@ -3,12 +3,7 @@ export default {
 	use: {
 		package$control: "youni.works/base/control"
 	},
-	View: {
-		super$: null,
-		once$control: function(){
-			return this.documentOwner.owner.bind(this);
-		}
-	},
+	/*
 	ViewControl: {
 		super$: "use.control.Control",
 		get$of: function() {
@@ -26,11 +21,9 @@ export default {
 			this.owner.sensor[sensorType](this, signal);
 		}
 	},
+	*/
 	Viewer: {
 		super$: "use.control.Processor",
-		use: {
-			type$Control: "ViewControl",
-		},
 		get$owner: function() {
 			return this.controller;
 		},
@@ -42,23 +35,19 @@ export default {
 			return view;
 		},
 		control: function(view, model) {
-			let control = this.sys.extend(this.use.Control, {
-				model: model,
-				view: view,
-				controller: this
-			});
-			this.sys.define(view, "control", control, "const");
+			this.sys.define(view, "controller", this, "const");
+			view.model = model;
 		},
 		action: {
 			draw: function(on, signal) {
 				let render = this.owner.render[this.viewType];
-				render && render.call(this, on.view);
+				render && render.call(this, on);
 			}
 		}
 	},
 	Owner: {
 		super$: "use.control.Controller",
-		type$content: "View",
+		type$content: "use.control.Control",
 		extend$render: {
 		},
 		type$send: "use.control.Transmitter.down",
@@ -71,13 +60,13 @@ export default {
 			let viewer = this.part[view.nodeName.toLowerCase()] || this.part["view"];
 			viewer.control(view);
 		},
-		initialize: function(conf) {
+		before$initialize: function(conf) {
 			this.sys.define(this, "content", conf.document.body);
 			conf.controller = this;
 			conf.document.owner = this;
 		},
 		open: function() {
-			this.send(this.content.control, "draw");
+			this.send(this.content, "draw");
 		}
 	},
 	Remote: {

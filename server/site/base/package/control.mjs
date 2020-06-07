@@ -4,14 +4,16 @@ export default {
 	Control: {
 		super$: "Object",
 		type$controller: "Controller",
-		"@iterator": function* iterate() {
-		},
+		type$part: "Empty",
 		receive: function(message) {
 			this.controller.process(this, message);
 		}
 	},
 	Controller: {
-		super$: "Part",
+		super$: "Control",
+		use: {
+			type$Part: "Record"
+		},
 		process: function(on, message) {
 			let action = message.action;
 			while (action) try {
@@ -32,6 +34,13 @@ export default {
 			fault.processing = message;
 			fault.on = on;
 			throw fault;
+		},
+		initialize: function(conf) {
+			this.sys.define(this, "controller", conf.controller, "const");
+//			this.part[Symbol.iterator] = function* iterate() {
+//				for (let name in this) yield this[name];
+//			});
+			this.part[Symbol.iterator] = this.use.Part[Symbol.iterator];
 		}
 	},
 	Processor: {
@@ -70,31 +79,24 @@ export default {
 			if (!signal.action) signal = messageFor.call(this, signal);
 				
 			signal.action && on.receive && on.receive(signal);
-			if (signal.action && on[Symbol.iterator]) for (on of on) {
+			if (signal.action && on.part) for (on of on.part) {
 				down(on, signal);
 				if (!signal.action) return;
 			}
 		}
 	},
-	Node: {
-		super$: "Control",
+	Empty: {
+		"@iterator": function* iterate() {
+		}
+	},
+	List: {
 		"@iterator": function* iterate() {
 			for (let i = 0; i < this.length; i++) yield this[i];
 		}
 	},
 	Record: {
-		super$: "Control",
 		"@iterator": function* iterate() {
 			for (let name in this) yield this[name];
-		}
-	},
-	Part: {
-		super$: "Control",
-		"@iterator": function* iterate() {
-			for (let name in this.part) yield this.part[name];
-		},
-		initialize: function(conf) {
-			this.sys.define(this, "controller", conf.controller, "const");
 		}
 	}
 }
