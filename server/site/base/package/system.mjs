@@ -94,7 +94,7 @@ export default {
 			return decl;
 		},
 		defineInterface: function(object, name) {
-			if (!object.sys) object.sys = this;
+			if (!object.sys) OBJECT.defineProperty(object, "sys", {value: this});
 			if (name) OBJECT.defineProperty(object, Symbol.toStringTag, {value: name});
 			if (this.isInterface(this.prototypeOf(object))) {
 				OBJECT.defineProperty(object, INTERFACE, {value: object});
