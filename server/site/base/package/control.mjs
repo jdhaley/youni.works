@@ -14,6 +14,7 @@ export default {
 		use: {
 			type$Part: "Record"
 		},
+		log: console,
 		process: function(on, message) {
 			let action = message.action;
 			while (action) try {
@@ -36,11 +37,9 @@ export default {
 			throw fault;
 		},
 		initialize: function(conf) {
-			this.sys.define(this, "controller", conf.controller, "const");
-//			this.part[Symbol.iterator] = function* iterate() {
-//				for (let name in this) yield this[name];
-//			});
-			this.part[Symbol.iterator] = this.use.Part[Symbol.iterator];
+			if (!this.part[Symbol.iterator]) {
+				this.sys.define(this.part, Symbol.iterator, this.use.Part[Symbol.iterator], "const");
+			}
 		}
 	},
 	Processor: {
@@ -72,7 +71,7 @@ export default {
 			signal = messageFor.call(this, signal);
 			while (signal.action && on) {
 				on.receive && on.receive(signal);
-				on = on.of;
+				on = on.partOf;
 			}
 		},
 		down: function down(on, signal) {

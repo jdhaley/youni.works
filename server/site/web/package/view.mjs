@@ -3,29 +3,11 @@ export default {
 	use: {
 		package$control: "youni.works/base/control"
 	},
-	/*
-	ViewControl: {
-		super$: "use.control.Control",
-		get$of: function() {
-			return this.view.parentNode && this.view.parentNode.control;
-		},
-		get$owner: function() {
-			return this.view.ownerDocument.owner;
-		},
-		type$view: "View",
-		"@iterator": function* iterate() {
-			let length = this.view.children.length;
-			for (let i = 0; i < length; i++) yield this.view.children[i].control;
-		},
-		sense: function(sensorType, signal) {
-			this.owner.sensor[sensorType](this, signal);
-		}
-	},
-	*/
 	Viewer: {
 		super$: "use.control.Processor",
-		get$owner: function() {
-			return this.controller;
+		type$owner: "Owner",
+		get$controller: function() {
+			return this.owner;
 		},
 		viewName: "div",
 		viewType: "text",
@@ -43,6 +25,9 @@ export default {
 				let render = this.owner.render[this.viewType];
 				render && render.call(this, on);
 			}
+		},
+		before$initialize: function(conf) {
+			this.sys.define(this, "owner", conf.owner, "const");
 		}
 	},
 	Owner: {
@@ -53,20 +38,14 @@ export default {
 		type$send: "use.control.Transmitter.down",
 		type$sense: "use.control.Transmitter.up",
 		view: function(name) {
-			let doc = this.content.ownerDocument;
-			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
 		},
 		control: function(view) {
-			let viewer = this.part[view.nodeName.toLowerCase()] || this.part["view"];
-			viewer.control(view);
-		},
-		before$initialize: function(conf) {
-			this.sys.define(this, "content", conf.document.body);
-			conf.controller = this;
-			conf.document.owner = this;
 		},
 		open: function() {
 			this.send(this.content, "draw");
+		},
+		before$initialize: function(conf) {
+			conf.owner = this;
 		}
 	},
 	Remote: {
@@ -130,3 +109,23 @@ export default {
 		}
 	}
 }
+
+/*
+ViewControl: {
+	super$: "use.control.Control",
+	get$of: function() {
+		return this.view.parentNode && this.view.parentNode.control;
+	},
+	get$owner: function() {
+		return this.view.ownerDocument.owner;
+	},
+	type$view: "View",
+	"@iterator": function* iterate() {
+		let length = this.view.children.length;
+		for (let i = 0; i < length; i++) yield this.view.children[i].control;
+	},
+	sense: function(sensorType, signal) {
+		this.owner.sensor[sensorType](this, signal);
+	}
+},
+*/
