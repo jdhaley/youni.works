@@ -3,43 +3,6 @@ export default {
 	use: {
 		package$view: "youni.works/web/view"
 	},
-	Frame: {
-		super$: "use.view.Owner",
-		once$window: function() {
-			return this.content.ownerDocument.defaultView;
-		},
-		virtual$selection: function() {
-			let selection = this.window.getSelection();
-			if (arguments.length) {
-					selection.removeAllRanges();
-					selection.addRange(arguments[0]);
-					return;
-			}
-			if (selection && selection.rangeCount) {
-				return selection.getRangeAt(0);
-			} else {
-				let range = this.window.document.createRange();
-				range.collapse();
-				return range;
-			}
-		},
-		view: function(name) {
-			let doc = this.content.ownerDocument;
-			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
-		},
-		control: function(view) {
-			let viewer = this.part[view.nodeName.toLowerCase()] || this.part["view"];
-			viewer.control(view);
-		},
-		before$initialize: function(conf) {
-			conf.document.owner = this;
-			this.sys.define(this, "content", conf.document.body);
-			this.sys.implement(this.window.Element.prototype, conf.platform.view);
-			this.sys.implement(this.window.Range.prototype, conf.platform.range);
-			this.device = this.sys.extend(null, conf.platform.devices);
-			createStyleSheet(this);
-		}
-	},
 	Main: {
 		super$: "use.view.Viewer",
 		viewType: "composite",
@@ -162,21 +125,4 @@ export default {
 			view.tabIndex = 1;
 		}
 	}
-}
-
-function createStyleSheet(owner) {
-	let ele = owner.window.document.createElement("style");
-	ele.type = "text/css";
-	owner.window.document.head.appendChild(ele);
-	owner.sheet = ele.sheet;
-}
-
-function defineRule(viewer) {
-	let out = `[data-view=I${viewer.id}] {`;
-	for (let name in viewer.style) {
-		out += name + ":" + viewer.style[name] + ";"
-	}
-	out += "}";
-	let index = viewer.owner.sheet.insertRule(out);
-	viewer.style = viewer.owner.sheet.cssRules[index];
 }

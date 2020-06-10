@@ -65,22 +65,37 @@ export default {
 			return message;
 		}
 	},
+	Owner: {
+		super$: "Controller",
+		type$content: "Control",
+		type$transmit: "Transmitter",
+		receive: function(message) {
+			message = messageFor.call(this, message);
+			//self
+			this.controller.process(this, message);
+			this.transmit.down(this, message);
+			//content
+			this.content.controller.process(this.content, message);
+			this.transmit.down(this.content, message);
+		},
+		before$initialize: function(conf) {
+			conf.owner = this;
+		}
+	},
 	Transmitter: {
 		super$: null,
 		up: function(on, signal) {
-			signal = messageFor.call(this, signal);
-			while (signal.action && on) {
+			while (on) {
+				if (!signal.action) return;
 				on.receive && on.receive(signal);
 				on = on.partOf;
 			}
 		},
 		down: function down(on, signal) {
-			if (!signal.action) signal = messageFor.call(this, signal);
-				
-			signal.action && on.receive && on.receive(signal);
-			if (signal.action && on.part) for (on of on.part) {
-				down(on, signal);
+			if (on.part) for (on of on.part) {
 				if (!signal.action) return;
+				on.receive && on.receive(signal);
+				down(on, signal);
 			}
 		}
 	},

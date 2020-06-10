@@ -5,7 +5,7 @@ export default {
 	},
 	Viewer: {
 		super$: "use.control.Processor",
-		type$owner: "Owner",
+		type$owner: "Frame",
 		get$controller: function() {
 			return this.owner;
 		},
@@ -22,7 +22,8 @@ export default {
 		},
 		action: {
 			draw: function(on, signal) {
-				let render = this.owner.render[this.viewType];
+				let render = this.owner.render;
+				render = render && render[this.viewType];
 				render && render.call(this, on);
 			}
 		},
@@ -30,22 +31,43 @@ export default {
 			this.sys.define(this, "owner", conf.owner, "const");
 		}
 	},
-	Owner: {
-		super$: "use.control.Controller",
-		type$content: "use.control.Control",
-		extend$render: {
+	Frame: {
+		super$: "use.control.Owner",
+		render: {
 		},
-		type$send: "use.control.Transmitter.down",
-		type$sense: "use.control.Transmitter.up",
+		once$window: function() {
+			return this.content.ownerDocument.defaultView;
+		},
+		virtual$selection: function() {
+			let selection = this.window.getSelection();
+			if (arguments.length) {
+					selection.removeAllRanges();
+					selection.addRange(arguments[0]);
+					return;
+			}
+			if (selection && selection.rangeCount) {
+				return selection.getRangeAt(0);
+			} else {
+				let range = this.window.document.createRange();
+				range.collapse();
+				return range;
+			}
+		},
 		view: function(name) {
+			let doc = this.content.ownerDocument;
+			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
 		},
 		control: function(view) {
-		},
-		open: function() {
-			this.send(this.content, "draw");
+			let viewer = this.part[view.nodeName.toLowerCase()] || this.part["view"];
+			viewer.control(view);
 		},
 		before$initialize: function(conf) {
-			conf.owner = this;
+			conf.document.owner = this;
+			this.sys.define(this, "content", conf.document.body);
+			this.sys.implement(this.window.Element.prototype, conf.platform.view);
+			this.sys.implement(this.window.Range.prototype, conf.platform.range);
+			this.device = this.sys.extend(null, conf.platform.devices);
+			createStyleSheet(this);
 		}
 	},
 	Remote: {
@@ -110,6 +132,22 @@ export default {
 	}
 }
 
+function createStyleSheet(owner) {
+	let ele = owner.window.document.createElement("style");
+	ele.type = "text/css";
+	owner.window.document.head.appendChild(ele);
+	owner.sheet = ele.sheet;
+}
+
+function defineRule(viewer) {
+	let out = `[data-view=I${viewer.id}] {`;
+	for (let name in viewer.style) {
+		out += name + ":" + viewer.style[name] + ";"
+	}
+	out += "}";
+	let index = viewer.owner.sheet.insertRule(out);
+	viewer.style = viewer.owner.sheet.cssRules[index];
+}
 /*
 ViewControl: {
 	super$: "use.control.Control",

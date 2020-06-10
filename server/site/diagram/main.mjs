@@ -1,7 +1,7 @@
 export default function main(sys, conf) {
 	const pkg = sys.load(conf.packages);
 
-	const frame = sys.extend(pkg.browser.Frame, {
+	const frame = sys.extend(pkg.view.Frame, {
 		service: pkg.services.public,
 		part: pkg.parts.public,
 		
@@ -11,9 +11,9 @@ export default function main(sys, conf) {
 	});
 	
 	conf.action = "initialize";
-	frame.send(frame, conf);
+	frame.receive(conf);
 	console.info(frame);
-	frame.open();
+	frame.receive("draw");
 
 	return frame;
 }
