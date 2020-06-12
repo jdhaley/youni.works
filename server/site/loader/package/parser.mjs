@@ -7,7 +7,7 @@ export default {
 		super$: "use.control.Controller",
 		file: "/source.json",
 		use: {
-			type$Member: "use.control.Part"
+			type$Member: "use.control.Control"
 		},
 		save: function(source) {
 			let member = this.parse(source);

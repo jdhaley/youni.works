@@ -6,7 +6,8 @@ export default {
 	Loader: {
 		super$: "use.control.Processor",
 		use: {
-			type$Member: "use.control.Part",
+			type$Member: "use.control.Control",
+			type$Part: "use.control.Record",
 			type$Transmitter: "use.control.Transmitter"
 		},
 		file: "/source.json",
@@ -46,7 +47,7 @@ export default {
 		createMember: function createMember(member) {
 			let part = member.part;
 			
-			member.part = this.sys.extend();
+			member.part = this.sys.extend(this.use.Part);
 			member.controller = this;
 			member = this.sys.extend(this.use.Member, member);
 			for (let name in part) {
