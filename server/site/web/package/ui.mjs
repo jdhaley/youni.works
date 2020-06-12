@@ -1,110 +1,15 @@
 export default {
-	package$: "youni.works/web/ui",
+	package$: "youni.works/web/browser",
 	use: {
-		package$signal: "youni.works/base/signal",
-		package$part: "youni.works/base/part",
-		package$platform: "youni.works/web/platform"
-	},
-	Frame: {
-		super$: "use.signal.Receiver",
-		type$controller: "use.platform.Sensor",
-		"@iterator": function* iterate() {
-			for (let name in this.part) yield this.part[name];
-		},
-		log: console,
-		window: null,
-		var$device: {
-		},
-		var$viewer: {
-		},
-		//TODO rename to view.
-		get$content: function() {
-			return this.window.document.body;
-		},
-		virtual$selection: function() {
-			let selection = this.window.getSelection();
-			if (arguments.length) {
-					selection.removeAllRanges();
-					selection.addRange(arguments[0]);
-					return;
-			}
-			if (selection && selection.rangeCount) {
-				return selection.getRangeAt(0);
-			} else {
-				let range = this.window.document.createRange();
-				range.collapse();
-				return range;
-			}
-		},
-		createView: function(name) {
-			let doc = this.window.document;
-			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
-		},
-		before$initialize: function(conf) {
-			this.part.main.owner = this;
-			this.window.document.owner = this;
-			this.initializePlatform(conf);
-			createStyleSheet(this);
-		},
-		initializePlatform: function(conf) {
-			this.sys.implement(this.window.Node.prototype, conf.platform.node);
-			this.sys.implement(this.window.Range.prototype, conf.platform.range);
-			this.device = this.sys.extend(null, conf.platform.devices);
-		},
-		activate: function() {
-			let main = this.part.main;
-			if (!main) this.log.error("No main Viewer");
-			this.content.append(main.createView());
-			let message = this.sys.extend();
-			message.action = "open";
-			this.receive(message);
-		}
-	},
-	Viewer: {
-		super$: "use.part.Component",
-		controlName: "div",
-		view: "text",
-		get$render: function() {
-			return this.of && this.of.render;
-		},
-		extend$shortcut: {
-		},
-		extend$instruction: {
-			draw: function(on, signal) {
-				this.draw(on, this.view);
-			}
-		},
-		createView: function(model) {
-			let view = this.owner.createView(this.controlName);
-			view.model = model;
-			this.control(view);
-			return view;
-		},
-		control: function(control) {
-			if (control.controller == this) return;
-			control.controller = this;
-			if (this.name) control.dataset.view = "I" + this.id;
-			if (this.classes) control.className = this.classes;
-		},
-		draw: function(view, render) {
-			render = this.render[render];
-			render && render.call(this, view);
-		},
-		after$initialize: function(conf) {
-			this.owner.viewer["I" + this.id] = this;
-			if (this.style) this.style = defineRule(this, conf);
-		}
+		package$view: "youni.works/web/view"
 	},
 	Main: {
-		super$: "Viewer",
-		view: "composite",
-		controlName: "main",
-		var$render: {
-		},
+		super$: "use.view.Viewer",
+		viewType: "composite",
+		viewName: "main",
 		var$group: {
 		},
 		after$initialize: function(conf) {
-			this.render = conf.platform.renders;
 			for (let name in conf.actions) this.initializeInstruction(name, conf.actions[name]);
 		},
 		initializeInstruction: function(name, conf) {
@@ -130,7 +35,7 @@ export default {
 		getAction: function(event) {
 			return event.device.getCharacter(event) ? "Character" : event.device.getKey(event);
 		},
-		extend$instruction: {
+		extend$action: {
 			open: function(on, message) {
 				let location = this.owner.window.location;
 				if (location.search) {
@@ -188,9 +93,9 @@ export default {
 		}		
 	},
 	Ribbon: {
-		super$: "Viewer",
+		super$: "use.view.Viewer",
 		controlName: "nav",
-		extend$instruction: {
+		extend$action: {
 			draw: function(on) {
 				let markup = "";
 				for (let groupName in this.of.group) {
@@ -212,7 +117,7 @@ export default {
 		}
 	},
 	Article: {
-		super$: "Viewer",
+		super$: "use.view.Viewer",
 		controlName: "article",
 		view: "markup",
 		after$control: function(view) {
@@ -220,24 +125,4 @@ export default {
 			view.tabIndex = 1;
 		}
 	}
-//	Action: {
-//		super$: "Part"
-//	}
-}
-
-function createStyleSheet(owner) {
-	let ele = owner.window.document.createElement("style");
-	ele.type = "text/css";
-	owner.window.document.head.appendChild(ele);
-	owner.sheet = ele.sheet;
-}
-
-function defineRule(viewer) {
-	let out = `[data-view=I${viewer.id}] {`;
-	for (let name in viewer.style) {
-		out += name + ":" + viewer.style[name] + ";"
-	}
-	out += "}";
-	let index = viewer.owner.sheet.insertRule(out);
-	viewer.style = viewer.owner.sheet.cssRules[index];
 }

@@ -10,7 +10,6 @@ export default function main(sys, conf) {
 		device: conf.platform.devices
 	});
 	
-	conf.action = "initialize";
 	frame.receive(conf);
 	console.info(frame);
 	frame.receive("draw");

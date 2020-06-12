@@ -1,25 +1,17 @@
 export default {
-	event: function(target, action) {
-		const owner = target.owner;
-		target.addEventListener(action.toLowerCase(), event => {
-			event[Symbol.Signal] = "Event";
-			event.action = action;
-			event.owner = owner;
-			event.source = event.target;
-			owner.transmit.up(event);
-			if (!event.action) event.preventDefault();
+	event: function(target, signal) {
+		target.addEventListener(signal.toLowerCase(), event => {
+			event.action = signal;
+			target.owner.transmit.up(event.target, event);
+			if (!event.signal) event.preventDefault();
 		});
 	},
 	//Propagate from the selection container rather than the event target:
-	selection: function(target, action) {
-		const owner = target.owner;
-		target.addEventListener(action.toLowerCase(), event => {
-			event[Symbol.Signal] = "Event";
-			event.action = action;
-			event.owner = owner;
-			event.source = owner.selection.container
-			owner.transmit.up(event);
-			if (!event.action) event.preventDefault();
+	selection: function(target, signal) {
+		target.addEventListener(signal.toLowerCase(), event => {
+			event.action = signal;
+			target.owner.transmit.up(target.owner.selection.container, event);
+			if (!event.signal) event.preventDefault();
 		});
 	}
 }

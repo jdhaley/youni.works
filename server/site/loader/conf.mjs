@@ -1,7 +1,5 @@
-import signal		from "../base/package/signal.mjs";
-import part			from "../base/package/part.mjs";
 import control		from "../base/package/control.mjs";
-import platform		from "../web/package/platform.mjs";
+import client		from "../web/package/client.mjs";
 
 import parser		from "./package/parser.mjs";
 import loader		from "./package/loader.mjs";
@@ -11,10 +9,8 @@ import services		from "./conf/services.mjs";
 
 export default {
 	packages: {
-		signal: signal,
-		part: part,
 		control: control,
-		platform: platform,
+		platform: client,
 		parser: parser,
 		loader: loader,
 		

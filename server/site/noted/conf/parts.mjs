@@ -1,52 +1,60 @@
 export default {
 	package$: "youni.works/noted/parts",
 	use: {
-		package$ui: "youni.works/web/ui"
+		package$view: "youni.works/web/view",
+		package$ui: "youni.works/web/browser"
 	},
 	public: {
-		main: {
-			type$: "use.ui.Main",
+		body: {
+			type$: "use.view.Viewer",
+			viewName: "body",
+			viewType: "composite",
 			part: {
-				ribbon: {
-					type$: "use.ui.Ribbon",
-				},
-				body: {
-					type$: "use.ui.Article",
+				main: {
+					type$: "use.ui.Main",
+					part: {
+						ribbon: {
+							type$: "use.ui.Ribbon",
+						},
+						body: {
+							type$: "use.ui.Article",
+						}
+					},
+					extend$shortcut: {
+					},
+					extend$instruction: {
+						Input: DEFAULT,
+						Cut: DEFAULT,
+						Copy: DEFAULT,
+						Paste: DEFAULT,
+						Delete: DEFAULT,
+						Insert: DEFAULT,
+						Erase: DEFAULT,
+						Split: DEFAULT,
+						Join: DEFAULT,
+						Promote: DEFAULT,
+						Demote: DEFAULT,
+						Character: DEFAULT,
+					},
+					getAction: getAction,
+					after$control: function(view) {
+						view.sense("event", "Click");
+						view.sense("event", "KeyDown");
+						view.sense("event", "MouseUp");
+						view.sense("event", "Input");
+						view.sense("event", "Cut");
+						view.sense("event", "Copy");
+						view.sense("event", "Paste");
+						view.ownerDocument.sense("selection", "SelectionChange");
+					},
+					after$initialize: function(conf) {
+						let doc = this.owner.window.document;
+						doc.execCommand("styleWithCSS", false, false);
+						doc.execCommand("defaultParagraphSeparator", false, "P");
+						//	sys.implement(this, cmd.Commander);
+						//this.lastCommand = this.sys.extend();
+					}
 				}
-			},
-			extend$shortcut: {
-			},
-			extend$instruction: {
-				Input: DEFAULT,
-				Cut: DEFAULT,
-				Copy: DEFAULT,
-				Paste: DEFAULT,
-				Delete: DEFAULT,
-				Insert: DEFAULT,
-				Erase: DEFAULT,
-				Split: DEFAULT,
-				Join: DEFAULT,
-				Promote: DEFAULT,
-				Demote: DEFAULT,
-				Character: DEFAULT,
-			},
-			getAction: getAction,
-			after$control: function(view) {
-				view.sense("event", "Click");
-				view.sense("event", "KeyDown");
-				view.sense("event", "MouseUp");
-				view.sense("event", "Input");
-				view.sense("event", "Cut");
-				view.sense("event", "Copy");
-				view.sense("event", "Paste");
-				view.ownerDocument.sense("selection", "SelectionChange");
-			},
-			after$initialize: function(conf) {
-				let doc = this.owner.window.document;
-				doc.execCommand("styleWithCSS", false, false);
-				doc.execCommand("defaultParagraphSeparator", false, "P");
-				//	sys.implement(this, cmd.Commander);
-				//this.lastCommand = this.sys.extend();
 			}
 		}
 	}

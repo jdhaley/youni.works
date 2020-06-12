@@ -1,16 +1,16 @@
 export default {
 	package$: "youni.works/compiler/service",
 	use: {
-		package$platform: "youni.works/web/platform"
+		package$client: "youni.works/web/client"
 	},
 	public: {
 		open: {
-			type$: "use.platform.Remote",
+			type$: "use.client.Remote",
 			url: "/file?compiler/package/",
 			method: "GET"
 		},
 		save: {
-			type$: "use.platform.Remote",
+			type$: "use.client.Remote",
 			url: "/file?compiler/package/",
 			method: "PUT"
 		}

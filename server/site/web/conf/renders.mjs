@@ -8,8 +8,8 @@ export default {
 	composite: function(view) {
 		view.parts = this.sys.extend();
 		for (let name in this.part) {
-			let member = this.part[name].createView(view.model);
-			member.classList.add(name + "-part");
+			let member = this.part[name].view(view.model);
+//			member.classList.add(name + "-part");
 //			if (typeof part.width == "number") {
 //				item.style.flex = part.width + " 1 " + (part.width * 2) + "cm";
 //			}

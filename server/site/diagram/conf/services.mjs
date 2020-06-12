@@ -1,16 +1,16 @@
 export default {
 	package$: "youni.works/diagram/service",
 	use: {
-		package$web: "youni.works/web/view"
+		package$client: "youni.works/web/client"
 	},
 	public: {
 		open: {
-			type$: "use.web.Remote",
+			type$: "use.client.Remote",
 			url: "/file",
 			method: "GET"
 		},
 		save: {
-			type$: "use.web.Remote",
+			type$: "use.client.Remote",
 			url: "/file",
 			method: "PUT"
 		}

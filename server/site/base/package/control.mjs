@@ -71,12 +71,13 @@ export default {
 		type$transmit: "Transmitter",
 		receive: function(message) {
 			message = messageFor.call(this, message);
-			//self
-			this.controller.process(this, message);
-			this.transmit.down(this, message);
-			//content
-			this.content.controller.process(this.content, message);
-			this.transmit.down(this.content, message);
+			if (message.channel == "self") {
+				this.controller.process(this, message);
+				this.transmit.down(this, message);				
+			} else {
+				this.content.controller.process(this.content, message);
+				this.transmit.down(this.content, message);
+			}
 		},
 		before$initialize: function(conf) {
 			conf.owner = this;
