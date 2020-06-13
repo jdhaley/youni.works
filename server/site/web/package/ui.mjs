@@ -5,8 +5,8 @@ export default {
 	},
 	Main: {
 		super$: "use.view.Viewer",
-		viewType: "composite",
 		viewName: "main",
+		viewType: "composite",
 		var$group: {
 		},
 		after$initialize: function(conf) {
@@ -94,12 +94,12 @@ export default {
 	},
 	Ribbon: {
 		super$: "use.view.Viewer",
-		controlName: "nav",
+		viewName: "nav",
 		extend$action: {
 			draw: function(on) {
 				let markup = "";
-				for (let groupName in this.of.group) {
-					let group = this.of.group[groupName];
+				for (let groupName in this.partOf.group) {
+					let group = this.partOf.group[groupName];
 					markup += `<menu title='${groupName}'>`
 					for (let name in group) {
 						let action = group[name];
@@ -118,8 +118,7 @@ export default {
 	},
 	Article: {
 		super$: "use.view.Viewer",
-		controlName: "article",
-		view: "markup",
+		viewName: "article",
 		after$control: function(view) {
 			view.contentEditable = true;
 			view.tabIndex = 1;

@@ -40,6 +40,7 @@ export default {
 			if (!this.part[Symbol.iterator]) {
 				this.sys.define(this.part, Symbol.iterator, this.use.Part[Symbol.iterator], "const");
 			}
+			for (let part of this.part) part.partOf = this;
 		}
 	},
 	Processor: {

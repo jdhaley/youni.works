@@ -66,7 +66,6 @@ export default {
 			this.sys.define(this, "content", conf.document.body);
 			this.sys.implement(this.window.Element.prototype, conf.platform.view);
 			this.sys.implement(this.window.Range.prototype, conf.platform.range);
-			this.device = this.sys.extend(null, conf.platform.devices);
 			createStyleSheet(this);
 		}
 	},
