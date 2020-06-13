@@ -79,7 +79,7 @@ export default {
 
 function Heading(on, event) {
 	event.action = "";
-	let range = event.owner.selection;
+	let range = event.target.owner.selection;
 	let node = range.container;
 	switch (getContainerType(node)) {
 		case "heading":
@@ -100,7 +100,7 @@ function Heading(on, event) {
 
 function Promote(on, event) {
 	event.action = "";
-	let range = event.owner.selection;
+	let range = event.target.owner.selection;
 	let node = range.container;
 	switch (getContainerType(node)) {
 		case "heading":
@@ -131,7 +131,7 @@ function Promote(on, event) {
 }
 function Demote(on, event) {
 	event.action = "";
-	let range = event.owner.selection;
+	let range = event.target.owner.selection;
 	let node = range.container;
 	switch (getContainerType(node)) {
 		case "heading":

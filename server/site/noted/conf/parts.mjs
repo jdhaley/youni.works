@@ -24,7 +24,7 @@ export default {
 					},
 					extend$shortcut: {
 					},
-					extend$instruction: {
+					extend$action: {
 						Input: DEFAULT,
 						Cut: DEFAULT,
 						Copy: DEFAULT,
@@ -66,7 +66,7 @@ function DEFAULT(event) {
 }
 
 function getAction(event) {
-	const range = event.owner.selection;
+	const range = event.target.owner.selection;
 	const isCollapsed = range && range.collapsed;
 	switch (event.device.getKey(event)) {
 		case "Insert":
