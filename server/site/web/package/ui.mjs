@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/web/browser",
+	package$: "youni.works/web/ui",
 	use: {
 		package$view: "youni.works/web/view"
 	},
@@ -21,7 +21,7 @@ export default {
 			}
 			if (conf.instruction) {
 				this.instruction[name] = conf.instruction;
-			} else if (!this.instruction[name]) {
+			} else if (!this.action[name]) {
 				this.log.warn(`Main viewer: Instruction "${name}" is not handled.`);
 			}
 			if (conf.shortcut) {
@@ -46,25 +46,20 @@ export default {
 				}
 			},
 			load: function(on, message) {
+				
+				let view = on.parts.article;
 				if (message.status == 200) {
-					let model = this.owner.createView("div");
-					model.innerHTML = message.content;
-					model = model.firstChild.innerHTML;
-					on.model = model;
-					message.action = "draw";
+					let content = this.owner.view("div");
+					content.innerHTML = message.content;
+					view.innerHTML = content.firstChild.innerHTML;
 				} else if (message.status == 204) {
-					on.model = "<h1>" + this.owner.window.document.title + "</h1>";
+					view.innerHTML = "<h1>" + this.owner.window.document.title + "</h1>";
 					this.owner.window.document.title += " (New)";
-					message.action = "draw";
 				} else {
-					message.action = "altStatus";
+					let level = message.status >= 400 ? "Error" : "Note";
+					let color = message.status >= 400 ? "red" : "blue";
+					view.innerHTML = `<h1>${level}</h1><font color=${color}>${message.content}</font>`;
 				}
-			},
-			altStatus: function(on, message) {
-				let level = message.status >= 400 ? "Error" : "Note";
-				let color = message.status >= 400 ? "red" : "blue";
-				on.model = `<h1>${level}</h1><font color=${color}>${message.content}</font>`;
-				message.action = "draw";
 			},
 			saved: function(on, event) {
 				let title = this.owner.window.document.title;

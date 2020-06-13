@@ -58,8 +58,8 @@ export default {
 			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
 		},
 		control: function(view) {
-			let viewer = this.part[view.nodeName.toLowerCase()] || this.part["view"];
-			viewer.control(view);
+			let viewer = this.part[view.nodeName.toLowerCase()];
+			viewer && viewer.control(view);
 		},
 		before$initialize: function(conf) {
 			conf.document.owner = this;
