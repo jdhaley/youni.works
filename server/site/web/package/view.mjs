@@ -87,22 +87,3 @@ function defineRule(viewer) {
 	let index = viewer.owner.sheet.insertRule(out);
 	viewer.style = viewer.owner.sheet.cssRules[index];
 }
-/*
-ViewControl: {
-	super$: "use.control.Control",
-	get$of: function() {
-		return this.view.parentNode && this.view.parentNode.control;
-	},
-	get$owner: function() {
-		return this.view.ownerDocument.owner;
-	},
-	type$view: "View",
-	"@iterator": function* iterate() {
-		let length = this.view.children.length;
-		for (let i = 0; i < length; i++) yield this.view.children[i].control;
-	},
-	sense: function(sensorType, signal) {
-		this.owner.sensor[sensorType](this, signal);
-	}
-},
-*/
