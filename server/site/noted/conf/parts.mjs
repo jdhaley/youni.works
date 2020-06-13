@@ -2,13 +2,9 @@ export default {
 	package$: "youni.works/noted/parts",
 	use: {
 		package$view: "youni.works/web/view",
-		package$ui: "youni.works/web/browser"
+		package$ui: "youni.works/web/ui"
 	},
 	public: {
-		menu: {
-			type$: "use.view.Viewer",
-			viewName: "menu"
-		},
 		body: {
 			type$: "use.view.Viewer",
 			viewName: "body",
@@ -21,7 +17,7 @@ export default {
 							type$: "use.ui.Ribbon",
 							viewName: "nav"
 						},
-						body: {
+						article: {
 							type$: "use.ui.Article",
 							viewName: "article"
 						}
