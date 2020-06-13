@@ -20,7 +20,7 @@ export default {
 				}
 			}
 			if (conf.instruction) {
-				this.instruction[name] = conf.instruction;
+				this.action[name] = conf.instruction;
 			} else if (!this.action[name]) {
 				this.log.warn(`Main viewer: Instruction "${name}" is not handled.`);
 			}
@@ -46,7 +46,6 @@ export default {
 				}
 			},
 			load: function(on, message) {
-				
 				let view = on.parts.article;
 				if (message.status == 200) {
 					let content = this.owner.view("div");
@@ -72,7 +71,7 @@ export default {
 				event.action = ""; //Stop Control+S to save on client.
 				this.owner.service.save.service(this.owner, "saved", {
 					url: this.owner.window.location.search + ".view",
-					content: on.parts.body.outerHTML
+					content: on.parts.article.outerHTML
 				});
 			},
 			KeyDown: function(on, event) {

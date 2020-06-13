@@ -3,7 +3,7 @@ export default {
 		target.addEventListener(signal.toLowerCase(), event => {
 			event.action = signal;
 			target.owner.transmit.up(event.target, event);
-			if (!event.signal) event.preventDefault();
+			if (!event.action) event.preventDefault();
 		});
 	},
 	//Propagate from the selection container rather than the event target:
@@ -11,7 +11,7 @@ export default {
 		target.addEventListener(signal.toLowerCase(), event => {
 			event.action = signal;
 			target.owner.transmit.up(target.owner.selection.container, event);
-			if (!event.signal) event.preventDefault();
+			if (!event.action) event.preventDefault();
 		});
 	}
 }

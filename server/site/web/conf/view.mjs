@@ -7,6 +7,9 @@ export default {
 		this.ownerDocument.owner.control(this);
 		return this.controller;
 	},
+	get$partOf: function() {
+		return this.parentNode;
+	},
 	get$part: function() {
 		return this.childNodes;
 	},
