@@ -5,6 +5,10 @@ export default {
 		package$ui: "youni.works/web/browser"
 	},
 	public: {
+		menu: {
+			type$: "use.view.Viewer",
+			viewName: "menu"
+		},
 		body: {
 			type$: "use.view.Viewer",
 			viewName: "body",
@@ -15,9 +19,11 @@ export default {
 					part: {
 						ribbon: {
 							type$: "use.ui.Ribbon",
+							viewName: "nav"
 						},
 						body: {
 							type$: "use.ui.Article",
+							viewName: "article"
 						}
 					},
 					extend$shortcut: {
@@ -45,7 +51,7 @@ export default {
 						view.sense("event", "Cut");
 						view.sense("event", "Copy");
 						view.sense("event", "Paste");
-						view.ownerDocument.sense("selection", "SelectionChange");
+	//					view.ownerDocument.sense("selection", "SelectionChange");
 					},
 					after$initialize: function(conf) {
 						let doc = this.owner.window.document;

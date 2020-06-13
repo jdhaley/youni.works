@@ -1,16 +1,16 @@
 export default {
 	package$: "youni.works/noted/service",
 	use: {
-		package$platform: "youni.works/web/view"
+		package$client: "youni.works/web/client"
 	},
 	public: {
 		open: {
-			type$: "use.platform.Remote",
+			type$: "use.client.Remote",
 			url: "/file",
 			method: "GET"
 		},
 		save: {
-			type$: "use.platform.Remote",
+			type$: "use.client.Remote",
 			url: "/file",
 			method: "PUT"
 		}

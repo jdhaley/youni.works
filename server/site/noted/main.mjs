@@ -4,10 +4,14 @@ export default function main(sys, conf) {
 		window: window,
 		part: pkg.parts.public,
 		service: pkg.services.public,
+		
+		sensor: conf.platform.sensors,
+		render: conf.platform.renders,
+		device: conf.platform.devices
 	});
 	frame.receive(conf);
 	console.info(frame);
-	frame.receive("open");
+	frame.receive("draw");
 	
 	return frame;
 }
