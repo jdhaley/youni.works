@@ -13,6 +13,6 @@ export default function main(sys, conf) {
 	frame.receive(conf);
 	console.info(frame);
 	frame.receive("draw");
-
+	frame.receive("test");
 	return frame;
 }

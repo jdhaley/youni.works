@@ -1,46 +1,50 @@
 export default {
 	package$: "youni.works/diagram/parts",
 	use: {
-		package$view: "youni.works/web/view"
+		package$view: "youni.works/web/view",
+		package$ui: "youni.works/web/ui",
+		package$graphic: "youni.works/web/graphic"
 	},
 	public: {
-//		view: {
-//			type$: "use.view.Viewer",
-//			viewName: "div",
-//			viewType: "text",					
-//		},
 		body: {
 			type$: "use.view.Viewer",
 			viewName: "body",
 			viewType: "composite",
 			part: {
 				main: {
-					type$: "use.view.Viewer",
-					viewName: "main",
-					viewType: "composite",
+					type$: "use.ui.Main",
 					part: {
 						ribbon: {
-							type$: "use.view.Viewer",
+							type$: "use.ui.Ribbon",
 							viewName: "nav"
 						},
 						article: {
-							type$: "use.view.Viewer",
-							viewName: "article"
+							type$: "use.graphic.Graphic",
 						}
 					},
+					extend$shortcut: {
+					},
+//					extend$action: {
+//						Input: DEFAULT,
+//						Cut: DEFAULT,
+//						Copy: DEFAULT,
+//						Paste: DEFAULT,
+//						Delete: DEFAULT,
+//						Insert: DEFAULT,
+//						Erase: DEFAULT,
+//						Split: DEFAULT,
+//						Join: DEFAULT,
+//						Promote: DEFAULT,
+//						Demote: DEFAULT,
+//						Character: DEFAULT,
+//					},
 					after$control: function(view) {
 						view.sense("event", "Click");
 						view.sense("event", "KeyDown");
 						view.sense("event", "MouseDown");
 						view.sense("event", "MouseUp");
-					//	view.ownerDocument.sense("selection", "SelectionChange");
 					},
 					after$initialize: function(conf) {
-						let doc = this.owner.window.document;
-						doc.execCommand("styleWithCSS", false, false);
-						doc.execCommand("defaultParagraphSeparator", false, "P");
-						//	sys.implement(this, cmd.Commander);
-						//this.lastCommand = this.sys.extend();
 					}
 				}
 			}
