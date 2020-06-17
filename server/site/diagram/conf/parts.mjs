@@ -19,43 +19,9 @@ export default {
 							viewName: "nav"
 						},
 						article: {
-							type$: "use.graphic.Graphic",
+							type$: "use.graphic.GraphicContext",
 							cellSize: 20,
-							part: {
-								rect: {
-									type$: "use.graphic.Shaper",
-									viewName: "rect",
-									width: 4,
-									height: 2,
-									fill: "none",
-									stroke: "green",
-									draw: function(g, x, y) {
-										let cell = g.cellSize;
-										let rect = this.view();
-										x -= x % cell;
-										y -= y % cell;
-										rect.setAttribute("x", x - this.width * cell / 2);
-										rect.setAttribute("y", y - this.height * cell / 2);
-										rect.setAttribute("width", this.width * cell);
-										rect.setAttribute("height", this.height * cell);
-										rect.setAttribute("fill", this.fill);
-										rect.setAttribute("stroke", this.stroke);
-										return rect;										
-									}
-								},
-								ellipse: {
-									type$: "use.graphic.Shaper",
-									viewName: "ellipse"									
-								}
-							},
-							action: {
-								Click: function(on, event) {					
-									if (event.ctrlKey) {
-										let rect = this.part.rect.draw(this, event.offsetX, event.offsetY);
-										on.append(rect);
-									}
-								}
-							}
+							type$part: "shapes",
 						}
 					},
 					extend$shortcut: {
@@ -79,11 +45,40 @@ export default {
 						view.sense("event", "KeyDown");
 						view.sense("event", "MouseDown");
 						view.sense("event", "MouseUp");
+						view.sense("event", "MouseMove");
 					},
 					after$initialize: function(conf) {
 					}
 				}
 			}
+		}
+	},
+	shapes: {
+		rect: {
+			type$: "use.graphic.Shape",
+			viewName: "rect",
+			width: 80,
+			height: 40,
+			fill: "white",
+			stroke: "green",
+			draw: function(g, x, y) {
+				let cell = g.cellSize;
+				let rect = this.view();
+				x -= x % cell;
+				y -= y % cell;
+				rect.setAttribute("x", x - this.width / 2);
+				rect.setAttribute("y", y - this.height / 2);
+				rect.setAttribute("width", this.width);
+				rect.setAttribute("height", this.height);
+				rect.setAttribute("fill", this.fill);
+				rect.setAttribute("stroke", this.stroke);
+				this.control(rect);
+				return rect;										
+			}
+		},
+		ellipse: {
+			type$: "use.graphic.Shape",
+			viewName: "ellipse"									
 		}
 	}
 }
