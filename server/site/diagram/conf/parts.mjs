@@ -54,16 +54,17 @@ export default {
 		}
 	},
 	shapes: {
-		rect: {
+		handle: {
 			type$: "use.graphic.Shape",
 			viewName: "rect",
 			width: 80,
 			height: 40,
 			fill: "white",
 			stroke: "green",
-			draw: function(g, x, y) {
+			create: function(g, x, y) {
 				let cell = g.cellSize;
 				let rect = this.view();
+				rect.handle = true;
 				x -= x % cell;
 				y -= y % cell;
 				rect.setAttribute("x", x - this.width / 2);
@@ -76,9 +77,24 @@ export default {
 				return rect;										
 			}
 		},
-		ellipse: {
+		connector: {
 			type$: "use.graphic.Shape",
-			viewName: "ellipse"									
+			viewName: "line",
+			stroke: "green",
+			create: function(g, x, y) {
+				let line = this.view();
+				line.connector = true;
+				line.setAttribute("x1", x);
+				line.setAttribute("y1", y);
+				line.setAttribute("stroke", this.stroke);
+				this.control(line);
+				return line;										
+			},
+			move: function(line, x, y) {
+				line.setAttribute("x2", x);
+				line.setAttribute("y2", y);
+				return line;										
+			}			
 		}
 	}
 }

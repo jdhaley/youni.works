@@ -1,4 +1,4 @@
-let SHAPE = null;
+let STATE;
 
 export default {
 	package$: "youni.works/web/graphic",
@@ -15,41 +15,63 @@ export default {
 	},
 	Shape: {
 		super$: "Graphic",
-		extend$action: {
-			MouseDown: function(on, event) {
-				if (!SHAPE) SHAPE = on;
-			}
-		}
 	},
 	GraphicContext: {
 		super$: "Graphic",
 		viewName: "svg",
 		cellSize: 1,
+		move: function(shape, x, y) {
+			let cell = this.cellSize;
+			x = x - x % cell;
+			x = x - shape.getAttribute("width") / 2;
+			y = y - y % cell;
+			y = y - shape.getAttribute("height") / 2;
+			console.log(x, y);
+			shape.setAttribute("x", x);
+			shape.setAttribute("y", y);		
+		},
 		extend$action: {
-			Click: function(on, event) {					
-				if (event.ctrlKey) {
-					console.log(event);
-					let rect = this.part.rect.draw(this, event.offsetX, event.offsetY);
-					on.append(rect);
+			MouseMove: function(on, event) {
+				if (event.buttons == 1 && STATE.active) {
+					if (STATE.connect) {
+						on.style.cursor = "crosshair";
+					} else {
+						this.move(STATE.active, event.offsetX, event.offsetY);
+					}
 				}
 			},
-			MouseMove: function(on, event) {
-				if (event.buttons == 1 && SHAPE) {
-					let cell = this.cellSize;
-					let x = event.offsetX;
-					x = x - x % cell;
-					x = x - SHAPE.getAttribute("width") / 2;
-					let y = event.offsetY;
-					y = y - y % cell;
-					y = y - SHAPE.getAttribute("height") / 2;
-					console.log(x, y);
-					SHAPE.setAttribute("x", x);
-					SHAPE.setAttribute("y", y);				
+			MouseDown: function(on, event) {
+				if (event.target.handle) {
+					let shape = event.target;
+					if (event.altKey) {
+						let x = shape.getAttribute("x");
+						let y = shape.getAttribute("y");
+						STATE.connect = this.part.connector.create(this, x, y);
+					}
+					STATE.active = shape;
 				}
 			},
 			MouseUp: function(on, event) {
-				SHAPE = null;
+				if (event.altKey) {
+					if (STATE.connect) {
+						if (STATE.active) {
+							
+						} else {
+							console.log("No active item.");
+						}
+					} else {
+						let rect = this.part.handle.create(this, event.offsetX, event.offsetY);
+						on.append(rect);						
+					}
+				}
+				STATE.active = null;
+				STATE.connect = null;
+				on.style.cursor = "default";
 			}
+		},
+		after$initialize: function(conf) {
+			STATE = this.sys.extend();
+			STATE.active = null;
 		}
 	}
 }
