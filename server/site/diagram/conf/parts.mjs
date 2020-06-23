@@ -55,46 +55,17 @@ export default {
 	},
 	shapes: {
 		handle: {
-			type$: "use.graphic.Shape",
+			type$: "use.graphic.Group",
 			viewName: "rect",
 			width: 80,
 			height: 40,
 			fill: "white",
 			stroke: "green",
-			create: function(g, x, y) {
-				let cell = g.cellSize;
-				let rect = this.view();
-				rect.handle = true;
-				x -= x % cell;
-				y -= y % cell;
-				rect.setAttribute("x", x - this.width / 2);
-				rect.setAttribute("y", y - this.height / 2);
-				rect.setAttribute("width", this.width);
-				rect.setAttribute("height", this.height);
-				rect.setAttribute("fill", this.fill);
-				rect.setAttribute("stroke", this.stroke);
-				this.control(rect);
-				return rect;										
-			}
 		},
 		connector: {
-			type$: "use.graphic.Shape",
+			type$: "use.graphic.Connector",
 			viewName: "line",
-			stroke: "green",
-			create: function(g, x, y) {
-				let line = this.view();
-				line.connector = true;
-				line.setAttribute("x1", x);
-				line.setAttribute("y1", y);
-				line.setAttribute("stroke", this.stroke);
-				this.control(line);
-				return line;										
-			},
-			move: function(line, x, y) {
-				line.setAttribute("x2", x);
-				line.setAttribute("y2", y);
-				return line;										
-			}			
+			stroke: "green"
 		}
 	}
 }
