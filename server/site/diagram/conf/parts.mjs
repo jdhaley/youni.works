@@ -60,7 +60,8 @@ export default {
 			width: 80,
 			height: 40,
 			fill: "white",
-			stroke: "green",
+			stroke: "slateGray",
+			strokeDasharray: "5 2"
 		},
 		connector: {
 			type$: "use.graphic.Connector",

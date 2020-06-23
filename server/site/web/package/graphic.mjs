@@ -5,19 +5,21 @@ export default {
 	use: {
 		package$view: "youni.works/web/view"
 	},
-	model: {
+	graph: {
 		Node: {
 			type: "",
 			x: 0,
 			y: 0,
+			//z: 0,
 			w: 0,
 			h: 0,
-			arcs: []
+			//d: 0,
+			value: undefined
 		},
 		Arc: {
-			toNode: null,
 			type: "",
-			spline: []
+			from: null,
+			to: null
 		}
 	},
 	Graphic: {
@@ -27,6 +29,25 @@ export default {
 			this.control(view, model);
 			return view;
 		}
+	},
+	Connector: {
+		super$: "Graphic",
+		create: function(gc, from, to) {
+			let line = this.view();
+			line.connector = true;
+			line.setAttribute("x1", from.getAttribute("x") * 1 + from.getAttribute("width") / 2);
+			line.setAttribute("y1", from.getAttribute("y") * 1 + from.getAttribute("height") / 2);
+			line.setAttribute("x2", to.getAttribute("x") * 1 + to.getAttribute("width") / 2);
+			line.setAttribute("y2", to.getAttribute("y") * 1 + to.getAttribute("height") / 2);
+			line.setAttribute("stroke", this.stroke);
+			this.control(line);
+			return line;										
+		},
+		arc: function(line, x, y) {
+			line.setAttribute("x2", x);
+			line.setAttribute("y2", y);
+			return line;										
+		}			
 	},
 	Group: {
 		super$: "Graphic",
@@ -42,26 +63,10 @@ export default {
 			rect.setAttribute("height", this.height);
 			rect.setAttribute("fill", this.fill);
 			rect.setAttribute("stroke", this.stroke);
+			rect.setAttribute("stroke-dasharray", this.strokeDasharray);
 			this.control(rect);
 			return rect;										
 		}
-	},
-	Connector: {
-		super$: "Graphic",
-		create: function(g, x, y) {
-			let line = this.view();
-			line.connector = true;
-			line.setAttribute("x1", x);
-			line.setAttribute("y1", y);
-			line.setAttribute("stroke", this.stroke);
-			this.control(line);
-			return line;										
-		},
-		arc: function(line, x, y) {
-			line.setAttribute("x2", x);
-			line.setAttribute("y2", y);
-			return line;										
-		}			
 	},
 	GraphicContext: {
 		super$: "Graphic",
@@ -88,39 +93,30 @@ export default {
 				}
 			},
 			MouseDown: function(on, event) {
+				STATE.selection && STATE.selection.setAttribute("stroke", "slateGray");
 				if (event.target.handle) {
-					let shape = event.target;
-					if (STATE.selection == shape) {
-						//Toggle Selection
+					if (STATE.selection == event.target) {
 						STATE.selection = null;
 						return;
 					}
-					if (event.altKey) {
-						let x = shape.getAttribute("x");
-						let y = shape.getAttribute("y");
-						STATE.connect = this.part.connector.create(this, x, y);
+					
+					if (STATE.selection && event.altKey) {
+						let connector = this.part.connector.create(this, STATE.selection, event.target);
+						on.append(connector);
 					}
-					STATE.selection = shape;
+
+					STATE.selection = event.target;
+					STATE.selection.setAttribute("stroke", "green");
+					
 				} else {
-					STATE.selection = null;
+					if (event.altKey) {
+						STATE.selection = this.part.handle.create(this, event.offsetX, event.offsetY);;
+						STATE.selection.setAttribute("stroke", "green");
+						on.append(STATE.selection);
+					}
 				}
 			},
 			MouseUp: function(on, event) {
-				if (event.altKey) {
-					if (STATE.connect) {
-						if (STATE.selection) {
-							
-						} else {
-							console.log("No active item.");
-						}
-					} else {
-						let rect = this.part.handle.create(this, event.offsetX, event.offsetY);
-						on.append(rect);						
-					}
-				}
-				STATE.selection = null;
-				STATE.connect = null;
-				on.style.cursor = "default";
 			}
 		},
 		after$initialize: function(conf) {
