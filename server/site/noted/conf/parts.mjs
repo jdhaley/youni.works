@@ -39,7 +39,8 @@ export default {
 						Character: DEFAULT,
 					},
 					getAction: getAction,
-					after$control: function(view) {
+					control: function(view) {
+						this.super("control", view);
 						view.sense("event", "Click");
 						view.sense("event", "KeyDown");
 						view.sense("event", "MouseUp");
@@ -49,7 +50,8 @@ export default {
 						view.sense("event", "Paste");
 	//					view.ownerDocument.sense("selection", "SelectionChange");
 					},
-					after$initialize: function(conf) {
+					initialize: function(conf) {
+						this.super("initialize", conf);
 						let doc = this.owner.window.document;
 						doc.execCommand("styleWithCSS", false, false);
 						doc.execCommand("defaultParagraphSeparator", false, "P");

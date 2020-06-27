@@ -3,19 +3,35 @@ export default {
 	use: {
 		package$graphic: "youni.works/web/graphic"
 	},
-	type$Graphic: "use.graphic.Graphic",
+	/*
+  <foreignObject x="20" y="20" width="160" height="160">
+    <!--
+      In the context of SVG embedded in an HTML document, the XHTML 
+      namespace could be omitted, but it is mandatory in the 
+      context of an SVG document
+    -->
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Sed mollis mollis mi ut ultricies. Nullam magna ipsum,
+      porta vel dui convallis, rutrum imperdiet eros. Aliquam
+      erat volutpat.
+    </div>
+  </foreignObject>
+
+	 */
 	Text: {
-		super$: "Graphic",
+		super$: "use.graphic.Box",
 		viewName: "foreignObject",
 		create: function(gc, x, y) {
+			let text = this.super("create", x, y);
 			
 		}
 	},
 	Node: {
-		super$: "Graphic",
+		super$: "use.graphic.Box",
 		viewName: "rect",
 		create: function(gc, x, y) {
-			let node = this.view();
+			let node = this.super("create", x, y);
 			gc.append(node);
 			node.id = gc.controller.identify();
 			node.toArcs = [];
@@ -24,20 +40,17 @@ export default {
 			node.classList.add("node", "selectable", "selected");
 			node.setAttribute("width", this.width);
 			node.setAttribute("height", this.height);
-			this.move(node, x, y);
 			
-			this.control(node);
 			return node;										
 		},
 		move: function(node, x, y) {
-			let cell = node.parentNode.controller.cellSize;
-			moveNode(node, x, y);
-			for (let arc of node.toArcs) moveArc(arc);
-			for (let arc of node.fromArcs) moveArc(arc);
+			this.super("move", node, x, y);
+			if (node.toArcs) for (let arc of node.toArcs) moveArc(arc);
+			if (node.fromArcs) for (let arc of node.fromArcs) moveArc(arc);
 		}
 	},
 	Arc: {
-		super$: "Graphic",
+		super$: "use.graphic.Graphic",
 		viewName: "line",
 		create: function(gc, from, to) {
 			let arc = this.view();
@@ -53,7 +66,6 @@ export default {
 			arc.setAttribute("x2", to.getAttribute("x") * 1 + to.getAttribute("width") / 2);
 			arc.setAttribute("y2", to.getAttribute("y") * 1 + to.getAttribute("height") / 2);
 
-			this.control(arc);
 			gc.prepend(arc); //Prepend so that Nodes are drawn on top of Arcs.
 
 			return arc;										

@@ -7,6 +7,15 @@ export default {
 		type$part: "Empty",
 		receive: function(message) {
 			this.controller.process(this, message);
+		},
+		super: function(method, ...args) {
+			let object = this;
+			if (this[method]) while (object = this.sys.prototypeOf(object)) {
+				let fn = object[method];
+				if (fn != this[method]) {
+					return fn.apply(this, args);
+				}
+			}
 		}
 	},
 	Controller: {

@@ -27,28 +27,13 @@ export default {
 					},
 					extend$shortcut: {
 					},
-//					extend$action: {
-//						Input: DEFAULT,
-//						Cut: DEFAULT,
-//						Copy: DEFAULT,
-//						Paste: DEFAULT,
-//						Delete: DEFAULT,
-//						Insert: DEFAULT,
-//						Erase: DEFAULT,
-//						Split: DEFAULT,
-//						Join: DEFAULT,
-//						Promote: DEFAULT,
-//						Demote: DEFAULT,
-//						Character: DEFAULT,
-//					},
-					after$control: function(view) {
+					control: function(view) {
+						this.super("control", view);
 						view.sense("event", "Click");
 						view.sense("event", "KeyDown");
 						view.sense("event", "MouseDown");
 						view.sense("event", "MouseUp");
 						view.sense("event", "MouseMove");
-					},
-					after$initialize: function(conf) {
 					}
 				}
 			}

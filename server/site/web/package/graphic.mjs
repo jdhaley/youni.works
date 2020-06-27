@@ -66,10 +66,27 @@ export default {
 			MouseUp: function(on, event) {
 			}
 		},
-		after$initialize: function(conf) {
+		initialize: function(conf) {
+			this.super("initialize", conf);
 			STATE = this.sys.extend();
 			STATE.selection = null;
 			STATE.lastId = 0;
+		}
+	},
+	Box: {
+		super$: "Graphic",
+		create: function(x, y) {
+			let box = this.view();
+			box.setAttribute("width", this.width);
+			box.setAttribute("height", this.height);
+			this.move(box, x, y);
+			return box;										
+		},
+		move: function(box, x, y) {
+			x = x - box.getAttribute("width") / 2;
+			y = y - box.getAttribute("height") / 2;
+			box.setAttribute("x", x);
+			box.setAttribute("y", y);		
 		}
 	}
 }

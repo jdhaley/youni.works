@@ -61,12 +61,13 @@ export default {
 			let viewer = this.part[view.nodeName.toLowerCase()];
 			viewer && viewer.control(view);
 		},
-		before$initialize: function(conf) {
+		initialize: function(conf) {
 			conf.document.owner = this;
 			this.sys.define(this, "content", conf.document.body);
 			this.sys.implement(this.window.Element.prototype, conf.platform.view);
 			this.sys.implement(this.window.Range.prototype, conf.platform.range);
 			createStyleSheet(this);
+			this.super("initialize", conf);
 		}
 	},
 }

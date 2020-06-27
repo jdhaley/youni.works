@@ -9,7 +9,8 @@ export default {
 		viewType: "composite",
 		var$group: {
 		},
-		after$initialize: function(conf) {
+		initialize: function(conf) {
+			this.super("initialize", conf);
 			for (let name in conf.actions) this.initializeInstruction(name, conf.actions[name]);
 		},
 		initializeInstruction: function(name, conf) {
@@ -113,7 +114,8 @@ export default {
 	Article: {
 		super$: "use.view.Viewer",
 		viewName: "article",
-		after$control: function(view) {
+		control: function(view) {
+			this.super("control", view);
 			view.contentEditable = true;
 			view.tabIndex = 1;
 		}
