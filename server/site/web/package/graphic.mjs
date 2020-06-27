@@ -23,7 +23,9 @@ export default {
 		extend$action: {
 			MouseMove: function(on, event) {
 				if (event.buttons == 1 && STATE.selection) {
-					STATE.selection.controller.move(STATE.selection, event.offsetX, event.offsetY);
+					let x = event.offsetX - event.offsetX % this.cellSize;
+					let y = event.offsetY - event.offsetY % this.cellSize;
+					STATE.selection.controller.move(STATE.selection, x, y);
 				}
 			},
 			MouseDown: function(on, event) {
@@ -43,7 +45,9 @@ export default {
 					
 				} else {
 					if (event.altKey) {
-						STATE.selection = this.part.node.create(on, event.offsetX, event.offsetY);;
+						let x = event.offsetX - event.offsetX % this.cellSize;
+						let y = event.offsetY - event.offsetY % this.cellSize;
+						STATE.selection = this.part.node.create(on, x, y);
 					}
 				}
 			},

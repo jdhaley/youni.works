@@ -4,18 +4,22 @@ export default {
 		package$graphic: "youni.works/web/graphic"
 	},
 	type$Graphic: "use.graphic.Graphic",
+	Text: {
+		super$: "Graphic",
+		viewName: "foreignObject",
+		create: function(gc, x, y) {
+			
+		}
+	},
 	Node: {
 		super$: "Graphic",
 		viewName: "rect",
 		create: function(gc, x, y) {
-			let cell = gc.controller.cellSize;
 			let node = this.view();
 			node.id = gc.controller.identify();
 			node.toArcs = [];
 			node.fromArcs = [];
 			node.classList.add("node", "selectable", "selected");
-			x -= x % cell;
-			y -= y % cell;
 			node.setAttribute("x", x - this.width / 2);
 			node.setAttribute("y", y - this.height / 2);
 			node.setAttribute("width", this.width);
@@ -27,8 +31,6 @@ export default {
 		},
 		move: function(node, x, y) {
 			let cell = node.parentNode.controller.cellSize;
-			x = x - x % cell;
-			y = y - y % cell;
 			moveNode(node, x, y);
 			for (let arc of node.toArcs) moveArc(arc);
 			for (let arc of node.fromArcs) moveArc(arc);
@@ -38,8 +40,8 @@ export default {
 		super$: "Graphic",
 		viewName: "line",
 		create: function(gc, from, to) {
-			arc.classList.add("connector");
 			let arc = this.view();
+			arc.classList.add("connector");
 			arc.setAttribute("data-from", from.id);
 			arc.setAttribute("data-to", to.id);
 			arc.fromNode = from;
