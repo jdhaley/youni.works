@@ -55,8 +55,8 @@ export default {
 		}
 	},
 	shapes: {
-		handle: {
-			type$: "use.diagram.Group",
+		node: {
+			type$: "use.diagram.Node",
 			width: 80,
 			height: 40,
 			fill: "white",
@@ -68,8 +68,9 @@ export default {
 			}
 		},
 		connector: {
-			type$: "use.diagram.Connector",
-			stroke: "green"
+			type$: "use.diagram.Arc",
+			stroke: "slateGray",
+			strokeDasharray: "5 2"
 		}
 	}
 }

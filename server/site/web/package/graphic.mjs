@@ -17,6 +17,9 @@ export default {
 		super$: "Graphic",
 		viewName: "svg",
 		cellSize: 1,
+		identify: function() {
+			return ++STATE.lastId;
+		},
 		extend$action: {
 			MouseMove: function(on, event) {
 				if (event.buttons == 1 && STATE.selection) {
@@ -25,11 +28,12 @@ export default {
 			},
 			MouseDown: function(on, event) {
 				STATE.selection && STATE.selection.setAttribute("stroke", "slateGray");
-				if (event.target.handle) {
-					if (STATE.selection == event.target) {
-						STATE.selection = null;
-						return;
-					}
+				if (event.target.classList.contains("selectable")) {
+					console.log(event.target.classList);
+//					if (STATE.selection == event.target) {
+//						STATE.selection = null;
+//						return;
+//					}
 					
 					if (STATE.selection && event.altKey) {
 						this.part.connector.create(on, STATE.selection, event.target);
@@ -40,7 +44,7 @@ export default {
 					
 				} else {
 					if (event.altKey) {
-						STATE.selection = this.part.handle.create(on, event.offsetX, event.offsetY);;
+						STATE.selection = this.part.node.create(on, event.offsetX, event.offsetY);;
 						STATE.selection.setAttribute("stroke", "green");
 					}
 				}
@@ -51,6 +55,7 @@ export default {
 		after$initialize: function(conf) {
 			STATE = this.sys.extend();
 			STATE.selection = null;
+			STATE.lastId = 0;
 		}
 	}
 }
