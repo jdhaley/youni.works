@@ -59,18 +59,9 @@ export default {
 			type$: "use.diagram.Node",
 			width: 80,
 			height: 40,
-			fill: "white",
-			stroke: "slateGray",
-			strokeDasharray: "5 2",
-			style: {
-				fill: "white",
-				stroke: "slateGray"
-			}
 		},
 		connector: {
 			type$: "use.diagram.Arc",
-			stroke: "slateGray",
-			strokeDasharray: "5 2"
 		}
 	}
 }

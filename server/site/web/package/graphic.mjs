@@ -27,9 +27,8 @@ export default {
 				}
 			},
 			MouseDown: function(on, event) {
-				STATE.selection && STATE.selection.setAttribute("stroke", "slateGray");
+				STATE.selection && STATE.selection.classList.remove("selected");
 				if (event.target.classList.contains("selectable")) {
-					console.log(event.target.classList);
 //					if (STATE.selection == event.target) {
 //						STATE.selection = null;
 //						return;
@@ -40,12 +39,11 @@ export default {
 					}
 
 					STATE.selection = event.target;
-					STATE.selection.setAttribute("stroke", "green");
+					STATE.selection.classList.add("selected");
 					
 				} else {
 					if (event.altKey) {
 						STATE.selection = this.part.node.create(on, event.offsetX, event.offsetY);;
-						STATE.selection.setAttribute("stroke", "green");
 					}
 				}
 			},
