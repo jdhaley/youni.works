@@ -2,7 +2,7 @@
 	fill: white;
 	stroke: slateGray;
 	stroke-dasharray: 5 2;
-	transition: all 200ms ease-out;
+	transition: all 100ms ease-out;
 }
 .connector {
 	stroke: slateGray;

@@ -3,14 +3,26 @@ let STATE;
 export default {
 	package$: "youni.works/web/graphic",
 	use: {
+		package$control: "youni.works/base/control",
 		package$view: "youni.works/web/view"
 	},
 	Graphic: {
-		super$: "use.view.Viewer",
-		view: function(model) {
+		super$: "use.control.Processor",
+		type$owner: "use.view.Frame",
+		get$controller: function() {
+			return this.owner;
+		},
+		viewName: "",
+		view: function() {
 			let view = this.owner.window.document.createElementNS("http://www.w3.org/2000/svg", this.viewName);
-			this.control(view, model);
+			this.control(view);
 			return view;
+		},
+		control: function(view) {
+			this.sys.define(view, "controller", this, "const");
+		},
+		before$initialize: function(conf) {
+			this.sys.define(this, "owner", conf.owner, "const");
 		}
 	},
 	GraphicContext: {

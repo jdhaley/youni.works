@@ -16,17 +16,17 @@ export default {
 		viewName: "rect",
 		create: function(gc, x, y) {
 			let node = this.view();
+			gc.append(node);
 			node.id = gc.controller.identify();
 			node.toArcs = [];
 			node.fromArcs = [];
+		
 			node.classList.add("node", "selectable", "selected");
-			node.setAttribute("x", x - this.width / 2);
-			node.setAttribute("y", y - this.height / 2);
 			node.setAttribute("width", this.width);
 			node.setAttribute("height", this.height);
-
+			this.move(node, x, y);
+			
 			this.control(node);
-			gc.append(node);
 			return node;										
 		},
 		move: function(node, x, y) {
