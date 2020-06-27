@@ -3,7 +3,8 @@ export default {
 	use: {
 		package$view: "youni.works/web/view",
 		package$ui: "youni.works/web/ui",
-		package$graphic: "youni.works/web/graphic"
+		package$graphic: "youni.works/web/graphic",
+		package$diagram: "youni.works/diagram/diagram"
 	},
 	public: {
 		body: {
@@ -55,17 +56,19 @@ export default {
 	},
 	shapes: {
 		handle: {
-			type$: "use.graphic.Group",
-			viewName: "rect",
+			type$: "use.diagram.Group",
 			width: 80,
 			height: 40,
 			fill: "white",
 			stroke: "slateGray",
-			strokeDasharray: "5 2"
+			strokeDasharray: "5 2",
+			style: {
+				fill: "white",
+				stroke: "slateGray"
+			}
 		},
 		connector: {
-			type$: "use.graphic.Connector",
-			viewName: "line",
+			type$: "use.diagram.Connector",
 			stroke: "green"
 		}
 	}
