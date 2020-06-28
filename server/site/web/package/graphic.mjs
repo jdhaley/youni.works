@@ -1,5 +1,3 @@
-let STATE;
-
 export default {
 	package$: "youni.works/web/graphic",
 	use: {
@@ -23,68 +21,69 @@ export default {
 		},
 		before$initialize: function(conf) {
 			this.sys.define(this, "owner", conf.owner, "const");
+		},
+		extend$action: {
+			MouseDown: function(on, event) {
+				if (on.classList.contains("selectable")) event.selection = on;
+			}
 		}
 	},
 	GraphicContext: {
 		super$: "Graphic",
 		viewName: "svg",
 		cellSize: 1,
-		identify: function() {
-			return ++STATE.lastId;
+		identify: function(gc) {
+			if (!gc.lastId) gc.lastId = 0;
+			return ++gc.lastId;
 		},
 		extend$action: {
 			MouseMove: function(on, event) {
-				if (event.buttons == 1 && STATE.selection) {
+				if (event.buttons == 1 && on.selection) {
 					let x = event.offsetX - event.offsetX % this.cellSize;
 					let y = event.offsetY - event.offsetY % this.cellSize;
-					STATE.selection.controller.move(STATE.selection, x, y);
+					on.selection.controller.move(on.selection, x, y);
 				}
 			},
 			MouseDown: function(on, event) {
-				STATE.selection && STATE.selection.classList.remove("selected");
-				if (event.target.classList.contains("selectable")) {
-//					if (STATE.selection == event.target) {
-//						STATE.selection = null;
-//						return;
-//					}
+				on.selection && on.selection.classList.remove("selected");
+				if (event.selection) {
 					
-					if (STATE.selection && event.altKey) {
-						this.part.connector.create(on, STATE.selection, event.target);
+					if (on.selection && event.altKey) {
+						this.part.connector.create(on, on.selection, event.selection);
 					}
 
-					STATE.selection = event.target;
-					STATE.selection.classList.add("selected");
+					on.selection = event.selection;
+					on.selection.classList.add("selected");
 					
 				} else {
 					if (event.altKey) {
 						let x = event.offsetX - event.offsetX % this.cellSize;
 						let y = event.offsetY - event.offsetY % this.cellSize;
-						STATE.selection = this.part.node.create(on, x, y);
+						on.selection = this.part.node.create(on, x, y);
 					}
 				}
-			},
-			MouseUp: function(on, event) {
 			}
-		},
-		initialize: function(conf) {
-			this.super("initialize", conf);
-			STATE = this.sys.extend();
-			STATE.selection = null;
-			STATE.lastId = 0;
 		}
 	},
 	Box: {
 		super$: "Graphic",
 		create: function(x, y) {
 			let box = this.view();
-			box.setAttribute("width", this.width);
-			box.setAttribute("height", this.height);
+			this.size(box, this.width, this.height);
 			this.move(box, x, y);
 			return box;										
 		},
+		size: function(box, width, height) {
+			let x = box.getAttribute("x") * 1 + (width - box.getAttribute("width") * 1) / 2;
+			let y = box.getAttribute("y") * 1 + (height - box.getAttribute("height") * 1) / 2;
+			box.setAttribute("x", x);
+			box.setAttribute("y", y);		
+			box.setAttribute("width", width);
+			box.setAttribute("height", height);
+		},
 		move: function(box, x, y) {
-			x = x - box.getAttribute("width") / 2;
-			y = y - box.getAttribute("height") / 2;
+			x = x - (box.getAttribute("width") || 0) / 2;
+			y = y - (box.getAttribute("height") || 0) / 2;
 			box.setAttribute("x", x);
 			box.setAttribute("y", y);		
 		}

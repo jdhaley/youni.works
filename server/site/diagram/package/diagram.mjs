@@ -23,8 +23,19 @@ export default {
 		super$: "use.graphic.Box",
 		viewName: "foreignObject",
 		create: function(gc, x, y) {
-			let text = this.super("create", x, y);
-			
+			let object = this.super("create", x, y);
+			object.text = gc.ownerDocument.createElementNS("http://www.w3.org/1999/xhtml", "div");
+			object.text.className = "text";
+			object.append(object.text);
+			object.text.textContent = "Test";
+			object.text.contentEditable = true;
+			gc.append(object);
+			return object;
+		},
+		extend$action: {
+			MouseDown: function(on, event) {
+				event.selection = on.node;
+			}
 		}
 	},
 	Node: {
@@ -33,18 +44,25 @@ export default {
 		create: function(gc, x, y) {
 			let node = this.super("create", x, y);
 			gc.append(node);
-			node.id = gc.controller.identify();
+			node.id = gc.controller.identify(gc);
+			
+			node.object = gc.controller.part.text.create(gc, x, y);
+			node.object.node = node;
+			node.object.controller.size(node.object, this.width * 1 - 20, this.height * 1 - 20);
+			node.object.text.textContent = "Test";
+
 			node.toArcs = [];
 			node.fromArcs = [];
 		
 			node.classList.add("node", "selectable", "selected");
 			node.setAttribute("width", this.width);
 			node.setAttribute("height", this.height);
-			
+			this.move(node, x, y);
 			return node;										
 		},
 		move: function(node, x, y) {
 			this.super("move", node, x, y);
+			if (node.object) node.object.controller.move(node.object, x, y);
 			if (node.toArcs) for (let arc of node.toArcs) moveArc(arc);
 			if (node.fromArcs) for (let arc of node.fromArcs) moveArc(arc);
 		}

@@ -47,6 +47,11 @@ export default {
 		},
 		connector: {
 			type$: "use.diagram.Arc",
+		},
+		text: {
+			type$: "use.diagram.Text",
+			width: 80,
+			height: 40,
 		}
 	}
 }
