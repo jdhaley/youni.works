@@ -28,7 +28,7 @@ export default {
 			object.text.className = "text";
 			object.text.disabled = true;
 			object.append(object.text);
-			object.text.value = "Test";
+			object.text.title = "Click to add text";
 			gc.append(object);
 			return object;
 		},

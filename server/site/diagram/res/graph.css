@@ -1,13 +1,13 @@
 .node, foreignobject {
 	transition: all 80ms ease-out;
 }
+foreignobject {
+	padding: 1px;
+}
 .node {
 	fill: white;
 	stroke: slateGray;
 	stroke-dasharray: 5 2;
-}
-.node:hover {
-	fill: lightSteelBlue;
 }
 .connector {
 	stroke: slateGray;
@@ -21,9 +21,18 @@
 .text {
 	font-size: 14px;
 	outline: 0;
-	border: 0;
+	padding: 0;
+	margin: 0;
 	color: slateGray;
+	cursor: text;
+	background: transparent;
 }
-.text:focus {
+
+.node:hover {
+	stroke: green;
+}
+
+.text:hover, .text:focus {
 	color: black;
+	background: ghostWhite;
 }
