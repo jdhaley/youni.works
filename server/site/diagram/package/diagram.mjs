@@ -84,12 +84,42 @@ export default {
 			let fromY = arc.fromNode.getAttribute("y") * 1 + arc.fromNode.getAttribute("height") / 2;
 			let toX = arc.toNode.getAttribute("x") * 1 + arc.toNode.getAttribute("width") / 2;
 			let toY = arc.toNode.getAttribute("y") * 1 + arc.toNode.getAttribute("height") / 2;
-			let path = `\
-				M ${fromX} ${fromY}\
-				C ${fromX + arc.count * 100} ${fromY + arc.count * 100}\
-				, ${toX + arc.count * 100} ${toX + arc.count * 100}\
-				, ${toX} ${toY}\
-			`
+			let cx;
+			let cX = fromX < toX 
+				? (toX - fromX) / 2 + fromX 
+				: (fromX - toX) / 2 + toX /*+ arc.count * 10 */;
+			let cY = fromY < toY 
+				? (toY - fromY) / 2 + fromY
+				: (fromY - toY) / 2 + toY /*+  arc.count * 10 */;
+			
+			cX += arc.count * 10 * (arc.count % 2 ? 1 : -1);
+			cY += arc.count * 10;
+			console.log(`(${fromX}, ${fromY}) - (${toX}, ${toY}): (${cX}, ${cY})`);
+			let path = `M ${fromX} ${fromY} C ${cX} ${cY}, ${cX} ${cY}, ${toX} ${toY} M ${toX} ${fromY} L ${fromX} ${toY}`;
+
+			arc.setAttribute("d", path);
+		},
+		topbottomdraw: function(arc) {
+			let fromY = arc.fromNode.getAttribute("y");
+			let toY = arc.toNode.getAttribute("y");
+			
+			if (fromY < toY) fromY += arc.fromNode.getAttribute("height") * 1;
+			if (toY < fromY) toY += arc.fromNode.getAttribute("height") * 1;
+			let fromX = arc.fromNode.getAttribute("x") * 1 + arc.fromNode.getAttribute("width") / 2;
+			let toX = arc.toNode.getAttribute("x") * 1 + arc.toNode.getAttribute("width") / 2;
+		
+			let count = 0;
+			for (let existing of arc.fromNode.arc) {
+				if (existing.toNode == arc.toNode || existing.fromNode == arc.toNode) count++;
+			}
+
+			let length = arc.fromNode.getAttribute("width") * 1;
+			if (length > arc.toNode.getAttribute("width") * 1) length = arc.toNode.getAttribute("width") * 1;
+
+			let seg = length / ++count * arc.count * (arc.count % 2 ? -1 : 1);
+			fromX += seg;
+			toX += seg;
+			let path = `M ${fromX} ${fromY} L ${toX} ${toY} M ${toX} ${fromY} L ${fromX} ${toY}`;
 			arc.setAttribute("d", path);
 		}
 	}
