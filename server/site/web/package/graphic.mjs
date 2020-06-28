@@ -21,11 +21,6 @@ export default {
 		},
 		before$initialize: function(conf) {
 			this.sys.define(this, "owner", conf.owner, "const");
-		},
-		extend$action: {
-			MouseDown: function(on, event) {
-				if (on.classList.contains("selectable")) event.selection = on;
-			}
 		}
 	},
 	GraphicContext: {
@@ -38,30 +33,30 @@ export default {
 		},
 		extend$action: {
 			MouseMove: function(on, event) {
+				event.action = "";
 				if (event.buttons == 1 && on.selection) {
-					let x = event.offsetX - event.offsetX % this.cellSize;
-					let y = event.offsetY - event.offsetY % this.cellSize;
+					on.selection.classList.add("selected");		
+					let x = event.clientX - event.clientX % this.cellSize;
+					let y = event.clientY - event.clientY % this.cellSize;
 					on.selection.controller.move(on.selection, x, y);
 				}
 			},
 			MouseDown: function(on, event) {
 				on.selection && on.selection.classList.remove("selected");
-				if (event.selection) {
-					
+				if (event.target.classList.contains("selectable")) {
 					if (on.selection && event.altKey) {
-						this.part.connector.create(on, on.selection, event.selection);
+						this.part.connector.create(on, on.selection, event.target);
+					} else {
+						on.selection = event.target;
 					}
-
-					on.selection = event.selection;
-					on.selection.classList.add("selected");
-					
+				} else if (event.altKey && event.target == on) {
+					let x = event.clientX - event.clientX % this.cellSize;
+					let y = event.clientY - event.clientY % this.cellSize;
+					on.selection = this.part.node.create(on, x, y);
 				} else {
-					if (event.altKey) {
-						let x = event.offsetX - event.offsetX % this.cellSize;
-						let y = event.offsetY - event.offsetY % this.cellSize;
-						on.selection = this.part.node.create(on, x, y);
-					}
+					on.selection = null;
 				}
+				on.selection && on.selection.classList.add("selected");
 			}
 		}
 	},

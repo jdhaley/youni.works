@@ -24,17 +24,21 @@ export default {
 		viewName: "foreignObject",
 		create: function(gc, x, y) {
 			let object = this.super("create", x, y);
-			object.text = gc.ownerDocument.createElementNS("http://www.w3.org/1999/xhtml", "div");
+			object.text = gc.ownerDocument.createElementNS("http://www.w3.org/1999/xhtml", "input");
 			object.text.className = "text";
+			object.text.disabled = true;
 			object.append(object.text);
-			object.text.textContent = "Test";
-			object.text.contentEditable = true;
+			object.text.value = "Test";
 			gc.append(object);
 			return object;
 		},
 		extend$action: {
-			MouseDown: function(on, event) {
-				event.selection = on.node;
+			Click: function(on, event) {
+				on.text.disabled = undefined;
+				on.text.focus();
+			},
+			FocusOut: function(on, event) {
+				on.text.disabled = true;
 			}
 		}
 	},

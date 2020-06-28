@@ -29,8 +29,11 @@ export default {
 					},
 					control: function(view) {
 						this.super("control", view);
-						view.sense("event", "Click");
 						view.sense("event", "KeyDown");
+						view.sense("event", "Input");
+						view.sense("event", "FocusOut");
+						view.sense("event", "Click");
+						view.sense("event", "DblClick");
 						view.sense("event", "MouseDown");
 						view.sense("event", "MouseUp");
 						view.sense("event", "MouseMove");
