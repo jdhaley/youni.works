@@ -3,22 +3,6 @@ export default {
 	use: {
 		package$graphic: "youni.works/web/graphic"
 	},
-	/*
-  <foreignObject x="20" y="20" width="160" height="160">
-    <!--
-      In the context of SVG embedded in an HTML document, the XHTML 
-      namespace could be omitted, but it is mandatory in the 
-      context of an SVG document
-    -->
-    <div xmlns="http://www.w3.org/1999/xhtml">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      Sed mollis mollis mi ut ultricies. Nullam magna ipsum,
-      porta vel dui convallis, rutrum imperdiet eros. Aliquam
-      erat volutpat.
-    </div>
-  </foreignObject>
-
-	 */
 	Text: {
 		super$: "use.graphic.Box",
 		viewName: "foreignObject",
@@ -67,30 +51,46 @@ export default {
 		move: function(node, x, y) {
 			this.super("move", node, x, y);
 			if (node.object) node.object.controller.move(node.object, x, y);
-			if (node.toArcs) for (let arc of node.toArcs) moveArc(arc);
-			if (node.fromArcs) for (let arc of node.fromArcs) moveArc(arc);
+			if (node.toArcs) for (let arc of node.toArcs) arc.controller.draw(arc);
+			if (node.fromArcs) for (let arc of node.fromArcs) arc.controller.draw(arc);
 		}
 	},
 	Arc: {
 		super$: "use.graphic.Graphic",
-		viewName: "line",
+		viewName: "path",
 		create: function(gc, from, to) {
 			let arc = this.view();
+			arc.setAttribute("fill", "transparent");
 			arc.classList.add("connector");
 			arc.setAttribute("data-from", from.id);
 			arc.setAttribute("data-to", to.id);
+			arc.count = 0;
 			arc.fromNode = from;
 			arc.toNode = to;
+			for (let existing of from.toArcs) if (existing.toNode == to) {
+				arc.count++;
+				console.log("additional arc", arc.count);
+			}
 			from.toArcs.push(arc);
 			to.fromArcs.push(arc);
-			arc.setAttribute("x1", from.getAttribute("x") * 1 + from.getAttribute("width") / 2);
-			arc.setAttribute("y1", from.getAttribute("y") * 1 + from.getAttribute("height") / 2);
-			arc.setAttribute("x2", to.getAttribute("x") * 1 + to.getAttribute("width") / 2);
-			arc.setAttribute("y2", to.getAttribute("y") * 1 + to.getAttribute("height") / 2);
-
-			gc.prepend(arc); //Prepend so that Nodes are drawn on top of Arcs.
-
+			gc.prepend(arc); //Prepend so that Nodes are drawn on top of Arcs.			
+			this.draw(arc);
 			return arc;										
+		},
+		draw: function(arc) {
+			let from
+			/* <path d="M 10 10 C 20 20, 40 20, 50 10" stroke="black" fill="transparent"/> */
+			let fromX = arc.fromNode.getAttribute("x") * 1 + arc.fromNode.getAttribute("width") / 2;
+			let fromY = arc.fromNode.getAttribute("y") * 1 + arc.fromNode.getAttribute("height") / 2;
+			let toX = arc.toNode.getAttribute("x") * 1 + arc.toNode.getAttribute("width") / 2;
+			let toY = arc.toNode.getAttribute("y") * 1 + arc.toNode.getAttribute("height") / 2;
+			let path = `\
+				M ${fromX} ${fromY}\
+				C ${fromX + arc.count * 100} ${fromY + arc.count * 100}\
+				, ${toX + arc.count * 100} ${toX + arc.count * 100}\
+				, ${toX} ${toY}\
+			`
+			arc.setAttribute("d", path);
 		}
 	}
 }
