@@ -84,12 +84,18 @@ export default {
 			let fromY = arc.fromNode.getAttribute("y") * 1 + arc.fromNode.getAttribute("height") / 2;
 			let toX = arc.toNode.getAttribute("x") * 1 + arc.toNode.getAttribute("width") / 2;
 			let toY = arc.toNode.getAttribute("y") * 1 + arc.toNode.getAttribute("height") / 2;
-			let path = `\
-				M ${fromX} ${fromY}\
-				C ${fromX + arc.count * 100} ${fromY + arc.count * 100}\
-				, ${toX + arc.count * 100} ${toX + arc.count * 100}\
-				, ${toX} ${toY}\
-			`
+			let cx;
+			let cX = fromX < toX 
+				? (toX - fromX) / 2 + fromX 
+				: (fromX - toX) / 2 + toX /*+ arc.count * 10 */;
+			let cY = fromY < toY 
+				? (toY - fromY) / 2 + fromY
+				: (fromY - toY) / 2 + toY /*+  arc.count * 10 */;
+			
+			cX += arc.count * 10 * (arc.count % 2 ? 1 : -1);
+			cY += arc.count * 10;
+			console.log(`(${fromX}, ${fromY}) - (${toX}, ${toY}): (${cX}, ${cY})`);
+			let path = `M ${fromX} ${fromY} C ${cX} ${cY}, ${cX} ${cY}, ${toX} ${toY}`;
 			arc.setAttribute("d", path);
 		}
 	}
