@@ -1,3 +1,5 @@
+const EMPTY_ARRAY = Object.freeze([]);
+
 export default {
 	package$: "youni.works/diagram/diagram",
 	use: {
@@ -31,17 +33,21 @@ export default {
 		viewName: "rect",
 		create: function(gc, x, y) {
 			let node = this.super("create", x, y);
-			gc.append(node);
 			node.id = gc.controller.identify(gc);
+			node.model = this.sys.extend(this.graph.Node, {
+				id: node.id,
+				x: x,
+				y: y,
+				width: this.width,
+				height: this.height,
+				arc: []
+			});
+			gc.append(node);
 			
 			node.object = gc.controller.part.text.create(gc, x, y);
 			node.object.node = node;
 			node.object.controller.size(node.object, this.width * 1 - 20, this.height * 1 - 20);
-			node.object.text.textContent = "Test";
 
-			node.toArcs = [];
-			node.fromArcs = [];
-		
 			node.classList.add("node", "selectable", "selected");
 			node.setAttribute("width", this.width);
 			node.setAttribute("height", this.height);
@@ -51,8 +57,7 @@ export default {
 		move: function(node, x, y) {
 			this.super("move", node, x, y);
 			if (node.object) node.object.controller.move(node.object, x, y);
-			if (node.toArcs) for (let arc of node.toArcs) arc.controller.draw(arc);
-			if (node.fromArcs) for (let arc of node.fromArcs) arc.controller.draw(arc);
+			if (node.model) for (let arc of node.model.arc) arc.controller.draw(arc);
 		}
 	},
 	Arc: {
@@ -67,12 +72,11 @@ export default {
 			arc.count = 0;
 			arc.fromNode = from;
 			arc.toNode = to;
-			for (let existing of from.toArcs) if (existing.toNode == to) {
-				arc.count++;
-				console.log("additional arc", arc.count);
+			for (let existing of from.model.arc) {
+				if (existing.toNode == arc.toNode || existing.fromNode == arc.toNode) arc.count++;
 			}
-			from.toArcs.push(arc);
-			to.fromArcs.push(arc);
+			from.model.arc.push(arc);
+			to.model.arc.push(arc);
 			gc.prepend(arc); //Prepend so that Nodes are drawn on top of Arcs.			
 			this.draw(arc);
 			return arc;										

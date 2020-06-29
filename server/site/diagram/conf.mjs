@@ -1,8 +1,10 @@
 import control		from "../base/package/control.mjs";
+import graph		from "../base/package/graph.mjs";
 import view			from "../web/package/view.mjs";
 import client		from "../web/package/client.mjs";
 import ui			from "../web/package/ui.mjs";
 import graphic		from "../web/package/graphic.mjs";
+
 import diagram		from "../diagram/package/diagram.mjs";
 
 import services		from "./conf/services.mjs";
@@ -19,6 +21,7 @@ export default {
 	
 	packages: {
 		control: control,
+		graph: graph,
 		client: client,
 		
 		view: view,

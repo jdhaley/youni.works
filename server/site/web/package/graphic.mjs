@@ -2,10 +2,12 @@ export default {
 	package$: "youni.works/web/graphic",
 	use: {
 		package$control: "youni.works/base/control",
+		package$graph: "youni.works/base/graph",
 		package$view: "youni.works/web/view"
 	},
 	Graphic: {
 		super$: "use.control.Processor",
+		type$graph: "use.graph",
 		type$owner: "use.view.Frame",
 		get$controller: function() {
 			return this.owner;
