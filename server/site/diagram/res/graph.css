@@ -1,16 +1,17 @@
 .node, foreignobject {
 	transition: all 80ms ease-out;
 }
-foreignobject {
-	padding: 1px;
-}
+
 .node {
-	fill: white;
+	fill: ghostWhite;
 	stroke: slateGray;
+	stroke-width: 1px;
 	stroke-dasharray: 5 2;
 }
+
 .connector {
 	stroke: slateGray;
+	stroke-width: 1px;
 	stroke-dasharray: 5 2;
 }
 
@@ -21,8 +22,8 @@ foreignobject {
 .text {
 	font-size: 14px;
 	outline: 0;
-	padding: 0;
 	margin: 0;
+	padding: 4px;
 	color: slateGray;
 	cursor: text;
 	background: transparent;
@@ -34,5 +35,5 @@ foreignobject {
 
 .text:hover, .text:focus {
 	color: black;
-	background: ghostWhite;
+	background: white;
 }

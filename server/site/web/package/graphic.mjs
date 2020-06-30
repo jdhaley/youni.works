@@ -13,8 +13,9 @@ export default {
 			return this.owner;
 		},
 		viewName: "",
-		view: function() {
+		view: function(model) {
 			let view = this.owner.window.document.createElementNS("http://www.w3.org/2000/svg", this.viewName);
+			view.model = model;
 			this.control(view);
 			return view;
 		},
@@ -35,7 +36,7 @@ export default {
 		},
 		extend$action: {
 			MouseMove: function(on, event) {
-				event.action = "";
+				//event.action = "";
 				if (event.buttons == 1 && on.selection) {
 					on.selection.classList.add("selected");		
 					let x = event.clientX - event.clientX % this.cellSize;
