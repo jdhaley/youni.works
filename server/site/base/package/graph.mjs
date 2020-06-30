@@ -12,6 +12,9 @@ export default {
 		size: function(width, height) {
 			this.x += (width - this.width) / 2;
 			this.y += (height - this.height) / 2;
+			this.sys.define(this, "width", width);
+			this.sys.define(this, "height", height);
+			return this;
 		},
 		virtual$top: function() {
 			if (arguments.length) {

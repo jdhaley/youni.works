@@ -38,10 +38,11 @@ export default {
 			MouseMove: function(on, event) {
 				//event.action = "";
 				if (event.buttons == 1 && on.selection) {
-					on.selection.classList.add("selected");		
-					let x = event.clientX - event.clientX % this.cellSize;
-					let y = event.clientY - event.clientY % this.cellSize;
-					on.selection.controller.move(on.selection, x, y);
+					on.selection.classList.add("selected");
+					let node = on.selection.model;
+					node.x = event.clientX - event.clientX % this.cellSize;
+					node.y = event.clientY - event.clientY % this.cellSize;
+					on.selection.controller.draw(on.selection);
 				}
 			},
 			MouseDown: function(on, event) {
