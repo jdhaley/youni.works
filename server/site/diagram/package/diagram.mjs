@@ -31,8 +31,22 @@ export default {
 	Node: {
 		super$: "use.graphic.Box",
 		viewName: "rect",
+		move: function(node, x, y) {
+			node.model.x = x;
+			node.model.y = y;
+			this.draw(node);
+		},
+		draw: function(node) {
+			let m = node.model;
+			node.setAttribute("width", m.width);
+			node.setAttribute("height", m.height);
+			node.setAttribute("x", m.x - m.width / 2);
+			node.setAttribute("y", m.y - m.height / 2);
+			if (node.object) node.object.controller.move(node.object, m.x, m.y);
+			if (node.model) for (let arc of node.model.arc) arc.view.controller.draw(arc.view);
+		},
 		create: function(gc, x, y) {
-			let node = this.super("create", x, y);
+			let node = this.view();
 			node.id = gc.controller.identify(gc);
 			node.model = this.sys.extend(this.graph.Node, {
 				id: node.id,
@@ -40,10 +54,10 @@ export default {
 				y: y,
 				width: this.width,
 				height: this.height,
-				arc: []
+				arc: [],
+				view: node
 			});
 			gc.append(node);
-			
 			node.object = gc.controller.part.text.create(gc, x, y);
 			node.object.node = node;
 			node.object.controller.size(node.object, this.width * 1 - 20, this.height * 1 - 20);
@@ -51,13 +65,8 @@ export default {
 			node.classList.add("node", "selectable", "selected");
 			node.setAttribute("width", this.width);
 			node.setAttribute("height", this.height);
-			this.move(node, x, y);
+			this.draw(node);
 			return node;										
-		},
-		move: function(node, x, y) {
-			this.super("move", node, x, y);
-			if (node.object) node.object.controller.move(node.object, x, y);
-			if (node.model) for (let arc of node.model.arc) arc.controller.draw(arc);
 		}
 	},
 	Arc: {
@@ -65,23 +74,31 @@ export default {
 		viewName: "path",
 		create: function(gc, from, to) {
 			let arc = this.view();
+			arc.model = this.sys.extend(this.graph.Arc, {
+				from: from.model,
+				to: to.model,
+				view: arc
+			});
+
 			arc.setAttribute("fill", "transparent");
 			arc.classList.add("connector");
 			arc.setAttribute("data-from", from.id);
 			arc.setAttribute("data-to", to.id);
-			arc.count = 0;
-			arc.fromNode = from;
-			arc.toNode = to;
-			for (let existing of from.model.arc) {
-				if (existing.toNode == arc.toNode || existing.fromNode == arc.toNode) arc.count++;
-			}
-			from.model.arc.push(arc);
-			to.model.arc.push(arc);
+			from.model.arc.push(arc.model);
+			to.model.arc.push(arc.model);
 			gc.prepend(arc); //Prepend so that Nodes are drawn on top of Arcs.			
 			this.draw(arc);
 			return arc;										
 		},
 		draw: function(arc) {
+			let cX = arc.model.x; // + arc.count * 10 * (arc.count % 2 ? 1 : -1);
+			let cY = arc.model.y; // + arc.count * 10;
+			// M ${toX} ${fromY} L ${fromX} ${toY}
+			let path = `M ${arc.model.from.x} ${arc.model.from.y} C ${cX} ${cY}, ${cX} ${cY}, ${arc.model.to.x} ${arc.model.to.y}`;
+
+			arc.setAttribute("d", path);
+		},
+		xxxxxxxxxxxxdraw: function(arc) {
 			let from
 			/* <path d="M 10 10 C 20 20, 40 20, 50 10" stroke="black" fill="transparent"/> */
 			let fromX = arc.fromNode.getAttribute("x") * 1 + arc.fromNode.getAttribute("width") / 2;

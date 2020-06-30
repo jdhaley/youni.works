@@ -9,29 +9,33 @@ export default {
 		y: 0,
 		width: 0,
 		height: 0,
+		size: function(width, height) {
+			this.x += (width - this.width) / 2;
+			this.y += (height - this.height) / 2;
+		},
 		virtual$top: function() {
-			if (arguments) {
+			if (arguments.length) {
 				this.y = arguments[0] * 1 + this.height / 2;
 				return;
 			}
 			return this.y - this.height / 2;
 		},
 		virtual$right: function() {
-			if (arguments) {
+			if (arguments.length) {
 				this.x = arguments[0] * 1 - this.width / 2;
 				return;
 			}
 			return this.x + this.width / 2;
 		},
 		virtual$bottom: function() {
-			if (arguments) {
+			if (arguments.length) {
 				this.y = arguments[0] * 1 - this.height / 2;
 				return;
 			}
 			return this.y + this.height / 2;
 		},
 		virtual$left: function() {
-			if (arguments) {
+			if (arguments.length) {
 				this.x = arguments[0] * 1 + this.width / 2;
 				return;
 			}
