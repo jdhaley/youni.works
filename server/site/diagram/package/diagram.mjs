@@ -14,7 +14,7 @@ export default {
 			object.text.className = "text";
 			object.text.disabled = true;
 			object.append(object.text);
-			object.text.title = "Click to add text";
+			object.text.title = "Click to edit text";
 			gc.append(object);
 			return object;
 		},
@@ -36,37 +36,36 @@ export default {
 			node.model.y = y;
 			this.draw(node);
 		},
-		draw: function(node) {
-			let m = node.model;
-			node.setAttribute("width", m.width);
-			node.setAttribute("height", m.height);
-			node.setAttribute("x", m.x - m.width / 2);
-			node.setAttribute("y", m.y - m.height / 2);
-			if (node.object) node.object.controller.move(node.object, m.x, m.y);
-			if (node.model) for (let arc of node.model.arc) arc.view.controller.draw(arc.view);
+		draw: function(view) {
+			let m = view.model;
+			view.setAttribute("width", m.width);
+			view.setAttribute("height", m.height);
+			view.setAttribute("x", m.x - m.width / 2);
+			view.setAttribute("y", m.y - m.height / 2);
+			if (view.object) view.object.controller.move(view.object, m.x, m.y);
+			for (let arc of m.arc) arc.view.controller.draw(arc.view);
 		},
 		create: function(gc, x, y) {
-			let node = this.view();
-			node.id = gc.controller.identify(gc);
-			node.model = this.sys.extend(this.graph.Node, {
-				id: node.id,
+			let view = this.view();
+			view.id = gc.controller.identify(gc);
+			view.model = this.sys.extend(this.graph.Node, {
+				id: view.id,
 				x: x,
 				y: y,
 				width: this.width,
 				height: this.height,
 				arc: [],
-				view: node
+				view: view
 			});
-			gc.append(node);
-			node.object = gc.controller.part.text.create(gc, x, y);
-			node.object.node = node;
-			node.object.controller.size(node.object, this.width * 1 - 20, this.height * 1 - 20);
+			gc.append(view);
+			view.object = gc.controller.part.text.create(gc, x, y);
+			view.object.controller.size(view.object, this.width * 1 - 20, this.height * 1 - 20);
 
-			node.classList.add("node", "selectable", "selected");
-			node.setAttribute("width", this.width);
-			node.setAttribute("height", this.height);
-			this.draw(node);
-			return node;										
+			view.classList.add("node", "selectable", "selected");
+			view.setAttribute("width", this.width);
+			view.setAttribute("height", this.height);
+			this.draw(view);
+			return view;										
 		}
 	},
 	Arc: {
