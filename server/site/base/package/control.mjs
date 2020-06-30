@@ -13,7 +13,7 @@ export default {
 			if (this[method]) while (object = this.sys.prototypeOf(object)) {
 				let fn = object[method];
 				if (fn != this[method]) {
-					return fn.apply(this, args);
+					return fn ? fn.apply(this, args) : undefined;
 				}
 			}
 		}
