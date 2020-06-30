@@ -6,10 +6,11 @@ export default {
 		package$graphic: "youni.works/web/graphic"
 	},
 	Text: {
-		super$: "use.graphic.Box",
+		super$: "use.graphic.Graphic",
 		viewName: "foreignObject",
-		create: function(gc, x, y) {
-			let object = this.super("create", x, y);
+		create: function(gc, model) {
+			let object = this.view();
+			object.model = model;
 			object.text = gc.ownerDocument.createElementNS("http://www.w3.org/1999/xhtml", "input");
 			object.text.className = "text";
 			object.text.disabled = true;
@@ -17,6 +18,13 @@ export default {
 			object.text.title = "Click to edit text";
 			gc.append(object);
 			return object;
+		},
+		draw: function(view) {
+			let m = view.model;
+			view.setAttribute("width", m.width);
+			view.setAttribute("height", m.height - 20);
+			view.setAttribute("x", m.x - m.width / 2);
+			view.setAttribute("y", m.y - m.height / 2);
 		},
 		extend$action: {
 			Click: function(on, event) {
@@ -29,7 +37,7 @@ export default {
 		}
 	},
 	Node: {
-		super$: "use.graphic.Box",
+		super$: "use.graphic.Graphic",
 		viewName: "rect",
 		move: function(node, x, y) {
 			node.model.x = x;
@@ -42,28 +50,29 @@ export default {
 			view.setAttribute("height", m.height);
 			view.setAttribute("x", m.x - m.width / 2);
 			view.setAttribute("y", m.y - m.height / 2);
-			if (view.object) view.object.controller.move(view.object, m.x, m.y);
+			if (view.object) {
+				view.object.controller.draw(view.object);
+			}
 			for (let arc of m.arc) arc.view.controller.draw(arc.view);
 		},
 		create: function(gc, x, y) {
-			let view = this.view();
-			view.id = gc.controller.identify(gc);
-			view.model = this.sys.extend(this.graph.Node, {
-				id: view.id,
+			let node = this.sys.extend(this.graph.Node, {
+				id: gc.controller.identify(gc),
 				x: x,
 				y: y,
 				width: this.width,
 				height: this.height,
-				arc: [],
-				view: view
+				arc: []
 			});
-			gc.append(view);
-			view.object = gc.controller.part.text.create(gc, x, y);
-			view.object.controller.size(view.object, this.width * 1 - 20, this.height * 1 - 20);
-
+			
+			let view = this.view();			
+			view.model = node;
+			view.id = node.id;
 			view.classList.add("node", "selectable", "selected");
-			view.setAttribute("width", this.width);
-			view.setAttribute("height", this.height);
+			gc.append(view);
+			view.object = gc.controller.part.text.create(gc, node);
+
+			node.view = view;
 			this.draw(view);
 			return view;										
 		}

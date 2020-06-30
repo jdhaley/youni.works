@@ -61,28 +61,5 @@ export default {
 				on.selection && on.selection.classList.add("selected");
 			}
 		}
-	},
-	Box: {
-		super$: "Graphic",
-		create: function(x, y) {
-			let box = this.view();
-			this.size(box, this.width, this.height);
-			this.move(box, x, y);
-			return box;										
-		},
-		size: function(box, width, height) {
-			let x = box.getAttribute("x") * 1 + (width - box.getAttribute("width") * 1) / 2;
-			let y = box.getAttribute("y") * 1 + (height - box.getAttribute("height") * 1) / 2;
-			box.setAttribute("x", x);
-			box.setAttribute("y", y);		
-			box.setAttribute("width", width);
-			box.setAttribute("height", height);
-		},
-		move: function(box, x, y) {
-			x = x - (box.getAttribute("width") || 0) / 2;
-			y = y - (box.getAttribute("height") || 0) / 2;
-			box.setAttribute("x", x);
-			box.setAttribute("y", y);		
-		}
 	}
 }
