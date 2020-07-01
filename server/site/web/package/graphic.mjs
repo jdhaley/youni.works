@@ -15,8 +15,11 @@ export default {
 		viewName: "",
 		view: function(model) {
 			let view = this.owner.window.document.createElementNS("http://www.w3.org/2000/svg", this.viewName);
-			view.model = model;
-			model && model.view = view;
+			if (this.template) view.innerHTML = this.template;
+			if (model) {
+				model.view = view;
+				view.model = model;
+			}
 			this.control(view);
 			return view;
 		},

@@ -69,6 +69,23 @@ export default {
 		type: "",
 		type$from: "Node",
 		type$to: "Node",
+		index: 0,
+		get$offset: function() {
+			let offset = this.index % 2 ? (this.index + 1) * -1 : this.index;
+			return offset * 10;
+		},
+		get$fromX: function() {
+			return this.from.x + this.offset;
+		},
+		get$fromY: function() {
+			return this.from.y < this.to.y ? this.from.bottom : this.from.top;
+		},
+		get$toX: function() {
+			return this.to.x + this.offset;
+		},
+		get$toY: function() {
+			return this.from.y < this.to.y ? this.to.top : this.to.bottom;
+		},
 		get$top: function() {
 			return this.from.top < this.to.top ? this.from.top : this.to.top;
 		},

@@ -75,9 +75,13 @@ export default {
 		super$: "use.graphic.Graphic",
 		viewName: "path",
 		createModel: function(from, to) {
+			let index = 0;
+			for (let arc of from.arc) if (arc.from == to || arc.to == to) index++;
+
 			let model = this.sys.extend(this.graph.Arc, {
 				from: from,
-				to: to
+				to: to,
+				index: index
 			});
 			from.arc.push(model);
 			to.arc.push(model);
@@ -91,11 +95,17 @@ export default {
 			view.classList.add("connector");
 			view.setAttribute("data-from", from.id);
 			view.setAttribute("data-to", to.id);
-			gc.prepend(view); //Prepend so that Nodes are drawn on top of Arcs.			
+			view.setAttribute("marker-end", "url(#marker.arrow)");
+			
+			gc.append(view);	
 			this.draw(view);
 			return view;										
 		},
 		draw: function(view) {
+			let m = view.model;
+			view.setAttribute("d", `M ${m.fromX} ${m.fromY} L ${m.toX} ${m.toY}`);
+		},
+		arc_draw: function(view) {
 			let m = view.model;
 			view.setAttribute("d", 
 				`M ${m.from.x} ${m.from.y} `

@@ -23,6 +23,16 @@ export default {
 							type$: "use.graphic.GraphicContext",
 							cellSize: 20,
 							type$part: "shapes",
+							template: `
+								<defs>
+								    <marker id="marker.circle" markerWidth="8" markerHeight="8" refX="5" refY="5">
+								        <circle cx="5" cy="5" r="3" style="stroke: none; fill:green;"/>
+								    </marker>
+								    <marker id="marker.arrow" markerWidth="15" markerHeight="10" refX="15" refY="5" orient="auto">
+								        <path d="M0,0 L15,5 L0, 10" style="stroke: slateGray; stroke-linejoin: miter; fill: none" />
+								    </marker>
+								</defs>
+							`
 						}
 					},
 					extend$shortcut: {

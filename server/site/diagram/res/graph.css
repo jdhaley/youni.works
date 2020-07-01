@@ -6,13 +6,11 @@
 	fill: ghostWhite;
 	stroke: slateGray;
 	stroke-width: 1px;
-	stroke-dasharray: 5 2;
 }
 
 .connector {
 	stroke: slateGray;
 	stroke-width: 1px;
-	stroke-dasharray: 5 2;
 }
 
 .selected {
