@@ -11,9 +11,8 @@ export default {
 		create: function(gc, model) {
 			let object = this.view();
 			object.model = model;
-			object.text = gc.ownerDocument.createElementNS("http://www.w3.org/1999/xhtml", "input");
+			object.text = gc.ownerDocument.createElementNS("http://www.w3.org/1999/xhtml", "div");
 			object.text.className = "text";
-			object.text.disabled = true;
 			object.append(object.text);
 			object.text.title = "Click to edit text";
 			gc.append(object);
@@ -28,11 +27,11 @@ export default {
 		},
 		extend$action: {
 			Click: function(on, event) {
-				on.text.disabled = undefined;
+				on.text.contentEditable = true;
 				on.text.focus();
 			},
 			FocusOut: function(on, event) {
-				on.text.disabled = true;
+				delete on.text.contentEditable;
 			}
 		}
 	},
