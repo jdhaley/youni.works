@@ -13,9 +13,6 @@
 	stroke-width: 1px;
 }
 
-.selected {
-	stroke: green;
-}
 
 .text {
 	font-size: 14px;
@@ -29,6 +26,9 @@
 
 .node:hover {
 	stroke: green;
+}
+.selected, .selected:hover {
+	stroke: orange;
 }
 
 .text:hover, .text:focus {

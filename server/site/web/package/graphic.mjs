@@ -38,6 +38,9 @@ export default {
 			if (!gc.lastId) gc.lastId = 0;
 			return ++gc.lastId;
 		},
+		after$control: function(view) {
+			view.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+		},
 		extend$action: {
 			MouseMove: function(on, event) {
 				//event.action = "";
