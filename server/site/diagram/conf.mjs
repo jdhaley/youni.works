@@ -8,7 +8,8 @@ import graphic		from "../web/package/graphic.mjs";
 import diagram		from "../diagram/package/diagram.mjs";
 
 import services		from "./conf/services.mjs";
-import parts		from "./conf/parts.mjs";
+import app			from "./conf/app.mjs";
+import component	from "./conf/component.mjs";
 
 import actions		from "./conf/actions.mjs";
 import platform		from "../web/conf/browser.mjs";
@@ -28,9 +29,9 @@ export default {
 		ui: ui,
 		graphic: graphic,
 		diagram: diagram,
-		
 		services: services,
-		parts: parts		
+		component: component,
+		parts: app
 	},
 	document: document,
 	actions: actions,
