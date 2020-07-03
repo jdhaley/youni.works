@@ -15,6 +15,39 @@ export default {
 			    <marker id="marker.arrow" markerWidth="15" markerHeight="10" refX="15" refY="5" orient="auto">
 			        <path d="M0,0 L15,5 L0, 10" style="stroke: slateGray; stroke-linejoin: miter; fill: none" />
 			    </marker>
+			    <style>
+				    .node, foreignobject {
+						transition: all 80ms ease-out;
+					}
+					.node {
+						fill: ghostWhite;
+						stroke: slateGray;
+						stroke-width: 1px;
+					}
+					.connector {
+						stroke: slateGray;
+						stroke-width: 1px;
+					}
+					.text {
+						font-size: 14px;
+						outline: 0;
+						margin: 0;
+						padding: 4px;
+						color: slateGray;
+						cursor: text;
+						background: transparent;
+					}
+					.node:hover {
+						stroke: green;
+					}
+					.selected, .selected:hover {
+						stroke: orange;
+					}
+					.text:hover, .text:focus {
+						color: black;
+						background: white;
+					}
+				</style>
 			</defs>
 		`,
 		part: {
