@@ -1,10 +1,10 @@
 export default {
 	package$: "youni.works/base/graph",
-	Command: {
-		
+	use: {
+		package$control: "youni.works/base/control"
 	},
 	Box: {
-		super$: "Object",
+		super$: "use.control.Control",
 		x: 0,
 		y: 0,
 		width: 0,
@@ -65,7 +65,7 @@ export default {
 //		}
 	},
 	Arc: {
-		super$: "Object",
+		super$: "use.control.Control",
 		type: "",
 		type$from: "Node",
 		type$to: "Node",

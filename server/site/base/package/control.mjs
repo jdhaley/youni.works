@@ -8,15 +8,6 @@ export default {
 		receive: function(message) {
 			this.controller.process(this, message);
 		},
-		super: function(method, ...args) {
-			let object = this;
-			if (this[method]) while (object = this.sys.prototypeOf(object)) {
-				let fn = object[method];
-				if (fn != this[method]) {
-					return fn ? fn.apply(this, args) : undefined;
-				}
-			}
-		}
 	},
 	Controller: {
 		super$: "Control",
@@ -50,6 +41,15 @@ export default {
 				this.sys.define(this.part, Symbol.iterator, this.use.Part[Symbol.iterator], "const");
 			}
 			for (let part of this.part) part.partOf = this;
+		},
+		super: function(method, ...args) {
+			let object = this;
+			if (this[method]) while (object = this.sys.prototypeOf(object)) {
+				let fn = object[method];
+				if (fn != this[method]) {
+					return fn ? fn.apply(this, args) : undefined;
+				}
+			}
 		}
 	},
 	Processor: {
@@ -111,15 +111,18 @@ export default {
 		}
 	},
 	Empty: {
+		super$: "Object",
 		"@iterator": function* iterate() {
 		}
 	},
 	List: {
+		super$: "Object",
 		"@iterator": function* iterate() {
 			for (let i = 0; i < this.length; i++) yield this[i];
 		}
 	},
 	Record: {
+		super$: "Object",
 		"@iterator": function* iterate() {
 			for (let name in this) yield this[name];
 		}
