@@ -64,6 +64,9 @@ export default {
 		}
 	},
 	type: function(prop, target) {
+		prop.configurable = true;
+		prop.enumerable = true;
+		prop.writable = true;
 		prop.value = this.forName(prop.source);
 	},
 	package: function(prop, target) {
