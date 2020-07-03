@@ -32,6 +32,13 @@ export default {
 						view.sense("event", "MouseDown");
 						view.sense("event", "MouseUp");
 						view.sense("event", "MouseMove");
+					},
+					extend$action: {
+						loadNew: function(on, message) {
+							let view = on.parts.article;
+							view.innerHTML = this.part.article.template;
+							on.owner.window.document.title += " (New)";
+						}
 					}
 				}
 			}

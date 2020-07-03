@@ -37,31 +37,43 @@ export default {
 			return event.device.getCharacter(event) ? "Character" : event.device.getKey(event);
 		},
 		extend$action: {
-			open: function(on, message) {
+			activate: function(on, message) {
 				let location = this.owner.window.location;
 				if (location.search) {
 					this.owner.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
 					this.owner.service.open.service(this.owner, "load", {
-						url: this.owner.window.location.search + ".view",
+						url: this.owner.window.location.search + this.part.article.media.extension,
 					});
 				}
 			},
 			load: function(on, message) {
-				let view = on.parts.article;
 				if (message.status == 200) {
-					let content = this.owner.view("div");
-					content.innerHTML = message.content;
-					view.innerHTML = content.firstChild.innerHTML;
+					message.action = "loadExisting";
 				} else if (message.status == 204) {
-					view.innerHTML = "<h1>" + this.owner.window.document.title + "</h1>";
-					this.owner.window.document.title += " (New)";
+					message.action = "loadNew";
 				} else {
-					let level = message.status >= 400 ? "Error" : "Note";
-					let color = message.status >= 400 ? "red" : "blue";
-					view.innerHTML = `<h1>${level}</h1><font color=${color}>${message.content}</font>`;
+					message.action = "loadError"
 				}
 			},
-			saved: function(on, event) {
+			loadExisting: function(on, message) {
+				let view = on.parts.article;
+				let content = this.owner.view("div");
+				content.innerHTML = message.content;
+				view.innerHTML = content.firstChild.innerHTML;
+			},
+			loadNew: function(on, message) {
+				let view = on.parts.article;
+				view.innerHTML = "<h1>" + this.owner.window.document.title + "</h1>";
+				this.owner.window.document.title += " (New)";
+			},
+			loadError: function(on, message) {
+				let level = message.status >= 400 ? "Error" : "Note";
+				let color = message.status >= 400 ? "red" : "blue";
+				let view = this.owner.view("article");
+				view.innerHTML = `<h1>${level}</h1><font color=${color}>${message.content}</font>`;
+				on.parts.article = view;
+			},
+			saved: function(on, message) {
 				let title = this.owner.window.document.title;
 				if (title.endsWith(" (New)")) {
 					title = title.substring(0, title.indexOf(" (New)"));
@@ -71,7 +83,7 @@ export default {
 			Save: function(on, event) {
 				event.action = ""; //Stop Control+S to save on client.
 				this.owner.service.save.service(this.owner, "saved", {
-					url: this.owner.window.location.search + ".view",
+					url: this.owner.window.location.search + this.part.article.media.extension,
 					content: on.parts.article.outerHTML
 				});
 			},
@@ -114,6 +126,10 @@ export default {
 	Article: {
 		super$: "use.view.Viewer",
 		viewName: "article",
+		media: {
+			type: "application/json",
+			extension: ".view"
+		},
 		control: function(view) {
 			this.super("control", view);
 			view.contentEditable = true;

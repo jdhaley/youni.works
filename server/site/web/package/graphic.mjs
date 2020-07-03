@@ -32,6 +32,10 @@ export default {
 	},
 	GraphicContext: {
 		super$: "Graphic",
+		media: {
+			type: "image/svg",
+			extension: ".svg"
+		},
 		viewName: "svg",
 		cellSize: 1,
 		identify: function(gc) {
