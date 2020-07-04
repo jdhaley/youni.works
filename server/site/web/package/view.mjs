@@ -5,30 +5,34 @@ export default {
 	},
 	Viewer: {
 		super$: "use.control.Processor",
-		type$owner: "Frame",
-		get$controller: function() {
-			return this.owner;
-		},
-		viewName: "div",
 		viewType: "text",
+		viewName: "div",
+		get$owner: function() {
+			return this.controller;
+		},
 		view: function(model) {
 			let view = this.owner.view(this.viewName);
-			this.control(view, model);
+			view.model = this.model(model);
+			this.control(view);
 			return view;
 		},
-		control: function(view, model) {
-			this.sys.define(view, "controller", this, "const");
-			view.model = model;
+		control: function(view) {
+			this.sys.define(view, "controller", this, "const");			
+		},
+		model: function(model) {
+			return model;
+		},
+		draw: function(view) {
+			let render = this.owner.render && this.owner.render[this.viewType];
+			render && render.call(this, view);			
 		},
 		action: {
 			draw: function(on, signal) {
-				let render = this.owner.render;
-				render = render && render[this.viewType];
-				render && render.call(this, on);
+				this.draw(on);
 			}
 		},
 		before$initialize: function(conf) {
-			this.sys.define(this, "owner", conf.owner, "const");
+			this.sys.define(this, "controller", conf.owner, "const");
 		}
 	},
 	Frame: {

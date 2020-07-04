@@ -9,8 +9,7 @@ export default {
 		viewType: "composite",
 		var$group: {
 		},
-		initialize: function(conf) {
-			this.super("initialize", conf);
+		after$initialize: function(conf) {
 			for (let name in conf.actions) this.initializeInstruction(name, conf.actions[name]);
 		},
 		initializeInstruction: function(name, conf) {

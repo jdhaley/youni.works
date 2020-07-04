@@ -4,7 +4,7 @@ export default {
 	},
 	once$controller: function() {
 		this.controller = null;
-		this.ownerDocument.owner.control(this);
+		this.owner.control(this);
 		return this.controller;
 	},
 	get$partOf: function() {

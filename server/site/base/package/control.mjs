@@ -61,6 +61,40 @@ export default {
 			op && op.call(this, on, message);
 		}
 	},
+	Owner: {
+		super$: "Controller",
+		type$content: "Control",
+		receive: function(message) {
+			message = messageFor.call(this, message);
+			if (message.channel == "self") {
+				this.controller.process(this, message);
+				this.transmit.down(this, message);				
+			} else {
+				this.content.controller.process(this.content, message);
+				this.transmit.down(this.content, message);
+			}
+		},
+		transmit: {
+			up: function(on, signal) {
+				while (on) {
+					if (!signal.action) return;
+					on.receive && on.receive(signal);
+					on = on.partOf;
+				}
+			},
+			//NB: down() is explicitly named because it is recursive.
+			down: function down(on, signal) {
+				if (on.part) for (on of on.part) {
+					if (!signal.action) return;
+					on.receive && on.receive(signal);
+					down(on, signal);
+				}
+			}
+		},
+		before$initialize: function(conf) {
+			conf.owner = this;
+		}
+	},
 	Service: {
 		super$: "Object",
 		service: function(receiver, subject, request) {
@@ -73,41 +107,6 @@ export default {
 			message.request = request;
 			message.status = 0;
 			return message;
-		}
-	},
-	Owner: {
-		super$: "Controller",
-		type$content: "Control",
-		type$transmit: "Transmitter",
-		receive: function(message) {
-			message = messageFor.call(this, message);
-			if (message.channel == "self") {
-				this.controller.process(this, message);
-				this.transmit.down(this, message);				
-			} else {
-				this.content.controller.process(this.content, message);
-				this.transmit.down(this.content, message);
-			}
-		},
-		before$initialize: function(conf) {
-			conf.owner = this;
-		}
-	},
-	Transmitter: {
-		super$: null,
-		up: function(on, signal) {
-			while (on) {
-				if (!signal.action) return;
-				on.receive && on.receive(signal);
-				on = on.partOf;
-			}
-		},
-		down: function down(on, signal) {
-			if (on.part) for (on of on.part) {
-				if (!signal.action) return;
-				on.receive && on.receive(signal);
-				down(on, signal);
-			}
 		}
 	},
 	Part: {
