@@ -14,7 +14,7 @@ export default {
 		},
 		viewName: "",
 		view: function(model) {
-			let view = this.owner.window.document.createElementNS("http://www.w3.org/2000/svg", this.viewName);
+			let view = this.owner.create(this.viewName);
 			if (this.template) view.innerHTML = this.template;
 			if (model) {
 				model.view = view;
@@ -36,7 +36,7 @@ export default {
 			type: "image/svg",
 			extension: ".svg"
 		},
-		viewName: "svg",
+		viewName: "http://www.w3.org/2000/svg/svg",
 		cellSize: 1,
 		identify: function(gc) {
 			if (!gc.lastId) gc.lastId = 0;

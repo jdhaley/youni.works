@@ -37,11 +37,11 @@ export default {
 		},
 		extend$action: {
 			activate: function(on, message) {
-				let location = this.owner.window.location;
+				let location = this.owner.location;
 				if (location.search) {
-					this.owner.window.document.title = location.search.substring(location.search.lastIndexOf("/") + 1);
+					this.owner.title = location.search.substring(location.search.lastIndexOf("/") + 1);
 					this.owner.service.open.service(this.owner, "load", {
-						url: this.owner.window.location.search + this.part.article.media.extension,
+						url: location.search + this.part.article.media.extension,
 					});
 				}
 			},
@@ -56,14 +56,14 @@ export default {
 			},
 			loadExisting: function(on, message) {
 				let view = on.parts.article;
-				let content = this.owner.view("div");
+				let content = this.owner.create("div");
 				content.innerHTML = message.content;
 				view.innerHTML = content.firstChild.innerHTML;
 			},
 			loadNew: function(on, message) {
 				let view = on.parts.article;
-				view.innerHTML = "<h1>" + this.owner.window.document.title + "</h1>";
-				this.owner.window.document.title += " (New)";
+				view.innerHTML = "<h1>" + this.owner.title + "</h1>";
+				this.owner.title = this.owner.title + " (New)";
 			},
 			loadError: function(on, message) {
 				let level = message.status >= 400 ? "Error" : "Note";
@@ -73,16 +73,15 @@ export default {
 				on.parts.article = view;
 			},
 			saved: function(on, message) {
-				let title = this.owner.window.document.title;
-				if (title.endsWith(" (New)")) {
-					title = title.substring(0, title.indexOf(" (New)"));
-					this.owner.window.document.title = title;
+				let index = this.owner.title.indexOf(" (New)");
+				if (index >= 0) {
+					this.owner.title = this.owner.title.substring(0, index);
 				}
 			},
 			Save: function(on, event) {
 				event.action = ""; //Stop Control+S to save on client.
 				this.owner.service.save.service(this.owner, "saved", {
-					url: this.owner.window.location.search + this.part.article.media.extension,
+					url: this.owner.location.search + this.part.article.media.extension,
 					content: on.parts.article.outerHTML
 				});
 			},

@@ -11,7 +11,7 @@ export default {
 			return this.controller;
 		},
 		view: function(model) {
-			let view = this.owner.view(this.viewName);
+			let view = this.owner.create(this.viewName);
 			view.model = this.model(model);
 			this.control(view);
 			return view;
@@ -37,13 +37,19 @@ export default {
 	},
 	Frame: {
 		super$: "use.control.Owner",
-		render: {
+		get$location: function() {
+			return this.content.ownerDocument.defaultView.location;
 		},
-		once$window: function() {
-			return this.content.ownerDocument.defaultView;
+		virtual$title: function() {
+			if (arguments.length) {
+				this.content.ownerDocument.title = arguments[0];
+				return;
+			}
+			return this.content.ownerDocument.title;
 		},
 		virtual$selection: function() {
-			let selection = this.window.getSelection();
+			let window = this.content.ownerDocument.defaultView;
+			let selection = window.getSelection();
 			if (arguments.length) {
 					selection.removeAllRanges();
 					selection.addRange(arguments[0]);
@@ -52,43 +58,62 @@ export default {
 			if (selection && selection.rangeCount) {
 				return selection.getRangeAt(0);
 			} else {
-				let range = this.window.document.createRange();
+				let range = window.document.createRange();
 				range.collapse();
 				return range;
 			}
 		},
-		view: function(name) {
+		create: function(name) {
 			let doc = this.content.ownerDocument;
-			return arguments.length ? doc.createElement("" + name) : doc.createDocumentFragment();
+			if (!name) return doc.createDocumentFragment();
+			name = "" + name;
+			let index = name.lastIndexOf("/");
+			if (index >= 0) {
+				return doc.createElementNS(name.substring(0, index), name.substring(index + 1));
+			}
+			return doc.createElement("" + name);
+		},
+		createStyle: function(selector, object) {
+			let out = `${selector} {\n`;
+			out += defineProperties("", object);
+			out += "\n}";
+			let index = this.styles.insertRule(out);
+			return this.styles.cssRules[index];
+		},
+		render: {
 		},
 		control: function(view) {
-			let viewer = this.part[view.nodeName.toLowerCase()];
+			let viewer = this.part[view.dataset.view] || this.part[view.nodeName.toUpperCase()];
 			viewer && viewer.control(view);
 		},
 		initialize: function(conf) {
-			conf.document.owner = this;
-			this.sys.define(this, "content", conf.document.body);
-			this.sys.implement(this.window.Element.prototype, conf.platform.view);
-			this.sys.implement(this.window.Range.prototype, conf.platform.range);
+			conf.window.owner = this;
+			conf.window.document.owner = this;
+			this.sys.define(this, "content", conf.window.document.body);
+			this.sys.implement(conf.window.Element.prototype, conf.platform.view);
+			this.sys.implement(conf.window.Range.prototype, conf.platform.range);
 			createStyleSheet(this);
 			this.super("initialize", conf);
 		}
-	},
+	}
 }
 
 function createStyleSheet(owner) {
-	let ele = owner.window.document.createElement("style");
-	ele.type = "text/css";
-	owner.window.document.head.appendChild(ele);
-	owner.sheet = ele.sheet;
+	let control = owner.create("style");
+	control.type = "text/css";
+	control.ownerDocument.head.appendChild(control);
+	owner.styles = control.sheet;
 }
 
-function defineRule(viewer) {
-	let out = `[data-view=I${viewer.id}] {`;
-	for (let name in viewer.style) {
-		out += name + ":" + viewer.style[name] + ";"
+function defineProperties(prefix, object) {
+	out = "";
+	for (let name in object) {
+		let value = object[name];
+		if (typeof value == "object") {
+			out += defineProperties(prefix + name + "-", value);
+		} else {
+			out += "\t" + prefix + name + ": " + value + ";\n"
+		}
 	}
-	out += "}";
-	let index = viewer.owner.sheet.insertRule(out);
-	viewer.style = viewer.owner.sheet.cssRules[index];
+	return out;
 }
