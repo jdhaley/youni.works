@@ -52,7 +52,7 @@ export default {
 					},
 					initialize: function(conf) {
 						this.super("initialize", conf);
-						let doc = this.owner.window.document;
+						let doc = this.owner.content.ownerDocument;
 						doc.execCommand("styleWithCSS", false, false);
 						doc.execCommand("defaultParagraphSeparator", false, "P");
 						//	sys.implement(this, cmd.Commander);

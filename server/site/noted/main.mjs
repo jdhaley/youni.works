@@ -1,13 +1,12 @@
 export default function main(sys, conf) {
 	const pkg = sys.load(conf.packages);
 	const frame = sys.extend(pkg.view.Frame, {
-		window: window,
+		sensor: conf.platform.sensors,
+		device: conf.platform.devices,
+		
 		part: pkg.parts.public,
 		service: pkg.services.public,
-		
-		sensor: conf.platform.sensors,
-		render: conf.platform.renders,
-		device: conf.platform.devices
+		render: conf.platform.renders
 	});
 	frame.receive(conf);
 	frame.receive("draw");
