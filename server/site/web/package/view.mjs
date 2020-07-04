@@ -7,11 +7,13 @@ export default {
 		super$: "use.control.Processor",
 		viewType: "text",
 		viewName: "div",
+		template: "",
 		get$owner: function() {
 			return this.controller;
 		},
 		view: function(model) {
 			let view = this.owner.create(this.viewName);
+			if (this.template) view.innerHTML = this.template;
 			view.model = this.model(model);
 			this.control(view);
 			return view;

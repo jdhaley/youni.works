@@ -22,7 +22,7 @@ export default {
 		services: services,
 		parts: parts		
 	},
-	document: document,
+	window: window,
 	platform: browser,
 	actions: actions
 }

@@ -5,7 +5,7 @@ export default {
 		package$ui: "youni.works/web/ui"
 	},
 	public: {
-		body: {
+		BODY: {
 			type$: "use.view.Viewer",
 			viewName: "body",
 			viewType: "composite",

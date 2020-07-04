@@ -6,28 +6,12 @@ export default {
 		package$view: "youni.works/web/view"
 	},
 	Graphic: {
-		super$: "use.control.Processor",
+		super$: "use.view.Viewer",
 		type$graph: "use.graph",
-		type$owner: "use.view.Frame",
-		get$controller: function() {
-			return this.owner;
-		},
-		viewName: "",
-		view: function(model) {
-			let view = this.owner.create(this.viewName);
-			if (this.template) view.innerHTML = this.template;
-			if (model) {
-				model.view = view;
-				view.model = model;
-			}
-			this.control(view);
+		after$view: function(model) {
+			let view = Function.returned;
+			if (model) model.view = view;
 			return view;
-		},
-		control: function(view) {
-			this.sys.define(view, "controller", this, "const");
-		},
-		before$initialize: function(conf) {
-			this.sys.define(this, "owner", conf.owner, "const");
 		}
 	},
 	GraphicContext: {

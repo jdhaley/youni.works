@@ -7,11 +7,11 @@ export default {
 	},
 	Text: {
 		super$: "use.graphic.Graphic",
-		viewName: "foreignObject",
+		viewName: "http://www.w3.org/2000/svg/foreignObject",
 		create: function(gc, model) {
 			let object = this.view();
 			object.model = model;
-			object.text = gc.ownerDocument.createElementNS("http://www.w3.org/1999/xhtml", "div");
+			object.text = this.owner.create("http://www.w3.org/1999/xhtml/div");
 			object.text.className = "text";
 			object.append(object.text);
 			object.text.title = "Click to edit text";
@@ -37,7 +37,7 @@ export default {
 	},
 	Node: {
 		super$: "use.graphic.Graphic",
-		viewName: "rect",
+		viewName: "http://www.w3.org/2000/svg/rect",
 		createModel: function(id, x, y) {
 			return this.sys.extend(this.graph.Node, {
 				id: id,
@@ -72,7 +72,7 @@ export default {
 	},
 	Arc: {
 		super$: "use.graphic.Graphic",
-		viewName: "path",
+		viewName: "http://www.w3.org/2000/svg/path",
 		createModel: function(from, to) {
 			let index = 0;
 			for (let arc of from.arc) if (arc.from == to || arc.to == to) index++;

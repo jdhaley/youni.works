@@ -33,7 +33,7 @@ export default {
 		component: component,
 		parts: app
 	},
-	document: document,
+	window: window,
 	actions: actions,
 	platform: platform
 }
