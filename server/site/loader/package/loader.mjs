@@ -5,10 +5,10 @@ export default {
 	},
 	Loader: {
 		super$: "use.control.Processor",
+		type$controller: "use.control.Owner",
 		use: {
 			type$Member: "use.control.Control",
 			type$Part: "use.control.Record",
-			type$Transmitter: "use.control.Transmitter"
 		},
 		file: "/source.json",
 		forName: function(name) {
@@ -57,7 +57,7 @@ export default {
 			return member;
 		},
 		send: function(to, message) {
-			this.use.Transmitter.down(to, message);
+			this.controller.transmit.down(to, message);
 		},
 		action: {
 			openDependencies: function(on, message) {
