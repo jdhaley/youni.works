@@ -4,7 +4,7 @@ export default {
 	Control: {
 		super$: "Object",
 		type$controller: "Controller",
-		type$part: "Empty",
+		type$part: "Part",
 		receive: function(message) {
 			this.controller.process(this, message);
 		},
@@ -107,6 +107,17 @@ export default {
 				if (!signal.action) return;
 				on.receive && on.receive(signal);
 				down(on, signal);
+			}
+		}
+	},
+	Part: {
+		super$: "Object",
+		"@iterator": function* iterate() {
+			const length = this.length;
+			if (length) {
+				for (let i = 0; i < length; i++) yield this[i];				
+			} else {
+				for (let name in this) yield this[name];				
 			}
 		}
 	},
