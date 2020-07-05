@@ -107,6 +107,25 @@ export default {
 			message.request = request;
 			message.status = 0;
 			return message;
+		},
+		process: function(receiver, message) {
+			throw new Error("Abstract Service Call.");
+		}
+	},
+	FileService: {
+		super$: "Service",
+		open: function(pathname, receiver) {
+			this.service(receiver, "opened", {
+				url: pathname,
+				method: "GET"
+			});
+		},
+		save: function(pathname, content, receiver) {
+			this.service(receiver, "saved", {
+				url: pathname,
+				content: content,
+				method: "PUT"
+			});
 		}
 	},
 	Part: {

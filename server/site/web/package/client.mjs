@@ -27,7 +27,7 @@ export default {
 			return xhr;
 		},
 		prepare: function(xhr) {
-			let header = this.getHeader(xhr.receiver, xhr.message);
+			let header = this.getHeaders(xhr.receiver, xhr.message);
 			for (let name in header) {
 				let value = header[name];
 				value && xhr.setRequestHeader(name, value);
@@ -43,17 +43,21 @@ export default {
 				case 4: // DONE The operation is complete.
 					xhr.message.status = xhr.status;
 					xhr.message.content = xhr.responseText;
-					xhr.receiver.receive(xhr.message);
+					if (typeof xhr.receiver == "function") {
+						xhr.receiver(xhr.message);
+					} else {
+						xhr.receiver.receive(xhr.message);
+					}
 			}
 		},
 		getMethod: function(on, message) {
-			return this.method;
+			return message.request.method || this.method;
 		},
 		getUrl: function(on, message) {
 			let requestUrl = message.request.url || "";
 			return this.url + requestUrl;
 		},
-		getHeader: function(on, message) {
+		getHeaders: function(on, message) {
 			return null;
 //			{
 //				"Session-Id": this.session.id
@@ -62,5 +66,10 @@ export default {
 		getContent: function(on, message) {
 			return message.request.content || null;
 		}
+	},
+	FileService: {
+		super$: "Remote",
+		type$open: "use.control.FileService.open",
+		type$save: "use.control.FileService.save"
 	}
 }
