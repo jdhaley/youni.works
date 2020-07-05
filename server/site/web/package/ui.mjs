@@ -1,90 +1,12 @@
 export default {
 	package$: "youni.works/web/ui",
 	use: {
+		package$control: "youni.works/base/control",
 		package$view: "youni.works/web/view"
 	},
-	Main: {
+	Component: {
 		super$: "use.view.Viewer",
-		viewName: "main",
-		viewType: "composite",
-		var$group: {
-		},
-		after$initialize: function(conf) {
-			for (let name in conf.actions) this.initializeInstruction(name, conf.actions[name]);
-		},
-		initializeInstruction: function(name, conf) {
-			if (conf.group) {
-				for (let group of conf.group.split()) {
-					if (!this.group[group]) this.group[group] = this.sys.extend();
-					this.group[group][name] = conf;					
-				}
-			}
-			if (conf.instruction) {
-				this.action[name] = conf.instruction;
-			} else if (!this.action[name]) {
-				this.log.warn(`Main viewer: Instruction "${name}" is not handled.`);
-			}
-			if (conf.shortcut) {
-				this.shortcut[conf.shortcut] = name;
-			}
-		},
-		getShortcut: function(event) {
-			let shortcut = event.device.getShortcut(event);
-			return this.shortcut[shortcut];
-		},
-		getAction: function(event) {
-			return event.device.getCharacter(event) ? "Character" : event.device.getKey(event);
-		},
 		extend$action: {
-			activate: function(on, message) {
-				let location = this.owner.location;
-				if (location.search) {
-					this.owner.title = location.search.substring(location.search.lastIndexOf("/") + 1);
-					this.owner.service.open.service(this.owner, "load", {
-						url: location.search + this.part.article.media.extension,
-					});
-				}
-			},
-			load: function(on, message) {
-				if (message.status == 200) {
-					message.action = "loadExisting";
-				} else if (message.status == 204) {
-					message.action = "loadNew";
-				} else {
-					message.action = "loadError"
-				}
-			},
-			loadExisting: function(on, message) {
-				let view = on.parts.article;
-				let content = this.owner.create("div");
-				content.innerHTML = message.content;
-				view.innerHTML = content.firstChild.innerHTML;
-			},
-			loadNew: function(on, message) {
-				let view = on.parts.article;
-				view.innerHTML = "<h1>" + this.owner.title + "</h1>";
-				this.owner.title = this.owner.title + " (New)";
-			},
-			loadError: function(on, message) {
-				let level = message.status >= 400 ? "Error" : "Note";
-				let color = message.status >= 400 ? "red" : "blue";
-				let view = this.owner.view("article");
-				view.innerHTML = `<h1>${level}</h1><font color=${color}>${message.content}</font>`;
-				on.parts.article = view;
-			},
-			saved: function(on, message) {
-				let index = this.owner.title.indexOf(" (New)");
-				if (index >= 0) {
-					this.owner.title = this.owner.title.substring(0, index);
-				}
-			},
-			Save: function(on, event) {
-				event.action = ""; //Stop Control+S to save on client.
-				this.owner.service.save.service(this.owner, "saved", {
-					url: this.owner.location.search + this.part.article.media.extension,
-					content: on.parts.article.outerHTML
-				});
-			},
 			KeyDown: function(on, event) {
 				event.device = this.owner.device.keyboard;
 				event.action = this.getShortcut(event) || this.getAction(event);
@@ -95,16 +17,46 @@ export default {
 				let action = event.target.parentNode.dataset.command;
 				if (action) event.action = action;
 			}
-		}		
+		},
+		getShortcut: function(event) {
+			let shortcut = event.device.getShortcut(event);
+			return this.shortcut[shortcut];
+		},
+		getAction: function(event) {
+			return event.device.getCharacter(event) ? "Character" : event.device.getKey(event);
+		}
 	},
 	Ribbon: {
 		super$: "use.view.Viewer",
 		viewName: "nav",
+		var$group: {
+		},
+		after$initialize: function(conf) {
+			for (let name in conf.actions) this.initializeAction(name, conf.actions[name]);
+		},
+		initializeAction: function(name, action) {
+			let component = this.partOf;
+
+			if (action.group) {
+				for (let group of action.group.split()) {
+					if (!this.group[group]) this.group[group] = this.sys.extend();
+					this.group[group][name] = action;					
+				}
+			}
+			if (action.instruction) {
+				component.action[name] = action.instruction;
+			} else if (!this.action[name]) {
+				this.log.warn(`Main viewer: Instruction "${name}" is not handled.`);
+			}
+			if (action.shortcut) {
+				component.shortcut[action.shortcut] = name;
+			}
+		},
 		extend$action: {
 			draw: function(on) {
 				let markup = "";
-				for (let groupName in this.partOf.group) {
-					let group = this.partOf.group[groupName];
+				for (let groupName in this.group) {
+					let group = this.group[groupName];
 					markup += `<menu title='${groupName}'>`
 					for (let name in group) {
 						let action = group[name];
@@ -117,7 +69,6 @@ export default {
 					markup += "</menu>";
 				}
 				on.innerHTML = markup;
-				on.parentNode.ribbon = on;
 			}			
 		}
 	},
@@ -132,6 +83,57 @@ export default {
 			this.super("control", view);
 			view.contentEditable = true;
 			view.tabIndex = 1;
+		}
+	},
+	Application: {
+		super$: "Component",
+		viewName: "main",
+		viewType: "composite",
+		type$fs: "use.control.FileService",
+		extend$action: {
+			activate: function(on, message) {
+				let location = this.owner.location;
+				if (location.search) {
+					this.owner.title = location.search.substring(location.search.lastIndexOf("/") + 1);
+					this.fs.open(location.search + this.part.article.media.extension, this.owner);
+				}
+			},
+			opened: function(on, message) {
+				if (message.status == 200) {
+					message.action = "openExisting";
+				} else if (message.status == 204) {
+					message.action = "openNew";
+				} else {
+					message.action = "openError"
+				}
+			},
+			saved: function(on, message) {
+				let index = this.owner.title.indexOf(" (New)");
+				if (index >= 0) {
+					this.owner.title = this.owner.title.substring(0, index);
+				}
+			},
+			openExisting: function(on, message) {
+				let view = on.parts.article;
+				let content = this.owner.create("div");
+				content.innerHTML = message.content;
+				view.innerHTML = content.firstChild.innerHTML;
+			},
+			openNew: function(on, message) {
+				let view = on.parts.article;
+				view.innerHTML = "<h1>" + this.owner.title + "</h1>";
+				this.owner.title = this.owner.title + " (New)";
+			},
+			openError: function(on, message) {
+				let level = message.status >= 400 ? "Error" : "Note";
+				let color = message.status >= 400 ? "red" : "blue";
+				let view = this.owner.view("article");
+				view.innerHTML = `<h1>${level}</h1><font color=${color}>${message.content}</font>`;
+				on.parts.article = view;
+			}
+		},
+		after$initialize: function(conf) {
+			this.sys.define(this, "fs", conf.packages.services.public.fs, "const");
 		}
 	}
 }
