@@ -37,7 +37,7 @@ export default {
 			this.sys.define(this, "controller", conf.owner, "const");
 		}
 	},
-	Frame: {
+	Owner: {
 		super$: "use.control.Owner",
 		get$location: function() {
 			return this.content.ownerDocument.defaultView.location;
@@ -49,21 +49,7 @@ export default {
 			}
 			return this.content.ownerDocument.title;
 		},
-		virtual$selection: function() {
-			let window = this.content.ownerDocument.defaultView;
-			let selection = window.getSelection();
-			if (arguments.length) {
-					selection.removeAllRanges();
-					selection.addRange(arguments[0]);
-					return;
-			}
-			if (selection && selection.rangeCount) {
-				return selection.getRangeAt(0);
-			} else {
-				let range = window.document.createRange();
-				range.collapse();
-				return range;
-			}
+		render: {
 		},
 		create: function(name) {
 			let doc = this.content.ownerDocument;
@@ -82,20 +68,8 @@ export default {
 			let index = this.styles.insertRule(out);
 			return this.styles.cssRules[index];
 		},
-		render: {
-		},
-		control: function(view) {
-			let viewer = this.part[view.dataset.view] || this.part[view.nodeName.toUpperCase()];
-			viewer && viewer.control(view);
-		},
-		initialize: function(conf) {
-			conf.window.owner = this;
-			conf.window.document.owner = this;
-			this.sys.define(this, "content", conf.window.document.body);
-			this.sys.implement(conf.window.Element.prototype, conf.platform.view);
-			this.sys.implement(conf.window.Range.prototype, conf.platform.range);
+		after$initialize: function(conf) {
 			createStyleSheet(this);
-			this.super("initialize", conf);
 		}
 	}
 }

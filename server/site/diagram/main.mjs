@@ -2,7 +2,7 @@ export default function main(sys, conf) {
 	conf.packages = sys.load(conf.packages);
 	const pkg = conf.packages;
 
-	const frame = sys.extend(pkg.view.Frame, {
+	const frame = sys.extend(pkg.ui.Frame, {
 		part: pkg.parts.public,
 		
 		sensor: conf.platform.sensors,
