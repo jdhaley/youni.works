@@ -4,6 +4,7 @@ export default {
 		title: "Save",
 		shortcut: "Control+S",
 		icon: "<i class='material-icons'>cloud_upload</i>",
+		instruction: Save
 	},
 	Promote: {
 		group: "Outline",
@@ -75,6 +76,14 @@ export default {
 			event.action = "";
 		}
 	}
+}
+function Save(on, event) {
+	event.action = ""; //Stop Control+S to save on client.
+	this.fs.save(
+		this.owner.location.search + this.part.article.media.extension,
+		on.parts.article.outerHTML,
+		this.owner
+	);
 }
 
 function Heading(on, event) {
@@ -164,7 +173,7 @@ function Demote(on, event) {
 }
 function edit(command, argument) {
 	try {
-		this.owner.window.document.execCommand(command, false, argument || "");
+		this.owner.content.ownerDocument.execCommand(command, false, argument || "");
 		return this.owner.selection;
 	} catch (error) {
 		console.error("Command error", command, argument);

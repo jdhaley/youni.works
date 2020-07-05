@@ -1,11 +1,11 @@
 export default function main(sys, conf) {
-	const pkg = sys.load(conf.packages);
+	conf.packages = sys.load(conf.packages);
+	const pkg = conf.packages;
 	const frame = sys.extend(pkg.view.Frame, {
 		sensor: conf.platform.sensors,
 		device: conf.platform.devices,
 		
 		part: pkg.parts.public,
-		service: pkg.services.public,
 		render: conf.platform.renders
 	});
 	frame.receive(conf);

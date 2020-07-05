@@ -15,9 +15,10 @@ export default {
 			let pkg = this.package[name];
 			if (pkg !== undefined) return pkg;
 			this.package[name] = null;
-			this.service.open.service(this, "load", {
+			this.fs.service(this, "load", {
 				pkgName: name,
-				url: name + this.file
+				url: name + this.file,
+				method: "GET"
 			});
 		},
 		load: function(message) {

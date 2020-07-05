@@ -11,7 +11,7 @@ export default {
 			viewType: "composite",
 			part: {
 				main: {
-					type$: "use.ui.Main",
+					type$: "use.ui.Application",
 					part: {
 						ribbon: {
 							type$: "use.ui.Ribbon",

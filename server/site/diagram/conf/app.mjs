@@ -7,7 +7,7 @@ export default {
 	},
 	public: {
 		MAIN: {
-			type$: "use.ui.Main",
+			type$: "use.ui.Application",
 			part: {
 				ribbon: {
 					type$: "use.ui.Ribbon",
@@ -29,7 +29,7 @@ export default {
 				view.sense("event", "MouseMove");
 			},
 			extend$action: {
-				loadNew: function(on, message) {
+				openNew: function(on, message) {
 					let view = on.parts.article;
 					view.innerHTML = this.part.article.template;
 					this.owner.title = this.owner.title + " (New)";

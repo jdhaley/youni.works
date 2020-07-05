@@ -1,8 +1,8 @@
 export default function main(sys, conf) {
-	const pkg = sys.load(conf.packages);
+	conf.packages = sys.load(conf.packages);
+	const pkg = conf.packages;
 
 	const frame = sys.extend(pkg.view.Frame, {
-		service: pkg.services.public,
 		part: pkg.parts.public,
 		
 		sensor: conf.platform.sensors,

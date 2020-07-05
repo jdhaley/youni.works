@@ -12,10 +12,7 @@ export default {
 		save: function(source) {
 			let member = this.parse(source);
 			let pathname = member.part[""].source + this.file;
-			this.service.save.service(this, "saved", {
-				url: pathname,
-				content: JSON.stringify(member, null, "\t")
-			});
+			this.fs.save(pathname, JSON.stringify(member, null, "\t"), this);
 			return member;
 		},
 		saved: function(message) {
