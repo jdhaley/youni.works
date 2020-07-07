@@ -1,0 +1,418 @@
+{
+	"package$": "youniworks.com/grammar-rules",
+	"package$parser": "youniworks.com/parser",
+	"text": {
+		"type$": "parser.String",
+		"name": "text",
+		"delimiter": "\""
+	},
+	"source": {
+		"type$": "parser.Rule",
+		"name": "source",
+		"type$next": "statements",
+		"type$expr": "tokens"
+	},
+	"statements": {
+		"type$": "parser.Choice",
+		"name": "statements",
+		"min": 0,
+		"max": 9007199254740991,
+		"exprs": [
+			{
+				"type$": "parser.Rule",
+				"type$expr": "property"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "expr"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "primary"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "error"
+			}
+		]
+	},
+	"property": {
+		"type$": "parser.Sequence",
+		"name": "property",
+		"exprs": [
+			{
+				"type$": "parser.Rule",
+				"min": 0,
+				"max": 1,
+				"type$expr": "expr"
+			},
+			{
+				"type$": "parser.Match",
+				"viewName": "key"
+			},
+			{
+				"type$": "parser.Rule",
+				"min": 0,
+				"max": 1,
+				"type$expr": "expr"
+			},
+			{
+				"type$": "parser.Match",
+				"min": 0,
+				"max": 1,
+				"viewName": "comma"
+			}
+		]
+	},
+	"object": {
+		"type$": "parser.Sequence",
+		"name": "object",
+		"exprs": [
+			{
+				"type$": "parser.Match",
+				"production": "none",
+				"viewText": "{",
+				"viewName": "brace"
+			},
+			{
+				"type$": "parser.Choice",
+				"min": 0,
+				"max": 9007199254740991,
+				"exprs": [
+					{
+						"type$": "parser.Rule",
+						"type$expr": "property"
+					},
+					{
+						"type$": "parser.Rule",
+						"type$expr": "expr"
+					}
+				]
+			},
+			{
+				"type$": "parser.Match",
+				"production": "none",
+				"viewText": "}",
+				"viewName": "brace"
+			}
+		]
+	},
+	"primary": {
+		"type$": "parser.Choice",
+		"name": "primary",
+		"production": "lift",
+		"exprs": [
+			{
+				"type$": "parser.Rule",
+				"type$expr": "object"
+			},
+			{
+				"type$": "parser.Match",
+				"viewName": "name"
+			},
+			{
+				"type$": "parser.Match",
+				"viewName": "op"
+			},
+			{
+				"type$": "parser.Match",
+				"viewName": "string"
+			},
+			{
+				"type$": "parser.Match",
+				"viewName": "number"
+			},
+			{
+				"type$": "parser.Match",
+				"viewName": "symbol"
+			}
+		]
+	},
+	"error": {
+		"type$": "parser.Choice",
+		"name": "error",
+		"min": 1,
+		"max": 9007199254740991,
+		"exprs": [
+			{
+				"type$": "parser.Match",
+				"viewName": "key"
+			},
+			{
+				"type$": "parser.Match",
+				"viewName": "comma"
+			},
+			{
+				"type$": "parser.Match",
+				"viewName": "brace"
+			}
+		]
+	},
+	"expr": {
+		"type$": "parser.Choice",
+		"name": "expr",
+		"production": "lift",
+		"exprs": [
+			{
+				"type$": "parser.Rule",
+				"type$expr": "e"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "primary"
+			}
+		]
+	},
+	"e": {
+		"type$": "parser.Sequence",
+		"name": "e",
+		"exprs": [
+			{
+				"type$": "parser.Rule",
+				"type$expr": "primary"
+			},
+			{
+				"type$": "parser.Rule",
+				"min": 1,
+				"max": 9007199254740991,
+				"type$expr": "primary"
+			}
+		]
+	},
+	"tokens": {
+		"type$": "parser.Choice",
+		"name": "tokens",
+		"production": "lift",
+		"min": 0,
+		"max": 9007199254740991,
+		"exprs": [
+			{
+				"type$": "parser.Rule",
+				"type$expr": "ws"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "number"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "name"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "op"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "string"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "symbol"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "brace"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "key"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "comma"
+			}
+		]
+	},
+	"brace": {
+		"type$": "parser.Term",
+		"name": "brace",
+		"production": "token",
+		"term": "{}"
+	},
+	"key": {
+		"type$": "parser.Term",
+		"name": "key",
+		"production": "token",
+		"term": ":"
+	},
+	"comma": {
+		"type$": "parser.Term",
+		"name": "comma",
+		"production": "token",
+		"term": ","
+	},
+	"name": {
+		"type$": "parser.Sequence",
+		"name": "name",
+		"production": "token",
+		"exprs": [
+			{
+				"type$": "parser.Choice",
+				"exprs": [
+					{
+						"type$": "parser.Rule",
+						"type$expr": "lower"
+					},
+					{
+						"type$": "parser.Rule",
+						"type$expr": "upper"
+					}
+				]
+			},
+			{
+				"type$": "parser.Choice",
+				"min": 0,
+				"max": 9007199254740991,
+				"exprs": [
+					{
+						"type$": "parser.Rule",
+						"type$expr": "lower"
+					},
+					{
+						"type$": "parser.Rule",
+						"type$expr": "upper"
+					},
+					{
+						"type$": "parser.Rule",
+						"type$expr": "letterLike"
+					},
+					{
+						"type$": "parser.Rule",
+						"type$expr": "digit"
+					}
+				]
+			}
+		]
+	},
+	"op": {
+		"type$": "parser.Choice",
+		"name": "op",
+		"production": "token",
+		"exprs": [
+			{
+				"type$": "parser.Rule",
+				"type$expr": "index"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "mul"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "add"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "rel"
+			},
+			{
+				"type$": "parser.Rule",
+				"type$expr": "bool"
+			}
+		]
+	},
+	"string": {
+		"type$": "parser.Match",
+		"name": "string",
+		"production": "token",
+		"viewName": "text"
+	},
+	"number": {
+		"type$": "parser.Sequence",
+		"name": "number",
+		"production": "token",
+		"exprs": [
+			{
+				"type$": "parser.Rule",
+				"type$expr": "digit"
+			},
+			{
+				"type$": "parser.Rule",
+				"min": 0,
+				"max": 9007199254740991,
+				"type$expr": "digit"
+			},
+			{
+				"type$": "parser.Sequence",
+				"min": 0,
+				"max": 1,
+				"exprs": [
+					{
+						"type$": "parser.Term",
+						"term": "."
+					},
+					{
+						"type$": "parser.Rule",
+						"type$expr": "digit"
+					},
+					{
+						"type$": "parser.Rule",
+						"min": 0,
+						"max": 9007199254740991,
+						"type$expr": "digit"
+					}
+				]
+			}
+		]
+	},
+	"symbol": {
+		"type$": "parser.Term",
+		"name": "symbol",
+		"production": "token",
+		"term": "()[];."
+	},
+	"upper": {
+		"type$": "parser.Term",
+		"name": "upper",
+		"term": "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	},
+	"lower": {
+		"type$": "parser.Term",
+		"name": "lower",
+		"term": "abcdefghijklmnopqrstuvwxyz"
+	},
+	"letterLike": {
+		"type$": "parser.Term",
+		"name": "letterLike",
+		"term": "$_"
+	},
+	"digit": {
+		"type$": "parser.Term",
+		"name": "digit",
+		"term": "0123456789"
+	},
+	"index": {
+		"type$": "parser.Term",
+		"name": "index",
+		"term": "@#^"
+	},
+	"mul": {
+		"type$": "parser.Term",
+		"name": "mul",
+		"term": "*/%"
+	},
+	"add": {
+		"type$": "parser.Term",
+		"name": "add",
+		"term": "+-"
+	},
+	"rel": {
+		"type$": "parser.Term",
+		"name": "rel",
+		"term": "<=>!"
+	},
+	"bool": {
+		"type$": "parser.Term",
+		"name": "bool",
+		"term": "&|~"
+	},
+	"ws": {
+		"type$": "parser.Term",
+		"name": "ws",
+		"production": "none",
+		"min": 0,
+		"max": 9007199254740991,
+		"term": " \t\r\n"
+	}
+}
