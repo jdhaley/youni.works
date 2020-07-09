@@ -3,8 +3,50 @@ export default {
 	use: {
 		package$control: "youni.works/base/control",		
 	},
+	Content: {
+		super$: "Object",
+		"@iterator": function* iterate() {
+			for (let i = 0, len = this.length; i < len; i++) yield this.at(i);
+		},
+		get$name: function() {
+			return this._rule.name;
+		},
+		get$length: function() {
+			return this._content.length;
+		},
+		at: function(index) {
+			return this._content[index];
+		},
+		slice: function() {
+			let content = this._content.slice.apply(this._content, arguments);
+			return this._rule.createContent(content);
+		},
+		concat: function() {
+			let content = this._content.concat.apply(this._content, arguments);
+			return this._rule.createContent(content);			
+		},
+		accept: function() {
+			if (!arguments.length) return 0;
+			let content = this._content;
+			if (typeof content == "string") {
+				this._content = content.concat.apply(content, arguments);
+			} else {
+				content.push.apply(content, arguments);
+			}
+			return arguments.length;
+		}
+	},
 	Rule: {
-		super$: "use.control.Controller",
+		super$: "Object",
+		use: {
+			type$Content: "Content"
+		},
+		createContent: function() {
+			return this.sys.extend(this.use.Content, {
+				_rule: this,
+				_content: arguments.length ? arguments[0] : []
+			});
+		},
 		production: "",
 		min: 1,
 		max: 1,
@@ -15,15 +57,14 @@ export default {
 			token: function(source, start, view) {
 				let match = this.scan(source, start);
 				if (match && view) {
-					let node = this.control();
-					node.accept(source.slice(start, start + match));
+					let node = this.createContent(source.slice(start, start + match));
 					if (this.next) node = this.next.view(node);
 					this.target(node, view);
 				}
 				return match;
 			},
 			set: function(source, start, view) {
-				let node = view ? this.control() : null;
+				let node = view ? this.createContent() : null;
 				let match = this.scan(source, start, node);
 				if (match && view && this.name) {
 					view[this.name] = node;
@@ -31,7 +72,7 @@ export default {
 				return match;
 			},
 			lift: function(source, start, view) {
-				let node = view ? this.control() : null;
+				let node = view ? this.createContent() : null;
 				let match = this.scan(source, start, node);
 				if (match && view) {
 					if (this.next) node = this.next.view(node);
@@ -44,11 +85,11 @@ export default {
 			}
 		},
 		view: function(source) {
-			let view = this.control();
+			let view = this.createContent();
 			view.source = source;
 			//Convert the source to a Text Sequence if needed.
-			if (!this.sys.isPrototypeOf(this.type.var, source)) {
-				source = this.control("" + source);				
+			if (!this.sys.isPrototypeOf(this.use.Content, source)) {
+				source = this.createContent("" + source);				
 			}
 			this.parse(source, 0, view);
 			return view;
@@ -136,8 +177,7 @@ export default {
 			if (match && view && this.production != "none") {
 				let node;
 				if (this.production != "lift") {
-					node = this.control();
-					node.accept(source.at(start));
+					node = this.createContent([source.at(start)]);
 				} else {
 					node = source.at(start);
 				}
@@ -157,9 +197,7 @@ export default {
 	strip: {
 		type$: "Rule",
 		view: function(view) {
-			let text = view.text.slice(1, view.text.length - 1);
-			view.splice(0);
-			view.accept(text);
+			view._content = view._content.slice(1, view.length - 1);
 			return view;
 		}
 	}
