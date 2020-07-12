@@ -6,8 +6,12 @@ export default function main(sys, conf) {
 function parserTest(sys, conf) {
 	let rule = conf.packages.rules.test;
 	let source = conf.packages.parser.Production.createNode("it was. the best.");
-	let target = rule.createNode();
+	source.name = "source";
+	console.log(source.markup);
+	let target =  conf.packages.parser.Production.createNode();
+	target.name = "target";
 	rule.parse(source, 0, target);
+	console.log(target.markup);
 	console.log(target);
 }
 //function grammarTest(sys, conf) {
