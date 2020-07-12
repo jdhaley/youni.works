@@ -12,7 +12,7 @@ import rules		from "./conf/test-rules.mjs";
 //import rules		from "./conf/grammar-rules.mjs";
 //import grammarSource from "./conf/grammar-source.mjs";
 
-//import engine 		from "./conf/engine.mjs";
+import engine 		from "./conf/engine.mjs";
 
 export default {
 	packages: {
@@ -28,5 +28,6 @@ export default {
 //		grammar: grammar,		
 //		grammarSource: grammarSource
 	},
-//	engine: engine
+	window: window,
+	engine: engine
 }

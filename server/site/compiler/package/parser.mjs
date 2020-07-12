@@ -35,16 +35,16 @@ export default {
 	},
 	Sequence: {
 		super$: "Expr",
-		type$exprs: "use.model.Content",
+		type$sequence: "use.model.Strand",
 		match: function(source, start, target) {
 			let at = start;
-			if (this.exprs) for (let expr of this.exprs) {
-				let isTerminal = !expr.parse;
-				let match = isTerminal
-					? (expr === source.content[at] ? 1 : 0)
-					: expr.parse(source, at, target);
-				//NB: expr.min check to enable optional parts in the sequence.
-				if (!match && (isTerminal || expr.min)) return 0;
+			if (this.sequence) for (let expr of this.sequence) {
+				let match = expr.parse
+					? expr.parse(source, at, target)
+					: (expr === source.content.at(at) ? 1 : 0);
+				// The strict zero test is used to ensure expr is in fact a min 0 expression
+				// and not an undefined value.
+				if (!match && !(expr.min === 0)) return 0;
 				at += match;
 			}
 			return at - start;
@@ -52,15 +52,13 @@ export default {
 	},
 	Choice: {
 		super$: "Expr",
-		type$exprs: "use.model.Content",
+		type$choice: "use.model.Strand",
 		match: function(source, start, target) {
-			//if (typeof this.exprs == "string") return this.exprs.indexOf(source.content[start]) >= 0 ? 1 : 0;
-			if (this.exprs) for (let expr of this.exprs) {
-				let isTerminal = !expr.parse;
-				let match = isTerminal
-					? (expr === source.content[start] ? 1 : 0)
-					: expr.parse(source, start, target);
-				//NB: This is a PEG-based choice: Choices are precedence-based.
+			if (this.choice) for (let expr of this.choice) {
+				let match = expr.parse
+					? expr.parse(source, start, target)
+					: (expr === source.content.at(start) ? 1 : 0);
+				//NB: This is a PEG-based (precedence) choice so return the first match
 				if (match) return match;
 			}
 			return 0;
@@ -71,11 +69,11 @@ export default {
 		nodeName: "",
 		nodeValue: "",
 		match: function(source, start, target) {
-			source = source[start];
-			if (!source) return 0;
-			if (this.nodeName && this.nodeName != source.name) return 0;
-			if (this.nodeText && this.nodeText != source.text) return 0;
-			return 0;
+			let node = source.content.at(start);
+			if (!node) return 0;
+			if (this.nodeName && this.nodeName != node.name) return 0;
+			if (this.nodeText && this.nodeText != node.text) return 0;
+			return 1;
 		}
 	},
 	Rule: {
@@ -92,7 +90,7 @@ export default {
 		},
 		name: "",
 		createNode: function(content) {
-			if (!content) content = this.sys.extend(this.use.model.Content, {
+			if (!content) content = this.sys.extend(this.use.model.Strand, {
 				length: 0
 			});
 			return this.sys.extend(this.use.model.Node, {

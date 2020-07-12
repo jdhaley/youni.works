@@ -1,15 +1,20 @@
 export default {
 	package$: "youni.works/compiler/model",
 	/*
-		Content is an index-based collection of values. Both JS Strings and Arrays
-		are Content values.  This interface is non-mutable however an object of this interface may be.
+		A Strand is a sequence of values.
+		This interface is non-mutable however an object of this interface may be.
+		Both Strings and Arrays can be polyfilled to Strands by adding the at() method.
+		Strands provide the base interface for flyweight sub-sequence implementations.
 	 */
-	Content: {
+	Strand: {
 		super$: "Object",
 		"@iterator": function* iterate() {
-			for (let i = 0, len = this.length; i < len; i++) yield this[i];
+			for (let i = 0, len = this.length; i < len; i++) yield this.at(i);
 		},
 		length: 0,
+		at: function(index) {
+			return this[index];
+		},
 		indexOf: function() {
 			return Array.prototype.indexOf.apply(this, arguments);
 		},
@@ -18,11 +23,11 @@ export default {
 		},
 		concat: function() {
 			return Array.prototype.concat.apply(this, arguments);
-		}		
+		}
 	},
 	Node: {
 		super$: "Object",
-		type$content: "Content",
+		type$content: "Strand",
 		get$text: function() {
 			if (typeof this.content == "string") return this.content;
 			let text = "";

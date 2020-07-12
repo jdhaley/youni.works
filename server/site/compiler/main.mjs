@@ -1,4 +1,5 @@
 export default function main(sys, conf) {
+	conf.engine(conf.window);
 	conf.packages = sys.load(conf.packages);
 	parserTest(sys, conf);
 	//grammarTest(sys, conf);

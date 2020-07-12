@@ -6,11 +6,11 @@ export default
 		type$: "parser.Rule",
 		expr: {
 			type$: "parser.Choice",
-			exprs: [
+			choice: [
 				{
 					type$: "parser.Choice",
 					name: "ws",
-					exprs: " \t\r\n"
+					choice: " \t\r\n"
 				},
 				{
 					type$: "parser.Production",
@@ -18,7 +18,7 @@ export default
 					expr: {
 						type$: "parser.Choice",
 						max: 1,
-						exprs: "()[],:#^" + "."
+						choice: "()[],:#^" + "."
 					}
 				},
 				{
@@ -26,13 +26,13 @@ export default
 					name: "name",
 					expr: {
 						"type$": "parser.Sequence",
-						"exprs": [
+						"sequence": [
 							{
 								use$: "lower"
 							},
 							{
 								"type$": "parser.Choice",
-								"exprs": [
+								"choice": [
 									{
 										use$: "lower"
 									},
@@ -55,18 +55,18 @@ export default
 	},
 	upper: {
 		type$: "parser.Choice",
-		exprs: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		choice: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	},
 	lower: {
 		type$: "parser.Choice",
-		exprs: "abcdefghijklmnopqrstuvwxyz"
+		choice: "abcdefghijklmnopqrstuvwxyz"
 	},
 	letterLike: {
 		type$: "parser.Choice",
-		exprs: "$_"
+		choice: "$_"
 	},
 	digit: {
 		type$: "parser.Choice",
-		exprs: "0123456789"
+		choice: "0123456789"
 	}
 }
