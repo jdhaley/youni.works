@@ -3,7 +3,7 @@ export default
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
 	test: {
-		type$: "parser.Production",
+		type$: "parser.Rule",
 		expr: {
 			type$: "parser.Choice",
 			exprs: [
