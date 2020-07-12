@@ -28,22 +28,22 @@ export default
 						"type$": "parser.Sequence",
 						"exprs": [
 							{
-								"type$": "lower",
+								use$: "lower"
 							},
 							{
 								"type$": "parser.Choice",
 								"exprs": [
 									{
-										"type$": "lower"
+										use$: "lower"
 									},
 									{
-										"type$": "upper"
+										use$: "upper"
 									},
 									{
-										"type$": "letterLike"
+										use$: "letterLike"
 									},
 									{
-										"type$": "digit"
+										use$: "digit"
 									}
 								]
 							}
