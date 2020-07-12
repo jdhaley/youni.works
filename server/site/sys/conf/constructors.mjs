@@ -9,6 +9,18 @@ export default {
 		}
 		return target;
 	},
+	use: function(prop) {
+		for (let name in prop.source) {
+			if (name != "use$") {
+				this.log.warn("A use object should only contain the reference property. Other properties are ignored.", prop);
+				break;
+			}
+		}
+		let value = this.sourceType(prop.source);
+		if (prop.component) prop.component[prop.name] = value;
+		prop.object = value;
+		return value;		
+	},
 	type: function(prop) {
 		let value = this.sourceType(prop.source);
 		value = this.sys.extend(value);
