@@ -6,7 +6,7 @@ export default function main(sys, conf) {
 }
 function parserTest(sys, conf) {
 	let rule = conf.packages.rules.test;
-	let source = conf.packages.parser.Production.createNode("it was. the best.");
+	let source = conf.packages.parser.Production.createNode("it was. /* truly */ \"the\" 10 best.");
 	source.name = "source";
 	console.log(source.markup);
 	let target =  conf.packages.parser.Production.createNode();

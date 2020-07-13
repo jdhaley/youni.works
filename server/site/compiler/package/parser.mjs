@@ -33,12 +33,26 @@ export default {
 			return 1;
 		}
 	},
+	Choice: {
+		super$: "Expr",
+		type$choice: "use.model.Strand",
+		match: function(source, start, target) {
+			for (let expr of this.choice) {
+				let match = expr.parse
+					? expr.parse(source, start, target)
+					: (expr === source.content.at(start) ? 1 : 0);
+				//NB: This is a PEG-based (precedence) choice so return the first match
+				if (match) return match;
+			}
+			return 0;
+		}
+	},
 	Sequence: {
 		super$: "Expr",
 		type$sequence: "use.model.Strand",
 		match: function(source, start, target) {
 			let at = start;
-			if (this.sequence) for (let expr of this.sequence) {
+			for (let expr of this.sequence) {
 				let match = expr.parse
 					? expr.parse(source, at, target)
 					: (expr === source.content.at(at) ? 1 : 0);
@@ -48,20 +62,6 @@ export default {
 				at += match;
 			}
 			return at - start;
-		}
-	},
-	Choice: {
-		super$: "Expr",
-		type$choice: "use.model.Strand",
-		match: function(source, start, target) {
-			if (this.choice) for (let expr of this.choice) {
-				let match = expr.parse
-					? expr.parse(source, start, target)
-					: (expr === source.content.at(start) ? 1 : 0);
-				//NB: This is a PEG-based (precedence) choice so return the first match
-				if (match) return match;
-			}
-			return 0;
 		}
 	},
 	Match: {
