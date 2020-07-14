@@ -19,6 +19,7 @@ export default {
 		control: control,
 		platform: client,
 		services: services,
+		client: client,
 		
 		//Compiler...
 		model: model,

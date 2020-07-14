@@ -84,13 +84,13 @@ export default
 					}
 				},
 				{
-					type$: "parser.Production",
-					name: "string",
-					expr: {
-						type$: "parser.Sequence",
-						sequence: [
-							"\"",
-							{
+					type$: "parser.Sequence",
+					sequence: [
+						"\"",
+						{
+							type$: "parser.Production",
+							name: "string",
+							expr: {
 								type$: "parser.Choice",
 								choice: [
 									{
@@ -103,10 +103,11 @@ export default
 										negate: true
 									}
 								]
-							},
-							"\""
-						]
-					}
+							}
+						},
+						"\""
+					],
+					max: 1
 				}
 			]
 		}

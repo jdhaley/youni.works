@@ -1,15 +1,16 @@
 export default function main(sys, conf) {
 	conf.engine(conf.window);
 	conf.packages = sys.load(conf.packages);
-	parserTest(sys, conf);
-	//grammarTest(sys, conf);
+	let fs = conf.packages.services.public.fs;
+	fs.open("test-parser.txt", (message) => parserTest(sys, conf, message.content));
 }
-function parserTest(sys, conf) {
+function parserTest(sys, conf, source) {
+	source = conf.packages.parser.Production.createNode(source);
+	let target =  conf.packages.parser.Production.createNode();
+	
 	let rule = conf.packages.rules.test;
-	let source = conf.packages.parser.Production.createNode("it was. /* truly */ \"the\" 10 best.");
 	source.name = "source";
 	console.log(source.markup);
-	let target =  conf.packages.parser.Production.createNode();
 	target.name = "target";
 	rule.parse(source, 0, target);
 	console.log(target.markup);
