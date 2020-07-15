@@ -6,12 +6,20 @@ export default function main(sys, conf) {
 }
 function parserTest(sys, conf, source) {
 	source = conf.packages.parser.Production.createNode(source);
-	let target =  conf.packages.parser.Production.createNode();
-	
-	let rule = conf.packages.rules.test;
 	source.name = "source";
+	let target =  conf.packages.parser.Production.createNode();
+	target.name = "tokens";
+	
+	let rule = conf.packages.tokens.main;
 	console.log(source.markup);
-	target.name = "target";
+	rule.parse(source, 0, target);
+	console.log(target.markup);
+	console.log(target);
+
+	source = target;
+	target =  conf.packages.parser.Production.createNode();
+	target.name = "target";	
+	rule = conf.packages.match.main;
 	rule.parse(source, 0, target);
 	console.log(target.markup);
 	console.log(target);

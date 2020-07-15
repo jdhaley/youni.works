@@ -6,6 +6,7 @@ export default {
 	Parser: {
 		super$: "Object",		
 		parse: function(source, start, target) {
+			return 0;
 		}
 	},
 	Expr: {
@@ -14,13 +15,16 @@ export default {
 		max: 9007199254740991,
 		negate: false,
 		parse: function(source, start, target) {
+			return this.scan(source, start, target);
+		},		
+		scan: function(source, start, target) {
 			let at = start;
 			for (let count = 0; count < this.max && at < source.content.length; count++) {
 				let match = this.match(source, at, target);
 				if (this.negate) match = match ? 0 : 1;
 				if (match) {
 					at += match;
-					//If there is no target, do a quick match...
+					//If there is no target, do a quick predicate match...
 					//if (!target && count >= this.min) return true;
 				} else {
 					if (count < this.min) at = start;
@@ -68,27 +72,31 @@ export default {
 		super$: "Expr",
 		nodeName: "",
 		nodeValue: "",
+		suppress: false,
+		parse: function(source, start, target) {
+			let match = this.scan(source, start);
+			if (match && target && !this.suppress) {
+				for (let i = 0; i < match; i++) {
+					target.accept(source.content.at(start + i));
+				}
+			}
+			return match;
+		},
 		match: function(source, start, target) {
 			let node = source.content.at(start);
 			if (!node) return 0;
 			if (this.nodeName && this.nodeName != node.name) return 0;
 			if (this.nodeText && this.nodeText != node.text) return 0;
 			return 1;
-		}
-	},
-	Rule: {
-		super$: "Parser",
-		type$expr: "Expr",
-		parse: function(source, start, target) {
-			return this.expr.parse(source, start, target);
-		}
+		},
 	},
 	Production: {
-		super$: "Rule",
+		super$: "Parser",
 		use: {
 			type$model: "use.model"
 		},
 		name: "",
+		type$expr: "Expr",
 		createNode: function(content) {
 			if (!content) content = this.sys.extend(this.use.model.Strand, {
 				length: 0

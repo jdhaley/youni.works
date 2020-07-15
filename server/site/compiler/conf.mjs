@@ -7,7 +7,8 @@ import parser		from "./package/parser.mjs";
 //import grammar		from "./package/grammar.mjs";
 
 import services		from "./conf/services.mjs";
-import rules		from "./conf/test-rules.mjs";
+import tokens		from "./conf/test-token-rules.mjs";
+import match		from "./conf/test-match-rules.mjs";
 
 //import rules		from "./conf/grammar-rules.mjs";
 //import grammarSource from "./conf/grammar-source.mjs";
@@ -24,7 +25,8 @@ export default {
 		//Compiler...
 		model: model,
 		parser: parser,
-		rules: rules,
+		tokens: tokens,
+		match: match,
 
 //		grammar: grammar,		
 //		grammarSource: grammarSource
