@@ -41,10 +41,12 @@ export default {
 			if (name) markup += "</" + name + ">";
 			return markup;
 		},
-		accept: function() {
+		append: function() {
 			if (!arguments.length) return 0;
 			if (typeof this.content == "string") {
-				this.content = [this.content];
+				for (let i = 0; i < arguments.length; i++) {
+					this.content += textOf(arguments[i]);
+				}
 			}
 			Array.prototype.push.apply(this.content, arguments);
 			return arguments.length;

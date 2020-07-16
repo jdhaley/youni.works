@@ -77,7 +77,7 @@ export default {
 			let match = this.scan(source, start);
 			if (match && target && !this.suppress) {
 				for (let i = 0; i < match; i++) {
-					target.accept(source.content.at(start + i));
+					target.append(source.content.at(start + i));
 				}
 			}
 			return match;
@@ -105,11 +105,11 @@ export default {
 			if (!match || !target) return match;
 			if (this.name && typeof source.content == "string") {
 				let node = this.createNode(source.content.slice(start, start + match));
-				target.accept(node);
+				target.append(node);
 				return match;
 			}
 			let node = this.createNode();
-			target.accept(node);
+			target.append(node);
 			return this.expr.parse(source, start, node);
 		}
 	}
