@@ -71,7 +71,7 @@ export default {
 	Match: {
 		super$: "Expr",
 		nodeName: "",
-		nodeValue: "",
+		nodeText: "",
 		suppress: false,
 		parse: function(source, start, target) {
 			let match = this.scan(source, start);
@@ -93,18 +93,12 @@ export default {
 	Production: {
 		super$: "Parser",
 		use: {
-			type$model: "use.model"
+			type$Owner: "use.model.Owner"
 		},
 		name: "",
 		type$expr: "Expr",
 		createNode: function(content) {
-			if (!content) content = this.sys.extend(this.use.model.Strand, {
-				length: 0
-			});
-			return this.sys.extend(this.use.model.Node, {
-				name: this.name || "",
-				content: content
-			});
+			return this.use.Owner.create(this.name, content);
 		},
 		parse: function(source, start, target) {
 			let match = this.expr.parse(source, start);

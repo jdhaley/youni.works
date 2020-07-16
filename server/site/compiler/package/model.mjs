@@ -11,7 +11,7 @@ export default {
 		"@iterator": function* iterate() {
 			for (let i = 0, len = this.length; i < len; i++) yield this.at(i);
 		},
-		length: 0,
+		var$length: 0,
 		at: function(index) {
 			return this[index];
 		},
@@ -48,6 +48,20 @@ export default {
 			}
 			Array.prototype.push.apply(this.content, arguments);
 			return arguments.length;
+		}
+	},
+	Owner: {
+		super$: "Object",
+		use: {
+			type$Strand: "Strand",
+			type$Node: "Node"
+		},
+		create: function(name, content) {
+			return this.sys.extend(this.use.Node, {
+				owner: this,
+				name: name || "",
+				content: content || this.sys.extend(this.use.Strand)
+			});
 		}
 	}
 }
@@ -103,22 +117,3 @@ function markupString(value) {
 	}
 	return markup;
 }
-//Content: {
-//"@iterator": function* iterate() {
-//	for (let i = 0, len = this.length; i < len; i++) yield this.at(i);
-//},
-//get$length: function() {
-//	return this._content.length;
-//},
-//at: function(index) {
-//	return this._content[index];
-//},
-//slice: function() {
-//	let content = this._content.slice.apply(this._content, arguments);
-//	return this._rule.createNode(content);
-//},
-//concat: function() {
-//	let content = this._content.concat.apply(this._content, arguments);
-//	return this._rule.createNode(content);			
-//}		
-//},
