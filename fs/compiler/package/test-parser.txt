@@ -1,0 +1,9 @@
+test-parser: [
+	it was /* truly */ ["\"the\"" (10 or 20) best
+] of times.
+{
+	x: 30.5;
+	y: -20.334e-2;
+	z: +20.334E2;
+}
+(asdf [ asdfasdasdf /*{*/ } sdfasdfasdd f [ asdfasdfafda ] asfaf { dsasdfasdf ( sdfadsasdfsdf } /*)*/
