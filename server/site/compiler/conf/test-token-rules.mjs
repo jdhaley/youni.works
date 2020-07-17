@@ -48,8 +48,41 @@ export default
 					type$: "parser.Choice",
 					choice: "0123456789",
 					min: 1
+				},
+				{
+					type$: "parser.Sequence",
+					max: 1,
+					sequence: [
+						".",
+						{
+							type$: "parser.Choice",
+							choice: "0123456789",
+							min: 1
+						},
+						{
+							type$: "parser.Sequence",
+							max: 1,
+							sequence: [
+								{
+									type$: "parser.Choice",
+									min: 1,
+									max: 1,
+									choice: "Ee"
+								},
+								{
+									type$: "parser.Choice",
+									choice: "+-",
+									max: 1
+								},
+								{
+									type$: "parser.Choice",
+									choice: "0123456789",
+									min: 1
+								}
+							]
+						}
+					]
 				}
-				//Just do integers for now.
 			]
 		}
 	},
