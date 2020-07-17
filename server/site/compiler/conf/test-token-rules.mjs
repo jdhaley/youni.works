@@ -5,109 +5,144 @@ export default
 	main: {
 		type$: "parser.Choice",
 		choice: [
+			{use$: "ws"},
+			{use$: "comment"},
+			{use$: "number"},
+			{use$: "string"},
+			{use$: "word"},
+			{use$: "push"},
+			{use$: "pop"},
+			{use$: "pn"}
+		]
+	},
+	ws: {
+		type$: "parser.Choice",
+		choice: " \t\r\n"
+	},
+	comment: {
+		type$: "parser.Sequence",
+		sequence: [
+			{use$: "commentStart"},
 			{
 				type$: "parser.Choice",
-				name: "ws",
-				choice: " \t\r\n"
-			},
-			{
-				type$: "parser.Sequence",
-				sequence: [
-					{
-						use$: "commentStart",
-					},
-					{
-						type$: "parser.Choice",
-						choice: [
-							{use$: "commentEnd"}
-						],
-						negate: true
-					},
-					{
-						use$: "commentEnd"
-					}
+				negate: true,
+				choice: [
+					{use$: "commentEnd"}
 				]
 			},
-			{
-				type$: "parser.Production",
-				name: "number",	
-				expr: {
-					type$: "parser.Sequence",
-					sequence: [
-						{
-							type$: "parser.Choice",
-							choice: "+-",
-							max: 1
-						},
-						{
-							type$: "parser.Choice",
-							choice: "0123456789",
-							min: 1
-						}
-						//Just do integers for now.
-					]
+			{use$: "commentEnd"}
+		]
+	},
+	number: {
+		type$: "parser.Production",
+		name: "number",	
+		expr: {
+			type$: "parser.Sequence",
+			sequence: [
+				{
+					type$: "parser.Choice",
+					choice: "+-",
+					max: 1
+				},
+				{
+					type$: "parser.Choice",
+					choice: "0123456789",
+					min: 1
 				}
-			},
+				//Just do integers for now.
+			]
+		}
+	},
+	string: {
+		type$: "parser.Sequence",
+		sequence: [
+			"\"",
 			{
 				type$: "parser.Production",
-				name: "pn",
+				name: "string",
 				expr: {
 					type$: "parser.Choice",
-					min: 1,
-					max: 1,
-					choice: "{}()[];,:.@#^*/%+-<=>!&|~?"
-				}
-			},
-			{
-				type$: "parser.Production",
-				name: "word",
-				expr: {
-					"type$": "parser.Sequence",
-					"sequence": [
+					choice: [
 						{
-							use$: "letter",
+							type$: "parser.Sequence",
+							sequence: "\\\""
 						},
 						{
-							"type$": "parser.Choice",
-							"choice": [
-								{
-									use$: "letter"
-								},
-								{
-									use$: "digit"
-								}
-							]
+							type$: "parser.Choice",
+							choice: "\"",
+							negate: true
 						}
 					]
 				}
 			},
-			{
-				type$: "parser.Sequence",
-				sequence: [
-					"\"",
-					{
-						type$: "parser.Production",
-						name: "string",
-						expr: {
-							type$: "parser.Choice",
-							choice: [
-								{
-									type$: "parser.Sequence",
-									sequence: "\\\""
-								},
-								{
-									type$: "parser.Choice",
-									choice: "\"",
-									negate: true
-								}
-							]
+			"\""
+		],
+		max: 1
+	},
+	word: {
+		type$: "parser.Production",
+		name: "word",
+		expr: {
+			type$: "parser.Sequence",
+			sequence: [
+				{
+					use$: "letter",
+				},
+				{
+					type$: "parser.Choice",
+					choice: [
+						{
+							use$: "letter"
+						},
+						{
+							use$: "digit"
 						}
-					},
-					"\""
-				],
-				max: 1
-			}
-		]
+					]
+				}
+			]
+		}
+	},
+	push: {
+		type$: "parser.Production",
+		name: "push",
+		expr: {
+			type$: "parser.Choice",
+			min: 1,
+			max: 1,
+			choice: "{(["
+		}
+	},
+	pop: {
+		type$: "parser.Production",
+		name: "pop",
+		expr: {
+			type$: "parser.Choice",
+			min: 1,
+			max: 1,
+			choice: "})]"
+		}
+	},
+	pn: {
+		type$: "parser.Production",
+		name: "pn",
+		expr: {
+			type$: "parser.Choice",
+			min: 1,
+			max: 1,
+			choice: ";,:.@#^*/%+-<=>!&|~?"
+		}
+	},
+	commentStart: {
+		type$: "parser.Sequence",
+		sequence: "/*",
+		min: 1,
+		max: 1
+	},
+	commentEnd: {
+		type$: "parser.Sequence",
+		sequence: "*/",
+		min: 1,
+		max: 1
 	},
 	upper: {
 		type$: "parser.Choice",
@@ -138,18 +173,5 @@ export default
 				use$: "letterLike"
 			}
 		]
-	},
-	commentStart: {
-		type$: "parser.Sequence",
-		sequence: "/*",
-		min: 1,
-		max: 1
-	},
-	commentEnd: {
-		type$: "parser.Sequence",
-		sequence: "*/",
-		min: 1,
-		max: 1
-	},
-
+	}
 }
