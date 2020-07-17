@@ -2,9 +2,9 @@ import rule from "../util/ruleBuilder.mjs";
 
 function branch(start, end) {
 	return rule.sequence(
-		rule.remove(rule.match("push", start)),
+		rule.remove(rule.match("pn", start)),
 		rule.many(rule.sequence({use$: "primary"})),
-		rule.remove(rule.match("pop", end))
+		rule.remove(rule.match("pn", end))
 	);	
 }
 
@@ -20,6 +20,6 @@ export default
 		rule.match("number"),
 		rule.match("string"),
 		rule.match("word"),
-		rule.match("pn")
+		rule.match("op")
 	)
 }
