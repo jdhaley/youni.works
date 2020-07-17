@@ -1,210 +1,59 @@
+import rule from "../util/ruleBuilder.mjs";
+
+let UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let LOWER = "abcdefghijklmnopqrstuvwxyz";
+let LETTER_LIKE = "$_";
+let LETTER = rule.charset(LOWER + UPPER + LETTER_LIKE);
+
+let QUOTE = rule.charset("\"");
+
+let DIGIT = rule.charset("0123456789");
+let DIGITS = rule.sequence(DIGIT, rule.many(DIGIT));
+
 export default
 {
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
-	main: {
-		type$: "parser.Choice",
-		choice: [
-			{use$: "ws"},
-			{use$: "comment"},
-			{use$: "number"},
-			{use$: "string"},
-			{use$: "word"},
-			{use$: "push"},
-			{use$: "pop"},
-			{use$: "pn"}
-		]
-	},
-	ws: {
-		type$: "parser.Choice",
-		choice: " \t\r\n"
-	},
-	comment: {
-		type$: "parser.Sequence",
-		sequence: [
-			{use$: "commentStart"},
-			{
-				type$: "parser.Choice",
-				negate: true,
-				choice: [
-					{use$: "commentEnd"}
-				]
-			},
-			{use$: "commentEnd"}
-		]
-	},
-	number: {
-		type$: "parser.Production",
-		name: "number",	
-		expr: {
-			type$: "parser.Sequence",
-			sequence: [
-				{
-					type$: "parser.Choice",
-					choice: "+-",
-					max: 1
-				},
-				{
-					type$: "parser.Choice",
-					choice: "0123456789",
-					min: 1
-				},
-				{
-					type$: "parser.Sequence",
-					max: 1,
-					sequence: [
-						".",
-						{
-							type$: "parser.Choice",
-							choice: "0123456789",
-							min: 1
-						},
-						{
-							type$: "parser.Sequence",
-							max: 1,
-							sequence: [
-								{
-									type$: "parser.Choice",
-									min: 1,
-									max: 1,
-									choice: "Ee"
-								},
-								{
-									type$: "parser.Choice",
-									choice: "+-",
-									max: 1
-								},
-								{
-									type$: "parser.Choice",
-									choice: "0123456789",
-									min: 1
-								}
-							]
-						}
-					]
-				}
-			]
-		}
-	},
-	string: {
-		type$: "parser.Sequence",
-		sequence: [
-			"\"",
-			{
-				type$: "parser.Production",
-				name: "string",
-				expr: {
-					type$: "parser.Choice",
-					choice: [
-						{
-							type$: "parser.Sequence",
-							sequence: "\\\""
-						},
-						{
-							type$: "parser.Choice",
-							choice: "\"",
-							negate: true
-						}
-					]
-				}
-			},
-			"\""
-		],
-		max: 1
-	},
-	word: {
-		type$: "parser.Production",
-		name: "word",
-		expr: {
-			type$: "parser.Sequence",
-			sequence: [
-				{
-					use$: "letter",
-				},
-				{
-					type$: "parser.Choice",
-					choice: [
-						{
-							use$: "letter"
-						},
-						{
-							use$: "digit"
-						}
-					]
-				}
-			]
-		}
-	},
-	push: {
-		type$: "parser.Production",
-		name: "push",
-		expr: {
-			type$: "parser.Choice",
-			min: 1,
-			max: 1,
-			choice: "{(["
-		}
-	},
-	pop: {
-		type$: "parser.Production",
-		name: "pop",
-		expr: {
-			type$: "parser.Choice",
-			min: 1,
-			max: 1,
-			choice: "})]"
-		}
-	},
-	pn: {
-		type$: "parser.Production",
-		name: "pn",
-		expr: {
-			type$: "parser.Choice",
-			min: 1,
-			max: 1,
-			choice: ";,:.@#^*/%+-<=>!&|~?"
-		}
-	},
-	commentStart: {
-		type$: "parser.Sequence",
-		sequence: "/*",
-		min: 1,
-		max: 1
-	},
-	commentEnd: {
-		type$: "parser.Sequence",
-		sequence: "*/",
-		min: 1,
-		max: 1
-	},
-	upper: {
-		type$: "parser.Choice",
-		choice: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	},
-	lower: {
-		type$: "parser.Choice",
-		choice: "abcdefghijklmnopqrstuvwxyz"
-	},
-	letterLike: {
-		type$: "parser.Choice",
-		choice: "$_"
-	},
-	digit: {
-		type$: "parser.Choice",
-		choice: "0123456789"
-	},
-	letter: {
-		type$: "parser.Choice",
-		choice: [
-			{
-				use$: "lower"
-			},
-			{
-				use$: "upper"
-			},
-			{
-				use$: "letterLike"
-			}
-		]
-	}
+	main: rule.many(rule.choice(
+		{use$: "ws"},
+		{use$: "comment"},
+		{use$: "number"},
+		{use$: "string"},
+		{use$: "word"},
+		{use$: "pn"},
+		{use$: "op"}
+	)),
+	ws: rule.many(rule.charset(" \t\r\n")),
+	comment: rule.sequence(
+		rule.charseq("/*"),
+		rule.many(rule.negate(rule.charseq("*/"))),
+		rule.charseq("*/")
+	),
+	number: rule.create("number", rule.sequence(
+		rule.opt(rule.charset("+-")),
+		DIGITS,
+		rule.opt(rule.sequence(
+			rule.charset("."),
+			DIGITS,
+			rule.opt(rule.sequence(
+				rule.charset("eE"),
+				rule.opt(rule.charset("+-")),
+				DIGITS,					
+			))
+		)),
+	)),
+	string: rule.create("string", rule.sequence(
+		QUOTE,
+		rule.many(rule.choice(
+			rule.charseq("\\\""),
+			rule.negate(rule.charseq("\""))
+		)),
+		QUOTE
+	)),
+	word: rule.create("word", rule.sequence(
+		LETTER,
+		rule.many(rule.choice(LETTER, DIGIT))
+	)),
+	pn: rule.create("pn", rule.charset("({[)}]")),
+	op: rule.create("op", rule.charset(";,:.@#^*/%+-<=>!&|~?"))
 }
