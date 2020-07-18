@@ -3,55 +3,58 @@ import rule from "../util/ruleBuilder.mjs";
 let UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let LOWER = "abcdefghijklmnopqrstuvwxyz";
 let LETTER_LIKE = "$_";
-let LETTER = rule.charset(LOWER + UPPER + LETTER_LIKE);
+let DIGIT = "0123456789";
 
-let DIGIT = rule.charset("0123456789");
-let DIGITS = rule.sequence(DIGIT, rule.many(DIGIT));
+let Letter = rule.choice(LOWER + UPPER + LETTER_LIKE);
+let Digit = rule.choice(DIGIT);
+let Digits = rule.sequence([Digit, rule.choice(DIGIT, "*")]);
 
 export default
 {
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
-	main: rule.many(rule.choice(
-		{use$: "ws"},
-		{use$: "comment"},
-		{use$: "number"},
-		{use$: "string"},
-		{use$: "word"},
-		{use$: "pn"},
-		{use$: "op"}
-	)),
-	ws: rule.many(rule.charset(" \t\r\n")),
-	comment: rule.sequence(
-		rule.charseq("/*"),
-		rule.many(rule.negate(rule.charseq("*/"))),
-		rule.opt(rule.charseq("*/")) // Compilation to check for unterminated comment.
+	main: rule.choice(["ws", "comment", "number", "string", "word", "op", "pn"], "*"),
+	ws: rule.choice(" \t\r\n", "*"),
+	comment: rule.sequence([
+		rule.sequence("/*"),
+		rule.sequence("*/", "~*"),
+		rule.sequence("*/", "?") // Compilation to check for unterminated comment.
+	]),
+	number: rule.create("number",
+		rule.sequence([
+			rule.choice("+-", "?"),
+			Digits,
+			rule.sequence([
+				rule.sequence("."),
+				Digits,
+				rule.sequence([
+					rule.choice("eE"),
+					rule.choice("+-", "?"),
+					Digits				
+				], "?")
+			], "?")
+		])
 	),
-	number: rule.create("number", rule.sequence(
-		rule.opt(rule.charset("+-")),
-		DIGITS,
-		rule.opt(rule.sequence(
-			rule.charset("."),
-			DIGITS,
-			rule.opt(rule.sequence(
-				rule.charset("eE"),
-				rule.opt(rule.charset("+-")),
-				DIGITS,					
-			))
-		)),
-	)),
-	string: rule.create("string", rule.sequence(
-		rule.charset("\""),
-		rule.many(rule.choice(
-			rule.charseq("\\\""),
-			rule.negate(rule.charseq("\""))
-		)),
-		rule.opt(rule.charset("\"")) // Compilation to check for unterminated string.
-	)),
-	word: rule.create("word", rule.sequence(
-		LETTER,
-		rule.many(rule.choice(LETTER, DIGIT))
-	)),
-	pn: rule.create("pn", rule.charset("({[)}]")),
-	op: rule.create("op", rule.charset(";,:.@#^*/%+-<=>!&|~?"))
+	string: rule.create("string",
+		rule.sequence([
+			rule.sequence("\""),
+			rule.choice([
+				rule.sequence("\\\""),
+				rule.sequence("\"", "~")
+			], "*"),
+			rule.sequence("\"", "?") // Compilation to check for unterminated string.
+		])
+	),
+	word: rule.create("word",
+		rule.sequence([
+			Letter,
+			rule.choice([Letter, Digit], "*")
+		])
+	),
+	pn: rule.create("pn",
+		rule.choice("({[)}]")
+	),
+	op: rule.create("op",
+		rule.choice(";,:.@#^*/%+-<=>!&|~?")
+	)
 }
