@@ -101,6 +101,10 @@ export default {
 			return this.use.Owner.create(this.name, content);
 		},
 		parse: function(source, start, target) {
+			if (!this.expr) {
+				target && target.append(this.createNode());
+				return 0;
+			}
 			let match = this.expr.parse(source, start);
 			if (!match || !target) return match;
 			if (this.name && typeof source.content == "string") {
@@ -118,15 +122,22 @@ export default {
 		use: {
 			type$Owner: "use.model.Owner"
 		},
-		type$source: "Parser",
+		type$pipeline: "use.model.Strand",
 		type$target: "Parser",
 		createNode: function(content) {
 			return this.use.Owner.create("pipe", content);
 		},
 		parse: function(source, start, target) {
-			let pipe = this.createNode();
-			let match = this.source.parse(source, start, pipe);
-			return match ? this.target.parse(pipe, 0, target) : 0;
+			if (this.pipeline.length < 2) throw new Error("Pipeline requires 2 or more rules.");
+			let length = this.pipeline.length - 1; //Don't loop on the last one.
+			for (let i = 0; i < length; i++) {
+				let rule = this.pipeline[i];
+				let pipe = this.createNode();
+				let match = rule.parse(source, start, pipe);
+				source = pipe;
+				start = 0;
+			}
+			return this.pipeline[length].parse(source, 0, target);
 		}
 	}
 }

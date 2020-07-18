@@ -16,19 +16,18 @@ a {use$: "name"} reference.
 
  */
 export default {
-	pipe: function(source, target) {
+	pipe: function(...pipeline) {
 		return {
 			type$: "parser.Pipe",
-			source: source,
-			target: target
+			pipeline: setRef(pipeline)
 		}		
 	},
 	create: function(name, expr) {
 		return {
 			type$: "parser.Production",
-			name: name,
+			name: name || "",
 			expr: expr
-		}		
+		}
 	},
 	sequence: function(sequence, expr) {
 		return _expr({

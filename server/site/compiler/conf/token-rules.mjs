@@ -52,9 +52,9 @@ export default
 		])
 	),
 	pn: rule.create("pn",
-		rule.choice("({[)}]")
+		rule.choice(",;:({[)}]")
 	),
 	op: rule.create("op",
-		rule.choice(";,:.@#^*/%+-<=>!&|~?")
+		rule.choice(".@#^*/%+-<=>!&|~?")
 	)
 }
