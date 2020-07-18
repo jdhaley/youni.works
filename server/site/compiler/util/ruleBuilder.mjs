@@ -16,6 +16,13 @@ a {use$: "name"} reference.
 
  */
 export default {
+	pipe: function(source, target) {
+		return {
+			type$: "parser.Pipe",
+			source: source,
+			target: target
+		}		
+	},
 	create: function(name, expr) {
 		return {
 			type$: "parser.Production",

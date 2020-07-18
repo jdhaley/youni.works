@@ -96,7 +96,7 @@ export default {
 			type$Owner: "use.model.Owner"
 		},
 		name: "",
-		type$expr: "Expr",
+		type$expr: "Parser",
 		createNode: function(content) {
 			return this.use.Owner.create(this.name, content);
 		},
@@ -111,6 +111,22 @@ export default {
 			let node = this.createNode();
 			target.append(node);
 			return this.expr.parse(source, start, node);
+		}
+	},
+	Pipe: {
+		super$: "Parser",
+		use: {
+			type$Owner: "use.model.Owner"
+		},
+		type$source: "Parser",
+		type$target: "Parser",
+		createNode: function(content) {
+			return this.use.Owner.create("pipe", content);
+		},
+		parse: function(source, start, target) {
+			let pipe = this.createNode();
+			let match = this.source.parse(source, start, pipe);
+			return match ? this.target.parse(pipe, 0, target) : 0;
 		}
 	}
 }

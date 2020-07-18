@@ -7,6 +7,7 @@ import client		from "../web/package/client.mjs";
 import services		from "./conf/services.mjs";
 import tokens		from "./conf/token-rules.mjs";
 import branches		from "./conf/branch-rules.mjs";
+import compiler		from "./conf/compiler-rules.mjs";
 
 import engine 		from "./conf/engine.mjs";
 
@@ -22,6 +23,7 @@ export default {
 		
 		tokens: tokens,
 		branches: branches,
+		compiler: compiler
 	},
 	window: window,
 	engine: engine
