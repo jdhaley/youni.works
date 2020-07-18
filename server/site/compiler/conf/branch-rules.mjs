@@ -1,13 +1,5 @@
 import rule from "../util/ruleBuilder.mjs";
 
-function branch(start, end) {
-	return rule.sequence([
-		rule.filter("pn", start),
-		rule.sequence(["primary"], "*"),
-		rule.filter("pn", end)
-	]);	
-}
-
 export default {
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
@@ -22,4 +14,12 @@ export default {
 		rule.match("op")
 	]),
 	any: rule.match()
+}
+
+function branch(start, end) {
+	return rule.sequence([
+		rule.filter("pn", start),
+		rule.sequence(["primary"], "*"),
+		rule.filter("pn", end)
+	]);	
 }
