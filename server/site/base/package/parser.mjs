@@ -15,17 +15,12 @@ export default {
 		max: 9007199254740991,
 		negate: false,
 		parse: function(source, start, target) {
-			return this.scan(source, start, target);
-		},		
-		scan: function(source, start, target) {
 			let at = start;
 			for (let count = 0; count < this.max && at < source.content.length; count++) {
-				let match = this.match(source, at, target);
+				let match = this.scan(source, at, target);
 				if (this.negate) match = match ? 0 : 1;
 				if (match) {
 					at += match;
-					//If there is no target, do a quick predicate match...
-					//if (!target && count >= this.min) return true;
 				} else {
 					if (count < this.min) at = start;
 					break;
@@ -33,14 +28,14 @@ export default {
 			}
 			return at - start;
 		},
-		match: function(source, start, target) {
+		scan: function(source, start, target) {
 			return 1;
 		}
 	},
 	Choice: {
 		super$: "Expr",
 		type$choice: "use.model.Strand",
-		match: function(source, start, target) {
+		scan: function(source, start, target) {
 			for (let expr of this.choice) {
 				let match = expr.parse
 					? expr.parse(source, start, target)
@@ -54,7 +49,7 @@ export default {
 	Sequence: {
 		super$: "Expr",
 		type$sequence: "use.model.Strand",
-		match: function(source, start, target) {
+		scan: function(source, start, target) {
 			let at = start;
 			for (let expr of this.sequence) {
 				let match = expr.parse
@@ -73,16 +68,20 @@ export default {
 		nodeName: "",
 		nodeText: "",
 		suppress: false,
-		match: function(source, start, target) {
-			let node = source.content.at(start);
-			if (!node) return 0;
-			if (this.nodeName && this.nodeName != node.name) return 0;
-			if (this.nodeText && this.nodeText != node.text) return 0;
+		scan: function(source, start, target) {
+			let content = source.content.at(start);
+			let match = this.match(content) ? 1 : 0;
 			if (target && !this.suppress) {
-				target.append(source.content.at(start));
+				if (this.negate ? !match : match) target.append(content);
 			}
-			return 1;
+			return match;
 		},
+		//Returns boolean.
+		match: function(node) {
+			if (this.nodeName && this.nodeName != node.name) return false;
+			if (this.nodeText && this.nodeText != node.text) return false;
+			return true;
+		}
 	},
 	Production: {
 		super$: "Parser",
