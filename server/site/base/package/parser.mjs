@@ -73,20 +73,14 @@ export default {
 		nodeName: "",
 		nodeText: "",
 		suppress: false,
-		parse: function(source, start, target) {
-			let match = this.scan(source, start);
-			if (match && target && !this.suppress) {
-				for (let i = 0; i < match; i++) {
-					target.append(source.content.at(start + i));
-				}
-			}
-			return match;
-		},
 		match: function(source, start, target) {
 			let node = source.content.at(start);
 			if (!node) return 0;
 			if (this.nodeName && this.nodeName != node.name) return 0;
 			if (this.nodeText && this.nodeText != node.text) return 0;
+			if (target && !this.suppress) {
+				target.append(source.content.at(start));
+			}
 			return 1;
 		},
 	},
@@ -114,7 +108,8 @@ export default {
 			}
 			let node = this.createNode();
 			target.append(node);
-			return this.expr.parse(source, start, node);
+			this.expr.parse(source, start, node);
+			return match;
 		}
 	},
 	Pipe: {
@@ -134,6 +129,7 @@ export default {
 				let rule = this.pipeline[i];
 				let pipe = this.createNode();
 				let match = rule.parse(source, start, pipe);
+				console.debug(pipe.markup);
 				source = pipe;
 				start = 0;
 			}

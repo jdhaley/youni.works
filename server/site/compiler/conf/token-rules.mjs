@@ -13,7 +13,10 @@ export default
 {
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
-	main: rule.choice(["ws", "comment", "number", "string", "word", "op", "pn"], "*"),
+	main: rule.choice([
+		"ws", "comment", "pn", "down", "up",
+		"number", "string", "word", "op"
+	], "*"),
 	ws: rule.choice(" \t\r\n", "*"),
 	comment: rule.sequence([
 		rule.sequence("/*"),
@@ -52,7 +55,13 @@ export default
 		])
 	),
 	pn: rule.create("pn",
-		rule.choice(",;:({[)}]")
+		rule.choice(",;:")
+	),
+	down: rule.create("down",
+		rule.choice("({[")
+	),
+	up: rule.create("up",
+		rule.choice(")}]")
 	),
 	op: rule.create("op",
 		rule.choice(".@#^*/%+-<=>!&|~?")

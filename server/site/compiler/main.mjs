@@ -6,11 +6,11 @@ export default function main(sys, conf) {
 }
 function parserTest(sys, conf, source) {
 	source = conf.packages.model.Owner.create("source", source);
-	let target =  conf.packages.model.Owner.create("target");
-	
-	let pipe = conf.packages.compiler.main;
-	pipe.parse(source, 0, target);
-	
 	console.debug(source.markup);
+	
+	let target =  conf.packages.model.Owner.create("target");
+	let pipe = conf.packages.compiler.main;
+	
+	pipe.parse(source, 0, target);
 	console.debug(target.markup);
 }

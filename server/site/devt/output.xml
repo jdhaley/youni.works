@@ -6,16 +6,14 @@
 			<word>object</word>
 		</expr>
 		<object>
+			<pn>:</pn>
 			<pair>
-				<void></void>
-				<pair>
-					<expr>
-						<word>test</word>
-						<op>?</op>
-						<number>30.5</number>
-					</expr>
-					<number>-20.334e-2</number>
-				</pair>
+				<expr>
+					<word>test</word>
+					<op>?</op>
+					<number>30.5</number>
+				</expr>
+				<number>-20.334e-2</number>
 			</pair>
 			<pn>,</pn>
 			<pair>
@@ -27,6 +25,7 @@
 						<pn>,</pn>
 						<word>b</word>
 						<pn>,</pn>
+						<word>c</word>
 						<word>c</word>
 					</list>
 				</expr>
@@ -61,6 +60,36 @@
 									<op>.</op>
 									<word>number</word>
 								</expr>
+								<expr>
+									<word>or</word>
+									<word>x</word>
+									<op>.</op>
+									<word>number</word>
+								</expr>
+							</list>
+							<word>best</word>
+						</expr>
+						<expr>
+							<list>
+								<number>10</number>
+								<pn>,</pn>
+								<expr>
+									<word>or</word>
+									<number>20</number>
+								</expr>
+								<pn>,</pn>
+								<expr>
+									<word>or</word>
+									<word>x</word>
+									<op>.</op>
+									<word>number</word>
+								</expr>
+								<expr>
+									<word>or</word>
+									<word>x</word>
+									<op>.</op>
+									<word>number</word>
+								</expr>
 							</list>
 							<word>best</word>
 						</expr>
@@ -72,10 +101,11 @@
 			<pn>,</pn>
 			<pair>
 				<word>r</word>
-				<expr>
+				<fn>
 					<word>function</word>
 					<word>name</word>
 					<list>
+						<word>x</word>
 						<word>x</word>
 					</list>
 					<object>
@@ -87,7 +117,27 @@
 						</expr>
 						<pn>;</pn>
 					</object>
-				</expr>
+				</fn>
+			</pair>
+			<pair>
+				<word>r</word>
+				<fn>
+					<word>function</word>
+					<word>name</word>
+					<list>
+						<word>x</word>
+						<word>x</word>
+					</list>
+					<object>
+						<expr>
+							<word>return</word>
+							<number>10</number>
+							<op>+</op>
+							<number>20</number>
+						</expr>
+						<pn>;</pn>
+					</object>
+				</fn>
 			</pair>
 		</object>
 	</pair>
