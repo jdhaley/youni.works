@@ -64,6 +64,6 @@ export default
 		rule.choice(")}]")
 	),
 	op: rule.create("op",
-		rule.choice(".@#^*/%+-<=>!&|~?")
+		rule.choice(".@#^*/%+-<=>!&|~?", "*")
 	)
 }

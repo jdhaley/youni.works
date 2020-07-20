@@ -22,7 +22,7 @@ export default {
 	primary: rule.choice([
 		"fn",
 		"list",
-		"object",
+		"body",
 		"array",
 		rule.match("number"),
 		rule.match("string"),
@@ -30,36 +30,33 @@ export default {
 		rule.match("op")
 	]),
 	fn: rule.create("fn",
-		rule.sequence([
-			rule.match("word", "function", "?"),
-			rule.match("word", "", "?"),
-			"list", 
-			branch("body", "{", ";", "}"),
+		rule.choice([
+			rule.sequence([
+				rule.match("word", "function", "?"),
+				rule.match("word", "", "?"),
+				"list", 
+				"body"
+			]),
+			rule.sequence([
+				rule.choice(["list", rule.match("word")], "?"),
+				rule.match("op", "=>"),
+				rule.choice(["expr", "primary"], "?")
+			])
 		])
 	),
-	list: branch("list", "(", ",", ")"), 
-	object: branch("object", "{", ",", "}"),
-	array: branch("array", "[", ",", "]"),
+	list: branch("list", "(", ")"), 
+	body: branch("body", "{", "}"),
+	array: branch("array", "[", "]"),
 }
 
-function statements(pn, end) {
-	return rule.sequence([
-		rule.sequence([
-			"statement",
-			rule.filter("pn", pn)
-		], "*"),
-		rule.choice([
-			"statement",
-			rule.match("up", end, "~")
-		], "?")
-	]);
-}
-
-function branch(name, down, pn, up) {
+function branch(name, down, up) {
 	return rule.create(name,
 		rule.sequence([
 			rule.filter("down", down),
-			statements(pn, up),
+			rule.choice([
+				"statement",
+				rule.match("up", up, "~")
+			], "*"),
 			rule.filter("up", up)
 		])
 	);
