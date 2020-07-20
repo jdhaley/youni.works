@@ -5,8 +5,7 @@ export default function main(sys, conf) {
 	fs.open("test-parser.txt", (message) => parserTest(sys, conf, message.content));
 }
 function parserTest(sys, conf, source) {
-	source = conf.packages.model.Owner.create("source", source);
-	console.debug(source.markup);
+	console.debug(source);
 	
 	let target =  conf.packages.model.Owner.create("target");
 	let pipe = conf.packages.compiler.main;
