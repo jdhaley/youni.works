@@ -5,7 +5,7 @@
 			<op>-</op>
 			<word>object</word>
 		</expr>
-		<object>
+		<body>
 			<pn>:</pn>
 			<pair>
 				<expr>
@@ -26,14 +26,18 @@
 						<word>b</word>
 						<pn>,</pn>
 						<word>c</word>
-						<word>c</word>
 					</list>
 				</expr>
 			</pair>
 			<pn>,</pn>
 			<pair>
 				<word>z</word>
-				<number>+20.334E2</number>
+				<fn>
+					<word>x</word>
+					<word>x</word>
+					<op>=&gt;</op>
+					<number>+20.334E2</number>
+				</fn>
 			</pair>
 			<pn>,</pn>
 			<pn>,</pn>
@@ -60,36 +64,6 @@
 									<op>.</op>
 									<word>number</word>
 								</expr>
-								<expr>
-									<word>or</word>
-									<word>x</word>
-									<op>.</op>
-									<word>number</word>
-								</expr>
-							</list>
-							<word>best</word>
-						</expr>
-						<expr>
-							<list>
-								<number>10</number>
-								<pn>,</pn>
-								<expr>
-									<word>or</word>
-									<number>20</number>
-								</expr>
-								<pn>,</pn>
-								<expr>
-									<word>or</word>
-									<word>x</word>
-									<op>.</op>
-									<word>number</word>
-								</expr>
-								<expr>
-									<word>or</word>
-									<word>x</word>
-									<op>.</op>
-									<word>number</word>
-								</expr>
 							</list>
 							<word>best</word>
 						</expr>
@@ -106,9 +80,8 @@
 					<word>name</word>
 					<list>
 						<word>x</word>
-						<word>x</word>
 					</list>
-					<object>
+					<body>
 						<expr>
 							<word>return</word>
 							<number>10</number>
@@ -116,30 +89,10 @@
 							<number>20</number>
 						</expr>
 						<pn>;</pn>
-					</object>
+					</body>
 				</fn>
 			</pair>
-			<pair>
-				<word>r</word>
-				<fn>
-					<word>function</word>
-					<word>name</word>
-					<list>
-						<word>x</word>
-						<word>x</word>
-					</list>
-					<object>
-						<expr>
-							<word>return</word>
-							<number>10</number>
-							<op>+</op>
-							<number>20</number>
-						</expr>
-						<pn>;</pn>
-					</object>
-				</fn>
-			</pair>
-		</object>
+		</body>
 	</pair>
 	<pn>,</pn>
 	<expr>
