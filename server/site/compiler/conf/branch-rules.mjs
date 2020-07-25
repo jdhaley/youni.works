@@ -29,21 +29,23 @@ export default {
 		rule.match("word"),
 		rule.match("op")
 	]),
-	fn: rule.create("fn",
-		rule.choice([
+	fn: rule.choice([
+		rule.create("fn",
 			rule.sequence([
-				rule.match("word", "function", "?"),
+				rule.filter("word", "function", "?"),
 				rule.match("word", "", "?"),
 				"list", 
 				"body"
-			]),
+			])
+		),
+		rule.create("fn",
 			rule.sequence([
 				rule.choice(["list", rule.match("word")], "?"),
 				rule.match("op", "=>"),
 				rule.choice(["expr", "primary"], "?")
 			])
-		])
-	),
+		)
+	]),
 	list: branch("list", "(", ")"), 
 	body: branch("body", "{", "}"),
 	array: branch("array", "[", "]"),

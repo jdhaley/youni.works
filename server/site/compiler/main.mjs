@@ -2,7 +2,7 @@ export default function main(sys, conf) {
 	conf.engine(conf.window);
 	conf.packages = sys.load(conf.packages);
 	let fs = conf.packages.services.public.fs;
-	fs.open("test-parser.txt", (message) => parserTest(sys, conf, message.content));
+	fs.open("sys.txt", (message) => parserTest(sys, conf, message.content));
 }
 function parserTest(sys, conf, source) {
 	console.debug(source);

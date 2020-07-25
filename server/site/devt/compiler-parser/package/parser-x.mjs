@@ -14,28 +14,31 @@ export default {
 		min: 0,
 		max: 9007199254740991,
 		negate: false,
+		isProduction: false,
 		parse: function(content, start, target) {
 			let at = start;
 			for (let count = 0; count < this.max && at < content.length; count++) {
-				let match = this.scan(content, at, target);
+				let match = this.match(content, at, target);
 				if (this.negate) match = match ? 0 : 1;
-				if (match) {
-					at += match;
-				} else {
-					if (count < this.min) at = start;
-					break;
-				}
+				if (!match && count < this.min) return 0;
+				at += match;
 			}
 			return at - start;
 		},
-		scan: function(content, start, target) {
+		match: function(content, start, target) {
 			return 1;
 		}
 	},
 	Choice: {
 		super$: "Expr",
 		type$choice: "use.model.Strand",
-		scan: function(content, start, target) {
+		once$isProduction: function() {
+			for (let expr in this.choice) {
+				if (expr.isProduction) return true;
+			}
+			return false;
+		},
+		match: function(content, start, target) {
 			for (let expr of this.choice) {
 				let match = expr.parse
 					? expr.parse(content, start, target)
@@ -49,7 +52,13 @@ export default {
 	Sequence: {
 		super$: "Expr",
 		type$sequence: "use.model.Strand",
-		scan: function(content, start, target) {
+		once$isProduction: function() {
+			for (let expr in this.sequence) {
+				if (expr.isProduction) return true;
+			}
+			return false;
+		},
+		match: function(content, start, target) {
 			let at = start;
 			for (let expr of this.sequence) {
 				let match = expr.parse
@@ -67,30 +76,18 @@ export default {
 		super$: "Expr",
 		nodeName: "",
 		nodeText: "",
-		suppress: false,
-		scan: function(content, start, target) {
+		match: function(content, start, target) {
 			content = content.at(start);
-			let match = this.match(content) ? 1 : 0;
-			if (target && !this.suppress) {
+			let match = this.matchNode(content);
+			if (target && this.isProduction) {
 				if (this.negate ? !match : match) target.append(content);
 			}
 			return match;
 		},
 		//Returns boolean.
-		match: function(node) {
-			if (this.nodeName && this.nodeName != node.name) return false;
-			if (this.nodeText && this.nodeText != node.text) return false;
-			return true;
-		}
-	},
-	MatchParse: {
-		super$: "Expr",
-		nodeName: "",
-		type$expr: "Parser",
-		scan: function(content, start, target) {
-			content = content.at(start);
-			if (this.nodeName && this.nodeName != content.name) return 0;
-			let match = this.expr.parse(content.content, 0, target);
+		matchNode: function(node) {
+			if (this.nodeName && this.nodeName != node.name) return 0;
+			if (this.nodeText && this.nodeText != node.text) return 0;
 			return 1;
 		}
 	},
@@ -99,6 +96,7 @@ export default {
 		use: {
 			type$Owner: "use.model.Owner"
 		},
+		isProduction: true,
 		name: "",
 		type$expr: "Parser",
 		createNode: function(content) {
