@@ -16,6 +16,13 @@ a {use$: "name"} reference.
 
  */
 export default {
+	statements: function(pn) {
+		return {
+			type$: "parser.Parser",
+			pn: pn,
+			parse: parseStatements
+		}
+	},
 	pipe: function(...pipeline) {
 		return {
 			type$: "parser.Pipe",
@@ -41,11 +48,13 @@ export default {
 			choice: setRef(choice),
 		}, expr);
 	},
-	match: function(name, text, expr) {
+	match: function(name, rule, expr) {
 		return _expr({
+//			type$: rule && rule.parse ? "parser.ParseMatch" : "parser.Match",
 			type$: "parser.Match",
 			nodeName: name || "",
-			nodeText: text || "",
+//			expr: rule || "",
+			nodeText: rule || "",
 			suppress: false
 		}, expr);
 	},
@@ -95,4 +104,35 @@ function setRef(array) {
 		}
 	}
 	return array;
+}
+
+function parseStatements(content, start, target) {
+	let slice = [];
+	for (let i = start; i < content.length; i++) {
+		let node = content.at(i);
+		if (node.name == "pn" && node.text == this.pn) {
+			createStatement(slice, target);
+		} else {
+			slice.push(node);
+		}
+	}
+	if (slice.length) createStatement(slice, target)
+	return content.length - start;
+}
+
+function createStatement(slice, target) {
+	switch (slice.length) {
+		case 0:
+			node = target.owner.create("void");
+			break;
+		case 1:
+			node = slice[0];
+			slice.length = 0;
+			break;
+		default:
+			node = target.owner.create("stmt", slice);
+			slice = [];
+			break;
+	}
+	target.append(node);
 }

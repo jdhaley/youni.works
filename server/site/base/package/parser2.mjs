@@ -11,12 +11,13 @@ export default {
 	},
 	Expr: {
 		super$: "Parser",
-		min: 0,
-		max: 9007199254740991,
+		min: 1,
+		max: 1,
 		negate: false,
 		parse: function(content, start, target) {
+			if (start + this.min > content.length) return 0;
 			let at = start;
-			for (let count = 0; count < this.max && at < content.length; count++) {
+			for (let count = 0; count < this.max; count++) {
 				let match = this.scan(content, at, target);
 				if (this.negate) match = match ? 0 : 1;
 				if (match) {
@@ -66,7 +67,7 @@ export default {
 	Match: {
 		super$: "Expr",
 		nodeName: "",
-		nodeText: "",
+		rule: "",
 		suppress: false,
 		scan: function(content, start, target) {
 			content = content.at(start);
@@ -79,8 +80,19 @@ export default {
 		//Returns boolean.
 		match: function(node) {
 			if (this.nodeName && this.nodeName != node.name) return false;
-			if (this.nodeText && this.nodeText != node.text) return false;
+			if (this.rule && this.rule != node.text) return false;
 			return true;
+		}
+	},
+	ParseMatch: {
+		super$: "Expr",
+		nodeName: "",
+		type$expr: "Parser",
+		scan: function(content, start, target) {
+			let node = content.at(start);
+			if (this.nodeName && this.nodeName != node.name) return 0;
+			this.expr.parse(node.content, 0, target);
+			return 1;
 		}
 	},
 	Production: {
@@ -116,26 +128,56 @@ export default {
 	},
 	Pipe: {
 		super$: "Parser",
-		use: {
-			type$Owner: "use.model.Owner"
-		},
 		type$pipeline: "use.model.Strand",
-		type$target: "Parser",
-		createNode: function(content) {
-			return this.use.Owner.create("pipe", content);
-		},
+		parse: function(content, start, target) {
+			let match = this.pipeline[0].parse(content, start);
+			if (!match) return match;
+			content = content.slice(start, start + match);
+			let node = target && target.owner.create(this.name);
+			target.append(node);
+			for (let i = 1; i < this.pipeline.length; i++) {
+				let rule = this.pipeline[i];
+				rule.parse(content, 0, node);
+				content = node.content;
+				node.content = [];
+			}
+			return match;
+		}
+	},
+	Pipe2: {
+		super$: "Parser",
+		name: "",
+		type$pipeline: "use.model.Strand",
 		parse: function(content, start, target) {
 			if (this.pipeline.length < 2) throw new Error("Pipeline requires 2 or more rules.");
 			let length = this.pipeline.length - 1; //Don't loop on the last one.
+			let match = 0;
 			for (let i = 0; i < length; i++) {
 				let rule = this.pipeline[i];
-				let pipe = this.createNode();
-				let match = rule.parse(content, start, pipe);
-				console.debug(pipe.markup);
+				match = rule.parse(content, start);
+				if (match) {
+					content = content.slice(start, start + match);
+					start = 0;
+				}
+				let pipe = target && target.owner.create();
+			//	console.debug(pipe.markup);
 				content = pipe.content;
 				start = 0;
 			}
 			return this.pipeline[length].parse(content, 0, target);
 		}
-	}
+	},
+	/*
+ 			let match = this.expr.parse(content, start);
+			if (match && target) {
+				let content = content.slice(start, start + match);
+				if (this.name) {
+					let node = this.createNode(this.next);
+					target.append(node);
+					target = node;
+				}
+				
+			}
+			return match;
+	*/
 }
