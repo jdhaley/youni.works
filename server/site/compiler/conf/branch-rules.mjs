@@ -3,7 +3,45 @@ import rule from "../util/ruleBuilder.mjs";
 export default {
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
-	main: rule.choice(["primary", rule.match()], "*"),
+	branch: rule.choice(["dobranch", rule.match()], "*"),
+	fn: rule.choice([
+		rule.create("fn",
+			rule.sequence([
+				rule.filter("word", "function", "?"),
+				rule.match("word", "", "?"),
+				rule.match("list"),
+				rule.match("body")
+			])
+		),
+		rule.down("fn"),
+		rule.match()
+	], "*"),	
+	dobranch: rule.choice([
+		branch("list", "(", ")"), 
+		branch("body", "{", "}"),
+		branch("array", "[", "]"),		
+	]),
+//	divvy: rule.choice([
+//		rule.divvy("list", "list", ","),
+//		rule.divvy("body", "object", ","),
+//		rule.divvy("array", "array", ","),
+//		rule.match()
+//	], "*")
+//	primary: rule.choice([
+//	//	"fn",
+//		"list",
+//		"body",
+//		"array",
+//		rule.match("pn"),
+//
+//		rule.match("number"),
+//		rule.match("string"),
+//		rule.match("word"),
+//		rule.match("op")
+//	]),
+//	list: branch("list", "(", ")"), 
+//	body: branch("body", "{", "}"),
+//	array: branch("array", "[", "]"),
 //	statement: rule.choice(["pair", "expr", "primary"]),
 //	pair: rule.create("pair",
 //		rule.sequence([
@@ -19,18 +57,6 @@ export default {
 //			rule.sequence(["primary"], "*")
 //		])
 //	),
-	primary: rule.choice([
-	//	"fn",
-		"list",
-		"body",
-		"array",
-		rule.match("pn"),
-
-		rule.match("number"),
-		rule.match("string"),
-		rule.match("word"),
-		rule.match("op")
-	]),
 //	fn: rule.choice([
 //		rule.create("fn",
 //			rule.sequence([
@@ -48,29 +74,26 @@ export default {
 //			])
 //		)
 //	]),
-	list: branch("list", "(", ")"), 
-	body: branch("body", "{", "}"),
-	array: branch("array", "[", "]"),
 }
 
-function statements(pn) {
-	return rule.sequence([
-		rule.sequence([
-			"statement",
-			rule.filter("pn", pn)
-		], "*"),
-		rule.sequence("statement", "?")
-	]);
-}
 function branch(name, down, up) {
 	return rule.create(name,
 		rule.sequence([
 			rule.filter("down", down),
 			rule.choice([
-				"primary",
+				"dobranch",
 				rule.match("up", up, "~")
 			], "*"),
 			rule.filter("up", up)
 		])
 	);
 }
+
+
+//rule.pipe(
+//	{
+//		type$: "parser.Divvy",
+//		name: name,
+//		pn: ","
+//	}
+//);

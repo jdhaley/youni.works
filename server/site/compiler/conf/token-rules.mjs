@@ -14,7 +14,7 @@ export default
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
 	main: rule.choice([
-		"ws", "comment", "pn", "down", "up",
+		"ws", "lineComment", "comment", "pn", "down", "up",
 		"number", "string", "word", "op"
 	], "*"),
 	ws: rule.choice(" \t\r\n", "*"),
@@ -22,6 +22,11 @@ export default
 		rule.sequence("/*"),
 		rule.sequence("*/", "~*"),
 		rule.sequence("*/", "?") // Compilation to check for unterminated comment.
+	]),
+	lineComment: rule.sequence([
+		rule.sequence("//"),
+		rule.sequence("\n", "~*"),
+		rule.sequence("\n")
 	]),
 	number: rule.create("number",
 		rule.sequence([

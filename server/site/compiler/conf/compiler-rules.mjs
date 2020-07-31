@@ -7,7 +7,7 @@ export default {
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
 	token: token.main,
-	branch: branch.main,
-//	divvy: divvy.main,
-	main: rule.pipe("token", "branch")
+	branch: branch.branch,
+	fn: branch.fn,
+	main: rule.pipe("token", "branch", "fn")
 }

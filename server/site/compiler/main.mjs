@@ -11,5 +11,5 @@ function parserTest(sys, conf, source) {
 	let pipe = conf.packages.compiler.main;
 	
 	pipe.parse(source, 0, target);
-	console.debug(target);
+	console.debug(target.markup);
 }

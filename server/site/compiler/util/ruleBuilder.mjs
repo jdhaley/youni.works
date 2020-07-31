@@ -16,23 +16,29 @@ a {use$: "name"} reference.
 
  */
 export default {
-	statements: function(pn) {
+	down: function(expr) {
 		return {
-			type$: "parser.Parser",
-			pn: pn,
-			parse: parseStatements
+			type$: "parser.Down",
+			expr: typeof expr == "string" ? {use$: expr} : expr
 		}
 	},
-	pipe: function(...pipeline) {
+	divvy: function(name, pn) {
+		return {
+			type$: "parser.Divvy",
+			name: name,
+			pn: pn
+		}
+	},
+	pipe: function(...pipe) {
 		return {
 			type$: "parser.Pipe",
-			pipeline: setRef(pipeline)
+			pipeline: setRef(pipe)
 		}		
 	},
-	create: function(name, expr) {
+	create: function(name, expr, target) {
 		return {
 			type$: "parser.Production",
-			name: name || "",
+			name: name,
 			expr: expr
 		}
 	},
@@ -104,35 +110,4 @@ function setRef(array) {
 		}
 	}
 	return array;
-}
-
-function parseStatements(content, start, target) {
-	let slice = [];
-	for (let i = start; i < content.length; i++) {
-		let node = content.at(i);
-		if (node.name == "pn" && node.text == this.pn) {
-			createStatement(slice, target);
-		} else {
-			slice.push(node);
-		}
-	}
-	if (slice.length) createStatement(slice, target)
-	return content.length - start;
-}
-
-function createStatement(slice, target) {
-	switch (slice.length) {
-		case 0:
-			node = target.owner.create("void");
-			break;
-		case 1:
-			node = slice[0];
-			slice.length = 0;
-			break;
-		default:
-			node = target.owner.create("stmt", slice);
-			slice = [];
-			break;
-	}
-	target.append(node);
 }
