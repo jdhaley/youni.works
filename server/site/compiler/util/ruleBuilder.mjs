@@ -16,6 +16,39 @@ a {use$: "name"} reference.
 
  */
 export default {
+	expr: expr,
+	sequence: function(sequence, opt) {
+		return expr({
+			type$: "parser.Sequence",
+			sequence: useExprs(sequence)
+		}, opt);
+	},
+	choice: function(choice, opt) {
+		return expr({
+			type$: "parser.Choice",
+			choice: useExprs(choice),
+		}, opt);
+	},
+	filter: match,
+	match: function(name, rule, opt) {
+		return {
+			type$: "parser.Append",
+			expr: match(name, rule, opt)
+		};
+	},
+	create: function(name, expr) {
+		return {
+			type$: "parser.Create",
+			name: name,
+			expr: useExpr(expr)
+		}
+	},
+	append: function(expr) {
+		return {
+			type$: "parser.Append",
+			expr: useExpr(expr)
+		}
+	},
 	down: function(expr) {
 		return {
 			type$: "parser.Down",
@@ -32,78 +65,68 @@ export default {
 	pipe: function(...pipe) {
 		return {
 			type$: "parser.Pipe",
-			pipeline: setRef(pipe)
+			pipeline: useExprs(pipe)
 		}		
 	},
-	create: function(name, expr, target) {
-		return {
-			type$: "parser.Production",
-			name: name,
-			expr: expr
-		}
-	},
-	sequence: function(sequence, expr) {
-		return _expr({
-			type$: "parser.Sequence",
-			sequence: setRef(sequence)
-		}, expr);
-	},
-	choice: function(choice, expr) {
-		return _expr({
-			type$: "parser.Choice",
-			choice: setRef(choice),
-		}, expr);
-	},
-	match: function(name, rule, expr) {
-		return _expr({
-//			type$: rule && rule.parse ? "parser.ParseMatch" : "parser.Match",
-			type$: "parser.Match",
-			nodeName: name || "",
-//			expr: rule || "",
-			nodeText: rule || "",
-			suppress: false
-		}, expr);
-	},
-	filter: function(name, text, expr) {
-		return _expr({
-			type$: "parser.Match",
-			nodeName: name || "",
-			nodeText: text || "",
-			suppress: true
-		}, expr);
+}
+
+function expr(rule, opt) {
+	rule = useExpr(rule);
+	switch (opt || "") {
+		case "~?":
+			return {
+				type$: "parser.Expr",
+				expr: rule,
+				negate: true,
+				min: 0
+			}
+		case "?":
+			return {
+				type$: "parser.Expr",
+				expr: rule,
+				min: 0
+			}
+		case "~*":
+			return {
+				type$: "parser.Expr",
+				expr: rule,
+				negate: true,
+				min: 0,
+				max: 9007199254740991
+			}
+		case "*":
+			return {
+				type$: "parser.Expr",
+				expr: rule,
+				min: 0,
+				max: 9007199254740991
+			}
+		case "~":
+			return {
+				type$: "parser.Expr",
+				expr: rule,
+				negate: true,
+			}
+		case "":
+			return rule;
+		default:
+			throw new Error(`Invalid option "${opt}"`);
 	}
 }
 
-function _expr(rule, expr) {
-	if (expr === undefined) expr = "";
-	switch (expr) {
-		case "~?":
-			rule.negate = true;
-			//fall
-		case "?":
-			rule.min = 0;
-			rule.max = 1;
-			return rule;
-		case "~*":
-			rule.negate = true;
-			//fall
-		case "*":
-			rule.min = 0;
-			rule.max = 9007199254740991;
-			return rule;
-		case "~":
-			rule.negate = true;
-			//fall
-		case "":
-			rule.min = 1;
-			rule.max = 1;
-			return rule;
-		default:
-			throw new Error(`Invalid expression "${expr}"`);
-	}	
+function match(name, rule, opt) {
+	return expr({
+		type$: "parser.Match",
+		name: name || "",
+		rule: rule || ""
+	}, opt);
 }
 
-function setRef(array) {
+function useExpr(expr) {
+	if (typeof expr == "string") expr = {use$: expr};
+	return expr;
+}
+function useExprs(array) {
 	if (typeof array != "string") {
 		for (let i = 0; i < array.length; i++) {
 			if (typeof array[i] == "string") array[i] = {use$: array[i]};

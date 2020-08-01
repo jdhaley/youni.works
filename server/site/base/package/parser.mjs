@@ -6,34 +6,20 @@ export default {
 	Parser: {
 		super$: "Object",		
 		parse: function(content, start, target) {
-			return 0;
-		}
-	},
-	Target: {
-		super$: "Object",
-		type$name: "",
-		type$expr: null,
-		target: function(target, content, start, match) {
-			content = content.slice(start, start + match);		
-			if (this.expr) {
-				let node = target.owner.create(this.name);
-				target.append(node);				
-				this.expr.parse(content, 0, node);
-			} else {
-				let node = target.owner.create(this.name, content);
-				target.append(node);								
-			}
+			if (target) target.append(content.at(start));
+			return 1;
 		}
 	},
 	Expr: {
 		super$: "Parser",
-		min: 0,
-		max: 9007199254740991,
+		type$expr: "Parser",
+		min: 1,
+		max: 1,
 		negate: false,
 		parse: function(content, start, target) {
 			let at = start;
 			for (let count = 0; count < this.max && at < content.length; count++) {
-				let match = this.scan(content, at, target);
+				let match = this.expr.parse(content, at, target);
 				if (this.negate) match = match ? 0 : 1;
 				if (match) {
 					at += match;
@@ -43,9 +29,6 @@ export default {
 				}
 			}
 			return at - start;
-		},
-		scan: function(content, start, target) {
-			return 1;
 		}
 	},
 //	Choice: {
@@ -64,9 +47,9 @@ export default {
 //		}
 //	},
 	Choice: {
-		super$: "Expr",
+		super$: "Parser",
 		type$choice: "use.model.Strand",
-		scan: function(content, start, target) {
+		parse: function(content, start, target) {
 			for (let expr of this.choice) {
 				let match = expr.parse
 					? expr.parse(content, start, target)
@@ -78,9 +61,9 @@ export default {
 		}
 	},
 	Sequence: {
-		super$: "Expr",
+		super$: "Parser",
 		type$sequence: "use.model.Strand",
-		scan: function(content, start, target) {
+		parse: function(content, start, target) {
 			let at = start;
 			for (let expr of this.sequence) {
 				let match = expr.parse
@@ -95,23 +78,33 @@ export default {
 		}
 	},
 	Match: {
-		super$: "Expr",
-		nodeName: "",
-		nodeText: "",
-		suppress: false,
-		scan: function(content, start, target) {
-			content = content.at(start);
-			let match = this.match(content) ? 1 : 0;
-			if (target && !this.suppress) {
-				if (this.negate ? !match : match) target.append(content);
+		super$: "Parser",
+		name: "",
+		rule: "",
+		parse: function(content, start, target) {
+			let node = content.at(start);
+			if (!node || this.name && this.name != node.name) return 0;
+			if (!this.rule) return 1;
+			if (typeof this.rule == "string") {
+				return this.rule === node.text ? 1 : 0				
 			}
-			return match;
-		},
-		//Returns boolean.
-		match: function(node) {
-			if (this.nodeName && this.nodeName != node.name) return false;
-			if (this.nodeText && this.nodeText != node.text) return false;
-			return true;
+			return this.rule.parse(node.content, 0) ? 1 : 0;
+		}
+	},
+	Target: {
+		super$: "Object",
+		type$name: "",
+		type$expr: null,
+		target: function(target, content, start, match) {
+			content = content.slice(start, start + match);		
+			if (this.expr) {
+				let node = target.owner.create(this.name);
+				target.append(node);				
+				this.expr.parse(content, 0, node);
+			} else {
+				let node = target.owner.create(this.name, content);
+				target.append(node);								
+			}
 		}
 	},
 //	Production: {
@@ -132,7 +125,18 @@ export default {
 //		target.append(node);
 //		target = node;
 //	}
-	Production: {
+	Append: {
+		super$: "Parser",
+		type$expr: "Parser",
+		parse: function(content, start, target) {
+			let match = this.expr.parse(content, start);
+			if (target) for (let i = start; i < start + match; i++) {
+				target.append(content.at(i));
+			}
+			return match;
+		}
+	},
+	Create: {
 		super$: "Parser",
 		name: "",
 		type$expr: "Parser",

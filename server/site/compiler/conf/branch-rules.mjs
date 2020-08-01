@@ -7,9 +7,15 @@ export default {
 	fn: rule.choice([
 		rule.create("fn",
 			rule.sequence([
-				rule.filter("word", "function", "?"),
-				rule.match("word", "", "?"),
+				rule.filter("id", "function", "?"),
+				rule.match("id", "", "?"),
 				rule.match("list"),
+				rule.match("body")
+			])
+		),
+		rule.create("object",
+			rule.sequence([
+				rule.match("id"),
 				rule.match("body")
 			])
 		),

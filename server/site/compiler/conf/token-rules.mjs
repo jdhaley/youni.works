@@ -15,7 +15,7 @@ export default
 	package$parser: "youni.works/compiler/parser",
 	main: rule.choice([
 		"ws", "lineComment", "comment", "pn", "down", "up",
-		"number", "string", "word", "op"
+		"number", "string", "id", "op"
 	], "*"),
 	ws: rule.choice(" \t\r\n", "*"),
 	comment: rule.sequence([
@@ -53,10 +53,10 @@ export default
 			rule.sequence("\"", "?") // Compilation to check for unterminated string.
 		])
 	),
-	word: rule.create("word",
+	id: rule.create("id",
 		rule.sequence([
 			Letter,
-			rule.choice([Letter, Digit], "*")
+			rule.choice([Letter, Digit, rule.sequence(".")], "*")
 		])
 	),
 	pn: rule.create("pn",
