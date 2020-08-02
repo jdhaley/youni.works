@@ -3,12 +3,23 @@ import rule from "../util/ruleBuilder.mjs";
 export default {
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
-	branch: rule.choice(["dobranch", rule.match()], "*"),
-	fn: rule.choice([
+	main: rule.pipe(
+		rule.choice([
+			"branch",
+			rule.match()
+		], "*"),
+		"group"
+	),
+	branch: rule.choice([
+		branch("list", "(", ")"), 
+		branch("body", "{", "}"),
+		branch("array", "[", "]")
+	]),
+	group: rule.choice([
 		rule.create("fn",
 			rule.sequence([
-				rule.filter("id", "function", "?"),
-				rule.match("id", "", "?"),
+//				rule.filter("id", "function", "?"),
+//				rule.match("id", "", "?"),
 				rule.match("list"),
 				rule.match("body")
 			])
@@ -19,14 +30,9 @@ export default {
 				rule.match("body")
 			])
 		),
-		rule.down("fn"),
+		rule.down("group"),
 		rule.match()
 	], "*"),	
-	dobranch: rule.choice([
-		branch("list", "(", ")"), 
-		branch("body", "{", "}"),
-		branch("array", "[", "]"),		
-	]),
 //	divvy: rule.choice([
 //		rule.divvy("list", "list", ","),
 //		rule.divvy("body", "object", ","),
@@ -85,21 +91,12 @@ export default {
 function branch(name, down, up) {
 	return rule.create(name,
 		rule.sequence([
-			rule.filter("down", down),
+			rule.filter("pn", down),
 			rule.choice([
-				"dobranch",
-				rule.match("up", up, "~")
+				"branch",
+				rule.match("pn", up, "~")
 			], "*"),
-			rule.filter("up", up)
+			rule.filter("pn", up)
 		])
 	);
 }
-
-
-//rule.pipe(
-//	{
-//		type$: "parser.Divvy",
-//		name: name,
-//		pn: ","
-//	}
-//);

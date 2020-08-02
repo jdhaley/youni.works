@@ -14,19 +14,34 @@ export default
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
 	main: rule.choice([
-		"ws", "lineComment", "comment", "pn", "down", "up",
-		"number", "string", "id", "op"
+		"token",
+		"other"
 	], "*"),
-	ws: rule.choice(" \t\r\n", "*"),
-	comment: rule.sequence([
-		rule.sequence("/*"),
-		rule.sequence("*/", "~*"),
-		rule.sequence("*/", "?") // Compilation to check for unterminated comment.
+	token: rule.choice([
+		"ws", "comment",
+		"string", "number", "id",
+		"op", "pn"
 	]),
-	lineComment: rule.sequence([
-		rule.sequence("//"),
-		rule.sequence("\n", "~*"),
-		rule.sequence("\n")
+	other: rule.create("other",
+		rule.expr("token", "~*")
+	),
+	ws: rule.choice(" \t\r\n", "*"),
+	comment: rule.choice([
+		rule.sequence([
+			rule.sequence("//"),
+			rule.sequence("\n", "~*"),
+			rule.sequence("\n")
+		]),
+		rule.sequence([
+			rule.sequence("/*"),
+			rule.sequence("*/", "~*"),
+			rule.sequence("*/", "?") // Compilation to check for unterminated comment.
+		])
+	]),
+	string: rule.choice([
+		string("\""),
+		string("'"),
+		string("`")
 	]),
 	number: rule.create("number",
 		rule.sequence([
@@ -43,16 +58,6 @@ export default
 			], "?")
 		])
 	),
-	string: rule.create("string",
-		rule.sequence([
-			rule.sequence("\""),
-			rule.choice([
-				rule.sequence("\\\""),
-				rule.sequence("\"", "~")
-			], "*"),
-			rule.sequence("\"", "?") // Compilation to check for unterminated string.
-		])
-	),
 	id: rule.create("id",
 		rule.sequence([
 			Letter,
@@ -60,15 +65,22 @@ export default
 		])
 	),
 	pn: rule.create("pn",
-		rule.choice(",;:")
-	),
-	down: rule.create("down",
-		rule.choice("({[")
-	),
-	up: rule.create("up",
-		rule.choice(")}]")
+		rule.choice(",;:({[)}].")
 	),
 	op: rule.create("op",
-		rule.choice(".@#^*/%+-<=>!&|~?", "*")
+		rule.choice("@#^*/%+-<=>!&|~?", "*")
 	)
+}
+
+function string(pn) {
+	return rule.create("string",
+		rule.sequence([
+			rule.sequence(pn),
+			rule.choice([
+				rule.sequence("\\" + pn),
+				rule.sequence(pn, "~")
+			], "*"),
+			rule.sequence(pn, "?") // Compilation to check for unterminated string.
+		])
+	);
 }
