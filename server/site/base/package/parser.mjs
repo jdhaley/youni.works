@@ -200,6 +200,21 @@ export default {
 			return match;
 		}
 	},
+	Process: {
+		super$: "Parser",
+		type$expr: "Parser",
+		parse: function(content, start, target) {
+			let node = content.at(start);
+			if (node.content) {
+				content = node.content;
+				node.content = [];
+				this.expr.parse(content, 0, node);
+
+			}
+			target.append(node);
+			return 1;
+		}
+	},
 	Down: {
 		super$: "Parser",
 		type$expr: "Parser",

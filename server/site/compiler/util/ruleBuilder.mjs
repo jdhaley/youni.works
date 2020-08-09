@@ -29,12 +29,12 @@ export default {
 			choice: useExprs(choice),
 		}, opt);
 	},
-	filter: match,
-	match: function(name, rule, opt) {
-		return {
-			type$: "parser.Append",
-			expr: match(name, rule, opt)
-		};
+	match: function match(name, rule, opt) {
+		return expr({
+			type$: "parser.Match",
+			name: name || "",
+			rule: rule || ""
+		}, opt);
 	},
 	create: function(name, expr) {
 		return {
@@ -114,13 +114,6 @@ function expr(rule, opt) {
 	}
 }
 
-function match(name, rule, opt) {
-	return expr({
-		type$: "parser.Match",
-		name: name || "",
-		rule: rule || ""
-	}, opt);
-}
 
 function useExpr(expr) {
 	if (typeof expr == "string") expr = {use$: expr};

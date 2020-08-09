@@ -3,36 +3,37 @@ import rule from "../util/ruleBuilder.mjs";
 export default {
 	package$: false,
 	package$parser: "youni.works/compiler/parser",
-	main: rule.pipe(
-		rule.choice([
-			"branch",
-			rule.match()
-		], "*"),
-		"group"
-	),
+	main: rule.choice([
+		"branch",
+		"any"
+	], "*"),
+	any: rule.append(rule.match()),
 	branch: rule.choice([
-		branch("list", "(", ")"), 
-		branch("body", "{", "}"),
-		branch("array", "[", "]")
-	]),
-	group: rule.choice([
+		statement("if"),
+		statement("while"),
+		statement("for"),
+		statement("switch"),
 		rule.create("fn",
 			rule.sequence([
-//				rule.filter("id", "function", "?"),
-//				rule.match("id", "", "?"),
-				rule.match("list"),
-				rule.match("body")
+				rule.match("id", "function", "?"),
+				rule.expr(rule.append(rule.match("id")), "?"),
+				"list",
+				"body"
 			])
 		),
 		rule.create("object",
 			rule.sequence([
-				rule.match("id"),
-				rule.match("body")
+				rule.append(rule.match("id")),
+				"body"
 			])
 		),
-		rule.down("group"),
-		rule.match()
-	], "*"),	
+		"list",
+		"body",
+		"array"
+	]),
+	list: branch("list", "(", ")"), 
+	body: branch("body", "{", "}"),
+	array: branch("array", "[", "]")
 //	divvy: rule.choice([
 //		rule.divvy("list", "list", ","),
 //		rule.divvy("body", "object", ","),
@@ -88,15 +89,25 @@ export default {
 //	]),
 }
 
+function statement(name) {
+	return rule.create(name,
+		rule.sequence([
+			rule.match("id", name),
+			"list",
+			rule.expr("body", "?")
+		])
+	)
+}
+
 function branch(name, down, up) {
 	return rule.create(name,
 		rule.sequence([
-			rule.filter("pn", down),
+			rule.match("pn", down),
 			rule.choice([
 				"branch",
-				rule.match("pn", up, "~")
+				rule.append(rule.match("pn", up, "~"))
 			], "*"),
-			rule.filter("pn", up)
+			rule.match("pn", up)
 		])
 	);
 }
