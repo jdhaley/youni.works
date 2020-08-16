@@ -16,24 +16,28 @@ import platform		from "../web/conf/browser.mjs";
 
 const document = window.document;
 
+import layout from "./package/layout.mjs";
+import test from "./test.mjs";
+
 export default {
-	action: "initialize",
-	channel: "self",
-	
+//	action: "initialize",
+//	channel: "self",
 	packages: {
-		control: control,
-		graph: graph,
-		client: client,
-		
-		view: view,
-		ui: ui,
-		graphic: graphic,
-		diagram: diagram,
-		services: services,
-		component: component,
-		parts: app
+		layout: layout,
+		test: test
+//
+//		graph: graph,
+//		client: client,
+//		
+//		view: view,
+//		ui: ui,
+//		graphic: graphic,
+//		diagram: diagram,
+//		services: services,
+//		component: component,
+//		parts: app
 	},
-	window: window,
-	actions: actions,
-	platform: platform
+//	window: window,
+//	actions: actions,
+//	platform: platform
 }

@@ -2,10 +2,12 @@
 @import url("res/content.css");
 @import url("res/icon.css");
 
-svg {
-	width: 1000px;
-	height: 600px;
+body {
+	scroll: auto;
 }
-
-rect {
+svg {
+	background: linen;
+}
+.itemText {
+	font-size: 8pt;
 }
