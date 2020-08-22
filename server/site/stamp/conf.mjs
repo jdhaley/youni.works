@@ -16,7 +16,7 @@ import platform		from "../web/conf/browser.mjs";
 
 const document = window.document;
 
-import layout from "./package/layout.mjs";
+import layout from "./package/hlayout.mjs";
 import test from "./test.mjs";
 
 export default {

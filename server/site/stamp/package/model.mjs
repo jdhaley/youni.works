@@ -13,7 +13,7 @@ export default {
 	Design: {
 		id: "",
 		image: "",
-		method: "typo litho overprint ..."
+		method: "typo litho overprint ..." //litho | typo, litho & engr
 		//width height shape
 	},
 	Variety: {

@@ -1,13 +1,55 @@
+/*
 @import url("res/main.css");
 @import url("res/content.css");
 @import url("res/icon.css");
-
+*/
+* {
+	text-align: center;
+	font-size: 9pt;
+}
 body {
 	scroll: auto;
+	padding: 2mm;
 }
-svg {
+.page {
+	min-width: 216mm;
+	max-width: 216mm;
+	min-height: 280mm;
+	max-height: 280mm;
 	background: linen;
+	padding: 10mm 5mm 5mm 10mm;
 }
-.itemText {
-	font-size: 8pt;
+.region {
+	font-size: 14pt;
+	font-weight: bold;
+}
+.item {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 1px solid black;
+	color: black;
+	margin: 1mm;
+	flex: 0;
+}
+.item>img {
+	/*
+	position: relative;
+	margin: 0;
+	top: 1mm;
+	*/
+}
+.group {
+	justify-content: space-around;
+}
+.title {
+	margin-top: 1mm;
+}
+.items {
+	display: flex;
+	flex: 0;
+	justify-content: center;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	margin: 0 2mm 0 2mm;
 }
