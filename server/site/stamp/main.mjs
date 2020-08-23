@@ -1,8 +1,13 @@
 export default function main(sys, conf) {
 	conf.packages = sys.load(conf.packages);
 	const pkg = conf.packages;
-	let pages = pkg.test.pages;
-	for (let page of pages) page.draw(document.body);
+//	let pages = pkg.test.pages;
+//	for (let page of pages) page.draw(document.body);
+	let input = pkg.input.Varieties;
+	for (let issue of pkg.model) {
+		document.body.append(issue.title);
+		input.draw(document.body, issue.varieties);
+	}
 }
 
 function oldmain(sys, conf) {

@@ -1,25 +1,46 @@
 export default {
-	[Region Set Variety Issue Minor]
+	Watermark: {
+		id: "",
+		image: ""
+	},
 	Region: {
 		id: "",
-		name: ""
+		name: "",
+		relatedRegions: {
+			//region: relationship
+		}
 	},
-	Set: {
+	Era: {
 		type$region: "Region",
-		id: "",
-		varieties: [],
-		issues: []
+		seq: 0,
+		get$id: function() {
+			return this.region.id + "-" + this.seq;
+		},
+		title: "",
+		from: "0000-00-00",
+		to: "000-00-00",
+		currency: ""
 	},
 	Design: {
-		id: "",
+		era: 0,
+		seq: "", //A, B, ..., Z, AA, AB, ..., AAA, ...
+		get$id: function() {
+			return this.era.seq + this.seq;
+		},
 		image: "",
 		method: "typo litho overprint ..." //litho | typo, litho & engr
+		relatedDesigns: {
+			//design: relationship type
+		}
 		//width height shape
 	},
 	Variety: {
-		type$set: "Set",
 		type$design: "Design",
-		purpose: "",
+		seq: 0,
+		get$id: function() {
+			return this.design.id + this.seq;
+		},
+		purpose: "", //Postage & Charity, Postage | Revenue, 
 		denom: "",
 		color: "",
 		subject: "",
@@ -28,9 +49,22 @@ export default {
 	},
 	Issue: {
 		sequence: "", //{a, b1, b2, c}
-		date: "",
+		from: "0000-00-00",
+		to: "0000-00-00",
+		demonetized: "0000-00-00",
 		shade: "",
 		media: null,
-		printing: null
+		
+	},
+	Media: {
+		paperType: "",
+		watermark: "",
+		tagging: "",
+		rotated: false,
+	},
+	Product: {
+		type: "", //sheet booklet coil souvenior ...
+		description: "", //
+		image: ""
 	}
 }

@@ -29,12 +29,11 @@ export default {
 									image: "/file/stamp/GB1.png",
 									content: "GB1",
 								},
-
 								{
 									type$: "use.layout.Item",
 									width: 22,
 									height: 25,
-									content: "2d Blue"
+									content: "2d\nBlue"
 								}
 							]
 						},
@@ -52,13 +51,14 @@ export default {
 								{
 									type$: "use.layout.Item",
 									width: 22,
-									height: 25
+									height: 25,
+									content: "1d blue"
 								},
 								{
 									type$: "use.layout.Item",
 									width: 25,
 									height: 22,
-									content: "A lot of text here"
+									content: "5d green" // "A lot of data text within the item"
 								},
 								{
 									type$: "use.layout.Item",
