@@ -4,6 +4,7 @@ import input from "./conf/input.mjs";
 
 import test from "./test.mjs";
 import testModel from "./testModel.mjs";
+import shapes from "./shapes.mjs";
 
 export default {
 	packages: {
@@ -11,6 +12,7 @@ export default {
 		input: input,
 		layout: layout,
 		test: test,
-		model: testModel
+		model: testModel,
+		shapes: shapes
 	}
 }

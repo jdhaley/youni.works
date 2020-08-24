@@ -40,24 +40,27 @@ body {
 	font-size: 14pt;
 	font-weight: bold;
 }
-.item {
+.shape {
 	display: flex;
+	position: relative;
 	justify-content: center;
 	align-items: center;
 	border: 1px solid black;
 	color: black;
 	margin: 1mm;
+	padding: 0;
 	flex: 0;
 }
-.item>img {
-	/*
-	position: relative;
-	margin: 0;
-	top: 1mm;
-	*/
+.shape>img, shape>.data {
+	position: absolute;
+}
+.data {
+	z-index: 2;
+	color: rgba(0, 0, 0, .75);
 }
 .group {
-	justify-content: space-around;
+	display: flex;
+	justify-content: center;
 }
 .title {
 	margin-top: 1mm;

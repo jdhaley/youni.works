@@ -5,7 +5,6 @@ export default {
 	},
 	Variety: {
 		super$: "use.control.Record",
-		//Design		Variety		Denom.	Colors		Subject	Title		Caption
 		fields: [
 			{
 				super$: "use.control.Field",

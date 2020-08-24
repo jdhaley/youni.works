@@ -4,8 +4,25 @@ export default function main(sys, conf) {
 //	let pages = pkg.test.pages;
 //	for (let page of pages) page.draw(document.body);
 	let input = pkg.input.Varieties;
+	let shape = pkg.control.Shape;
+	let shapes = pkg.shapes;
 	for (let issue of pkg.model) {
 		document.body.append(issue.title);
+		let group = pkg.control.Control.append(document.body, "div", {
+			class: "group"
+		});
+		for (let variety of issue.varieties) {
+			let design = shapes[variety["design"]];
+			let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
+			let data = (variety.denom || "") + "\n" + (variety.colors || "") + "\n" + (variety.subject || "");
+			if (design) shape.draw(group, {
+				value: variety,
+				width: design.width,
+				height: design.height,
+				image: image,
+				data: data
+			});
+		}
 		input.draw(document.body, issue.varieties);
 	}
 }

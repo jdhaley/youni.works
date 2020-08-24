@@ -6,7 +6,8 @@ export default [
 				design: "GB1A",
 				variety: "1",
 				denom: "1d",
-				colors: "black"
+				colors: "black",
+				image: "GB1A"
 			},
 			{
 				design: "GB1A",
