@@ -8,9 +8,37 @@
 	font-size: 9pt;
 }
 body {
-	scroll: auto;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	max-height: 100vh;
+	overflow: hidden;
+}
+.pages {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
 	padding: 2mm;
-	background: ghostWhite;
+}
+.page {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	background: linen;
+	padding: 5mm;
+	flex: 1;
+	box-shadow: 2px 2px 3px silver;
+}
+.issue {
+	display: flex;
+	flex-direction: column;
+	margin: 0 2mm 0 2mm;
+}
+
+.sheets {
+	flex: none;
+	max-height: 20vh;
+	overflow: auto;
 }
 .field {
 	border: 0;
@@ -28,17 +56,13 @@ body {
 .record:last-child {
 	border-bottom: 1px solid silver;
 }
-.page {
-	min-width: 216mm;
-	max-width: 216mm;
-	min-height: 280mm;
-	max-height: 280mm;
-	background: linen;
-	padding: 10mm 5mm 5mm 10mm;
-}
 .region {
 	font-size: 14pt;
 	font-weight: bold;
+}
+.group {
+	display: flex;
+	justify-content: center;
 }
 .shape {
 	display: flex;
@@ -58,10 +82,6 @@ body {
 	z-index: 2;
 	color: rgba(0, 0, 0, .75);
 }
-.group {
-	display: flex;
-	justify-content: center;
-}
 .title {
 	margin-top: 1mm;
 }
@@ -72,4 +92,25 @@ body {
 	flex-wrap: wrap;
 	align-items: flex-end;
 	margin: 0 2mm 0 2mm;
+}
+
+@media print {
+	BODY, .pages {
+		margin: 0;
+		padding: 0;
+	}
+	.page {
+		background: white;
+		box-shadow: none;
+		min-width: 216mm;
+		max-width: 216mm;
+		min-height: 280mm;
+		max-height: 280mm;
+		background: linen;
+		padding: 10mm 5mm 5mm 10mm;
+	}
+	.sheets {
+		display: none;
+		max-height: 0;
+	}
 }

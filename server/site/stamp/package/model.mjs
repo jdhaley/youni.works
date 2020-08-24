@@ -22,10 +22,10 @@ export default {
 		currency: ""
 	},
 	Design: {
-		era: 0,
+		type$era: "Era",
 		seq: "", //A, B, ..., Z, AA, AB, ..., AAA, ...
 		get$id: function() {
-			return this.era.seq + this.seq;
+			return this.era.id + this.seq;
 		},
 		image: "",
 		method: "typo litho overprint ..." //litho | typo, litho & engr
