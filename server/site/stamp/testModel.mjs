@@ -1,4 +1,8 @@
 export default {
+	watermarks: {
+		"GB-V2R": {
+		}
+	},
 	designs: {
 		GB1A: {
 			shape: "rectangle",
@@ -16,6 +20,19 @@ export default {
 	issues: [
 		{
 			title: "1840. First Issue",
+			printings: [
+				{
+					seq: "a",
+					method: "Engraved",
+					watermark: "GB-V2R"
+				},
+				{
+					seq: "b",
+					method: "Engraved",
+					watermark: "GB-V2R",
+					seperation: "12x12"
+				}
+			],
 			varieties: [
 				{
 					design: "GB1A",
@@ -34,6 +51,8 @@ export default {
 		},
 		{
 			title: "1887. Jubilee",
+			printings: [
+			],
 			varieties: [
 				{
 					design: "GB1D",

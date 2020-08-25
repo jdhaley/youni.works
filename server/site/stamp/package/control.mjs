@@ -41,9 +41,7 @@ export default {
 				model[watchers].push(view);
 			}
 		},
-		
 		process: function(signal) {
-			if (signal.source != signal.target) console.log(signal);
 		}
 	},
 	Field: {
@@ -73,13 +71,6 @@ export default {
 				let name = field.name;
 				ctx.fields[name] = field.draw(ctx, value[name]);
 			}
-		},
-		event: {
-			Update: function(event) {
-				for (let field in event.target.fields) {
-					field.control && field.control.observe(event);
-				}
-			}
 		}
 	},
 	Table: {
@@ -104,9 +95,9 @@ export default {
 						property: event.target.name,
 						priorValue: prior
 					});
-					if (value[watchers]) for (let view of value[watchers]) {
-						signal.target = view;
-						view.control.process(signal);
+					if (value[watchers]) for (let target of value[watchers]) {
+						signal.target = target;
+						target.control.process(signal);
 					}
 				}
 			}
@@ -114,12 +105,20 @@ export default {
 	},
 	Shape: {
 		super$: "Control",
-		draw: function(ctx, shape) {
+		uom: "mm",
+		shape: function(model) {
+			return model;
+		},
+		draw: function(ctx, model) {
+			let shape = this.shape(model);
+			let w = shape.width + this.uom;
+			let h = shape.height + this.uom;
+
 			ctx = this.append(ctx, ".shape", {
-				style: `min-width: ${shape.width}mm; min-height: ${shape.height}mm`
+				style: `min-width:${w};min-height:${h};max-width:${w};max-height:${h};`
 			});
-			this.watch(ctx, shape);
-			this.watch(ctx, shape.value);
+			
+			this.watch(ctx, model);
 			
 			this.drawImage(ctx, shape);
 			this.drawPath(ctx, shape);
@@ -127,35 +126,25 @@ export default {
 			return ctx;
 		},
 		drawImage: function(ctx, shape) {
+			let w = shape.width - 2 + this.uom;
+			let h = shape.height - 2 + this.uom;
 			if (shape.image) this.append(ctx, "img", {
 				src: shape.image,
-				style: `width: ${shape.width - 2}mm; height: ${shape.height - 2}mm`
+				style: `width:${w};height:{$h};`
 			});
 		},
 		drawData: function(ctx, shape) {
-			if (typeof shape.value == "object") {
-				ctx = this.append(ctx, "span.data");
-				if (shape.image) ctx.style.webkitTextStroke = ".2mm rgba(255, 255, 255, .25)";
+			if (shape.data) {
+				ctx.data = this.append(ctx, "span.data");
+				if (shape.image) ctx.data.style.webkitTextStroke = ".2mm rgba(255, 255, 255, .25)";
 
-				ctx.innerHTML = shape.data.replace("\n", "<br>");
+				ctx.data.innerHTML = shape.data.replace("\n", "<br>");
 			}
 		},
 		drawPath: function(ctx, shape) {
 //			if (shape.path) ctx.append("path", {
 //				d: this.path.draw(ctx.x, ctx.y, this.width, this.height)
 //			});
-		},
-		process: function(signal) {
-			switch (signal.property) {
-				case "denom":
-				case "colors":
-				case "subject":
-					let variety = signal.object;
-					let data = (variety.denom || "") + "\n" + (variety.colors || "") + "\n" + (variety.subject || "");
-
-					signal.target.datae
-					console.log("update shape data");
-			}
 		}
 	}
 }

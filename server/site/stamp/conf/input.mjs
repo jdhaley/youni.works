@@ -6,57 +6,84 @@ export default {
 	Shape: {
 		super$: "use.control.Shape",
 		shape: function(variety) {
-			let design = issue.designs[variety["design"]];
+			let design = variety.album.designs[variety["design"]];
 			let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
-			let data = (variety.denom || "") + "\n" + (variety.colors || "") + "\n" + (variety.subject || "");
+			let data = this.shapeData(variety);
 			return {
-				value: variety,
 				width: design.width,
 				height: design.height,
 				//path: design.path,
-				image: image
+				image: image,
+				data: data,
+				model: variety
 			};
 		},
-		draw: function(ctx, variety) {
-			
-			ctx = this.append(ctx, ".shape", {
-				style: `min-width: ${shape.width}mm; min-height: ${shape.height}mm`
-			});
-			this.watch(ctx, shape);
-			this.watch(ctx, shape.value);
-			
-			this.drawImage(ctx, shape);
-			this.drawPath(ctx, shape);
-			this.drawData(ctx, shape);
-			return ctx;
+		shapeData: function(variety) {
+			return (variety.denom || "") + "<br>" + (variety.colors || "") + "<br>" + (variety.subject || "");
 		},
+		process: function(signal) {
+			if (signal.type == "update") {
+				let data = this.shapeData(signal.object);
+				signal.target.data.innerHTML = data;
+			}
+		}
 	},
 	Issue: {
 		super$: "use.control.Control",
-		designs: null,
+		album: null,
 		use: {
-			type$Shape: "use.control.Shape"
+			type$Shape: "Shape"
 		},
 		draw: function(ctx, issue) {
 			ctx = this.append(ctx, ".issue");
 			let title = this.append(ctx, ".title");
 			title.textContent = issue.title;
-			
+			title.contentEditable = true;
 			let group = this.append(ctx, ".group");
 			for (let variety of issue.varieties) {
 				variety.album = issue.album;
-				let design = issue.album.designs[variety["design"]];
-				let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
-				let data = (variety.denom || "") + "\n" + (variety.colors || "") + "\n" + (variety.subject || "");
-				if (design) this.use.Shape.draw(group, {
-					value: variety,
-					width: design.width,
-					height: design.height,
-					image: image,
-					data: data
-				});	
+				this.use.Shape.draw(group, variety);
 			}
+			title.style.maxWidth = group.getBoundingClientRect().width * 1.5 + "px";
+			console.log(group.style.width);
 		}
+	},
+/*
+Printing {
+	printer: "",
+	method: "",
+	paper: "",
+	watermark: "",
+	separation: "",
+	tagging: "",
+	imprint: "",
+	image: ""
+}
+*/
+	Printing: {
+		super$: "use.control.Record",
+		fields: [
+			{
+				super$: "use.control.Field",
+				name: "seq",
+				size: 4,
+			},
+			{
+				super$: "use.control.Field",
+				name: "method",
+				size: 6,
+			},
+			{
+				super$: "use.control.Field",
+				name: "watermark",
+				size: 6,
+			},
+			{
+				super$: "use.control.Field",
+				name: "seperation",
+				size: 10,
+			}	
+		]
 	},
 	Variety: {
 		super$: "use.control.Record",
@@ -69,7 +96,12 @@ export default {
 			{
 				super$: "use.control.Field",
 				name: "variety",
-				size: 4
+				size: 2
+			},
+			{
+				super$: "use.control.Field",
+				name: "printing",
+				size: 3
 			},
 			{
 				super$: "use.control.Field",
@@ -88,6 +120,11 @@ export default {
 			},
 			{
 				super$: "use.control.Field",
+				name: "issued",
+				size: 8
+			},
+			{
+				super$: "use.control.Field",
 				name: "title",
 				size: 16
 			},
@@ -98,6 +135,10 @@ export default {
 			}
 		]
 	},
+	Printings: {
+		super$: "use.control.Table",
+		type$record: "Printing"
+	},
 	Varieties: {
 		super$: "use.control.Table",
 		type$record: "Variety"
@@ -106,16 +147,19 @@ export default {
 		super$: "use.control.Control",
 		use: {
 			type$Varieties: "Varieties",
+			type$Printings: "Printings",
 			type$Issue: "Issue",
 			type$Shape: "use.control.Shape"
 		},
 		draw: function(ctx, album) {
 			let pages = this.append(ctx, ".pages");
 			let page = this.append(pages, ".page");
+			let content = this.append(page, ".content");
 			let sheets = this.append(ctx, ".sheets");
 			for (let issue of album.issues) {
 				issue.album = album;
-				this.use.Issue.draw(page, issue);
+				this.use.Issue.draw(content, issue);
+				this.use.Printings.draw(sheets, issue.printings);
 				this.use.Varieties.draw(sheets, issue.varieties);
 			}
 		}
