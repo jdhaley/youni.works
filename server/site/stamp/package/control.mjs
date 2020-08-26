@@ -1,10 +1,47 @@
-const watchers = Symbol("watchers");
+const observers = Symbol("observers");
 
 export default {
 	package$: "youni.works/base/control",
-	Control: {
+	Observer: {
 		super$: "Object",
-		create: function(owner, name, attributes) {
+		observe: function(event) {
+		}
+	},
+	Owner: {
+		super$: "Object",
+		send: function(type, source, object, name, value) {
+			let signal = this.sys.extend(null, {
+				type: type,
+				source: source,
+				object: object,
+				property: name,
+				value: value
+			});
+			if (object[observers]) for (let target of object[observers]) {
+				if (target && target.observe) target.observe(signal);
+			}
+		},
+		bind: function(view, model) {
+			this.unbind(view);
+			if (typeof model == "object") {
+				if (!model[observers]) model[observers] = [];
+				model[observers].push(view);
+			}
+			if (model !== undefined) view.model = model;
+		},
+		unbind: function(view) {
+			if (view.model && view.model[observers]) {
+				let list = view.model[observers];
+				for (let i = 0, len = list.length; i < len; i++) {
+					if (view == list[i]) {
+						list.splice(i, 1);
+						break;
+					}
+				}
+			}
+			delete view.model;
+		},
+		create: function(doc, name, attributes) {
 			let baseClass = "";
 			let dot = name.indexOf(".");
 			switch (dot) {
@@ -19,29 +56,39 @@ export default {
 					name = name.substring(0, dot);
 					break;
 			}
-			let ele = owner.createElement(name);
+			let ele = doc.createElement(name);
 			if (attributes) for (let name in attributes) {
 				ele.setAttribute(name, attributes[name]);
 			}
 			if (baseClass) ele.classList.add(baseClass);
-			ele.control = this;
+			ele.observe = View_observe;
 			return ele;
 		},
-		append: function(view, name, attributes) {
-			let ele = this.create(view.ownerDocument, name, attributes);
-			view.append(ele);
+		append: function(parent, name, attributes) {
+			let ele = this.create(parent.ownerDocument, name, attributes);
+			parent.append(ele);
 			return ele;
+		}
+	},
+	Control: {
+		super$: "Object",
+		type$owner: "Owner",
+		viewName: "div.view",
+		viewAttributes: function(model) {
+			return null;
 		},
-		draw: function(view, model) {
+		process: function(view, event) {
 		},
-		watch: function(view, model) {
-			view.value = model;
-			if (model && typeof model == "object") {
-				if (!model[watchers]) model[watchers] = [];
-				model[watchers].push(view);
-			}
+		draw: function(parent, model) {
+			let view = this.owner.append(parent, this.viewName, this.viewAttributes(model));
+			this.owner.bind(view, model);
+			this.view(view);
+			view.control = this;
+			this.control(view);
 		},
-		process: function(signal) {
+		view: function(view) {	
+		},
+		control: function(view) {
 		}
 	},
 	Field: {
@@ -49,102 +96,103 @@ export default {
 		type: "text",
 		name: "",
 		size: 0,
-		draw: function(ctx, value) {
-			let field = this.append(ctx, "input", {
+		viewName: "input.field",
+		viewAttributes: function(model) {
+			return {
 				type: this.type,
 				name: this.name,
 				title: this.name,
-				class: "field",
 				size: this.size,
-				value: value || "",
-			});
+				value: model || "",
+			}
 		}
 	},
 	Record: {
 		super$: "Control",
 		fields: [],
-		draw: function(ctx, value) {
-			ctx = this.append(ctx, ".record");
-			this.watch(ctx, value);
-			ctx.fields = Object.create(null);
+		viewName: "div.record",
+		control: function(view) {
+			view.addEventListener("input", this.actions.inputEvent);			
+		},
+		view: function(view) {
+			let model = view.model;
+			view.fields = Object.create(null);
 			for (let field of this.fields) {
 				let name = field.name;
-				ctx.fields[name] = field.draw(ctx, value[name]);
+				let value = model ? model[name] : undefined;
+				view.fields[name] = field.draw(view, value);
+			}
+		},
+		extend$actions: {
+			inputEvent: function(event) {
+				const target = event.target;
+				if (target.control && target.classList.contains("field")) {
+					let model = target.parentNode.model;
+					if (model && model[observers]) {
+						target.control.owner.send("update", target, model, target.name, target.value);
+					}
+				}
 			}
 		}
 	},
 	Table: {
 		super$: "Control",
 		type$record: "Record",
-		draw: function(ctx, value) {
-			ctx = this.append(ctx, ".table");
-			ctx.addEventListener("input", this.actions.inputEvent);
-			for (let i of value) this.record.draw(ctx, i)
-		},
-		extend$actions: {
-			inputEvent: function(event) {
-				if (event.target.nodeName == "INPUT") {
-					let value = event.target.parentNode.value;
-					let prior = value[event.target.name];
-					value[event.target.name] = event.target.value;
-					let signal = this.control.sys.extend(null, {
-						type: "update",
-						source: event.target.parentNode,
-						target: null,
-						object: value,
-						property: event.target.name,
-						priorValue: prior
-					});
-					if (value[watchers]) for (let target of value[watchers]) {
-						signal.target = target;
-						target.control.process(signal);
-					}
-				}
-			}
+		viewName: "div.table",
+		view: function(view) {
+			let model = view.model;
+			if (model) for (let row of model) this.record.draw(view, row)
 		}
 	},
 	Shape: {
 		super$: "Control",
 		uom: "mm",
-		shape: function(model) {
-			return model;
-		},
-		draw: function(ctx, model) {
+		viewName: "div.shape",
+		viewAttributes: function(model) {
 			let shape = this.shape(model);
 			let w = shape.width + this.uom;
 			let h = shape.height + this.uom;
-
-			ctx = this.append(ctx, ".shape", {
+			return {
 				style: `min-width:${w};min-height:${h};max-width:${w};max-height:${h};`
-			});
-			
-			this.watch(ctx, model);
-			
-			this.drawImage(ctx, shape);
-			this.drawPath(ctx, shape);
-			this.drawData(ctx, shape);
-			return ctx;
+			};
 		},
-		drawImage: function(ctx, shape) {
+		shape: function(model) {
+			return model || this.sys.extend(null, {
+				shape: "rectangle",
+				width: 10,
+				height: 10
+			});
+		},
+		view: function(view) {
+			let shape = this.shape(view.model);
+			this.drawImage(view, shape);
+			this.drawPath(view, shape);
+			this.drawData(view, shape);
+		},
+		drawImage: function(view, shape) {
 			let w = shape.width - 2 + this.uom;
 			let h = shape.height - 2 + this.uom;
-			if (shape.image) this.append(ctx, "img", {
+			if (shape.image) this.owner.append(view, "img", {
 				src: shape.image,
 				style: `width:${w};height:{$h};`
 			});
 		},
-		drawData: function(ctx, shape) {
+		drawData: function(view, shape) {
 			if (shape.data) {
-				ctx.data = this.append(ctx, "span.data");
-				if (shape.image) ctx.data.style.webkitTextStroke = ".2mm rgba(255, 255, 255, .25)";
+				view.data = this.owner.append(view, "span.data");
+				if (shape.image) view.data.style.webkitTextStroke = ".2mm rgba(255, 255, 255, .25)";
 
-				ctx.data.innerHTML = shape.data.replace("\n", "<br>");
+				view.data.innerHTML = shape.data.replace("\n", "<br>");
 			}
 		},
-		drawPath: function(ctx, shape) {
+		drawPath: function(view, shape) {
 //			if (shape.path) ctx.append("path", {
 //				d: this.path.draw(ctx.x, ctx.y, this.width, this.height)
 //			});
 		}
 	}
+}
+
+function View_observe(event) {
+	this.control && this.control.process(this, event);
 }

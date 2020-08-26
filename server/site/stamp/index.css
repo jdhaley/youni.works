@@ -23,7 +23,7 @@ body {
 .page {
 	background: linen;
 	padding: 5mm;
-	flex: 1;
+	flex: 4;
 	box-shadow: 2px 2px 3px silver;
 }
 .content {
@@ -39,8 +39,7 @@ body {
 }
 
 .sheets {
-	flex: none;
-	max-height: 20vh;
+	flex: 0;
 	overflow: auto;
 }
 .field {

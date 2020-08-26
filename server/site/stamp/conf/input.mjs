@@ -21,10 +21,10 @@ export default {
 		shapeData: function(variety) {
 			return (variety.denom || "") + "<br>" + (variety.colors || "") + "<br>" + (variety.subject || "");
 		},
-		process: function(signal) {
+		process: function(view, signal) {
 			if (signal.type == "update") {
 				let data = this.shapeData(signal.object);
-				signal.target.data.innerHTML = data;
+				view.data.innerHTML = data;
 			}
 		}
 	},
@@ -35,11 +35,11 @@ export default {
 			type$Shape: "Shape"
 		},
 		draw: function(ctx, issue) {
-			ctx = this.append(ctx, ".issue");
-			let title = this.append(ctx, ".title");
+			ctx = this.owner.append(ctx, ".issue");
+			let title = this.owner.append(ctx, ".title");
 			title.textContent = issue.title;
 			title.contentEditable = true;
-			let group = this.append(ctx, ".group");
+			let group = this.owner.append(ctx, ".group");
 			for (let variety of issue.varieties) {
 				variety.album = issue.album;
 				this.use.Shape.draw(group, variety);
@@ -152,10 +152,10 @@ Printing {
 			type$Shape: "use.control.Shape"
 		},
 		draw: function(ctx, album) {
-			let pages = this.append(ctx, ".pages");
-			let page = this.append(pages, ".page");
-			let content = this.append(page, ".content");
-			let sheets = this.append(ctx, ".sheets");
+			let pages = this.owner.append(ctx, ".pages");
+			let page = this.owner.append(pages, ".page");
+			let content = this.owner.append(page, ".content");
+			let sheets = this.owner.append(ctx, ".sheets");
 			for (let issue of album.issues) {
 				issue.album = album;
 				this.use.Issue.draw(content, issue);
