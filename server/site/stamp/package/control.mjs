@@ -10,15 +10,16 @@ export default {
 	Owner: {
 		super$: "Object",
 		send: function(type, source, object, name, value) {
-			let signal = this.sys.extend(null, {
+			let event = this.sys.extend(null, {
 				type: type,
 				source: source,
 				object: object,
 				property: name,
 				value: value
 			});
+			
 			if (object[observers]) for (let target of object[observers]) {
-				if (target && target.observe) target.observe(signal);
+				if (target && target.observe) target.observe(event);
 			}
 		},
 		bind: function(view, model) {
@@ -41,6 +42,9 @@ export default {
 			}
 			delete view.model;
 		},
+	},
+	ViewOwner: {
+		super$: "Owner",
 		create: function(doc, name, attributes) {
 			let baseClass = "";
 			let dot = name.indexOf(".");
@@ -70,9 +74,9 @@ export default {
 			return ele;
 		}
 	},
-	Control: {
+	ViewControl: {
 		super$: "Object",
-		type$owner: "Owner",
+		type$owner: "ViewOwner",
 		viewName: "div.view",
 		viewAttributes: function(model) {
 			return null;
@@ -92,7 +96,7 @@ export default {
 		}
 	},
 	Field: {
-		super$: "Control",
+		super$: "ViewControl",
 		type: "text",
 		name: "",
 		size: 0,
@@ -108,7 +112,7 @@ export default {
 		}
 	},
 	Record: {
-		super$: "Control",
+		super$: "ViewControl",
 		fields: [],
 		viewName: "div.record",
 		control: function(view) {
@@ -136,7 +140,7 @@ export default {
 		}
 	},
 	Table: {
-		super$: "Control",
+		super$: "ViewControl",
 		type$record: "Record",
 		viewName: "div.table",
 		view: function(view) {
@@ -145,7 +149,7 @@ export default {
 		}
 	},
 	Shape: {
-		super$: "Control",
+		super$: "ViewControl",
 		uom: "mm",
 		viewName: "div.shape",
 		viewAttributes: function(model) {

@@ -24,13 +24,14 @@ export default {
 				{
 					seq: "a",
 					method: "Engraved",
-					watermark: "GB-V2R"
+					watermark: "GB-V2R",
+					seperation: "imperf"
 				},
 				{
 					seq: "b",
 					method: "Engraved",
 					watermark: "GB-V2R",
-					seperation: "12x12"
+					seperation: "perf 12 12"
 				}
 			],
 			varieties: [

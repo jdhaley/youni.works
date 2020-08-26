@@ -29,7 +29,7 @@ export default {
 		}
 	},
 	Issue: {
-		super$: "use.control.Control",
+		super$: "use.control.ViewControl",
 		album: null,
 		use: {
 			type$Shape: "Shape"
@@ -144,7 +144,7 @@ Printing {
 		type$record: "Variety"
 	},
 	Album: {
-		super$: "use.control.Control",
+		super$: "use.control.ViewControl",
 		use: {
 			type$Varieties: "Varieties",
 			type$Printings: "Printings",
