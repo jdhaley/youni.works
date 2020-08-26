@@ -1,130 +1,85 @@
 export default {
-	package$: "youni.works/graphic/layout",
+	package$: "youni.works/album/layout",
 	use: {
-		package$control: "youni.works/base/control"
+		package$control: "youni.works/base/control",
+		package$input: "youni.works/album/input"
 	},
-	Area: {
-		super$: "use.control.Control",
-		width: 0,
-		height: 0,
-		draw: function(ctx) {
-		}
-	},
-	Item: {
-		super$: "Area",
-		type$path: "Path",
-		image: "",
-		data: "",
-		draw: function(ctx) {
-			ctx = this.append(ctx, "div", {
-				class: "item",
-				style: `min-width: ${this.width}mm; min-height: ${this.height}mm`
-			});
-			this.drawImage(ctx);
-			this.drawData(ctx);
-			this.drawShape(ctx);
-			return ctx;
+	Shape: {
+		super$: "use.control.Shape",
+		shape: function(variety) {
+			let design = variety.album.designs[variety["design"]];
+			let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
+			let data = this.shapeData(variety);
+			return {
+				width: design.width,
+				height: design.height,
+				//path: design.path,
+				image: image,
+				data: data,
+				model: variety
+			};
 		},
-		drawImage: function(ctx) {
-			if (this.image) this.append(ctx, "img", {
-				src: this.image,
-				style: `width: ${this.width - 2}mm; height: ${this.height - 2}mm`
-			});
+		shapeData: function(variety) {
+			return (variety.denom || "") + "<br>" + (variety.colors || "") + "<br>" + (variety.subject || "");
 		},
-		drawData: function(ctx) {
-			if (!this.image && this.content) {
-				ctx = this.append(ctx, "span", {
-					class: "data"
-				});
-				ctx.innerHTML = this.content.replace("\n", "<br>");
-			}
-		},
-		drawShape: function(ctx) {
-//			if (this.path) ctx.append("path", {
-//				d: this.path.draw(ctx.x, ctx.y, this.width, this.height)
-//			});
-		}
-	},
-	Page: {
-		super$: "Area",
-		content: [], //of Area		
-		draw: function(ctx) {
-			ctx = this.append(ctx, "div", {
-				class: "page"
-			});
-			this.drawTitle(ctx);
-			this.drawContent(ctx);
-		},
-		drawTitle: function(ctx) {
-			if (!this.title) return;
-			let text = this.append(ctx, "div", {
-				class: "region"
-			});
-			text.textContent = this.title;
-		},
-		drawContent: function(ctx) {
-			for (let item of this.content) {
-				item.draw(ctx);
+		process: function(view, signal) {
+			if (signal.type == "update") {
+				let data = this.shapeData(signal.object);
+				view.data.innerHTML = data;
 			}
 		}
 	},
-	Group: {
-		super$: "Area",
-		content: [], //of Area
-		direction: "", //"H" (default) or "V"
-		metrics: {
-			innerMargin: 3,
-			topMargin: 3
+	Issue: {
+		super$: "use.control.ViewControl",
+		viewName: "div.issue",
+		album: null,
+		use: {
+			type$Shape: "Shape"
 		},
-		get$width: function() {
-			let margin = this.metrics.innerMargin;
-			let width = 0;
-			for (let item of this.content) {
-				if (this.direction == "V") {
-					if (item.width > width) width = item.width;
-				} else {
-					width += item.width + margin;
-				}
+		view: function(view) {
+			let title = this.drawTitle(view);
+			let group = this.drawGroup(view);
+			title.style.maxWidth = group.getBoundingClientRect().width * 1.5 + "px";
+		},
+		drawTitle: function(view) {
+			let title = this.owner.append(view, ".title");
+			title.textContent = view.model.title;
+			title.contentEditable = true;
+			return title;
+		},
+		drawGroup: function(view) {
+			let group = this.owner.append(view, ".group");
+			let model = view.model;
+			for (let variety of model.varieties) {
+				variety.album = model.album;
+				this.use.Shape.draw(group, variety);
 			}
-			return this.direction == "V" ? width : width - margin;
-		},
-		get$height: function() {
-			let height = 0;
-			for (let item of this.content) {
-				if (this.direction == "V") {
-					height += item.height;
-				} else {
-					if (item.height > height) height = item.height;				
-				}
-			}
-			return height;
-		},
-		draw: function(ctx) {
-			ctx = this.append(ctx, "div", {
-				class: "group"
-			});
-			this.drawTitle(ctx);
-			this.drawContent(ctx);
-		},
-		drawTitle: function(ctx) {
-			if (!this.title) return;
-			let text = this.append(ctx, "div", {
-				class: "title"
-			});
-			text.textContent = this.title;
-		},
-		drawContent: function(ctx) {
-			ctx = this.append(ctx, "div", {
-				class: "items"
-			});
-			for (let item of this.content) {
-				item.draw(ctx);
-			}
+			return group;
 		}
 	},
-	Path: {
-		draw: function(x, y, w, h) {
-			return `M ${x} ${y} h ${w} v ${h} h ${-w} v ${-h}`
+	Album: {
+		super$: "use.control.ViewControl",
+		viewName: "div.album",
+		use: {
+			type$Issue: "Issue",
+			type$Varieties: "use.input.Varieties",
+			type$Printings: "use.input.Printings",
+		},
+		paginate: function(view) {
+			//TODO
+		},
+		view: function(view) {
+			let pages = this.owner.append(view, ".pages");
+			let page = this.owner.append(pages, ".page");
+			let content = this.owner.append(page, ".content");
+			let sheets = this.owner.append(view, ".sheets");
+			let album = view.model;
+			for (let issue of album.issues) {
+				issue.album = album;
+				this.use.Issue.draw(content, issue);
+				this.use.Printings.draw(sheets, issue.printings);
+				this.use.Varieties.draw(sheets, issue.varieties);
+			}
 		}
 	}
 }

@@ -8,6 +8,13 @@
 	font-size: 9pt;
 }
 body {
+	margin: 0;
+	padding: 0;
+	min-height: 100vh;
+	max-height: 100vh;
+}
+
+.album {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
@@ -22,6 +29,8 @@ body {
 }
 .page {
 	background: linen;
+	max-width: 216mm;
+	max-height: 280mm;
 	padding: 5mm;
 	flex: 4;
 	box-shadow: 2px 2px 3px silver;
