@@ -2,6 +2,11 @@ const observers = Symbol("observers");
 
 export default {
 	package$: "youni.works/base/control",
+	Controller: {
+		super$: "Object",
+		process: function(control, event) {
+		}
+	},
 	Observer: {
 		super$: "Object",
 		observe: function(event) {
@@ -61,12 +66,15 @@ export default {
 					break;
 			}
 			let ele = doc.createElement(name);
-			if (attributes) for (let name in attributes) {
-				ele.setAttribute(name, attributes[name]);
-			}
+			this.setAttributes(ele, attributes);
 			if (baseClass) ele.classList.add(baseClass);
 			ele.observe = View_observe;
 			return ele;
+		},
+		setAttributes(ele, attributes) {
+			if (attributes) for (let name in attributes) {
+				ele.setAttribute(name, attributes[name]);
+			}
 		},
 		append: function(parent, name, attributes) {
 			let ele = this.create(parent.ownerDocument, name, attributes);
@@ -75,7 +83,7 @@ export default {
 		}
 	},
 	ViewControl: {
-		super$: "Object",
+		super$: "Controller",
 		type$owner: "ViewOwner",
 		viewName: "div.view",
 		viewAttributes: function(model) {
@@ -85,14 +93,12 @@ export default {
 			let view = this.owner.append(parent, this.viewName, this.viewAttributes(model));
 			this.owner.bind(view, model);
 			this.draw(view);
+			this.control(view, model);
 			view.control = this;
-			this.control(view);
-		},
-		draw: function(view) {	
 		},
 		control: function(view) {
 		},
-		process: function(view, event) {
+		draw: function(view) {
 		}
 	},
 	Field: {
@@ -166,28 +172,34 @@ export default {
 		super$: "ViewControl",
 		uom: "mm",
 		viewName: "div.shape",
-		viewAttributes: function(model) {
-			let shape = this.shape(model);
-			let w = shape.width + this.uom;
-			let h = shape.height + this.uom;
-			return {
-				style: `min-width:${w};min-height:${h};max-width:${w};max-height:${h};`
-			};
-		},
-		shape: function(model) {
-			return model || this.sys.extend(null, {
+		shape: function(object) {
+			return object || this.sys.extend(null, {
 				shape: "rectangle",
+				path: "",
 				width: 10,
-				height: 10
+				height: 10,
+				image: "",
+				data: ""
 			});
 		},
-		draw: function(view) {
-			let shape = this.shape(view.model);
-			this.drawImage(view, shape);
-			this.drawPath(view, shape);
-			this.drawData(view, shape);
+		size: function(view) {
+			let shape = view.shape;
+			let w = shape.width + this.uom;
+			view.style.minWidth = w;
+			view.style.maxWidth = w;
+			let h = shape.height + this.uom;
+			view.style.minHeight = h;
+			view.style.maxHeight = h;
 		},
-		drawImage: function(view, shape) {
+		draw: function(view) {
+			if (!view.shape) view.shape = this.shape(view.model);
+			this.size(view);
+			this.drawImage(view);
+			this.drawData(view);
+			this.drawPath(view);
+		},
+		drawImage: function(view) {
+			let shape = view.shape;
 			let w = shape.width - 2 + this.uom;
 			let h = shape.height - 2 + this.uom;
 			if (shape.image) this.owner.append(view, "img", {
@@ -195,7 +207,8 @@ export default {
 				style: `width:${w};height:{$h};`
 			});
 		},
-		drawData: function(view, shape) {
+		drawData: function(view) {
+			let shape = view.shape;
 			if (shape.data) {
 				view.data = this.owner.append(view, "span.data");
 				if (shape.image) view.data.style.webkitTextStroke = ".2mm rgba(255, 255, 255, .25)";
