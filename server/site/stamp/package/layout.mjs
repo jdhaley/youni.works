@@ -36,7 +36,7 @@ export default {
 		use: {
 			type$Shape: "Shape"
 		},
-		view: function(view) {
+		draw: function(view) {
 			let title = this.drawTitle(view);
 			let group = this.drawGroup(view);
 			title.style.maxWidth = group.getBoundingClientRect().width * 1.5 + "px";
@@ -52,7 +52,7 @@ export default {
 			let model = view.model;
 			for (let variety of model.varieties) {
 				variety.album = model.album;
-				this.use.Shape.draw(group, variety);
+				this.use.Shape.view(group, variety);
 			}
 			return group;
 		}
@@ -68,7 +68,7 @@ export default {
 		paginate: function(view) {
 			//TODO
 		},
-		view: function(view) {
+		draw: function(view) {
 			let pages = this.owner.append(view, ".pages");
 			let page = this.owner.append(pages, ".page");
 			let content = this.owner.append(page, ".content");
@@ -76,9 +76,9 @@ export default {
 			let album = view.model;
 			for (let issue of album.issues) {
 				issue.album = album;
-				this.use.Issue.draw(content, issue);
-				this.use.Printings.draw(sheets, issue.printings);
-				this.use.Varieties.draw(sheets, issue.varieties);
+				this.use.Issue.view(content, issue);
+				this.use.Printings.view(sheets, issue.printings);
+				this.use.Varieties.view(sheets, issue.varieties);
 			}
 		}
 	}

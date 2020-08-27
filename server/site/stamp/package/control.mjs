@@ -81,18 +81,18 @@ export default {
 		viewAttributes: function(model) {
 			return null;
 		},
-		process: function(view, event) {
-		},
-		draw: function(parent, model) {
+		view: function(parent, model) {
 			let view = this.owner.append(parent, this.viewName, this.viewAttributes(model));
 			this.owner.bind(view, model);
-			this.view(view);
+			this.draw(view);
 			view.control = this;
 			this.control(view);
 		},
-		view: function(view) {	
+		draw: function(view) {	
 		},
 		control: function(view) {
+		},
+		process: function(view, event) {
 		}
 	},
 	Field: {
@@ -118,13 +118,13 @@ export default {
 		control: function(view) {
 			view.addEventListener("input", this.actions.inputEvent);			
 		},
-		view: function(view) {
+		draw: function(view) {
 			let model = view.model;
 			view.fields = Object.create(null);
 			for (let field of this.fields) {
 				let name = field.name;
 				let value = model ? model[name] : undefined;
-				view.fields[name] = field.draw(view, value);
+				view.fields[name] = field.view(view, value);
 			}
 		},
 		extend$actions: {
@@ -143,9 +143,23 @@ export default {
 		super$: "ViewControl",
 		type$record: "Record",
 		viewName: "div.table",
-		view: function(view) {
+		draw: function(view) {
 			let model = view.model;
-			if (model) for (let row of model) this.record.draw(view, row)
+			if (model) for (let row of model) this.record.view(view, row)
+		}
+	},
+	Item: {
+		super$: "ViewControl",
+		draw: function(view) {
+			this.drawHeader(view);
+			this.drawBody(view);
+			this.drawFooter(view);
+		},
+		drawHeader: function(view) {
+		},
+		drawBody: function(view) {
+		},
+		drawFooter: function(view) {
 		}
 	},
 	Shape: {
@@ -167,7 +181,7 @@ export default {
 				height: 10
 			});
 		},
-		view: function(view) {
+		draw: function(view) {
 			let shape = this.shape(view.model);
 			this.drawImage(view, shape);
 			this.drawPath(view, shape);
