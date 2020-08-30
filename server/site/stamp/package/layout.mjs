@@ -2,7 +2,6 @@ export default {
 	package$: "youni.works/album/layout",
 	use: {
 		package$control: "youni.works/base/control",
-		package$input: "youni.works/album/input"
 	},
 	Shape: {
 		super$: "use.control.Shape",
@@ -60,11 +59,12 @@ export default {
 	},
 	Album: {
 		super$: "use.control.Viewer",
+		types: null,
 		viewName: "div.album",
 		use: {
 			type$Control: "use.control.Control",
-			type$Varieties: "use.input.Varieties",
-			type$Printings: "use.input.Printings",
+			type$Record: "use.control.Record",
+			type$Table: "use.control.Table",
 			type$Issue: "Issue"
 		},
 		paginate: function(view) {
@@ -76,11 +76,24 @@ export default {
 			let content = this.owner.append(page, ".content");
 			let sheets = this.owner.append(view, ".sheets");
 			let album = view.model;
+			let doc = view.ownerDocument;
+			let printing = this.sys.extend(this.use.Record, {
+				fields: doc.types["Printing"]
+			});
+			let printings = this.sys.extend(this.use.Table, {
+				record: printing
+			});
+			let variety = this.sys.extend(this.use.Record, {
+				fields: doc.types["Variety"]
+			});
+			let varieties = this.sys.extend(this.use.Table, {
+				record: variety
+			});
 			for (let issue of album.issues) {
 				issue.album = album;
 				this.use.Issue.view(content, issue);
-				this.use.Printings.view(sheets, issue.printings);
-				this.use.Varieties.view(sheets, issue.varieties);
+				printings.view(sheets, issue.printings);
+				varieties.view(sheets, issue.varieties);
 			}
 		}
 	}

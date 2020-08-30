@@ -96,8 +96,9 @@ export default {
 	Viewer: {
 		super$: "Controller",
 		type$owner: "ViewOwner",
+		
 		viewName: "div.view",
-		viewAttributes: function(model) {
+		viewAttributes: function(model, type) {
 			return null;
 		},
 		classOf: function(ele) {
@@ -111,9 +112,9 @@ export default {
 			}
 			return cls;
 		},
-		view: function(parent, model) {
+		view: function(parent, model, type) {
 			let owner = this.owner.ownerOf(parent);
-			let view = owner.append(parent, this.viewName, this.viewAttributes(model));
+			let view = owner.append(parent, this.viewName, this.viewAttributes(model, type));
 			owner.bind(view, model);
 			this.draw(view);
 			view.control = this;
@@ -151,27 +152,33 @@ export default {
 	},
 	Field: {
 		super$: "Viewer",
-		type: "text",
-		name: "",
-		size: 0,
-		get$viewName: function() {
-			return this.type == "div" ? "div.field" : "input.field"
+		conf: {
+			type: "text",
+			name: "",
+			size: 0
 		},
-		viewAttributes: function(model) {
-			if (this.type == "div") return {
+		get$viewName: function() {
+			return this.conf.type == "div" ? "div.field" : "input.field"
+		},
+		viewAttributes: function(model, conf) {
+			if (conf.type == "div") return {
 				contentEditable: true
 			};
 			return {
-				type: this.type,
-				name: this.name,
-				title: this.name,
-				size: this.size,
+				type: conf.type,
+				name: conf.name,
+				title: conf.name,
+				size: conf.size,
 				value: model || "",
 			}
 		}
 	},
 	Record: {
 		super$: "Viewer",
+		use: {
+			type$Control: "Control",
+			type$Field: "Field"
+		},
 		fields: [],
 		viewName: "div.record",
 		control: function(view) {
@@ -183,7 +190,7 @@ export default {
 			for (let field of this.fields) {
 				let name = field.name;
 				let value = model ? model[name] : undefined;
-				view.fields[name] = field.view(view, value);
+				view.fields[name] = this.use.Field.view(view, value, field);
 			}
 		},
 		extend$actions: {
