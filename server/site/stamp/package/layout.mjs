@@ -22,7 +22,7 @@ export default {
 			return (variety.denom || "") + "<br>" + (variety.colors || "") + "<br>" + (variety.subject || "");
 		},
 		process: function(view, signal) {
-			if (signal.type == "update") {
+			if (signal.type == "updated") {
 				let data = this.shapeData(signal.object);
 				view.data.innerHTML = data;
 			}

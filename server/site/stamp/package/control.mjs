@@ -18,16 +18,16 @@ export default {
 	Owner: {
 		super$: "Object",
 		send: function(type, source, object, name, value) {
-			let event = this.sys.extend(null, {
+			let event = {
 				type: type,
 				source: source,
 				object: object,
 				property: name,
 				value: value
-			});
+			};
 			
 			if (object[observers]) for (let target of object[observers]) {
-				if (target && target.observe) target.receive(event);
+				if (target && target.receive) target.receive(event);
 			}
 		},
 		bind: function(control, model) {
@@ -117,7 +117,7 @@ export default {
 			let view = owner.append(parent, this.viewName, this.viewAttributes(model, type));
 			owner.bind(view, model);
 			this.draw(view);
-			view.control = this;
+			view.controller = this;
 			view.receive = this.use.Control.receive;
 			this.control(view);
 			return view;
@@ -196,10 +196,12 @@ export default {
 		extend$actions: {
 			inputEvent: function(event) {
 				const target = event.target;
-				if (target.control && target.classList.contains("field")) {
+				if (target.controller && target.classList.contains("field")) {
 					let model = target.parentNode.model;
+					let prior = target.value;
+					model[target.name] = target.value;
 					if (model && model[observers]) {
-						target.control.owner.send("update", target, model, target.name, target.value);
+						target.controller.owner.send("updated", target, model, target.name, prior);
 					}
 				}
 			}
