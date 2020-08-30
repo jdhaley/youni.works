@@ -34,6 +34,7 @@ export default {
 		viewName: "div.issue",
 		album: null,
 		use: {
+			type$Control: "use.control.Control",
 			type$Shape: "Shape"
 		},
 		draw: function(view) {
@@ -61,9 +62,10 @@ export default {
 		super$: "use.control.Viewer",
 		viewName: "div.album",
 		use: {
-			type$Issue: "Issue",
+			type$Control: "use.control.Control",
 			type$Varieties: "use.input.Varieties",
 			type$Printings: "use.input.Printings",
+			type$Issue: "Issue"
 		},
 		paginate: function(view) {
 			//TODO

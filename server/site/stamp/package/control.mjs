@@ -2,14 +2,17 @@ const observers = Symbol("observers");
 
 export default {
 	package$: "youni.works/base/control",
-	Controller: {
-		super$: "Object",
-		process: function(control, event) {
+	Control: {
+		receive: function(event) {
+			this.controller && this.controller.process(this, event);
 		}
 	},
-	Observer: {
+	Controller: {
 		super$: "Object",
-		observe: function(event) {
+		use: {
+			type$Control: "Control"
+		},
+		process: function(control, event) {
 		}
 	},
 	Owner: {
@@ -24,32 +27,41 @@ export default {
 			});
 			
 			if (object[observers]) for (let target of object[observers]) {
-				if (target && target.observe) target.observe(event);
+				if (target && target.observe) target.receive(event);
 			}
 		},
-		bind: function(view, model) {
-			this.unbind(view);
+		bind: function(control, model) {
+			this.unbind(control);
 			if (typeof model == "object") {
 				if (!model[observers]) model[observers] = [];
-				model[observers].push(view);
+				model[observers].push(control);
 			}
-			if (model !== undefined) view.model = model;
+			if (model !== undefined) control.model = model;
 		},
-		unbind: function(view) {
-			if (view.model && view.model[observers]) {
-				let list = view.model[observers];
+		unbind: function(control) {
+			if (control.model && control.model[observers]) {
+				let list = control.model[observers];
 				for (let i = 0, len = list.length; i < len; i++) {
-					if (view == list[i]) {
+					if (control == list[i]) {
 						list.splice(i, 1);
 						break;
 					}
 				}
 			}
-			delete view.model;
+			delete control.model;
 		},
 	},
 	ViewOwner: {
 		super$: "Owner",
+		ownerOf: function(document) {
+			if (!document.owner) {
+				document.owner = this.sys.extend(this, {
+					document: document,
+					classes: []
+				});
+			}
+			return document.owner;
+		},
 		create: function(doc, name, attributes) {
 			let baseClass = "";
 			let dot = name.indexOf(".");
@@ -68,7 +80,6 @@ export default {
 			let ele = doc.createElement(name);
 			this.setAttributes(ele, attributes);
 			if (baseClass) ele.classList.add(baseClass);
-			ele.observe = View_observe;
 			return ele;
 		},
 		setAttributes(ele, attributes) {
@@ -89,22 +100,35 @@ export default {
 		viewAttributes: function(model) {
 			return null;
 		},
+		classOf: function(ele) {
+			let owner = this.owner.ownerOf(ele);
+			let cls = owner.classes[this.viewName];
+			if (!cls) {
+				cls = this.sys.extend(null, {
+					controller: this
+				});
+				owner.classes[this.viewName] = cls;
+			}
+			return cls;
+		},
 		view: function(parent, model) {
-			let view = this.owner.append(parent, this.viewName, this.viewAttributes(model));
-			this.owner.bind(view, model);
+			let owner = this.owner.ownerOf(parent);
+			let view = owner.append(parent, this.viewName, this.viewAttributes(model));
+			owner.bind(view, model);
 			this.draw(view);
-			this.control(view);
 			view.control = this;
+			view.receive = this.use.Control.receive;
+			this.control(view);
 			return view;
 		},
-		control: function(view) {
-		},
 		draw: function(view) {
+		},
+		control: function(view) {
 		}
 	},
 	Item: {
 		super$: "Viewer",
-		viewName: "div.item",
+		viewName: ".item",
 		draw: function(view) {
 			view.header = this.drawHeader(view);
 			view.body = this.drawBody(view);
@@ -237,9 +261,35 @@ export default {
 //				d: this.path.draw(ctx.x, ctx.y, this.width, this.height)
 //			});
 		}
+	},
+	Styles: {
+		super$: "Object",
+		document: null,
+		once$sheet: function() {
+			let styles = this.document.createElement("style");
+			styles.type = "text/css";
+			this.document.head.appendChild(styles);
+			return styles.sheet;
+		},
+		createRule: function(selector, object) {
+			let out = `${selector} {\n`;
+			out += styleProperties("", object);
+			out += "\n}";
+			let index = this.styles.insertRule(out);
+			return this.styles.cssRules[index];
+		}
 	}
 }
 
-function View_observe(event) {
-	this.control && this.control.process(this, event);
+function styleProperties(prefix, object) {
+	out = "";
+	for (let name in object) {
+		let value = object[name];
+		if (typeof value == "object") {
+			out += defineProperties(prefix + name + "-", value);
+		} else {
+			out += "\t" + prefix + name + ": " + value + ";\n"
+		}
+	}
+	return out;
 }

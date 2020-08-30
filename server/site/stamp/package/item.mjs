@@ -5,4 +5,9 @@ export default {
 	use: {
 		package$control: "youni.works/base/control"
 	},
+	Window: {
+		super$: "use.control.Item",
+		viewName: ".window",
+		
+	}
 }

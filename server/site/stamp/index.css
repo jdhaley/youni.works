@@ -17,20 +17,27 @@ body {
 .item {
 	display: flex;
 	flex-direction: column;
+}
+.body {
+	flex: 1
+}
+.header, .footer {
+	flex: 0;
+}
+.window {
 	position: absolute;
 	width: 100px;
 	height: 50px;
 	background: white;
 	z-index: 2;
 }
-.item>.body {
-	flex: 1
-}
-.item>.header, .item>.footer {
-	flex: 0;
-	background: gray;
+.window>.header {
+	background: activecaption;
+	color: captiontext;
+	font: small-caption;
 	padding: 2px;
 }
+
 .album {
 	display: flex;
 	flex-direction: column;
