@@ -82,7 +82,7 @@ export default {
 			return ele;
 		}
 	},
-	ViewControl: {
+	Viewer: {
 		super$: "Controller",
 		type$owner: "ViewOwner",
 		viewName: "div.view",
@@ -103,7 +103,7 @@ export default {
 		}
 	},
 	Item: {
-		super$: "ViewControl",
+		super$: "Viewer",
 		viewName: "div.item",
 		draw: function(view) {
 			view.header = this.drawHeader(view);
@@ -126,7 +126,7 @@ export default {
 		}
 	},
 	Field: {
-		super$: "ViewControl",
+		super$: "Viewer",
 		type: "text",
 		name: "",
 		size: 0,
@@ -147,7 +147,7 @@ export default {
 		}
 	},
 	Record: {
-		super$: "ViewControl",
+		super$: "Viewer",
 		fields: [],
 		viewName: "div.record",
 		control: function(view) {
@@ -185,7 +185,7 @@ export default {
 		}
 	},
 	Shape: {
-		super$: "ViewControl",
+		super$: "Viewer",
 		viewName: "div.shape",
 		uom: "mm",
 		shape: function(object) {

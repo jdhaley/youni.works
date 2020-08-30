@@ -30,7 +30,7 @@ export default {
 		}
 	},
 	Issue: {
-		super$: "use.control.ViewControl",
+		super$: "use.control.Viewer",
 		viewName: "div.issue",
 		album: null,
 		use: {
@@ -58,7 +58,7 @@ export default {
 		}
 	},
 	Album: {
-		super$: "use.control.ViewControl",
+		super$: "use.control.Viewer",
 		viewName: "div.album",
 		use: {
 			type$Issue: "Issue",
