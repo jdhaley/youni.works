@@ -37,8 +37,37 @@ Printing {
 				super$: "use.control.Field",
 				name: "seperation",
 				size: 10,
-			}	
+			}
 		]
+	},
+	Var: {
+		design: {
+			size: 6
+		},
+		variety: {
+			size: 2
+		},
+		printing: {
+			size: 3
+		},
+		denom: {
+			size: 8
+		},
+		colors: {
+			size: 16
+		},
+		subject: {
+			size: 16
+		},
+		issued: {
+			type: "date"
+		},
+		title: {
+			type: "div"
+		},
+		caption: {
+			type: "div"
+		}
 	},
 	Variety: {
 		super$: "use.control.Record",
@@ -80,11 +109,13 @@ Printing {
 			},
 			{
 				super$: "use.control.Field",
+				type: "div",
 				name: "title",
 				size: 16
 			},
 			{
 				super$: "use.control.Field",
+				type: "div",
 				name: "caption",
 				size: 16
 			}

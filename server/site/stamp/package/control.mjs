@@ -93,12 +93,36 @@ export default {
 			let view = this.owner.append(parent, this.viewName, this.viewAttributes(model));
 			this.owner.bind(view, model);
 			this.draw(view);
-			this.control(view, model);
+			this.control(view);
 			view.control = this;
+			return view;
 		},
 		control: function(view) {
 		},
 		draw: function(view) {
+		}
+	},
+	Item: {
+		super$: "ViewControl",
+		viewName: "div.item",
+		draw: function(view) {
+			view.header = this.drawHeader(view);
+			view.body = this.drawBody(view);
+			view.footer = this.drawFooter(view);
+			view.style.top = "100px";
+			view.style.left = "100px";
+		},
+		drawHeader: function(view) {
+			let header = this.owner.append(view, "div.header");
+			header.contentEditable = true;
+			header.innerHTML = "<br>";
+			return header;
+		},
+		drawBody: function(view) {
+			return this.owner.append(view, "div.body");
+		},
+		drawFooter: function(view) {
+			return this.owner.append(view, "div.footer");
 		}
 	},
 	Field: {
@@ -106,8 +130,13 @@ export default {
 		type: "text",
 		name: "",
 		size: 0,
-		viewName: "input.field",
+		get$viewName: function() {
+			return this.type == "div" ? "div.field" : "input.field"
+		},
 		viewAttributes: function(model) {
+			if (this.type == "div") return {
+				contentEditable: true
+			};
 			return {
 				type: this.type,
 				name: this.name,
@@ -146,32 +175,19 @@ export default {
 		}
 	},
 	Table: {
-		super$: "ViewControl",
+		super$: "Item",
 		type$record: "Record",
 		viewName: "div.table",
-		draw: function(view) {
-			let model = view.model;
-			if (model) for (let row of model) this.record.view(view, row)
-		}
-	},
-	Item: {
-		super$: "ViewControl",
-		draw: function(view) {
-			this.drawHeader(view);
-			this.drawBody(view);
-			this.drawFooter(view);
-		},
-		drawHeader: function(view) {
-		},
 		drawBody: function(view) {
-		},
-		drawFooter: function(view) {
+			let body = this.owner.append(view, "div.body");
+			let model = view.model;
+			if (model) for (let row of model) this.record.view(body, row)
 		}
 	},
 	Shape: {
 		super$: "ViewControl",
-		uom: "mm",
 		viewName: "div.shape",
+		uom: "mm",
 		shape: function(object) {
 			return object || this.sys.extend(null, {
 				shape: "rectangle",
