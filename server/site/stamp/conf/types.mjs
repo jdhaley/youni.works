@@ -1,13 +1,21 @@
 export default {
 	Album: [
 		{
-			name: "designs",
-			type: "map*Design"
-		},		
+			name: "region"
+			size: 3
+		},
+		{
+			name: "era",
+			size: 2
+		},
 		{
 			name: "watermarks",
 			type: "map*Watermark"
 		},
+		{
+			name: "designs",
+			type: "map*Design"
+		},		
 		{
 			name: "issues",
 			type: "array*Issue"

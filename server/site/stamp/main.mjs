@@ -3,7 +3,13 @@ export default function main(sys, conf) {
 	document.types = conf.types;
 	const pkg = conf.packages;
 	pkg.layout.Album.view(document.body, conf.model);
-	let item = pkg.control.Item.view(document.body);
-	item.className = "window";
-	item.header.innerHTML = "Window";
+
+	let printing = sys.extend(pkg.control.Record, {
+		fields: conf.types["Printing"]
+	});
+	let printings = sys.extend(pkg.control.Table, {
+		record: printing
+	});
+	let win = pkg.item.Window.view(document.body);
+	printings.view(win.body, conf.model.issues[0].printings);
 }

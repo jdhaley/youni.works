@@ -139,7 +139,7 @@ export default {
 		},
 		drawHeader: function(view) {
 			let header = this.owner.append(view, "div.header");
-			header.contentEditable = true;
+			//header.contentEditable = true;
 			header.innerHTML = "<br>";
 			return header;
 		},
@@ -181,9 +181,6 @@ export default {
 		},
 		fields: [],
 		viewName: "div.record",
-		control: function(view) {
-			view.addEventListener("input", this.actions.inputEvent);			
-		},
 		draw: function(view) {
 			let model = view.model;
 			view.fields = Object.create(null);
@@ -192,6 +189,9 @@ export default {
 				let value = model ? model[name] : undefined;
 				view.fields[name] = this.use.Field.view(view, value, field);
 			}
+		},
+		control: function(view) {
+			view.addEventListener("input", this.actions.inputEvent);			
 		},
 		extend$actions: {
 			inputEvent: function(event) {
@@ -208,13 +208,12 @@ export default {
 		}
 	},
 	Table: {
-		super$: "Item",
+		super$: "Viewer",
 		type$record: "Record",
 		viewName: "div.table",
-		drawBody: function(view) {
-			let body = this.owner.append(view, "div.body");
+		draw: function(view) {
 			let model = view.model;
-			if (model) for (let row of model) this.record.view(body, row)
+			if (model) for (let row of model) this.record.view(view, row)
 		}
 	},
 	Shape: {

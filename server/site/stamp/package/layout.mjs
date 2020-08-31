@@ -77,12 +77,7 @@ export default {
 			let sheets = this.owner.append(view, ".sheets");
 			let album = view.model;
 			let doc = view.ownerDocument;
-			let printing = this.sys.extend(this.use.Record, {
-				fields: doc.types["Printing"]
-			});
-			let printings = this.sys.extend(this.use.Table, {
-				record: printing
-			});
+
 			let variety = this.sys.extend(this.use.Record, {
 				fields: doc.types["Variety"]
 			});
@@ -92,7 +87,6 @@ export default {
 			for (let issue of album.issues) {
 				issue.album = album;
 				this.use.Issue.view(content, issue);
-				printings.view(sheets, issue.printings);
 				varieties.view(sheets, issue.varieties);
 			}
 		}
