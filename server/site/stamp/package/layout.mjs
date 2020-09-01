@@ -52,7 +52,7 @@ export default {
 			let model = view.model;
 			for (let variety of model.varieties) {
 				variety.album = model.album;
-				this.use.Shape.view(group, variety);
+				this.use.Shape.createView(group, variety);
 			}
 			return group;
 		}
@@ -86,8 +86,8 @@ export default {
 			});
 			for (let issue of album.issues) {
 				issue.album = album;
-				this.use.Issue.view(content, issue);
-				varieties.view(sheets, issue.varieties);
+				this.use.Issue.createView(content, issue);
+				varieties.createView(sheets, issue.varieties);
 			}
 		}
 	}

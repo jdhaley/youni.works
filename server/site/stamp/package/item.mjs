@@ -12,6 +12,7 @@ export default {
 		control: function(view) {
 			view.header.addEventListener("mousedown", this.actions.startMove);			
 			view.ownerDocument.body.addEventListener("mousemove", this.actions.move);			
+			view.ownerDocument.documentElement.addEventListener("mouseleave", this.actions.endMove);			
 			view.ownerDocument.body.addEventListener("mouseup", this.actions.endMove);			
 		},
 		extend$actions: {
@@ -22,6 +23,7 @@ export default {
 					y: event.pageY - box.y,
 					ele: event.target.parentNode
 				}
+				document.documentElement.style.cursor = "move";
 				event.preventDefault();
 			},
 			move: function(event) {
@@ -31,8 +33,26 @@ export default {
 				MOVE.ele.style.top = event.pageY  - MOVE.y  + "px";				
 			},
 			endMove: function(event) {
+				document.documentElement.style.cursor = "default";
 				MOVE = null;
 			}
+		}
+	},
+	TableWindow: {
+		super$: "Window",
+		use: {
+			type$control: "use.control"
+		},
+		show: function(parent, conf, model) {
+			let view = this.createView(parent, model);
+			let record = this.sys.extend(this.use.control.Record, {
+				fields: view.ownerDocument.types[conf.type]
+			});
+			let table = this.sys.extend(this.use.control.Table, {
+				record: record
+			});
+			table.createView(view, model);
+			return view;
 		}
 	}
 }

@@ -1,7 +1,7 @@
 export default {
 	Album: [
 		{
-			name: "region"
+			name: "region",
 			size: 3
 		},
 		{
@@ -83,17 +83,23 @@ export default {
 		{
 			name: "design",
 			size: 6,
+			maxLength: 6
 		},
 		{
 			name: "variety",
-			size: 2
+			title: "Major",
+			size: 4,
+			maxLength: 3
 		},
 		{
 			name: "printing",
-			size: 3
+			title: "Minor",
+			size: 4,
+			maxLength: 4
 		},
 		{
 			name: "denom",
+			title: "Denomination",
 			size: 8
 		},
 		{

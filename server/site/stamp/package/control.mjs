@@ -3,15 +3,10 @@ const observers = Symbol("observers");
 export default {
 	package$: "youni.works/base/control",
 	Control: {
-		receive: function(event) {
-			this.controller && this.controller.process(this, event);
-		}
+		receive: Control_receive
 	},
 	Controller: {
 		super$: "Object",
-		use: {
-			type$Control: "Control"
-		},
 		process: function(control, event) {
 		}
 	},
@@ -112,14 +107,18 @@ export default {
 			}
 			return cls;
 		},
-		view: function(parent, model, type) {
+		createView: function(parent, model, type) {
 			let owner = this.owner.ownerOf(parent);
 			let view = owner.append(parent, this.viewName, this.viewAttributes(model, type));
-			owner.bind(view, model);
-			this.draw(view);
+			this.view(view, model);
+			return view;
+		},
+		view: function(view, model) {
 			view.controller = this;
-			view.receive = this.use.Control.receive;
+			this.owner.bind(view, model);
+			this.draw(view);
 			this.control(view);
+			view.receive = Control_receive;
 			return view;
 		},
 		draw: function(view) {
@@ -165,10 +164,10 @@ export default {
 				contentEditable: true
 			};
 			return {
-				type: conf.type,
+				type: conf.type || "text",
 				name: conf.name,
-				title: conf.name,
-				size: conf.size,
+				title: conf.title,
+				maxlength: conf.maxLength || 1000,
 				value: model || "",
 			}
 		}
@@ -187,7 +186,8 @@ export default {
 			for (let field of this.fields) {
 				let name = field.name;
 				let value = model ? model[name] : undefined;
-				view.fields[name] = this.use.Field.view(view, value, field);
+				view.fields[name] = this.use.Field.createView(view, value, field);
+				view.fields[name].style.width = field.size + "em";
 			}
 		},
 		control: function(view) {
@@ -208,12 +208,24 @@ export default {
 		}
 	},
 	Table: {
-		super$: "Viewer",
+		super$: "Item",
 		type$record: "Record",
 		viewName: "div.table",
-		draw: function(view) {
+		drawHeader: function(view) {
+			view = this.owner.append(view, "div.header");
+			for (let field of this.record.fields) {
+				if (!field.title) {
+					field.title = field.name.substr(0, 1).toUpperCase() + field.name.substr(1);
+				}
+				let col = this.owner.append(view, "div.column");
+				col.style.flex = (field.size || 1) + "em";
+				col.textContent = field.title;
+			}
+		},
+		drawBody: function(view) {
 			let model = view.model;
-			if (model) for (let row of model) this.record.view(view, row)
+			view = this.owner.append(view, "div.body");
+			if (model) for (let row of model) this.record.createView(view, row)
 		}
 	},
 	Shape: {
@@ -287,6 +299,9 @@ export default {
 			return this.styles.cssRules[index];
 		}
 	}
+}
+function Control_receive(event) {
+	this.controller && this.controller.process(this, event);
 }
 
 function styleProperties(prefix, object) {

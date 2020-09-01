@@ -4,11 +4,11 @@
 @import url("res/icon.css");
 */
 * {
-	text-align: center;
 	font-size: 9pt;
 }
 body {
 	display: relative;
+	overflow: hidden;
 	margin: 0;
 	padding: 0;
 	min-height: 100vh;
@@ -37,7 +37,12 @@ body {
 	font: small-caption;
 	padding: 2px;
 }
-
+.table>.header {
+	display: flex;
+}
+.column {
+	flex: 1;
+}
 .album {
 	display: flex;
 	flex-direction: column;
@@ -76,19 +81,20 @@ body {
 	flex: 0;
 	overflow: auto;
 }
-.field {
-	flex: 0;
+.column {
+	background: gray;
+	color: white;
+}
+.field, .column {
 	border: 0;
 	border-left: 1px solid silver;
 	border-top: 1px solid silver;
 	outline: 0;
 	text-align: left;
 	padding: 2px;
+	overflow: hidden;
 }
-div.field {
-	min-width: 5em;
-}
-.field:last-child {
+.field:last-child, .column:last-child {
 	border-right: 1px solid silver;
 }
 .record {
@@ -130,6 +136,7 @@ div.field {
 }
 .title {
 	margin-top: 1mm;
+	text-align: center;
 }
 .items {
 	display: flex;
