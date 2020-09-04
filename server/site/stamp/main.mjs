@@ -4,9 +4,12 @@ export default function main(sys, conf) {
 	document.types = conf.types;
 	pkg.layout.Album.createView(document.body, conf.model);
 
-	pkg.item.TableWindow.show(document.body, {
+	pkg.item.DataWindow.show(document.body, {
 		type: "Printing"
 	}, conf.model.issues[0].printings);
+	pkg.item.DataWindow.show(document.body, {
+		type: "Printing"
+	}, conf.model.issues[0].printings[0]);
 	testLoad(sys, conf);
 //	let printing = sys.extend(pkg.control.Record, {
 //		fields: conf.types["Printing"]

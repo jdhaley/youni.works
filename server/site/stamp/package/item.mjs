@@ -38,7 +38,7 @@ export default {
 			}
 		}
 	},
-	TableWindow: {
+	DataWindow: {
 		super$: "Window",
 		use: {
 			type$control: "use.control"
@@ -48,10 +48,10 @@ export default {
 			let record = this.sys.extend(this.use.control.Record, {
 				fields: view.ownerDocument.types[conf.type]
 			});
-			let table = this.sys.extend(this.use.control.Table, {
+			let editor = this.sys.extend(model && model.length ? this.use.control.Table : this.use.control.Properties, {
 				record: record
 			});
-			table.createView(view, model);
+			editor.createView(view.body, model);
 			return view;
 		}
 	}

@@ -181,12 +181,14 @@ export default {
 		fields: [],
 		viewName: "div.record",
 		draw: function(view) {
+			view.classList.add("row");
 			let model = view.model;
 			view.fields = Object.create(null);
 			for (let field of this.fields) {
 				let name = field.name;
 				let value = model ? model[name] : undefined;
 				view.fields[name] = this.use.Field.createView(view, value, field);
+				view.fields[name].classList.add("cell");
 				view.fields[name].style.width = field.size + "em";
 			}
 		},
@@ -212,6 +214,7 @@ export default {
 		type$record: "Record",
 		viewName: "div.table",
 		drawHeader: function(view) {
+			view.classList.add("grid");
 			view = this.owner.append(view, "div.header");
 			for (let field of this.record.fields) {
 				if (!field.title) {
@@ -220,12 +223,42 @@ export default {
 				let col = this.owner.append(view, "div.column");
 				col.style.flex = (field.size || 1) + "em";
 				col.textContent = field.title;
+				col.classList.add("cell");
 			}
 		},
 		drawBody: function(view) {
 			let model = view.model;
 			view = this.owner.append(view, "div.body");
 			if (model) for (let row of model) this.record.createView(view, row)
+		}
+	},
+	Properties: {
+		super$: "Viewer",
+		use: {
+			type$Control: "Control",
+			type$Field: "Field"
+		},
+		type$record: "Record",
+		viewName: "div.properties",
+		draw: function(view) {
+			view.classList.add("grid");
+			let model = view.model;
+			view.fields = {};
+			for (let field of this.record.fields) {
+				let prop = this.owner.append(view, ".property");
+				prop.classList.add("row");
+				let label = this.owner.append(prop, ".label");
+				label.classList.add("cell");
+				let title = field.title;
+				if (!title) {
+					title = field.name.substr(0, 1).toUpperCase() + field.name.substr(1);
+				}
+				label.textContent = title;
+				let name = field.name;
+				let value = model ? model[name] : undefined;
+				view.fields[name] = this.use.Field.createView(prop, value, field);
+				view.fields[name].classList.add("cell");
+			}
 		}
 	},
 	Shape: {
