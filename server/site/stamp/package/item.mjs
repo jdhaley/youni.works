@@ -4,7 +4,8 @@ let MOVE = null;
 export default {
 	package$: "youni.works/base/item",
 	use: {
-		package$control: "youni.works/base/control"
+		package$control: "youni.works/base/control",
+		package$cell: "youni.works/view/cell"
 	},
 	Window: {
 		super$: "use.control.Item",
@@ -41,14 +42,14 @@ export default {
 	DataWindow: {
 		super$: "Window",
 		use: {
-			type$control: "use.control"
+			type$cell: "use.cell"
 		},
 		show: function(parent, conf, model) {
 			let view = this.createView(parent, model);
-			let record = this.sys.extend(this.use.control.Record, {
+			let record = this.sys.extend(this.use.cell.Record, {
 				fields: view.ownerDocument.types[conf.type]
 			});
-			let editor = this.sys.extend(model && model.length ? this.use.control.Table : this.use.control.Properties, {
+			let editor = this.sys.extend(model && model.length ? this.use.cell.Table : this.use.cell.Properties, {
 				record: record
 			});
 			editor.createView(view.body, model);

@@ -2,6 +2,7 @@ export default {
 	package$: "youni.works/album/layout",
 	use: {
 		package$control: "youni.works/base/control",
+		package$cell: "youni.works/view/cell",
 	},
 	Shape: {
 		super$: "use.control.Shape",
@@ -63,8 +64,8 @@ export default {
 		viewName: "div.album",
 		use: {
 			type$Control: "use.control.Control",
-			type$Record: "use.control.Record",
-			type$Table: "use.control.Table",
+			type$Record: "use.cell.Record",
+			type$Table: "use.cell.Table",
 			type$Issue: "Issue"
 		},
 		paginate: function(view) {
