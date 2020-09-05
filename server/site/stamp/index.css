@@ -25,13 +25,17 @@ body {
 	flex: 0;
 }
 .window {
+	display: flex;
+	flex-direction: column;
 	position: absolute;
 	min-width: 100px;
 	min-height: 50px;
 	background: white;
 	z-index: 2;
-	padding: 3px;
-	background: transparent;
+	padding: 0;
+}
+.window>* {
+	background: silver;
 }
 .window:hover {
 	cursor: w-resize;
@@ -39,14 +43,21 @@ body {
 .window>*:hover {
 	cursor: default;
 }
-.window>.header {
+.body {
+	display: flex;
+	flex-direction: column;
+	background: window;
+}
+.header {
+	display: flex;
+	flex-direction: row;
 	background: activecaption;
 	color: captiontext;
 	font: small-caption;
 	padding: 2px;
 }
-.table>.header {
-	display: flex;
+.table, .table * {
+	border-color: green;
 }
 .column {
 	flex: 1;
@@ -89,10 +100,6 @@ body {
 	flex: 0;
 	overflow: auto;
 }
-.column {
-	background: gray;
-	color: white;
-}
 
 .cell {
 	outline: 0;
@@ -107,6 +114,11 @@ body {
 	border-right: 0;
 }
 .row {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	text-align: left;
 	border: 0;
 	border-bottom: 1px solid silver;
 }
@@ -115,17 +127,6 @@ body {
 }
 .grid {
 	border: 1px solid silver;
-}
-
-.record {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
-	align-items: stretch;
-	text-align: left;
-}
-.record:last-child {
-	border-bottom: 1px solid silver;
 }
 .property {
 	display: flex;

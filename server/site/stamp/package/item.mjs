@@ -1,22 +1,45 @@
 const observers = Symbol("observers");
 let MOVE = null;
-
+let MOUSEDOWN = null;
 export default {
 	package$: "youni.works/base/item",
 	use: {
 		package$control: "youni.works/base/control",
 		package$cell: "youni.works/view/cell"
 	},
+	Application: {
+		super$: "use.control.Viewer",
+		event: {
+			input: UP,
+			mousedown: function(event) {
+				MOUSE_TARGET = event.target;
+			},
+			mouseup: function(event) {
+				MOUSE_TARGET = null;
+			},
+			mousemove: function(event) {
+				event.mouseTarget = MOUSE_TARGET;
+				UP(event);
+			},
+			mouseleave: function(event) {
+				MOUSE_TARGET = null;
+			}
+		}
+	},
 	Window: {
 		super$: "use.control.Item",
 		viewName: ".window",
 		control: function(view) {
-			view.header.addEventListener("mousedown", this.actions.startMove);			
-			view.ownerDocument.body.addEventListener("mousemove", this.actions.move);			
-			view.ownerDocument.documentElement.addEventListener("mouseleave", this.actions.endMove);			
-			view.ownerDocument.body.addEventListener("mouseup", this.actions.endMove);			
+			view.addEventListener("input", this.events.input)
+			view.header.addEventListener("mousedown", this.events.startMove);			
+			view.ownerDocument.body.addEventListener("mousemove", this.events.move);			
+			view.ownerDocument.addEventListener("mouseleave", this.events.endMove);			
+			view.ownerDocument.body.addEventListener("mouseup", this.events.endMove);			
 		},
-		extend$actions: {
+		extend$events: {
+			input: function(event) {
+				this.owner.transmit.up(event.target, event);
+			},
 			startMove: function(event) {
 				let box = event.target.getBoundingClientRect();
 				MOVE = {
@@ -56,4 +79,9 @@ export default {
 			return view;
 		}
 	}
+}
+
+function UP(event) {
+	let control = event.currentTarget.control;
+	control && control.owner.transmit.up(event.target, event);
 }

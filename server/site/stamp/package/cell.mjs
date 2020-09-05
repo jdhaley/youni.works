@@ -24,6 +24,39 @@ export default {
 				maxlength: conf.maxLength || 1000,
 				value: model || "",
 			}
+		},
+		drawTitle: function(ctx, conf, cls) {
+			let label = this.owner.append(ctx, "." + cls);
+			label.classList.add("cell");
+			let title = conf.title;
+			if (!title) {
+				title = conf.name.substr(0, 1).toUpperCase() + conf.name.substr(1);
+			}
+			label.textContent = title;
+			return label;
+		},
+		getViewValue: function(view) {
+			return view.nodeName == "input" ? view.value : view.textContent;
+		},
+		extend$actions: {
+			input: function(on, event) {
+				let name = on.name;
+				let record = this.getViewContext(on, "record");
+				let model = record ? record.model : undefined;
+				if (model) {
+					let prior = model[name];
+					model[name] = this.getViewValue(event.target);
+					event = {
+						type: "updated",
+						target: record,
+						source: on,
+						object: model,
+						property: name,
+						value: prior
+					}
+					this.owner.transmit.object(on, event);
+				}
+			}
 		}
 	},
 	Record: {

@@ -2,6 +2,33 @@ const observers = Symbol("observers");
 
 export default {
 	package$: "youni.works/base/control",
+	Factory: {
+		types: {
+			"": null
+		},
+		bind: function(conf) {
+			let ctx = this.sys.extend(this);
+			ctx.types = Object.create(this.types);
+			for (let name in conf) {
+				let value = conf[name]
+				switch (typeof value) {
+					case "function":
+						ctx.types[name] = value.bind(ctx);
+						break;
+					case "object":
+						if (this.sys.isInterface(value)) {
+							ctx.types[name] = this.sys.extend.bind(this.sys, value);
+						} else if (typeof value.create == "function") {
+							value = Object.create(value);
+							value.context = ctx;
+							ctx.types[name] = value.create.bind(value);
+						}
+						break;
+				}
+			}
+			return ctx.types;
+		}
+	},
 	Control: {
 		receive: Control_receive
 	},
@@ -12,19 +39,46 @@ export default {
 	},
 	Owner: {
 		super$: "Object",
-		send: function(type, source, object, name, value) {
-			let event = {
-				type: type,
-				source: source,
-				object: object,
-				property: name,
-				value: value
-			};
-			
-			if (object[observers]) for (let target of object[observers]) {
-				if (target && target.receive) target.receive(event);
+		transmit: {
+			up: function(on, event) {
+				event.stopPropagation && event.stopPropagation();
+				while (on && event.type) {
+					on.receive && on.receive(event);
+					on = on.parentNode;
+				}
+			},
+			//NB: down() is explicitly named because it is recursive.
+			down: function down(on, message) {
+				event.stopPropagation && event.stopPropagation();
+				for (on of on.childNodes) {
+					if (!message.type) return;
+					on.receive && on.receive(message);
+					down(on, message);
+				}
+			},
+			object: function(on, event) {
+				event.stopPropagation && event.stopPropagation();
+				let object = event.object;
+				if (object) for (let on of object[observers]) {
+					if (!event.type) return;
+					on && on.receive && on.receive(event);
+				}
 			}
 		},
+//		send: function(type, source, object, name, value) {			
+//			if (object && object[observers]) {
+//				let event = {
+//					type: type,
+//					target: source,
+//					object: object,
+//					property: name,
+//					value: value
+//				};
+//				for (let target of object[observers]) {
+//					if (target && target.receive) target.receive(event);
+//				}				
+//			}
+//		},
 		bind: function(control, model) {
 			this.unbind(control);
 			if (typeof model == "object") {
@@ -93,6 +147,7 @@ export default {
 		type$owner: "ViewOwner",
 		
 		viewName: "div.view",
+		events: null,
 		viewAttributes: function(model, type) {
 			return null;
 		},
@@ -114,16 +169,31 @@ export default {
 			return view;
 		},
 		view: function(view, model) {
+			view.receive = Control_receive;
 			view.controller = this;
 			this.owner.bind(view, model);
 			this.draw(view);
+			this.controlEvents(view);
 			this.control(view);
-			view.receive = Control_receive;
 			return view;
 		},
 		draw: function(view) {
 		},
 		control: function(view) {
+		},
+		controlEvents: function(view) {
+			for (let event in this.events) {
+				let listener = this.events[event];
+				view.addEventListener(event, listener);
+			}
+		},
+		getViewContext: function(view, name) {
+			while (view) {
+				if (view.classList.contains(name)) {
+					return view;
+				}
+				view = view.parentNode;
+			}
 		}
 	},
 	Item: {
