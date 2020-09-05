@@ -1,0 +1,41 @@
+.cell {
+	outline: 0;
+	margin: 0;
+	border: 0;
+	padding: 2px;
+	border-right: 1px solid silver;
+	text-align: left;
+	overflow: hidden;
+}
+input.cell {
+	width: 100%;
+	height: 100%;
+}
+.cell:last-child {
+	border-right: 0;
+}
+.row {
+	outline: 0;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	border-bottom: 1px solid silver;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	text-align: left;
+}
+.row:last-child {
+	border-bottom: 0;
+}
+.grid {
+	border: 1px solid silver;
+}
+.grid>.header {
+	padding: 0;
+	border-bottom: 1px solid silver;
+}
+.property>.label {
+	width: 25%;
+}

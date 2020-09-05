@@ -9,6 +9,7 @@ export default {
 	},
 	Application: {
 		super$: "use.control.Viewer",
+		viewName: "main.application",
 		event: {
 			input: UP,
 			mousedown: function(event) {
