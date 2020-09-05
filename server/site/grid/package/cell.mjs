@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/view/cell",
+	package$: "youni.works/base/cell",
 	use: {
 		package$control: "youni.works/base/control"
 	},

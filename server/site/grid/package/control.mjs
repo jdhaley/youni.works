@@ -35,6 +35,8 @@ export default {
 	Controller: {
 		super$: "Object",
 		process: function(control, event) {
+			let action = this.actions && this.actions[event.type];
+			action && action.call(this, control, event);
 		}
 	},
 	Owner: {
@@ -199,6 +201,8 @@ export default {
 	Item: {
 		super$: "Viewer",
 		viewName: ".item",
+		startMove: function(view) {
+		},
 		draw: function(view) {
 			view.header = this.drawHeader(view);
 			view.body = this.drawBody(view);
@@ -217,6 +221,30 @@ export default {
 		},
 		drawFooter: function(view) {
 			return this.owner.append(view, "div.footer");
+		},
+		extend$actions: {
+			mousedown: function(on, event) {
+				if (this.startMove(on, event.mouseTarget)) {
+					let box = on.getBoundingClientRect();
+					on.MOVE = {
+						x: event.pageX - box.x,
+						y: event.pageY - box.y,
+					}
+					event.preventDefault();
+				}
+			},
+			mousemove: function(on, event) {
+				if (on.MOVE) {
+					on.style.left = event.pageX - on.MOVE.x  + "px";
+					on.style.top = event.pageY  - on.MOVE.y  + "px";		
+				}
+			},
+			mouseup: function(on, event) {
+				delete on.MOVE;
+			},
+			mouseleave: function(on, event) {
+				delete on.MOVE;
+			}
 		}
 	},
 	Shape: {

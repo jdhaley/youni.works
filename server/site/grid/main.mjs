@@ -3,8 +3,8 @@ export default function main(sys, conf) {
 	const pkg = conf.packages;
 	document.types = conf.types;
 
-	let app = pkg.item.Application.createView(document.body);
-	pkg.item.DataWindow.show(app, {
+	let app = pkg.app.Application.createView(document.body);
+	pkg.app.DataWindow.show(app, {
 		type: "Field"
 	}, conf.types.Field);
 }
