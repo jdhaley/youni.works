@@ -36,6 +36,9 @@ export default {
 		super$: "Object",
 		process: function(control, event) {
 			let action = this.actions && this.actions[event.type];
+			if (action == "updated") {
+				console.log(event.type, control);
+			}
 			action && action.call(this, control, event);
 		}
 	},
@@ -67,20 +70,6 @@ export default {
 				}
 			}
 		},
-//		send: function(type, source, object, name, value) {			
-//			if (object && object[observers]) {
-//				let event = {
-//					type: type,
-//					target: source,
-//					object: object,
-//					property: name,
-//					value: value
-//				};
-//				for (let target of object[observers]) {
-//					if (target && target.receive) target.receive(event);
-//				}				
-//			}
-//		},
 		bind: function(control, model) {
 			this.unbind(control);
 			if (typeof model == "object") {
@@ -142,6 +131,14 @@ export default {
 			let ele = this.create(parent.ownerDocument, name, attributes);
 			parent.append(ele);
 			return ele;
+		},
+		getViewContext: function(view, name) {
+			while (view) {
+				if (view.classList && view.classList.contains(name)) {
+					return view;
+				}
+				view = view.parentNode;
+			}
 		}
 	},
 	Viewer: {
@@ -187,14 +184,6 @@ export default {
 			for (let event in this.events) {
 				let listener = this.events[event];
 				view.addEventListener(event, listener);
-			}
-		},
-		getViewContext: function(view, name) {
-			while (view) {
-				if (view.classList.contains(name)) {
-					return view;
-				}
-				view = view.parentNode;
 			}
 		}
 	},

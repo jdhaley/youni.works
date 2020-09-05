@@ -36,12 +36,12 @@ export default {
 			return label;
 		},
 		getViewValue: function(view) {
-			return view.nodeName == "input" ? view.value : view.textContent;
+			return view.nodeName == "INPUT" ? view.value : view.textContent;
 		},
 		extend$actions: {
 			input: function(on, event) {
 				let name = on.name;
-				let record = this.getViewContext(on, "record");
+				let record = this.owner.getViewContext(on, "record");
 				let model = record ? record.model : undefined;
 				if (model) {
 					let prior = model[name];
@@ -79,19 +79,10 @@ export default {
 				view.fields[name].style.width = field.size + "em";
 			}
 		},
-		control: function(view) {
-			view.addEventListener("input", this.actions.inputEvent);			
-		},
 		extend$actions: {
-			inputEvent: function(event) {
-				const target = event.target;
-				if (target.controller && target.classList.contains("field")) {
-					let model = target.parentNode.model;
-					let prior = target.value;
-					model[target.name] = target.value;
-					if (model && model[observers]) {
-						target.controller.owner.send("updated", target, model, target.name, prior);
-					}
+			updated: function(on, event) {
+				if (on != event.target) {
+					on.fields[event.property].value = event.object[event.property];
 				}
 			}
 		}
@@ -128,6 +119,7 @@ export default {
 		type$record: "Record",
 		viewName: "div.properties",
 		draw: function(view) {
+			view.classList.add("record");
 			view.classList.add("grid");
 			let model = view.model;
 			view.fields = {};
@@ -145,6 +137,13 @@ export default {
 				let value = model ? model[name] : undefined;
 				view.fields[name] = this.use.Field.createView(prop, value, field);
 				view.fields[name].classList.add("cell");
+			}
+		},
+		extend$actions: {
+			updated: function(on, event) {
+				if (on != event.target) {
+					on.fields[event.property].value = event.object[event.property];
+				}
 			}
 		}
 	}

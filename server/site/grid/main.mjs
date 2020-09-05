@@ -7,4 +7,7 @@ export default function main(sys, conf) {
 	pkg.app.DataWindow.show(app, {
 		type: "Field"
 	}, conf.types.Field);
+	pkg.app.DataWindow.show(app, {
+		type: "Field"
+	}, conf.types.Field[0]);
 }
