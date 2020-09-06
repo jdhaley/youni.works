@@ -4,11 +4,11 @@ let MOUSE_TARGET = null;
 export default {
 	package$: "youni.works/base/app",
 	use: {
-		package$control: "youni.works/base/control",
+		package$view: "youni.works/base/view",
 		package$cell: "youni.works/base/cell"
 	},
 	Application: {
-		super$: "use.control.Viewer",
+		super$: "use.view.Viewer",
 		viewName: "main.application",
 		extend$events: {
 			input: UP,
@@ -40,7 +40,7 @@ export default {
 		}
 	},
 	Window: {
-		super$: "use.control.Item",
+		super$: "use.view.Item",
 		viewName: ".window",
 		startMove: function(window, target) {
 			return target == window.header;	

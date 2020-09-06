@@ -1,10 +1,11 @@
 export default {
 	package$: "youni.works/base/cell",
 	use: {
-		package$control: "youni.works/base/control"
+		package$control: "youni.works/base/control",
+		package$view: "youni.works/base/view"
 	},
 	Field: {
-		super$: "use.control.Viewer",
+		super$: "use.view.Viewer",
 		conf: {
 			type: "text",
 			name: "",
@@ -56,7 +57,7 @@ export default {
 		}
 	},
 	Record: {
-		super$: "use.control.Viewer",
+		super$: "use.view.Viewer",
 		use: {
 			type$Control: "use.control.Control",
 			type$Field: "Field"
@@ -84,7 +85,7 @@ export default {
 		}
 	},
 	Table: {
-		super$: "use.control.Item",
+		super$: "use.view.Item",
 		type$record: "Record",
 		viewName: "div.table",
 		drawHeader: function(view) {
@@ -107,7 +108,7 @@ export default {
 		}
 	},
 	Properties: {
-		super$: "use.control.Viewer",
+		super$: "use.view.Viewer",
 		use: {
 			type$Control: "use.control.Control",
 			type$Field: "Field"
