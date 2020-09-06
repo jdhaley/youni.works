@@ -96,19 +96,20 @@ export default {
 		createView: function(parent, model, type) {
 			let owner = this.owner.ownerOf(parent);
 			let view = owner.append(parent, this.viewName, this.viewAttributes(model, type));
-			this.view(view, model);
+			this.draw(view, model);
+			this.bind(view, model);
 			return view;
 		},
-		view: function(view, model) {
+		bind: function(view, model) {
+			view.model = model;
 			view.receive = Control_receive;
 			view.controller = this;
 			this.owner.bind(view, model);
-			this.draw(view);
 			this.controlEvents(view);
 			this.control(view);
 			return view;
 		},
-		draw: function(view) {
+		draw: function(view, model) {
 		},
 		control: function(view) {
 		},
@@ -124,10 +125,10 @@ export default {
 		viewName: ".item",
 		startMove: function(view) {
 		},
-		draw: function(view) {
-			view.header = this.drawHeader(view);
-			view.body = this.drawBody(view);
-			view.footer = this.drawFooter(view);
+		draw: function(view, model) {
+			view.header = this.drawHeader(view, model);
+			view.body = this.drawBody(view, model);
+			view.footer = this.drawFooter(view, model);
 			view.style.top = "100px";
 			view.style.left = "100px";
 		},

@@ -31,7 +31,7 @@ export default {
 		},
 		bind: function(control, model) {
 			this.unbind(control);
-			if (typeof model == "object") {
+			if (model && typeof model == "object") {
 				if (!model[observers]) model[observers] = [];
 				model[observers].push(control);
 			}

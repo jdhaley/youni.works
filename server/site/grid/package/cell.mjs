@@ -6,11 +6,78 @@ export default {
 	},
 	Field: {
 		super$: "use.view.Viewer",
-		conf: {
-			type: "text",
-			name: "",
-			size: 0
+		implicitTypes: {
+			string: function(parent, model, conf) {
+				if (conf.choice) {
+					let at = {
+						name: conf.name,
+					};
+					let view = this.owner.append(parent, "select.string", at);
+					for (let name of choice) {
+						let option = this.owner.append(view, "option");
+						option.value = name;
+						option.textContent = choice[name];
+						if (choice[name] == model) option.selected = true;
+					}
+					return view;
+				}
+				let at = {
+					type: "text",
+					name: conf.name,
+					value: model || ""
+				};
+				if (conf.maxLength) at.maxLength = conf.maxLength;
+				return this.owner.append(parent, "input.string", at);
+			},
+			number: function(parent, model, conf) {
+				let at = {
+					type: "number",
+					name: conf.name,
+					value: model || ""
+				};
+				return this.owner.append(parent, "input.number", at);
+			},		
+			boolean: function(parent, model, conf) {
+				let at = {
+					type: "checkbox",
+					name: conf.name,
+					checked: "true",
+				};
+				return this.owner.append(parent, "input.boolean", at);
+			},
+			time: function(parent, model, conf) {
+				let at = {
+					type: conf.precision == "day" ? "date" : "datetime-local",
+					name: conf.name,
+					value: model || ""
+				};
+				return this.owner.append(parent, "input.time", at);
+			},
+			text: function(parent, model, conf) {
+				let at = {
+					type: conf.precision == "day" ? "date" : "datetime-local",
+					name: conf.name,
+					value: model || ""
+				};
+				let view = this.owner.append(parent, "div.text");
+				view.innerHTML = model;
+				return view;
+			},
 		},
+		getTypes: function(view) {
+			return this.owner.getViewContext(view, "application").types;
+		},
+		createView: function(parent, model, conf) {
+			let owner = this.owner.ownerOf(parent);
+			let types = this.implicitTypes;
+			let type = types[conf.type] || types[typeof model] || types.string;
+			let view = type.call(this, parent, model, conf);
+			view.classList.add("field");
+			//this.draw(view, model);
+			this.bind(view, model);
+			return view;
+		},
+		/*
 		get$viewName: function() {
 			return this.conf.type == "div" ? "div.field" : "input.field"
 		},
@@ -26,6 +93,7 @@ export default {
 				value: model || "",
 			}
 		},
+		*/
 		drawTitle: function(ctx, conf, cls) {
 			let label = this.owner.append(ctx, "." + cls);
 			label.classList.add("cell");
@@ -64,9 +132,8 @@ export default {
 		},
 		fields: [],
 		viewName: "div.record",
-		draw: function(view) {
+		draw: function(view, model) {
 			view.classList.add("row");
-			let model = view.model;
 			view.fields = Object.create(null);
 			for (let field of this.fields) {
 				let name = field.name;
@@ -88,7 +155,7 @@ export default {
 		super$: "use.view.Item",
 		type$record: "Record",
 		viewName: "div.table",
-		drawHeader: function(view) {
+		drawHeader: function(view, model) {
 			view.classList.add("grid");
 			view = this.owner.append(view, "div.header");
 			for (let field of this.record.fields) {
@@ -101,10 +168,9 @@ export default {
 				col.classList.add("cell");
 			}
 		},
-		drawBody: function(view) {
-			let model = view.model;
+		drawBody: function(view, model) {
 			view = this.owner.append(view, "div.body");
-			if (model) for (let row of model) this.record.createView(view, row)
+			if (model) for (let row of model) this.record.createView(view, row);
 		}
 	},
 	Properties: {
@@ -115,10 +181,9 @@ export default {
 		},
 		type$record: "Record",
 		viewName: "div.properties",
-		draw: function(view) {
+		draw: function(view, model) {
 			view.classList.add("record");
 			view.classList.add("grid");
-			let model = view.model;
 			view.fields = {};
 			for (let field of this.record.fields) {
 				let prop = this.owner.append(view, ".property");
