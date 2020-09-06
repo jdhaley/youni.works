@@ -28,11 +28,7 @@ export default {
 		drawTitle: function(ctx, conf, cls) {
 			let label = this.owner.append(ctx, "." + cls);
 			label.classList.add("cell");
-			let title = conf.title;
-			if (!title) {
-				title = conf.name.substr(0, 1).toUpperCase() + conf.name.substr(1);
-			}
-			label.textContent = title;
+			label.textContent = conf.title ? conf.title : nameToTitle(name);
 			return label;
 		},
 		getViewValue: function(view) {
@@ -96,7 +92,7 @@ export default {
 			view = this.owner.append(view, "div.header");
 			for (let field of this.record.fields) {
 				if (!field.title) {
-					field.title = field.name.substr(0, 1).toUpperCase() + field.name.substr(1);
+					field.title = nameToTitle(field.name);
 				}
 				let col = this.owner.append(view, "div.column");
 				col.style.flex = (field.size || 1) + "em";
@@ -147,4 +143,30 @@ export default {
 			}
 		}
 	}
+}
+
+function titleToName(title) {
+	let char = title.charAt(0);
+	let name = /[A-Z]|[a-z]/.test(char) ? char : "";
+	for (let i = 1; i < title.length; i++) {
+		char = name.charAt(i);
+		if (/[A-Z]|[a-z]|[0-9]|_/.test(char)) name += char;
+	}
+	return name;
+}
+function nameToTitle(name) {
+	let title = name.charAt(0).toUpperCase();
+	for (let i = 1; i < name.length; i++) {
+		let char = name.charAt(i);
+		let next = name.charAt(i + 1);
+		if (char.toUpperCase() == char) {
+			if (next.toLowerCase() == next) title += " ";
+		} 
+		title += char;
+		if (char.toLowerCase() == char) {
+			if (next.toUpperCase() == next) title += " ";
+		}
+
+	}
+	return title;
 }
