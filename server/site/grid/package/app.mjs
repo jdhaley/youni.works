@@ -89,12 +89,18 @@ export default {
 			let app = this.owner.getViewContext(parent, "application");
 			type = app && app.types && app.types[type];
 
-			let record = this.sys.extend(this.use.cell.Record, {
-				fields: type
-			});
-			let editor = this.sys.extend(model && model.length ? this.use.cell.Table : this.use.cell.Properties, {
-				record: record
-			});
+			let editor;
+			if (model.length) {
+				editor = this.sys.extend(this.use.cell.Table, {
+					record: this.sys.extend(this.use.cell.Record, {
+						fields: type
+					})
+				});
+			} else {
+				editor = this.sys.extend(this.use.cell.Properties, {
+					fields: type
+				});
+			}
 			let view = this.createView(parent, model);
 			editor.createView(view.body, model);
 			return view;

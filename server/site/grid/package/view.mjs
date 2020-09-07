@@ -7,15 +7,6 @@ export default {
 	},
 	ViewOwner: {
 		super$: "use.control.Owner",
-		ownerOf: function(document) {
-			if (!document.owner) {
-				document.owner = this.sys.extend(this, {
-					document: document,
-					classes: []
-				});
-			}
-			return document.owner;
-		},
 		create: function(doc, name, attributes) {
 			let baseClass = "";
 			let dot = name.indexOf(".");
@@ -76,29 +67,17 @@ export default {
 	Viewer: {
 		super$: "use.control.Controller",
 		type$owner: "ViewOwner",
-		
 		viewName: "div.view",
 		events: null,
-		classOf: function(ele) {
-			let owner = this.owner.ownerOf(ele);
-			let cls = owner.classes[this.viewName];
-			if (!cls) {
-				cls = this.sys.extend(null, {
-					controller: this
-				});
-				owner.classes[this.viewName] = cls;
-			}
-			return cls;
-		},
-		createView: function(parent, model, type) {
+		createView: function(parent, model, conf) {
 			let view = this.owner.append(parent, this.viewName);
-			this.draw(view, model);
-			this.bind(view, model);
+			this.draw(view, model, conf);
+			this.bind(view, model, conf);
 			return view;
 		},
 		draw: function(view, model, conf) {
 		},
-		bind: function(view, model) {
+		bind: function(view, model, conf) {
 			view.model = model;
 			view.receive = Control_receive;
 			view.controller = this;

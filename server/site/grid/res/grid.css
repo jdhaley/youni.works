@@ -40,6 +40,7 @@
 .column {
 	background: inherit;
 }
-.property>.label {
-	width: 25%;
+.label {
+	color: steelblue;
+	background: ghostwhite;
 }

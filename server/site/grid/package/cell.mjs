@@ -66,7 +66,6 @@ export default {
 			return this.owner.getViewContext(view, "application").types;
 		},
 		createView: function(parent, model, conf) {
-			let owner = this.owner.ownerOf(parent);
 			let types = this.implicitTypes;
 			let type = types[conf.type] || types[typeof model] || types.string;
 			let view = type.call(this, parent, model, conf);
@@ -75,23 +74,6 @@ export default {
 			this.bind(view, model);
 			return view;
 		},
-		/*
-		get$viewName: function() {
-			return this.conf.type == "div" ? "div.field" : "input.field"
-		},
-		viewAttributes: function(model, conf) {
-			if (conf.type == "div") return {
-				contentEditable: true
-			};
-			return {
-				type: conf.type || "text",
-				name: conf.name,
-				title: conf.title,
-				maxlength: conf.maxLength || 1000,
-				value: model || "",
-			}
-		},
-		*/
 		drawTitle: function(ctx, conf, cls) {
 			let label = this.owner.append(ctx, "." + cls);
 			label.classList.add("cell");
@@ -110,47 +92,33 @@ export default {
 		},
 		extend$actions: {
 			input: function(on, event) {
-				let name = on.name;
-				let record = this.owner.getViewContext(on, "record");
-				let model = record ? record.model : undefined;
-				if (model) {
-					let prior = model[name];
-					model[name] = this.getViewValue(event.target);
-					event = {
-						type: "updated",
-						target: record,
-						source: on,
-						object: model,
-						property: name,
-						value: prior
-					}
-					this.owner.transmit.object(on, event);
-				}
+				on.record && on.record.controller.update(on.record, on.name, this.getViewValue(on))
 			}
 		}
 	},
 	Record: {
 		super$: "use.view.Viewer",
 		use: {
-			type$Control: "use.control.Control",
 			type$Field: "Field"
 		},
+		viewName: ".record",
 		fields: [],
-		viewName: "div.record",
-		draw: function(view, model) {
-			view.classList.add("row");
-			view.fields = Object.create(null);
-			for (let field of this.fields) {
-				let name = field.name;
-				let value = model ? model[name] : undefined;
-				view.fields[name] = this.use.Field.createView(view, value, field);
-				view.fields[name].classList.add("cell");
-				view.fields[name].style.width = field.size + "em";
-			}
+		update: function(record, name, value) {
+			let model = record.model;
+			if (model === undefined) return;
+			let prior = model[name];
+			model[name] = value;
+			this.owner.transmit.object(record, {
+				type: "updated",
+				source: record,
+				object: model,
+				property: name,
+				priorValue: prior
+			});
 		},
 		extend$actions: {
 			updated: function(on, event) {
-				if (on != event.target) {
+				if (on != event.source) {
 					let field = on.fields[event.property];
 					field.controller.setViewValue(field, event.object[event.property]);
 				}
@@ -183,44 +151,56 @@ export default {
 		},
 		createBody: function(view, model) {
 			view = this.owner.append(view, ".body");
-			if (model) for (let row of model) this.record.createView(view, row);
+			if (model) for (let row of model) this.createRow(view, row);
 			return view;
+		},
+		createRow: function(body, model) {
+			let row = this.record.createView(body, model);
+			row.classList.add("row");
+			row.fields = Object.create(null);
+			for (let conf of this.record.fields) {
+				let name = conf.name;
+				let value = model ? model[name] : undefined;
+				let field = this.record.use.Field.createView(row, value, conf);
+				field.classList.add("cell");
+				field.style.width = conf.size + "em";
+				field.record = row;
+				row.fields[name] = field;
+			}
 		}
 	},
 	Properties: {
-		super$: "use.view.Viewer",
+		super$: "Record",
 		use: {
-			type$Control: "use.control.Control",
 			type$Field: "Field"
 		},
-		type$record: "Record",
-		viewName: "div.properties",
 		draw: function(view, model) {
-			view.classList.add("record");
+			view.classList.add("properties");
 			view.classList.add("grid");
-			view.fields = {};
-			for (let field of this.record.fields) {
+			view.fields = Object.create(null);
+			for (let conf of this.fields) {
 				let prop = this.owner.append(view, ".property");
 				prop.classList.add("row");
-				let label = this.owner.append(prop, ".label");
-				label.classList.add("cell");
-				let title = field.title;
-				if (!title) {
-					title = field.name.substr(0, 1).toUpperCase() + field.name.substr(1);
-				}
-				label.textContent = title;
-				let name = field.name;
-				let value = model ? model[name] : undefined;
-				view.fields[name] = this.use.Field.createView(prop, value, field);
-				view.fields[name].classList.add("cell");
+				this.createLabel(prop, conf);
+				let field = this.createField(prop, model, conf);
+				field.record = view;
+				view.fields[field.name] = field;
 			}
 		},
-		extend$actions: {
-			updated: function(on, event) {
-				if (on != event.target) {
-					on.fields[event.property].value = event.object[event.property];
-				}
+		createLabel: function(prop, field) {
+			let label = this.owner.append(prop, ".label");
+			label.classList.add("cell");
+			if (!field.title) {
+				field.title = nameToTitle(field.name);
 			}
+			label.textContent = field.title;
+			return label;
+		},
+		createField: function(prop, model, field) {
+			let value = model ? model[field.name] : undefined;
+			let view = this.use.Field.createView(prop, value, field);
+			view.classList.add("cell");
+			return view;
 		}
 	}
 }
