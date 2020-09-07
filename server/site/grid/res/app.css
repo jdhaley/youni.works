@@ -10,26 +10,36 @@
 .header, .footer {
 	display: flex;
 	flex-direction: row;
-	flex: 1;
-	background: steelblue;
+	background: silver;
 	color: ghostwhite;
+	padding: 2px;
+	min-height: 24px;
 }
-
+.footer {
+	min-height: 0;
+}
 .application, .application * {
-	align-content: stretch;
-	align-items: stretch;
 	font: 16px arial;
 	margin: 0;
 	padding: 0;
 	border: 0;
 	outline: 0;
-}
-.window {
+	align-content: stretch;
+	align-items: stretch;
 	display: flex;
+	flex: 1;
+}
+
+.window {
 	flex-direction: column;
 	position: absolute;
-	z-index: 2;
+	background: white;
 }
-.window>.header {
-	padding: 2px;
+
+.active {
+	z-index: 10000;
+	box-shadow: 2px 2px 2px silver;
+}
+.active>.header {
+	background: steelblue;
 }

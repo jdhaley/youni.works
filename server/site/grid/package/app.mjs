@@ -72,6 +72,12 @@ export default {
 		viewName: ".window",
 		startMove: function(window, target) {
 			return target == window.header;	
+		},
+		createHeader: function(window, model) {
+			return this.owner.append(window, ".header");
+		},
+		createBody: function(window, model) {
+			return this.owner.append(window, ".body");
 		}
 	},
 	DataWindow: {
@@ -82,13 +88,14 @@ export default {
 		show: function(parent, type, model) {
 			let app = this.owner.getViewContext(parent, "application");
 			type = app && app.types && app.types[type];
-			let view = this.createView(parent, model);
+
 			let record = this.sys.extend(this.use.cell.Record, {
 				fields: type
 			});
 			let editor = this.sys.extend(model && model.length ? this.use.cell.Table : this.use.cell.Properties, {
 				record: record
 			});
+			let view = this.createView(parent, model);
 			editor.createView(view.body, model);
 			return view;
 		}

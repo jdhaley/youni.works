@@ -54,12 +54,10 @@ export default {
 				return this.owner.append(parent, "input.time", at);
 			},
 			text: function(parent, model, conf) {
-				let at = {
-					type: conf.precision == "day" ? "date" : "datetime-local",
-					name: conf.name,
-					value: model || ""
-				};
-				let view = this.owner.append(parent, "div.text");
+				let view = this.owner.append(parent, "div.text", {
+					contentEditable: true
+				});
+				view.name = conf.name;
 				view.innerHTML = model;
 				return view;
 			},
@@ -73,7 +71,7 @@ export default {
 			let type = types[conf.type] || types[typeof model] || types.string;
 			let view = type.call(this, parent, model, conf);
 			view.classList.add("field");
-			//this.draw(view, model);
+			this.draw(view, model);
 			this.bind(view, model);
 			return view;
 		},
@@ -102,6 +100,13 @@ export default {
 		},
 		getViewValue: function(view) {
 			return view.nodeName == "INPUT" ? view.value : view.textContent;
+		},
+		setViewValue: function(view, value) {
+			if (view.nodeName == "INPUT") {
+				view.value = value;
+			} else {
+				view.textContent = value;
+			}
 		},
 		extend$actions: {
 			input: function(on, event) {
@@ -146,7 +151,8 @@ export default {
 		extend$actions: {
 			updated: function(on, event) {
 				if (on != event.target) {
-					on.fields[event.property].value = event.object[event.property];
+					let field = on.fields[event.property];
+					field.controller.setViewValue(field, event.object[event.property]);
 				}
 			}
 		}
@@ -155,22 +161,30 @@ export default {
 		super$: "use.view.Item",
 		type$record: "Record",
 		viewName: "div.table",
-		drawHeader: function(view, model) {
+		control: function(view) {
 			view.classList.add("grid");
-			view = this.owner.append(view, "div.header");
-			for (let field of this.record.fields) {
-				if (!field.title) {
-					field.title = nameToTitle(field.name);
-				}
-				let col = this.owner.append(view, "div.column");
-				col.style.flex = (field.size || 1) + "em";
-				col.textContent = field.title;
-				col.classList.add("cell");
-			}
 		},
-		drawBody: function(view, model) {
-			view = this.owner.append(view, "div.body");
+		createHeader: function(view, model) {
+			view = this.owner.append(view, ".header");
+			for (let field of this.record.fields) {
+				this.createColumn(view, field);
+			}
+			return view;
+		},
+		createColumn: function(header, field) {
+			if (!field.title) {
+				field.title = nameToTitle(field.name);
+			}
+			let col = this.owner.append(header, ".column");
+			col.style.flex = (field.size || 1) + "em";
+			col.textContent = field.title;
+			col.classList.add("cell");
+			return col;
+		},
+		createBody: function(view, model) {
+			view = this.owner.append(view, ".body");
 			if (model) for (let row of model) this.record.createView(view, row);
+			return view;
 		}
 	},
 	Properties: {

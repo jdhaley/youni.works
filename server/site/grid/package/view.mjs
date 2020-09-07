@@ -79,9 +79,6 @@ export default {
 		
 		viewName: "div.view",
 		events: null,
-		viewAttributes: function(model, type) {
-			return null;
-		},
 		classOf: function(ele) {
 			let owner = this.owner.ownerOf(ele);
 			let cls = owner.classes[this.viewName];
@@ -94,22 +91,21 @@ export default {
 			return cls;
 		},
 		createView: function(parent, model, type) {
-			let owner = this.owner.ownerOf(parent);
-			let view = owner.append(parent, this.viewName, this.viewAttributes(model, type));
+			let view = this.owner.append(parent, this.viewName);
 			this.draw(view, model);
 			this.bind(view, model);
 			return view;
+		},
+		draw: function(view, model, conf) {
 		},
 		bind: function(view, model) {
 			view.model = model;
 			view.receive = Control_receive;
 			view.controller = this;
-			this.owner.bind(view, model);
 			this.controlEvents(view);
 			this.control(view);
+			this.owner.bind(view, model);
 			return view;
-		},
-		draw: function(view, model) {
 		},
 		control: function(view) {
 		},
@@ -123,29 +119,26 @@ export default {
 	Item: {
 		super$: "Viewer",
 		viewName: ".item",
-		startMove: function(view) {
-		},
 		draw: function(view, model) {
-			view.header = this.drawHeader(view, model);
-			view.body = this.drawBody(view, model);
-			view.footer = this.drawFooter(view, model);
-			view.style.top = "100px";
-			view.style.left = "100px";
+			view.header = this.createHeader(view, model);
+			view.body = this.createBody(view, model);
+			view.footer = this.createFooter(view, model);
 		},
-		drawHeader: function(view) {
-			let header = this.owner.append(view, "div.header");
-			//header.contentEditable = true;
-			header.innerHTML = "<br>";
-			return header;
+		createHeader: function(item, model) {
 		},
-		drawBody: function(view) {
-			return this.owner.append(view, "div.body");
+		createBody: function(item, model) {
 		},
-		drawFooter: function(view) {
-			return this.owner.append(view, "div.footer");
+		createFooter: function(item, model) {
+		},
+		startMove: function(view) {
+			return false;
 		},
 		extend$actions: {
 			mousedown: function(on, event) {
+				let current = on.ownerDocument.querySelector(".active");
+				if (current) current.classList.remove("active");
+				on.classList.add("active");
+				event.target.focus();
 				if (this.startMove(on, event.mouseTarget)) {
 					let box = on.getBoundingClientRect();
 					on.MOVE = {

@@ -7,7 +7,8 @@ export default {
 			name: "type"
 		},
 		{
-			name: "title"
+			name: "title",
+			type: "text"
 		},
 		{
 			name: "size",

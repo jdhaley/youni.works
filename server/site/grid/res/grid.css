@@ -1,14 +1,17 @@
-
+.grid {
+	flex-direction: column;
+	border: 1px solid silver;
+}
 .cell {
+	min-height: 20px;
+	overflow: hidden;
 	outline: 0;
 	margin: 0;
 	border: 0;
 	padding: 2px;
 	border-right: 1px solid silver;
-	text-align: left;
-	overflow: hidden;
+	background: white;
 }
-
 .cell:last-child {
 	border-right: 0;
 }
@@ -21,18 +24,21 @@
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
-	align-items: stretch;
 	text-align: left;
 }
 .row:last-child {
 	border-bottom: 0;
 }
 .grid {
-	border: 1px solid silver;
 }
 .grid>.header {
 	padding: 0;
 	border-bottom: 1px solid silver;
+	background: ghostWhite;
+	color: steelblue;
+}
+.column {
+	background: inherit;
 }
 .property>.label {
 	width: 25%;
