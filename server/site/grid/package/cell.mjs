@@ -9,15 +9,16 @@ export default {
 		implicitTypes: {
 			string: function(parent, model, conf) {
 				if (conf.choice) {
+					let choice = conf.choice
 					let at = {
 						name: conf.name,
 					};
 					let view = this.owner.append(parent, "select.string", at);
-					for (let name of choice) {
+					for (let name in choice) {
 						let option = this.owner.append(view, "option");
 						option.value = name;
 						option.textContent = choice[name];
-						if (choice[name] == model) option.selected = true;
+						if (name == model) option.selected = true;
 					}
 					return view;
 				}

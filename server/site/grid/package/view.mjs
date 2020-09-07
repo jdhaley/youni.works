@@ -78,12 +78,12 @@ export default {
 		draw: function(view, model, conf) {
 		},
 		bind: function(view, model, conf) {
-			view.model = model;
 			view.receive = Control_receive;
 			view.controller = this;
+			view.model = model;
+			this.owner.bind(view, model);
 			this.controlEvents(view);
 			this.control(view);
-			this.owner.bind(view, model);
 			return view;
 		},
 		control: function(view) {

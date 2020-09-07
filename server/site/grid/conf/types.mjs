@@ -4,7 +4,14 @@ export default {
 			name: "name",
 		},
 		{
-			name: "type"
+			name: "type",
+			choice: {
+				string: "String",
+				number: "Number",
+				boolean: "Boolean",
+				time: "Time",
+				text: "Text"
+			}
 		},
 		{
 			name: "title",
