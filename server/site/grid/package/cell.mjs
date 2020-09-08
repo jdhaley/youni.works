@@ -180,13 +180,17 @@ export default {
 			view.classList.add("grid");
 			view.fields = Object.create(null);
 			for (let conf of this.fields) {
-				let prop = this.owner.append(view, ".property");
-				prop.classList.add("row");
-				this.createLabel(prop, conf);
-				let field = this.createField(prop, model, conf);
-				field.record = view;
-				view.fields[field.name] = field;
+				this.createProperty(view, model, conf);
 			}
+		},
+		createProperty: function(record, model, conf) {
+			let prop = this.owner.append(record, ".property");
+			prop.classList.add("row");
+			this.createLabel(prop, conf);
+			let field = this.createField(prop, model, conf);
+			field.record = record;
+			record.fields[field.name] = field;
+			return prop;
 		},
 		createLabel: function(prop, field) {
 			let label = this.owner.append(prop, ".label");
