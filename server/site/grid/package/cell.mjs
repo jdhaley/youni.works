@@ -164,7 +164,7 @@ export default {
 				let value = model ? model[name] : undefined;
 				let field = this.record.use.Field.createView(row, value, conf);
 				field.classList.add("cell");
-				field.style.width = conf.size + "em";
+				field.style.flex = (conf.size || 1) + "em";
 				field.record = row;
 				row.fields[name] = field;
 			}

@@ -5,35 +5,8 @@ export default {
 	package$: "youni.works/base/app",
 	use: {
 		package$view: "youni.works/base/view",
-		package$cell: "youni.works/base/cell"
-	},
-	Factory: {
-		super$: "Object",
-		types: {
-		},
-		bind: function(types) {
-			let ctx = this.sys.extend(this, {
-				extend$types: {}
-			});
-			for (let name in types) {
-				let value = types[name]
-				switch (typeof value) {
-					case "function":
-						ctx.types[name] = value.bind(ctx);
-						break;
-					case "object":
-						if (this.sys.isInterface(value)) {
-							ctx.types[name] = this.sys.extend.bind(this.sys, value);
-						} else if (typeof value.create == "function") {
-							value = Object.create(value);
-							value.context = ctx;
-							ctx.types[name] = value.create.bind(value);
-						}
-						break;
-				}
-			}
-			return ctx.types;
-		}
+		package$cell: "youni.works/base/cell",
+		package$remote: "youni.works/web/remote"
 	},
 	Application: {
 		super$: "use.view.Viewer",
@@ -65,6 +38,20 @@ export default {
 					MOUSE_TARGET = null;
 				}
 			}
+		},
+		type$fs: "use.remote.Remote",
+		open: function(pathname, receiver) {
+			this.fs.service(receiver, "opened", {
+				url: pathname,
+				method: "GET"
+			});
+		},
+		save: function(pathname, content, receiver) {
+			this.fs.service(receiver, "saved", {
+				url: pathname,
+				content: content,
+				method: "PUT"
+			});
 		}
 	},
 	Window: {
@@ -112,3 +99,32 @@ function UP(event, from) {
 	let controller = event.currentTarget.controller;
 	controller && controller.owner.transmit.up(from || event.target, event);
 }
+
+//Factory: {
+//	super$: "Object",
+//	types: {
+//	},
+//	bind: function(types) {
+//		let ctx = this.sys.extend(this, {
+//			extend$types: {}
+//		});
+//		for (let name in types) {
+//			let value = types[name]
+//			switch (typeof value) {
+//				case "function":
+//					ctx.types[name] = value.bind(ctx);
+//					break;
+//				case "object":
+//					if (this.sys.isInterface(value)) {
+//						ctx.types[name] = this.sys.extend.bind(this.sys, value);
+//					} else if (typeof value.create == "function") {
+//						value = Object.create(value);
+//						value.context = ctx;
+//						ctx.types[name] = value.create.bind(value);
+//					}
+//					break;
+//			}
+//		}
+//		return ctx.types;
+//	}
+//},
