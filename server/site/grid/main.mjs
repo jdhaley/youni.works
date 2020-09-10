@@ -6,12 +6,12 @@ export default function main(sys, conf) {
 	
 	let app = pkg.app.Application.createView(document.body);
 	app.path = "/file/stamp/data.json";
-	pkg.app.Application.open("/file/stamp/types.json", loadTypes);
+	app.controller.owner.open("/file/stamp/types.json", loadTypes);
 	
 	
 	function loadTypes(msg) {
 		app.types = JSON.parse(msg.content);
-		app.controller.open(app.path, loadData)
+		app.controller.owner.open(app.path, loadData)
 	}
 	function loadData(msg) {
 		app.model = JSON.parse(msg.content);

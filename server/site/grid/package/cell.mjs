@@ -153,6 +153,7 @@ export default {
 		createBody: function(view, model) {
 			view = this.owner.append(view, ".body");
 			if (model) for (let row of model) this.createRow(view, row);
+			this.createRow(view, {});
 			return view;
 		},
 		createRow: function(body, model) {
@@ -167,6 +168,32 @@ export default {
 				field.style.flex = (conf.size || 1) + "em";
 				field.record = row;
 				row.fields[name] = field;
+			}
+			return row;
+		},
+		extend$actions: {
+			keydown: function(on, event) {
+				if (event.key.length == 1) {
+					let row = this.owner.getViewContext(event.target, "row");
+					if (!row.nextSibling) this.createRow(on.body, {});
+				}
+				if (event.key == "Enter") {
+					event.preventDefault();
+					let currentRow = this.owner.getViewContext(event.target, "row");
+					
+					let row = this.createRow(on.body, {});
+					on.body.insertBefore(row, currentRow);
+					row.firstChild.focus();
+				}
+				if (event.key == "Delete") {
+					event.preventDefault();
+					let row = this.owner.getViewContext(event.target, "row");
+					if (!row.nextSibling) {
+						this.createRow(on.body, {});						
+					}
+					row.nextSibling.firstChild.focus();
+					row.remove();
+				}
 			}
 		}
 	},

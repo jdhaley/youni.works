@@ -6,13 +6,26 @@ export default {
 	use: {
 		package$view: "youni.works/base/view",
 		package$cell: "youni.works/base/cell",
-		package$remote: "youni.works/web/remote"
+	},
+	Window: {
+		super$: "use.view.Item",
+		viewName: ".window",
+		startMove: function(window, target) {
+			return target == window.header;	
+		},
+		createHeader: function(window, model) {
+			return this.owner.append(window, ".header");
+		},
+		createBody: function(window, model) {
+			return this.owner.append(window, ".body");
+		}
 	},
 	Application: {
 		super$: "use.view.Viewer",
 		viewName: "main.application",
 		extend$events: {
 			input: UP,
+			keydown: UP,
 			mousedown: function(event) {
 				MOUSE_TARGET = event.target;
 				event.mouseTarget = MOUSE_TARGET;
@@ -37,43 +50,15 @@ export default {
 					UP(event, MOUSE_TARGET);
 					MOUSE_TARGET = null;
 				}
-			},
-			keydown: UP
+			}
 		},
 		extend$actions: {
 			keydown: function(on, event) {
 				if (event.ctrlKey && event.key == "s") {
 					event.preventDefault();
-					this.save(on.path, on.model);
+					this.owner.save(on.path, on.model);
 				}	
 			}
-		},
-		type$fs: "use.remote.Remote",
-		open: function(pathname, receiver) {
-			this.fs.service(receiver, "opened", {
-				url: pathname,
-				method: "GET"
-			});
-		},
-		save: function(pathname, content, receiver) {
-			this.fs.service(receiver, "saved", {
-				url: pathname,
-				content: content,
-				method: "PUT"
-			});
-		}
-	},
-	Window: {
-		super$: "use.view.Item",
-		viewName: ".window",
-		startMove: function(window, target) {
-			return target == window.header;	
-		},
-		createHeader: function(window, model) {
-			return this.owner.append(window, ".header");
-		},
-		createBody: function(window, model) {
-			return this.owner.append(window, ".body");
 		}
 	},
 	DataWindow: {
