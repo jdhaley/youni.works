@@ -37,6 +37,15 @@ export default {
 					UP(event, MOUSE_TARGET);
 					MOUSE_TARGET = null;
 				}
+			},
+			keydown: UP
+		},
+		extend$actions: {
+			keydown: function(on, event) {
+				if (event.ctrlKey && event.key == "s") {
+					event.preventDefault();
+					this.save(on.path, on.model);
+				}	
 			}
 		},
 		type$fs: "use.remote.Remote",

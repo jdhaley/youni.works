@@ -5,16 +5,17 @@ export default function main(sys, conf) {
 	const pkg = conf.packages;
 	
 	let app = pkg.app.Application.createView(document.body);
-
+	app.path = "/file/stamp/data.json";
 	pkg.app.Application.open("/file/stamp/types.json", loadTypes);
+	
 	
 	function loadTypes(msg) {
 		app.types = JSON.parse(msg.content);
-		app.controller.open("/file/stamp/data.json", loadData)
+		app.controller.open(app.path, loadData)
 	}
 	function loadData(msg) {
-		let data = JSON.parse(msg.content)
-		pkg.app.DataWindow.show(app, "Variety", data.issues[0].varieties);
-		pkg.app.DataWindow.show(app, "Variety", data.issues[0].varieties[0]);
+		app.model = JSON.parse(msg.content);
+		pkg.app.DataWindow.show(app, "Variety", app.model.issues[0].varieties);
+		pkg.app.DataWindow.show(app, "Variety", app.model.issues[0].varieties[0]);
 	}
 }
