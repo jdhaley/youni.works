@@ -8,14 +8,12 @@ export default function main(sys, conf) {
 	app.path = "/file/stamp/data.json";
 	app.controller.owner.open("/file/stamp/types.json", loadTypes);
 	
-	
 	function loadTypes(msg) {
 		app.types = JSON.parse(msg.content);
 		app.controller.owner.open(app.path, loadData)
 	}
 	function loadData(msg) {
 		app.model = JSON.parse(msg.content);
-		pkg.app.DataWindow.show(app, "Variety", app.model.issues[0].varieties);
-		pkg.app.DataWindow.show(app, "Variety", app.model.issues[0].varieties[0]);
+		app.controller.show(app, "Variety", app.model.issues[0].varieties);
 	}
 }

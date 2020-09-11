@@ -99,11 +99,6 @@ export default {
 	},
 	Record: {
 		super$: "use.view.Viewer",
-		use: {
-			type$Field: "Field"
-		},
-		viewName: ".record",
-		fields: [],
 		update: function(record, name, value) {
 			let model = record.model;
 			if (model === undefined) return;
@@ -128,14 +123,18 @@ export default {
 	},
 	Table: {
 		super$: "use.view.Item",
-		type$record: "Record",
+		use: {
+			type$Record: "Record",
+			type$Field: "Field"
+		},
 		viewName: "div.table",
+		fields: null,
 		control: function(view) {
 			view.classList.add("grid");
 		},
 		createHeader: function(view, model) {
 			view = this.owner.append(view, ".header");
-			for (let field of this.record.fields) {
+			for (let field of this.fields) {
 				this.createColumn(view, field);
 			}
 			return view;
@@ -157,13 +156,13 @@ export default {
 			return view;
 		},
 		createRow: function(body, model) {
-			let row = this.record.createView(body, model);
+			let row = this.use.Record.createView(body, model);
 			row.classList.add("row");
 			row.fields = Object.create(null);
-			for (let conf of this.record.fields) {
+			for (let conf of this.fields) {
 				let name = conf.name;
 				let value = model ? model[name] : undefined;
-				let field = this.record.use.Field.createView(row, value, conf);
+				let field = this.use.Field.createView(row, value, conf);
 				field.classList.add("cell");
 				field.style.flex = (conf.size || 1) + "em";
 				field.record = row;
@@ -176,6 +175,13 @@ export default {
 				if (event.key.length == 1) {
 					let row = this.owner.getViewContext(event.target, "row");
 					if (!row.nextSibling) this.createRow(on.body, {});
+				}
+				if (event.ctrlKey && event.key == " ") {
+					let row = this.owner.getViewContext(event.target, "row");
+					let app = this.owner.getViewContext(on, "application");
+					let window = app.controller.show(app, "Variety", row.model);
+					let box = event.target.getBoundingClientRect();
+					window.controller.moveTo(window, box.left, box.bottom);
 				}
 				if (event.key == "Enter") {
 					event.preventDefault();

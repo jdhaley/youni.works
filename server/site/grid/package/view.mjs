@@ -127,6 +127,10 @@ export default {
 		startMove: function(view) {
 			return false;
 		},
+		moveTo: function(item, x, y) {
+			item.style.left = x + "px";
+			item.style.top = y + "px";
+		},
 		extend$actions: {
 			mousedown: function(on, event) {
 				let current = on.ownerDocument.querySelector(".active");
@@ -144,8 +148,7 @@ export default {
 			},
 			mousemove: function(on, event) {
 				if (on.MOVE) {
-					on.style.left = event.pageX - on.MOVE.x  + "px";
-					on.style.top = event.pageY  - on.MOVE.y  + "px";		
+					this.moveTo(on, event.pageX - on.MOVE.x, event.pageY  - on.MOVE.y);
 				}
 			},
 			mouseup: function(on, event) {

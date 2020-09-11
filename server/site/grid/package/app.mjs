@@ -22,6 +22,11 @@ export default {
 	},
 	Application: {
 		super$: "use.view.Viewer",
+		use: {
+			type$Properties: "use.cell.Properties",
+			type$Table: "use.cell.Table",
+			type$Window: "Window"
+		},
 		viewName: "main.application",
 		extend$events: {
 			input: UP,
@@ -59,32 +64,18 @@ export default {
 					this.owner.save(on.path, on.model);
 				}	
 			}
-		}
-	},
-	DataWindow: {
-		super$: "Window",
-		use: {
-			type$cell: "use.cell"
 		},
-		show: function(parent, type, model) {
-			let app = this.owner.getViewContext(parent, "application");
+		show: function(app, type, model) {
 			type = app && app.types && app.types[type];
 
-			let editor;
-			if (model.length) {
-				editor = this.sys.extend(this.use.cell.Table, {
-					record: this.sys.extend(this.use.cell.Record, {
-						fields: type
-					})
-				});
-			} else {
-				editor = this.sys.extend(this.use.cell.Properties, {
-					fields: type
-				});
-			}
-			let view = this.createView(parent, model);
-			editor.createView(view.body, model);
-			return view;
+			let editor = this.sys.extend(model.length ? this.use.Table : this.use.Properties, {
+				fields: type
+			});
+			let window = this.use.Window.createView(app);
+			editor.createView(window.body, model);
+			window.classList.add("active");
+			window.focus();
+			return window;
 		}
 	}
 }
