@@ -112,12 +112,33 @@ export default {
 				priorValue: prior
 			});
 		},
+		delete: function(record) {
+			let model = record.model;
+			if (model === undefined) return;
+			this.owner.transmit.object(record, {
+				type: "deleted",
+				source: record,
+				object: model
+			});
+		},
 		extend$actions: {
 			updated: function(on, event) {
 				if (on != event.source) {
 					let field = on.fields[event.property];
 					field.controller.setViewValue(field, event.object[event.property]);
 				}
+				this.owner.transmit.up(on, {
+					type: "contentUpdated",
+					target: on
+				});
+			},
+			deleted: function(on, event) {
+				this.owner.unbind(on);
+				this.owner.transmit.up(on, {
+					type: "contentDeleted",
+					target: on
+				});
+				on.remove();
 			}
 		}
 	},
@@ -191,15 +212,14 @@ export default {
 					on.body.insertBefore(row, currentRow);
 					row.firstChild.focus();
 				}
-				if (event.key == "Delete") {
+				if (event.ctrlKey && event.key == "Delete") {
 					event.preventDefault();
 					let row = this.owner.getViewContext(event.target, "row");
-					if (!row.nextSibling) {
-						this.createRow(on.body, {});						
-					}
-					row.nextSibling.firstChild.focus();
-					row.remove();
+					row.controller.delete(row);
 				}
+			},
+			contentDeleted: function(on, event) {
+				console.log(event.target);
 			}
 		}
 	},

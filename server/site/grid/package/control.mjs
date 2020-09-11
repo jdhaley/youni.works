@@ -11,9 +11,6 @@ export default {
 		super$: "Object",
 		process: function(control, event) {
 			let action = this.actions && this.actions[event.type];
-			if (action == "updated") {
-				console.log(event.type, control);
-			}
 			action && action.call(this, control, event);
 		}
 	},
@@ -22,10 +19,13 @@ export default {
 		transmit: {
 			object: function(on, event) {
 				event.stopPropagation && event.stopPropagation();
-				let object = event.object;
-				if (object) for (let on of object[observers]) {
-					if (!event.type) return;
-					on && on.receive && on.receive(event);
+				let object = event.object; 
+				if (object && object[observers]) {
+					//The observers might bind() or unbind() so copy the array...
+					for (let on of object[observers].slice()) {
+						if (!event.type) return;
+						on && on.receive && on.receive(event);
+					}
 				}
 			}
 		},
