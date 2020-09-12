@@ -24,6 +24,7 @@ export default {
 	Application: {
 		super$: "use.view.Viewer",
 		use: {
+			type$Command: "use.command.Command",
 			type$Commands: "use.command.ObjectCommands",
 			type$Properties: "use.cell.Properties",
 			type$Table: "use.cell.Table",
@@ -32,7 +33,9 @@ export default {
 		viewName: "main.application",
 		control: function(view) {
 			view.commands = this.sys.extend(this.use.Commands, {
-				lastCommand: null
+				lastCommand: this.sys.extend(this.use.Command, {
+					next: null
+				})
 			});
 		},
 		extend$events: {
@@ -69,7 +72,18 @@ export default {
 				if (event.ctrlKey && event.key == "s") {
 					event.preventDefault();
 					this.owner.save(on.path, on.model);
-				}	
+					return;
+				}
+				if (event.ctrlKey && event.key == "z") {
+					event.preventDefault();
+					on.commands.undo();
+					return;
+				}
+				if (event.ctrlKey && event.key == "y") {
+					event.preventDefault();
+					on.commands.redo();
+					return;
+				}
 			}
 		},
 		show: function(app, type, model) {
