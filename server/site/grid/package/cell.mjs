@@ -99,18 +99,29 @@ export default {
 	},
 	Record: {
 		super$: "use.view.Viewer",
+		create: function(record) {
+			this.owner.transmit.object(record, {
+				type: "created",
+				source: record,
+				object: record.model
+			});
+		},
 		update: function(record, name, value) {
 			let model = record.model;
 			if (model === undefined) return;
+			let app = this.owner.getViewContext(record, "application");
+			app.commands.update(model, name, value);
+			/*
 			let prior = model[name];
 			model[name] = value;
 			this.owner.transmit.object(record, {
 				type: "updated",
 				source: record,
 				object: model,
-				property: name,
+				index: name,
 				priorValue: prior
 			});
+			*/
 		},
 		delete: function(record) {
 			let model = record.model;
@@ -122,10 +133,16 @@ export default {
 			});
 		},
 		extend$actions: {
+			created: function(on, event) {
+				this.owner.transmit.up(on, {
+					type: "contentCreated",
+					target: on
+				});
+			},
 			updated: function(on, event) {
 				if (on != event.source) {
-					let field = on.fields[event.property];
-					field.controller.setViewValue(field, event.object[event.property]);
+					let field = on.fields[event.index];
+					field.controller.setViewValue(field, event.object[event.index]);
 				}
 				this.owner.transmit.up(on, {
 					type: "contentUpdated",

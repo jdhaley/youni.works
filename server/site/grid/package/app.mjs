@@ -4,6 +4,7 @@ let MOUSE_TARGET = null;
 export default {
 	package$: "youni.works/base/app",
 	use: {
+		package$command: "youni.works/base/command",
 		package$view: "youni.works/base/view",
 		package$cell: "youni.works/base/cell",
 	},
@@ -23,11 +24,17 @@ export default {
 	Application: {
 		super$: "use.view.Viewer",
 		use: {
+			type$Commands: "use.command.ObjectCommands",
 			type$Properties: "use.cell.Properties",
 			type$Table: "use.cell.Table",
 			type$Window: "Window"
 		},
 		viewName: "main.application",
+		control: function(view) {
+			view.commands = this.sys.extend(this.use.Commands, {
+				lastCommand: null
+			});
+		},
 		extend$events: {
 			input: UP,
 			keydown: UP,
