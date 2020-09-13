@@ -1,6 +1,8 @@
 const observers = Symbol("observers");
 let MOVE = null;
 let MOUSE_TARGET = null;
+let zIndex = 1;
+
 export default {
 	package$: "youni.works/base/app",
 	use: {
@@ -11,6 +13,14 @@ export default {
 	Window: {
 		super$: "use.view.Item",
 		viewName: ".window",
+		activate: function(on) {
+			let current = on.ownerDocument.querySelector(".active");
+			if (on == current) return;
+			if (current) current.classList.remove("active");
+			on.classList.add("active");
+			on.style.zIndex = ++zIndex;
+			on.body.focus();		
+		},
 		startMove: function(window, target) {
 			return target == window.header;	
 		},
@@ -41,6 +51,9 @@ export default {
 		extend$events: {
 			input: UP,
 			keydown: UP,
+			focus: function(event) {
+				console.log(event);
+			},
 			mousedown: function(event) {
 				MOUSE_TARGET = event.target;
 				event.mouseTarget = MOUSE_TARGET;
@@ -64,7 +77,7 @@ export default {
 					event.mouseTarget = MOUSE_TARGET;
 					UP(event, MOUSE_TARGET);
 					MOUSE_TARGET = null;
-				}
+				}					
 			}
 		},
 		extend$actions: {
@@ -94,7 +107,6 @@ export default {
 			});
 			let window = this.use.Window.createView(app);
 			editor.createView(window.body, model);
-			window.classList.add("active");
 			window.focus();
 			return window;
 		}

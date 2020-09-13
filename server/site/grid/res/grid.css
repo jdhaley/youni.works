@@ -4,6 +4,7 @@
 	max-width: 90vw;
 }
 .cell {
+	font: 16px arial;
 	min-height: 20px;
 	overflow: hidden;
 	outline: 0;

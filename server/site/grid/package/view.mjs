@@ -1,5 +1,4 @@
 const observers = Symbol("observers");
-
 export default {
 	package$: "youni.works/base/view",
 	use: {
@@ -88,6 +87,7 @@ export default {
 			let view = this.owner.append(parent, this.viewName);
 			this.draw(view, model, conf);
 			this.bind(view, model, conf);
+			this.activate(view);
 			return view;
 		},
 		draw: function(view, model, conf) {
@@ -103,6 +103,8 @@ export default {
 		},
 		control: function(view) {
 		},
+		activate: function(view) {
+		},
 		controlEvents: function(view) {
 			for (let event in this.events) {
 				let listener = this.events[event];
@@ -117,6 +119,7 @@ export default {
 			view.header = this.createHeader(view, model);
 			view.body = this.createBody(view, model);
 			view.footer = this.createFooter(view, model);
+			this.activate(view);
 		},
 		createHeader: function(item, model) {
 		},
@@ -133,10 +136,6 @@ export default {
 		},
 		extend$actions: {
 			mousedown: function(on, event) {
-				let current = on.ownerDocument.querySelector(".active");
-				if (current) current.classList.remove("active");
-				on.classList.add("active");
-				event.target.focus();
 				if (this.startMove(on, event.mouseTarget)) {
 					let box = on.getBoundingClientRect();
 					on.MOVE = {
@@ -145,6 +144,7 @@ export default {
 					}
 					event.preventDefault();
 				}
+				this.activate(on);
 			},
 			mousemove: function(on, event) {
 				if (on.MOVE) {
@@ -155,7 +155,7 @@ export default {
 				delete on.MOVE;
 			},
 			mouseleave: function(on, event) {
-				delete on.MOVE;
+			//	delete on.MOVE;
 			}
 		}
 	}

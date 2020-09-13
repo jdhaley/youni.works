@@ -182,7 +182,7 @@ export default {
 				field.title = nameToTitle(field.name);
 			}
 			let col = this.owner.append(header, ".column");
-			col.style.flex = (field.size || 1) + "em";
+			col.style.flex = (field.size || 1) * 10 + "mm";
 			col.textContent = field.title;
 			col.classList.add("cell");
 			return col;
@@ -202,7 +202,7 @@ export default {
 				let value = model ? model[name] : undefined;
 				let field = this.use.Field.createView(row, value, conf);
 				field.classList.add("cell");
-				field.style.flex = (conf.size || 1) + "em";
+				field.style.flex = (conf.size || 1) * 10 + "mm";
 				field.record = row;
 				row.fields[name] = field;
 			}
@@ -214,12 +214,23 @@ export default {
 					let row = this.owner.getViewContext(event.target, "row");
 					if (!row.nextSibling) this.createRow(on.body, {});
 				}
+				if (event.key == "Escape") {
+					let row = this.owner.getViewContext(event.target, "row");
+					if (row.properties && row.properties.style.display == "flex") {
+						row.properties.style.display = "none";
+					}
+				}
 				if (event.ctrlKey && event.key == " ") {
 					let row = this.owner.getViewContext(event.target, "row");
-					let app = this.owner.getViewContext(on, "application");
-					let window = app.controller.show(app, "Variety", row.model);
+					if (!row.properties) {
+						let app = this.owner.getViewContext(on, "application");
+						row.properties = app.controller.show(app, "Variety", row.model);
+					}
 					let box = event.target.getBoundingClientRect();
-					window.controller.moveTo(window, box.left, box.bottom);
+					row.properties.controller.moveTo(row.properties, box.left, box.bottom);
+					row.properties.style.display = "flex";
+					row.properties.controller.activate(row.properties);
+					return;
 				}
 				if (event.key == "Enter") {
 					event.preventDefault();
@@ -256,10 +267,10 @@ export default {
 		createProperty: function(record, model, conf) {
 			let prop = this.owner.append(record, ".property");
 			prop.classList.add("row");
-			this.createLabel(prop, conf);
-			let field = this.createField(prop, model, conf);
-			field.record = record;
-			record.fields[field.name] = field;
+			prop.lbl = this.createLabel(prop, conf);
+			prop.field = this.createField(prop, model, conf);
+			prop.field.record = record;
+			record.fields[prop.field.name] = prop.field;
 			return prop;
 		},
 		createLabel: function(prop, field) {
@@ -276,6 +287,14 @@ export default {
 			let view = this.use.Field.createView(prop, value, field);
 			view.classList.add("cell");
 			return view;
+		},
+		extend$actions: {
+			keydown: function(on, event) {
+				if (event.key == "Escape") {
+					let window = this.owner.getViewContext(event.target, "window");
+					window.style.display = "none";
+				}
+			}
 		}
 	}
 }
