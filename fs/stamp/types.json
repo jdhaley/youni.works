@@ -1,4 +1,32 @@
 {
+	"Field": [
+		{
+			"name": "name"
+		},
+		{
+			"name": "type",
+			"choice": {
+				"string": "String",
+				"number": "Number",
+				"boolean": "Boolean",
+				"time": "Time",
+				"object": "Object",
+				"array": "Array",
+				"map": "Map"
+			}
+		},
+		{
+			"name": "of"
+		},
+		{
+			"name": "size",
+			"type": "number"
+		},
+		{
+			"name": "width",
+			"type": "number"
+		}
+	],
 	"Album": [
 		{
 			"name": "region",
@@ -10,15 +38,18 @@
 		},
 		{
 			"name": "watermarks",
-			"type": "map*Watermark"
+			"type": "map",
+			"of": "Watermark"
 		},
 		{
 			"name": "designs",
-			"type": "map*Design"
+			"type": "map",
+			"of": "Design"
 		},
 		{
 			"name": "issues",
-			"type": "array*Issue"
+			"type": "array",
+			"of": "Issue"
 		}
 	],
 	"Watermark": [
@@ -30,21 +61,21 @@
 	"Design": [
 		{
 			"name": "shape",
-			"width": 8
+			"size": 8
 		},
 		{
 			"name": "width",
 			"type": "number",
-			"width": 4
+			"size": 4
 		},
 		{
 			"name": "height",
 			"type": "number",
-			"width": 4
+			"size": 4
 		},
 		{
 			"name": "image",
-			"width": 8
+			"size": 8
 		}
 	],
 	"Issue": [
@@ -54,11 +85,13 @@
 		},
 		{
 			"name": "printings",
-			"type": "array*Printing"
+			"type": "array",
+			"of": "Printing"
 		},
 		{
 			"name": "varieties",
-			"type": "array*Variety"
+			"type": "array",
+			"of": "Variety"
 		}
 	],
 	"Printing": [
@@ -87,6 +120,7 @@
 		},
 		{
 			"name": "variety",
+			"type": "number",
 			"title": "Major",
 			"size": 4,
 			"maxLength": 3
@@ -112,15 +146,17 @@
 		},
 		{
 			"name": "issued",
-			"size": 8
+			"type": "time",
+			"precision": "day",
+			"size": 14
 		},
 		{
-			"type": "div",
+			"type": "text",
 			"name": "title",
 			"size": 16
 		},
 		{
-			"type": "div",
+			"type": "text",
 			"name": "caption",
 			"size": 16
 		}
