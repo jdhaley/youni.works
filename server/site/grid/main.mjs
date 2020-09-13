@@ -1,4 +1,4 @@
-import model from "./conf/testModel.mjs";
+//import model from "./conf/testModel.mjs";
 export default function main(sys, conf) {
 //	pkg.app.Application.save("/file/stamp/testModel.json", model);
 	conf.packages = sys.load(conf.packages);
@@ -15,5 +15,6 @@ export default function main(sys, conf) {
 	function loadData(msg) {
 		app.model = JSON.parse(msg.content);
 		app.controller.show(app, "Variety", app.model.issues[0].varieties);
+		app.controller.show(app, "Album", app.model);
 	}
 }

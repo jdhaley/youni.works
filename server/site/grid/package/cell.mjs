@@ -6,7 +6,7 @@ export default {
 	},
 	Field: {
 		super$: "use.view.Viewer",
-		implicitTypes: {
+		dataTypes: {
 			string: function(parent, model, conf) {
 				if (conf.choice) {
 					let choice = conf.choice
@@ -62,13 +62,46 @@ export default {
 				view.innerHTML = model;
 				return view;
 			},
+			map: function(parent, model, conf) {
+				let view = this.owner.append(parent, ".link");
+				view.name = conf.name;
+				view.innerHTML = "...";
+				return view;							
+			},
+			array: function(parent, model, conf) {
+				let view = this.owner.append(parent, ".link");
+				view.name = conf.name;
+				view.innerHTML = "...";
+				return view;				
+			},
+			object: function(parent, model, conf) {
+				let view = this.owner.append(parent, ".link");
+				view.name = conf.name;
+				view.innerHTML = "...";
+				return view;								
+			}
 		},
 		getTypes: function(view) {
 			return this.owner.getViewContext(view, "application").types;
 		},
+		typeOf: function(model, conf) {
+			let type = conf.type;
+			if (!type) {
+				type = typeof model;
+				if (type == "object") {
+					if (Object.getPrototypeOf(model) == Array.prototype) {
+						type = "array";
+					} else if (conf.of) {
+						type = "object";
+					} else {
+						type = "map";
+					}
+				}
+			}
+			return this.dataTypes[type] || this.dataTypes.string;
+		},
 		createView: function(parent, model, conf) {
-			let types = this.implicitTypes;
-			let type = types[conf.type] || types[typeof model] || types.string;
+			let type = this.typeOf(model, conf);
 			let view = type.call(this, parent, model, conf);
 			view.classList.add("field");
 			this.draw(view, model);

@@ -5,9 +5,6 @@ import view from "./package/view.mjs";
 import cell from "./package/cell.mjs";
 import app from "./package/app.mjs";
 
-import types from "./conf/types.mjs";
-import mm from "./conf/albumTypes.mjs";
-
 export default {
 	packages: {
 		control: control,
@@ -16,7 +13,5 @@ export default {
 		view: view,
 		cell: cell,
 		app: app
-	},
-	types: types,
-	mm: mm
+	}
 }
