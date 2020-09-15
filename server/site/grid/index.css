@@ -8,6 +8,23 @@
 	outline: 0;
 }
 
+::-webkit-scrollbar
+{
+  width: 8px;  /* for vertical scrollbars */
+  height: 8px; /* for horizontal scrollbars */
+  background: lightsteelblue;
+}
+
+::-webkit-scrollbar-track
+{
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb
+{
+  background: rgba(0, 0, 0, 0.5);
+}
 body {
-	overflow: hidden;
+	overflow: scroll;
+	background: black;
 }

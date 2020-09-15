@@ -1,7 +1,6 @@
 .grid {
 	flex-direction: column;
 	border: 1px solid silver;
-	max-width: 90vw;
 }
 .cell {
 	font: 16px arial;
@@ -45,4 +44,7 @@
 .label {
 	color: steelblue;
 	background: ghostwhite;
+}
+
+.link {
 }

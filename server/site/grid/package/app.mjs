@@ -28,7 +28,9 @@ export default {
 			return this.owner.append(window, ".header");
 		},
 		createBody: function(window, model) {
-			return this.owner.append(window, ".body");
+			return this.owner.append(window, ".body", {
+				tabindex: "0"
+			});
 		}
 	},
 	Application: {
@@ -38,6 +40,7 @@ export default {
 			type$Commands: "use.command.ObjectCommands",
 			type$Properties: "use.cell.Properties",
 			type$Table: "use.cell.Table",
+			type$Map: "use.cell.Map",
 			type$Window: "Window"
 		},
 		viewName: "main.application",
@@ -51,9 +54,8 @@ export default {
 		extend$events: {
 			input: UP,
 			keydown: UP,
-			focus: function(event) {
-				console.log(event);
-			},
+			click: UP,
+			contextmenu: UP,
 			mousedown: function(event) {
 				MOUSE_TARGET = event.target;
 				event.mouseTarget = MOUSE_TARGET;
@@ -99,10 +101,28 @@ export default {
 				}
 			}
 		},
-		show: function(app, type, model) {
+		show: function(app, type, model, datatype) {
 			type = app && app.types && app.types[type];
-
-			let editor = this.sys.extend(model.length ? this.use.Table : this.use.Properties, {
+			
+			if (!datatype) {
+				if (model.length) {
+					datatype = "array";
+				} else if (type) {
+					datatype = "object";
+				} else {
+					datatype = "map";
+				}
+			}
+			let editor = this.use.Map;
+			switch (datatype) {
+				case "array":
+					editor = this.use.Table;
+					break;
+				case "object":
+					editor = this.use.Properties;
+					break;
+			}
+			editor = this.sys.extend(editor, {
 				fields: type
 			});
 			let window = this.use.Window.createView(app);

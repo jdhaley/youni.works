@@ -4,6 +4,36 @@ export default {
 		package$control: "youni.works/base/control",
 		package$view: "youni.works/base/view"
 	},
+	Label: {
+		super$: "use.view.Viewer",
+		viewName: "div.label",
+		draw: function(label, conf) {
+			label.classList.add("cell");
+			if (!conf.title) {
+				conf.title = nameToTitle(conf.name);
+			}
+			label.textContent = conf.title;
+			return label;
+		},
+		link: function(view) {
+			if (!view.link) {
+				let app = this.owner.getViewContext(view, "application");
+				view.link = app.controller.show(app, "Field", view.model);
+			}
+			return view.link;
+		},
+		extend$actions: {
+			contextmenu: function(on, event) {
+				event.preventDefault();
+				let link = this.link(on);
+				let box = on.getBoundingClientRect();
+				on.link.controller.moveTo(on.link, box.left, box.bottom);
+				on.link.style.display = "flex";
+				on.link.controller.activate(on.link);
+				return;
+			}
+		}
+	},
 	Field: {
 		super$: "use.view.Viewer",
 		dataTypes: {
@@ -63,20 +93,25 @@ export default {
 				return view;
 			},
 			map: function(parent, model, conf) {
-				let view = this.owner.append(parent, ".link");
-				view.name = conf.name;
+				let view = this.owner.append(parent, ".map");
+				view.classList.add("link");
+				view.conf = conf;
 				view.innerHTML = "...";
 				return view;							
 			},
 			array: function(parent, model, conf) {
-				let view = this.owner.append(parent, ".link");
+				let view = this.owner.append(parent, ".array");
+				view.classList.add("link");
 				view.name = conf.name;
+				view.conf = conf;
 				view.innerHTML = "...";
 				return view;				
 			},
 			object: function(parent, model, conf) {
-				let view = this.owner.append(parent, ".link");
+				let view = this.owner.append(parent, ".object");
+				view.classList.add("link");
 				view.name = conf.name;
+				view.conf = conf;
 				view.innerHTML = "...";
 				return view;								
 			}
@@ -103,6 +138,10 @@ export default {
 		createView: function(parent, model, conf) {
 			let type = this.typeOf(model, conf);
 			let view = type.call(this, parent, model, conf);
+			this.owner.setAttributes(view, {
+				tabindex: "0",
+				name: conf.name
+			});
 			view.classList.add("field");
 			this.draw(view, model);
 			this.bind(view, model);
@@ -124,9 +163,26 @@ export default {
 				view.textContent = value;
 			}
 		},
+		link: function(view) {
+			if (!view.link) {
+				let app = this.owner.getViewContext(view, "application");
+				view.link = app.controller.show(app, view.conf.of, view.model, view.conf.type);
+			}
+			return view.link;
+		},
 		extend$actions: {
 			input: function(on, event) {
 				on.record && on.record.controller.update(on.record, on.name, this.getViewValue(on))
+			},
+			click: function(on, event) {
+				if (on.classList.contains("link")) {
+					let link = this.link(on);
+					let box = on.getBoundingClientRect();
+					on.link.controller.moveTo(on.link, box.left, box.bottom);
+					on.link.style.display = "flex";
+					on.link.controller.activate(on.link);
+					return;
+				}
 			}
 		}
 	},
@@ -196,7 +252,8 @@ export default {
 		super$: "use.view.Item",
 		use: {
 			type$Record: "Record",
-			type$Field: "Field"
+			type$Field: "Field",
+			type$Label: "Label"
 		},
 		viewName: "div.table",
 		fields: null,
@@ -205,19 +262,20 @@ export default {
 		},
 		createHeader: function(view, model) {
 			view = this.owner.append(view, ".header");
+			let width = 0;
 			for (let field of this.fields) {
+				width += field.size || 5;
 				this.createColumn(view, field);
 			}
+			view.parentNode.style.maxWidth = width * 16 + "px";
 			return view;
 		},
-		createColumn: function(header, field) {
-			if (!field.title) {
-				field.title = nameToTitle(field.name);
+		createColumn: function(header, conf) {
+			if (!conf.title) {
+				conf.title = nameToTitle(conf.name);
 			}
-			let col = this.owner.append(header, ".column");
-			col.style.flex = (field.size || 1) * 10 + "mm";
-			col.textContent = field.title;
-			col.classList.add("cell");
+			let col = this.use.Label.createView(header, conf);
+			col.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
 			return col;
 		},
 		createBody: function(view, model) {
@@ -235,7 +293,7 @@ export default {
 				let value = model ? model[name] : undefined;
 				let field = this.use.Field.createView(row, value, conf);
 				field.classList.add("cell");
-				field.style.flex = (conf.size || 1) * 10 + "mm";
+				field.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
 				field.record = row;
 				row.fields[name] = field;
 			}
@@ -263,6 +321,7 @@ export default {
 					row.properties.controller.moveTo(row.properties, box.left, box.bottom);
 					row.properties.style.display = "flex";
 					row.properties.controller.activate(row.properties);
+					row.properties.body.focus();
 					return;
 				}
 				if (event.key == "Enter") {
@@ -287,6 +346,7 @@ export default {
 	Properties: {
 		super$: "Record",
 		use: {
+			type$Label: "Label",
 			type$Field: "Field"
 		},
 		draw: function(view, model) {
@@ -306,14 +366,45 @@ export default {
 			record.fields[prop.field.name] = prop.field;
 			return prop;
 		},
-		createLabel: function(prop, field) {
-			let label = this.owner.append(prop, ".label");
+		createLabel: function(header, conf) {
+			let label = this.use.Label.createView(header, conf);
 			label.classList.add("cell");
-			if (!field.title) {
-				field.title = nameToTitle(field.name);
-			}
-			label.textContent = field.title;
 			return label;
+		},
+		createField: function(prop, model, field) {
+			let value = model ? model[field.name] : undefined;
+			let view = this.use.Field.createView(prop, value, field);
+			view.classList.add("cell");
+			return view;
+		},
+		extend$actions: {
+			keydown: function(on, event) {
+				if (event.key == "Escape") {
+					let window = this.owner.getViewContext(event.target, "window");
+					window.style.display = "none";
+				}
+			}
+		}
+	},
+	Map: {
+		super$: "Record",
+		use: {
+			type$Field: "Field"
+		},
+		draw: function(view, model) {
+			view.classList.add("grid");
+			for (let key in model) {
+				this.createRow(view, model[key], key);
+			}
+		},
+		createRow: function(record, model, key) {
+			let prop = this.owner.append(record, ".property");
+			prop.classList.add("row");
+			prop.lbl = this.owner.append(prop, ".key");
+			prop.field = this.createField(prop, model, {
+				name: key
+			});
+			return prop;
 		},
 		createField: function(prop, model, field) {
 			let value = model ? model[field.name] : undefined;
@@ -353,7 +444,6 @@ function nameToTitle(name) {
 		if (char.toLowerCase() == char) {
 			if (next.toUpperCase() == next) title += " ";
 		}
-
 	}
 	return title;
 }

@@ -14,7 +14,6 @@ export default function main(sys, conf) {
 	}
 	function loadData(msg) {
 		app.model = JSON.parse(msg.content);
-		app.controller.show(app, "Variety", app.model.issues[0].varieties);
 		app.controller.show(app, "Album", app.model);
 	}
 }
