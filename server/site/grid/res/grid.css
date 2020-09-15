@@ -16,6 +16,9 @@
 .cell:last-child {
 	border-right: 0;
 }
+.key {
+	font-weight: bold;
+}
 .row {
 	outline: 0;
 	margin: 0;

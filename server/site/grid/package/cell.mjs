@@ -10,7 +10,7 @@ export default {
 		draw: function(label, conf) {
 			label.classList.add("cell");
 			if (!conf.title) {
-				conf.title = nameToTitle(conf.name);
+				conf.title = conf.name ? nameToTitle(conf.name) : "";
 			}
 			label.textContent = conf.title;
 			return label;
@@ -147,12 +147,6 @@ export default {
 			this.bind(view, model);
 			return view;
 		},
-		drawTitle: function(ctx, conf, cls) {
-			let label = this.owner.append(ctx, "." + cls);
-			label.classList.add("cell");
-			label.textContent = conf.title ? conf.title : nameToTitle(name);
-			return label;
-		},
 		getViewValue: function(view) {
 			return view.nodeName == "INPUT" ? view.value : view.textContent;
 		},
@@ -263,6 +257,12 @@ export default {
 		createHeader: function(view, model) {
 			view = this.owner.append(view, ".header");
 			let width = 0;
+			if (model.length === undefined) {
+				this.createColumn(view, {
+					size: 10
+				});
+				width += 10;
+			}
 			for (let field of this.fields) {
 				width += field.size || 5;
 				this.createColumn(view, field);
@@ -272,7 +272,7 @@ export default {
 		},
 		createColumn: function(header, conf) {
 			if (!conf.title) {
-				conf.title = nameToTitle(conf.name);
+				conf.title = conf.name ? nameToTitle(conf.name) : "";
 			}
 			let col = this.use.Label.createView(header, conf);
 			col.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
@@ -280,24 +280,35 @@ export default {
 		},
 		createBody: function(view, model) {
 			view = this.owner.append(view, ".body");
-			if (model) for (let row of model) this.createRow(view, row);
+			if (model) {
+				if (model.length) {
+					for (let row of model) this.createRow(view, row);					
+				} else {
+					for (let key in model) this.createRow(view, model[key], key);
+				}
+			}
 			this.createRow(view, {});
 			return view;
 		},
-		createRow: function(body, model) {
+		createRow: function(body, model, key) {
 			let row = this.use.Record.createView(body, model);
 			row.classList.add("row");
 			row.fields = Object.create(null);
-			for (let conf of this.fields) {
-				let name = conf.name;
-				let value = model ? model[name] : undefined;
-				let field = this.use.Field.createView(row, value, conf);
-				field.classList.add("cell");
-				field.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
-				field.record = row;
-				row.fields[name] = field;
-			}
+			if (key) this.createField(row, key, {
+				size: 10
+			});
+			for (let conf of this.fields) this.createField(row, model, conf);
 			return row;
+		},
+		createField: function(row, model, conf) {
+			let name = conf.name;
+			let value = model ? (name ? model[name] : model) : undefined;
+			let field = this.use.Field.createView(row, value, conf);
+			if (!conf.name) field.classList.add("key");
+			field.classList.add("cell");
+			field.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
+			field.record = row;
+			row.fields[name] = field;			
 		},
 		extend$actions: {
 			keydown: function(on, event) {
@@ -370,41 +381,6 @@ export default {
 			let label = this.use.Label.createView(header, conf);
 			label.classList.add("cell");
 			return label;
-		},
-		createField: function(prop, model, field) {
-			let value = model ? model[field.name] : undefined;
-			let view = this.use.Field.createView(prop, value, field);
-			view.classList.add("cell");
-			return view;
-		},
-		extend$actions: {
-			keydown: function(on, event) {
-				if (event.key == "Escape") {
-					let window = this.owner.getViewContext(event.target, "window");
-					window.style.display = "none";
-				}
-			}
-		}
-	},
-	Map: {
-		super$: "Record",
-		use: {
-			type$Field: "Field"
-		},
-		draw: function(view, model) {
-			view.classList.add("grid");
-			for (let key in model) {
-				this.createRow(view, model[key], key);
-			}
-		},
-		createRow: function(record, model, key) {
-			let prop = this.owner.append(record, ".property");
-			prop.classList.add("row");
-			prop.lbl = this.owner.append(prop, ".key");
-			prop.field = this.createField(prop, model, {
-				name: key
-			});
-			return prop;
 		},
 		createField: function(prop, model, field) {
 			let value = model ? model[field.name] : undefined;

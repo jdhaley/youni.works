@@ -105,7 +105,7 @@ export default {
 			type = app && app.types && app.types[type];
 			
 			if (!datatype) {
-				if (model.length) {
+				if (model.length !== undefined) {
 					datatype = "array";
 				} else if (type) {
 					datatype = "object";
@@ -113,15 +113,7 @@ export default {
 					datatype = "map";
 				}
 			}
-			let editor = this.use.Map;
-			switch (datatype) {
-				case "array":
-					editor = this.use.Table;
-					break;
-				case "object":
-					editor = this.use.Properties;
-					break;
-			}
+			let editor = datatype == "object" ? this.use.Properties : this.use.Table;
 			editor = this.sys.extend(editor, {
 				fields: type
 			});
