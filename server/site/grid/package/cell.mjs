@@ -254,6 +254,16 @@ export default {
 		control: function(view) {
 			view.classList.add("grid");
 		},
+		indexOf: function(view) {
+			view = this.owner.getViewContext(view, "row");
+			let body = this.owner.getViewContext(view, "body");
+			let index = 0;
+			for (let row of body.childNodes) {
+				if (row == view) return index;
+				i++;
+			}
+			return -1;
+		},
 		createHeader: function(view, model) {
 			view = this.owner.append(view, ".header");
 			let width = 0;
@@ -338,6 +348,10 @@ export default {
 				if (event.key == "Enter") {
 					event.preventDefault();
 					let currentRow = this.owner.getViewContext(event.target, "row");
+					let index = this.indexOf(currentRow);
+					let app = this.owner.getViewContext(on, "application");
+					let model = {};
+					app.commands.insert(model, index, model);
 					
 					let row = this.createRow(on.body, {});
 					on.body.insertBefore(row, currentRow);

@@ -4,6 +4,9 @@ export default {
 		super$: "Object",
 		type$prior: "Command",
 		type$next: "Command",
+		get$execute: function() {
+			return this.redo;
+		},
 		undo: function() {
 		},
 		redo: function() {
@@ -43,6 +46,24 @@ export default {
 			}
 		}
 	},
+	CreateCommand: {
+		super$: "ObjectCommand",
+		index: "",
+		oldValue: undefined,
+		newValue: undefined,
+		undo: function() {
+			this.transmit({
+				type: "deleted",
+				object: this.object,
+			});
+		},
+		redo: function() {
+			this.transmit({
+				type: "created",
+				object: this.object,
+			});
+		},
+	},
 	UpdateCommand: {
 		super$: "ObjectCommand",
 		index: "",
@@ -69,28 +90,49 @@ export default {
 	},
 	ObjectCommands: {
 		super$: "Commander",
+		createCommand: function(type, object, index, value, oldValue) {
+			let cmd = this.sys.extend(this.use.Update, {
+				type: type,
+				object: null,
+				index: index,
+				oldValue: null,
+				newValue: null,
+				next: null,
+				prior: null
+			});
+			cmd.object = object;
+			cmd.oldValue = oldValue;
+			cmd.newValue = value;
+			return cmd;
+		},
 		use: {
 			type$Update: "UpdateCommand"
+		},
+		create: function(object, index, value) {
+			cmd = this.sys.extend(this.use.Update, {
+				type: "create",
+				object: null,
+				index: index,
+				oldValue: null,
+				newValue: null,
+				next: null,
+				prior: null
+			});
+			//TODO if the object is source, it will be converted in the extend above...
+			cmd.object = object;
+			cmd.redo();
+			this.addCommand(cmd);
 		},
 		update: function(object, index, value) {
 			let cmd = this.lastCommand;
 			if (cmd && cmd.object == object && cmd.index == index) {
 				if (cmd.value !== value) {
 					cmd.newValue = value;
-					cmd.redo();
+					cmd.execute();
 				}
 			} else if (object[index] !== value) {
-				cmd = this.sys.extend(this.use.Update, {
-					object: object,
-					index: index,
-					oldValue: object[index],
-					newValue: value,
-					next: null,
-					prior: null
-				});
-				//TODO if the object is source, it will be converted in the extend above...
-				cmd.object = object;
-				cmd.redo();
+				cmd = this.createCommand("update", object, index, value, object[index]);
+				cmd.execute();
 				this.addCommand(cmd);
 			}
 		}
