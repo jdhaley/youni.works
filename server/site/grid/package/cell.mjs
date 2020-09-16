@@ -142,6 +142,7 @@ export default {
 				tabindex: "0",
 				name: conf.name
 			});
+			view.name = conf.name; //TODO review whether we use attribute or property for name.
 			view.classList.add("field");
 			this.draw(view, model);
 			this.bind(view, model);
@@ -166,7 +167,8 @@ export default {
 		},
 		extend$actions: {
 			input: function(on, event) {
-				on.record && on.record.controller.update(on.record, on.name, this.getViewValue(on))
+				let app = this.owner.getViewContext(on, "application");
+				app.commands.update(on.record, on.name, this.getViewValue(on));
 			},
 			click: function(on, event) {
 				if (on.classList.contains("link")) {
@@ -182,63 +184,12 @@ export default {
 	},
 	Record: {
 		super$: "use.view.Viewer",
-		create: function(record) {
-			this.owner.transmit.object(record, {
-				type: "created",
-				source: record,
-				object: record.model
-			});
-		},
-		update: function(record, name, value) {
-			let model = record.model;
-			if (model === undefined) return;
-			let app = this.owner.getViewContext(record, "application");
-			app.commands.update(model, name, value);
-			/*
-			let prior = model[name];
-			model[name] = value;
-			this.owner.transmit.object(record, {
-				type: "updated",
-				source: record,
-				object: model,
-				index: name,
-				priorValue: prior
-			});
-			*/
-		},
-		delete: function(record) {
-			let model = record.model;
-			if (model === undefined) return;
-			this.owner.transmit.object(record, {
-				type: "deleted",
-				source: record,
-				object: model
-			});
-		},
 		extend$actions: {
-			created: function(on, event) {
-				this.owner.transmit.up(on, {
-					type: "contentCreated",
-					target: on
-				});
-			},
 			updated: function(on, event) {
 				if (on != event.source) {
 					let field = on.fields[event.index];
-					field.controller.setViewValue(field, event.object[event.index]);
+					field.controller.setViewValue(field, event.value);
 				}
-				this.owner.transmit.up(on, {
-					type: "contentUpdated",
-					target: on
-				});
-			},
-			deleted: function(on, event) {
-				this.owner.unbind(on);
-				this.owner.transmit.up(on, {
-					type: "contentDeleted",
-					target: on
-				});
-				on.remove();
 			}
 		}
 	},
@@ -260,9 +211,12 @@ export default {
 			let index = 0;
 			for (let row of body.childNodes) {
 				if (row == view) return index;
-				i++;
+				index++;
 			}
 			return -1;
+		},
+		rowOf: function(on, index) {
+			return on.body.childNodes[index];
 		},
 		createHeader: function(view, model) {
 			view = this.owner.append(view, ".header");
@@ -321,6 +275,16 @@ export default {
 			row.fields[name] = field;			
 		},
 		extend$actions: {
+			created: function(on, event) {
+				let row = this.createRow(on.body, event.value);
+				let rel = this.rowOf(on, event.index);
+				on.body.insertBefore(row, rel);
+				row.firstChild.focus();
+			},
+			deleted: function(on, event) {
+				let row = this.rowOf(on, event.index);
+				row.remove();
+			},
 			keydown: function(on, event) {
 				if (event.key.length == 1) {
 					let row = this.owner.getViewContext(event.target, "row");
@@ -350,17 +314,14 @@ export default {
 					let currentRow = this.owner.getViewContext(event.target, "row");
 					let index = this.indexOf(currentRow);
 					let app = this.owner.getViewContext(on, "application");
-					let model = {};
-					app.commands.insert(model, index, model);
-					
-					let row = this.createRow(on.body, {});
-					on.body.insertBefore(row, currentRow);
-					row.firstChild.focus();
+					app.commands.create(on, index, {});
 				}
 				if (event.ctrlKey && event.key == "Delete") {
 					event.preventDefault();
 					let row = this.owner.getViewContext(event.target, "row");
-					row.controller.delete(row);
+					let index = this.indexOf(row);
+					let app = this.owner.getViewContext(on, "application");
+					app.commands.delete(on, index, row.model);
 				}
 			},
 			contentDeleted: function(on, event) {

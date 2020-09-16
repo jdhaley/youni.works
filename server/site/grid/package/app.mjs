@@ -40,7 +40,6 @@ export default {
 			type$Commands: "use.command.ObjectCommands",
 			type$Properties: "use.cell.Properties",
 			type$Table: "use.cell.Table",
-			type$Map: "use.cell.Map",
 			type$Window: "Window"
 		},
 		viewName: "main.application",
