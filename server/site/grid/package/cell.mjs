@@ -323,9 +323,6 @@ export default {
 					let app = this.owner.getViewContext(on, "application");
 					app.commands.delete(on, index, row.model);
 				}
-			},
-			contentDeleted: function(on, event) {
-				console.log(event.target);
 			}
 		}
 	},
@@ -364,6 +361,10 @@ export default {
 			return view;
 		},
 		extend$actions: {
+			deleted: function(on, event) {
+				let window = this.owner.getViewContext(event.target, "window");
+				window.style.display = "none"
+			},
 			keydown: function(on, event) {
 				if (event.key == "Escape") {
 					let window = this.owner.getViewContext(event.target, "window");
