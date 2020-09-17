@@ -46,6 +46,7 @@ export default {
 		control: function(view) {
 			view.commands = this.sys.extend(this.use.Commands, {
 				lastCommand: this.sys.extend(this.use.Command, {
+					prior: null,
 					next: null
 				})
 			});

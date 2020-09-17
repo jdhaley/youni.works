@@ -9,11 +9,11 @@ export default function main(sys, conf) {
 	app.controller.owner.open("/file/stamp/types.json", loadTypes);
 	
 	function loadTypes(msg) {
-		app.types = JSON.parse(msg.content);
+		app.types = sys.extend(null, JSON.parse(msg.content));
 		app.controller.owner.open(app.path, loadData)
 	}
 	function loadData(msg) {
-		app.model = JSON.parse(msg.content);
+		app.model = sys.extend(null, JSON.parse(msg.content));
 		app.controller.show(app, "Album", app.model);
 	}
 }

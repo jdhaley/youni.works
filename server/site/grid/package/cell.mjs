@@ -152,6 +152,7 @@ export default {
 			return view.nodeName == "INPUT" ? view.value : view.textContent;
 		},
 		setViewValue: function(view, value) {
+			if (!value) value = "";
 			if (view.nodeName == "INPUT") {
 				view.value = value;
 			} else {
@@ -186,10 +187,8 @@ export default {
 		super$: "use.view.Viewer",
 		extend$actions: {
 			updated: function(on, event) {
-				if (on != event.source) {
-					let field = on.fields[event.index];
-					field.controller.setViewValue(field, event.value);
-				}
+				let field = on.fields[event.index];
+				field.controller.setViewValue(field, event.value);
 			}
 		}
 	},
@@ -314,7 +313,7 @@ export default {
 					let currentRow = this.owner.getViewContext(event.target, "row");
 					let index = this.indexOf(currentRow);
 					let app = this.owner.getViewContext(on, "application");
-					app.commands.create(on, index, {});
+					app.commands.create(on, index);
 				}
 				if (event.ctrlKey && event.key == "Delete") {
 					event.preventDefault();

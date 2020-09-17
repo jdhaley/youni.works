@@ -32,6 +32,7 @@ export default {
 			if (this.lastCommand) this.lastCommand.next = command;
 			command.prior = this.lastCommand;
 			this.lastCommand = command;
+			return command;
 		}
 	},
 	ObjectCommand: {
@@ -45,6 +46,7 @@ export default {
 		undo: function() {
 			let type = "";
 			let value = this.value;
+			console.debug("before undo", this);
 			switch (this.type) {
 				case "create":
 					if (this.object.splice) {
@@ -64,6 +66,7 @@ export default {
 					type = "created";
 					break;
 			}
+			console.debug("after undo", this);
 			this.transmit(type, value);
 		},
 		redo: function() {
@@ -118,7 +121,7 @@ export default {
 			type$ObjectCommand: "ObjectCommand"
 		},
 		newCommand: function(type, source, object, index, value, oldValue) {
-			return this.sys.extend(this.use.ObjectCommand, {
+			let cmd = this.sys.extend(this.use.ObjectCommand, {
 				type: type,
 				source: source,
 				object: object,
@@ -128,10 +131,10 @@ export default {
 				next: null,
 				prior: null
 			});
+			return this.addCommand(cmd);
 		},
-		create: function(source, index, value) {
-			let cmd = this.newCommand("create", source, source.model, index, value);
-			this.addCommand(cmd);
+		create: function(source, index) {
+			let cmd = this.newCommand("create", source, source.model, index, this.sys.extend());
 			cmd.execute();
 		},
 		update: function(source, index, value) {
@@ -140,14 +143,12 @@ export default {
 			if (cmd && cmd.value !== value && cmd.object == object && cmd.index == index) {
 				cmd.value = value;
 			} else if (object[index] !== value) {
-				cmd = this.newCommand("update", source, index, value, object[index]);
-				this.addCommand(cmd);
+				cmd = this.newCommand("update", source, source.model, index, value, object[index]);
 			}
 			cmd.execute();
 		},
 		delete: function(source, index, value) {
 			let cmd = this.newCommand("delete", source, source.model, index, value);
-			this.addCommand(cmd);
 			cmd.execute();
 		}
 	},
