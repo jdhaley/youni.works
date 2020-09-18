@@ -168,8 +168,10 @@ export default {
 		},
 		extend$actions: {
 			input: function(on, event) {
-				let app = this.owner.getViewContext(on, "application");
-				app.commands.update(on.record, on.name, this.getViewValue(on));
+				if (on.record.model) {
+					let app = this.owner.getViewContext(on, "application");
+					app.commands.update(on.record, on.name, this.getViewValue(on));
+				}
 			},
 			click: function(on, event) {
 				if (on.classList.contains("link")) {
@@ -234,6 +236,12 @@ export default {
 			view.parentNode.style.maxWidth = width * 16 + "px";
 			return view;
 		},
+		createFooter: function(view) {
+			view = this.owner.append(view, "input.footer");
+			view.value = "x";
+			return view;
+			
+		},
 		createColumn: function(header, conf) {
 			if (!conf.title) {
 				conf.title = conf.name ? nameToTitle(conf.name) : "";
@@ -251,7 +259,6 @@ export default {
 					for (let key in model) this.createRow(view, model[key], key);
 				}
 			}
-			this.createRow(view, {});
 			return view;
 		},
 		createRow: function(body, model, key) {
@@ -275,10 +282,14 @@ export default {
 			row.fields[name] = field;			
 		},
 		extend$actions: {
+			keydown: function(on, event) {
+				let shortcut = this.shortcuts[event.key];
+				if (shortcut) shortcut.call(this, on, event);
+			},
 			created: function(on, event) {
 				let row = this.createRow(on.body, event.value);
 				let rel = this.rowOf(on, event.index);
-				on.body.insertBefore(row, rel);
+				if (rel) on.body.insertBefore(row, rel);
 				row.firstChild.focus();
 			},
 			deleted: function(on, event) {
@@ -286,45 +297,69 @@ export default {
 				let focus = row.nextSibling || row.previousSibling;
 				row.remove();
 				focus && focus.firstChild.focus();
+			}
+		},
+		extend$shortcuts: {
+			ArrowUp: function(on, event) {
+				let name = this.owner.getViewContext(event.target, "field").name;
+				let row = this.owner.getViewContext(event.target, "row");
+				if (row.previousSibling) {
+					if (event.ctrlKey) {
+						//TODO need to alter the model. - need "move" command.
+						on.body.insertBefore(row, row.previousSibling);
+					} else {
+						row = row.previousSibling;
+					}
+					row.fields[name].focus();
+				}
 			},
-			keydown: function(on, event) {
-				if (event.key.length == 1) {
-					let row = this.owner.getViewContext(event.target, "row");
-					if (!row.nextSibling) this.createRow(on.body, {});
-				}
-				if (event.key == "Escape") {
-					let row = this.owner.getViewContext(event.target, "row");
-					if (row.properties && row.properties.style.display == "flex") {
-						row.properties.style.display = "none";
+			ArrowDown: function(on, event) {
+				let name = this.owner.getViewContext(event.target, "field").name;
+				let row = this.owner.getViewContext(event.target, "row");
+				if (row.nextSibling) {
+					if (event.ctrlKey) {
+						//TODO need to alter the model. - need "move" command.
+						on.body.insertBefore(row, row.nextSibling.nextSibling);
+					} else {
+						row = row.nextSibling;
 					}
+					row.fields[name].focus();
 				}
-				if (event.ctrlKey && event.key == " ") {
-					let row = this.owner.getViewContext(event.target, "row");
-					if (!row.properties) {
-						let app = this.owner.getViewContext(on, "application");
-						row.properties = app.controller.show(app, "Variety", row.model);
-					}
-					let box = event.target.getBoundingClientRect();
-					row.properties.controller.moveTo(row.properties, box.left, box.bottom);
-					row.properties.style.display = "flex";
-					row.properties.controller.activate(row.properties);
-					row.properties.body.focus();
-					return;
+			},
+			Escape: function(on, event) {
+				let row = this.owner.getViewContext(event.target, "row");
+				if (row.properties && row.properties.style.display == "flex") {
+					row.properties.style.display = "none";
 				}
-				if (event.key == "Enter") {
-					event.preventDefault();
-					let currentRow = this.owner.getViewContext(event.target, "row");
-					let index = this.indexOf(currentRow);
+			},
+			Enter: function(on, event) {
+				event.preventDefault();
+				let currentRow = this.owner.getViewContext(event.target, "row");
+				let index = currentRow ? this.indexOf(currentRow) : on.childNodes.length + 1;
+				let app = this.owner.getViewContext(on, "application");
+				app.commands.create(on, index);
+			},
+			Delete: function(on, event) {
+				if (!event.ctrlKey) return;
+				event.preventDefault();
+				let row = this.owner.getViewContext(event.target, "row");
+				let index = this.indexOf(row);
+				let app = this.owner.getViewContext(on, "application");
+				app.commands.delete(on, index, row.model);
+			},
+			" ": function(on, event) {
+				if (!event.ctrlKey) return;
+				let row = this.owner.getViewContext(event.target, "row");
+				if (!row.properties) {
 					let app = this.owner.getViewContext(on, "application");
-					app.commands.create(on, index);
+					row.properties = app.controller.show(app, "Variety", row.model);
 				}
-				if (event.ctrlKey && event.key == "Delete") {
-					event.preventDefault();
-					let row = this.owner.getViewContext(event.target, "row");
-					let index = this.indexOf(row);
-					let app = this.owner.getViewContext(on, "application");
-					app.commands.delete(on, index, row.model);
-				}
+				let box = event.target.getBoundingClientRect();
+				row.properties.controller.moveTo(row.properties, box.left, box.bottom);
+				row.properties.style.display = "flex";
+				row.properties.controller.activate(row.properties);
+				row.properties.body.focus();
+				return;
 			}
 		}
 	},
