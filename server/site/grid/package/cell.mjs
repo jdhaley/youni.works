@@ -189,6 +189,7 @@ export default {
 			updated: function(on, event) {
 				let field = on.fields[event.index];
 				field.controller.setViewValue(field, event.value);
+				field.focus();
 			}
 		}
 	},
@@ -282,7 +283,9 @@ export default {
 			},
 			deleted: function(on, event) {
 				let row = this.rowOf(on, event.index);
+				let focus = row.nextSibling || row.previousSibling;
 				row.remove();
+				focus && focus.firstChild.focus();
 			},
 			keydown: function(on, event) {
 				if (event.key.length == 1) {
