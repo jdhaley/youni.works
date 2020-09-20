@@ -45,6 +45,7 @@ export default {
 		value: undefined,
 		undo: function() {
 			let type = "";
+			let index = this.index;
 			let value = this.value;
 			console.debug("before undo", this);
 			switch (this.type) {
@@ -65,9 +66,19 @@ export default {
 					this.object.splice(this.index, 0, value);
 					type = "created";
 					break;
+				case "move":
+					if (this.object.splice) {
+						let ele = this.object[this.value];
+						this.object.splice(this.value, 1);
+						this.object.splice(this.index, 0, ele);
+						index = this.value;
+						value = this.index;
+					}					
+					type = "moved";
+					break;
 			}
 			console.debug("after undo", this);
-			this.transmit(type, value);
+			this.transmit(type, index, value);
 		},
 		redo: function() {
 			let type = "";
@@ -96,15 +107,23 @@ export default {
 					}
 					type = "deleted";
 					break;
+				case "move":
+					if (this.object.splice) {
+						let ele = this.object[this.index];
+						this.object.splice(this.index, 1);
+						this.object.splice(this.value, 0, ele);
+					}
+					type = "moved";
+					break;
 			}
-			this.transmit(type, value);
+			this.transmit(type, this.index, value);
 		},
-		transmit: function(type, value) {
+		transmit: function(type, index, value) {
 			let event = {
 				type: type,
 				source: this.source,
 				object: this.object,
-				index: this.index,
+				index: index,
 				value: value
 			}
 			if (this.object[Symbol.observers]) {
@@ -149,6 +168,10 @@ export default {
 		},
 		delete: function(source, index, value) {
 			let cmd = this.newCommand("delete", source, source.model, index, value);
+			cmd.execute();
+		},
+		move: function(source, index, value) {
+			let cmd = this.newCommand("move", source, source.model, index, value);
 			cmd.execute();
 		}
 	},

@@ -34,6 +34,23 @@ export default {
 			}
 		}
 	},
+	Handle: {
+		super$: "use.view.Viewer",
+		viewName: "div.handle",
+		control: function(view) {
+			this.owner.setAttributes(view, {
+				tabindex: "0",
+			});
+		},
+		draw: function(handle, conf) {
+			handle.classList.add("cell");
+			handle.innerHTML = "<br>";
+		},
+		link: function(view) {
+		},
+		extend$actions: {
+		}
+	},
 	Field: {
 		super$: "use.view.Viewer",
 		dataTypes: {
@@ -96,7 +113,7 @@ export default {
 				let view = this.owner.append(parent, ".map");
 				view.classList.add("link");
 				view.conf = conf;
-				view.innerHTML = "...";
+				view.innerHTML = "<div>...</div>";
 				return view;							
 			},
 			array: function(parent, model, conf) {
@@ -104,7 +121,7 @@ export default {
 				view.classList.add("link");
 				view.name = conf.name;
 				view.conf = conf;
-				view.innerHTML = "...";
+				view.innerHTML = "<div>...</div>";
 				return view;				
 			},
 			object: function(parent, model, conf) {
@@ -112,7 +129,7 @@ export default {
 				view.classList.add("link");
 				view.name = conf.name;
 				view.conf = conf;
-				view.innerHTML = "...";
+				view.innerHTML = "<div>...</div>";
 				return view;								
 			}
 		},
@@ -167,14 +184,27 @@ export default {
 			return view.link;
 		},
 		extend$actions: {
+			contextmenu: function(on, event) {
+				event.preventDefault();
+			},
 			input: function(on, event) {
 				if (on.record.model) {
 					let app = this.owner.getViewContext(on, "application");
 					app.commands.update(on.record, on.name, this.getViewValue(on));
 				}
 			},
+			keydown: function(on, event) {
+				if (on.classList.contains("link") && (event.key == " " || event.key == "Enter")) {
+					let link = this.link(on);
+					let box = on.getBoundingClientRect();
+					on.link.controller.moveTo(on.link, box.left, box.bottom);
+					on.link.style.display = "flex";
+					on.link.controller.activate(on.link);
+					return;
+				}				
+			},
 			click: function(on, event) {
-				if (on.classList.contains("link")) {
+				if (on.classList.contains("link") && event.target != on) {
 					let link = this.link(on);
 					let box = on.getBoundingClientRect();
 					on.link.controller.moveTo(on.link, box.left, box.bottom);
@@ -199,11 +229,15 @@ export default {
 		super$: "use.view.Item",
 		use: {
 			type$Record: "Record",
+			type$Handle: "Handle",
 			type$Field: "Field",
 			type$Label: "Label"
 		},
 		viewName: "div.table",
 		fields: null,
+		model: function(view, value) {
+			return value ? value : [];
+		},
 		control: function(view) {
 			view.classList.add("grid");
 		},
@@ -222,8 +256,9 @@ export default {
 		},
 		createHeader: function(view, model) {
 			view = this.owner.append(view, ".header");
+			view.handle = this.use.Handle.createView(view);
 			let width = 0;
-			if (model.length === undefined) {
+			if (model && model.length === undefined) {
 				this.createColumn(view, {
 					size: 10
 				});
@@ -264,6 +299,7 @@ export default {
 		createRow: function(body, model, key) {
 			let row = this.use.Record.createView(body, model);
 			row.classList.add("row");
+			row.handle = this.use.Handle.createView(row);
 			row.fields = Object.create(null);
 			if (key) this.createField(row, key, {
 				size: 10
@@ -287,7 +323,7 @@ export default {
 				if (shortcut) shortcut.call(this, on, event);
 			},
 			created: function(on, event) {
-				let row = this.createRow(on.body, event.value);
+				let row = this.createRow(on.body, event.value, event.index);
 				let rel = this.rowOf(on, event.index);
 				if (rel) on.body.insertBefore(row, rel);
 				row.firstChild.focus();
@@ -297,33 +333,49 @@ export default {
 				let focus = row.nextSibling || row.previousSibling;
 				row.remove();
 				focus && focus.firstChild.focus();
+			},
+			moved: function(on, event) {
+				let row = this.rowOf(on, event.index);
+				row.remove();
+				let to = this.rowOf(on, event.value);
+				on.body.insertBefore(row, to);
+				if (row.goto_cell) {
+					row.goto_cell.focus();
+					delete row.goto_cell;
+				} else {
+					row.firstChild.focus();
+				}
 			}
 		},
 		extend$shortcuts: {
 			ArrowUp: function(on, event) {
-				let name = this.owner.getViewContext(event.target, "field").name;
+				let cell = this.owner.getViewContext(event.target, "cell");
 				let row = this.owner.getViewContext(event.target, "row");
 				if (row.previousSibling) {
 					if (event.ctrlKey) {
-						//TODO need to alter the model. - need "move" command.
-						on.body.insertBefore(row, row.previousSibling);
+						row.goto_cell = cell;
+						let index = this.indexOf(row);
+						let app = this.owner.getViewContext(on, "application");
+						app.commands.move(on, index, index - 1);
 					} else {
 						row = row.previousSibling;
+						row.fields[cell.name].focus();
 					}
-					row.fields[name].focus();
 				}
 			},
 			ArrowDown: function(on, event) {
-				let name = this.owner.getViewContext(event.target, "field").name;
+				let cell = this.owner.getViewContext(event.target, "cell");
 				let row = this.owner.getViewContext(event.target, "row");
 				if (row.nextSibling) {
 					if (event.ctrlKey) {
-						//TODO need to alter the model. - need "move" command.
-						on.body.insertBefore(row, row.nextSibling.nextSibling);
+						row.goto_cell = cell;
+						let index = this.indexOf(row);
+						let app = this.owner.getViewContext(on, "application");
+						app.commands.move(on, index, index + 1);
 					} else {
 						row = row.nextSibling;
+						row.fields[cell.name].focus();
 					}
-					row.fields[name].focus();
 				}
 			},
 			Escape: function(on, event) {

@@ -16,7 +16,10 @@ export default {
 		activate: function(on) {
 			let current = on.ownerDocument.querySelector(".active");
 			if (on == current) return;
-			if (current) current.classList.remove("active");
+			if (current) {
+				on.priorWindow = current;
+				current.classList.remove("active");
+			}
 			on.classList.add("active");
 			on.style.zIndex = ++zIndex;
 			on.body.focus();		
@@ -31,6 +34,15 @@ export default {
 			return this.owner.append(window, ".body", {
 				tabindex: "0"
 			});
+		},
+		extend$actions: {
+			keydown: function(on, event) {
+				if (event.key == "Escape") {
+					if (on.priorWindow) on.priorWindow.controller.activate(on.priorWindow);
+					on.style.display = "none";
+					return;
+				}
+			}
 		}
 	},
 	Application: {

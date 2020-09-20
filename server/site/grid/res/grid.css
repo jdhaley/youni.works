@@ -44,11 +44,12 @@
 .column {
 	background: inherit;
 }
-.label {
+.label, .handle {
 	color: steelblue;
 	background: ghostwhite;
 }
 
-.link {
+.link>div {
+	max-width: 16px;
 	cursor: pointer;
 }

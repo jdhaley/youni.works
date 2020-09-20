@@ -85,12 +85,16 @@ export default {
 		events: null,
 		createView: function(parent, model, conf) {
 			let view = this.owner.append(parent, this.viewName);
+			model = this.model(view, model);
 			this.draw(view, model, conf);
 			this.bind(view, model, conf);
 			this.activate(view);
 			return view;
 		},
 		draw: function(view, model, conf) {
+		},
+		model: function(view, value) {
+			return value;
 		},
 		bind: function(view, model, conf) {
 			view.receive = Control_receive;
