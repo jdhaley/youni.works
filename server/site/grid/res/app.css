@@ -28,7 +28,7 @@
 	background: white;
 }
 
-.application, .application * {
+.grid * {
 	flex: 1 1 0;
 	display: flex;
 	align-content: stretch;
