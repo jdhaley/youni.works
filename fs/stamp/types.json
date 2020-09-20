@@ -4,7 +4,11 @@
 			"name": "name"
 		},
 		{
+			"name": "title"
+		},
+		{
 			"name": "type",
+			"title": "Datatype",
 			"choice": {
 				"string": "String",
 				"number": "Number",
@@ -16,14 +20,11 @@
 			}
 		},
 		{
-			"name": "of"
+			"name": "of",
+			"title": "Record Type"
 		},
 		{
 			"name": "size",
-			"type": "number"
-		},
-		{
-			"name": "width",
 			"type": "number"
 		}
 	],
@@ -81,7 +82,8 @@
 	"Issue": [
 		{
 			"name": "title",
-			"type": "div"
+			"type": "div",
+			"size": 15
 		},
 		{
 			"name": "printings",
@@ -114,11 +116,6 @@
 	],
 	"Variety": [
 		{
-			"name": "design",
-			"size": 6,
-			"maxLength": 6
-		},
-		{
 			"name": "variety",
 			"type": "number",
 			"title": "Major",
@@ -126,10 +123,15 @@
 			"maxLength": 3
 		},
 		{
-			"name": "printing",
+			"name": "releases",
 			"title": "Minor",
-			"size": 4,
-			"maxLength": 4
+			"type": "array",
+			"of": "Release"
+		},
+		{
+			"name": "design",
+			"size": 6,
+			"maxLength": 6
 		},
 		{
 			"name": "denom",
@@ -143,22 +145,33 @@
 		{
 			"name": "subject",
 			"size": 16
+		}
+	],
+	"Release": [
+		{
+			"name": "printing",
+			"size": 4
 		},
 		{
 			"name": "issued",
-			"type": "time",
-			"precision": "day",
-			"size": 14
+			"size": 8
 		},
 		{
-			"type": "text",
-			"name": "title",
-			"size": 16
+			"name": "value",
+			"choice": {
+				"?": "?",
+				"0": "\u2606\u2606\u2606\u2606\u2606",
+				"1": "\u2605\u2606\u2606\u2606\u2606",
+				"2": "\u2605\u2605\u2606\u2606\u2606",
+				"3": "\u2605\u2605\u2605\u2606\u2606",
+				"4": "\u2605\u2605\u2605\u2605\u2606",
+				"5": "\u2605\u2605\u2605\u2605\u2605"
+			},
+			"size": 8
 		},
 		{
-			"type": "text",
-			"name": "caption",
-			"size": 16
+			"name": "other",
+			"type": "text"
 		}
 	]
 }
