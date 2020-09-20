@@ -1,1 +1,3 @@
-@import url("../grid/index.css");
+@import url("../grid/res/app.css");
+@import url("../grid/res/grid.css");
+@import url("./res/layout.css");

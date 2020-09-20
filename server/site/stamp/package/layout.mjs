@@ -28,14 +28,14 @@ export default {
 			view.style.minHeight = h;
 			view.style.maxHeight = h;
 		},
-		draw: function(view) {
-			if (!view.shape) view.shape = this.shape(view.model);
+		draw: function(view, model) {
+			if (!view.shape) view.shape = this.shape(model);
 			this.size(view);
 			this.drawImage(view);
 			this.drawData(view);
 			this.drawPath(view);
 		},
-		drawImage: function(view) {
+		drawImage: function(view, model) {
 			let shape = view.shape;
 			let w = shape.width - 2 + this.uom;
 			let h = shape.height - 2 + this.uom;
@@ -44,7 +44,7 @@ export default {
 				style: `width:${w};height:{$h};`
 			});
 		},
-		drawData: function(view) {
+		drawData: function(view, model) {
 			let shape = view.shape;
 			if (shape.data) {
 				view.data = this.owner.append(view, "span.data");
@@ -92,20 +92,19 @@ export default {
 			type$Control: "use.control.Control",
 			type$Shape: "Shape"
 		},
-		draw: function(view) {
-			let title = this.drawTitle(view);
-			let group = this.drawGroup(view);
+		draw: function(view, model) {
+			let title = this.drawTitle(view, model);
+			let group = this.drawGroup(view, model);
 			title.style.maxWidth = group.getBoundingClientRect().width * 1.5 + "px";
 		},
-		drawTitle: function(view) {
+		drawTitle: function(view, model) {
 			let title = this.owner.append(view, ".title");
-			title.textContent = view.model.title;
+			title.textContent = model.title;
 			title.contentEditable = true;
 			return title;
 		},
-		drawGroup: function(view) {
+		drawGroup: function(view, model) {
 			let group = this.owner.append(view, ".group");
-			let model = view.model;
 			for (let variety of model.varieties) {
 				variety.album = model.album;
 				this.use.Shape.createView(group, variety);
@@ -126,24 +125,23 @@ export default {
 		paginate: function(view) {
 			//TODO
 		},
-		draw: function(view) {
+		draw: function(view, model) {
 			let pages = this.owner.append(view, ".pages");
 			let page = this.owner.append(pages, ".page");
 			let content = this.owner.append(page, ".content");
-			let sheets = this.owner.append(view, ".sheets");
-			let album = view.model;
-			let doc = view.ownerDocument;
-
-			let variety = this.sys.extend(this.use.Record, {
-				fields: doc.types["Variety"]
-			});
-			let varieties = this.sys.extend(this.use.Table, {
-				record: variety
-			});
-			for (let issue of album.issues) {
-				issue.album = album;
+			//let sheets = this.owner.append(view, ".sheets");
+//			let doc = view.ownerDocument;
+//
+//			let variety = this.sys.extend(this.use.Record, {
+//				fields: doc.types["Variety"]
+//			});
+//			let varieties = this.sys.extend(this.use.Table, {
+//				record: variety
+//			});
+			for (let issue of model.issues) {
+				issue.album = model;
 				this.use.Issue.createView(content, issue);
-				varieties.createView(sheets, issue.varieties);
+			//	varieties.createView(sheets, issue.varieties);
 			}
 		}
 	}
