@@ -2,65 +2,10 @@ export default {
 	package$: "youni.works/album/layout",
 	use: {
 		package$control: "youni.works/base/control",
-		package$cell: "youni.works/base/cell",
-		package$view: "youni.works/base/view"
-	},
-	BaseShape: {
-		super$: "use.view.Viewer",
-		viewName: "div.shape",
-		uom: "mm",
-		shape: function(object) {
-			return object || this.sys.extend(null, {
-				shape: "rectangle",
-				path: "",
-				width: 10,
-				height: 10,
-				image: "",
-				data: ""
-			});
-		},
-		size: function(view) {
-			let shape = view.shape;
-			let w = shape.width + this.uom;
-			view.style.minWidth = w;
-			view.style.maxWidth = w;
-			let h = shape.height + this.uom;
-			view.style.minHeight = h;
-			view.style.maxHeight = h;
-		},
-		draw: function(view) {
-			if (!view.shape) view.shape = this.shape(view.model);
-			this.size(view);
-			this.drawImage(view);
-			this.drawData(view);
-			this.drawPath(view);
-		},
-		drawImage: function(view) {
-			let shape = view.shape;
-			let w = shape.width - 2 + this.uom;
-			let h = shape.height - 2 + this.uom;
-			if (shape.image) this.owner.append(view, "img", {
-				src: shape.image,
-				style: `width:${w};height:{$h};`
-			});
-		},
-		drawData: function(view) {
-			let shape = view.shape;
-			if (shape.data) {
-				view.data = this.owner.append(view, "span.data");
-				if (shape.image) view.data.style.webkitTextStroke = ".2mm rgba(255, 255, 255, .25)";
-
-				view.data.innerHTML = shape.data.replace("\n", "<br>");
-			}
-		},
-		drawPath: function(view, shape) {
-//			if (shape.path) ctx.append("path", {
-//				d: this.path.draw(ctx.x, ctx.y, this.width, this.height)
-//			});
-		}
+		package$cell: "youni.works/view/cell",
 	},
 	Shape: {
-		super$: "BaseShape",
+		super$: "use.control.Shape",
 		shape: function(variety) {
 			let design = variety.album.designs[variety["design"]];
 			let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
@@ -85,7 +30,7 @@ export default {
 		}
 	},
 	Issue: {
-		super$: "use.view.Viewer",
+		super$: "use.control.Viewer",
 		viewName: "div.issue",
 		album: null,
 		use: {
@@ -114,7 +59,7 @@ export default {
 		}
 	},
 	Album: {
-		super$: "use.view.Viewer",
+		super$: "use.control.Viewer",
 		types: null,
 		viewName: "div.album",
 		use: {

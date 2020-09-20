@@ -1,28 +1,20 @@
+//import model from "./conf/testModel.mjs";
 export default function main(sys, conf) {
-	conf.packages = sys.load(conf.packages);
-	const pkg = conf.packages;
-	document.types = conf.types;
+//	pkg.app.Application.save("/file/stamp/testModel.json", model);
+	let pkg = sys.load(conf.packages);
+
 	pkg.layout.Album.createView(document.body, conf.model);
 
-	pkg.item.DataWindow.show(document.body, {
-		type: "Printing"
-	}, conf.model.issues[0].printings);
-	pkg.item.DataWindow.show(document.body, {
-		type: "Printing"
-	}, conf.model.issues[0].printings[0]);
-	testLoad(sys, conf);
-//	let printing = sys.extend(pkg.control.Record, {
-//		fields: conf.types["Printing"]
-//	});
-//	let printings = sys.extend(pkg.control.Table, {
-//		record: printing
-//	});
-//	let win = pkg.item.Window.createView(document.body);
-//	printings.createView(win.body, conf.model.issues[0].printings);
-}
-
-function testLoad(sys, conf) {
+	let app = pkg.grid.app.Application.createView(document.body);
+	app.path = "/file/stamp/data.json";
+	app.controller.owner.open("/file/stamp/types.json", loadTypes);
 	
-	let target = conf.packages.loader.Compiler.compile(conf.testLoader, "/test");
-	console.log(target);
+	function loadTypes(msg) {
+		app.types = sys.extend(null, JSON.parse(msg.content));
+		app.controller.owner.open(app.path, loadData)
+	}
+	function loadData(msg) {
+		app.model = sys.extend(null, JSON.parse(msg.content));
+		app.controller.show(app, "Album", app.model);
+	}
 }
