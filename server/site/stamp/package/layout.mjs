@@ -5,7 +5,7 @@ export default {
 		package$cell: "youni.works/base/cell",
 		package$view: "youni.works/base/view"
 	},
-	BaseShape: {
+	Shape: {
 		super$: "use.view.Viewer",
 		viewName: "div.shape",
 		uom: "mm",
@@ -28,14 +28,14 @@ export default {
 			view.style.minHeight = h;
 			view.style.maxHeight = h;
 		},
-		draw: function(view, model) {
-			if (!view.shape) view.shape = this.shape(model);
+		draw: function(view) {
+			if (!view.shape) view.shape = this.shape(view.model);
 			this.size(view);
 			this.drawImage(view);
 			this.drawData(view);
 			this.drawPath(view);
 		},
-		drawImage: function(view, model) {
+		drawImage: function(view) {
 			let shape = view.shape;
 			let w = shape.width - 2 + this.uom;
 			let h = shape.height - 2 + this.uom;
@@ -44,7 +44,7 @@ export default {
 				style: `width:${w};height:{$h};`
 			});
 		},
-		drawData: function(view, model) {
+		drawData: function(view) {
 			let shape = view.shape;
 			if (shape.data) {
 				view.data = this.owner.append(view, "span.data");
@@ -53,14 +53,51 @@ export default {
 				view.data.innerHTML = shape.data.replace("\n", "<br>");
 			}
 		},
-		drawPath: function(view, shape) {
+		drawPath: function(view) {
 //			if (shape.path) ctx.append("path", {
 //				d: this.path.draw(ctx.x, ctx.y, this.width, this.height)
 //			});
+		},
+		link: function(view) {
+			let link = view.link;
+			if (!link) {
+				let app = this.owner.getViewContext(view, "application");
+				link = app.controller.show(app, view.conf.of, view.model, view.conf.type);
+				view.link = link;
+			}
+			let box = view.getBoundingClientRect();
+			link.controller.moveTo(link, box.left, box.bottom);
+			link.style.display = "flex";
+			link.controller.activate(link);
+			return;			
+		},
+		extend$actions: {
+			contextmenu: function(on, event) {
+				event.preventDefault();
+			},
+			input: function(on, event) {
+				if (on.record.model) {
+					let app = this.owner.getViewContext(on, "application");
+					app.commands.update(on.record, on.name, this.getViewValue(on));
+				}
+			},
+			keydown: function(on, event) {
+				if (on.classList.contains("link") && (event.key == " " || event.key == "Enter")) {
+					let link = this.link(on);
+					let box = on.getBoundingClientRect();
+					on.link.controller.moveTo(on.link, box.left, box.bottom);
+					on.link.style.display = "flex";
+					on.link.controller.activate(on.link);
+					return;
+				}				
+			},
+			click: function(on, event) {
+				if (event.shiftKey) this.link(on);
+			}
 		}
 	},
-	Shape: {
-		super$: "BaseShape",
+	Stamp: {
+		super$: "Shape",
 		shape: function(variety) {
 			let design = variety.album.designs[variety["design"]];
 			let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
@@ -76,34 +113,47 @@ export default {
 		},
 		shapeData: function(variety) {
 			return (variety.denom || "") + "<br>" + (variety.colors || "") + "<br>" + (variety.subject || "");
-		},
+		}
+		/*
 		process: function(view, signal) {
 			if (signal.type == "updated") {
 				let data = this.shapeData(signal.object);
 				view.data.innerHTML = data;
 			}
 		}
+		*/
+	},
+	Group: {
+		super$: "use.view.Item",
+		viewName: ".group",
+		use: {
+			type$Control: "use.control.Control",
+			type$Shape: "Shape"
+		}
 	},
 	Issue: {
-		super$: "use.view.Viewer",
+		super$: "Group",
 		viewName: "div.issue",
 		album: null,
 		use: {
 			type$Control: "use.control.Control",
-			type$Shape: "Shape"
+			type$Shape: "Stamp"
 		},
+		/*
 		draw: function(view, model) {
 			let title = this.drawTitle(view, model);
 			let group = this.drawGroup(view, model);
 			title.style.maxWidth = group.getBoundingClientRect().width * 1.5 + "px";
 		},
-		drawTitle: function(view, model) {
+		*/
+		createHeader: function(view) {
 			let title = this.owner.append(view, ".title");
-			title.textContent = model.title;
+			title.textContent = view.model.title;
 			title.contentEditable = true;
 			return title;
 		},
-		drawGroup: function(view, model) {
+		createBody: function(view) {
+			let model = view.model;
 			let group = this.owner.append(view, ".group");
 			for (let variety of model.varieties) {
 				variety.album = model.album;
@@ -125,7 +175,8 @@ export default {
 		paginate: function(view) {
 			//TODO
 		},
-		draw: function(view, model) {
+		draw: function(view) {
+			let model = view.model;
 			let pages = this.owner.append(view, ".pages");
 			let page = this.owner.append(pages, ".page");
 			let content = this.owner.append(page, ".content");

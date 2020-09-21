@@ -85,51 +85,49 @@ export default {
 		events: null,
 		createView: function(parent, model, conf) {
 			let view = this.owner.append(parent, this.viewName);
-			model = this.model(view, model);
-			this.draw(view, model, conf);
 			this.bind(view, model, conf);
+			this.draw(view);
 			this.activate(view);
 			return view;
-		},
-		draw: function(view, model, conf) {
-		},
-		model: function(view, value) {
-			return value;
 		},
 		bind: function(view, model, conf) {
 			view.receive = Control_receive;
 			view.controller = this;
-			view.model = model;
-			this.owner.bind(view, model);
-			this.controlEvents(view);
+			view.conf = conf;
+			for (let event in this.events) {
+				let listener = this.events[event];
+				view.addEventListener(event, listener);
+			}
+			this.owner.bind(view, this.model(view, model));
 			this.control(view);
 			return view;
+		},
+		model: function(view, value) {
+			return value;
+		},
+		draw: function(view) {
 		},
 		control: function(view) {
 		},
 		activate: function(view) {
 		},
 		controlEvents: function(view) {
-			for (let event in this.events) {
-				let listener = this.events[event];
-				view.addEventListener(event, listener);
-			}
 		}
 	},
 	Item: {
 		super$: "Viewer",
 		viewName: ".item",
-		draw: function(view, model) {
-			view.header = this.createHeader(view, model);
-			view.body = this.createBody(view, model);
-			view.footer = this.createFooter(view, model);
+		draw: function(view) {
+			view.header = this.createHeader(view);
+			view.body = this.createBody(view);
+			view.footer = this.createFooter(view);
 			this.activate(view);
 		},
-		createHeader: function(item, model) {
+		createHeader: function(item) {
 		},
-		createBody: function(item, model) {
+		createBody: function(item) {
 		},
-		createFooter: function(item, model) {
+		createFooter: function(item) {
 		},
 		startMove: function(view) {
 			return false;

@@ -15,40 +15,6 @@ export default {
 			action && action.call(this, control, event);
 		}
 	},
-//	LinkControl: {
-//		super$: "Object",
-//		type$object: "Object",
-//		index: "",
-//		type$value: "Object",
-//		receive: function(event) {
-//			let fn = this.events[event.type];
-//			fn && fn.call(this, event);
-//		},
-//		events: {
-//			updated: function(event) {
-//				if (event.object == this.value) {
-//					this.transmit({
-//						type: "update",
-//						object: this.object,
-//						index: this.index,
-//						priorValue: this.value
-//					});
-//				}
-//			},
-//			deleted: function(event) {
-//				if (event.object == this.value) {
-//					this.object[this.index] = undefined; //check JSON serialization of object/array.
-//					this.transmit({
-//						type: "update",
-//						object: this.object,
-//						index: this.index,
-//						priorValue: this.value
-//					});
-//					//unbind()???
-//				}
-//			}
-//		}
-//	},
 	Owner: {
 		super$: "Object",
 		transmit: {
@@ -70,7 +36,7 @@ export default {
 				if (!model[Symbol.observers]) model[Symbol.observers] = [];
 				model[Symbol.observers].push(control);
 			}
-			if (model !== undefined) control.model = model;
+			control.model = model;
 		},
 		unbind: function(control) {
 			if (control.model && control.model[Symbol.observers]) {
@@ -86,3 +52,38 @@ export default {
 		},
 	}
 }
+
+//LinkControl: {
+//super$: "Object",
+//type$object: "Object",
+//index: "",
+//type$value: "Object",
+//receive: function(event) {
+//	let fn = this.events[event.type];
+//	fn && fn.call(this, event);
+//},
+//events: {
+//	updated: function(event) {
+//		if (event.object == this.value) {
+//			this.transmit({
+//				type: "update",
+//				object: this.object,
+//				index: this.index,
+//				priorValue: this.value
+//			});
+//		}
+//	},
+//	deleted: function(event) {
+//		if (event.object == this.value) {
+//			this.object[this.index] = undefined; //check JSON serialization of object/array.
+//			this.transmit({
+//				type: "update",
+//				object: this.object,
+//				index: this.index,
+//				priorValue: this.value
+//			});
+//			//unbind()???
+//		}
+//	}
+//}
+//},

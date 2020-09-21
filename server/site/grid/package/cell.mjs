@@ -7,8 +7,9 @@ export default {
 	Label: {
 		super$: "use.view.Viewer",
 		viewName: "div.label",
-		draw: function(label, conf) {
+		draw: function(label) {
 			label.classList.add("cell");
+			let conf = label.conf;
 			if (!conf.title) {
 				conf.title = conf.name ? nameToTitle(conf.name) : "";
 			}
@@ -42,7 +43,7 @@ export default {
 				tabindex: "0",
 			});
 		},
-		draw: function(handle, conf) {
+		draw: function(handle) {
 			handle.classList.add("cell");
 			handle.innerHTML = "<br>";
 		},
@@ -112,7 +113,6 @@ export default {
 			map: function(parent, model, conf) {
 				let view = this.owner.append(parent, ".map");
 				view.classList.add("link");
-				view.conf = conf;
 				view.innerHTML = "<div>...</div>";
 				return view;							
 			},
@@ -120,7 +120,6 @@ export default {
 				let view = this.owner.append(parent, ".array");
 				view.classList.add("link");
 				view.name = conf.name;
-				view.conf = conf;
 				view.innerHTML = "<div>...</div>";
 				return view;				
 			},
@@ -128,7 +127,6 @@ export default {
 				let view = this.owner.append(parent, ".object");
 				view.classList.add("link");
 				view.name = conf.name;
-				view.conf = conf;
 				view.innerHTML = "<div>...</div>";
 				return view;								
 			}
@@ -155,15 +153,18 @@ export default {
 		createView: function(parent, model, conf) {
 			let type = this.typeOf(model, conf);
 			let view = type.call(this, parent, model, conf);
+			this.bind(view, model, conf);
+			this.draw(view);
+			this.activate(view);
+			return view;
+		},
+		control: function(view) {
 			this.owner.setAttributes(view, {
 				tabindex: "0",
-				name: conf.name
+				name: view.conf.name
 			});
-			view.name = conf.name; //TODO review whether we use attribute or property for name.
+			view.name = view.conf.name; //TODO review whether we use attribute or property for name.
 			view.classList.add("field");
-			this.draw(view, model);
-			this.bind(view, model);
-			return view;
 		},
 		getViewValue: function(view) {
 			return view.nodeName == "INPUT" ? view.value : view.textContent;
@@ -254,7 +255,8 @@ export default {
 		rowOf: function(on, index) {
 			return on.body.childNodes[index];
 		},
-		createHeader: function(view, model) {
+		createHeader: function(view) {
+			let model = view.model;
 			view = this.owner.append(view, ".header");
 			view.handle = this.use.Handle.createView(view);
 			let width = 0;
@@ -285,7 +287,8 @@ export default {
 			col.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
 			return col;
 		},
-		createBody: function(view, model) {
+		createBody: function(view) {
+			let model = view.model;
 			view = this.owner.append(view, ".body");
 			if (model) {
 				if (model.length) {
@@ -421,12 +424,12 @@ export default {
 			type$Label: "Label",
 			type$Field: "Field"
 		},
-		draw: function(view, model) {
+		draw: function(view) {
 			view.classList.add("properties");
 			view.classList.add("grid");
 			view.fields = Object.create(null);
 			for (let conf of this.fields) {
-				this.createProperty(view, model, conf);
+				this.createProperty(view, view.model, conf);
 			}
 		},
 		createProperty: function(record, model, conf) {
@@ -439,7 +442,7 @@ export default {
 			return prop;
 		},
 		createLabel: function(header, conf) {
-			let label = this.use.Label.createView(header, conf);
+			let label = this.use.Label.createView(header, undefined, conf);
 			label.classList.add("cell");
 			return label;
 		},
