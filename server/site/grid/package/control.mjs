@@ -52,38 +52,3 @@ export default {
 		},
 	}
 }
-
-//LinkControl: {
-//super$: "Object",
-//type$object: "Object",
-//index: "",
-//type$value: "Object",
-//receive: function(event) {
-//	let fn = this.events[event.type];
-//	fn && fn.call(this, event);
-//},
-//events: {
-//	updated: function(event) {
-//		if (event.object == this.value) {
-//			this.transmit({
-//				type: "update",
-//				object: this.object,
-//				index: this.index,
-//				priorValue: this.value
-//			});
-//		}
-//	},
-//	deleted: function(event) {
-//		if (event.object == this.value) {
-//			this.object[this.index] = undefined; //check JSON serialization of object/array.
-//			this.transmit({
-//				type: "update",
-//				object: this.object,
-//				index: this.index,
-//				priorValue: this.value
-//			});
-//			//unbind()???
-//		}
-//	}
-//}
-//},
