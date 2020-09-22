@@ -320,8 +320,9 @@ export default {
 				if (shortcut) shortcut.call(this, on, event);
 			},
 			created: function(on, event) {
-				let row = this.createRow(on.body, event.value, event.index);
-				let rel = this.rowOf(on, event.index);
+				let index = event.index;
+				let row = this.createRow(on.body, event.value, typeof index == "number" ? undefined : index);
+				let rel = this.rowOf(on, index);
 				if (rel) on.body.insertBefore(row, rel);
 				row.firstChild.focus();
 			},
