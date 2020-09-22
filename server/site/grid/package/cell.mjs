@@ -273,17 +273,11 @@ export default {
 			view.parentNode.style.maxWidth = width * 16 + "px";
 			return view;
 		},
-		createFooter: function(view) {
-			view = this.owner.append(view, "input.footer");
-			view.value = "x";
-			return view;
-			
-		},
 		createColumn: function(header, conf) {
 			if (!conf.title) {
 				conf.title = conf.name ? nameToTitle(conf.name) : "";
 			}
-			let col = this.use.Label.createView(header, conf);
+			let col = this.use.Label.createView(header, null, conf);
 			col.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
 			return col;
 		},

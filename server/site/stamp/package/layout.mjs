@@ -9,15 +9,21 @@ export default {
 		super$: "use.view.Viewer",
 		viewName: "div.shape",
 		uom: "mm",
+		model: function(view, value) {
+			if (!view.shape) view.shape = this.shape(value);
+			return value;
+		},
 		shape: function(object) {
-			return object || this.sys.extend(null, {
+			return this.sys.extend(null, {
 				shape: "rectangle",
 				path: "",
 				width: 10,
 				height: 10,
 				image: "",
-				data: ""
 			});
+		},
+		shapeData: function(view) {
+			return "";
 		},
 		size: function(view) {
 			let shape = view.shape;
@@ -29,7 +35,6 @@ export default {
 			view.style.maxHeight = h;
 		},
 		draw: function(view) {
-			if (!view.shape) view.shape = this.shape(view.model);
 			this.size(view);
 			this.drawImage(view);
 			this.drawData(view);
@@ -45,24 +50,23 @@ export default {
 			});
 		},
 		drawData: function(view) {
-			let shape = view.shape;
-			if (shape.data) {
-				view.data = this.owner.append(view, "span.data");
-				if (shape.image) view.data.style.webkitTextStroke = ".2mm rgba(255, 255, 255, .25)";
-
-				view.data.innerHTML = shape.data.replace("\n", "<br>");
-			}
+			view.data = this.owner.append(view, "span.data");
+			if (view.shape.image) view.data.style.webkitTextStroke = ".2mm rgba(255, 255, 255, .25)";
+			view.data.innerHTML = this.shapeData(view)
 		},
 		drawPath: function(view) {
 //			if (shape.path) ctx.append("path", {
 //				d: this.path.draw(ctx.x, ctx.y, this.width, this.height)
 //			});
 		},
+		linkType: "",
 		link: function(view) {
+			if (!this.linkType) return;
+				
 			let link = view.link;
 			if (!link) {
 				let app = this.owner.getViewContext(view, "application");
-				link = app.controller.show(app, view.conf.of, view.model, view.conf.type);
+				link = app.controller.show(app, this.linkType, view.model);
 				view.link = link;
 			}
 			let box = view.getBoundingClientRect();
@@ -72,46 +76,31 @@ export default {
 			return;			
 		},
 		extend$actions: {
-			contextmenu: function(on, event) {
-				event.preventDefault();
-			},
-			input: function(on, event) {
-				if (on.record.model) {
-					let app = this.owner.getViewContext(on, "application");
-					app.commands.update(on.record, on.name, this.getViewValue(on));
-				}
-			},
-			keydown: function(on, event) {
-				if (on.classList.contains("link") && (event.key == " " || event.key == "Enter")) {
-					let link = this.link(on);
-					let box = on.getBoundingClientRect();
-					on.link.controller.moveTo(on.link, box.left, box.bottom);
-					on.link.style.display = "flex";
-					on.link.controller.activate(on.link);
-					return;
-				}				
+			updated: function(on, event) {
+				on.data.innerHTML = this.shapeData(on);
 			},
 			click: function(on, event) {
-				if (event.shiftKey) this.link(on);
+				if (event.shiftKey) {
+					event.preventDefault();
+					this.link(on);
+				}
 			}
 		}
 	},
 	Stamp: {
 		super$: "Shape",
+		linkType: "Variety",
 		shape: function(variety) {
 			let design = variety.album.designs[variety["design"]];
 			let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
-			let data = this.shapeData(variety);
 			return {
 				width: design.width,
 				height: design.height,
-				//path: design.path,
 				image: image,
-				data: data,
-				model: variety
 			};
 		},
-		shapeData: function(variety) {
+		shapeData: function(view) {
+			let variety = view.model;
 			return (variety.denom || "") + "<br>" + (variety.colors || "") + "<br>" + (variety.subject || "");
 		}
 		/*
@@ -129,6 +118,30 @@ export default {
 		use: {
 			type$Control: "use.control.Control",
 			type$Shape: "Shape"
+		},
+		created: function(on, event) {
+			let shape = this.createShape(on.body, event.value, event.index);
+			let rel = this.shapeOf(on, event.index);
+			if (rel) on.body.insertBefore(shape, rel);
+			shape.focus();
+		},
+		deleted: function(on, event) {
+			let row = this.rowOf(on, event.index);
+			let focus = row.nextSibling || row.previousSibling;
+			row.remove();
+			focus && focus.firstChild.focus();
+		},
+		moved: function(on, event) {
+			let row = this.rowOf(on, event.index);
+			row.remove();
+			let to = this.rowOf(on, event.value);
+			on.body.insertBefore(row, to);
+			if (row.goto_cell) {
+				row.goto_cell.focus();
+				delete row.goto_cell;
+			} else {
+				row.firstChild.focus();
+			}
 		}
 	},
 	Issue: {

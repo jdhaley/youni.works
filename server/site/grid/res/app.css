@@ -23,9 +23,8 @@
 }
 .application {
 	font: 16px arial;
-	width: 100vw;
-	height: 100vh;
 	background: white;
+	flex: 1;
 }
 
 .grid * {
