@@ -5,15 +5,43 @@ export default {
 		package$cell: "youni.works/base/cell",
 		package$view: "youni.works/base/view"
 	},
+	Group: {
+		super$: "use.view.Container",
+		viewName: ".group",
+		use: {
+			type$Element: "Shape"
+		},
+		extend$actions: {
+			created: function(on, event) {
+				let ele = this.createElement(on, event.value, event.index);
+				let rel = this.elementOf(on, event.index);
+				if (rel) on.insertBefore(ele, rel);
+				ele.focus();
+			},
+			deleted: function(on, event) {
+				let ele = this.elementOf(on, event.index);
+				let focus = ele.nextSibling || ele.previousSibling;
+				ele.remove();
+				focus && focus.focus();
+			},
+			moved: function(on, event) {
+				let ele = this.elementOf(on, event.index);
+				ele.remove();
+				let to = this.elementOf(on, event.value);
+				on.insertBefore(ele, to);
+				ele.focus();
+			}
+		}
+	},
 	Shape: {
-		super$: "use.view.Viewer",
+		super$: "use.view.Composite",
 		viewName: "div.shape",
 		uom: "mm",
 		model: function(view, value) {
-			if (!view.shape) view.shape = this.shape(value);
+			if (!view.shape) view.shape = this.shape(view, value);
 			return value;
 		},
-		shape: function(object) {
+		shape: function(view, object) {
 			return this.sys.extend(null, {
 				shape: "rectangle",
 				path: "",
@@ -90,12 +118,13 @@ export default {
 	Stamp: {
 		super$: "Shape",
 		linkType: "Variety",
-		shape: function(variety) {
-			let design = variety.album.designs[variety["design"]];
+		shape: function(view, variety) {
+			let album = this.owner.getViewContext(view, "album").model;
+			let design = album.designs[variety.design];
 			let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
 			return {
-				width: design.width,
-				height: design.height,
+				width: design ? design.width : 10,
+				height: design ? design.height : 10,
 				image: image,
 			};
 		},
@@ -112,45 +141,17 @@ export default {
 		}
 		*/
 	},
-	Group: {
-		super$: "use.view.Item",
-		viewName: ".group",
-		use: {
-			type$Control: "use.control.Control",
-			type$Shape: "Shape"
-		},
-		created: function(on, event) {
-			let shape = this.createShape(on.body, event.value, event.index);
-			let rel = this.shapeOf(on, event.index);
-			if (rel) on.body.insertBefore(shape, rel);
-			shape.focus();
-		},
-		deleted: function(on, event) {
-			let row = this.rowOf(on, event.index);
-			let focus = row.nextSibling || row.previousSibling;
-			row.remove();
-			focus && focus.firstChild.focus();
-		},
-		moved: function(on, event) {
-			let row = this.rowOf(on, event.index);
-			row.remove();
-			let to = this.rowOf(on, event.value);
-			on.body.insertBefore(row, to);
-			if (row.goto_cell) {
-				row.goto_cell.focus();
-				delete row.goto_cell;
-			} else {
-				row.firstChild.focus();
-			}
-		}
-	},
 	Issue: {
-		super$: "Group",
+		super$: "use.view.Item",
 		viewName: "div.issue",
 		album: null,
 		use: {
-			type$Control: "use.control.Control",
-			type$Shape: "Stamp"
+			Group: {
+				super$: "Group",
+				use: {
+					type$Element: "Stamp"
+				}
+			}
 		},
 		/*
 		draw: function(view, model) {
@@ -166,6 +167,8 @@ export default {
 			return title;
 		},
 		createBody: function(view) {
+			return this.use.Group.createView(view, view.model.varieties);
+			/*
 			let model = view.model;
 			let group = this.owner.append(view, ".group");
 			for (let variety of model.varieties) {
@@ -173,6 +176,7 @@ export default {
 				this.use.Shape.createView(group, variety);
 			}
 			return group;
+			*/
 		}
 	},
 	Album: {
@@ -203,7 +207,6 @@ export default {
 //				record: variety
 //			});
 			for (let issue of model.issues) {
-				issue.album = model;
 				this.use.Issue.createView(content, issue);
 			//	varieties.createView(sheets, issue.varieties);
 			}

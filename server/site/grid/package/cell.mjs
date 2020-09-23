@@ -217,7 +217,7 @@ export default {
 		}
 	},
 	Record: {
-		super$: "use.view.Viewer",
+		super$: "use.view.Composite",
 		extend$actions: {
 			updated: function(on, event) {
 				let field = on.fields[event.index];

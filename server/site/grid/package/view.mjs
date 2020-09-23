@@ -98,7 +98,8 @@ export default {
 				let listener = this.events[event];
 				view.addEventListener(event, listener);
 			}
-			this.owner.bind(view, this.model(view, model));
+			model = this.model(view, model);
+			this.owner.bind(view, model);
 			this.control(view);
 			return view;
 		},
@@ -158,6 +159,54 @@ export default {
 			},
 			mouseleave: function(on, event) {
 			//	delete on.MOVE;
+			}
+		}
+	},
+	Container: {
+		super$: "Viewer",
+		use: {
+			type$Element: "Composite"
+		},
+		extend$action: {
+			created: function(on, event) {
+			},
+			deleted: function(on, event) {
+			},
+			moved: function(on, event) {
+			}
+		},
+		draw: function(view) {
+			let model = view.model;
+			if (model) {
+				if (model.length) {
+					for (let row of model) this.createElement(view, row);					
+				} else {
+					for (let key in model) this.createElement(view, model[key], key);
+				}
+			}
+			return view;
+		},
+		indexOf: function(element) {
+			element = this.owner.getViewContext(element, "row");
+			let body = this.owner.getViewContext(element, "body");
+			let index = 0;
+			for (let row of body.childNodes) {
+				if (row == element) return index;
+				index++;
+			}
+			return -1;
+		},
+		elementOf: function(container, index) {
+			return container.childNodes[index];
+		},
+		createElement: function(container, model, index) {
+			return this.use.Element.createView(container, model, index);
+		}
+	},
+	Composite: {
+		super$: "Viewer",
+		extend$action: {
+			updated: function(on, event) {
 			}
 		}
 	}
