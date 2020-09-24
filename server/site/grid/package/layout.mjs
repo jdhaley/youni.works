@@ -35,9 +35,9 @@ export default {
 		super$: "use.view.Composite",
 		viewName: "div.shape",
 		uom: "mm",
-		model: function(view, value) {
+		control: function(view, value) {
 			if (!view.shape) view.shape = this.shape(view, value);
-			return value;
+			return this.owner.bind(view, value);
 		},
 		shape: function(view, object) {
 			return this.sys.extend(null, {

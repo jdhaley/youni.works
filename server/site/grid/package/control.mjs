@@ -37,6 +37,7 @@ export default {
 				model[Symbol.observers].push(control);
 			}
 			control.model = model;
+			return model;
 		},
 		unbind: function(control) {
 			if (control.model && control.model[Symbol.observers]) {
@@ -49,6 +50,7 @@ export default {
 				}
 			}
 			delete control.model;
+			return control;
 		},
 	}
 }

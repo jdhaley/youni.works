@@ -83,36 +83,30 @@ export default {
 		type$owner: "ViewOwner",
 		viewName: "div.view",
 		events: null,
-		createView: function(parent, model, conf) {
-			let view = this.owner.append(parent, this.viewName);
-			this.bind(view, model, conf);
-			this.draw(view);
-			this.activate(view);
-			return view;
+		forType: function(value, conf) {
+			return (parent, value, conf) => this.owner.append(parent, this.viewName);
 		},
-		bind: function(view, model, conf) {
-			view.receive = Control_receive;
-			view.controller = this;
-			view.conf = conf;
+		createView: function(parent, model, conf) {
+			let constr = this.forType(model, conf);
+			let view = constr.call(this, parent, model, conf);
 			for (let event in this.events) {
 				let listener = this.events[event];
 				view.addEventListener(event, listener);
 			}
-			model = this.model(view, model);
-			this.owner.bind(view, model);
-			this.control(view);
+			view.receive = Control_receive;
+			view.controller = this;
+			view.conf = conf;
+			model = this.control(view, model);
+			this.draw(view, model);
+			this.activate(view);
 			return view;
 		},
-		model: function(view, value) {
-			return value;
+		control: function(control, value) {
+			return this.owner.bind(control, value);
 		},
-		draw: function(view) {
+		draw: function(view, value) {
 		},
-		control: function(view) {
-		},
-		activate: function(view) {
-		},
-		controlEvents: function(view) {
+		activate: function(control) {
 		}
 	},
 	Item: {

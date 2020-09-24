@@ -131,10 +131,7 @@ export default {
 				return view;								
 			}
 		},
-		getTypes: function(view) {
-			return this.owner.getViewContext(view, "application").types;
-		},
-		typeOf: function(model, conf) {
+		forType: function(model, conf) {
 			let type = conf.type;
 			if (!type) {
 				type = typeof model;
@@ -150,21 +147,17 @@ export default {
 			}
 			return this.dataTypes[type] || this.dataTypes.string;
 		},
-		createView: function(parent, model, conf) {
-			let type = this.typeOf(model, conf);
-			let view = type.call(this, parent, model, conf);
-			this.bind(view, model, conf);
-			this.draw(view);
-			this.activate(view);
-			return view;
+		getTypes: function(view) {
+			return this.owner.getViewContext(view, "application").types;
 		},
-		control: function(view) {
+		control: function(view, value) {
 			this.owner.setAttributes(view, {
 				tabindex: "0",
 				name: view.conf.name
 			});
 			view.name = view.conf.name; //TODO review whether we use attribute or property for name.
 			view.classList.add("field");
+			return this.owner.bind(view, value);
 		},
 		getViewValue: function(view) {
 			return view.nodeName == "INPUT" ? view.value : view.textContent;
@@ -236,11 +229,9 @@ export default {
 		},
 		viewName: "div.table",
 		fields: null,
-		model: function(view, value) {
-			return value ? value : [];
-		},
-		control: function(view) {
+		control: function(view, value) {
 			view.classList.add("grid");
+			return this.owner.bind(view, value ? value : []);
 		},
 		indexOf: function(view) {
 			view = this.owner.getViewContext(view, "row");
