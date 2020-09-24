@@ -1,8 +1,6 @@
 export default {
-	package$: "youni.works/album/layout",
+	package$: "youni.works/base/layout",
 	use: {
-		package$control: "youni.works/base/control",
-		package$cell: "youni.works/base/cell",
 		package$view: "youni.works/base/view"
 	},
 	Group: {
@@ -112,103 +110,6 @@ export default {
 					event.preventDefault();
 					this.link(on);
 				}
-			}
-		}
-	},
-	Stamp: {
-		super$: "Shape",
-		linkType: "Variety",
-		shape: function(view, variety) {
-			let album = this.owner.getViewContext(view, "album").model;
-			let design = album.designs[variety.design];
-			let image = variety.image ? "/file/stamp/" + variety.image + ".png" : "";
-			return {
-				width: design ? design.width : 10,
-				height: design ? design.height : 10,
-				image: image,
-			};
-		},
-		shapeData: function(view) {
-			let variety = view.model;
-			return (variety.denom || "") + "<br>" + (variety.colors || "") + "<br>" + (variety.subject || "");
-		}
-		/*
-		process: function(view, signal) {
-			if (signal.type == "updated") {
-				let data = this.shapeData(signal.object);
-				view.data.innerHTML = data;
-			}
-		}
-		*/
-	},
-	Issue: {
-		super$: "use.view.Item",
-		viewName: "div.issue",
-		album: null,
-		use: {
-			Group: {
-				super$: "Group",
-				use: {
-					type$Element: "Stamp"
-				}
-			}
-		},
-		/*
-		draw: function(view, model) {
-			let title = this.drawTitle(view, model);
-			let group = this.drawGroup(view, model);
-			title.style.maxWidth = group.getBoundingClientRect().width * 1.5 + "px";
-		},
-		*/
-		createHeader: function(view) {
-			let title = this.owner.append(view, ".title");
-			title.textContent = view.model.title;
-			title.contentEditable = true;
-			return title;
-		},
-		createBody: function(view) {
-			return this.use.Group.createView(view, view.model.varieties);
-			/*
-			let model = view.model;
-			let group = this.owner.append(view, ".group");
-			for (let variety of model.varieties) {
-				variety.album = model.album;
-				this.use.Shape.createView(group, variety);
-			}
-			return group;
-			*/
-		}
-	},
-	Album: {
-		super$: "use.view.Viewer",
-		types: null,
-		viewName: "div.album",
-		use: {
-			type$Control: "use.control.Control",
-			type$Record: "use.cell.Record",
-			type$Table: "use.cell.Table",
-			type$Issue: "Issue"
-		},
-		paginate: function(view) {
-			//TODO
-		},
-		draw: function(view) {
-			let model = view.model;
-			let pages = this.owner.append(view, ".pages");
-			let page = this.owner.append(pages, ".page");
-			let content = this.owner.append(page, ".content");
-			//let sheets = this.owner.append(view, ".sheets");
-//			let doc = view.ownerDocument;
-//
-//			let variety = this.sys.extend(this.use.Record, {
-//				fields: doc.types["Variety"]
-//			});
-//			let varieties = this.sys.extend(this.use.Table, {
-//				record: variety
-//			});
-			for (let issue of model.issues) {
-				this.use.Issue.createView(content, issue);
-			//	varieties.createView(sheets, issue.varieties);
 			}
 		}
 	}

@@ -1,8 +1,8 @@
 import grid from "../grid/conf.mjs";
-import layout from "./package/layout.mjs";
+import stamp from "./package/stamp.mjs";
 export default {
 	packages: {
 		grid: grid.packages,
-		layout: layout
+		stamp: stamp
 	}
 }

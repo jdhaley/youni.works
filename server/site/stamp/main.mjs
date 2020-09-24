@@ -1,6 +1,4 @@
-//import model from "./conf/testModel.mjs";
 export default function main(sys, conf) {
-//	pkg.app.Application.save("/file/stamp/testModel.json", model);
 	let pkg = sys.load(conf.packages);
 
 	let app = pkg.grid.app.Application.createView(document.body);
@@ -14,7 +12,7 @@ export default function main(sys, conf) {
 	function loadData(msg) {
 		app.model = sys.extend(null, JSON.parse(msg.content));
 		app.controller.show(app, "Album", app.model);
-		pkg.layout.Album.createView(app, app.model);
+		pkg.stamp.Album.createView(app, app.model);
 
 	}
 }
