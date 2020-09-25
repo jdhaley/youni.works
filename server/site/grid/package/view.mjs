@@ -179,25 +179,30 @@ export default {
 				}
 			}
 		},
-		createElement: function(container, model, index) {
-			let element = this.use.Element.createView(container, model);
-			return element;
+		createElement: function(view, value, index) {
+			return this.use.Element.createView(view, value, view.conf);
+		},
+		findElement: function(node) {
+			return this.owner.getViewContext(node, "element");
+		},
+		findCollection: function(node) {
+			return this.owner.getViewContext(node, "collection");
 		},
 		indexOf: function(view) {
-			view = this.owner.getViewContext(view, "element");
-			let container = this.owner.getViewContext(view, "container");
+			view = this.findElement(view);
+			let collection = this.findCollection(view);
 			let index = -1;
-			if (container) for (let ele of container.childNodes) {
+			if (collection) for (let ele of collection.childNodes) {
 				index++;
 				if (view == ele) return index;
 			}
 			return index;
 		},
-		elementOf: function(container, index) {
+		elementOf: function(view, index) {
 			if (typeof index == "number") {
-				return container.childNodes[index];
+				return view.childNodes[index];
 			} else {
-				for (let ele of container.childNodes) {
+				for (let ele of view.childNodes) {
 					if (ele.index === index) return ele;
 				}
 			}

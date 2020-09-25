@@ -248,26 +248,12 @@ export default {
 		use: {
 			type$Element: "Row"
 		},
-		createElement: function(view, model, index) {
-			let ele = this.use.Element.createView(view, model, view.conf);
-			ele.classList.add("row");
+		findElement: function(node) {
+			return this.owner.getViewContext(node, "row");
 		},
-		// THE FOLLOWING WAS MOVED FROM TABLE.
-		
-		indexOf: function(view) {
-			view = this.owner.getViewContext(view, "row");
-			let body = this.owner.getViewContext(view, "body");
-			let index = 0;
-			for (let row of body.childNodes) {
-				if (row == view) return index;
-				index++;
-			}
-			return -1;
+		findCollection: function(node) {
+			return this.owner.getViewContext(node, "grid");
 		},
-		rowOf: function(on, index) {
-			return on.childNodes[index];
-		},
-
 		extend$actions: {
 			keydown: function(on, event) {
 				let shortcut = this.shortcuts[event.key];
@@ -276,20 +262,20 @@ export default {
 			created: function(on, event) {
 				let index = event.index;
 				let row = this.createElement(on, event.value, typeof index == "number" ? undefined : index);
-				let rel = this.rowOf(on, index);
+				let rel = this.elementOf(on, index);
 				if (rel) on.insertBefore(row, rel);
 				row.firstChild.focus();
 			},
 			deleted: function(on, event) {
-				let row = this.rowOf(on, event.index);
+				let row = this.elementOf(on, event.index);
 				let focus = row.nextSibling || row.previousSibling;
 				row.remove();
 				focus && focus.firstChild.focus();
 			},
 			moved: function(on, event) {
-				let row = this.rowOf(on, event.index);
+				let row = this.elementOf(on, event.index);
 				row.remove();
-				let to = this.rowOf(on, event.value);
+				let to = this.elementOf(on, event.value);
 				on.insertBefore(row, to);
 				if (row.goto_cell) {
 					row.goto_cell.focus();
