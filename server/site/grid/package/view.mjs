@@ -208,6 +208,15 @@ export default {
 		extend$action: {
 			updated: function(on, event) {
 			}
+		},
+		draw: function(view) {
+			view.parts = Object.create(null);
+			for (let conf of view.conf) {
+				this.createPart(view, view.model, conf);
+			}
+		},
+		createPart: function(view, value, conf) {
+			console.log("no part");
 		}
 	}
 }

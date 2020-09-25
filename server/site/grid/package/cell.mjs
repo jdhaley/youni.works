@@ -218,17 +218,16 @@ export default {
 		},
 		draw: function(row) {
 			row.handle = this.createHandle(row);
-			row.cells = Object.create(null);
+			row.parts = Object.create(null);
 //			if (key) this.createField(row, key, {
 //				size: 10
 //			});
-			for (let conf of row.conf) this.createCell(row, row.model, conf);
-			return row;
+			for (let conf of row.conf) this.createPart(row, row.model, conf);
 		},
 		createHandle: function(row) {
 			return this.use.Handle.createView(row);
 		},
-		createCell: function(row, model, conf) {
+		createPart: function(row, model, conf) {
 			let name = conf.name;
 			let value = model ? (name ? model[name] : model) : undefined;
 			let cell = this.use.Cell.createView(row, value, conf);
@@ -236,11 +235,11 @@ export default {
 			cell.classList.add("cell");
 			cell.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
 			cell.record = row;
-			row.cells[name] = cell;			
+			row.parts[name] = cell;			
 		},
 		extend$actions: {
 			updated: function(on, event) {
-				let field = on.cells[event.index];
+				let field = on.parts[event.index];
 				field.controller.setViewValue(field, event.value);
 				field.focus();
 			}
@@ -315,7 +314,7 @@ export default {
 						app.commands.move(on, index, index - 1);
 					} else {
 						row = row.previousSibling;
-						row.cells[cell.name].focus();
+						row.parts[cell.name].focus();
 					}
 				}
 			},
@@ -330,7 +329,7 @@ export default {
 						app.commands.move(on, index, index + 1);
 					} else {
 						row = row.nextSibling;
-						row.cells[cell.name].focus();
+						row.parts[cell.name].focus();
 					}
 				}
 			},
@@ -404,10 +403,6 @@ export default {
 			return col;
 		}
 	},
-	Record: {
-		super$: "Row",
-	},
-
 	Table: {
 		super$: "use.view.Item",
 		use: {
@@ -432,21 +427,19 @@ export default {
 			type$Label: "Label",
 			type$Field: "Field"
 		},
-		draw: function(view) {
+		control: function(view, value) {
+			view.conf = this.fields;
 			view.classList.add("properties");
 			view.classList.add("grid");
-			view.cells = Object.create(null);
-			for (let conf of this.fields) {
-				this.createProperty(view, view.model, conf);
-			}
+			return this.owner.bind(view, value);
 		},
-		createProperty: function(record, model, conf) {
+		createPart: function(record, model, conf) {
 			let prop = this.owner.append(record, ".property");
 			prop.classList.add("row");
 			prop.lbl = this.createLabel(prop, conf);
 			prop.field = this.createField(prop, model, conf);
 			prop.field.record = record;
-			record.cells[prop.field.name] = prop.field;
+			record.parts[prop.field.name] = prop.field;
 			return prop;
 		},
 		createLabel: function(header, conf) {
