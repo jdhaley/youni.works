@@ -257,17 +257,53 @@ export default {
 			ele.classList.add("row");
 		}
 	},
+	TableHeader: {
+		super$: "use.view.Viewer",
+		use: {
+			type$Handle: "Handle",
+			type$Label: "Label"
+		},
+		viewName: ".header",
+		draw: function(view) {
+			view.classList.add("row");
+			view.handle = this.use.Handle.createView(view);
+			let model = view.model;
+			let width = 0;
+			if (model && model.length === undefined) {
+				this.createColumn(view, {
+					size: 10
+				});
+				width += 10;
+			}
+			for (let field of view.conf) {
+				width += field.size || 5;
+				this.createColumn(view, field);
+			}
+			view.parentNode.style.maxWidth = width * 16 + "px";
+		},
+		createColumn: function(header, conf) {
+			if (!conf.title) {
+				conf.title = conf.name ? nameToTitle(conf.name) : "";
+			}
+			let col = this.use.Label.createView(header, null, conf);
+			col.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
+			return col;
+		}
+	},
 	Table: {
 		super$: "use.view.Item",
 		use: {
-			type$Grid: "Grid",
-			type$Record: "Record",
-			type$Handle: "Handle",
-			type$Field: "Field",
-			type$Label: "Label"
+			type$Header: "TableHeader",
+			type$Body: "Grid"
 		},
-		viewName: "div.table",
+		viewName: ".table",
 		fields: null,
+		createHeader: function(view) {
+			return this.use.Header.createView(view, view.model, this.fields);
+		},
+		createBody: function(view) {
+			return this.use.Body.createView(view, view.model, this.fields);
+		},
 		control: function(view, value) {
 			return this.owner.bind(view, value ? value : []);
 		},
@@ -284,47 +320,7 @@ export default {
 		rowOf: function(on, index) {
 			return on.body.childNodes[index];
 		},
-		createHeader: function(view) {
-			let model = view.model;
-			view = this.owner.append(view, ".header");
-			view.classList.add("row");
-			view.handle = this.use.Handle.createView(view);
-			let width = 0;
-			if (model && model.length === undefined) {
-				this.createColumn(view, {
-					size: 10
-				});
-				width += 10;
-			}
-			for (let field of this.fields) {
-				width += field.size || 5;
-				this.createColumn(view, field);
-			}
-			view.parentNode.style.maxWidth = width * 16 + "px";
-			return view;
-		},
-		createColumn: function(header, conf) {
-			if (!conf.title) {
-				conf.title = conf.name ? nameToTitle(conf.name) : "";
-			}
-			let col = this.use.Label.createView(header, null, conf);
-			col.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
-			return col;
-		},
-		createBody: function(view) {
-			return this.use.Grid.createView(view, view.model, this.fields);
-			/*
-			view = this.owner.append(view, ".body");
-			if (model) {
-				if (model.length) {
-					for (let row of model) this.createRow(view, row);					
-				} else {
-					for (let key in model) this.createRow(view, model[key], key);
-				}
-			}
-			return view;
-			*/
-		},
+
 		extend$actions: {
 			keydown: function(on, event) {
 				let shortcut = this.shortcuts[event.key];
