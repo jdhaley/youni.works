@@ -172,29 +172,35 @@ export default {
 		draw: function(view) {
 			let model = view.model;
 			if (model) {
-				if (model.length) {
-					for (let row of model) this.createElement(view, row);					
+				if (model[Symbol.iterable]) {
+					for (let row of model) this.createElement(view, row, i++);					
 				} else {
 					for (let key in model) this.createElement(view, model[key], key);
 				}
 			}
-			return view;
-		},
-		indexOf: function(element) {
-			element = this.owner.getViewContext(element, "row");
-			let body = this.owner.getViewContext(element, "body");
-			let index = 0;
-			for (let row of body.childNodes) {
-				if (row == element) return index;
-				index++;
-			}
-			return -1;
-		},
-		elementOf: function(container, index) {
-			return container.childNodes[index];
 		},
 		createElement: function(container, model, index) {
-			return this.use.Element.createView(container, model, index);
+			let element = this.use.Element.createView(container, model);
+			return element;
+		},
+		indexOf: function(view) {
+			view = this.owner.getViewContext(view, "element");
+			let container = this.owner.getViewContext(view, "container");
+			let index = -1;
+			if (container) for (let ele of container.childNodes) {
+				index++;
+				if (view == ele) return index;
+			}
+			return index;
+		},
+		elementOf: function(container, index) {
+			if (typeof index == "number") {
+				return container.childNodes[index];
+			} else {
+				for (let ele of container.childNodes) {
+					if (ele.index === index) return ele;
+				}
+			}
 		}
 	},
 	Composite: {

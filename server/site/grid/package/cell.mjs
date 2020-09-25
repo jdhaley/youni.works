@@ -179,7 +179,7 @@ export default {
 		},
 		extend$actions: {
 			contextmenu: function(on, event) {
-				event.preventDefault();
+//			event.preventDefault();
 			},
 			input: function(on, event) {
 				if (on.record.model) {
@@ -217,11 +217,50 @@ export default {
 				field.controller.setViewValue(field, event.value);
 				field.focus();
 			}
+		},
+		createField: function(row, model, conf) {
+			let name = conf.name;
+			let value = model ? (name ? model[name] : model) : undefined;
+			let field = this.use.Field.createView(row, value, conf);
+			if (!conf.name) field.classList.add("key");
+			field.classList.add("cell");
+			field.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
+			field.record = row;
+			row.fields[name] = field;			
+		}
+	},
+	Row: {
+		super$: "Record",
+		viewName: ".row",
+		use: {
+			type$Handle: "Handle",
+			type$Field: "Field",
+		},
+		draw: function(row) {
+			row.handle = this.use.Handle.createView(row);
+			row.fields = Object.create(null);
+//			if (key) this.createField(row, key, {
+//				size: 10
+//			});
+			for (let conf of row.conf) this.createField(row, row.model, conf);
+			return row;
+		}
+	},
+	Grid: {
+		super$: "use.view.Container",
+		viewName: ".grid",
+		use: {
+			type$Element: "Row"
+		},
+		createElement: function(view, model, index) {
+			let ele = this.use.Element.createView(view, model, view.conf);
+			ele.classList.add("row");
 		}
 	},
 	Table: {
 		super$: "use.view.Item",
 		use: {
+			type$Grid: "Grid",
 			type$Record: "Record",
 			type$Handle: "Handle",
 			type$Field: "Field",
@@ -230,7 +269,6 @@ export default {
 		viewName: "div.table",
 		fields: null,
 		control: function(view, value) {
-			view.classList.add("grid");
 			return this.owner.bind(view, value ? value : []);
 		},
 		indexOf: function(view) {
@@ -249,6 +287,7 @@ export default {
 		createHeader: function(view) {
 			let model = view.model;
 			view = this.owner.append(view, ".header");
+			view.classList.add("row");
 			view.handle = this.use.Handle.createView(view);
 			let width = 0;
 			if (model && model.length === undefined) {
@@ -273,7 +312,8 @@ export default {
 			return col;
 		},
 		createBody: function(view) {
-			let model = view.model;
+			return this.use.Grid.createView(view, view.model, this.fields);
+			/*
 			view = this.owner.append(view, ".body");
 			if (model) {
 				if (model.length) {
@@ -283,27 +323,7 @@ export default {
 				}
 			}
 			return view;
-		},
-		createRow: function(body, model, key) {
-			let row = this.use.Record.createView(body, model);
-			row.classList.add("row");
-			row.handle = this.use.Handle.createView(row);
-			row.fields = Object.create(null);
-			if (key) this.createField(row, key, {
-				size: 10
-			});
-			for (let conf of this.fields) this.createField(row, model, conf);
-			return row;
-		},
-		createField: function(row, model, conf) {
-			let name = conf.name;
-			let value = model ? (name ? model[name] : model) : undefined;
-			let field = this.use.Field.createView(row, value, conf);
-			if (!conf.name) field.classList.add("key");
-			field.classList.add("cell");
-			field.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
-			field.record = row;
-			row.fields[name] = field;			
+			*/
 		},
 		extend$actions: {
 			keydown: function(on, event) {
