@@ -240,14 +240,7 @@ export default {
 			cell.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
 			cell.record = row;
 			row.parts[name] = cell;			
-		},
-		extend$actions: {
-			updated: function(on, event) {
-				let field = on.parts[event.index];
-				field.controller.setViewValue(field, event.value);
-				field.focus();
-			}
-		},
+		}
 	},
 	Grid: {
 		super$: "use.view.Collection",
