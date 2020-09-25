@@ -4,7 +4,7 @@ export default {
 		package$view: "youni.works/base/view"
 	},
 	Group: {
-		super$: "use.view.Container",
+		super$: "use.view.Collection",
 		viewName: ".group",
 		use: {
 			type$Element: "Shape"

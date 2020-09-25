@@ -156,7 +156,7 @@ export default {
 			}
 		}
 	},
-	Container: {
+	Collection: {
 		super$: "Viewer",
 		use: {
 			type$Element: "Composite"
@@ -207,6 +207,8 @@ export default {
 		super$: "Viewer",
 		extend$action: {
 			updated: function(on, event) {
+				let part = on.parts[event.index];
+				part.controller.update(part, event);
 			}
 		},
 		draw: function(view) {
@@ -216,7 +218,6 @@ export default {
 			}
 		},
 		createPart: function(view, value, conf) {
-			console.log("no part");
 		}
 	}
 }

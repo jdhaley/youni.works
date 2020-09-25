@@ -159,6 +159,10 @@ export default {
 			view.classList.add("field");
 			return this.owner.bind(view, value);
 		},
+		update: function(part, value) {
+			this.setViewValue(part, value);
+			part.focus();
+		},
 		getViewValue: function(view) {
 			return view.nodeName == "INPUT" ? view.value : view.textContent;
 		},
@@ -246,7 +250,7 @@ export default {
 		},
 	},
 	Grid: {
-		super$: "use.view.Container",
+		super$: "use.view.Collection",
 		viewName: ".grid",
 		use: {
 			type$Element: "Row"
