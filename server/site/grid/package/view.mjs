@@ -82,20 +82,26 @@ export default {
 		super$: "use.control.Controller",
 		type$owner: "ViewOwner",
 		viewName: "div.view",
-		events: null,
+		focusType: function(view) {
+			return "";
+		},
 		forType: function(value, conf) {
 			return (parent, value, conf) => this.owner.append(parent, this.viewName);
 		},
-		createView: function(parent, model, conf) {
-			let constr = this.forType(model, conf);
-			let view = constr.call(this, parent, model, conf);
+		controlView: function(view, conf) {
+			view.receive = Control_receive;
+			view.controller = this;
+			view.conf = conf;
 			for (let event in this.events) {
 				let listener = this.events[event];
 				view.addEventListener(event, listener);
 			}
-			view.receive = Control_receive;
-			view.controller = this;
-			view.conf = conf;
+		},
+		createView: function(parent, model, conf) {
+			let constr = this.forType(model, conf);
+			let view = constr.call(this, parent, model, conf);
+			
+			this.controlView(view, conf);
 			model = this.control(view, model);
 			this.draw(view, model);
 			this.activate(view);
@@ -107,6 +113,16 @@ export default {
 		draw: function(view, value) {
 		},
 		activate: function(control) {
+		},
+		extend$events: {
+		},
+		extend$actions: {
+			keydown: function(on, event) {
+				let shortcut = this.shortcuts[event.key];
+				if (shortcut) shortcut.call(this, on, event);
+			}
+		},
+		extend$shortcuts: {
 		}
 	},
 	Item: {
@@ -161,19 +177,39 @@ export default {
 		use: {
 			type$Element: "Composite"
 		},
-		extend$action: {
+		extend$actions: {
 			created: function(on, event) {
+				let ele = this.createElement(on, event.value, event.index);
+				let rel = this.elementOf(on, event.index);
+				if (rel) on.insertBefore(ele, rel);
+				ele.focus();
 			},
 			deleted: function(on, event) {
+				let ele = this.elementOf(on, event.index);
+				let focus = ele.nextSibling || ele.previousSibling;
+				ele.remove();
+				//Group: focus && focus.focus();
+				focus && focus.firstChild.focus();
 			},
 			moved: function(on, event) {
+				let ele = this.elementOf(on, event.index);
+				ele.remove();
+				let to = this.elementOf(on, event.value);
+				on.insertBefore(ele, to);
+				//Group: ele.focus();
+				if (ele.goto_cell) {
+					ele.goto_cell.focus();
+					delete ele.goto_cell;
+				} else {
+					ele.firstChild.focus();
+				}
 			}
 		},
 		draw: function(view) {
 			let model = view.model;
 			if (model) {
 				if (model[Symbol.iterable]) {
-					for (let row of model) this.createElement(view, row, i++);					
+					for (let ele of model) this.createElement(view, ele, i++);					
 				} else {
 					for (let key in model) this.createElement(view, model[key], key);
 				}
@@ -210,19 +246,22 @@ export default {
 	},
 	Composite: {
 		super$: "Viewer",
-		extend$action: {
-			updated: function(on, event) {
-				let part = on.parts[event.index];
-				part.controller.update(part, event);
-			}
-		},
 		draw: function(view) {
+			view.handle = this.createHandle(view);
 			view.parts = Object.create(null);
 			for (let conf of view.conf) {
 				this.createPart(view, view.model, conf);
 			}
 		},
+		createHandle: function(view) {
+		},
 		createPart: function(view, value, conf) {
+		},
+		extend$action: {
+			updated: function(on, event) {
+				let part = on.parts[event.index];
+				part.controller.update(part, event);
+			}
 		}
 	}
 }

@@ -220,15 +220,10 @@ export default {
 			type$Handle: "Handle",
 			type$Cell: "Field",
 		},
-		draw: function(row) {
-			row.handle = this.createHandle(row);
-			row.parts = Object.create(null);
-//			if (key) this.createField(row, key, {
-//				size: 10
-//			});
-			for (let conf of row.conf) this.createPart(row, row.model, conf);
-		},
 		createHandle: function(row) {
+//			if (key) this.createField(row, key, {
+//			size: 10
+//		});
 			return this.use.Handle.createView(row);
 		},
 		createPart: function(row, model, conf) {
@@ -253,37 +248,6 @@ export default {
 		},
 		findCollection: function(node) {
 			return this.owner.getViewContext(node, "grid");
-		},
-		extend$actions: {
-			keydown: function(on, event) {
-				let shortcut = this.shortcuts[event.key];
-				if (shortcut) shortcut.call(this, on, event);
-			},
-			created: function(on, event) {
-				let index = event.index;
-				let row = this.createElement(on, event.value, typeof index == "number" ? undefined : index);
-				let rel = this.elementOf(on, index);
-				if (rel) on.insertBefore(row, rel);
-				row.firstChild.focus();
-			},
-			deleted: function(on, event) {
-				let row = this.elementOf(on, event.index);
-				let focus = row.nextSibling || row.previousSibling;
-				row.remove();
-				focus && focus.firstChild.focus();
-			},
-			moved: function(on, event) {
-				let row = this.elementOf(on, event.index);
-				row.remove();
-				let to = this.elementOf(on, event.value);
-				on.insertBefore(row, to);
-				if (row.goto_cell) {
-					row.goto_cell.focus();
-					delete row.goto_cell;
-				} else {
-					row.firstChild.focus();
-				}
-			}
 		},
 		extend$shortcuts: {
 			ArrowUp: function(on, event) {
