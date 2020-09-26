@@ -34,14 +34,14 @@ export default {
 				}
 			}
 		},
-		createHeader: function(view) {
+		createHeader: function(view, value) {
 			let title = this.owner.append(view, ".title");
-			title.textContent = view.model.title;
+			title.textContent = value.title;
 			title.contentEditable = true;
 			return title;
 		},
-		createBody: function(view) {
-			return this.use.Group.createView(view, view.model.varieties);
+		createBody: function(view, value) {
+			return this.use.Group.createView(view, value.varieties);
 		}
 	},
 	Album: {
@@ -54,12 +54,12 @@ export default {
 		paginate: function(view) {
 			//TODO
 		},
-		draw: function(view) {
-			let model = view.model;
+		draw: function(view, value) {
+			value = this.bind(view, value);
 			let pages = this.owner.append(view, ".pages");
 			let page = this.owner.append(pages, ".page");
 			let content = this.owner.append(page, ".content");
-			for (let issue of model.issues) {
+			for (let issue of value.issues) {
 				this.use.Issue.createView(content, issue);
 			}
 		}

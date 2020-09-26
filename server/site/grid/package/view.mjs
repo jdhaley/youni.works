@@ -82,11 +82,24 @@ export default {
 		super$: "use.control.Controller",
 		type$owner: "ViewOwner",
 		viewName: "div.view",
+		bind: function(control, value) {
+			return this.owner.bind(control, value);
+		},
 		focusType: function(view) {
 			return "";
 		},
 		forType: function(value, conf) {
 			return (parent, value, conf) => this.owner.append(parent, this.viewName);
+		},
+		createView: function(parent, model, conf) {
+			let constr = this.forType(model, conf);
+			let view = constr.call(this, parent, model, conf);
+			
+			this.controlView(view, conf);
+			this.control(view, model);
+			this.draw(view, model);
+			this.activate(view);
+			return view;
 		},
 		controlView: function(view, conf) {
 			view.receive = Control_receive;
@@ -97,18 +110,7 @@ export default {
 				view.addEventListener(event, listener);
 			}
 		},
-		createView: function(parent, model, conf) {
-			let constr = this.forType(model, conf);
-			let view = constr.call(this, parent, model, conf);
-			
-			this.controlView(view, conf);
-			model = this.control(view, model);
-			this.draw(view, model);
-			this.activate(view);
-			return view;
-		},
-		control: function(control, value) {
-			return this.owner.bind(control, value);
+		control: function(view, value) {
 		},
 		draw: function(view, value) {
 		},
@@ -128,17 +130,17 @@ export default {
 	Item: {
 		super$: "Viewer",
 		viewName: ".item",
-		draw: function(view) {
-			view.header = this.createHeader(view);
-			view.body = this.createBody(view);
-			view.footer = this.createFooter(view);
+		draw: function(view, value) {
+			view.header = this.createHeader(view, value);
+			view.body = this.createBody(view, value);
+			view.footer = this.createFooter(view, value);
 			this.activate(view);
 		},
-		createHeader: function(item) {
+		createHeader: function(item, value) {
 		},
-		createBody: function(item) {
+		createBody: function(item, value) {
 		},
-		createFooter: function(item) {
+		createFooter: function(item, value) {
 		},
 		startMove: function(view) {
 			return false;
@@ -205,13 +207,13 @@ export default {
 				}
 			}
 		},
-		draw: function(view) {
-			let model = view.model;
-			if (model) {
-				if (model[Symbol.iterable]) {
-					for (let ele of model) this.createElement(view, ele, i++);					
+		draw: function(view, value) {
+			value = this.bind(view, value);
+			if (value) {
+				if (value[Symbol.iterable]) {
+					for (let ele of value) this.createElement(view, ele, i++);					
 				} else {
-					for (let key in model) this.createElement(view, model[key], key);
+					for (let key in value) this.createElement(view, value[key], key);
 				}
 			}
 		},
@@ -246,14 +248,15 @@ export default {
 	},
 	Composite: {
 		super$: "Viewer",
-		draw: function(view) {
-			view.handle = this.createHandle(view);
+		draw: function(view, value) {
+			value = this.bind(view, value);
+			view.handle = this.createHandle(view, value);
 			view.parts = Object.create(null);
 			for (let conf of view.conf) {
-				this.createPart(view, view.model, conf);
+				this.createPart(view, value, conf);
 			}
 		},
-		createHandle: function(view) {
+		createHandle: function(view, value) {
 		},
 		createPart: function(view, value, conf) {
 		},

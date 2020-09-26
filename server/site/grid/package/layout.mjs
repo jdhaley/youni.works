@@ -35,10 +35,6 @@ export default {
 		super$: "use.view.Composite",
 		viewName: "div.shape",
 		uom: "mm",
-		control: function(view, value) {
-			if (!view.shape) view.shape = this.shape(view, value);
-			return this.owner.bind(view, value);
-		},
 		shape: function(view, object) {
 			return this.sys.extend(null, {
 				shape: "rectangle",
@@ -60,7 +56,9 @@ export default {
 			view.style.minHeight = h;
 			view.style.maxHeight = h;
 		},
-		draw: function(view) {
+		draw: function(view, value) {
+			value = this.bind(view, value);
+			view.shape = this.shape(view, value);
 			this.size(view);
 			this.drawImage(view);
 			this.drawData(view);

@@ -7,13 +7,13 @@ export default {
 	Label: {
 		super$: "use.view.Viewer",
 		viewName: "div.label",
-		draw: function(label) {
+		draw: function(label, value) {
+			label.model = value;
 			label.classList.add("cell");
-			let conf = label.conf;
-			if (!conf.title) {
-				conf.title = conf.name ? nameToTitle(conf.name) : "";
+			if (!value.title) {
+				value.title = value.name ? nameToTitle(value.name) : "";
 			}
-			label.textContent = conf.title;
+			label.textContent = value.title;
 			return label;
 		},
 		link: function(view) {
@@ -55,7 +55,7 @@ export default {
 	Field: {
 		super$: "use.view.Viewer",
 		dataTypes: {
-			string: function(parent, model, conf) {
+			string: function(parent, value, conf) {
 				if (conf.choice) {
 					let choice = conf.choice
 					let at = {
@@ -66,27 +66,27 @@ export default {
 						let option = this.owner.append(view, "option");
 						option.value = name;
 						option.textContent = choice[name];
-						if (name == model) option.selected = true;
+						if (name == value) option.selected = true;
 					}
 					return view;
 				}
 				let at = {
 					type: "text",
 					name: conf.name,
-					value: model || ""
+					value: value || ""
 				};
 				if (conf.maxLength) at.maxLength = conf.maxLength;
 				return this.owner.append(parent, "input.string", at);
 			},
-			number: function(parent, model, conf) {
+			number: function(parent, value, conf) {
 				let at = {
 					type: "number",
 					name: conf.name,
-					value: model || ""
+					value: value || ""
 				};
 				return this.owner.append(parent, "input.number", at);
 			},		
-			boolean: function(parent, model, conf) {
+			boolean: function(parent, value, conf) {
 				let at = {
 					type: "checkbox",
 					name: conf.name,
@@ -94,49 +94,52 @@ export default {
 				};
 				return this.owner.append(parent, "input.boolean", at);
 			},
-			time: function(parent, model, conf) {
+			time: function(parent, value, conf) {
 				let at = {
 					type: conf.precision == "day" ? "date" : "datetime-local",
 					name: conf.name,
-					value: model || ""
+					value: value || ""
 				};
 				return this.owner.append(parent, "input.time", at);
 			},
-			text: function(parent, model, conf) {
+			text: function(parent, value, conf) {
 				let view = this.owner.append(parent, "div.text", {
 					contentEditable: true
 				});
 				view.name = conf.name;
-				view.innerHTML = model;
+				view.innerHTML = value;
 				return view;
 			},
-			map: function(parent, model, conf) {
+			map: function(parent, value, conf) {
 				let view = this.owner.append(parent, ".map");
+				view.model = value;
 				view.classList.add("link");
 				view.innerHTML = "<div>...</div>";
 				return view;							
 			},
-			array: function(parent, model, conf) {
+			array: function(parent, value, conf) {
 				let view = this.owner.append(parent, ".array");
+				view.model = value;
 				view.classList.add("link");
 				view.name = conf.name;
 				view.innerHTML = "<div>...</div>";
 				return view;				
 			},
-			object: function(parent, model, conf) {
+			object: function(parent, value, conf) {
 				let view = this.owner.append(parent, ".object");
+				view.model = value;
 				view.classList.add("link");
 				view.name = conf.name;
 				view.innerHTML = "<div>...</div>";
 				return view;								
 			}
 		},
-		forType: function(model, conf) {
+		forType: function(value, conf) {
 			let type = conf.type;
 			if (!type) {
-				type = typeof model;
+				type = typeof value;
 				if (type == "object") {
-					if (Object.getPrototypeOf(model) == Array.prototype) {
+					if (Object.getPrototypeOf(value) == Array.prototype) {
 						type = "array";
 					} else if (conf.of) {
 						type = "object";
@@ -157,7 +160,7 @@ export default {
 			});
 			view.name = view.conf.name; //TODO review whether we use attribute or property for name.
 			view.classList.add("field");
-			return this.owner.bind(view, value);
+		//	return this.owner.bind(view, value);
 		},
 		update: function(part, value) {
 			this.setViewValue(part, value);
@@ -226,9 +229,9 @@ export default {
 //		});
 			return this.use.Handle.createView(row);
 		},
-		createPart: function(row, model, conf) {
+		createPart: function(row, value, conf) {
 			let name = conf.name;
-			let value = model ? (name ? model[name] : model) : undefined;
+			value = value ? (name ? value[name] : value) : undefined;
 			let cell = this.use.Cell.createView(row, value, conf);
 			if (!conf.name) cell.classList.add("key");
 			cell.classList.add("cell");
@@ -324,12 +327,11 @@ export default {
 			type$Label: "Label"
 		},
 		viewName: ".header",
-		draw: function(view) {
+		draw: function(view, value) {
 			view.classList.add("row");
 			view.handle = this.use.Handle.createView(view);
-			let model = view.model;
 			let width = 0;
-			if (model && model.length === undefined) {
+			if (value && value.length === undefined) {
 				this.createColumn(view, {
 					size: 10
 				});
@@ -345,7 +347,8 @@ export default {
 			if (!conf.title) {
 				conf.title = conf.name ? nameToTitle(conf.name) : "";
 			}
-			let col = this.use.Label.createView(header, null, conf);
+			/* * * A label's model is the configuration. * * */
+			let col = this.use.Label.createView(header, conf);
 			col.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
 			return col;
 		}
@@ -358,14 +361,14 @@ export default {
 		},
 		viewName: ".table",
 		fields: null,
-		createHeader: function(view) {
-			return this.use.Header.createView(view, view.model, this.fields);
+		createHeader: function(view, value) {
+			return this.use.Header.createView(view, value, this.fields);
 		},
-		createBody: function(view) {
-			return this.use.Body.createView(view, view.model, this.fields);
+		createBody: function(view, value) {
+			return this.use.Body.createView(view, value, this.fields);
 		},
 		control: function(view, value) {
-			return this.owner.bind(view, value ? value : []);
+//			return this.owner.bind(view, value ? value : []);
 		},
 	},
 	Properties: {
@@ -378,24 +381,24 @@ export default {
 			view.conf = this.fields;
 			view.classList.add("properties");
 			view.classList.add("grid");
-			return this.owner.bind(view, value);
 		},
-		createPart: function(record, model, conf) {
+		createPart: function(record, value, conf) {
 			let prop = this.owner.append(record, ".property");
 			prop.classList.add("row");
 			prop.lbl = this.createLabel(prop, conf);
-			prop.field = this.createField(prop, model, conf);
+			prop.field = this.createField(prop, value, conf);
 			prop.field.record = record;
 			record.parts[prop.field.name] = prop.field;
 			return prop;
 		},
 		createLabel: function(header, conf) {
-			let label = this.use.Label.createView(header, undefined, conf);
+			/* * * A label's model is the configuration. * * */
+			let label = this.use.Label.createView(header, conf);
 			label.classList.add("cell");
 			return label;
 		},
-		createField: function(prop, model, field) {
-			let value = model ? model[field.name] : undefined;
+		createField: function(prop, value, field) {
+			value = value ? value[field.name] : undefined;
 			let view = this.use.Field.createView(prop, value, field);
 			view.classList.add("cell");
 			return view;
