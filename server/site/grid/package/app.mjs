@@ -7,46 +7,9 @@ export default {
 	package$: "youni.works/base/app",
 	use: {
 		package$command: "youni.works/base/command",
+		package$remote: "youni.works/web/remote",
 		package$view: "youni.works/base/view",
 		package$cell: "youni.works/base/cell",
-	},
-	Window: {
-		super$: "use.view.Item",
-		viewName: ".window",
-		control: function(view) {
-			this.activate(view);
-		},
-		activate: function(view) {
-			let current = view.ownerDocument.querySelector(".active");
-			if (view == current) return;
-			if (current) {
-				view.priorWindow = current;
-				current.classList.remove("active");
-			}
-			view.classList.add("active");
-			view.style.zIndex = ++zIndex;
-			view.body.focus();		
-		},
-		startMove: function(window, target) {
-			return target == window.header;	
-		},
-		createHeader: function(window, model) {
-			return this.owner.append(window, ".header");
-		},
-		createBody: function(window, model) {
-			return this.owner.append(window, ".body", {
-				tabindex: "0"
-			});
-		},
-		extend$actions: {
-			keydown: function(on, event) {
-				if (event.key == "Escape") {
-					if (on.priorWindow) on.priorWindow.controller.activate(on.priorWindow);
-					on.style.display = "none";
-					return;
-				}
-			}
-		}
 	},
 	Application: {
 		super$: "use.view.Viewer",
@@ -58,6 +21,20 @@ export default {
 			type$Window: "Window"
 		},
 		viewName: "main.application",
+		type$remote: "use.remote.Remote",
+		open: function(pathname, receiver) {
+			this.remote.service(receiver, "opened", {
+				url: pathname,
+				method: "GET"
+			});
+		},
+		save: function(pathname, content, receiver) {
+			this.remote.service(receiver, "saved", {
+				url: pathname,
+				content: content,
+				method: "PUT"
+			});
+		},
 		control: function(view) {
 			view.commands = this.sys.extend(this.use.Commands, {
 				lastCommand: this.sys.extend(this.use.Command, {
@@ -65,6 +42,27 @@ export default {
 					next: null
 				})
 			});
+		},
+		show: function(app, type, model, datatype) {
+			type = app && app.types && app.types[type];
+			
+			if (!datatype) {
+				if (model.length !== undefined) {
+					datatype = "array";
+				} else if (type) {
+					datatype = "object";
+				} else {
+					datatype = "map";
+				}
+			}
+			let editor = datatype == "object" ? this.use.Properties : this.use.Table;
+			editor = this.sys.extend(editor, {
+				fields: type
+			});
+			let window = this.use.Window.createView(app);
+			editor.createView(window.body, model, editor.fields);
+			window.focus();
+			return window;
 		},
 		extend$events: {
 			input: UP,
@@ -101,7 +99,7 @@ export default {
 			s: function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();
-				this.owner.save(on.path, on.model);
+				this.save(on.path, on.model);
 			},
 			z: function(on, event) {
 				if (!event.ctrlKey) return;
@@ -113,27 +111,47 @@ export default {
 				event.preventDefault();
 				on.commands.redo();
 			}
+		}
+	},
+	Window: {
+		super$: "use.view.Item",
+		viewName: ".window",
+		events: {
+			focus: function(event) {
+				event.target.controller.activate(event.target);
+			}
 		},
-		show: function(app, type, model, datatype) {
-			type = app && app.types && app.types[type];
-			
-			if (!datatype) {
-				if (model.length !== undefined) {
-					datatype = "array";
-				} else if (type) {
-					datatype = "object";
-				} else {
-					datatype = "map";
+		control: function(view) {
+			view.tabIndex = "0";
+			this.activate(view);
+		},
+		activate: function(view) {
+			let current = view.ownerDocument.querySelector(".active");
+			if (view == current) return;
+			if (current) {
+				view.priorWindow = current;
+				current.classList.remove("active");
+			}
+			view.classList.add("active");
+			view.style.zIndex = ++zIndex;
+		},
+		startMove: function(window, target) {
+			return target == window.header;	
+		},
+		createHeader: function(window, model) {
+			return this.owner.append(window, "header.header");
+		},
+		createBody: function(window, model) {
+			return this.owner.append(window, "section.body",);
+		},
+		extend$actions: {
+			keydown: function(on, event) {
+				if (event.key == "Escape") {
+					if (on.priorWindow) on.priorWindow.controller.activate(on.priorWindow);
+					on.style.display = "none";
+					return;
 				}
 			}
-			let editor = datatype == "object" ? this.use.Properties : this.use.Table;
-			editor = this.sys.extend(editor, {
-				fields: type
-			});
-			let window = this.use.Window.createView(app);
-			editor.createView(window.body, model, editor.fields);
-			window.focus();
-			return window;
 		}
 	}
 }

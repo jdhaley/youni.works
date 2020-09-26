@@ -3,24 +3,9 @@ export default {
 	package$: "youni.works/base/view",
 	use: {
 		package$control: "youni.works/base/control",
-		package$remote: "youni.works/web/remote"
 	},
 	ViewOwner: {
 		super$: "use.control.Owner",
-		type$remote: "use.remote.Remote",
-		open: function(pathname, receiver) {
-			this.remote.service(receiver, "opened", {
-				url: pathname,
-				method: "GET"
-			});
-		},
-		save: function(pathname, content, receiver) {
-			this.remote.service(receiver, "saved", {
-				url: pathname,
-				content: content,
-				method: "PUT"
-			});
-		},
 		create: function(doc, name, attributes) {
 			let baseClass = "";
 			let dot = name.indexOf(".");
