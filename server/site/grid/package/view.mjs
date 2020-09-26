@@ -63,7 +63,7 @@ export default {
 			}
 		}
 	},
-	Viewer: {
+	View: {
 		super$: "use.control.Controller",
 		type$owner: "ViewOwner",
 		viewName: "div.view",
@@ -95,61 +95,10 @@ export default {
 		extend$shortcuts: {
 		}
 	},
-	Item: {
-		super$: "Viewer",
-		viewName: ".item",
-		draw: function(view, value) {
-			view.header = this.createHeader(view, value);
-			view.body = this.createBody(view, value);
-			view.footer = this.createFooter(view, value);
-		},
-		createHeader: function(item, value) {
-		},
-		createBody: function(item, value) {
-		},
-		createFooter: function(item, value) {
-		},
-		control: function(view) {
-			this.activate(view);
-		},
-		activate: function(item) {
-		},
-		startMove: function(view) {
-			return false;
-		},
-		moveTo: function(item, x, y) {
-			item.style.left = x + "px";
-			item.style.top = y + "px";
-		},
-		extend$actions: {
-			mousedown: function(on, event) {
-				if (this.startMove(on, event.mouseTarget)) {
-					let box = on.getBoundingClientRect();
-					on.MOVE = {
-						x: event.pageX - box.x,
-						y: event.pageY - box.y,
-					}
-					event.preventDefault();
-				}
-				this.activate(on);
-			},
-			mousemove: function(on, event) {
-				if (on.MOVE) {
-					this.moveTo(on, event.pageX - on.MOVE.x, event.pageY  - on.MOVE.y);
-				}
-			},
-			mouseup: function(on, event) {
-				delete on.MOVE;
-			},
-			mouseleave: function(on, event) {
-			//	delete on.MOVE;
-			}
-		}
-	},
 	Collection: {
-		super$: "Viewer",
+		super$: "View",
 		use: {
-			type$Element: "Viewer"
+			type$Element: "View"
 		},
 		extend$actions: {
 			created: function(on, event) {
@@ -160,10 +109,9 @@ export default {
 			},
 			deleted: function(on, event) {
 				let ele = this.elementOf(on, event.index);
-				let focus = ele.nextSibling || ele.previousSibling;
+				let goto = ele.nextSibling || ele.previousSibling || ele.parentNode;
 				ele.remove();
-				//Group: focus && focus.focus();
-				focus && focus.firstChild.focus();
+				goto.focus();
 			},
 			moved: function(on, event) {
 				let ele = this.elementOf(on, event.index);
@@ -215,6 +163,57 @@ export default {
 				for (let ele of view.childNodes) {
 					if (ele.index === index) return ele;
 				}
+			}
+		}
+	},
+	Item: {
+		super$: "View",
+		viewName: ".item",
+		draw: function(view, value) {
+			view.header = this.createHeader(view, value);
+			view.body = this.createBody(view, value);
+			view.footer = this.createFooter(view, value);
+		},
+		createHeader: function(item, value) {
+		},
+		createBody: function(item, value) {
+		},
+		createFooter: function(item, value) {
+		},
+		control: function(view) {
+			this.activate(view);
+		},
+		activate: function(item) {
+		},
+		startMove: function(view) {
+			return false;
+		},
+		moveTo: function(item, x, y) {
+			item.style.left = x + "px";
+			item.style.top = y + "px";
+		},
+		extend$actions: {
+			mousedown: function(on, event) {
+				if (this.startMove(on, event.mouseTarget)) {
+					let box = on.getBoundingClientRect();
+					on.MOVE = {
+						x: event.pageX - box.x,
+						y: event.pageY - box.y,
+					}
+					event.preventDefault();
+				}
+				this.activate(on);
+			},
+			mousemove: function(on, event) {
+				if (on.MOVE) {
+					this.moveTo(on, event.pageX - on.MOVE.x, event.pageY  - on.MOVE.y);
+				}
+			},
+			mouseup: function(on, event) {
+				delete on.MOVE;
+			},
+			mouseleave: function(on, event) {
+			//	delete on.MOVE;
 			}
 		}
 	}

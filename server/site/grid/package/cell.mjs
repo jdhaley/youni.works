@@ -5,7 +5,7 @@ export default {
 		package$view: "youni.works/base/view"
 	},
 	Label: {
-		super$: "use.view.Viewer",
+		super$: "use.view.View",
 		viewName: "div.label",
 		draw: function(label, value) {
 			label.model = value;
@@ -36,7 +36,7 @@ export default {
 		}
 	},
 	Handle: {
-		super$: "use.view.Viewer",
+		super$: "use.view.View",
 		viewName: "div.handle",
 		control: function(view) {
 			this.owner.setAttributes(view, {
@@ -53,7 +53,7 @@ export default {
 		}
 	},
 	Field: {
-		super$: "use.view.Viewer",
+		super$: "use.view.View",
 		dataTypes: {
 			string: function(parent, value, conf) {
 				if (conf.choice) {
@@ -216,7 +216,7 @@ export default {
 		}
 	},
 	Composite: {
-		super$: "use.view.Viewer",
+		super$: "use.view.View",
 		draw: function(view, value) {
 			value = this.bind(view, value);
 			view.handle = this.createHandle(view, value);
@@ -341,7 +341,7 @@ export default {
 		}
 	},
 	TableHeader: {
-		super$: "use.view.Viewer",
+		super$: "use.view.View",
 		use: {
 			type$Handle: "Handle",
 			type$Label: "Label"

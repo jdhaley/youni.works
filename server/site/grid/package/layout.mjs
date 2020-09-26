@@ -9,6 +9,7 @@ export default {
 		use: {
 			type$Element: "Shape"
 		},
+		/*
 		extend$actions: {
 			created: function(on, event) {
 				let ele = this.createElement(on, event.value, event.index);
@@ -30,9 +31,10 @@ export default {
 				ele.focus();
 			}
 		}
+		*/
 	},
 	Shape: {
-		super$: "use.view.Viewer",
+		super$: "use.view.View",
 		viewName: "div.shape",
 		uom: "mm",
 		shape: function(view, object) {

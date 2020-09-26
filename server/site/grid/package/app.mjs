@@ -12,7 +12,7 @@ export default {
 		package$cell: "youni.works/base/cell",
 	},
 	Application: {
-		super$: "use.view.Viewer",
+		super$: "use.view.View",
 		use: {
 			type$Command: "use.command.Command",
 			type$Commands: "use.command.ObjectCommands",

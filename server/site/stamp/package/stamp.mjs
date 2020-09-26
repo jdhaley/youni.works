@@ -45,7 +45,7 @@ export default {
 		}
 	},
 	Album: {
-		super$: "use.view.Viewer",
+		super$: "use.view.View",
 		types: null,
 		viewName: "div.album",
 		use: {
