@@ -32,7 +32,7 @@ export default {
 		}
 	},
 	Shape: {
-		super$: "use.view.Composite",
+		super$: "use.view.Viewer",
 		viewName: "div.shape",
 		uom: "mm",
 		shape: function(view, object) {

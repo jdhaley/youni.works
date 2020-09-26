@@ -215,8 +215,29 @@ export default {
 			}
 		}
 	},
+	Composite: {
+		super$: "use.view.Viewer",
+		draw: function(view, value) {
+			value = this.bind(view, value);
+			view.handle = this.createHandle(view, value);
+			view.parts = Object.create(null);
+			for (let conf of view.conf) {
+				this.createPart(view, value, conf);
+			}
+		},
+		createHandle: function(view, value) {
+		},
+		createPart: function(view, value, conf) {
+		},
+		extend$actions: {
+			updated: function(on, event) {
+				let part = on.parts[event.index];
+				part.controller.update(part, event.value);
+			}
+		}
+	},
 	Row: {
-		super$: "use.view.Composite",
+		super$: "Composite",
 		viewName: ".row",
 		use: {
 			type$Handle: "Handle",
@@ -368,7 +389,7 @@ export default {
 		},
 	},
 	Properties: {
-		super$: "use.view.Composite",
+		super$: "Composite",
 		use: {
 			type$Label: "Label",
 			type$Field: "Field"

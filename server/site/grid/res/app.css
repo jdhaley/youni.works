@@ -1,3 +1,6 @@
+*:focus {
+	outline: 2px solid lightsteelblue;
+}
 .cell:focus {
 	background: lightsteelblue;
 }
@@ -37,6 +40,7 @@
 .window {
 	flex-direction: column;
 	position: absolute;
+	border: 1px solid silver;
 }
 
 .active {

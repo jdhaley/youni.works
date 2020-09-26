@@ -164,7 +164,7 @@ export default {
 	Collection: {
 		super$: "Viewer",
 		use: {
-			type$Element: "Composite"
+			type$Element: "Viewer"
 		},
 		extend$actions: {
 			created: function(on, event) {
@@ -232,29 +232,5 @@ export default {
 				}
 			}
 		}
-	},
-	Composite: {
-		super$: "Viewer",
-		draw: function(view, value) {
-			value = this.bind(view, value);
-			view.handle = this.createHandle(view, value);
-			view.parts = Object.create(null);
-			for (let conf of view.conf) {
-				this.createPart(view, value, conf);
-			}
-		},
-		createHandle: function(view, value) {
-		},
-		createPart: function(view, value, conf) {
-		},
-		extend$action: {
-			updated: function(on, event) {
-				let part = on.parts[event.index];
-				part.controller.update(part, event);
-			}
-		}
 	}
-}
-function Control_receive(event) {
-	this.controller && this.controller.process(this, event);
 }

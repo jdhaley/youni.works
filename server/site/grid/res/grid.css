@@ -1,6 +1,5 @@
 .grid {
 	flex-direction: column;
-	border: 1px solid silver;
 }
 .cell {
 	font: 16px arial;
