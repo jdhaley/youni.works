@@ -153,14 +153,13 @@ export default {
 		getTypes: function(view) {
 			return this.owner.getViewContext(view, "application").types;
 		},
-		control: function(view, value) {
+		control: function(view) {
 			this.owner.setAttributes(view, {
 				tabindex: "0",
 				name: view.conf.name
 			});
 			view.name = view.conf.name; //TODO review whether we use attribute or property for name.
 			view.classList.add("field");
-		//	return this.owner.bind(view, value);
 		},
 		update: function(part, value) {
 			this.setViewValue(part, value);
@@ -367,9 +366,6 @@ export default {
 		createBody: function(view, value) {
 			return this.use.Body.createView(view, value, this.fields);
 		},
-		control: function(view, value) {
-//			return this.owner.bind(view, value ? value : []);
-		},
 	},
 	Properties: {
 		super$: "use.view.Composite",
@@ -377,7 +373,7 @@ export default {
 			type$Label: "Label",
 			type$Field: "Field"
 		},
-		control: function(view, value) {
+		control: function(view) {
 			view.conf = this.fields;
 			view.classList.add("properties");
 			view.classList.add("grid");

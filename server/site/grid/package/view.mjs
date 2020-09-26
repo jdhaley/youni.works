@@ -85,38 +85,21 @@ export default {
 		bind: function(control, value) {
 			return this.owner.bind(control, value);
 		},
-		focusType: function(view) {
-			return "";
-		},
 		forType: function(value, conf) {
 			return (parent, value, conf) => this.owner.append(parent, this.viewName);
 		},
 		createView: function(parent, model, conf) {
 			let constr = this.forType(model, conf);
 			let view = constr.call(this, parent, model, conf);
-			
-			this.controlView(view, conf);
-			this.control(view, model);
-			this.draw(view, model);
-			this.activate(view);
-			return view;
-		},
-		controlView: function(view, conf) {
-			view.receive = Control_receive;
-			view.controller = this;
 			view.conf = conf;
-			for (let event in this.events) {
-				let listener = this.events[event];
-				view.addEventListener(event, listener);
-			}
-		},
-		control: function(view, value) {
+			this.owner.control(view, this);
+			this.draw(view, model);
+			this.control(view);
+			return view;
 		},
 		draw: function(view, value) {
 		},
-		activate: function(control) {
-		},
-		extend$events: {
+		control: function(view) {
 		},
 		extend$actions: {
 			keydown: function(on, event) {
@@ -134,13 +117,17 @@ export default {
 			view.header = this.createHeader(view, value);
 			view.body = this.createBody(view, value);
 			view.footer = this.createFooter(view, value);
-			this.activate(view);
 		},
 		createHeader: function(item, value) {
 		},
 		createBody: function(item, value) {
 		},
 		createFooter: function(item, value) {
+		},
+		control: function(view) {
+			this.activate(view);
+		},
+		activate: function(item) {
 		},
 		startMove: function(view) {
 			return false;

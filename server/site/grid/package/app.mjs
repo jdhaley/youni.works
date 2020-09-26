@@ -13,16 +13,19 @@ export default {
 	Window: {
 		super$: "use.view.Item",
 		viewName: ".window",
-		activate: function(on) {
-			let current = on.ownerDocument.querySelector(".active");
-			if (on == current) return;
+		control: function(view) {
+			this.activate(view);
+		},
+		activate: function(view) {
+			let current = view.ownerDocument.querySelector(".active");
+			if (view == current) return;
 			if (current) {
-				on.priorWindow = current;
+				view.priorWindow = current;
 				current.classList.remove("active");
 			}
-			on.classList.add("active");
-			on.style.zIndex = ++zIndex;
-			on.body.focus();		
+			view.classList.add("active");
+			view.style.zIndex = ++zIndex;
+			view.body.focus();		
 		},
 		startMove: function(window, target) {
 			return target == window.header;	
@@ -94,23 +97,21 @@ export default {
 				}					
 			}
 		},
-		extend$actions: {
-			keydown: function(on, event) {
-				if (event.ctrlKey && event.key == "s") {
-					event.preventDefault();
-					this.owner.save(on.path, on.model);
-					return;
-				}
-				if (event.ctrlKey && event.key == "z") {
-					event.preventDefault();
-					on.commands.undo();
-					return;
-				}
-				if (event.ctrlKey && event.key == "y") {
-					event.preventDefault();
-					on.commands.redo();
-					return;
-				}
+		extend$shortcuts: {
+			s: function(on, event) {
+				if (!event.ctrlKey) return;
+				event.preventDefault();
+				this.owner.save(on.path, on.model);
+			},
+			z: function(on, event) {
+				if (!event.ctrlKey) return;
+				event.preventDefault();
+				on.commands.undo();
+			},
+			y: function(on, event) {
+				if (!event.ctrlKey) return;
+				event.preventDefault();
+				on.commands.redo();
 			}
 		},
 		show: function(app, type, model, datatype) {
@@ -130,7 +131,7 @@ export default {
 				fields: type
 			});
 			let window = this.use.Window.createView(app);
-			editor.createView(window.body, model);
+			editor.createView(window.body, model, editor.fields);
 			window.focus();
 			return window;
 		}

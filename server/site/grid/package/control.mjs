@@ -10,6 +10,10 @@ export default {
 	},
 	Controller: {
 		super$: "Object",
+		events: {
+		},
+		actions: {
+		},
 		process: function(control, event) {
 			let action = this.actions && this.actions[event.type];
 			action && action.call(this, control, event);
@@ -17,6 +21,18 @@ export default {
 	},
 	Owner: {
 		super$: "Object",
+		use: {
+			type$Control: "Control"
+		},
+		control: function(object, controller) {
+			if (!controller) return;
+			object.controller = controller;
+			object.receive = this.use.Control.receive;
+			for (let event in controller.events) {
+				let listener = controller.events[event];
+				object.addEventListener(event, listener);
+			}
+		},
 		transmit: {
 			object: function(on, event) {
 				event.stopPropagation && event.stopPropagation();
