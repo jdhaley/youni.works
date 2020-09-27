@@ -69,6 +69,9 @@ export default {
 			keydown: UP,
 			click: UP,
 			contextmenu: UP,
+			cut: UP,
+			copy: UP,
+			paste: UP,
 			mousedown: function(event) {
 				MOUSE_TARGET = event.target;
 				event.mouseTarget = MOUSE_TARGET;

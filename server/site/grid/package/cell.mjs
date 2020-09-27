@@ -166,13 +166,22 @@ export default {
 			part.focus();
 		},
 		getViewValue: function(view) {
-			return view.nodeName == "INPUT" ? view.value : view.textContent;
+			switch (view.nodeName) {
+				case "INPUT":
+				case "SELECT":
+					return view.value;
+				default:
+					return view.textContent;
+			}
 		},
 		setViewValue: function(view, value) {
 			if (!value) value = "";
 			if (view.nodeName == "INPUT") {
 				view.value = value;
-			} else {
+			} else if (view.nodeName == "SELECT") {
+				console.log(value);
+			}
+			else {
 				view.textContent = value;
 			}
 		},
@@ -272,6 +281,20 @@ export default {
 		findCollection: function(node) {
 			return this.owner.getViewContext(node, "grid");
 		},
+		extend$actions: {
+			click: function(on, event) {
+				if (!event.ctrlKey) {
+					for (let selected of on.querySelectorAll(".selected")) {
+						selected.classList.remove("selected");
+					}
+					return;
+				}
+				event.preventDefault();
+				event.stopPropagation();
+				let row = this.findElement(event.target);
+				row.classList.add("selected");
+			}
+		},
 		extend$shortcuts: {
 			ArrowUp: function(on, event) {
 				let cell = this.owner.getViewContext(event.target, "cell");
@@ -317,12 +340,18 @@ export default {
 				app.commands.create(on, index);
 			},
 			Delete: function(on, event) {
-				if (!event.ctrlKey) return;
-				event.preventDefault();
-				let row = this.owner.getViewContext(event.target, "row");
-				let index = this.indexOf(row);
+				let rows = []
+				for (let selected of on.querySelectorAll(".selected")) {
+					rows.push(this.indexOf(selected));
+				}
 				let app = this.owner.getViewContext(on, "application");
-				app.commands.delete(on, index, row.model);
+				if (rows.length) app.commands.cut(on, rows);
+//				if (!event.ctrlKey) return;
+//				event.preventDefault();
+//				let row = this.owner.getViewContext(event.target, "row");
+//				let index = this.indexOf(row);
+//				let app = this.owner.getViewContext(on, "application");
+//				app.commands.delete(on, index, row.model);
 			},
 			" ": function(on, event) {
 				if (!event.ctrlKey) return;

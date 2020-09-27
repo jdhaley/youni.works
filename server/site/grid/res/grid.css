@@ -10,7 +10,7 @@
 	border: 0;
 	padding: 2px;
 	border-right: 1px solid silver;
-	background: white;
+	background: inherit;
 }
 .cell:last-child {
 	border-right: 0;

@@ -35,6 +35,19 @@ export default {
 			return command;
 		}
 	},
+	BatchCommand: {
+		super$: "Command",
+		commands: null,
+		undo: function() {
+			//To undo a batch, each command must be done in reverse order.
+			for (let i = this.commands.length - 1; i >= 0; i--) {
+				this.commands[i].undo();
+			}
+		},
+		redo: function() {
+			for (let cmd of this.commands) cmd.redo();
+		}
+	},
 	ObjectCommand: {
 		super$: "Command",
 		type: "",
@@ -137,7 +150,8 @@ export default {
 	ObjectCommands: {
 		super$: "Commander",
 		use: {
-			type$ObjectCommand: "ObjectCommand"
+			type$ObjectCommand: "ObjectCommand",
+			type$BatchCommand: "BatchCommand"
 		},
 		newCommand: function(type, source, object, index, value, oldValue) {
 			let cmd = this.sys.extend(this.use.ObjectCommand, {
@@ -167,7 +181,29 @@ export default {
 			cmd.execute();
 		},
 		delete: function(source, index, value) {
+			if (source.model[index] !== value) console.log("delete problem?");
 			let cmd = this.newCommand("delete", source, source.model, index, value);
+			cmd.execute();
+		},
+		cut: function(source, indices) {
+			let cmd = this.sys.extend(this.use.BatchCommand, {
+				type: "cut",
+				source: source,
+				next: null,
+				prior: null,
+				commands: []
+			});
+			let priorIndex = -1;
+			let count = 0;
+			for (let index of indices) {
+				if (index <= priorIndex) throw new Error("bad cut request");
+				priorIndex = index;
+				let value = source.model[index];
+				//As elements are deleted, the following indices will be deleted.
+				index -= count++;
+				cmd.commands.push(this.newCommand("delete", source, source.model, index, value));
+			}
+			this.addCommand(cmd);
 			cmd.execute();
 		},
 		move: function(source, index, value) {
