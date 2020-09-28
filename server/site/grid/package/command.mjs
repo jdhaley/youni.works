@@ -166,8 +166,8 @@ export default {
 			});
 			return this.addCommand(cmd);
 		},
-		create: function(source, index) {
-			let cmd = this.newCommand("create", source, source.model, index, this.sys.extend());
+		create: function(source, index, value) {
+			let cmd = this.newCommand("create", source, source.model, index, value || this.sys.extend());
 			cmd.execute();
 		},
 		update: function(source, index, value) {

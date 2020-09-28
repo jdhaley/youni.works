@@ -41,6 +41,7 @@ export default {
 		control: function(view) {
 			this.owner.setAttributes(view, {
 				tabindex: "0",
+				contentEditable: "true"
 			});
 		},
 		draw: function(handle) {
@@ -293,6 +294,61 @@ export default {
 				event.stopPropagation();
 				let row = this.findElement(event.target);
 				row.classList.add("selected");
+			},
+			cut: function(on, event) {
+				let rows = []
+				for (let selected of on.querySelectorAll(".selected")) {
+					rows.push(this.indexOf(selected));
+				}
+				if (rows.length) {
+					event.preventDefault();
+					event.stopPropagation();
+					let data = [];
+					for (let index of rows) {
+						data.push(on.model[index]);
+					}
+					data = JSON.stringify(data);
+					event.clipboardData.setData("application/json", data);	
+					event.clipboardData.setData("text", data);	
+					let app = this.owner.getViewContext(on, "application");
+					if (rows.length) app.commands.cut(on, rows);					
+				}
+			},
+			copy: function(on, event) {
+				console.log(event);
+				let rows = []
+				for (let selected of on.querySelectorAll(".selected")) {
+					rows.push(this.indexOf(selected));
+				}
+				if (rows.length) {
+					event.preventDefault();
+					event.stopPropagation();
+					let data = [];
+					for (let index of rows) {
+						data.push(on.model[index]);
+					}
+					data = JSON.stringify(data);
+					event.clipboardData.setData("application/json", data);	
+					event.clipboardData.setData("text", data);	
+				}
+			},
+			paste: function(on, event) {
+				let cb = event.clipboardData;
+				let data = cb.getData("text");
+				try {
+					data = JSON.parse(data);
+				} catch (e) {
+				}
+				if (typeof data == "object" && data.length) {
+					event.preventDefault();
+					event.stopPropagation();
+					let currentRow = this.owner.getViewContext(event.target, "row");
+					let index = currentRow ? this.indexOf(currentRow) : on.childNodes.length + 1;
+					let app = this.owner.getViewContext(on, "application");
+					for (let object of data) {
+						app.commands.create(on, index, this.sys.extend(null, object));
+					}
+				}
 			}
 		},
 		extend$shortcuts: {
