@@ -8,7 +8,7 @@ option {
 	background: white;
 	padding: 2px;
 }
-.selected, .selected * {
+.selected {
 	background: lightSteelBlue;
 }
 .item {	

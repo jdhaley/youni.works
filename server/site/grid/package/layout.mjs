@@ -1,37 +1,21 @@
 export default {
 	package$: "youni.works/base/layout",
 	use: {
-		package$view: "youni.works/base/view"
+		package$view: "youni.works/base/view",
+		package$container: "youni.works/base/container"
 	},
 	Group: {
-		super$: "use.view.Collection",
+		super$: "use.container.Collection",
 		viewName: ".group",
 		use: {
 			type$Element: "Shape"
 		},
-		/*
-		extend$actions: {
-			created: function(on, event) {
-				let ele = this.createElement(on, event.value, event.index);
-				let rel = this.elementOf(on, event.index);
-				if (rel) on.insertBefore(ele, rel);
-				ele.focus();
-			},
-			deleted: function(on, event) {
-				let ele = this.elementOf(on, event.index);
-				let focus = ele.nextSibling || ele.previousSibling;
-				ele.remove();
-				focus && focus.focus();
-			},
-			moved: function(on, event) {
-				let ele = this.elementOf(on, event.index);
-				ele.remove();
-				let to = this.elementOf(on, event.value);
-				on.insertBefore(ele, to);
-				ele.focus();
-			}
+		findElement: function(node) {
+			return this.owner.getViewContext(node, "shape");
+		},
+		findCollection: function(node) {
+			return this.owner.getViewContext(node, "group");
 		}
-		*/
 	},
 	Shape: {
 		super$: "use.view.View",

@@ -2,6 +2,7 @@ export default {
 	package$: "youni.works/album/layout",
 	use: {
 		package$view: "youni.works/base/view",
+		package$container: "youni.works/base/container",
 		package$layout: "youni.works/base/layout",		
 	},
 	Stamp: {
@@ -23,7 +24,7 @@ export default {
 		}
 	},
 	Issue: {
-		super$: "use.view.Item",
+		super$: "use.container.Item",
 		viewName: "div.issue",
 		album: null,
 		use: {
@@ -43,6 +44,10 @@ export default {
 		createBody: function(view, value) {
 			return this.use.Group.createView(view, value.varieties);
 		}
+	},
+	Page: {
+		super$: "use.view.View",
+		viewName: "section.page"
 	},
 	Album: {
 		super$: "use.view.View",

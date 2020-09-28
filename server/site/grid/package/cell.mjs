@@ -2,7 +2,8 @@ export default {
 	package$: "youni.works/base/cell",
 	use: {
 		package$control: "youni.works/base/control",
-		package$view: "youni.works/base/view"
+		package$view: "youni.works/base/view",
+		package$container: "youni.works/base/container"
 	},
 	Label: {
 		super$: "use.view.View",
@@ -271,7 +272,7 @@ export default {
 		}
 	},
 	Grid: {
-		super$: "use.view.Collection",
+		super$: "use.container.Collection",
 		viewName: ".grid",
 		use: {
 			type$Element: "Row"
@@ -281,73 +282,6 @@ export default {
 		},
 		findCollection: function(node) {
 			return this.owner.getViewContext(node, "grid");
-		},
-		extend$actions: {
-			click: function(on, event) {
-				if (!event.ctrlKey) {
-					for (let selected of on.querySelectorAll(".selected")) {
-						selected.classList.remove("selected");
-					}
-					return;
-				}
-				event.preventDefault();
-				event.stopPropagation();
-				let row = this.findElement(event.target);
-				row.classList.add("selected");
-			},
-			cut: function(on, event) {
-				let rows = []
-				for (let selected of on.querySelectorAll(".selected")) {
-					rows.push(this.indexOf(selected));
-				}
-				if (rows.length) {
-					event.preventDefault();
-					event.stopPropagation();
-					let data = [];
-					for (let index of rows) {
-						data.push(on.model[index]);
-					}
-					data = JSON.stringify(data);
-					event.clipboardData.setData("application/json", data);	
-					event.clipboardData.setData("text", data);	
-					let app = this.owner.getViewContext(on, "application");
-					if (rows.length) app.commands.cut(on, rows);					
-				}
-			},
-			copy: function(on, event) {
-				console.log(event);
-				let rows = []
-				for (let selected of on.querySelectorAll(".selected")) {
-					rows.push(this.indexOf(selected));
-				}
-				if (rows.length) {
-					event.preventDefault();
-					event.stopPropagation();
-					let data = [];
-					for (let index of rows) {
-						data.push(on.model[index]);
-					}
-					data = JSON.stringify(data);
-					event.clipboardData.setData("application/json", data);	
-					event.clipboardData.setData("text", data);	
-				}
-			},
-			paste: function(on, event) {
-				let cb = event.clipboardData;
-				let data = cb.getData("text");
-				try {
-					data = JSON.parse(data);
-				} catch (e) {
-				}
-				if (typeof data == "object" && data.length) {
-					event.preventDefault();
-					event.stopPropagation();
-					let currentRow = this.owner.getViewContext(event.target, "row");
-					let index = currentRow ? this.indexOf(currentRow) : on.childNodes.length + 1;
-					let app = this.owner.getViewContext(on, "application");
-					app.commands.paste(on, index, data);
-				}
-			}
 		},
 		extend$shortcuts: {
 			ArrowUp: function(on, event) {
@@ -457,7 +391,7 @@ export default {
 		}
 	},
 	Table: {
-		super$: "use.view.Item",
+		super$: "use.container.Item",
 		use: {
 			type$Header: "TableHeader",
 			type$Body: "Grid"

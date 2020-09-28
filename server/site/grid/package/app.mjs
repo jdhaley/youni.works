@@ -9,6 +9,7 @@ export default {
 		package$command: "youni.works/base/command",
 		package$remote: "youni.works/web/remote",
 		package$view: "youni.works/base/view",
+		package$container: "youni.works/base/container",
 		package$cell: "youni.works/base/cell",
 	},
 	Application: {
@@ -117,7 +118,7 @@ export default {
 		}
 	},
 	Window: {
-		super$: "use.view.Item",
+		super$: "use.container.Item",
 		viewName: ".window",
 		events: {
 			focus: function(event) {
