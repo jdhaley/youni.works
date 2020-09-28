@@ -206,6 +206,22 @@ export default {
 			this.addCommand(cmd);
 			cmd.execute();
 		},
+		paste: function(source, index, elements) {
+			let cmd = this.sys.extend(this.use.BatchCommand, {
+				type: "cut",
+				source: source,
+				next: null,
+				prior: null,
+				commands: []
+			});
+			let priorIndex = -1;
+			let count = 0;
+			for (let value of elements) {
+				cmd.commands.push(this.newCommand("create", source, source.model, index++, value));
+			}
+			this.addCommand(cmd);
+			cmd.execute();
+		},
 		move: function(source, index, value) {
 			let cmd = this.newCommand("move", source, source.model, index, value);
 			cmd.execute();

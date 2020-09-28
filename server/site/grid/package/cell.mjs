@@ -345,9 +345,7 @@ export default {
 					let currentRow = this.owner.getViewContext(event.target, "row");
 					let index = currentRow ? this.indexOf(currentRow) : on.childNodes.length + 1;
 					let app = this.owner.getViewContext(on, "application");
-					for (let object of data) {
-						app.commands.create(on, index, this.sys.extend(null, object));
-					}
+					app.commands.paste(on, index, data);
 				}
 			}
 		},
