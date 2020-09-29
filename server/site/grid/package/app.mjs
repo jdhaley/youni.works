@@ -71,8 +71,12 @@ export default {
 			click: UP,
 			contextmenu: UP,
 			cut: UP,
-			copy: UP,
 			paste: UP,
+			copy: function(event) {
+				event.preventDefault();
+				let app = event.currentTarget;
+				app.controller.owner.setClipboard(event.clipboardData, app);
+			},
 			mousedown: function(event) {
 				MOUSE_TARGET = event.target;
 				event.mouseTarget = MOUSE_TARGET;

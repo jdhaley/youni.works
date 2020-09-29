@@ -44,6 +44,30 @@ export default {
 				view = view.parentNode;
 			}
 		},
+		getClipboard: function(clipboard) {
+			let data = clipboard.getData("application/json") || clipboard.getData("text/plain");
+			try {
+				data = JSON.parse(data);
+			} catch (e) {
+			}
+			return data;
+		},
+		setClipboard: function(clipboard, node) {
+			let data = this.getSelectedElements(node);
+			if (data) {
+				data = JSON.stringify(data);
+				clipboard.setData("application/json", data);	
+				clipboard.setData("text/plain", data);
+				return true;
+			}
+		},
+		getSelectedElements: function(node) {
+			let data = []
+			for (let selected of node.querySelectorAll(".selected")) {
+				data.push(selected.model);
+			}
+			return data.length ? data : null;
+		},
 		extend$transmit: {
 			up: function(on, event) {
 				event.stopPropagation && event.stopPropagation();

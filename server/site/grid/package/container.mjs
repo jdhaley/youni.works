@@ -8,6 +8,12 @@ export default {
 		use: {
 			type$Element: "use.view.View"
 		},
+		selectOnClick: false,
+		bind: function(control, value) {
+			if (!value) value = [];
+			if (!value.length) value.push(this.sys.extend());
+			return this.owner.bind(control, value);
+		},
 		draw: function(view, value) {
 			value = this.bind(view, value);
 			if (value) {
@@ -53,31 +59,6 @@ export default {
 			}
 			return indices.length ? indices : null;
 		},
-		getSelectedElements: function(on) {
-			let data = []
-			for (let selected of on.querySelectorAll(".selected")) {
-				data.push(selected.model);
-			}
-			return data.length ? data : null;
-		},
-		getClipboard: function(clipboard) {
-			let data = clipboard.getData("text/plain");
-			try {
-				data = JSON.parse(data);
-			} catch (e) {
-			}
-			return data;
-		},
-		setClipboard: function(view, clipboard) {
-			let data = this.getSelectedElements(view);
-			if (data) {
-				data = JSON.stringify(data);
-				clipboard.setData("application/json", data);	
-				clipboard.setData("text/plain", data);
-				console.log(data);
-				return true;
-			}
-		},
 		extend$actions: {
 			created: function(on, event) {
 				let ele = this.createElement(on, event.value, event.index);
@@ -109,25 +90,27 @@ export default {
 					for (let selected of on.querySelectorAll(".selected")) {
 						selected.classList.remove("selected");
 					}
+					if (!this.selectOnClick) return;
 				}
+				
 				event.preventDefault();
-				event.stopPropagation();
 				let row = this.findElement(event.target);
-				row.classList.add("selected");
+				if (row.classList.contains("selected")) {
+					row.classList.remove("selected");
+				} else {
+					row.classList.add("selected");					
+				}
 			},
 			cut: function(on, event) {
 				event.preventDefault();
-				if (this.setClipboard(on, event.clipboardData)) {
+				if (this.owner.setClipboard(event.clipboardData, on)) {
 					let app = this.owner.getViewContext(on, "application");
 					app.commands.cut(on, this.getSelectedIndices(on));					
 				}
 			},
-			copy: function(on, event) {
-				this.setClipboard(on, event.clipboardData);
-			},
 			paste: function(on, event) {
 				event.preventDefault();
-				let data = this.getClipboard(event.clipboardData);
+				let data = this.owner.getClipboard(event.clipboardData);
 				if (typeof data == "object" && data.length) {
 					let element = this.findElement(event.target);
 					let index = element ? this.indexOf(element) : on.childNodes.length;
