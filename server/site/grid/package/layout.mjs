@@ -7,6 +7,7 @@ export default {
 	Group: {
 		super$: "use.container.Collection",
 		viewName: ".group",
+		selectOnClick: true,
 		use: {
 			type$Element: "Shape"
 		},

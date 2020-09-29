@@ -36,7 +36,7 @@ export default {
 			}
 		},
 		createHeader: function(view, value) {
-			let title = this.owner.append(view, ".title");
+			let title = this.owner.append(view, "span.title");
 			title.textContent = value.title;
 			title.contentEditable = true;
 			return title;
@@ -44,6 +44,21 @@ export default {
 		createBody: function(view, value) {
 			return this.use.Group.createView(view, value.varieties);
 		}
+	},
+	Issues: {
+		super$: "use.layout.Group",
+		use: {
+			type$Element: "Issue"
+		},
+		viewName: "div.content",
+		elementType: "issue",
+		findElement: function(node) {
+			return this.owner.getViewContext(node, this.elementType);
+		},
+		findCollection: function(node) {
+			return this.owner.getViewContext(node, "collection");
+		},
+		album: null
 	},
 	Page: {
 		super$: "use.view.View",
@@ -54,7 +69,7 @@ export default {
 		types: null,
 		viewName: "div.album",
 		use: {
-			type$Issue: "Issue"
+			type$Issues: "Issues"
 		},
 		paginate: function(view) {
 			//TODO
@@ -63,10 +78,7 @@ export default {
 			value = this.bind(view, value);
 			let pages = this.owner.append(view, ".pages");
 			let page = this.owner.append(pages, ".page");
-			let content = this.owner.append(page, ".content");
-			for (let issue of value.issues) {
-				this.use.Issue.createView(content, issue);
-			}
+			let content = this.use.Issues.createView(page, value.issues);
 		}
 	}
 }
