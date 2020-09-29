@@ -46,12 +46,37 @@ export default {
 				}
 			}
 		},
-		getSelected: function(on) {
-			let rows = []
+		getSelectedIndices: function(on) {
+			let indices = []
 			for (let selected of on.querySelectorAll(".selected")) {
-				rows.push(this.indexOf(selected));
+				indices.push(this.indexOf(selected));
 			}
-			return rows.length ? rows : null;
+			return indices.length ? indices : null;
+		},
+		getSelectedElements: function(on) {
+			let data = []
+			for (let selected of on.querySelectorAll(".selected")) {
+				data.push(selected.model);
+			}
+			return data.length ? data : null;
+		},
+		getClipboard: function(clipboard) {
+			let data = clipboard.getData("text/plain");
+			try {
+				data = JSON.parse(data);
+			} catch (e) {
+			}
+			return data;
+		},
+		setClipboard: function(view, clipboard) {
+			let data = this.getSelectedElements(view);
+			if (data) {
+				data = JSON.stringify(data);
+				clipboard.setData("application/json", data);	
+				clipboard.setData("text/plain", data);
+				console.log(data);
+				return true;
+			}
 		},
 		extend$actions: {
 			created: function(on, event) {
@@ -91,47 +116,21 @@ export default {
 				row.classList.add("selected");
 			},
 			cut: function(on, event) {
-				let rows = this.getSelected(on);
-				if (rows) {
-					event.preventDefault();
-					event.stopPropagation();
-					let data = [];
-					for (let index of rows) {
-						data.push(on.model[index]);
-					}
-					data = JSON.stringify(data);
-					event.clipboardData.setData("application/json", data);	
-					event.clipboardData.setData("text", data);	
+				event.preventDefault();
+				if (this.setClipboard(on, event.clipboardData)) {
 					let app = this.owner.getViewContext(on, "application");
-					app.commands.cut(on, rows);					
+					app.commands.cut(on, this.getSelectedIndices(on));					
 				}
 			},
 			copy: function(on, event) {
-				let rows = this.getSelected(on);
-				if (rows) {
-					event.preventDefault();
-					event.stopPropagation();
-					let data = [];
-					for (let index of rows) {
-						data.push(on.model[index]);
-					}
-					data = JSON.stringify(data);
-					event.clipboardData.setData("application/json", data);	
-					event.clipboardData.setData("text", data);	
-				}
+				this.setClipboard(on, event.clipboardData);
 			},
 			paste: function(on, event) {
-				let cb = event.clipboardData;
-				let data = cb.getData("text");
-				try {
-					data = JSON.parse(data);
-				} catch (e) {
-				}
+				event.preventDefault();
+				let data = this.getClipboard(event.clipboardData);
 				if (typeof data == "object" && data.length) {
-					event.preventDefault();
-					event.stopPropagation();
-					let currentRow = this.owner.getViewContext(event.target, "row");
-					let index = currentRow ? this.indexOf(currentRow) : on.childNodes.length + 1;
+					let element = this.findElement(event.target);
+					let index = element ? this.indexOf(element) : on.childNodes.length;
 					let app = this.owner.getViewContext(on, "application");
 					app.commands.paste(on, index, data);
 				}
