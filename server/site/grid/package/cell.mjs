@@ -314,12 +314,12 @@ export default {
 					}
 				}
 			},
-			Escape: function(on, event) {
-				let row = this.owner.getViewContext(event.target, "row");
-				if (row.properties && row.properties.style.display == "flex") {
-					row.properties.style.display = "none";
-				}
-			},
+//			Escape: function(on, event) {
+//				let row = this.owner.getViewContext(event.target, "row");
+//				if (row.properties && row.properties.style.display == "flex") {
+//					row.properties.style.display = "none";
+//				}
+//			},
 			Enter: function(on, event) {
 				event.preventDefault();
 				let currentRow = this.owner.getViewContext(event.target, "row");

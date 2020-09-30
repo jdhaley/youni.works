@@ -11,13 +11,14 @@ export default {
 		selectOnClick: false,
 		bind: function(control, value) {
 			if (!value) value = [];
-			if (!value.length) value.push(this.sys.extend());
+			if (!value.length && value.push) value.push(this.sys.extend());
 			return this.owner.bind(control, value);
 		},
 		draw: function(view, value) {
 			value = this.bind(view, value);
 			if (value) {
 				if (value[Symbol.iterable]) {
+					let i = 0;
 					for (let ele of value) this.createElement(view, ele, i++);					
 				} else {
 					for (let key in value) this.createElement(view, value[key], key);
