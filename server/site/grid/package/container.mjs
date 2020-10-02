@@ -14,6 +14,10 @@ export default {
 			if (!value.length && value.push) value.push(this.sys.extend());
 			return this.owner.bind(control, value);
 		},
+		focusInto: function(view, back) {
+			view = back ? view.lastChild : view.firstChild;
+			return view.controller.focusInto(view, back);
+		},
 		draw: function(view, value) {
 			value = this.bind(view, value);
 			if (value) {
@@ -146,6 +150,10 @@ export default {
 		moveTo: function(item, x, y) {
 			item.style.left = x + "px";
 			item.style.top = y + "px";
+		},
+		focusInto: function(view, back) {
+			view = view.body;
+			return view.controller.focusInto(view, back);
 		},
 		extend$actions: {
 			mousedown: function(on, event) {

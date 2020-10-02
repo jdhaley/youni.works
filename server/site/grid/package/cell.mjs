@@ -230,15 +230,19 @@ export default {
 		super$: "use.view.View",
 		draw: function(view, value) {
 			value = this.bind(view, value);
-			view.handle = this.createHandle(view, value);
+			this.createParts(view, value);
+		},
+		createParts: function(view, value) {
 			view.parts = Object.create(null);
 			for (let conf of view.conf) {
 				this.createPart(view, value, conf);
 			}
 		},
-		createHandle: function(view, value) {
-		},
 		createPart: function(view, value, conf) {
+		},
+		focusInto: function(view, back) {
+			view = back ? view.lastChild : view.firstChild;
+			return view.controller.focusInto(view, back);
 		},
 		extend$actions: {
 			updated: function(on, event) {
@@ -253,6 +257,11 @@ export default {
 		use: {
 			type$Handle: "Handle",
 			type$Cell: "Field",
+		},
+		draw: function(view, value) {
+			value = this.bind(view, value);
+			this.createParts(view, value);
+			view.handle = this.createHandle(view, value);
 		},
 		createHandle: function(row) {
 //			if (key) this.createField(row, key, {
@@ -321,11 +330,13 @@ export default {
 //				}
 //			},
 			Enter: function(on, event) {
-				event.preventDefault();
-				let currentRow = this.owner.getViewContext(event.target, "row");
-				let index = currentRow ? this.indexOf(currentRow) : on.childNodes.length + 1;
-				let app = this.owner.getViewContext(on, "application");
-				app.commands.create(on, index);
+				if (event.target.classList.contains("handle")) {
+					event.preventDefault();
+					let currentRow = this.owner.getViewContext(event.target, "row");
+					let index = currentRow ? this.indexOf(currentRow.nextSibling) : on.childNodes.length + 1;
+					let app = this.owner.getViewContext(on, "application");
+					app.commands.create(on, index);					
+				}
 			},
 			Delete: function(on, event) {
 				let rows = []
@@ -366,7 +377,6 @@ export default {
 		viewName: ".header",
 		draw: function(view, value) {
 			view.classList.add("row");
-			view.handle = this.use.Handle.createView(view);
 			let width = 0;
 			if (value && value.length === undefined) {
 				this.createColumn(view, {
@@ -378,6 +388,8 @@ export default {
 				width += field.size || 5;
 				this.createColumn(view, field);
 			}
+			view.handle = this.use.Handle.createView(view);
+
 			view.parentNode.style.maxWidth = width * 16 + "px";
 		},
 		createColumn: function(header, conf) {
@@ -405,37 +417,41 @@ export default {
 			return this.use.Body.createView(view, value, this.fields);
 		},
 	},
+	Property: {
+		super$: "use.container.Item",
+		use: {
+			type$Header: "Label",
+			type$Body: "Field"
+		},
+		createHeader: function(view, value) {
+			/* * * A label's model is the configuration. * * */
+			let label = this.use.Header.createView(view, view.conf);
+			label.classList.add("cell");
+			return label;
+		},
+		createBody: function(view, value) {
+			value = value ? value[view.conf.name] : undefined;
+			let field = this.use.Body.createView(view, value, view.conf);
+			field.classList.add("cell");
+			field.parts = view.parentNode.parts;
+			field.parts[view.conf.name] = field;
+			return field;
+		},		
+	},
 	Properties: {
 		super$: "Composite",
 		use: {
-			type$Label: "Label",
-			type$Field: "Field"
+			type$Property: "Property"
 		},
 		control: function(view) {
 			view.conf = this.fields;
 			view.classList.add("properties");
 			view.classList.add("grid");
 		},
-		createPart: function(record, value, conf) {
-			let prop = this.owner.append(record, ".property");
+		createPart: function(properties, value, conf) {
+			let prop = this.use.Property.createView(properties, value, conf);
 			prop.classList.add("row");
-			prop.lbl = this.createLabel(prop, conf);
-			prop.field = this.createField(prop, value, conf);
-			prop.field.record = record;
-			record.parts[prop.field.name] = prop.field;
 			return prop;
-		},
-		createLabel: function(header, conf) {
-			/* * * A label's model is the configuration. * * */
-			let label = this.use.Label.createView(header, conf);
-			label.classList.add("cell");
-			return label;
-		},
-		createField: function(prop, value, field) {
-			value = value ? value[field.name] : undefined;
-			let view = this.use.Field.createView(prop, value, field);
-			view.classList.add("cell");
-			return view;
 		},
 		extend$actions: {
 			deleted: function(on, event) {

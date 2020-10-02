@@ -110,6 +110,10 @@ export default {
 		},
 		control: function(view) {
 		},
+		focusInto: function(view) {
+			view.focus();
+			return view;
+		},
 		extend$actions: {
 			keydown: function(on, event) {
 				let shortcut = this.shortcuts[event.key];
