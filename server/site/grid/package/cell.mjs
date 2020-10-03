@@ -196,12 +196,12 @@ export default {
 		},
 		extend$actions: {
 			contextmenu: function(on, event) {
-//			event.preventDefault();
+				//			event.preventDefault();
 			},
 			input: function(on, event) {
-				if (on.record.model) {
+				if (on.whole.model) {
 					let app = this.owner.getViewContext(on, "application");
-					app.commands.update(on.record, on.name, this.getViewValue(on));
+					app.commands.update(on.whole, on.name, this.getViewValue(on));
 				}
 			},
 			keydown: function(on, event) {
@@ -276,7 +276,7 @@ export default {
 			if (!conf.name) cell.classList.add("key");
 			cell.classList.add("cell");
 			cell.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
-			cell.record = row;
+			cell.whole = row;
 			row.parts[name] = cell;			
 		}
 	},
