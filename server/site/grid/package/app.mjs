@@ -58,7 +58,7 @@ export default {
 			}
 			let editor = datatype == "object" ? this.use.Properties : this.use.Table;
 			editor = this.sys.extend(editor, {
-				fields: type
+				fields: type.fields
 			});
 			let window = this.use.Window.createView(app);
 			editor.createView(window.body, model, editor.fields);

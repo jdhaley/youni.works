@@ -6,7 +6,8 @@ export default function main(sys, conf) {
 	app.controller.open("/file/stamp/types.json", loadTypes);
 	
 	function loadTypes(msg) {
-		app.types = sys.extend(null, JSON.parse(msg.content));
+		app.conf = sys.extend(null, JSON.parse(msg.content));
+		app.types = app.conf.types;
 		app.controller.open(app.path, loadData)
 	}
 	function loadData(msg) {
