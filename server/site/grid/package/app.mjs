@@ -109,6 +109,11 @@ export default {
 				event.preventDefault();
 				this.save(on.path, on.model);
 			},
+			S: function(on, event) {
+				if (!event.ctrlKey) return;
+				event.preventDefault();
+				this.save(on.path, on.metaModel);
+			},
 			z: function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();

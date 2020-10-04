@@ -257,11 +257,20 @@ export default {
 		use: {
 			type$Handle: "Handle",
 			type$Cell: "Part",
+			type$Key: "Part"
 		},
 		draw: function(view, value) {
 			value = this.bind(view, value);
 			this.createParts(view, value);
 			view.handle = this.createHandle(view, value);
+		},
+		createKey: function(row, value) {
+			let key = this.use.Key.createView(row, value, {
+				size: 10
+			});
+			key.classList.add("cell");
+			key.style.flex = "1 1 " + ((10) * 16) + "px";
+			row.insertBefore(key, row.firstChild);
 		},
 		createHandle: function(row) {
 //			if (key) this.createPart(row, key, {
@@ -284,7 +293,14 @@ export default {
 		super$: "use.container.Collection",
 		viewName: ".grid",
 		use: {
-			type$Element: "Row"
+			type$Element: "Row",
+		},
+		createElement: function(view, value, index) {
+			let row = this.use.Element.createView(view, value, view.conf);
+			if (typeof index != "number") {
+				this.use.Element.createKey(row, index);
+			}
+			
 		},
 		findElement: function(node) {
 			return this.owner.getViewContext(node, "row");
@@ -390,7 +406,7 @@ export default {
 			}
 			view.handle = this.use.Handle.createView(view);
 
-			view.parentNode.style.maxWidth = width * 16 + "px";
+			view.parentNode.style.width = width * 16 + "px";
 		},
 		createColumn: function(header, conf) {
 			if (!conf.title) {
