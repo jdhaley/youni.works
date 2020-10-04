@@ -20,7 +20,7 @@ export default {
 		link: function(view) {
 			if (!view.link) {
 				let app = this.owner.getViewContext(view, "application");
-				view.link = app.controller.show(app, "Field", view.model);
+				view.link = app.controller.show(app, "Part", view.model);
 			}
 			return view.link;
 		},
@@ -54,7 +54,7 @@ export default {
 		extend$actions: {
 		}
 	},
-	Field: {
+	Part: {
 		super$: "use.view.View",
 		dataTypes: {
 			string: function(parent, value, conf) {
@@ -161,7 +161,7 @@ export default {
 				name: view.conf.name
 			});
 			view.name = view.conf.name; //TODO review whether we use attribute or property for name.
-			view.classList.add("field");
+			view.classList.add("part");
 		},
 		update: function(part, value) {
 			this.setViewValue(part, value);
@@ -256,7 +256,7 @@ export default {
 		viewName: ".row",
 		use: {
 			type$Handle: "Handle",
-			type$Cell: "Field",
+			type$Cell: "Part",
 		},
 		draw: function(view, value) {
 			value = this.bind(view, value);
@@ -264,7 +264,7 @@ export default {
 			view.handle = this.createHandle(view, value);
 		},
 		createHandle: function(row) {
-//			if (key) this.createField(row, key, {
+//			if (key) this.createPart(row, key, {
 //			size: 10
 //		});
 			return this.use.Handle.createView(row);
@@ -272,12 +272,12 @@ export default {
 		createPart: function(row, value, conf) {
 			let name = conf.name;
 			value = value ? (name ? value[name] : value) : undefined;
-			let cell = this.use.Cell.createView(row, value, conf);
-			if (!conf.name) cell.classList.add("key");
-			cell.classList.add("cell");
-			cell.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
-			cell.whole = row;
-			row.parts[name] = cell;			
+			let part = this.use.Cell.createView(row, value, conf);
+			if (!conf.name) part.classList.add("key");
+			part.classList.add("cell");
+			part.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
+			part.whole = row;
+			row.parts[name] = part;		
 		}
 	},
 	Grid: {
@@ -384,9 +384,9 @@ export default {
 				});
 				width += 10;
 			}
-			for (let field of view.conf) {
-				width += field.size || 5;
-				this.createColumn(view, field);
+			for (let part of view.conf) {
+				width += part.size || 5;
+				this.createColumn(view, part);
 			}
 			view.handle = this.use.Handle.createView(view);
 
@@ -409,7 +409,7 @@ export default {
 			type$Body: "Grid"
 		},
 		viewName: ".table",
-		fields: null,
+		parts: null,
 		createHeader: function(view, value) {
 			return this.use.Header.createView(view, value, this.fields);
 		},
@@ -421,7 +421,7 @@ export default {
 		super$: "use.container.Item",
 		use: {
 			type$Header: "Label",
-			type$Body: "Field"
+			type$Body: "Part"
 		},
 		createHeader: function(view, value) {
 			/* * * A label's model is the configuration. * * */
@@ -431,11 +431,11 @@ export default {
 		},
 		createBody: function(view, value) {
 			value = value ? value[view.conf.name] : undefined;
-			let field = this.use.Body.createView(view, value, view.conf);
-			field.classList.add("cell");
-			field.parts = view.parentNode.parts;
-			field.parts[view.conf.name] = field;
-			return field;
+			let part = this.use.Body.createView(view, value, view.conf);
+			part.classList.add("cell");
+			part.whole = view.parentNode;
+			part.whole.parts[view.conf.name] = part;
+			return part;
 		},		
 	},
 	Properties: {
@@ -444,14 +444,13 @@ export default {
 			type$Property: "Property"
 		},
 		control: function(view) {
-			view.conf = this.fields;
+			view.conf = this.parts;
 			view.classList.add("properties");
 			view.classList.add("grid");
 		},
 		createPart: function(properties, value, conf) {
 			let prop = this.use.Property.createView(properties, value, conf);
 			prop.classList.add("row");
-			return prop;
 		},
 		extend$actions: {
 			deleted: function(on, event) {

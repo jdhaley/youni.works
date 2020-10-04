@@ -6,9 +6,11 @@ export default function main(sys, conf) {
 	app.controller.open("/file/stamp/types.json", loadTypes);
 	
 	function loadTypes(msg) {
+		app.controller.open(app.path, loadData)
 		app.conf = sys.extend(null, JSON.parse(msg.content));
 		app.types = app.conf.types;
-		app.controller.open(app.path, loadData)
+		app.controller.show(app, "MetaModel", app.conf);
+
 	}
 	function loadData(msg) {
 		app.model = sys.extend(null, JSON.parse(msg.content));
