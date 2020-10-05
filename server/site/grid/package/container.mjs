@@ -3,35 +3,38 @@ export default {
 	use: {
 		package$view: "youni.works/base/view",
 	},	
-	Collection: {
+	Container: {
 		super$: "use.view.View",
 		use: {
 			type$Element: "use.view.View"
 		},
-		selectOnClick: false,
-		bind: function(control, value) {
-			if (!value) value = [];
-			if (!value.length && value.push) value.push(this.sys.extend());
-			return this.owner.bind(control, value);
+		bind: function(control, data) {
+			if (!data) data = [];
+			if (!data.length && data.push) data.push(this.sys.extend());
+			return this.owner.bind(control, data);
+		},
+		draw: function(view, data) {
+			data = this.bind(view, data);
+			if (data) {
+				if (data[Symbol.iterator]) {
+					let i = 0;
+					for (let ele of data) this.createElement(view, ele, i++);					
+				} else {
+					for (let key in data) this.createElement(view, data[key], key);
+				}
+			}
+		},
+		createElement: function(view, data, index) {
+			return this.use.Element.createView(view, data, view.conf);
 		},
 		focusInto: function(view, back) {
 			view = back ? view.lastChild : view.firstChild;
 			return view.controller.focusInto(view, back);
-		},
-		draw: function(view, value) {
-			value = this.bind(view, value);
-			if (value) {
-				if (value[Symbol.iterator]) {
-					let i = 0;
-					for (let ele of value) this.createElement(view, ele, i++);					
-				} else {
-					for (let key in value) this.createElement(view, value[key], key);
-				}
-			}
-		},
-		createElement: function(view, value, index) {
-			return this.use.Element.createView(view, value, view.conf);
-		},
+		}
+	},
+	Collection: {
+		super$: "Container",
+		selectOnClick: false,
 		findElement: function(node) {
 			return this.owner.getViewContext(node, "element");
 		},
@@ -128,16 +131,16 @@ export default {
 	Item: {
 		super$: "use.view.View",
 		viewName: ".item",
-		draw: function(view, value) {
-			view.header = this.createHeader(view, value);
-			view.body = this.createBody(view, value);
-			view.footer = this.createFooter(view, value);
+		draw: function(view, data) {
+			view.header = this.createHeader(view, data);
+			view.body = this.createBody(view, data);
+			view.footer = this.createFooter(view, data);
 		},
-		createHeader: function(item, value) {
+		createHeader: function(item, data) {
 		},
-		createBody: function(item, value) {
+		createBody: function(item, data) {
 		},
-		createFooter: function(item, value) {
+		createFooter: function(item, data) {
 		},
 		control: function(view) {
 			this.activate(view);

@@ -97,12 +97,12 @@ export default {
 		forType: function(value, conf) {
 			return (parent, value, conf) => this.owner.append(parent, this.viewName);
 		},
-		createView: function(parent, model, conf) {
-			let constr = this.forType(model, conf);
-			let view = constr.call(this, parent, model, conf);
+		createView: function(parent, data, conf) {
+			let constr = this.forType(data, conf);
+			let view = constr.call(this, parent, data, conf);
 			view.conf = conf;
 			this.owner.control(view, this);
-			this.draw(view, model);
+			this.draw(view, data);
 			this.control(view);
 			return view;
 		},
