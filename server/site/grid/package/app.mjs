@@ -112,7 +112,7 @@ export default {
 			S: function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();
-				this.save(on.path, on.metaModel);
+				this.save(on.confPath, on.conf);
 			},
 			z: function(on, event) {
 				if (!event.ctrlKey) return;

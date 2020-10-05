@@ -21,7 +21,7 @@ export default {
 		draw: function(view, value) {
 			value = this.bind(view, value);
 			if (value) {
-				if (value[Symbol.iterable]) {
+				if (value[Symbol.iterator]) {
 					let i = 0;
 					for (let ele of value) this.createElement(view, ele, i++);					
 				} else {

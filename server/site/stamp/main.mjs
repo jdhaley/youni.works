@@ -3,7 +3,8 @@ export default function main(sys, conf) {
 
 	let app = pkg.grid.app.Application.createView(document.body);
 	app.path = "/file/stamp/data.json";
-	app.controller.open("/file/stamp/types.json", loadTypes);
+	app.confPath = "/file/stamp/types.json";
+	app.controller.open(app.confPath, loadTypes);
 	
 	function loadTypes(msg) {
 		app.controller.open(app.path, loadData)
