@@ -228,9 +228,12 @@ export default {
 	},
 	Composite: {
 		super$: "use.view.View",
-		draw: function(view, value) {
+		draw: function(view, value, index) {
 			value = this.bind(view, value);
+			this.createKey(view, index);
 			this.createParts(view, value);
+		},
+		createKey: function(row, value, index) {
 		},
 		createParts: function(view, value) {
 			view.parts = Object.create(null);
@@ -259,12 +262,14 @@ export default {
 			type$Cell: "Part",
 			type$Key: "Part"
 		},
-		draw: function(view, value) {
+		draw: function(view, value, index) {
 			value = this.bind(view, value);
+			this.createKey(view, index);
 			this.createParts(view, value);
 			view.handle = this.createHandle(view, value);
 		},
 		createKey: function(row, value) {
+			if (typeof value == "number") return;
 			let key = this.use.Key.createView(row, {
 				size: 10
 			}, value);
@@ -296,11 +301,7 @@ export default {
 			type$Element: "Row",
 		},
 		createElement: function(view, value, index) {
-			let row = this.use.Element.createView(view, view.conf, value);
-			if (typeof index != "number") {
-				this.use.Element.createKey(row, index);
-			}
-			return row;
+			return this.use.Element.createView(view, view.conf, value, index);
 		},
 		findElement: function(node) {
 			return this.owner.getViewContext(node, "row");

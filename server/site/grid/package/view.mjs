@@ -94,19 +94,20 @@ export default {
 		bind: function(control, value) {
 			return this.owner.bind(control, value);
 		},
+		//TODO flip the argument order
 		forType: function(value, conf) {
 			return (parent, value, conf) => this.owner.append(parent, this.viewName);
 		},
-		createView: function(parent, conf, data) {
+		createView: function(parent, conf, data, index) {
 			let constr = this.forType(data, conf);
 			let view = constr.call(this, parent, data, conf);
 			view.conf = conf;
 			this.owner.control(view, this);
-			this.draw(view, data);
+			this.draw(view, data, index);
 			this.control(view);
 			return view;
 		},
-		draw: function(view, value) {
+		draw: function(view, value, index) {
 		},
 		control: function(view) {
 		},
