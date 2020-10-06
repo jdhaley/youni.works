@@ -42,7 +42,7 @@ export default {
 			return title;
 		},
 		createBody: function(view, value) {
-			return this.use.Group.createView(view, value.varieties);
+			return this.use.Group.createView(view, undefined, value.varieties);
 		}
 	},
 	Issues: {
@@ -78,7 +78,7 @@ export default {
 			value = this.bind(view, value);
 			let pages = this.owner.append(view, ".pages");
 			let page = this.owner.append(pages, ".page");
-			let content = this.use.Issues.createView(page, value.issues);
+			let content = this.use.Issues.createView(page, undefined, value.issues);
 		}
 	}
 }

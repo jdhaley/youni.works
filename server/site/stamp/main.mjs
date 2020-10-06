@@ -16,7 +16,7 @@ export default function main(sys, conf) {
 	function loadData(msg) {
 		app.model = sys.extend(null, JSON.parse(msg.content));
 		app.controller.show(app, "Album", app.model);
-		pkg.stamp.Album.createView(app, app.model);
+		pkg.stamp.Album.createView(app, undefined, app.model);
 
 	}
 }

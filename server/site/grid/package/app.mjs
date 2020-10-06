@@ -61,7 +61,7 @@ export default {
 				fields: type.fields
 			});
 			let window = this.use.Window.createView(app);
-			editor.createView(window.body, model, editor.fields);
+			editor.createView(window.body, editor.fields, model);
 			window.focus();
 			return window;
 		},

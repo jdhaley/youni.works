@@ -265,9 +265,9 @@ export default {
 			view.handle = this.createHandle(view, value);
 		},
 		createKey: function(row, value) {
-			let key = this.use.Key.createView(row, value, {
+			let key = this.use.Key.createView(row, {
 				size: 10
-			});
+			}, value);
 			key.classList.add("cell");
 			key.style.flex = "1 1 " + ((10) * 16) + "px";
 			row.insertBefore(key, row.firstChild);
@@ -281,7 +281,7 @@ export default {
 		createPart: function(row, value, conf) {
 			let name = conf.name;
 			value = value ? (name ? value[name] : value) : undefined;
-			let part = this.use.Cell.createView(row, value, conf);
+			let part = this.use.Cell.createView(row, conf, value);
 			if (!conf.name) part.classList.add("key");
 			part.classList.add("cell");
 			part.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
@@ -296,11 +296,11 @@ export default {
 			type$Element: "Row",
 		},
 		createElement: function(view, value, index) {
-			let row = this.use.Element.createView(view, value, view.conf);
+			let row = this.use.Element.createView(view, view.conf, value);
 			if (typeof index != "number") {
 				this.use.Element.createKey(row, index);
 			}
-			
+			return row;
 		},
 		findElement: function(node) {
 			return this.owner.getViewContext(node, "row");
@@ -413,7 +413,8 @@ export default {
 				conf.title = conf.name ? nameToTitle(conf.name) : "";
 			}
 			/* * * A label's model is the configuration. * * */
-			let col = this.use.Label.createView(header, conf);
+			//TODO change this ^
+			let col = this.use.Label.createView(header, undefined, conf);
 			col.style.flex = "1 1 " + ((conf.size || 5) * 16) + "px";
 			return col;
 		}
@@ -427,10 +428,10 @@ export default {
 		viewName: ".table",
 		parts: null,
 		createHeader: function(view, value) {
-			return this.use.Header.createView(view, value, this.fields);
+			return this.use.Header.createView(view, this.fields, value);
 		},
 		createBody: function(view, value) {
-			return this.use.Body.createView(view, value, this.fields);
+			return this.use.Body.createView(view, this.fields, value);
 		},
 	},
 	Property: {
@@ -441,13 +442,14 @@ export default {
 		},
 		createHeader: function(view, value) {
 			/* * * A label's model is the configuration. * * */
-			let label = this.use.Header.createView(view, view.conf);
+			//TODO see above (change)
+			let label = this.use.Header.createView(view, undefined, view.conf);
 			label.classList.add("cell");
 			return label;
 		},
 		createBody: function(view, value) {
 			value = value ? value[view.conf.name] : undefined;
-			let part = this.use.Body.createView(view, value, view.conf);
+			let part = this.use.Body.createView(view, view.conf, value);
 			part.classList.add("cell");
 			part.whole = view.parentNode;
 			part.whole.parts[view.conf.name] = part;
@@ -465,7 +467,7 @@ export default {
 			view.classList.add("grid");
 		},
 		createPart: function(properties, value, conf) {
-			let prop = this.use.Property.createView(properties, value, conf);
+			let prop = this.use.Property.createView(properties, conf, value);
 			prop.classList.add("row");
 		},
 		extend$actions: {

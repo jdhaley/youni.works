@@ -25,7 +25,7 @@ export default {
 			}
 		},
 		createElement: function(view, data, index) {
-			return this.use.Element.createView(view, data, view.conf);
+			return this.use.Element.createView(view, view.conf, data);
 		},
 		focusInto: function(view, back) {
 			view = back ? view.lastChild : view.firstChild;
