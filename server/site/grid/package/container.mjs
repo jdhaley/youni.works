@@ -32,6 +32,34 @@ export default {
 			return view.controller.focusInto(view, back);
 		}
 	},
+	Composite: {
+		super$: "use.view.View",
+		draw: function(view, value, index) {
+			value = this.bind(view, value);
+			this.createKey(view, index);
+			this.createParts(view, value);
+		},
+		createKey: function(row, value, index) {
+		},
+		createParts: function(view, value) {
+			view.parts = Object.create(null);
+			for (let conf of view.conf) {
+				this.createPart(view, value, conf);
+			}
+		},
+		createPart: function(view, value, conf) {
+		},
+		focusInto: function(view, back) {
+			view = back ? view.lastChild : view.firstChild;
+			return view.controller.focusInto(view, back);
+		},
+		extend$actions: {
+			updated: function(on, event) {
+				let part = on.parts[event.index];
+				part.controller.update(part, event.value);
+			}
+		}
+	},
 	Collection: {
 		super$: "Container",
 		selectOnClick: false,
