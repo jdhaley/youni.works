@@ -6,13 +6,31 @@ export default {
 		super$: "Object",
 		extend$types: {
 		},
+		extend$transmit: {
+			up: function(on, event) {
+				//event.stopPropagation && event.stopPropagation();
+				while (on && event.topic) {
+					on.receive(event);
+					on = on.container;
+				}
+			},
+			//NB: down() is explicitly named because it is recursive.
+			down: function down(on, message) {
+				//event.stopPropagation && event.stopPropagation();
+				for (on of on) {
+					if (!message.topic) return;
+					on.receive(message);
+					down(on, message);
+				}
+			}
+		},
 		create: function(name, conf) {
 			if (!this.types[name]) {
 				console.error(`Type "${name}" does not exist.`);
 				return;
 			}
 			let control = this.sys.extend(this.types[name], conf);
-			if (!control.node) this.sys.define(control, "node", this.document.createElement(control.role));
+			if (!control.view) this.sys.define(control, "view", this.document.createElement(control.role));
 			return control;
 		}
 	},
@@ -35,26 +53,33 @@ export default {
 	},
 	View: {
 		super$: "Control",
-		node: null,
+		view: null,
+		get$container: function() {
+			return this.view && this.view.parentNode && this.view.parentNode.control;
+		},
 //		model: undefined,
 		get$owner: function() {
-			return this.node ? this.node.ownerDocument.owner : null;
+			return this.view ? this.view.ownerDocument.owner : document.owner;
 		},
 		"@iterator": function* iterate() {
-			 if (this.node) for (let node of this.node.childNodes) {
-				if (node.control) yield node.control;
+			 if (this.view) for (let view of this.view.childNodes) {
+				if (view.control) yield view.control;
 			}
 		},
-		append: function(view) {
-			this.node.append(view.node);
+		append: function(control) {
+			this.view.append(control.view);
 			if (!this.parts) return;
 			if (this.parts.length) {
-				this.parts.push(view);
+				this.parts.push(control);
 			} else {
-				this.parts[view.name] = view;
+				this.parts[control.index] = control;
 			}
 		},
-		view: function(model) {
+		initialize: function(events) {
+			if (this.view) for (let event in events) {
+				let listener = events[event];
+				this.view.addEventListener(event, listener);
+			}
 		}
 	}
 }

@@ -6,7 +6,7 @@ export default function main(sys, conf) {
 		types: pkg.types
 	});
 	let app = owner.create("app", {
-		node: document.body
+		view: document.body
 	});
 	app.append(owner.create("input", {
 		name: "surname"
