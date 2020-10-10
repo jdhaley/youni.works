@@ -4,7 +4,11 @@ export default {
 		package$control: "youni.works/base/control"
 	},
 	input: {
-		type$: "use.control.Control",
+		type$: "use.control.View",
 		role: "input"
+	},
+	app: {
+		type$: "use.control.View",
+		role: "body"		
 	}
 }

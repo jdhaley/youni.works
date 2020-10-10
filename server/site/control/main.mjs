@@ -1,12 +1,14 @@
 export default function main(sys, conf) {
-	let pkg = sys.load(conf.packages);
+	const pkg = sys.load(conf.packages);
 	
-	document.owner = sys.extend(pkg.control.Owner, {
+	const owner = sys.extend(pkg.control.Owner, {
 		document: document,
 		types: pkg.types
 	});
-	let control = document.owner.create("input", {
-		name: "surname"
+	let app = owner.create("app", {
+		node: document.body
 	});
-	document.body.append(control.view);
+	app.append(owner.create("input", {
+		name: "surname"
+	}));
 }
