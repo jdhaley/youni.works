@@ -124,19 +124,29 @@ export default {
 			},
 			dragstart: function(on, event) {
 				if (on.draggable) {
-					console.log("start drag on: ", on);
 					event.topic = "";
-				}
-				if (on.model) {
-					event.dataTransfer.setData("text/plain", JSON.stringify(on.model))
+					if (on.model) {
+						let data = JSON.stringify(on.model);
+						event.dataTransfer.setData("text/plain", data);
+						console.log("start drag on: ", data);
+					}
 				}
 			},
 			drop: function(on, event) {
-				if (on.droppable) {
-					console.log ("drop on: ", on);
-					return;
+			},
+			click: function(on, event) {
+				if (!event.ctrlKey) {
+					for (let selected of on.ownerDocument.body.querySelectorAll(".selected")) {
+						selected.classList.remove("selected");
+					}
 				}
-				event.preventDefault();
+				if (!on.selectable) return;
+				if (on.classList.contains("selected")) {
+					on.classList.remove("selected");					
+				} else {
+					on.classList.add("selected");										
+				}
+				event.topic = "";
 			}
 		},
 		extend$shortcuts: {

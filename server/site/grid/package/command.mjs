@@ -133,7 +133,7 @@ export default {
 		},
 		transmit: function(type, index, value) {
 			let event = {
-				type: type,
+				topic: type,
 				source: this.source,
 				object: this.object,
 				index: index,

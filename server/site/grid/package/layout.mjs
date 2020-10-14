@@ -44,6 +44,8 @@ export default {
 			view.style.maxHeight = h;
 		},
 		draw: function(view, value) {
+			view.draggable = true;
+			view.selectable = true;
 			value = this.bind(view, value);
 			view.shape = this.shape(view, value);
 			this.size(view);
@@ -93,12 +95,12 @@ export default {
 			updated: function(on, event) {
 				on.data.innerHTML = this.shapeData(on);
 			},
-			click: function(on, event) {
-				if (event.shiftKey) {
-					event.preventDefault();
-					this.link(on);
-				}
-			}
+//			click: function(on, event) {
+//				if (event.shiftKey) {
+//					event.preventDefault();
+//					this.link(on);
+//				}
+//			}
 		}
 	}
 }

@@ -225,6 +225,7 @@ export default {
 			},
 			click: function(on, event) {
 				if (on.classList.contains("link") && event.target != on) {
+					event.topic = "";
 					let link = this.link(on);
 					let box = on.getBoundingClientRect();
 					on.link.controller.moveTo(on.link, box.left, box.bottom);
@@ -245,6 +246,7 @@ export default {
 		},
 		draw: function(view, value, index) {
 			view.draggable = true;
+			view.selectable = true;
 			value = this.bind(view, value);
 			this.createKey(view, index);
 			this.createParts(view, value);

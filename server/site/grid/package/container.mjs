@@ -121,22 +121,22 @@ export default {
 					ele.firstChild.focus();
 				}
 			},
-			click: function(on, event) {
-				if (!event.ctrlKey) {
-					for (let selected of on.querySelectorAll(".selected")) {
-						selected.classList.remove("selected");
-					}
-					if (!this.selectOnClick) return;
-				}
-				
-				event.preventDefault();
-				let row = this.findElement(event.target);
-				if (row.classList.contains("selected")) {
-					row.classList.remove("selected");
-				} else {
-					row.classList.add("selected");					
-				}
-			},
+//			click: function(on, event) {
+//				if (!event.ctrlKey) {
+//					for (let selected of on.querySelectorAll(".selected")) {
+//						selected.classList.remove("selected");
+//					}
+//					if (!this.selectOnClick) return;
+//				}
+//				
+//				event.preventDefault();
+//				let row = this.findElement(event.target);
+//				if (row.classList.contains("selected")) {
+//					row.classList.remove("selected");
+//				} else {
+//					row.classList.add("selected");					
+//				}
+//			},
 			cut: function(on, event) {
 				event.preventDefault();
 				if (this.owner.setClipboard(event.clipboardData, on)) {
@@ -153,6 +153,20 @@ export default {
 					let app = this.owner.getViewContext(on, "application");
 					app.commands.paste(on, index, data);
 				}
+			},
+			drop: function(on, event) {
+				event.preventDefault();
+				event.topic = "";
+				let data = event.dataTransfer.getData("text/plain");
+				try {
+					data = JSON.parse(data);
+				} catch (error) {
+					return;
+				}
+				let element = this.findElement(event.target);
+				let index = element ? this.indexOf(element) : on.childNodes.length;
+				let app = this.owner.getViewContext(on, "application");
+				app.commands.paste(on, index, [data]);
 			}
 		}
 	},
