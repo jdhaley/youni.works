@@ -15,7 +15,7 @@ export default {
 		actions: {
 		},
 		process: function(control, event) {
-			let action = this.actions && this.actions[event.type];
+			let action = this.actions && this.actions[event.topic];
 			action && action.call(this, control, event);
 		}
 	},
@@ -36,11 +36,12 @@ export default {
 		transmit: {
 			object: function(on, event) {
 				event.stopPropagation && event.stopPropagation();
+				if (!event.topic) event.topic = event.type;
 				let object = event.object; 
 				if (object && object[Symbol.observers]) {
 					//The observers might bind() or unbind() so copy the array...
 					for (let on of object[Symbol.observers].slice()) {
-						if (!event.type) return;
+						if (!event.topic) return;
 						on && on.receive && on.receive(event);
 					}
 				}

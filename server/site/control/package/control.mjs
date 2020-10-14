@@ -34,37 +34,30 @@ export default {
 			return control;
 		}
 	},
-	Control: {
+	Receiver: {
 		super$: "Object",
-		type$owner: "Owner",
-		receive: function(event) {
-			let action = this.action && this.action[event.topic];
-			action && action.call(this, event);
+		getAction: function(message) {
+			return this[message.topic];
 		},
-		"@iterator": function* iterate() {
-//			const parts = this.parts;
-//			if (!parts) return;
-//			if (parts.length) {
-//				for (let i = 0, length = parts.length; i < length; i++) yield parts[i];				
-//			} else {
-//				for (let name in parts) yield parts[name];				
-//			}
+		receive: function(message) {
+			message.action = this.getAction(message)
+			message.action && message.action[message.length ? "apply" : "call"](this, message);
 		}
 	},
 	View: {
-		super$: "Control",
+		super$: "Receiver",
 		view: null,
+		"@iterator": function* iterate() {
+			if (this.view) for (let view of this.view.childNodes) {
+				if (view.control) yield view.control;
+			}
+		},
 		get$container: function() {
 			return this.view && this.view.parentNode && this.view.parentNode.control;
 		},
 //		model: undefined,
 		get$owner: function() {
 			return this.view ? this.view.ownerDocument.owner : document.owner;
-		},
-		"@iterator": function* iterate() {
-			 if (this.view) for (let view of this.view.childNodes) {
-				if (view.control) yield view.control;
-			}
 		},
 		append: function(control) {
 			this.view.append(control.view);

@@ -71,7 +71,8 @@ export default {
 		extend$transmit: {
 			up: function(on, event) {
 				event.stopPropagation && event.stopPropagation();
-				while (on && event.type) {
+				if (!event.topic) event.topic = event.type;
+				while (on && event.topic) {
 					on.receive && on.receive(event);
 					on = on.parentNode;
 				}
@@ -79,8 +80,9 @@ export default {
 			//NB: down() is explicitly named because it is recursive.
 			down: function down(on, message) {
 				event.stopPropagation && event.stopPropagation();
+				if (!event.topic) event.topic = event.type;
 				for (on of on.childNodes) {
-					if (!message.type) return;
+					if (!message.topic) return;
 					on.receive && on.receive(message);
 					down(on, message);
 				}
@@ -119,6 +121,22 @@ export default {
 			keydown: function(on, event) {
 				let shortcut = this.shortcuts[event.key];
 				if (shortcut) shortcut.call(this, on, event);
+			},
+			dragstart: function(on, event) {
+				if (on.draggable) {
+					console.log("start drag on: ", on);
+					event.topic = "";
+				}
+				if (on.model) {
+					event.dataTransfer.setData("text/plain", JSON.stringify(on.model))
+				}
+			},
+			drop: function(on, event) {
+				if (on.droppable) {
+					console.log ("drop on: ", on);
+					return;
+				}
+				event.preventDefault();
 			}
 		},
 		extend$shortcuts: {

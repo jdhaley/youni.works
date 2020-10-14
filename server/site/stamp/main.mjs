@@ -5,7 +5,12 @@ export default function main(sys, conf) {
 	app.path = "/file/stamp/data.json";
 	app.confPath = "/file/stamp/types.json";
 	app.controller.open(app.confPath, loadTypes);
+	app.controller.open("/file/ide/packages.json", loadPackages);
 	
+	function loadPackages(msg) {
+		app.controller.show(app, "Package", JSON.parse(msg.content));
+	}
+
 	function loadTypes(msg) {
 		app.controller.open(app.path, loadData)
 		app.conf = sys.extend(null, JSON.parse(msg.content));

@@ -72,6 +72,8 @@ export default {
 			contextmenu: UP,
 			cut: UP,
 			paste: UP,
+			dragstart: UP,
+			drop: UP,
 			copy: function(event) {
 				event.preventDefault();
 				let app = event.currentTarget;
@@ -157,13 +159,10 @@ export default {
 		createBody: function(window, model) {
 			return this.owner.append(window, "section.body",);
 		},
-		extend$actions: {
-			keydown: function(on, event) {
-				if (event.key == "Escape") {
-					if (on.priorWindow) on.priorWindow.controller.activate(on.priorWindow);
-					on.style.display = "none";
-					return;
-				}
+		extend$shortcuts: {
+			Escape: function(on, event) {
+				if (on.priorWindow) on.priorWindow.controller.activate(on.priorWindow);
+				on.style.display = "none";
 			}
 		}
 	}

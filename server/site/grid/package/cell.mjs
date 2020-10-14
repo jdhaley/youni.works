@@ -112,6 +112,15 @@ export default {
 				view.innerHTML = value;
 				return view;
 			},
+			image: function(parent, value, conf) {
+				let view = this.owner.append(parent, "img.image", {
+					src: "/file/stamp/" + "GB1A" + ".png"
+				});
+				view.style.flex = "0 0";
+				view.style.maxHeight = "10mm";
+				view.style.minHeight = "10mm";
+				return view;
+			},
 			map: function(parent, value, conf) {
 				let view = this.owner.append(parent, ".map");
 				view.model = value;
@@ -235,6 +244,7 @@ export default {
 			type$Key: "Part"
 		},
 		draw: function(view, value, index) {
+			view.draggable = true;
 			value = this.bind(view, value);
 			this.createKey(view, index);
 			this.createParts(view, value);
