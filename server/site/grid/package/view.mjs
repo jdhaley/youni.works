@@ -1,4 +1,10 @@
 const observers = Symbol("observers");
+
+function UP(event, from) {
+	let controller = event.currentTarget.controller;
+	controller && controller.owner.transmit.up(from || event.target, event);
+}
+
 export default {
 	package$: "youni.works/base/view",
 	use: {
@@ -74,7 +80,7 @@ export default {
 				if (!event.topic) event.topic = event.type;
 				while (on && event.topic) {
 					on.receive && on.receive(event);
-					on = on.parentNode;
+					on = on.parentNode || on.defaultView;
 				}
 			},
 			//NB: down() is explicitly named because it is recursive.
@@ -85,6 +91,48 @@ export default {
 					if (!message.topic) return;
 					on.receive && on.receive(message);
 					down(on, message);
+				}
+			}
+		}
+	},
+	Frame: {
+		super$: "use.control.Controller",
+		type$owner: "ViewOwner",
+		conf: null,
+		view: null,
+		initialize: function() {
+			this.owner.control(this.view, this);
+		},
+		events: {
+			input: UP,
+			cut: UP,
+			copy: UP,
+			paste: UP,
+			keydown: UP,
+
+			mousedown: UP,
+			mouseup: UP,
+			mousemove: UP,
+			mouseleave: UP,
+			click: UP,
+			contextmenu: UP,
+			
+			dragstart: UP,
+			dragover: UP,
+			drop: UP,
+		},
+		extend$actions: {
+			keydown: function(on, event) {
+				let shortcut = this.shortcuts[event.key];
+				if (shortcut) shortcut.call(this, on, event);
+			}	
+		},
+		extend$shortcuts: {
+			Escape: function(on, event) {
+				let active = this.view.document.querySelector(".active");
+				if (active) {
+					if (active.priorWindow) active.priorWindow.controller.activate(active.priorWindow);
+					active.style.display = "none";
 				}
 			}
 		}
@@ -123,13 +171,18 @@ export default {
 				if (shortcut) shortcut.call(this, on, event);
 			},
 			dragstart: function(on, event) {
-				if (on.draggable) {
-					event.topic = "";
-					if (on.model) {
-						let data = JSON.stringify(on.model);
-						event.dataTransfer.setData("text/plain", data);
-						console.log("start drag on: ", data);
-					}
+				if (on.classList.contains("selected")) {
+					if (on.draggable) {
+						event.topic = "";
+						if (on.model) {
+							let data = JSON.stringify(on.model);
+							event.dataTransfer.effectAllowed = "copyMove";
+							event.dataTransfer.setData("text/plain", data);
+							console.log("start drag on: ", data);
+						}
+					}					
+				} else {
+					event.preventDefault();
 				}
 			},
 			drop: function(on, event) {
@@ -142,7 +195,9 @@ export default {
 				}
 				if (!on.selectable) return;
 				if (on.classList.contains("selected")) {
-					on.classList.remove("selected");					
+					for (let selected of on.querySelectorAll(".selected")) {
+						selected.classList.remove("selected");
+					}
 				} else {
 					on.classList.add("selected");										
 				}

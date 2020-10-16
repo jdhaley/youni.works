@@ -10,6 +10,7 @@ export default {
 	},
 	Controller: {
 		super$: "Object",
+		type$owner: "Owner",
 		events: {
 		},
 		actions: {

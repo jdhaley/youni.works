@@ -66,14 +66,15 @@ export default {
 			return window;
 		},
 		extend$events: {
-			input: UP,
-			keydown: UP,
-			click: UP,
-			contextmenu: UP,
-			cut: UP,
-			paste: UP,
-			dragstart: UP,
-			drop: UP,
+//			input: UP,
+//			keydown: UP,
+//			click: UP,
+//			contextmenu: UP,
+//			cut: UP,
+//			paste: UP,
+//			dragstart: UP,
+//			dragover: UP,
+//			drop: UP,
 			copy: function(event) {
 				event.preventDefault();
 				let app = event.currentTarget;

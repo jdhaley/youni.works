@@ -95,6 +95,14 @@ export default {
 			updated: function(on, event) {
 				on.data.innerHTML = this.shapeData(on);
 			},
+			dragover: function(on, event) {
+				let box = on.getBoundingClientRect();
+				let x = event.pageX - box.x;
+				if (x < 6) {
+					console.log("drop here");
+					event.preventDefault();
+				}
+			}
 //			click: function(on, event) {
 //				if (event.shiftKey) {
 //					event.preventDefault();
