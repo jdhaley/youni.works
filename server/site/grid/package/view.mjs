@@ -1,8 +1,8 @@
 const observers = Symbol("observers");
 
-function UP(event, from) {
+function UP(event) {
 	let controller = event.currentTarget.controller;
-	controller && controller.owner.transmit.up(from || event.target, event);
+	controller && controller.owner.transmit.up(event.target, event);
 }
 
 export default {
@@ -78,19 +78,31 @@ export default {
 			up: function(on, event) {
 				event.stopPropagation && event.stopPropagation();
 				if (!event.topic) event.topic = event.type;
-				while (on && event.topic) {
-					on.receive && on.receive(event);
-					on = on.parentNode || on.defaultView;
+				if (!event.path) return;
+//DAG-based events.
+				for (let node of event.path) {
+					if (!event.topic) return;
+					node.receive && node.receive(event);
 				}
+//rooted tree events.
+//				while (on && event.topic) {
+//					on.receive && on.receive(event);
+//					on = on.parentNode || on.defaultView;
+//				}
 			},
 			//NB: down() is explicitly named because it is recursive.
 			down: function down(on, message) {
-				event.stopPropagation && event.stopPropagation();
-				if (!event.topic) event.topic = event.type;
+				message.stopPropagation && message.stopPropagation();
+				if (!message.topic) message.topic = message.type;
+				if (message.path) throw new Error("message already has a path.");
+				let path = [];
 				for (on of on.childNodes) {
+					message.path = path;
+					path.push(on);
 					if (!message.topic) return;
 					on.receive && on.receive(message);
 					down(on, message);
+					if (on != message.path.pop()) console.log("path problem?");
 				}
 			}
 		}
@@ -103,7 +115,7 @@ export default {
 		initialize: function() {
 			this.owner.control(this.view, this);
 		},
-		events: {
+		extend$events: {
 			input: UP,
 			cut: UP,
 			copy: UP,
@@ -115,8 +127,13 @@ export default {
 			mousemove: UP,
 			mouseleave: UP,
 			click: UP,
-			contextmenu: UP,
-			
+			contextmenu: function(event) {
+				if (event.ctrlKey) {
+					event.preventDefault();
+					UP(event);
+				}
+			},
+
 			dragstart: UP,
 			dragover: UP,
 			drop: UP,
@@ -125,11 +142,11 @@ export default {
 			keydown: function(on, event) {
 				let shortcut = this.shortcuts[event.key];
 				if (shortcut) shortcut.call(this, on, event);
-			}	
+			}
 		},
 		extend$shortcuts: {
 			Escape: function(on, event) {
-				let active = this.view.document.querySelector(".active");
+				let active = on.document.querySelector(".active");
 				if (active) {
 					if (active.priorWindow) active.priorWindow.controller.activate(active.priorWindow);
 					active.style.display = "none";
@@ -161,14 +178,19 @@ export default {
 		},
 		control: function(view) {
 		},
-		focusInto: function(view) {
+		focusInto: function(view, isBackwards) {
 			view.focus();
 			return view;
 		},
 		extend$actions: {
 			keydown: function(on, event) {
-				let shortcut = this.shortcuts[event.key];
-				if (shortcut) shortcut.call(this, on, event);
+				let shortcut = getCharacter(event) ? "Character" : getShortcut(event);
+				shortcut = this.shortcuts[shortcut];
+				if (typeof shortcut == "string") {
+					event.topic = shortcut;
+					shortcut = this.actions[event.topic];
+				}
+				shortcut && shortcut.call(this, on, event);
 			},
 			dragstart: function(on, event) {
 				if (on.classList.contains("selected")) {
@@ -207,4 +229,19 @@ export default {
 		extend$shortcuts: {
 		}
 	}
+}
+
+function getShortcut(event) {
+	let key = event.key;
+	let mod = "";
+	if (event.ctrlKey && key != "Control") mod += "Control_";
+	if (event.altKey && key != "Alt") mod += "Alt_";
+	if (event.shiftKey && key != "Shift" 
+		&& (key.length != 1 || key.toUpperCase() != key.toLowerCase())
+	) mod += "Shift_";
+	return mod + (key.length == 1 ? key.toUpperCase() : key);
+}
+
+function getCharacter(event) {
+	return event.key.length != 1 || event.ctrlKey || event.altKey || event.metaKey ? undefined: event.key;
 }

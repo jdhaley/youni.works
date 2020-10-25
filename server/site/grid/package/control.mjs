@@ -15,8 +15,9 @@ export default {
 		},
 		actions: {
 		},
-		process: function(control, event) {
-			let action = this.actions && this.actions[event.topic];
+		process: function(control, message) {
+			let action = typeof message == "object" && message ? message.topic : message;
+			action = action && this.actions[action];
 			action && action.call(this, control, event);
 		}
 	},
@@ -29,23 +30,9 @@ export default {
 			if (!controller) return;
 			object.controller = controller;
 			object.receive = this.use.Control.receive;
-			for (let event in controller.events) {
+			if (object.addEventListener) for (let event in controller.events) {
 				let listener = controller.events[event];
 				object.addEventListener(event, listener);
-			}
-		},
-		transmit: {
-			object: function(on, event) {
-				event.stopPropagation && event.stopPropagation();
-				if (!event.topic) event.topic = event.type;
-				let object = event.object; 
-				if (object && object[Symbol.observers]) {
-					//The observers might bind() or unbind() so copy the array...
-					for (let on of object[Symbol.observers].slice()) {
-						if (!event.topic) return;
-						on && on.receive && on.receive(event);
-					}
-				}
 			}
 		},
 		bind: function(control, model) {
@@ -70,5 +57,19 @@ export default {
 			delete control.model;
 			return control;
 		},
+		transmit: {
+			object: function(on, event) {
+				event.stopPropagation && event.stopPropagation();
+				if (!event.topic) event.topic = event.type;
+				let object = event.object; 
+				if (object && object[Symbol.observers]) {
+					//The observers might bind() or unbind() so copy the array...
+					for (let on of object[Symbol.observers].slice()) {
+						if (!event.topic) return;
+						on && on.receive && on.receive(event);
+					}
+				}
+			}
+		}
 	}
 }

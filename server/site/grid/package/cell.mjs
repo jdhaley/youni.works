@@ -20,12 +20,13 @@ export default {
 		link: function(view) {
 			if (!view.link) {
 				let app = this.owner.getViewContext(view, "application");
-				view.link = app.controller.show(app, "Part", view.model);
+				view.link = app.controller.show(app, "Field", view.model);
 			}
 			return view.link;
 		},
 		extend$actions: {
 			contextmenu: function(on, event) {
+				event.topic = "";
 				event.preventDefault();
 				let link = this.link(on);
 				let box = on.getBoundingClientRect();

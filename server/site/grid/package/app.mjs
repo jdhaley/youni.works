@@ -66,20 +66,6 @@ export default {
 			return window;
 		},
 		extend$events: {
-//			input: UP,
-//			keydown: UP,
-//			click: UP,
-//			contextmenu: UP,
-//			cut: UP,
-//			paste: UP,
-//			dragstart: UP,
-//			dragover: UP,
-//			drop: UP,
-			copy: function(event) {
-				event.preventDefault();
-				let app = event.currentTarget;
-				app.controller.owner.setClipboard(event.clipboardData, app);
-			},
 			mousedown: function(event) {
 				MOUSE_TARGET = event.target;
 				event.mouseTarget = MOUSE_TARGET;
@@ -106,23 +92,28 @@ export default {
 				}					
 			}
 		},
+		extend$actions: {
+			copy: function(on, event) {
+				event.preventDefault();
+				on.controller.owner.setClipboard(event.clipboardData, on);
+			}
+		},
 		extend$shortcuts: {
-			s: function(on, event) {
-				if (!event.ctrlKey) return;
+			"Control+S": function(on, event) {
 				event.preventDefault();
 				this.save(on.path, on.model);
 			},
-			S: function(on, event) {
+			"Control+Shift+S": function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();
 				this.save(on.confPath, on.conf);
 			},
-			z: function(on, event) {
+			"Control+Z": function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();
 				on.commands.undo();
 			},
-			y: function(on, event) {
+			"Control+Y": function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();
 				on.commands.redo();
@@ -159,12 +150,6 @@ export default {
 		},
 		createBody: function(window, model) {
 			return this.owner.append(window, "section.body",);
-		},
-		extend$shortcuts: {
-			Escape: function(on, event) {
-				if (on.priorWindow) on.priorWindow.controller.activate(on.priorWindow);
-				on.style.display = "none";
-			}
 		}
 	}
 }
@@ -173,32 +158,3 @@ function UP(event, from) {
 	let controller = event.currentTarget.controller;
 	controller && controller.owner.transmit.up(from || event.target, event);
 }
-
-//Factory: {
-//	super$: "Object",
-//	types: {
-//	},
-//	bind: function(types) {
-//		let ctx = this.sys.extend(this, {
-//			extend$types: {}
-//		});
-//		for (let name in types) {
-//			let value = types[name]
-//			switch (typeof value) {
-//				case "function":
-//					ctx.types[name] = value.bind(ctx);
-//					break;
-//				case "object":
-//					if (this.sys.isInterface(value)) {
-//						ctx.types[name] = this.sys.extend.bind(this.sys, value);
-//					} else if (typeof value.create == "function") {
-//						value = Object.create(value);
-//						value.context = ctx;
-//						ctx.types[name] = value.create.bind(value);
-//					}
-//					break;
-//			}
-//		}
-//		return ctx.types;
-//	}
-//},
