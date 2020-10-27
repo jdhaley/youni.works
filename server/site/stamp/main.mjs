@@ -1,11 +1,9 @@
 export default function main(sys, conf) {
-	let pkg = sys.load(conf.packages);
-	let frame = sys.extend(pkg.grid.view.Frame, {
-		conf: conf,
-		view: window
-	});
-	frame.initialize();
-	let app = pkg.grid.app.Application.createView(document.body);
+	conf = sys.load(conf);
+	let frame = conf.use.Frame.control(window, conf);
+	
+	let app = conf.use.Application.createView(document.body);
+	
 	app.path = "/file/stamp/data.json";
 	app.confPath = "/file/stamp/types.json";
 	app.controller.open(app.confPath, loadTypes);
@@ -25,7 +23,7 @@ export default function main(sys, conf) {
 	function loadData(msg) {
 		app.model = sys.extend(null, JSON.parse(msg.content));
 		app.controller.show(app, "Album", app.model);
-		pkg.stamp.Album.createView(app, undefined, app.model);
+		conf.use.Album.createView(app, undefined, app.model);
 
 	}
 }

@@ -80,15 +80,15 @@ export default {
 				if (!event.topic) event.topic = event.type;
 				if (!event.path) return;
 //DAG-based events.
-				for (let node of event.path) {
-					if (!event.topic) return;
-					node.receive && node.receive(event);
-				}
-//rooted tree events.
-//				while (on && event.topic) {
-//					on.receive && on.receive(event);
-//					on = on.parentNode || on.defaultView;
+//				for (let node of event.path) {
+//					if (!event.topic) return;
+//					node.receive && node.receive(event);
 //				}
+//rooted tree events.
+				while (on && event.topic) {
+					on.receive && on.receive(event);
+					on = on.parentNode || on.defaultView;
+				}
 			},
 			//NB: down() is explicitly named because it is recursive.
 			down: function down(on, message) {
@@ -107,57 +107,12 @@ export default {
 			}
 		}
 	},
-	Frame: {
-		super$: "use.control.Controller",
-		type$owner: "ViewOwner",
-		conf: null,
-		view: null,
-		initialize: function() {
-			this.owner.control(this.view, this);
-		},
-		extend$events: {
-			input: UP,
-			cut: UP,
-			copy: UP,
-			paste: UP,
-			keydown: UP,
-
-			mousedown: UP,
-			mouseup: UP,
-			mousemove: UP,
-			mouseleave: UP,
-			click: UP,
-			contextmenu: function(event) {
-				if (event.ctrlKey) {
-					event.preventDefault();
-					UP(event);
-				}
-			},
-
-			dragstart: UP,
-			dragover: UP,
-			drop: UP,
-		},
-		extend$actions: {
-			keydown: function(on, event) {
-				let shortcut = this.shortcuts[event.key];
-				if (shortcut) shortcut.call(this, on, event);
-			}
-		},
-		extend$shortcuts: {
-			Escape: function(on, event) {
-				let active = on.document.querySelector(".active");
-				if (active) {
-					if (active.priorWindow) active.priorWindow.controller.activate(active.priorWindow);
-					active.style.display = "none";
-				}
-			}
-		}
-	},
 	View: {
 		super$: "use.control.Controller",
 		type$owner: "ViewOwner",
 		viewName: "div.view",
+		shortcuts: {
+		},
 		bind: function(control, value) {
 			return this.owner.bind(control, value);
 		},
@@ -225,8 +180,6 @@ export default {
 				}
 				event.topic = "";
 			}
-		},
-		extend$shortcuts: {
 		}
 	}
 }

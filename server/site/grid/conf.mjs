@@ -6,16 +6,16 @@ import container from "./package/container.mjs";
 import cell from "./package/cell.mjs";
 import layout from "./package/layout.mjs";
 import app from "./package/app.mjs";
+import ui from "./package/ui.mjs";
 
 export default {
-	packages: {
-		control: control,
-		command: command,
-		remote: remote,
-		view: view,
-		container: container,
-		cell: cell,
-		layout: layout,
-		app: app
-	}
+	control: control,
+	command: command,
+	remote: remote,
+	view: view,
+	container: container,
+	cell: cell,
+	layout: layout,
+	app: app,
+	ui: ui
 }

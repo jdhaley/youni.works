@@ -3,6 +3,11 @@ let MOVE = null;
 let MOUSE_TARGET = null;
 let zIndex = 1;
 
+function UP(event, from) {
+	let controller = event.currentTarget.controller;
+	controller && controller.owner.transmit.up(from || event.target, event);
+}
+
 export default {
 	package$: "youni.works/base/app",
 	use: {
@@ -96,24 +101,23 @@ export default {
 			copy: function(on, event) {
 				event.preventDefault();
 				on.controller.owner.setClipboard(event.clipboardData, on);
-			}
-		},
-		extend$shortcuts: {
-			"Control+S": function(on, event) {
+			},
+			save: function(on, event) {
 				event.preventDefault();
 				this.save(on.path, on.model);
+				console.log("saved", Date.now());
 			},
-			"Control+Shift+S": function(on, event) {
+			submit: function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();
 				this.save(on.confPath, on.conf);
 			},
-			"Control+Z": function(on, event) {
+			undo: function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();
 				on.commands.undo();
 			},
-			"Control+Y": function(on, event) {
+			redo: function(on, event) {
 				if (!event.ctrlKey) return;
 				event.preventDefault();
 				on.commands.redo();
@@ -150,11 +154,19 @@ export default {
 		},
 		createBody: function(window, model) {
 			return this.owner.append(window, "section.body",);
+		},
+		extend$actions: {
+			escape: function(on, event) {
+				if (on.priorWindow) on.priorWindow.controller.activate(on.priorWindow);
+				on.style.display = "none";
+			}
+		},
+		extend$shortcuts: {
+			"Escape": "escape",
+			"Control+S": "save",
+			"Control+Shift+S": "submit",
+			"Control+Z": "undo",
+			"Control+Y": "redo"			
 		}
 	}
-}
-
-function UP(event, from) {
-	let controller = event.currentTarget.controller;
-	controller && controller.owner.transmit.up(from || event.target, event);
 }
