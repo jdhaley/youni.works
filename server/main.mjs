@@ -4,7 +4,11 @@ export default function main(sys, conf) {
 	const app = pkg.express();
 	app.use("/prd", pkg.express.static(conf.site));
 	app.use("/file", filer);
-	
+//	app.use("/packages.json", pkgdep);
+//	function pkgdep(req, res) {
+//		res.type("json");
+//		res.send('[{"name": "a"},{"name": "b"}]');		
+//	}
 	function filer(req, res) {
 		let path = conf.files + req.url.substring(req.url.indexOf("?") + 1);
 		if (req.method == "GET") {
