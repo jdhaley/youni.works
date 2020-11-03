@@ -43,13 +43,13 @@
 				},
 				{
 					"name": "use",
-					"type": "array",
-					"of": "Use",
+					"type": "map",
+					"of": "Package",
 					"title": "Uses"
 				},
 				{
 					"name": "public",
-					"type": "array",
+					"type": "map",
 					"of": "Member",
 					"title": "Members"
 				}
