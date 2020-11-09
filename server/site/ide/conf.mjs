@@ -1,4 +1,4 @@
-import base from "../grid/conf.mjs";
+import base from "./base/conf.mjs";
 
 export default {
 	package$: "configuration",
