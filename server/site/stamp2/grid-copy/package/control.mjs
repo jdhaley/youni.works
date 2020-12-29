@@ -16,7 +16,7 @@ export default {
 		actions: {
 		},
 		process: function(control, message) {
-			let action = message && typeof message == "object" ? message.topic : message;
+			let action = typeof message == "object" && message ? message.topic : message;
 			action = action && this.actions[action];
 			action && action.call(this, control, event);
 		}

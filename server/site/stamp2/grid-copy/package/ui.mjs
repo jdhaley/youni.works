@@ -9,10 +9,6 @@ export default {
 		type$owner: "use.view.ViewOwner",
 		context: null,
 		conf: null,
-		/*
-		 * We make the view a getter in case the document changes (e.g. setting window.location)
-		 * Not sure that actually how it works but logically it makes sense.
-		 */
 		get$view: function() {
 			return this.context.document.body;
 		},
