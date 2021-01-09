@@ -63,12 +63,6 @@ export default {
 			});
 		},
 		drawData: function(view) {
-			view.data = this.owner.append(view, ".data");
-			if (view.shape.image) {
-				view.data.style.color = "black";
-				view.data.style.webkitTextStroke = ".1mm rgba(255, 255, 255, .5)";
-			}
-			view.data.innerHTML = this.shapeData(view)
 		},
 		drawPath: function(view) {
 //			if (shape.path) ctx.append("path", {

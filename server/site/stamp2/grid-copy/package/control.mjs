@@ -4,6 +4,8 @@ export default {
 	package$: "youni.works/base/control",
 	Control: {
 		super$: null,
+		//controller: null,
+		//owner: null,
 		receive: function(event) {
 			this.controller && this.controller.process(this, event);
 		}
@@ -11,8 +13,6 @@ export default {
 	Controller: {
 		super$: "Object",
 		type$owner: "Owner",
-		events: {
-		},
 		actions: {
 		},
 		process: function(control, message) {
