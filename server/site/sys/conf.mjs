@@ -5,6 +5,8 @@ import boot			from "./package/boot.mjs";
 import constructors	from "./conf/constructors.mjs";
 import facets		from "./conf/facets.mjs";
 
+const environment = window;
+
 export default {
 	packages: {
 		system: system,
@@ -13,6 +15,7 @@ export default {
 	},
 	constructors: constructors,
 	facets: facets,
-	log: console
+	environment: environment,
+	log: environment.console
 }
 
