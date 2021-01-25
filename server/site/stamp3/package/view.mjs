@@ -9,14 +9,23 @@ export default {
 			control.controller = this;
 			control.receive = receive;
 		},
-		bind: function(view, data) {
+		bind: function(control, data) {
+			unobserve(control, control.model);
+			//The control model will be undefined if there is no property, null if there is no object to obtain property.
+			control.model = data ? data[this.conf.propertyName] : null;
+			observe(control, control.model);
 		},
 		extend$actions: {
 		}
 	},
 	Viewer: {
 		super$: "Controller",
+		type$app: "App",
+		conf: null,
 		nodeName: "div",
+		initialize: function(conf) {
+			this.sys.define(this, "conf", conf);
+		},
 		create: function(ctx, data) {
 			let view = ctx.ownerDocument.createElement(this.nodeName);
 			for (let name in this.events) {
@@ -38,20 +47,17 @@ export default {
 		extend$events: {
 		}
 	},
-	Property: {
+	Part: {
 		super$: "Viewer",
+		get$app: function() {
+			return this.comp.app;
+		},
+		type$comp: "Composite",
 		conf: {
 			propertyName: "",
 			dataType: "",
-			objectType: "",
 			title: "",
-			size: 4 //width, height
-		},
-		bind: function(view, data) {
-			unobserve(view, view.model);
-			//View model will be undefined if there is no property, null if there is no object to obtain property.
-			view.model = data ? data[this.conf.propertyName] : null;
-			observe(view, view.model);
+			viewWidth: 4
 		},
 		extend$actions: {
 			view: function(view, event) {
@@ -80,42 +86,91 @@ export default {
 	},
 	Shaper: {
 		super$: "Viewer",
-		size: function(view, shape) {
-			let w = shape.width + shape.uom;
-			view.style.minWidth = w;
-			view.style.maxWidth = w;
-			let h = shape.height + shape.uom;
-			view.style.minHeight = h;
-			view.style.maxHeight = h;
+		draw: function(view) {
+			view.style.width = view.model.width + view.model.uom;
+			view.style.height = view.model.height + view.model.uom;
 		}
 	},
-	Collection: {
+	Composite: {
 		super$: "Viewer",
-		forValue: function(value) {
-			return this.type;
+		use: {
+			type$DefaultView: "Part"
 		},
-		extend$actions: {
-			draw: function(on, event) {
-				for (let value of on.model) {
-					let controller = this.forValue(value);
-					let view = controller.create(on, value);
-				}
+		parts: null,
+		initialize: function(conf) {
+			this.sys.define(this, "conf", conf);
+			this.sys.define(this, "parts", []);
+			for (let part of conf.parts) {
+				let viewer = this.app.forName(part.view) || this.use.DefaultView;
+				viewer = this.sys.extend(viewer, {
+					comp: this
+				});
+				this.parts.push(viewer);
 			}
 		}
 	},
-	Context: {
+	App: {
 		super$: "Object",
-		controllers: null,
-		view: function(container, viewName, data) {
-			let controller = this.controllers[viewName];
-			let view = controller.create(container, data);
+		use: {
+			type$DefaultView: "Composite"
+		},
+		type$remote: "Remote",
+		types: null,
+		forName: function(name) {
+			/*
+			 * 	This default implementation uses the system package scheme to obtain a class.
+			 */
+			let cls = null;
+			if (name) {
+				let idx = name.lastIndexOf("/");
+				let pkg = this.sys.packages[name.substring(0, idx)];
+				if (pkg) cls = pkg[name.substring(idx + 1)];
+				if (!cls) console.log("Class '" + name + "' does not exist.");
+			}
+			return cls;			
+		},
+		initialize: function(types) {
+			this.conf.types = types;
+			for (let name in types) {
+				let type = types[name];
+				let viewer = this.forName(type.view) || this.use.DefaultView;
+				viewer = this.sys.extend(viewer, {
+					app: this,
+				});
+				this.viewers[name] = viewer;
+				viewer.initialize(type);
+			}
+		},
+		view: function(container, typeName, data) {
+			let type = this.viewers[typeName];
+			let view = type.create(container, data);
 			container.append(view);
 			let message = this.sys.extend(null, {
 				topic: "view"
 			});
 			send(view, message);
 		},
-		type$remote: "Remote",
+		show: function(type, data) {
+			type = app && app.types && app.types[type];
+			
+			if (!datatype) {
+				if (model.length !== undefined) {
+					datatype = "array";
+				} else if (type) {
+					datatype = "object";
+				} else {
+					datatype = "map";
+				}
+			}
+			let editor = datatype == "object" ? this.use.Properties : this.use.Table;
+			editor = this.sys.extend(editor, {
+				fields: type.fields
+			});
+			let window = this.use.Window.createView(app);
+			editor.createView(window.body, editor.fields, model);
+			window.focus();
+			return window;
+		},
 		open: function(pathname, receiver) {
 			this.remote.service(receiver, "opened", {
 				url: pathname,
@@ -206,7 +261,7 @@ Symbol.observers = Symbol("observers");
 
 function unobserve(control, model) {
 	let list = model ? model[Symbol.observers] : null;
-	for (let i = 0, len = list.length; i < len; i++) {
+	if (list) for (let i = 0, len = list.length; i < len; i++) {
 		if (control == list[i]) {
 			list.splice(i, 1);
 			break;
@@ -245,6 +300,10 @@ function receive(signal) {
 	if (this.controller) {
 		let action = signal && signal.topic || "";
 		if (action) action = this.controller.actions[action];
-		if (action) action.call(this.controller, this, signal);
+		if (action) try {
+			action.call(this.controller, this, signal);
+		} catch (error) {
+			throw error;
+		}
 	}
 }
