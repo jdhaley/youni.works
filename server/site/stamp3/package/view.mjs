@@ -2,18 +2,12 @@ export default {
 	package$: "youni.works/view",
 	Controller: {
 		super$: "Object",
-		create: function(ctx, data) {
+		create: function(context, data) {
 			//Return an object that will conform to the framework's interfaces.
 		},
 		control: function(control) {
 			control.controller = this;
 			control.receive = receive;
-		},
-		bind: function(control, data) {
-			unobserve(control, control.model);
-			//The control model will be undefined if there is no property, null if there is no object to obtain property.
-			control.model = data ? data[this.conf.propertyName] : null;
-			observe(control, control.model);
 		},
 		extend$actions: {
 		}
@@ -21,8 +15,8 @@ export default {
 	Viewer: {
 		super$: "Controller",
 		type$app: "App",
-		conf: null,
 		nodeName: "div",
+		conf: null,
 		initialize: function(conf) {
 			this.sys.define(this, "conf", conf);
 		},
@@ -35,6 +29,12 @@ export default {
 			this.control(view);
 			this.bind(view, data);
 			return view;
+		},
+		bind: function(control, data) {
+			unobserve(control, control.model);
+			//The control model will be undefined if there is no property, null if there is no object to obtain property.
+			control.model = data ? data[this.conf.propertyName] : null;
+			observe(control, control.model);
 		},
 		draw: function(view) {
 			//This is where the style & non-model elements get rendered.
@@ -49,31 +49,31 @@ export default {
 	},
 	Part: {
 		super$: "Viewer",
+		type$comp: "Composite",
 		get$app: function() {
 			return this.comp.app;
 		},
-		type$comp: "Composite",
 		conf: {
-			propertyName: "",
+			name: "",
 			dataType: "",
 			title: "",
 			viewWidth: 4
 		},
+		draw: function(view) {
+			view.className = this.conf.name;
+		},
 		extend$actions: {
 			view: function(view, event) {
 				this.draw(view);
-				let action = this.actions["view" + this.conf.dataType];
+				let action = this.actions["view" + (this.conf.dataType || "String")];
 				action && action.call(this, view, event);
 			},
 			viewString: function(view, event) {
 				view.textContent = view.model;
 			},
 			viewObject: function(view, event) {
-				let type = view.ownerDocument.objectTypes[this.conf.objectType];
-				if (type) for (let prop of type.parts) {
-					let content = prop.create(view);
-					view.append(content);					
-				}
+				let type = this.app.viewers[this.conf.objectType];
+				if (type) type.fill(view);
 			},
 			viewArray: function(view, event) {
 				let type = view.ownerDocument.objectTypes[this.conf.objectType];
@@ -82,13 +82,6 @@ export default {
 					view.append(content);					
 				}
 			}
-		}
-	},
-	Shaper: {
-		super$: "Viewer",
-		draw: function(view) {
-			view.style.width = view.model.width + view.model.uom;
-			view.style.height = view.model.height + view.model.uom;
 		}
 	},
 	Composite: {
@@ -106,6 +99,20 @@ export default {
 					comp: this
 				});
 				this.parts.push(viewer);
+				viewer.initialize(part);
+			}
+		},
+		fill: function(view) {
+			view.parts = this.sys.extend();
+			for (let part of this.parts) {
+				let prop = part.create(view);
+				view.parts[part.name] = prop;
+				view.append(prop);			
+			}
+		},
+		extend$actions: {
+			view: function(view, event) {
+				this.fill(view);
 			}
 		}
 	},
@@ -115,10 +122,10 @@ export default {
 			type$DefaultView: "Composite"
 		},
 		type$remote: "Remote",
-		types: null,
+		viewers: null,
 		forName: function(name) {
 			/*
-			 * 	This default implementation uses the system package scheme to obtain a class.
+			 * 	This default implementation uses the sys package scheme to obtain a class.
 			 */
 			let cls = null;
 			if (name) {
@@ -131,6 +138,7 @@ export default {
 		},
 		initialize: function(types) {
 			this.conf.types = types;
+			this.sys.define(this, "viewers", this.sys.extend());
 			for (let name in types) {
 				let type = types[name];
 				let viewer = this.forName(type.view) || this.use.DefaultView;
@@ -149,27 +157,6 @@ export default {
 				topic: "view"
 			});
 			send(view, message);
-		},
-		show: function(type, data) {
-			type = app && app.types && app.types[type];
-			
-			if (!datatype) {
-				if (model.length !== undefined) {
-					datatype = "array";
-				} else if (type) {
-					datatype = "object";
-				} else {
-					datatype = "map";
-				}
-			}
-			let editor = datatype == "object" ? this.use.Properties : this.use.Table;
-			editor = this.sys.extend(editor, {
-				fields: type.fields
-			});
-			let window = this.use.Window.createView(app);
-			editor.createView(window.body, editor.fields, model);
-			window.focus();
-			return window;
 		},
 		open: function(pathname, receiver) {
 			this.remote.service(receiver, "opened", {
@@ -256,6 +243,13 @@ export default {
 		}
 	}
 }
+//Shaper: {
+//	super$: "Viewer",
+//	draw: function(view) {
+//		view.style.width = view.model.width + view.model.uom;
+//		view.style.height = view.model.height + view.model.uom;
+//	}
+//},
 
 Symbol.observers = Symbol("observers");
 

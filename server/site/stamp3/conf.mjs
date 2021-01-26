@@ -7,8 +7,6 @@ export default {
 	},
 	app: {
 		type$: "use.view.App",
-		viewers: {
-		},
 		conf: {
 			typeSource: "/file/stamp/types3.json",
 			dataSource: "/file/stamp/data3.json",
