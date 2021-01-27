@@ -1,9 +1,11 @@
+import base from "./package/base.mjs";
 import view from "./package/view.mjs";
 
 export default {
 	package$: "configuration",
 	use: {
-		view: view,
+		base: base,
+		view: view
 	},
 	app: {
 		type$: "use.view.App",
