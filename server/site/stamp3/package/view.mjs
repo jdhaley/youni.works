@@ -2,12 +2,21 @@ export default {
 	package$: "youni.works/view",
 	Controller: {
 		super$: "Object",
-		create: function(context, data) {
-			//Return an object that will conform to the framework's interfaces.
+		conf: null,
+		initialize: function(conf) {
+			this.sys.define(this, "conf", conf);
+		},
+		create: function(container, data) {
+			let control = this.sys.extend();
+			this.control(control);
+			this.bind(control, data);
+			return control;
 		},
 		control: function(control) {
 			control.controller = this;
 			control.receive = receive;
+		},
+		bind: function(control, data) {
 		},
 		extend$actions: {
 		}
@@ -16,12 +25,8 @@ export default {
 		super$: "Controller",
 		type$app: "App",
 		nodeName: "div",
-		conf: null,
-		initialize: function(conf) {
-			this.sys.define(this, "conf", conf);
-		},
-		create: function(ctx, data) {
-			let view = ctx.ownerDocument.createElement(this.nodeName);
+		create: function(container, data) {
+			let view = container.ownerDocument.createElement(this.nodeName);
 			for (let name in this.events) {
 				let listener = this.events[name];
 				view.addEventListener(name, listener);
@@ -29,12 +34,6 @@ export default {
 			this.control(view);
 			this.bind(view, data);
 			return view;
-		},
-		bind: function(control, data) {
-			unobserve(control, control.model);
-			//The control model will be undefined if there is no property, null if there is no object to obtain property.
-			control.model = data ? data[this.conf.propertyName] : null;
-			observe(control, control.model);
 		},
 		draw: function(view) {
 			//This is where the style & non-model elements get rendered.
@@ -59,26 +58,29 @@ export default {
 			title: "",
 			viewWidth: 4
 		},
+		bind: function(view, data) {
+			if (data) view.model = data[this.conf.name];
+		},
 		draw: function(view) {
 			view.className = this.conf.name;
 		},
 		extend$actions: {
 			view: function(view, event) {
 				this.draw(view);
-				let action = this.actions["view" + (this.conf.dataType || "String")];
+				let action = this.actions["view-" + (this.conf.dataType || "String")];
 				action && action.call(this, view, event);
 			},
-			viewString: function(view, event) {
+			"view-string": function(view, event) {
 				view.textContent = view.model;
 			},
-			viewObject: function(view, event) {
+			"view-object": function(view, event) {
 				let type = this.app.viewers[this.conf.objectType];
 				if (type) type.fill(view);
 			},
-			viewArray: function(view, event) {
-				let type = view.ownerDocument.objectTypes[this.conf.objectType];
+			"view-array": function(view, event) {
+				let type = this.app.viewers[this.conf.objectType];
 				for (let value of view.model) {
-					let content = prop.create(view);
+					let content = type.create(view, value);
 					view.append(content);					
 				}
 			}
@@ -90,6 +92,11 @@ export default {
 			type$DefaultView: "Part"
 		},
 		parts: null,
+		bind: function(view, data) {
+			unobserve(view, view.model);
+			view.model = data;
+			observe(view, view.model);
+		},
 		initialize: function(conf) {
 			this.sys.define(this, "conf", conf);
 			this.sys.define(this, "parts", []);
@@ -102,16 +109,20 @@ export default {
 				viewer.initialize(part);
 			}
 		},
+		draw: function(view) {
+			view.className = this.name;
+		},
 		fill: function(view) {
 			view.parts = this.sys.extend();
 			for (let part of this.parts) {
-				let prop = part.create(view);
+				let prop = part.create(view, view.model);
 				view.parts[part.name] = prop;
 				view.append(prop);			
 			}
 		},
 		extend$actions: {
 			view: function(view, event) {
+				this.draw(view);
 				this.fill(view);
 			}
 		}
@@ -144,6 +155,7 @@ export default {
 				let viewer = this.forName(type.view) || this.use.DefaultView;
 				viewer = this.sys.extend(viewer, {
 					app: this,
+					name: name
 				});
 				this.viewers[name] = viewer;
 				viewer.initialize(type);
