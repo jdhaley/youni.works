@@ -1,15 +1,17 @@
 export default function main(sys, conf) {
 	conf = sys.load(conf);
 	let app = conf.app;
-	app.open(app.conf.typeSource, loadConf);
+	app.open(app.conf.typeSource, initializeApp);
 
-	function loadConf(msg) {
-		app.initialize(JSON.parse(msg.content));
-		app.open(app.conf.dataSource, loadData);
+	function initializeApp(msg) {
+		let conf = JSON.parse(msg.content);
+		conf = sys.extend(null, conf);
+		app.initialize(conf);
+		app.open(app.conf.dataSource, initializeView);
 	}
-	function loadData(msg) {
+	function initializeView(msg) {
 		let data = JSON.parse(msg.content);
-		let frame = app.frame(window);
-		frame.display(data, app.conf.dataType);
+		data = sys.extend(null, data);		
+		app.mainFrame.display(data, app.conf.dataType);
 	}
 }

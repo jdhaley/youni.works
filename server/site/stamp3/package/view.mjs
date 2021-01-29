@@ -112,9 +112,10 @@ export default {
 			type$DefaultView: "Composite"
 		},
 		viewers: null,
-		mainframe: null,
+		mainFrame: null,
 		initialize: function(types) {
 			this.conf.types = types;
+			this.sys.define(this, "mainFrame", this.frame(this.conf.window || window));
 			this.sys.define(this, "viewers", this.sys.extend());
 			for (let name in types) {
 				let type = types[name];
