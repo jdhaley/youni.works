@@ -9,6 +9,7 @@ export default function main(sys, conf) {
 	}
 	function loadData(msg) {
 		let data = JSON.parse(msg.content);
-		app.view(document.body, app.conf.dataType, data);
+		let frame = app.frame(window);
+		frame.display(data, app.conf.dataType);
 	}
 }

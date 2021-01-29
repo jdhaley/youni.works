@@ -34,12 +34,13 @@ export default {
 		initialize: function(conf) {
 			this.sys.define(this, "conf", conf);
 		},
-		create: function(container, data) {
-			let control = this.sys.extend();
-			this.control(control);
-			this.bind(control, data);
-			return control;
-		},
+		// A Controller isn't required to be a factory.
+		//		create: function(owner, data) {
+		//			let control = owner.createNode();
+		//			this.control(control);
+		//			this.bind(control, data);
+		//			return control;
+		//		},
 		control: function(control) {
 			control.controller = this;
 			control.receive = receive;
@@ -47,6 +48,14 @@ export default {
 		bind: function(control, data) {
 		},
 		extend$actions: {
+		}
+	},
+	Owner: {
+		super$: "Controller",
+		createNode: function(name) {
+			this.sys.extend(null, {
+				owner: this
+			});
 		}
 	},
 	Remote: {
@@ -161,7 +170,7 @@ function down(control, message) {
 	let context = message.context;
 	control.receive && control.receive(message);
 	message.context = control;
-	for (control of control.arc) {
+	for (control of control.to) {
 		down(control, message);
 	}
 	message.context = context;
