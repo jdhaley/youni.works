@@ -12,15 +12,15 @@
 					"title": "Module",
 					"size": 10
 				},
+								{
+					"name": "version",
+					"title": "Version",
+					"size": 5
+				},
 				{
 					"name": "package",
 					"title": "Package",
 					"size": 10
-				},
-				{
-					"name": "version",
-					"title": "Version",
-					"size": 5
 				}
 			]
 		},

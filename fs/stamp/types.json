@@ -92,14 +92,14 @@
 		"Type": {
 			"fields": [
 				{
-					"name": "title",
-					"title": "Title"
-				},
-				{
 					"name": "fields",
 					"type": "array",
 					"of": "Field",
 					"title": "Fields "
+				},
+				{
+					"name": "title",
+					"title": "Title"
 				}
 			]
 		},
@@ -110,8 +110,17 @@
 					"title": "Name "
 				},
 				{
-					"name": "title",
-					"title": "Title "
+					"name": "facet",
+					"title": "Facet",
+					"choice": {
+						"default": "",
+						"type": "type",
+						"var": "var",
+						"get": "get",
+						"virtual": "virtual",
+						"once": "once",
+						"extend": "extend"
+					}
 				},
 				{
 					"name": "type",
@@ -132,9 +141,18 @@
 					"title": "Record Type"
 				},
 				{
+					"name": "title",
+					"title": "Title "
+				},
+				{
 					"name": "size",
 					"type": "number",
 					"title": "Size "
+				},
+				{
+					"name": "Value",
+					"type": "text",
+					"size": 30
 				}
 			]
 		},
