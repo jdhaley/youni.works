@@ -12,6 +12,6 @@ export default function main(sys, conf) {
 	function initializeView(msg) {
 		let data = JSON.parse(msg.content);
 		data = sys.extend(null, data);		
-		app.mainFrame.display(data, app.conf.dataType);
+		app.mainFrame.display(data, app.conf.objectType);
 	}
 }

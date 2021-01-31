@@ -170,7 +170,9 @@ function down(control, message) {
 	let context = message.context;
 	control.receive && control.receive(message);
 	message.context = control;
-	for (control of control.to) {
+	if (control.to) for (control of control.to) {
+//		console.debug(control.controller, control.model);
+//		debugger;
 		down(control, message);
 	}
 	message.context = context;

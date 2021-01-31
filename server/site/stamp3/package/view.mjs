@@ -14,11 +14,13 @@ export default {
 			return control;
 		},
 		draw: function(view) {
-			//This is where the style & non-model elements get rendered.
+		},
+		display: function(view) {
 		},
 		extend$actions: {
 			view: function(view, event) {
 				this.draw(view);
+				this.display(view);
 			}
 		},
 		extend$events: {
@@ -37,32 +39,8 @@ export default {
 			viewWidth: 4
 		},
 		bind: function(view, data) {
+			view.model = undefined;
 			if (data) view.model = data[this.conf.name];
-		},
-		draw: function(view) {
-			view.className = this.conf.name;
-			//view.owner.style(view);
-		},
-		extend$actions: {
-			view: function(view, event) {
-				this.draw(view);
-				let action = this.actions["view-" + (this.conf.dataType || "String")];
-				action && action.call(this, view, event);
-			},
-			"view-string": function(view, event) {
-				view.textContent = view.model;
-			},
-			"view-object": function(view, event) {
-				let type = this.app.viewers[this.conf.objectType];
-				if (type) type.fill(view);
-			},
-			"view-array": function(view, event) {
-				let type = this.app.viewers[this.conf.objectType];
-				for (let value of view.model) {
-					let content = type.create(view.owner, value);
-					view.append(content);					
-				}
-			}
 		}
 	},
 	Composite: {
@@ -77,31 +55,26 @@ export default {
 		},
 		initialize: function(conf) {
 			this.sys.define(this, "conf", conf);
-			this.sys.define(this, "parts", []);
-			for (let part of conf.parts) {
-				let viewer = this.app.forName(part.view) || this.use.DefaultView;
-				viewer = this.sys.extend(viewer, {
-					comp: this
-				});
-				this.parts.push(viewer);
-				viewer.initialize(part);
-			}
+//			this.sys.define(this, "parts", []);
+//			for (let part of conf.parts) {
+//				let viewer = this.viewerOf(part);
+//				viewer = this.sys.extend(viewer, {
+//					comp: this
+//				});
+//				this.parts.push(viewer);
+//				viewer.initialize(part);
+//			}
 		},
 		draw: function(view) {
 			view.className = this.name;
 		},
-		fill: function(view) {
+		display: function(view) {
+			view.textContent = "";
 			view.parts = this.sys.extend();
 			for (let part of this.parts) {
 				let prop = part.create(view.owner, view.model);
 				view.parts[part.name] = prop;
 				view.append(prop);			
-			}
-		},
-		extend$actions: {
-			view: function(view, event) {
-				this.draw(view);
-				this.fill(view);
 			}
 		}
 	},
@@ -114,19 +87,9 @@ export default {
 		viewers: null,
 		mainFrame: null,
 		initialize: function(types) {
-			this.conf.types = types;
 			this.sys.define(this, "mainFrame", this.frame(this.conf.window || window));
 			this.sys.define(this, "viewers", this.sys.extend());
-			for (let name in types) {
-				let type = types[name];
-				let viewer = this.forName(type.view) || this.use.DefaultView;
-				viewer = this.sys.extend(viewer, {
-					app: this,
-					name: name
-				});
-				this.viewers[name] = viewer;
-				viewer.initialize(type);
-			}
+			defineTypes(this, types);
 		},
 		frame: function(window) {
 			if (!window.frame) {
@@ -161,7 +124,7 @@ export default {
 		},
 		createRule: function(selector, properties) {
 			let out = `${selector} {\n`;
-			out += defineProperties("", properties);
+			out += defineProperties(properties);
 			out += "\n}";
 			let index = this.window.styles.insertRule(out);
 			return this.window.styles.cssRules[index];
@@ -179,6 +142,27 @@ export default {
 	}
 }
 
+/*
+	Part: {
+		super$: "use.view.Part",
+		display: function(view) {
+			let type = this.app.viewers[this.conf.objectType];
+			if (view.model.length !== undefined) {
+				for (let value of view.model) {
+					let content = type.create(view.owner, value);
+					view.append(content);
+				}
+			} else {
+				for (let part of type.parts) {
+					let prop = part.create(view.owner, view.model);
+					view.parts[part.name] = prop;
+					view.append(prop);			
+				}
+			}
+		}
+	},
+
+ */
 function createStyleSheet(document) {
 	let ele = document.createElement("style");
 	ele.type = "text/css";
@@ -186,17 +170,45 @@ function createStyleSheet(document) {
 	return ele.sheet;
 }
 
-function defineProperties(prefix, object) {
+function defineProperties(object, prefix) {
+	if (!prefix) prefix = "";
 	let out = "";
 	for (let name in object) {
 		let value = object[name];
 		if (typeof value == "object") {
-			out += defineProperties(prefix + name + "-", value);
+			out += defineProperties(value, prefix + name + "-");
 		} else {
 			out += "\t" + prefix + name + ": " + value + ";\n"
 		}
 	}
 	return out;
+}
+
+function defineTypes(app, types) {
+	for (let name in types) {
+		let type = types[name];
+		let viewer = app.forName(type.view) || app.use.DefaultView;
+		viewer = app.sys.extend(viewer, {
+			app: app,
+			name: name,
+			parts: []
+		});
+		if (type.parts) for (let part of type.parts) {
+			let field = viewerOf(app, part);
+			field = app.sys.extend(field, {
+				comp: viewer
+			});
+			viewer.parts.push(field);
+			field.initialize(part);
+		}
+		app.viewers[name] = viewer;
+		viewer.initialize(type);
+	}
+}
+
+function viewerOf(app, conf) {
+	if (conf.view) return app.forName(part.view);
+	return app.conf.part[conf.dataType] || app.conf.part.string;
 }
 
 //Shaper: {
