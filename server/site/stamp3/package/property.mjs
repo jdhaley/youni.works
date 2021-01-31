@@ -1,11 +1,11 @@
 export default {
-	package$: "youni.works/part",
+	package$: "youni.works/property",
 	use: {
 		package$base: "youni.works/base",
 		package$view: "youni.works/view"
 	},
 	Input: {
-		super$: "use.view.Part",
+		super$: "use.view.Property",
 		nodeName: "input",
 		get$inputType: function() {
 			switch (this.conf.dataType) {
@@ -29,7 +29,7 @@ export default {
 		}
 	},
 	Text: {
-		super$: "use.view.Part",
+		super$: "use.view.Property",
 		draw: function(view) {
 			view.textContent = "";
 			view.className = this.conf.name;
@@ -42,8 +42,9 @@ export default {
 		}
 	},
 	Media: {
-		super$: "use.view.Part",
-		get$nodeName: function() {
+		super$: "use.view.Property",
+		nodeName: function(data) {
+			//TODO sniff the media type from the data.
 			switch (this.conf.mediaType) {
 				case "video" : return "video";
 				case "audio" : return "audio";
@@ -63,13 +64,13 @@ export default {
 		}
 	},
 	Link: {
-		super$: "use.view.Part",
+		super$: "use.view.Property",
 		draw: function(view) {
 			view.className = this.conf.name;
 		},
 		display: function(view) {
 			view.textContent = "...";
-			let type = this.app.viewers[this.conf.objectType];
+			let type = this.app.components[this.conf.objectType];
 			switch (this.conf.dataType) {
 				case "array":
 					for (let value of view.model) {

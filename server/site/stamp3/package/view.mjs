@@ -5,14 +5,16 @@ export default {
 	},
 	Viewer: {
 		super$: "use.base.Controller",
-		type$app: "App",
-		nodeName: "div",
+		type$app: "Application",
 		create: function(owner, data) {
-			let control = owner.createNode(this.nodeName, this.events);
+			let nodeName = this.nodeName;
+			if (typeof nodeName == "function") nodeName = this.nodeName(data);
+			let control = owner.createNode(nodeName, this.events);
 			this.control(control);
 			this.bind(control, data);
 			return control;
 		},
+		nodeName:"div",
 		draw: function(view) {
 		},
 		display: function(view) {
@@ -26,9 +28,9 @@ export default {
 		extend$events: {
 		}
 	},
-	Part: {
+	Property: {
 		super$: "Viewer",
-		type$comp: "Composite",
+		type$comp: "Component",
 		get$app: function() {
 			return this.comp.app;
 		},
@@ -43,27 +45,15 @@ export default {
 			if (data) view.model = data[this.conf.name];
 		}
 	},
-	Composite: {
+	Component: {
 		super$: "Viewer",
-		use: {
-			type$DefaultView: "Part"
+		conf: {
+			properties: ""
 		},
-		parts: null,
+		properties: null,
 		bind: function(view, data) {
 			this.app.observe(view, data)
 			view.model = data;
-		},
-		initialize: function(conf) {
-			this.sys.define(this, "conf", conf);
-//			this.sys.define(this, "parts", []);
-//			for (let part of conf.parts) {
-//				let viewer = this.viewerOf(part);
-//				viewer = this.sys.extend(viewer, {
-//					comp: this
-//				});
-//				this.parts.push(viewer);
-//				viewer.initialize(part);
-//			}
 		},
 		draw: function(view) {
 			view.className = this.name;
@@ -71,24 +61,24 @@ export default {
 		display: function(view) {
 			view.textContent = "";
 			view.parts = this.sys.extend();
-			for (let part of this.parts) {
-				let prop = part.create(view.owner, view.model);
-				view.parts[part.name] = prop;
-				view.append(prop);			
+			for (let prop of this.properties) {
+				let part = prop.create(view.owner, view.model);
+				view.parts[prop.name] = part;
+				view.append(part);			
 			}
 		}
 	},
-	App: {
+	Application: {
 		super$: "use.base.Context",
 		use: {
 			type$Frame: "Frame",
-			type$DefaultView: "Composite"
+			type$Component: "Component"
 		},
-		viewers: null,
+		components: null,
 		mainFrame: null,
 		initialize: function(types) {
 			this.sys.define(this, "mainFrame", this.frame(this.conf.window || window));
-			this.sys.define(this, "viewers", this.sys.extend());
+			this.sys.define(this, "components", this.sys.extend());
 			defineTypes(this, types);
 		},
 		frame: function(window) {
@@ -104,7 +94,7 @@ export default {
 	},
 	Frame: {
 		super$: "use.base.Owner",
-		type$app: "App",
+		type$app: "Application",
 		window: null,
 		get$view: function() {
 			return this.window.document.body;
@@ -113,7 +103,13 @@ export default {
 			this.window.styles = createStyleSheet(this.window.document);
 		},
 		createNode: function(name, events) {
-			let node = this.window.document.createElement(name);
+			let node;
+			if (name.indexOf("/") >= 0) {
+				let idx = name.lastIndexOf("/");
+				node = this.window.document.createElementNs(name.substring(0, idx), name.substring(idx + 1));
+			} else {
+				node = this.window.document.createElement(name);
+			}
 			node.owner = this;
 			node.to = node.childNodes; //allows send() message to be generic.
 			for (let name in events) {
@@ -130,7 +126,7 @@ export default {
 			return this.window.styles.cssRules[index];
 		},
 		display: function(data, viewName) {
-			let type = this.app.viewers[viewName]; //TODO if no viewName, read the data for the type/view.
+			let type = this.app.components[viewName]; //TODO if no viewName, read the data for the type/view.
 			if (!type) throw new Error(`Type view '${viewName}' does not exist.`);
 			let view = type.create(this, data);
 			this.view.append(view);
@@ -143,19 +139,19 @@ export default {
 }
 
 /*
-	Part: {
-		super$: "use.view.Part",
+	Property: {
+		super$: "use.view.Property",
 		display: function(view) {
-			let type = this.app.viewers[this.conf.objectType];
+			let type = this.app.components[this.conf.objectType];
 			if (view.model.length !== undefined) {
 				for (let value of view.model) {
 					let content = type.create(view.owner, value);
 					view.append(content);
 				}
 			} else {
-				for (let part of type.parts) {
-					let prop = part.create(view.owner, view.model);
-					view.parts[part.name] = prop;
+				for (let prop of type.properties) {
+					let prop = prop.create(view.owner, view.model);
+					view.properties[prop.name] = prop;
 					view.append(prop);			
 				}
 			}
@@ -187,28 +183,28 @@ function defineProperties(object, prefix) {
 function defineTypes(app, types) {
 	for (let name in types) {
 		let type = types[name];
-		let viewer = app.forName(type.view) || app.use.DefaultView;
-		viewer = app.sys.extend(viewer, {
+		let component = app.forName(type.view) || app.use.Component;
+		component = app.sys.extend(component, {
 			app: app,
 			name: name,
-			parts: []
+			properties: []
 		});
-		if (type.parts) for (let part of type.parts) {
-			let field = viewerOf(app, part);
-			field = app.sys.extend(field, {
-				comp: viewer
+		if (type.properties) for (let conf of type.properties) {
+			let property = viewerOf(app, conf);
+			property = app.sys.extend(property, {
+				comp: component
 			});
-			viewer.parts.push(field);
-			field.initialize(part);
+			component.properties.push(property);
+			property.initialize(conf);
 		}
-		app.viewers[name] = viewer;
-		viewer.initialize(type);
+		app.components[name] = component;
+		component.initialize(type);
 	}
 }
 
 function viewerOf(app, conf) {
-	if (conf.view) return app.forName(part.view);
-	return app.conf.part[conf.dataType] || app.conf.part.string;
+	if (conf.view) return app.forName(conf.view);
+	return app.conf.propertyType[conf.dataType] || app.conf.propertyType.string;
 }
 
 //Shaper: {
