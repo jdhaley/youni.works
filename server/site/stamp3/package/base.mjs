@@ -47,6 +47,14 @@ export default {
 		},
 		bind: function(control, data) {
 		},
+		call: function(action, on, signal) {
+			action = this.actions[action];
+			if (action) try {
+				return action.call(this, on, signal);
+			} catch (error) {
+				throw error;
+			}
+		},
 		extend$actions: {
 		}
 	},
@@ -180,12 +188,7 @@ function down(control, message) {
 
 function receive(signal) {
 	if (this.controller) {
-		let action = signal && signal.topic || "";
-		if (action) action = this.controller.actions[action];
-		if (action) try {
-			action.call(this.controller, this, signal);
-		} catch (error) {
-			throw error;
-		}
+		let action = signal && typeof signal == "object" ? signal.topic : "" + signal;
+		if (action) this.controller.call(action, this, signal);
 	}
 }

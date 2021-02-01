@@ -6,6 +6,7 @@ export default {
 	Viewer: {
 		super$: "use.base.Controller",
 		type$app: "Application",
+		nodeName:"div",
 		create: function(owner, data) {
 			let nodeName = this.nodeName;
 			if (typeof nodeName == "function") nodeName = this.nodeName(data);
@@ -14,7 +15,6 @@ export default {
 			this.bind(control, data);
 			return control;
 		},
-		nodeName:"div",
 		draw: function(view) {
 		},
 		display: function(view) {
@@ -61,9 +61,16 @@ export default {
 		display: function(view) {
 			view.textContent = "";
 			view.parts = this.sys.extend();
+			this.displayProperties(view);
+		},
+		displayProperties: function(view) {
 			for (let prop of this.properties) {
+				let label = view.owner.createNode("div");
+				label.textContent = prop.conf.name;
+				view.append(label);
 				let part = prop.create(view.owner, view.model);
-				view.parts[prop.name] = part;
+				part.container = view;
+				view.parts[prop.conf.name] = part;
 				view.append(part);			
 			}
 		}
@@ -166,13 +173,13 @@ function createStyleSheet(document) {
 	return ele.sheet;
 }
 
-function defineProperties(object, prefix) {
+function defineStyleProperties(object, prefix) {
 	if (!prefix) prefix = "";
 	let out = "";
 	for (let name in object) {
 		let value = object[name];
 		if (typeof value == "object") {
-			out += defineProperties(value, prefix + name + "-");
+			out += defineStyleProperties(value, prefix + name + "-");
 		} else {
 			out += "\t" + prefix + name + ": " + value + ";\n"
 		}
@@ -180,6 +187,10 @@ function defineProperties(object, prefix) {
 	return out;
 }
 
+/*
+TODO document the initialization sequence.  For example, 
+initialize() is called after the controller is added to its owner but before all peers are created.
+ */
 function defineTypes(app, types) {
 	for (let name in types) {
 		let type = types[name];
@@ -189,19 +200,21 @@ function defineTypes(app, types) {
 			name: name,
 			properties: []
 		});
-		if (type.properties) for (let conf of type.properties) {
-			let property = viewerOf(app, conf);
-			property = app.sys.extend(property, {
-				comp: component
-			});
-			component.properties.push(property);
-			property.initialize(conf);
-		}
+		if (type.properties) defineProperties(component, type.properties)
 		app.components[name] = component;
 		component.initialize(type);
 	}
 }
-
+function defineProperties(component, properties) {
+	for (let conf of properties) {
+		let property = viewerOf(component.app, conf);
+		property = component.sys.extend(property, {
+			comp: component
+		});
+		component.properties.push(property);
+		property.initialize(conf);
+	}
+}
 function viewerOf(app, conf) {
 	if (conf.view) return app.forName(conf.view);
 	return app.conf.propertyType[conf.dataType] || app.conf.propertyType.string;

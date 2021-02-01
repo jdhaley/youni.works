@@ -22,9 +22,10 @@ export default {
 			}			
 		},
 		draw: function(view) {
-			view.type = this.inputType;
+			view.className = this.conf.name;
 		},
 		display: function(view) {
+			view.type = this.inputType;
 			view.value = view.model || "";		
 		}
 	},
@@ -67,19 +68,24 @@ export default {
 		super$: "use.view.Property",
 		draw: function(view) {
 			view.className = this.conf.name;
+			view.textContent = "...";
 		},
 		display: function(view) {
-			view.textContent = "...";
-			let type = this.app.components[this.conf.objectType];
-			switch (this.conf.dataType) {
-				case "array":
-					for (let value of view.model) {
-						let content = type.create(view.owner, value);
-						view.append(content);
-					}
-					return;
-				case "list":
-				
+//			view.textContent = "...";
+//			let type = this.app.components[this.conf.objectType];
+//			switch (this.conf.dataType) {
+//				case "array":
+//					for (let value of view.model) {
+//						let content = type.create(view.owner, value);
+//						view.append(content);
+//					}
+//					return;
+//				case "list":
+//			}
+		},
+		extend$actions: {
+			click: function(on, event) {
+				console.log(event);
 			}
 		}
 	}
