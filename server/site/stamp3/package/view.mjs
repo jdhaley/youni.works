@@ -15,14 +15,14 @@ export default {
 			this.bind(control, data);
 			return control;
 		},
-		draw: function(view) {
-		},
-		display: function(view) {
-		},
 		extend$actions: {
 			view: function(view, event) {
 				this.draw(view);
 				this.display(view);
+			},
+			draw: function(view) {
+			},
+			display: function(view) {
 			}
 		},
 		extend$events: {
@@ -55,23 +55,29 @@ export default {
 			this.app.observe(view, data)
 			view.model = data;
 		},
-		draw: function(view) {
-			view.className = this.name;
-		},
-		display: function(view) {
-			view.textContent = "";
-			view.parts = this.sys.extend();
-			this.displayProperties(view);
-		},
-		displayProperties: function(view) {
-			for (let prop of this.properties) {
-				let label = view.owner.createNode("div");
-				label.textContent = prop.conf.name;
-				view.append(label);
-				let part = prop.create(view.owner, view.model);
-				part.container = view;
-				view.parts[prop.conf.name] = part;
-				view.append(part);			
+		extend$actions: {
+			view: function(view, event) {
+				this.draw(view);
+				this.display(view);
+			},
+			draw: function(view) {
+				view.className = this.name;
+			},
+			display: function(view) {
+				view.textContent = "";
+				view.parts = view.conf.type.sys.extend();
+				this.displayProperties(view);
+			},
+			displayProperties: function(view) {
+				for (let prop of view.conf.type.properties) {
+					let label = view.owner.createNode("div");
+					label.textContent = prop.conf.name;
+					view.append(label);
+					let part = prop.create(view.owner, view.model);
+					part.container = view;
+					view.parts[prop.conf.name] = part;
+					view.append(part);			
+				}
 			}
 		}
 	},

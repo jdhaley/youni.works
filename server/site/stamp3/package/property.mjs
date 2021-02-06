@@ -21,12 +21,14 @@ export default {
 					return "text";
 			}			
 		},
-		draw: function(view) {
-			view.className = this.conf.name;
-		},
-		display: function(view) {
-			view.type = this.inputType;
-			view.value = view.model || "";		
+		extend$actions: {
+			draw: function(view) {
+				view.className = view.conf.type.name;
+			},
+			display: function(view) {
+				view.type = view.conf.type.inputType;
+				view.value = view.model || "";		
+			}
 		}
 	},
 	Text: {
@@ -53,39 +55,41 @@ export default {
 			}
 			return "object";
 		},
-		draw: function(view) {
-			view.className = this.conf.name;
-		},
-		display: function(view) {
-			view.src = "";
-			view.textContent = "";
-			let data = view.model;
-			if (typeof data == "object") data = "";
-			view.src = data;
+		extend$actions: {
+			draw: function(view) {
+				view.className = this.conf.name;
+			},
+			display: function(view) {
+				view.src = "";
+				view.textContent = "";
+				let data = view.model;
+				if (typeof data == "object") data = "";
+				view.src = data;
+			}			
 		}
 	},
 	Link: {
 		super$: "use.view.Property",
-		draw: function(view) {
-			view.className = this.conf.name;
-			view.textContent = "...";
-		},
-		display: function(view) {
-//			view.textContent = "...";
-//			let type = this.app.components[this.conf.objectType];
-//			switch (this.conf.dataType) {
-//				case "array":
-//					for (let value of view.model) {
-//						let content = type.create(view.owner, value);
-//						view.append(content);
-//					}
-//					return;
-//				case "list":
-//			}
-		},
 		extend$actions: {
 			click: function(on, event) {
 				console.log(event);
+			},
+			draw: function(view) {
+				view.className = view.conf.type.name;
+				view.textContent = "...";
+			},
+			display: function(view) {
+//				view.textContent = "...";
+//				let type = this.app.components[this.conf.objectType];
+//				switch (this.conf.dataType) {
+//					case "array":
+//						for (let value of view.model) {
+//							let content = type.create(view.owner, value);
+//							view.append(content);
+//						}
+//						return;
+//					case "list":
+//				}
 			}
 		}
 	}

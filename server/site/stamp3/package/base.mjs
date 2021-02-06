@@ -32,6 +32,7 @@ export default {
 		super$: "Object",
 		conf: null,
 		initialize: function(conf) {
+			conf.type = this;
 			this.sys.define(this, "conf", conf);
 		},
 		// A Controller isn't required to be a factory.
@@ -42,18 +43,10 @@ export default {
 		//			return control;
 		//		},
 		control: function(control) {
-			control.controller = this;
+			control.conf = this.conf;
 			control.receive = receive;
 		},
 		bind: function(control, data) {
-		},
-		call: function(action, on, signal) {
-			action = this.actions[action];
-			if (action) try {
-				return action.call(this, on, signal);
-			} catch (error) {
-				throw error;
-			}
 		},
 		extend$actions: {
 		}
@@ -187,8 +180,9 @@ function down(control, message) {
 }
 
 function receive(signal) {
-	if (this.controller) {
+	if (this.conf) {
 		let action = signal && typeof signal == "object" ? signal.topic : "" + signal;
-		if (action) this.controller.call(action, this, signal);
+		action = action && this.conf.type.actions[action];
+		if (action) action.call(this.conf.type.actions, this, signal);
 	}
 }
