@@ -114,6 +114,8 @@ export default {
 		},
 		initialize: function() {
 			this.window.styles = createStyleSheet(this.window.document);
+			this.window.document.addEventListener("selectionstart", SELECTION_EVENT);
+			this.window.document.addEventListener("selectionchange", SELECTION_EVENT);
 		},
 		createNode: function(name, events) {
 			let node;
@@ -147,6 +149,29 @@ export default {
 				topic: "view"
 			});
 			this.app.send(view, message);
+		},
+		extend$events: {
+			resize: DOWN,
+			input: UP,
+			cut: UP,
+			copy: UP,
+			paste: UP,
+
+			keydown: UP,
+			mousedown: UP,
+			mouseup: UP,
+			mousemove: UP,
+			mouseleave: UP,
+			click: UP,
+			dragstart: UP,
+			dragover: UP,
+			drop: UP,
+			contextmenu: function(event) {
+				if (event.ctrlKey) {
+					event.preventDefault();
+					UP(event);
+				}
+			}
 		}
 	}
 }
@@ -226,6 +251,24 @@ function viewerOf(app, conf) {
 	return app.conf.propertyType[conf.dataType] || app.conf.propertyType.string;
 }
 
+function SELECTION_EVENT(event) {
+	let selection = event.target.defaultView.getSelection();
+	if (selection && selection.rangeCount) {
+		event.range = selection.getRangeAt(0);
+		let node = event.range.commonAncestorContainer;
+		if (node.controller) node.controller.owner.transmit.up(node, event);
+//		console.log(node);
+	}
+}
+function UP(event) {
+	let controller = event.currentTarget.controller;
+	controller && controller.owner.transmit.up(event.target, event);
+}
+
+function DOWN(event) {
+	let controller = event.currentTarget.controller;
+	controller && controller.owner.transmit.down(event.target, event);
+}
 //Shaper: {
 //	super$: "Viewer",
 //	draw: function(view) {
