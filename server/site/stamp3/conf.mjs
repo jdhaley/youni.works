@@ -1,23 +1,29 @@
 import base from "./package/base.mjs";
+import app from "./package/app.mjs";
 import view from "./package/view.mjs";
 import prop from "./package/property.mjs";
 
 import properties from "./conf/properties.mjs";
+import events from "./conf/events.mjs";
 
 export default {
 	package$: "configuration",
 	use: {
 		base: base,
+		app: app,
 		view: view,
 		prop: prop
 	},
 	app: {
-		type$: "use.view.Application",
-		conf: {
-			dataSource: "/file/stamp/data3.json",
-			typeSource: "/file/stamp/types3.json",
-			objectType: "Issues",
-			propertyType: properties
-		}
+		type$: "use.app.Application",
+		use: {
+			type$Frame: "use.app.Frame",
+			type$Component: "use.view.Component"
+		},
+		propertyType: properties
+	},
+	conf: {
+		window: window,
+		events: events
 	}
 }

@@ -102,3 +102,26 @@ export default {
 //		view.style.height = view.model.height + view.model.uom;
 //	}
 //},
+
+
+/*
+	Property: {
+		super$: "use.view.Property",
+		display: function(view) {
+			let type = this.app.components[this.conf.objectType];
+			if (view.model.length !== undefined) {
+				for (let value of view.model) {
+					let content = type.create(view.owner, value);
+					view.append(content);
+				}
+			} else {
+				for (let prop of type.properties) {
+					let prop = prop.create(view.owner, view.model);
+					view.properties[prop.name] = prop;
+					view.append(prop);			
+				}
+			}
+		}
+	},
+
+ */

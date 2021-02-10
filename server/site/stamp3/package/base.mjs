@@ -4,6 +4,7 @@ export default {
 		super$: "Object",
 		type$remote: "Remote",
 		send: down,
+		sense: up,
 		observe: function(observer, object) {
 			unobserve(observer, observer.model);
 			observe(observer, object);
@@ -177,6 +178,22 @@ function down(control, message) {
 		down(control, message);
 	}
 	message.context = context;
+}
+
+function up(on, event) {
+	event.stopPropagation && event.stopPropagation();
+	if (!event.topic) event.topic = event.type;
+	//DAG-based events.
+//	if (!event.path) return;
+//	for (let node of event.path) {
+//		if (!event.topic) return;
+//		node.receive && node.receive(event);
+//	}
+//rooted tree events.
+	while (on && event.topic) {
+		on.receive && on.receive(event);
+		on = on.parentNode || on.defaultView;
+	}
 }
 
 function receive(signal) {
