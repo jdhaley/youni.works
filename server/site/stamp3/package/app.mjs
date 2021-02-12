@@ -46,6 +46,7 @@ export default {
 		},
 		start: function(data) {
 			this.mainFrame.display(data, this.conf.objectType);
+			drawShape(this);
 		}
 	},
 	Frame: {
@@ -154,4 +155,17 @@ function defineProperties(component, properties) {
 function viewerOf(app, conf) {
 	if (conf.view) return app.forName(conf.view);
 	return app.propertyType[conf.dataType] || app.propertyType.string;
+}
+
+function drawShape(app) {
+	let shape = app.conf.shape;
+	let type = app.forName(shape.type);
+	if (type) type = app.sys.extend(type);
+	type.initialize(shape);
+	shape.type = type;
+	console.log(shape);
+	let view = type.create(app.mainFrame);
+	view.classList.add("shape");
+	type.actions.display(view);
+	app.mainFrame.view.append(view);
 }
