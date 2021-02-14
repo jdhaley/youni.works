@@ -35,7 +35,10 @@ export default {
 			}
 			function initializeTypes(msg) {
 				let components = JSON.parse(msg.content);
-				defineTypes(app, components);
+				app.sys.define(app, "components", app.sys.extend());
+				for (let conf of components) {
+					app.components[conf.name] = app.createController(conf);
+				}
 				app.open(app.conf.dataSource, initializeData);
 			}
 			function initializeData(msg) {
@@ -46,7 +49,7 @@ export default {
 		},
 		start: function(data) {
 			this.mainFrame.display(data, this.conf.objectType);
-			draw(this, this.conf.shape);
+			draw(this.mainFrame, this.conf.shape);
 		},
 		createController: function(conf, defaultType) {
 			conf = this.sys.extend(null, conf);
@@ -95,7 +98,7 @@ export default {
 		},
 		createRule: function(selector, properties) {
 			let out = `${selector} {\n`;
-			out += defineProperties(properties);
+			out += defineStyleProperties(properties);
 			out += "\n}";
 			let index = this.window.styles.insertRule(out);
 			return this.window.styles.cssRules[index];
@@ -134,28 +137,15 @@ function defineStyleProperties(object, prefix) {
 	return out;
 }
 
-/*
-TODO document the initialization sequence.  For example, 
-initialize() is called after the controller is added to its owner but before all peers are created.
- */
-function defineTypes(app, components) {
-	app.sys.define(app, "components", app.sys.extend());
-	for (let name in components) {
-		let component = app.createController(components[name]);
-		component.name = name;
-		app.components[name] = component;
-		component.initialize();
-	}
-}
-function viewerOf(app, conf) {
-	if (conf.view) return app.forName(conf.view);
-	return app.propertyType[conf.dataType] || app.propertyType.string;
-}
 
-function draw(app, conf) {
-	let viewer = app.createController(conf);
-	let view = viewer.create(app.mainFrame);
-	app.mainFrame.view.append(view);
+function draw(frame, conf) {
+	let viewer = frame.app.createController(conf);
+	let view = viewer.create(frame);
+	view.textContent = "This is a Window";
+	let body = frame.createNode("div");
+	body.textContent = "Hello";
+	view.append(body);
+	frame.view.append(view);
 	view.classList.add("shape");
 	viewer.actions.display(view);
 }

@@ -3,7 +3,7 @@ const zoneCursor = {
 	TC: "n-resize",
 	TR: "ne-resize",
 	CL: "w-resize",
-	CC: "default",
+	CC: "move",
 	CR: "e-resize",
 	BL: "sw-resize",
 	BC: "s-resize",
