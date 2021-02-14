@@ -81,6 +81,16 @@ export default {
 					view.append(part);			
 				}
 			}
+		},
+		initialize: function() {
+			if (!this.conf.properties) return;
+			let properties = [];
+			for (let conf of this.conf.properties) {
+				let property = this.app.createController(conf, this.app.propertyType[conf.dataType || "string"]);
+				this.sys.define(property, "comp", this);
+				properties.push(property);
+			}
+			this.sys.define(this, "properties", properties);
 		}
 	}
 }

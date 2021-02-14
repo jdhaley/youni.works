@@ -28,14 +28,14 @@ export default {
 			let app = this;
 			function initializeApp(msg) {
 				let conf = JSON.parse(msg.content);
-				conf = app.sys.extend(conf);
+				conf = app.sys.extend(null, conf);
 				app.sys.define(app, "conf", conf);
 				app.open(conf.typeSource, initializeTypes);
 				app.mainFrame.initialize();
 			}
 			function initializeTypes(msg) {
-				let types = JSON.parse(msg.content);
-				defineTypes(app, types);
+				let components = JSON.parse(msg.content);
+				defineTypes(app, components);
 				app.open(app.conf.dataSource, initializeData);
 			}
 			function initializeData(msg) {
@@ -46,7 +46,18 @@ export default {
 		},
 		start: function(data) {
 			this.mainFrame.display(data, this.conf.objectType);
-			drawShape(this);
+			draw(this, this.conf.shape);
+		},
+		createController: function(conf, defaultType) {
+			conf = this.sys.extend(null, conf);
+			let controller = this.forName(conf.type) || defaultType || this.use.Component;
+			controller = this.sys.extend(controller, {
+				app: this,
+				conf: conf
+			});
+			conf.type = controller;
+			controller.initialize();
+			return controller;
 		}
 	},
 	Frame: {
@@ -127,29 +138,13 @@ function defineStyleProperties(object, prefix) {
 TODO document the initialization sequence.  For example, 
 initialize() is called after the controller is added to its owner but before all peers are created.
  */
-function defineTypes(app, types) {
+function defineTypes(app, components) {
 	app.sys.define(app, "components", app.sys.extend());
-	for (let name in types) {
-		let type = types[name];
-		let component = app.forName(type.view) || app.use.Component;
-		component = app.sys.extend(component, {
-			app: app,
-			name: name,
-			properties: []
-		});
-		if (type.properties) defineProperties(component, type.properties)
+	for (let name in components) {
+		let component = app.createController(components[name]);
+		component.name = name;
 		app.components[name] = component;
-		component.initialize(type);
-	}
-}
-function defineProperties(component, properties) {
-	for (let conf of properties) {
-		let property = viewerOf(component.app, conf);
-		property = component.sys.extend(property, {
-			comp: component
-		});
-		component.properties.push(property);
-		property.initialize(conf);
+		component.initialize();
 	}
 }
 function viewerOf(app, conf) {
@@ -157,15 +152,10 @@ function viewerOf(app, conf) {
 	return app.propertyType[conf.dataType] || app.propertyType.string;
 }
 
-function drawShape(app) {
-	let shape = app.conf.shape;
-	let type = app.forName(shape.type);
-	if (type) type = app.sys.extend(type);
-	type.initialize(shape);
-	shape.type = type;
-	console.log(shape);
-	let view = type.create(app.mainFrame);
-	view.classList.add("shape");
-	type.actions.display(view);
+function draw(app, conf) {
+	let viewer = app.createController(conf);
+	let view = viewer.create(app.mainFrame);
 	app.mainFrame.view.append(view);
+	view.classList.add("shape");
+	viewer.actions.display(view);
 }

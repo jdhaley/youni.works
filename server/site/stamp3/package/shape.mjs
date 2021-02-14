@@ -21,14 +21,7 @@ export default {
 		super$: "use.view.Viewer",
 		extend$actions: {
 			display: function(on, event) {
-				on.ownerDocument.body.style.position = "relative";
-				//on.draggable = true;
-				//on.style.position = "absolute";
-				on.style.width = on.conf.width + "px";
-				on.style.height = on.conf.height + "px";
-				on.style.top = on.conf.y + "px";
-				on.style.left = on.conf.x + "px";
-
+				position(on, on.conf);
 			},
 			mousemove: function(on, event) {
 				setZone(on, event);
@@ -37,6 +30,16 @@ export default {
 		}
 	}
 }
+
+function position(on, rect) {
+	//on.draggable = true;
+	//on.style.position = "absolute";
+	on.style.width = rect.width + "px";
+	on.style.height = rect.height + "px";
+	on.style.top = rect.y + "px";
+	on.style.left = rect.x + "px";
+}
+
 function setZone(on, event) {
 	let border = 5;
 	let viewportX = event.clientX;

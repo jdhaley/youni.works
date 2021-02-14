@@ -32,9 +32,7 @@ export default {
 	Controller: {
 		super$: "Object",
 		conf: null,
-		initialize: function(conf) {
-			conf.type = this;
-			this.sys.define(this, "conf", conf);
+		initialize: function() {
 		},
 		// A Controller isn't required to be a factory.
 		//		create: function(owner, data) {
