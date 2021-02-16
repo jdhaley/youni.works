@@ -9,6 +9,9 @@ const zoneCursor = {
 	BC: "s-resize",
 	BR: "se-resize"
 }
+let SHAPE = null;
+let ZONE = "";
+
 export default {
 	package$: "youni.works/shape",
 	use: {
@@ -24,8 +27,15 @@ export default {
 				position(on, on.conf);
 			},
 			mousemove: function(on, event) {
+//				if (!SHAPE) {
+					setZone(on, event);
+					on.style.cursor = zoneCursor[event.zone];
+//				}
+			},
+			mousedown: function(on, event) {
 				setZone(on, event);
-				on.style.cursor = zoneCursor[event.zone];
+				SHAPE = this;
+				ZONE = event.zone;
 			}
 		}
 	}
@@ -47,6 +57,7 @@ function setZone(on, event) {
 	let rect = on.getBoundingClientRect();
 	let x = event.clientX - rect.x;
 	let y = event.clientY - rect.y;
+
 	if (y < border) {
 		event.zone = "T";
 	} else if (y > rect.height - border) {
@@ -55,15 +66,27 @@ function setZone(on, event) {
 		event.zone = "C";
 	}
 	
-	if (x < border) {;
+	if (x < border) {
 		event.zone += "L"
 	} else if (x > rect.width - border) {
 		event.zone += "R"
 	} else {
 		event.zone += "C"
 	}
+	
+//	if (event.zone != "CC") {
+//		let w = rect.width;
+//		if (x > w / 4 - 2 && x < w / 4 + 2)
+//	}
+	
 }
-
+function getPoint(offset, length) {
+	for (let i = 1; i < 4; i++) {
+		let p = length / 4 * i;
+		if (offset >= p - 2.5 && offset <= p + 2.5) return i;
+	}
+	return 0;
+}
 //Shaper: {
 //super$: "Viewer",
 //draw: function(view) {

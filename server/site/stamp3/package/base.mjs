@@ -16,9 +16,6 @@ export default {
 			});
 		},
 		forName: function(name) {
-			/*
-			 * 	This default implementation uses the sys package scheme to obtain a class.
-			 */
 			let cls = null;
 			if (name) {
 				let idx = name.lastIndexOf("/");
@@ -31,7 +28,7 @@ export default {
 	},
 	Controller: {
 		super$: "Object",
-		conf: null,
+		//conf: null,
 		initialize: function() {
 		},
 		// A Controller isn't required to be a factory.
@@ -41,9 +38,10 @@ export default {
 		//			this.bind(control, data);
 		//			return control;
 		//		},
-		control: function(control) {
-			control.conf = this.conf;
-			control.receive = receive;
+		control: function(object) {
+			object.conf = this.conf;
+			object.actions = this.actions;
+			object.receive = receive;
 		},
 		bind: function(control, data) {
 		},
@@ -195,9 +193,14 @@ function up(on, event) {
 }
 
 function receive(signal) {
-	if (this.conf) {
+	if (this.actions) {
 		let action = signal && typeof signal == "object" ? signal.topic : "" + signal;
-		action = action && this.conf.type.actions[action];
-		if (action) action.call(this.conf.type.actions, this, signal);
+		action = action && this.actions[action];
+		if (action) action.call(this.actions, this, signal);		
 	}
+//	if (this.conf) {
+//		let action = signal && typeof signal == "object" ? signal.topic : "" + signal;
+//		action = action && this.conf.type.actions[action];
+//		if (action) action.call(this.conf.type.actions, this, signal);
+//	}
 }

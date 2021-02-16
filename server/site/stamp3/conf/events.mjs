@@ -1,5 +1,8 @@
 export default {
 	windowEvents: {
+		select: UP, //may not exist
+		change: UP, //may not exist
+		
 		input: UP,
 		cut: UP,
 		copy: UP,
@@ -14,6 +17,10 @@ export default {
 		dragstart: UP,
 		dragover: UP,
 		drop: UP,
+		focusin: UP,
+		focusout: UP,
+		focus: UP,
+		blur: UP,
 		contextmenu: function(event) {
 			if (event.ctrlKey) {
 				event.preventDefault();
@@ -39,7 +46,12 @@ function SELECTION_EVENT(event) {
 	}
 }
 function UP(event) {
-	if (event.type != "mousemove") console.log(event.type);
+	if (event.type != "mousemove") {
+//		if (event.target.nodeName == "HTML") 
+//			console.log(event.target);
+		console.log(event.type + " " + event.target.nodeName);
+		if (event.target.nodeName == undefined) console.log(event.target);
+	}
 	event.topic = event.type;
 	event.target.owner.app.sense(event.target, event);
 }
