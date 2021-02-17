@@ -1,3 +1,4 @@
+let TRACK = null;
 export default {
 	windowEvents: {
 		select: UP, //may not exist
@@ -9,10 +10,31 @@ export default {
 		paste: UP,
 
 		keydown: UP,
-		mousedown: UP,
-		mouseup: UP,
-		mousemove: UP,
-		mouseleave: UP,
+		mousedown: function(event) {
+			UP(event);
+			if (event.track) {
+				event.preventDefault();
+				TRACK = event.track;
+				console.log("track");
+			}
+		},
+		mouseup: function(event) {
+			UP(event);
+			if (TRACK) console.log("untrack");
+			TRACK = null;
+		},
+		mousemove: function(event) {
+			UP(event);
+			if (TRACK) {
+				event.topic = "tracking";
+				event.target.owner.app.send(TRACK, event);
+			}
+		},
+		mouseleave: function(event) {
+			UP(event);
+			if (TRACK) console.log("untrack-leave");
+			TRACK = null;
+		},
 		click: UP,
 		dragstart: UP,
 		dragover: UP,

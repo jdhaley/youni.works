@@ -9,8 +9,6 @@ const zoneCursor = {
 	BC: "s-resize",
 	BR: "se-resize"
 }
-let SHAPE = null;
-let ZONE = "";
 
 export default {
 	package$: "youni.works/shape",
@@ -26,24 +24,31 @@ export default {
 			display: function(on, event) {
 				position(on, on.conf);
 			},
+			tracking: function(on, event) {
+				let rect = on.getBoundingClientRect(on);
+				if (on.$zone == "CC") {
+					on.style.top = event.clientY + "px";
+					on.style.left = event.clientX + "px";					
+				} else if (on.$zone == "TC") {
+					on.style.top = event.clientY + "px";
+				}
+			},
 			mousemove: function(on, event) {
-//				if (!SHAPE) {
-					setZone(on, event);
-					on.style.cursor = zoneCursor[event.zone];
-//				}
+				setZone(on, event);
+				on.style.cursor = zoneCursor[event.zone];
 			},
 			mousedown: function(on, event) {
 				setZone(on, event);
-				SHAPE = this;
-				ZONE = event.zone;
+				if (on == event.target) {
+					event.track = on;
+					on.$zone = event.zone;
+				}
 			}
 		}
 	}
 }
 
 function position(on, rect) {
-	//on.draggable = true;
-	//on.style.position = "absolute";
 	on.style.width = rect.width + "px";
 	on.style.height = rect.height + "px";
 	on.style.top = rect.y + "px";

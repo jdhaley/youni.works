@@ -74,6 +74,7 @@ export default {
 			return this.window.document.body;
 		},
 		initialize: function() {
+			this.control(this.window);
 			this.window.Node.prototype.owner = this;
 			this.window.styles = createStyleSheet(this.window.document);
 			this.addEvents(this.window, this.app.events.windowEvents);
@@ -113,7 +114,27 @@ export default {
 			});
 			this.app.send(view, message);
 		},
+		actions: {
+//			mousedown: starttrack,
+//			mousemove: trackmouse,
+//			mouseup: endtrack
+		}
 	}
+}
+let TRACK = null;
+function starttrack(on, event) {
+	if (event.track) {
+		event.preventDefault();
+		TRACK = event.track;
+		console.log("track");
+	}
+}
+function endtrack(on, event) {
+	if (TRACK) console.log("untrack");
+	TRACK = null;
+}
+function trackmouse(on, event) {
+	if (TRACK) console.log("tracking");
 }
 
 function createStyleSheet(document) {
@@ -139,13 +160,20 @@ function defineStyleProperties(object, prefix) {
 
 
 function draw(frame, conf) {
+	let parent = frame.createNode("div");
+	parent.style.position = "relative";
+	parent.style.background = "ghostwhite";
+	parent.style.width = "100%";
+	parent.style.height = "300px";
+	parent.style.overflow = "hidden";
+	frame.view.append(parent);
 	let viewer = frame.app.createController(conf);
 	let view = viewer.create(frame);
 	view.textContent = "This is a Window";
 	let body = frame.createNode("div");
 	body.textContent = "Hello";
 	view.append(body);
-	frame.view.append(view);
+	parent.append(view);
 	view.classList.add("shape");
 	viewer.actions.display(view);
 }
