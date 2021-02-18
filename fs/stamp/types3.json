@@ -1,6 +1,7 @@
-{
-	"Issues": {
-		"parts": [
+[
+	{
+		"name": "Issues",
+		"properties": [
 			{
 				"name": "issues",
 				"dataType": "array",
@@ -26,8 +27,9 @@
 			
 		]
 	},
-	"Issue": {
-		"parts": [
+	{
+		"name": "Issue",
+		"properties": [
 			{
 				"name": "issued",
 				"dataType": "date",
@@ -62,4 +64,4 @@
 			}
 		]
 	}
-}
+]
