@@ -20,6 +20,18 @@ export default {
 			}
 			return window.owner;
 		},
+		draw: function(view, data, type) {
+			let controller = this.forName(type || data.type || "youni.works/view/Viewer");
+			let control = controller.create(view.owner, data);
+			view.append(control);
+			let message = this.sys.extend(null, {
+				topic: "view"
+			});
+			this.send(control, message);
+		},
+		forName: function(name) {
+			return name && name.indexOf("/") < 0 ? this.components[name] : Object.getPrototypeOf(this).forName(name);
+		},
 		initialize: function(conf) {
 			console.log(this);
 			this.sys.define(this, "events", conf.events);
@@ -40,6 +52,12 @@ export default {
 					app.components[conf.name] = app.createController(conf);
 				}
 				app.open(app.conf.dataSource, initializeData);
+				app.open(app.conf.diagram, initializeDiagram)
+			}
+			function initializeDiagram(msg) {
+				let data = JSON.parse(msg.content);
+				data = app.sys.extend(null, data);
+				app.draw(app.mainFrame.view, data, "youni.works/shape/Diagram");
 			}
 			function initializeData(msg) {
 				let data = JSON.parse(msg.content);
@@ -49,7 +67,7 @@ export default {
 		},
 		start: function(data) {
 			this.mainFrame.display(data, this.conf.objectType);
-			draw(this.mainFrame, this.conf.shape);
+			//draw(this.mainFrame, this.conf.shape);
 		},
 		createController: function(conf, defaultType) {
 			conf = this.sys.extend(null, conf);
@@ -91,12 +109,6 @@ export default {
 			node.to = node.childNodes; //allows send() message to be generic.
 			return node;
 		},
-		addEvents: function(node, events) {
-			for (let name in events) {
-				let listener = events[name];
-				node.addEventListener(name, listener);
-			}
-		},
 		createRule: function(selector, properties) {
 			let out = `${selector} {\n`;
 			out += defineStyleProperties(properties);
@@ -104,8 +116,14 @@ export default {
 			let index = this.window.styles.insertRule(out);
 			return this.window.styles.cssRules[index];
 		},
+		addEvents: function(node, events) {
+			for (let name in events) {
+				let listener = events[name];
+				node.addEventListener(name, listener);
+			}
+		},
 		display: function(data, viewName) {
-			let type = this.app.components[viewName]; //TODO if no viewName, read the data for the type/view.
+			let type = this.app.forName(viewName || data && data.type);
 			if (!type) throw new Error(`Type view '${viewName}' does not exist.`);
 			let view = type.create(this, data);
 			this.view.append(view);
@@ -159,21 +177,3 @@ function defineStyleProperties(object, prefix) {
 }
 
 
-function draw(frame, conf) {
-	let parent = frame.createNode("div");
-	parent.style.position = "relative";
-	parent.style.background = "ghostwhite";
-	parent.style.width = "100%";
-	parent.style.height = "300px";
-	parent.style.overflow = "hidden";
-	frame.view.append(parent);
-	let viewer = frame.app.createController(conf);
-	let view = viewer.create(frame);
-	view.textContent = "This is a Window";
-	let body = frame.createNode("div");
-	body.textContent = "Hello";
-	view.append(body);
-	parent.append(view);
-	view.classList.add("shape");
-	viewer.actions.display(view);
-}

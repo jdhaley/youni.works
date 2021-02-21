@@ -39,7 +39,9 @@ export default {
 		//			return control;
 		//		},
 		control: function(object) {
+			//TODO rethink the conf vs. controller reference.
 			object.conf = this.conf;
+			object.of = this;
 			object.actions = this.actions;
 			object.receive = receive;
 		},

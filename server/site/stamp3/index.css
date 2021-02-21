@@ -1,3 +1,16 @@
+.diagram {
+	/*
+	testing overall scroll (works)
+	left: 50px;
+	top: 1500px;
+	*/
+	position: relative;
+	border: 1px solid buttonshadow;
+	width: 640px;
+	height: 480px;
+	border-radius: 2px;
+	overflow: auto;
+}
 .shape {
 	display: flex;
 	flex-direction: column;
@@ -5,17 +18,24 @@
 	align-content: stretch;
 	position: absolute;
 	border: 0;
-	background: ghostwhite;
-	color: steelblue;
-	padding: 5px;
-	border-radius: 5px;
+	padding: 3px;
+	border-radius: 3px;
 }
+
 .shape:hover {
-	background: silver;
+	background: lightsteelblue;
 }
+
 .shape>* {
+	display: flex;
+	flex-direction: column;
 	flex: 2;
 	color: black;
-	background: white;
-	cursor: default;
+	background: linen;
+	border: 1px solid gray;
+	padding: 1px;
+	text-align: center;
+	justify-content: center;
+	font: menu;
+	font-size: 10pt;
 }
