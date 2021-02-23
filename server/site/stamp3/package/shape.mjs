@@ -15,11 +15,10 @@ let TRACK;
 export default {
 	package$: "youni.works/shape",
 	use: {
-		package$base: "youni.works/base",
-		package$view: "youni.works/view"
+		package$app: "youni.works/app"
 	},
 	Diagram: {
-		super$: "use.view.Viewer",
+		super$: "use.app.View",
 		type$shape: "Shape",
 		bind: function(view, data) {
 			view.model = data;
@@ -56,7 +55,7 @@ export default {
 		}
 	},
 	Shape: {
-		super$: "use.view.Viewer",
+		super$: "use.app.View",
 		bind: function(view, data) {
 			view.model = data;
 		},
@@ -111,7 +110,7 @@ export default {
 		}
 	},
 	Connector: {
-		super$: "use.view.Viewer"
+		super$: "use.app.View"
 	}
 }
 

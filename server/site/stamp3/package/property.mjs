@@ -6,7 +6,9 @@ export default {
 	},
 	Input: {
 		super$: "use.view.Property",
-		nodeName: "input",
+		nodeNameFor: function(data) {
+			return "input";
+		},
 		get$inputType: function() {
 			switch (this.conf.dataType) {
 				case "number":
@@ -46,7 +48,7 @@ export default {
 	},
 	Media: {
 		super$: "use.view.Property",
-		nodeName: function(data) {
+		nodeNameFor: function(data) {
 			//TODO sniff the media type from the data.
 			switch (this.conf.mediaType) {
 				case "video" : return "video";

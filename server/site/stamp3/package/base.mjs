@@ -1,6 +1,6 @@
 export default {
 	package$: "youni.works/base",
-	Context: {
+	Application: {
 		super$: "Object",
 		type$remote: "Remote",
 		send: down,
@@ -28,7 +28,7 @@ export default {
 	},
 	Controller: {
 		super$: "Object",
-		//conf: null,
+		type$app: "Application",
 		initialize: function() {
 		},
 		// A Controller isn't required to be a factory.
@@ -52,10 +52,19 @@ export default {
 	},
 	Owner: {
 		super$: "Controller",
-		createNode: function(name) {
-			this.sys.extend(null, {
-				owner: this
-			});
+		type$app: "Application",
+		createControl: function(data, type) {
+			type = type || data.type;
+			let controller = this.app.forName(type);
+			if (!controller) {
+				console.error(`Control type "${type} does not exist.`);
+				return;
+			}
+			let control = this.sys.extend();
+//			this.addEvents(control, control.events);
+			controller.control(control);
+			controller.bind(control, data);
+			return control;
 		}
 	},
 	Remote: {

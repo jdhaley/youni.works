@@ -1,9 +1,9 @@
 .diagram {
 	/*
 	testing overall scroll (works)
+	*/
 	left: 50px;
 	top: 1500px;
-	*/
 	position: relative;
 	border: 1px solid buttonshadow;
 	width: 640px;

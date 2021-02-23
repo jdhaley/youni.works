@@ -3,8 +3,33 @@ export default {
 	use: {
 		package$base: "youni.works/base"
 	},
+	View: {
+		super$: "use.base.Controller",
+		type$app: "Application",
+		nodeNameFor: function(data) {
+			return "div";
+		},
+		create: function(owner, data) {
+			let nodeName = this.nodeNameFor(data);
+			let control = owner.createNode(nodeName);
+			owner.addEvents(control, this.events);
+			this.control(control);
+			this.bind(control, data);
+			return control;
+		},
+		extend$actions: {
+			view: function(view, event) {
+				this.draw(view);
+				this.display(view);
+			},
+			draw: function(viewl) {
+			},
+			display: function(view) {
+			}
+		}
+	},
 	Application: {
-		super$: "use.base.Context",
+		super$: "use.base.Application",
 		type$mainFrame: "Frame",
 		components: null,
 		propertyType: null,
@@ -21,7 +46,7 @@ export default {
 			return window.owner;
 		},
 		draw: function(view, data, type) {
-			let controller = this.forName(type || data.type || "youni.works/view/Viewer");
+			let controller = this.forName(type || data.type || "youni.works/app/View");
 			let control = controller.create(view.owner, data);
 			view.append(control);
 			let message = this.sys.extend(null, {
@@ -108,6 +133,20 @@ export default {
 			}
 			node.to = node.childNodes; //allows send() message to be generic.
 			return node;
+		},
+		createControl: function(data, type) {
+			type = type || data.type;
+			let controller = this.app.forName(type);
+			if (!controller) {
+				console.error(`View type "${type} does not exist.`);
+				return;
+			}
+			let nodeName = controller.nodeNameFor(data);
+			let control = this.createNode(nodeName);
+			this.addEvents(control, control.events);
+			this.control(control);
+			this.bind(control, data);
+			return control;
 		},
 		createRule: function(selector, properties) {
 			let out = `${selector} {\n`;

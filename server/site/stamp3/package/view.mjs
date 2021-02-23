@@ -1,37 +1,10 @@
 export default {
 	package$: "youni.works/view",
 	use: {
-		package$base: "youni.works/base",
 		package$app: "youni.works/app"
 	},
-	Viewer: {
-		super$: "use.base.Controller",
-		type$app: "use.app.Application",
-		nodeName:"div",
-		create: function(owner, data) {
-			let nodeName = this.nodeName;
-			if (typeof nodeName == "function") nodeName = this.nodeName(data);
-			let control = owner.createNode(nodeName);
-			owner.addEvents(control, this.events);
-			this.control(control);
-			this.bind(control, data);
-			return control;
-		},
-		extend$actions: {
-			view: function(view, event) {
-				this.draw(view);
-				this.display(view);
-			},
-			draw: function(view) {
-			},
-			display: function(view) {
-			}
-		},
-		extend$events: {
-		}
-	},
 	Property: {
-		super$: "Viewer",
+		super$: "use.app.View",
 		type$comp: "Component",
 		get$app: function() {
 			return this.comp.app;
@@ -48,7 +21,7 @@ export default {
 		}
 	},
 	Component: {
-		super$: "Viewer",
+		super$: "use.app.View",
 		conf: {
 			properties: ""
 		},
