@@ -53,18 +53,28 @@ export default {
 	Owner: {
 		super$: "Controller",
 		type$app: "Application",
-		createControl: function(data, type) {
-			type = type || data.type;
-			let controller = this.app.forName(type);
-			if (!controller) {
-				console.error(`Control type "${type} does not exist.`);
-				return;
+		create: function(data, type) {
+			let controller;
+			if (typeof type == "object") {
+				controller = type;
+			} else {
+				type = type || data.type;
+				controller = this.app.forName(type);
+				if (!controller) {
+					console.error(`Control type "${type} does not exist.`);
+					return;
+				}
 			}
-			let control = this.sys.extend();
+			let control = this.createControl(controller, data);
 //			this.addEvents(control, control.events);
 			controller.control(control);
 			controller.bind(control, data);
 			return control;
+		},
+		createControl: function(controller, data) {
+			return this.sys.extend({
+				owner: this
+			});
 		}
 	},
 	Remote: {

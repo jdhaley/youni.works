@@ -27,7 +27,7 @@ export default {
 			display: function(on, event) {
 				on.classList.add("diagram");
 				for (let model of on.model.shapes) {
-					let shape = on.of.shape.create(on.owner, model);
+					let shape = on.owner.create(model, on.of.shape);
 					on.append(shape);			
 				}
 			},

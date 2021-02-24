@@ -9,6 +9,7 @@ export default {
 		nodeNameFor: function(data) {
 			return "div";
 		},
+		/*
 		create: function(owner, data) {
 			let nodeName = this.nodeNameFor(data);
 			let control = owner.createNode(nodeName);
@@ -17,12 +18,13 @@ export default {
 			this.bind(control, data);
 			return control;
 		},
+		*/
 		extend$actions: {
-			view: function(view, event) {
-				this.draw(view);
-				this.display(view);
+			view: function(on, event) {
+				this.draw(on);
+				this.display(on);
 			},
-			draw: function(viewl) {
+			draw: function(view) {
 			},
 			display: function(view) {
 			}
@@ -46,8 +48,8 @@ export default {
 			return window.owner;
 		},
 		draw: function(view, data, type) {
-			let controller = this.forName(type || data.type || "youni.works/app/View");
-			let control = controller.create(view.owner, data);
+			//forName(type || data.type || "youni.works/app/View")
+			let control = view.owner.create(data, type);
 			view.append(control);
 			let message = this.sys.extend(null, {
 				topic: "view"
@@ -134,18 +136,10 @@ export default {
 			node.to = node.childNodes; //allows send() message to be generic.
 			return node;
 		},
-		createControl: function(data, type) {
-			type = type || data.type;
-			let controller = this.app.forName(type);
-			if (!controller) {
-				console.error(`View type "${type} does not exist.`);
-				return;
-			}
-			let nodeName = controller.nodeNameFor(data);
+		createControl: function(controller, data) {
+			let nodeName = controller.nodeNameFor ? controller.nodeNameFor(data) : "div";
 			let control = this.createNode(nodeName);
-			this.addEvents(control, control.events);
-			this.control(control);
-			this.bind(control, data);
+			this.addEvents(control, controller.events);
 			return control;
 		},
 		createRule: function(selector, properties) {
@@ -162,9 +156,9 @@ export default {
 			}
 		},
 		display: function(data, viewName) {
-			let type = this.app.forName(viewName || data && data.type);
-			if (!type) throw new Error(`Type view '${viewName}' does not exist.`);
-			let view = type.create(this, data);
+//			let type = this.app.forName(viewName || data && data.type);
+//			if (!type) throw new Error(`Type view '${viewName}' does not exist.`);
+			let view = this.create(data, viewName);
 			this.view.append(view);
 			let message = this.sys.extend(null, {
 				topic: "view"
