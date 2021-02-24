@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/view",
+	package$: "youni.works/grid",
 	use: {
 		package$app: "youni.works/app"
 	},

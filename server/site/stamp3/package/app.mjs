@@ -53,7 +53,7 @@ export default {
 			function initializeDiagram(msg) {
 				let data = JSON.parse(msg.content);
 				data = app.sys.extend(null, data);
-				app.draw(app.mainFrame.content, data, "youni.works/shape/Diagram");
+				app.draw(app.mainFrame.content, data, "youni.works/diagram/Diagram");
 			}
 			function initializeData(msg) {
 				let data = JSON.parse(msg.content);

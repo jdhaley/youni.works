@@ -1,11 +1,10 @@
 export default {
 	package$: "youni.works/property",
 	use: {
-		package$base: "youni.works/base",
-		package$view: "youni.works/view"
+		package$grid: "youni.works/grid"
 	},
 	Input: {
-		super$: "use.view.Property",
+		super$: "use.grid.Property",
 		nodeNameFor: function(data) {
 			return "input";
 		},
@@ -32,7 +31,7 @@ export default {
 		}
 	},
 	Text: {
-		super$: "use.view.Property",
+		super$: "use.grid.Property",
 		view: function(view) {
 			view.textContent = "";
 			view.className = this.conf.name;
@@ -43,7 +42,7 @@ export default {
 		}
 	},
 	Media: {
-		super$: "use.view.Property",
+		super$: "use.grid.Property",
 		nodeNameFor: function(data) {
 			//TODO sniff the media type from the data.
 			switch (this.conf.mediaType) {
@@ -65,7 +64,7 @@ export default {
 		}
 	},
 	Link: {
-		super$: "use.view.Property",
+		super$: "use.grid.Property",
 		extend$actions: {
 			click: function(on, event) {
 				console.log(event);

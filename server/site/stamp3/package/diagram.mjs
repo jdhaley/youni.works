@@ -13,7 +13,7 @@ const zoneCursor = {
 let TRACK;
 
 export default {
-	package$: "youni.works/shape",
+	package$: "youni.works/diagram",
 	use: {
 		package$app: "youni.works/app"
 	},

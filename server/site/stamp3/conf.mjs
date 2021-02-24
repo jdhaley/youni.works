@@ -1,8 +1,8 @@
 import base from "./package/base.mjs";
 import app from "./package/app.mjs";
-import view from "./package/view.mjs";
+import grid from "./package/grid.mjs";
 import prop from "./package/property.mjs";
-import shape from "./package/shape.mjs";
+import diagram from "./package/diagram.mjs";
 
 import properties from "./conf/properties.mjs";
 import events from "./conf/events.mjs";
@@ -12,15 +12,15 @@ export default {
 	use: {
 		base: base,
 		app: app,
-		view: view,
+		grid: grid,
 		prop: prop,
-		shape: shape
+		diagram: diagram
 	},
 	app: {
 		type$: "use.app.Application",
 		use: {
 			type$Frame: "use.app.Frame",
-			type$Component: "use.view.Component"
+			type$Component: "use.grid.Component"
 		},
 		propertyType: properties
 	},
