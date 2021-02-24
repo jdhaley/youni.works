@@ -111,6 +111,16 @@ export default {
 			//TODO could add a debugger statement when environment is development.
 			throw error;
 		},
+		forName: function(name) {
+			let cls = null;
+			if (name) {
+				let idx = name.lastIndexOf("/");
+				let pkg = this.packages[name.substring(0, idx)];
+				if (pkg) cls = pkg[name.substring(idx + 1)];
+				if (!cls) console.warn("Class '" + name + "' does not exist.");
+			}
+			return cls;			
+		},
 		//TODO follow the standard: package NOT packages.
 		packages: {
 		}
