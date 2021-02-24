@@ -24,7 +24,7 @@ export default {
 			view.model = data;
 		},
 		extend$actions: {
-			display: function(on, event) {
+			view: function(on, event) {
 				on.classList.add("diagram");
 				for (let model of on.model.shapes) {
 					let shape = on.owner.create(model, on.of.shape);
@@ -60,7 +60,7 @@ export default {
 			view.model = data;
 		},
 		extend$actions: {
-			display: function(on, event) {
+			view: function(on, event) {
 				position(on, on.model);
 				on.classList.add("shape");
 				on.innerHTML = "<div>" + on.model.content + "</div>";

@@ -2,6 +2,7 @@ export default {
 	package$: "youni.works/base",
 	Application: {
 		super$: "Object",
+		components: null,
 		type$remote: "Remote",
 		send: down,
 		sense: up,
@@ -16,14 +17,7 @@ export default {
 			});
 		},
 		forName: function(name) {
-			let cls = null;
-			if (name) {
-				let idx = name.lastIndexOf("/");
-				let pkg = this.sys.packages[name.substring(0, idx)];
-				if (pkg) cls = pkg[name.substring(idx + 1)];
-				if (!cls) console.warn("Class '" + name + "' does not exist.");
-			}
-			return cls;			
+			return name && name.indexOf("/") < 0 ? this.components[name] : this.sys.forName(name);
 		}
 	},
 	Controller: {
@@ -31,13 +25,6 @@ export default {
 		type$app: "Application",
 		initialize: function() {
 		},
-		// A Controller isn't required to be a factory.
-		//		create: function(owner, data) {
-		//			let control = owner.createNode();
-		//			this.control(control);
-		//			this.bind(control, data);
-		//			return control;
-		//		},
 		control: function(object) {
 			//TODO rethink the conf vs. controller reference.
 			object.conf = this.conf;
@@ -66,7 +53,6 @@ export default {
 				}
 			}
 			let control = this.createControl(controller, data);
-//			this.addEvents(control, control.events);
 			controller.control(control);
 			controller.bind(control, data);
 			return control;
@@ -213,11 +199,11 @@ function up(on, event) {
 	}
 }
 
-function receive(signal) {
+function receive(a) {
 	if (this.actions) {
-		let action = signal && typeof signal == "object" ? signal.topic : "" + signal;
+		let action = a && typeof a == "object" ? a.topic : "" + a;
 		action = action && this.actions[action];
-		if (action) action.call(this.actions, this, signal);		
+		if (action) action.call(this.actions, this, a);		
 	}
 //	if (this.conf) {
 //		let action = signal && typeof signal == "object" ? signal.topic : "" + signal;

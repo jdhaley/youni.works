@@ -24,10 +24,8 @@ export default {
 			}			
 		},
 		extend$actions: {
-			draw: function(view) {
+			view: function(view) {
 				view.className = view.conf.type.name;
-			},
-			display: function(view) {
 				view.type = view.conf.type.inputType;
 				view.value = view.model || "";		
 			}
@@ -35,12 +33,10 @@ export default {
 	},
 	Text: {
 		super$: "use.view.Property",
-		draw: function(view) {
+		view: function(view) {
 			view.textContent = "";
 			view.className = this.conf.name;
 			view.contentEditable = true;
-		},
-		display: function(view) {
 			let data = view.model;
 			if (typeof data == "object") data = "[object]";
 			view.textContent = data
@@ -58,10 +54,8 @@ export default {
 			return "object";
 		},
 		extend$actions: {
-			draw: function(view) {
+			view: function(view) {
 				view.className = this.conf.name;
-			},
-			display: function(view) {
 				view.src = "";
 				view.textContent = "";
 				let data = view.model;
@@ -76,11 +70,9 @@ export default {
 			click: function(on, event) {
 				console.log(event);
 			},
-			draw: function(view) {
+			view: function(view) {
 				view.className = view.conf.type.name;
 				view.textContent = "...";
-			},
-			display: function(view) {
 //				view.textContent = "...";
 //				let type = this.app.components[this.conf.objectType];
 //				switch (this.conf.dataType) {
@@ -96,15 +88,6 @@ export default {
 		}
 	}
 }
-
-//Shaper: {
-//	super$: "Viewer",
-//	draw: function(view) {
-//		view.style.width = view.model.width + view.model.uom;
-//		view.style.height = view.model.height + view.model.uom;
-//	}
-//},
-
 
 /*
 	Property: {

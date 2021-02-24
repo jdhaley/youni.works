@@ -3,33 +3,6 @@ export default {
 	use: {
 		package$base: "youni.works/base"
 	},
-	View: {
-		super$: "use.base.Controller",
-		type$app: "Application",
-		nodeNameFor: function(data) {
-			return "div";
-		},
-		/*
-		create: function(owner, data) {
-			let nodeName = this.nodeNameFor(data);
-			let control = owner.createNode(nodeName);
-			owner.addEvents(control, this.events);
-			this.control(control);
-			this.bind(control, data);
-			return control;
-		},
-		*/
-		extend$actions: {
-			view: function(on, event) {
-				this.draw(on);
-				this.display(on);
-			},
-			draw: function(view) {
-			},
-			display: function(view) {
-			}
-		}
-	},
 	Application: {
 		super$: "use.base.Application",
 		type$mainFrame: "Frame",
@@ -48,16 +21,12 @@ export default {
 			return window.owner;
 		},
 		draw: function(view, data, type) {
-			//forName(type || data.type || "youni.works/app/View")
 			let control = view.owner.create(data, type);
 			view.append(control);
 			let message = this.sys.extend(null, {
 				topic: "view"
 			});
 			this.send(control, message);
-		},
-		forName: function(name) {
-			return name && name.indexOf("/") < 0 ? this.components[name] : Object.getPrototypeOf(this).forName(name);
 		},
 		initialize: function(conf) {
 			console.log(this);
@@ -84,17 +53,13 @@ export default {
 			function initializeDiagram(msg) {
 				let data = JSON.parse(msg.content);
 				data = app.sys.extend(null, data);
-				app.draw(app.mainFrame.view, data, "youni.works/shape/Diagram");
+				app.draw(app.mainFrame.content, data, "youni.works/shape/Diagram");
 			}
 			function initializeData(msg) {
 				let data = JSON.parse(msg.content);
 				data = app.sys.extend(null, data);
-				app.start(data);
+				app.draw(app.mainFrame.content, data, app.conf.objectType);
 			}
-		},
-		start: function(data) {
-			this.mainFrame.display(data, this.conf.objectType);
-			//draw(this.mainFrame, this.conf.shape);
 		},
 		createController: function(conf, defaultType) {
 			conf = this.sys.extend(null, conf);
@@ -112,18 +77,17 @@ export default {
 		super$: "use.base.Owner",
 		type$app: "Application",
 		window: null,
+		get$content: function() {
+			return this.window.document.body;
+		},
 		get$search: function() {
 			return this.window.location.search.substring(1);
 		},
-		get$view: function() {
-			return this.window.document.body;
-		},
-		initialize: function() {
-			this.control(this.window);
-			this.window.Node.prototype.owner = this;
-			this.window.styles = createStyleSheet(this.window.document);
-			this.addEvents(this.window, this.app.events.windowEvents);
-			this.addEvents(this.window.document, this.app.events.documentEvents);
+		createControl: function(controller, data) {
+			let nodeName = controller.nodeNameFor ? controller.nodeNameFor(data) : "div";
+			let control = this.createNode(nodeName);
+			addEvents(control, controller.events);
+			return control;
 		},
 		createNode: function(name) {
 			let node;
@@ -136,12 +100,6 @@ export default {
 			node.to = node.childNodes; //allows send() message to be generic.
 			return node;
 		},
-		createControl: function(controller, data) {
-			let nodeName = controller.nodeNameFor ? controller.nodeNameFor(data) : "div";
-			let control = this.createNode(nodeName);
-			this.addEvents(control, controller.events);
-			return control;
-		},
 		createRule: function(selector, properties) {
 			let out = `${selector} {\n`;
 			out += defineStyleProperties(properties);
@@ -149,29 +107,30 @@ export default {
 			let index = this.window.styles.insertRule(out);
 			return this.window.styles.cssRules[index];
 		},
-		addEvents: function(node, events) {
-			for (let name in events) {
-				let listener = events[name];
-				node.addEventListener(name, listener);
-			}
-		},
-		display: function(data, viewName) {
-//			let type = this.app.forName(viewName || data && data.type);
-//			if (!type) throw new Error(`Type view '${viewName}' does not exist.`);
-			let view = this.create(data, viewName);
-			this.view.append(view);
-			let message = this.sys.extend(null, {
-				topic: "view"
-			});
-			this.app.send(view, message);
-		},
-		actions: {
-//			mousedown: starttrack,
-//			mousemove: trackmouse,
-//			mouseup: endtrack
+		initialize: function() {
+			this.control(this.window);
+			this.window.Node.prototype.owner = this;
+			this.window.styles = createStyleSheet(this.window.document);
+			addEvents(this.window, this.app.events.windowEvents);
+			addEvents(this.window.document, this.app.events.documentEvents);
+		}
+	},
+	View: {
+		super$: "use.base.Controller",
+		type$app: "Application",
+		nodeNameFor: function(data) {
+			return "DIV";
 		}
 	}
 }
+
+function addEvents(control, events) {
+	for (let name in events) {
+		let listener = events[name];
+		control.addEventListener(name, listener);
+	}
+}
+
 let TRACK = null;
 function starttrack(on, event) {
 	if (event.track) {
@@ -208,5 +167,3 @@ function defineStyleProperties(object, prefix) {
 	}
 	return out;
 }
-
-
