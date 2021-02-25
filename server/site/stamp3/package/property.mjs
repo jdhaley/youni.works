@@ -24,8 +24,8 @@ export default {
 		},
 		extend$actions: {
 			view: function(view) {
-				view.className = view.conf.type.name;
-				view.type = view.conf.type.inputType;
+				view.className = view.of.conf.name;
+				view.type = view.of.inputType;
 				view.value = view.model || "";		
 			}
 		}
@@ -34,7 +34,7 @@ export default {
 		super$: "use.grid.Property",
 		view: function(view) {
 			view.textContent = "";
-			view.className = this.conf.name;
+			view.className = view.of.conf.name;
 			view.contentEditable = true;
 			let data = view.model;
 			if (typeof data == "object") data = "[object]";
@@ -54,7 +54,7 @@ export default {
 		},
 		extend$actions: {
 			view: function(view) {
-				view.className = this.conf.name;
+				view.className = view.of.conf.name;
 				view.src = "";
 				view.textContent = "";
 				let data = view.model;
@@ -70,7 +70,7 @@ export default {
 				console.log(event);
 			},
 			view: function(view) {
-				view.className = view.conf.type.name;
+				view.className = view.of.conf.name;
 				view.textContent = "...";
 //				view.textContent = "...";
 //				let type = this.app.components[this.conf.objectType];

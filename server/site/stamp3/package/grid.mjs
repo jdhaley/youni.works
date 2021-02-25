@@ -32,14 +32,14 @@ export default {
 		},
 		extend$actions: {
 			view: function(view, event) {
-				view.className = this.name;
+				view.className = view.of.name;
 				view.textContent = "";
-				view.parts = view.conf.type.sys.extend();
+				view.parts = view.of.sys.extend();
 				this.viewProperties(view);
 			},
 			viewProperties: function(view) {
 				for (let prop of view.of.properties) {
-					let label = view.owner.createNode("div");
+					let label = view.owner.createNode("label");
 					label.textContent = prop.conf.name;
 					view.append(label);
 					let part = view.owner.create(null, prop)

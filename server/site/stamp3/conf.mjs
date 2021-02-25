@@ -20,6 +20,7 @@ export default {
 		type$: "use.app.Application",
 		use: {
 			type$Frame: "use.app.Frame",
+			type$Diagram: "use.diagram.Diagram",
 			type$Component: "use.grid.Component"
 		},
 		propertyType: properties

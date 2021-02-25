@@ -20,14 +20,6 @@ export default {
 			}
 			return window.owner;
 		},
-		draw: function(view, data, type) {
-			let control = view.owner.create(data, type);
-			view.append(control);
-			let message = this.sys.extend(null, {
-				topic: "view"
-			});
-			this.send(control, message);
-		},
 		initialize: function(conf) {
 			console.log(this);
 			this.sys.define(this, "events", conf.events);
@@ -53,12 +45,12 @@ export default {
 			function initializeDiagram(msg) {
 				let data = JSON.parse(msg.content);
 				data = app.sys.extend(null, data);
-				app.draw(app.mainFrame.content, data, "youni.works/diagram/Diagram");
+				app.mainFrame.content.view(data, "youni.works/diagram/Diagram");
 			}
 			function initializeData(msg) {
 				let data = JSON.parse(msg.content);
 				data = app.sys.extend(null, data);
-				app.draw(app.mainFrame.content, data, app.conf.objectType);
+				app.mainFrame.content.view(data, app.conf.objectType);
 			}
 		},
 		createController: function(conf, defaultType) {
@@ -110,6 +102,7 @@ export default {
 		initialize: function() {
 			this.control(this.window);
 			this.window.Node.prototype.owner = this;
+			this.window.Element.prototype.view = view;
 			this.window.styles = createStyleSheet(this.window.document);
 			addEvents(this.window, this.app.events.windowEvents);
 			addEvents(this.window.document, this.app.events.documentEvents);
@@ -124,29 +117,21 @@ export default {
 	}
 }
 
+function view(data, type) {
+	let control = this.owner.create(data, type);
+	this.append(control);
+	let message = this.owner.sys.extend(null, {
+		topic: "view"
+	});
+	this.owner.app.send(control, message);
+}
+
 function addEvents(control, events) {
 	for (let name in events) {
 		let listener = events[name];
 		control.addEventListener(name, listener);
 	}
 }
-
-let TRACK = null;
-function starttrack(on, event) {
-	if (event.track) {
-		event.preventDefault();
-		TRACK = event.track;
-		console.log("track");
-	}
-}
-function endtrack(on, event) {
-	if (TRACK) console.log("untrack");
-	TRACK = null;
-}
-function trackmouse(on, event) {
-	if (TRACK) console.log("tracking");
-}
-
 function createStyleSheet(document) {
 	let ele = document.createElement("style");
 	ele.type = "text/css";

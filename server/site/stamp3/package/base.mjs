@@ -27,9 +27,8 @@ export default {
 		},
 		control: function(object) {
 			//TODO rethink the conf vs. controller reference.
-			object.conf = this.conf;
+	//		object.conf = this.conf;
 			object.of = this;
-			object.actions = this.actions;
 			object.receive = receive;
 		},
 		bind: function(control, data) {
@@ -200,14 +199,9 @@ function up(on, event) {
 }
 
 function receive(a) {
-	if (this.actions) {
+	if (this.of.actions) {
 		let action = a && typeof a == "object" ? a.topic : "" + a;
-		action = action && this.actions[action];
-		if (action) action.call(this.actions, this, a);		
+		action = action && this.of.actions[action];
+		if (action) action.call(this.of.actions, this, a);		
 	}
-//	if (this.conf) {
-//		let action = signal && typeof signal == "object" ? signal.topic : "" + signal;
-//		action = action && this.conf.type.actions[action];
-//		if (action) action.call(this.conf.type.actions, this, signal);
-//	}
 }
