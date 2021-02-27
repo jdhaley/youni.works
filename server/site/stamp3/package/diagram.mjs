@@ -9,7 +9,6 @@ const zoneCursor = {
 	BC: "s-resize",
 	BR: "se-resize"
 }
-
 let TRACK;
 
 export default {
@@ -30,82 +29,71 @@ export default {
 					let shape = on.owner.create(model, on.of.shape);
 					on.append(shape);			
 				}
-			},
-			mousedown: function(on, event) {
-				if (event.track) {
-					event.preventDefault();
-					on.$track = event.track;
-					console.log("d-track");
-				}
-			},
-			mouseup: function(on, event) {
-				if (on.$track) console.log("d-untrack");
-				TRACK = null;
-			},
-			mousemove: function(on, event) {
-				if (on.$track) {
-					event.topic = "d-tracking";
-					on.owner.app.send(on.$track, event);
-				}
-			},
-			mouseleave: function(on, event) {
-				if (on.$track) console.log("d-leave");
-				delete on.$track;
 			}
 		}
 	},
 	Shape: {
 		super$: "use.app.View",
+		border: 5,
 		bind: function(view, data) {
 			view.model = data;
 		},
 		extend$actions: {
 			view: function(on, event) {
-				position(on, on.model);
+				let rect = on.model;
 				on.classList.add("shape");
+				on.style.width = rect.width + "px";
+				on.style.height = rect.height + "px";
+				on.style.top = rect.y + "px";
+				on.style.left = rect.x + "px";
 				on.innerHTML = "<div>" + on.model.content + "</div>";
-				
-			//	
-//				let viewer = frame.app.createController(conf);
-//				let view = viewer.create(frame);
-//				view.textContent = "This is a Window";
-//				let body = frame.createNode("div");
-//				body.textContent = "Hello";
-//				view.append(body);
-//				diagram.append(view);
-//				view.classList.add("shape");
-//				viewer.actions.display(view);
-
 			},
 			tracking: function(on, event) {
-				let rect = on.getBoundingClientRect(on);
-				if (on.$zone == "CC") {
-					let diag = on.parentNode.getBoundingClientRect();
-					let top = event.clientY - diag.top - on.$y;
-					top -= top % 5;
-					if (top < 0) top = 0;
-					let left = event.clientX - diag.left - on.$x;
-					left -= left % 5;
-					if (left < 0) left = 0;
+				let diag = on.parentNode.getBoundingClientRect();
+				let diagX = event.clientX - diag.left;
+				let diagY = event.clientY - diag.top;
+
+				let top = diagY - TRACK.shapeY;
+				let left = diagX - TRACK.shapeX;
+				
+				let shape = on.getBoundingClientRect();
+
+				let shapeX = shape.left - diag.left;
+				let shapeY = shape.top - diag.top;
+				switch (TRACK.horiz) {
+					case "R":
+						on.style.width = diagX - shapeX + "px";
+						break;
+					case "L":
+						on.style.width = TRACK.rect.right - event.clientX - TRACK.shapeX + "px"
+						on.style.left =  left + "px";
+						break;
+				}
+				switch (TRACK.vert) {
+					case "T":
+						on.style.height = TRACK.rect.bottom - event.clientY - TRACK.shapeY + "px"
+						on.style.top =  top + "px";
+						break;
+					case "B":
+						on.style.height = diagY - shapeY + "px";
+						break;
+				}
+				if (TRACK.vert + TRACK.horiz == "CC") {
 					on.style.top =  top + "px";
-					on.style.left =  left + "px";					
-				} else if (on.$zone == "TC") {
-					on.style.top = event.clientY + "px";
+					on.style.left =  left + "px";
 				}
 			},
 			mousemove: function(on, event) {
 				setZone(on, event);
-				on.style.cursor = zoneCursor[event.zone];
+				on.style.cursor = zoneCursor[event.vert + event.horiz];
 			},
 			mousedown: function(on, event) {
 				setZone(on, event);
-			//	if (on == event.target) {
-					event.track = on;
-					on.$zone = event.zone;
-					let rect = on.getBoundingClientRect();
-					on.$x = event.clientX - rect.left;
-					on.$y = event.clientY - rect.top;
-			//	}
+				event.track = on;
+				event.rect = on.getBoundingClientRect();
+				event.shapeX = event.clientX - event.rect.left;
+				event.shapeY = event.clientY - event.rect.top;
+				TRACK = event;
 			}
 		}
 	},
@@ -114,35 +102,25 @@ export default {
 	}
 }
 
-function position(on, rect) {
-	on.style.width = rect.width + "px";
-	on.style.height = rect.height + "px";
-	on.style.top = rect.y + "px";
-	on.style.left = rect.x + "px";
-}
-
 function setZone(on, event) {
-	let border = 5;
-	let viewportX = event.clientX;
-	let viewportY = event.clientY;
+	let border = on.of.border;
 	let rect = on.getBoundingClientRect();
-	let x = event.clientX - rect.x;
-	let y = event.clientY - rect.y;
 
-	if (y < border) {
-		event.zone = "T";
-	} else if (y > rect.height - border) {
-		event.zone = "B";
-	} else {
-		event.zone = "C";
+	let horiz = event.clientX - rect.x;
+	let vert = event.clientY - rect.y;
+
+	event.vert = "C";
+	if (vert < border) {
+		event.vert = "T";
+	} else if (vert > rect.height - border) {
+		event.vert = "B";
 	}
 	
-	if (x < border) {
-		event.zone += "L"
-	} else if (x > rect.width - border) {
-		event.zone += "R"
-	} else {
-		event.zone += "C"
+	event.horiz = "C"
+	if (horiz < border) {
+		event.horiz = "L"
+	} else if (horiz > rect.width - border) {
+		event.horiz = "R"
 	}
 }
 
