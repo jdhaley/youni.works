@@ -15,12 +15,12 @@ export default {
 			if (event.track) {
 				event.preventDefault();
 				TRACK = event.track;
-				console.log("track");
+				//console.log("track");
 			}
 		},
 		mouseup: function(event) {
 			UP(event);
-			if (TRACK) console.log("untrack");
+			//if (TRACK) console.log("untrack");
 			TRACK = null;
 		},
 		mousemove: function(event) {
@@ -30,11 +30,11 @@ export default {
 				event.target.owner.app.send(TRACK, event);
 			}
 		},
-		mouseleave: function(event) {
-			UP(event);
-			if (TRACK) console.log("untrack-leave");
-			TRACK = null;
-		},
+//		mouseleave: function(event) {
+//			UP(event);
+//			if (TRACK) console.log("untrack-leave");
+//			TRACK = null;
+//		},
 		click: UP,
 		dragstart: UP,
 		dragover: UP,

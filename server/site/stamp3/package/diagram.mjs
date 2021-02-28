@@ -10,7 +10,7 @@ const zoneCursor = {
 	BR: "se-resize"
 }
 let TRACK;
-
+let EDIT;
 export default {
 	package$: "youni.works/diagram",
 	use: {
@@ -47,6 +47,10 @@ export default {
 				on.style.top = rect.y + "px";
 				on.style.left = rect.x + "px";
 				on.innerHTML = "<div>" + on.model.content + "</div>";
+			//	on.firstChild.contentEditable = true;
+			},
+			click: function(on, event) {
+				console.log("text click");
 			},
 			tracking: function(on, event) {
 				let diag = on.parentNode.getBoundingClientRect();
@@ -85,15 +89,25 @@ export default {
 			},
 			mousemove: function(on, event) {
 				setZone(on, event);
-				on.style.cursor = zoneCursor[event.vert + event.horiz];
+				if (TRACK) TRACK.moved = true;
+				on.style.cursor = EDIT ? "text" : zoneCursor[event.vert + event.horiz];
 			},
 			mousedown: function(on, event) {
+				if (on == EDIT) return;
+				EDIT = null;
 				setZone(on, event);
 				event.track = on;
 				event.rect = on.getBoundingClientRect();
 				event.shapeX = event.clientX - event.rect.left;
 				event.shapeY = event.clientY - event.rect.top;
 				TRACK = event;
+			},
+			mouseup: function(on, event) {
+				if (TRACK && TRACK.moved) return;
+				on.contentEditable = true;
+				on.firstChild.focus();
+				on.style.cursor = "default";
+				EDIT = on;
 			}
 		}
 	},
