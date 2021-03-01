@@ -29,33 +29,71 @@ export default {
 					let shape = on.owner.create(model, on.of.shape);
 					on.append(shape);			
 				}
+			},
+			mousedown: function(on, event) {
+				if (EDIT) EDIT.blur();
+				EDIT = null;
 			}
 		}
 	},
 	Shape: {
 		super$: "use.app.View",
 		border: 5,
+		type$defaultContent: "Text",
 		bind: function(view, data) {
 			view.model = data;
 		},
 		extend$actions: {
 			view: function(on, event) {
-				let rect = on.model;
 				on.classList.add("shape");
-				on.style.width = rect.width + "px";
-				on.style.height = rect.height + "px";
-				on.style.top = rect.y + "px";
-				on.style.left = rect.x + "px";
-				on.innerHTML = "<div>" + on.model.content + "</div>";
-			//	on.firstChild.contentEditable = true;
+				on.style.width = (on.model.width || on.of.border * 3) + "px";
+				on.style.height = (on.model.height || on.of.border * 3) + "px";
+				on.style.top = on.model.y + "px";
+				on.style.left = on.model.x + "px";
+				on.style.overflow = "hidden";
+				this.viewContent(on, event);
 			},
-			click: function(on, event) {
-				console.log("text click");
+			viewContent: function(on, event) {
+				switch (typeof on.model.content) {
+					case "string":
+					case "number":
+						let content = on.owner.create(on.model.content, on.of.defaultContent);
+						on.append(content);
+						break;
+					case "boolean":
+					case "undefined":
+					case "function":
+					case "symbol":
+					case "bigint":
+					case "object":
+					default:
+						on.textContent = "";
+						on.textContent = on.model.content;
+						break;
+				}
 			},
 			tracking: function(on, event) {
+				if (TRACK.vert == "C" && TRACK.horiz == "C") {
+					this.move(on, event);
+				} else {
+					this.size(on, event);
+				}
+			},
+			move: function(on, event) {
 				let diag = on.parentNode.getBoundingClientRect();
-				let diagX = event.clientX - diag.left;
-				let diagY = event.clientY - diag.top;
+				let diagX = event.clientX - diag.left + on.parentNode.scrollLeft;
+				let diagY = event.clientY - diag.top + on.parentNode.scrollTop;
+
+				let top = diagY - TRACK.shapeY;
+				let left = diagX - TRACK.shapeX;
+				
+				on.style.top =  top + "px";
+				on.style.left =  left + "px";
+			},
+			size: function(on, event) {
+				let diag = on.parentNode.getBoundingClientRect();
+				let diagX = event.clientX - diag.left + on.parentNode.scrollLeft;
+				let diagY = event.clientY - diag.top + on.parentNode.scrollTop;
 
 				let top = diagY - TRACK.shapeY;
 				let left = diagX - TRACK.shapeX;
@@ -64,9 +102,14 @@ export default {
 
 				let shapeX = shape.left - diag.left;
 				let shapeY = shape.top - diag.top;
+				
+				let width;
+				let height;
 				switch (TRACK.horiz) {
 					case "R":
-						on.style.width = diagX - shapeX + "px";
+						width = diagX - shapeX;
+						if (width < on.of.border * 3) width = on.of.border * 3;
+						on.style.width = width + "px";
 						break;
 					case "L":
 						on.style.width = TRACK.rect.right - event.clientX - TRACK.shapeX + "px"
@@ -79,22 +122,21 @@ export default {
 						on.style.top =  top + "px";
 						break;
 					case "B":
-						on.style.height = diagY - shapeY + "px";
+						height = diagY - shapeY;
+						if (height < on.of.border * 3) height = on.of.border * 3;
+						on.style.height = height + "px";
 						break;
 				}
-				if (TRACK.vert + TRACK.horiz == "CC") {
-					on.style.top =  top + "px";
-					on.style.left =  left + "px";
-				}
+				
 			},
 			mousemove: function(on, event) {
 				setZone(on, event);
 				if (TRACK) TRACK.moved = true;
-				on.style.cursor = EDIT ? "text" : zoneCursor[event.vert + event.horiz];
+				on.style.cursor = EDIT && EDIT == on ? "text" : zoneCursor[event.vert + event.horiz];
 			},
 			mousedown: function(on, event) {
+				on.style.overflow = "hidden";
 				if (on == EDIT) return;
-				EDIT = null;
 				setZone(on, event);
 				event.track = on;
 				event.rect = on.getBoundingClientRect();
@@ -104,10 +146,23 @@ export default {
 			},
 			mouseup: function(on, event) {
 				if (TRACK && TRACK.moved) return;
-				on.contentEditable = true;
-				on.firstChild.focus();
-				on.style.cursor = "default";
 				EDIT = on;
+				on.focus();
+				on.style.cursor = "text";
+				on.style.overflow = "auto";
+			}
+		}
+	},
+	Text: {
+		super$: "use.app.View",
+		bind: function(view, data) {
+			view.model = data;
+		},
+		extend$actions: {
+			view: function(on, event) {
+				on.classList.add("text");
+				on.textContent = "";
+				on.textContent = "" + on.model;
 			}
 		}
 	},
