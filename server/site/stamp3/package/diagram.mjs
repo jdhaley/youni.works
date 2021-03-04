@@ -31,8 +31,13 @@ export default {
 				}
 			},
 			mousedown: function(on, event) {
-				if (EDIT) EDIT.blur();
-				EDIT = null;
+				if (on == event.target && EDIT) {
+					EDIT.blur();
+					EDIT.contentEditable = false;
+					EDIT.style.overflow = "hidden";
+					EDIT.style.cursor = "";
+					EDIT = null;
+				}
 			}
 		}
 	},
@@ -73,6 +78,8 @@ export default {
 				}
 			},
 			tracking: function(on, event) {
+				if (EDIT) return;
+				TRACK.moved = true;
 				if (TRACK.vert == "C" && TRACK.horiz == "C") {
 					this.move(on, event);
 				} else {
@@ -87,8 +94,8 @@ export default {
 				let top = diagY - TRACK.shapeY;
 				let left = diagX - TRACK.shapeX;
 				
-				on.style.top =  top + "px";
-				on.style.left =  left + "px";
+				on.style.top = top + "px";
+				on.style.left = left + "px";
 			},
 			size: function(on, event) {
 				let diag = on.parentNode.getBoundingClientRect();
@@ -130,14 +137,22 @@ export default {
 				
 			},
 			mousemove: function(on, event) {
+				if (EDIT) return;
 				setZone(on, event);
-				if (TRACK) TRACK.moved = true;
-				on.style.cursor = EDIT && EDIT == on ? "text" : zoneCursor[event.vert + event.horiz];
+				if (event.altKey) {
+					if (event.vert == "C" && event.horiz == "C") {
+						on.style.cursor = "text";
+					} else {
+						on.style.cursor = "crosshair";
+					}
+					return;
+				}
+				on.style.cursor = zoneCursor[event.vert + event.horiz];
 			},
 			mousedown: function(on, event) {
-				on.style.overflow = "hidden";
-				if (on == EDIT) return;
+				if (EDIT) return;
 				setZone(on, event);
+				on.style.cursor = zoneCursor[event.vert + event.horiz];
 				event.track = on;
 				event.rect = on.getBoundingClientRect();
 				event.shapeX = event.clientX - event.rect.left;
@@ -145,11 +160,12 @@ export default {
 				TRACK = event;
 			},
 			mouseup: function(on, event) {
-				if (TRACK && TRACK.moved) return;
-				EDIT = on;
-				on.focus();
-				on.style.cursor = "text";
-				on.style.overflow = "auto";
+//				if (TRACK && TRACK.moved) return;
+				TRACK = null;
+//				EDIT = on;
+//				on.focus();
+//				on.style.cursor = "text";
+//				on.style.overflow = "auto";
 			}
 		}
 	},
@@ -160,9 +176,18 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				on.classList.add("text");
+				on.classList.add("shape-text");
 				on.textContent = "";
 				on.textContent = "" + on.model;
+			},
+			mouseup: function(on, event) {
+				if (EDIT || TRACK && TRACK.moved) return;
+
+				on.contentEditable = true;
+				on.style.overflow = "auto";
+				on.style.cursor = "text";
+				on.focus();
+				EDIT = on;
 			}
 		}
 	},

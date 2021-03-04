@@ -9,10 +9,8 @@
 	background: ghostwhite;
 }
 .diagram {
-	/*
-	testing overall scroll (works)
-	*/
 	top: 300px;
+	left: 0px;
 	width: 640px;
 	height: 480px;
 	position: relative;
@@ -38,8 +36,7 @@
 	outline: 3px solid rgba(64, 64, 128, .3);
 }
 
-.shape>* {
-	overflow: none;
+.shape-text {
 	display: flex;
 	flex-direction: column;
 	flex: 2;
