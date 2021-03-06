@@ -163,7 +163,7 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				on.classList.add("shape-text");
+				on.classList.add("text");
 				on.textContent = "";
 				on.textContent = "" + on.model;
 				on.contentEditable = true;
@@ -176,23 +176,10 @@ export default {
 				}
 			},
 			keydown: function(on, event) {
-				if (event.key == "Enter") {
-					event.topic = "";
-				}
 				if (event.key == "Escape") {
 					event.topic = "";
 					on.blur();
 				}
-			},
-			focusin: function(on, event) {
-//				on.contentEditable = true;
-				on.style.overflow = "auto";
-				on.style.cursor = "text";
-			},
-			focusout: function(on, event) {
-//				on.contentEditable = false;
-				on.style.overflow = "hidden";
-				on.style.cursor = "";
 			}
 		}
 	},
