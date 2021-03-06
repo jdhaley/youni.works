@@ -69,6 +69,9 @@ export default {
 		super$: "use.base.Owner",
 		type$app: "Application",
 		window: null,
+		get$activeElement: function() {
+			return this.window.document.activeElement;
+		},
 		get$content: function() {
 			return this.window.document.body;
 		},

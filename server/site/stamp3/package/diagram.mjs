@@ -10,7 +10,6 @@ const zoneCursor = {
 	BR: "se-resize"
 }
 let TRACK;
-let EDIT;
 export default {
 	package$: "youni.works/diagram",
 	use: {
@@ -68,15 +67,6 @@ export default {
 						break;
 				}
 			},
-			tracking: function(on, event) {
-				if (EDIT) return;
-				TRACK.moved = true;
-				if (TRACK.vert == "C" && TRACK.horiz == "C") {
-					this.move(on, event);
-				} else {
-					this.size(on, event);
-				}
-			},
 			move: function(on, event) {
 				let diag = on.parentNode.getBoundingClientRect();
 				let diagX = event.clientX - diag.left + on.parentNode.scrollLeft;
@@ -127,8 +117,18 @@ export default {
 				}
 				
 			},
+			tracking: function(on, event) {
+				if (on.owner.activeElement.parentNode == on) return;
+				TRACK.moved = true;
+				if (TRACK.vert == "C" && TRACK.horiz == "C") {
+					this.move(on, event);
+				} else {
+					this.size(on, event);
+				}
+			},
 			mousemove: function(on, event) {
-				if (EDIT && EDIT.parentNode == on) return;
+				//Don't alter the cursor when a textShape has the focus.
+				if (on.owner.activeElement.parentNode == on) return;
 				setZone(on, event);
 				if (event.altKey) {
 					if (event.vert == "C" && event.horiz == "C") {
@@ -141,7 +141,8 @@ export default {
 				on.style.cursor = zoneCursor[event.vert + event.horiz];
 			},
 			mousedown: function(on, event) {
-				if (EDIT && EDIT.parentNode == on) return;
+				if (on.owner.activeElement.parentNode == on) return;
+				if (on.owner.activeElement) on.owner.activeElement.blur();
 				setZone(on, event);
 				on.style.cursor = zoneCursor[event.vert + event.horiz];
 				event.track = on;
@@ -151,12 +152,7 @@ export default {
 				TRACK = event;
 			},
 			mouseup: function(on, event) {
-//				if (TRACK && TRACK.moved) return;
 				TRACK = null;
-//				EDIT = on;
-//				on.focus();
-//				on.style.cursor = "text";
-//				on.style.overflow = "auto";
 			}
 		}
 	},
@@ -173,9 +169,9 @@ export default {
 				on.contentEditable = true;
 			},
 			mouseup: function(on, event) {
-				if (EDIT || TRACK && TRACK.moved) {
+				if (TRACK && TRACK.moved) {
 					return;
-				} else {
+				} else if (on.owner.activeElement != on) {
 					on.focus();
 				}
 			},
@@ -192,13 +188,11 @@ export default {
 //				on.contentEditable = true;
 				on.style.overflow = "auto";
 				on.style.cursor = "text";
-				EDIT = on;				
 			},
 			focusout: function(on, event) {
 //				on.contentEditable = false;
 				on.style.overflow = "hidden";
 				on.style.cursor = "";
-				EDIT = null;
 			}
 		}
 	},

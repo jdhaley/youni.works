@@ -1,3 +1,4 @@
+import util from "./package/util.mjs";
 import base from "./package/base.mjs";
 import app from "./package/app.mjs";
 import grid from "./package/grid.mjs";
@@ -10,6 +11,7 @@ import events from "./conf/events.mjs";
 export default {
 	package$: "configuration",
 	use: {
+		util: util,
 		base: base,
 		app: app,
 		grid: grid,
