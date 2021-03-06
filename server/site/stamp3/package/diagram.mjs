@@ -31,7 +31,7 @@ export default {
 				}
 			},
 			mousedown: function(on, event) {
-				if (on == event.target && EDIT) {
+				if (EDIT && EDIT != event.target) {
 					EDIT.blur();
 					EDIT.contentEditable = false;
 					EDIT.style.overflow = "hidden";
@@ -43,7 +43,7 @@ export default {
 	},
 	Shape: {
 		super$: "use.app.View",
-		border: 5,
+		border: 6,
 		type$defaultContent: "Text",
 		bind: function(view, data) {
 			view.model = data;
@@ -137,7 +137,6 @@ export default {
 				
 			},
 			mousemove: function(on, event) {
-				if (EDIT) return;
 				setZone(on, event);
 				if (event.altKey) {
 					if (event.vert == "C" && event.horiz == "C") {
@@ -150,7 +149,7 @@ export default {
 				on.style.cursor = zoneCursor[event.vert + event.horiz];
 			},
 			mousedown: function(on, event) {
-				if (EDIT) return;
+				if (EDIT && EDIT.parentNode == on) return;
 				setZone(on, event);
 				on.style.cursor = zoneCursor[event.vert + event.horiz];
 				event.track = on;
@@ -188,6 +187,12 @@ export default {
 				on.style.cursor = "text";
 				on.focus();
 				EDIT = on;
+			},
+			keydown: function(on, event) {
+				if (event.key == "Enter") {
+					event.preventDefault();
+					event.topic = "";
+				}
 			}
 		}
 	},
