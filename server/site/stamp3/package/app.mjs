@@ -75,6 +75,13 @@ export default {
 		get$search: function() {
 			return this.window.location.search.substring(1);
 		},
+		get$selectionRange: function() {
+			let selection = this.window.getSelection();
+			if (selection && selection.rangeCount) {
+				return selection.getRangeAt(0);
+			}
+			return this.window.document.createRange();
+		},
 		createControl: function(controller, data) {
 			let nodeName = controller.nodeNameFor ? controller.nodeNameFor(data) : "div";
 			let control = this.createNode(nodeName);
@@ -101,6 +108,7 @@ export default {
 		},
 		initialize: function() {
 			this.control(this.window);
+			this.control(this.content);
 			this.window.Node.prototype.owner = this;
 			this.window.Element.prototype.view = view;
 			this.window.styles = createStyleSheet(this.window.document);
@@ -120,10 +128,7 @@ export default {
 function view(data, type) {
 	let control = this.owner.create(data, type);
 	this.append(control);
-	let message = this.owner.sys.extend(null, {
-		topic: "view"
-	});
-	this.owner.app.send(control, message);
+	this.of.actions.send(control, "view");
 }
 
 function addEvents(control, events) {

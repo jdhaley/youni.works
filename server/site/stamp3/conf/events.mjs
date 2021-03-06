@@ -15,19 +15,17 @@ export default {
 			if (event.track) {
 				event.preventDefault();
 				TRACK = event.track;
-				//console.log("track");
 			}
 		},
 		mouseup: function(event) {
 			UP(event);
-			//if (TRACK) console.log("untrack");
 			TRACK = null;
 		},
 		mousemove: function(event) {
 			UP(event);
 			if (TRACK) {
 				event.topic = "tracking";
-				event.target.owner.app.send(TRACK, event);
+				event.target.owner.actions.send(TRACK, event);
 			}
 		},
 //		mouseleave: function(event) {
@@ -58,28 +56,14 @@ export default {
 }
 
 function SELECTION_EVENT(event) {
-	let selection = event.target.defaultView.getSelection();
-	if (selection && selection.rangeCount) {
-		console.log(event.type);
-		event.topic = event.type;
-		event.range = selection.getRangeAt(0);
-		let node = event.range.commonAncestorContainer;
-		node.owner.app.sense(node, event);
-	}
+	event.range = event.target.owner.selectionRange;
+	event.target.owner.actions.sense(event.range.commonAncestorContainer, event);
 }
+
 function UP(event) {
-	if (event.type != "mousemove") {
-//		if (event.target.nodeName == "HTML") 
-//			console.log(event.target);
-		console.log(event.type + " " + event.target.nodeName);
-		if (event.target.nodeName == undefined) console.log(event.target);
-	}
-	event.topic = event.type;
-	event.target.owner.app.sense(event.target, event);
+	event.target.owner.actions.sense(event.target, event);
 }
 
 function DOWN(event) {
-	console.log(event.type);
-	event.topic = event.type;
-	event.target.owner.app.send(event.target, event);
+	event.target.owner.actions.send(event.target, event);
 }

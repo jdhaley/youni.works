@@ -4,8 +4,6 @@ export default {
 		super$: "Object",
 		components: null,
 		type$remote: "Remote",
-		send: down,
-		sense: up,
 		observe: function(observer, object) {
 			unobserve(observer, observer.model);
 			observe(observer, object);
@@ -26,14 +24,26 @@ export default {
 		initialize: function() {
 		},
 		control: function(object) {
-			//TODO rethink the conf vs. controller reference.
-	//		object.conf = this.conf;
 			object.of = this;
-			object.receive = receive;
+			object.actions = this.actions;
 		},
 		bind: function(control, data) {
 		},
 		extend$actions: {
+			receive: function(on, signal) {
+				signal = prepareSignal(on, signal);
+				this[signal.topic] && this[signal.topic].call(this, on, signal);
+			},
+			send: function(to, message) {
+				message = prepareSignal(to, message);
+				log(to, message);
+				message && down(to, message);
+			},
+			sense: function(on, event) {
+				event = prepareSignal(on, event);
+				log(on, event);
+				event && up(on, event);
+			}
 		}
 	},
 	Owner: {
@@ -169,22 +179,26 @@ function observe(control, model) {
 	observers.push(control);
 }
 
-function down(control, message) {
-	if (!message || !message.topic) return;
-	let context = message.context;
-	control.receive && control.receive(message);
-	message.context = control;
-	if (control.to) for (control of control.to) {
-//		console.debug(control.controller, control.model);
-//		debugger;
-		down(control, message);
+function prepareSignal(on, signal) {
+	if (typeof signal != "object") {
+		signal = {
+			topic: signal
+		};
 	}
-	message.context = context;
+	signal.stopPropagation && signal.stopPropagation();
+	if (!signal.topic) signal.topic = signal.type;
+	return signal;
+}
+
+function down(on, message) {
+	if (!message.topic) return;
+	on.actions && on.actions.receive(on, message);
+	if (on.to) for (on of on.to) {
+		down(on, message);
+	}
 }
 
 function up(on, event) {
-	event.stopPropagation && event.stopPropagation();
-	if (!event.topic) event.topic = event.type;
 	//DAG-based events.
 //	if (!event.path) return;
 //	for (let node of event.path) {
@@ -193,15 +207,25 @@ function up(on, event) {
 //	}
 //rooted tree events.
 	while (on && event.topic) {
-		on.receive && on.receive(event);
+		on.actions && on.actions.receive(on, event);
 		on = on.parentNode || on.defaultView;
 	}
+	if (!event.topic && event.preventDefault) event.preventDefault();
 }
 
-function receive(a) {
-	if (this.of.actions) {
-		let action = a && typeof a == "object" ? a.topic : "" + a;
-		action = action && this.of.actions[action];
-		if (action) action.call(this.of.actions, this, a);		
+const DONTLOG = ["receive", "mousemove", "tracking", "selectionchange"];
+function log(on, event) {
+	for (let topic of DONTLOG) {
+		if (event.topic == topic) return;
 	}
+	console.debug(event.topic + " " + on.nodeName);
 }
+
+//function receive(a) {
+//	if (!a) return;
+//	if (this.of.actions) {
+//		let action = typeof a == "object" ? a.topic : "" + a;
+//		action = action && this.of.actions[action];
+//		if (action) action.call(this.of.actions, this, a);		
+//	}
+//}

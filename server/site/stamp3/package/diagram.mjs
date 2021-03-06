@@ -30,15 +30,6 @@ export default {
 					on.append(shape);			
 				}
 			},
-			mousedown: function(on, event) {
-				if (EDIT && EDIT != event.target) {
-					EDIT.blur();
-					EDIT.contentEditable = false;
-					EDIT.style.overflow = "hidden";
-					EDIT.style.cursor = "";
-					EDIT = null;
-				}
-			}
 		}
 	},
 	Shape: {
@@ -137,6 +128,7 @@ export default {
 				
 			},
 			mousemove: function(on, event) {
+				if (EDIT && EDIT.parentNode == on) return;
 				setZone(on, event);
 				if (event.altKey) {
 					if (event.vert == "C" && event.horiz == "C") {
@@ -178,21 +170,35 @@ export default {
 				on.classList.add("shape-text");
 				on.textContent = "";
 				on.textContent = "" + on.model;
+				on.contentEditable = true;
 			},
 			mouseup: function(on, event) {
-				if (EDIT || TRACK && TRACK.moved) return;
-
-				on.contentEditable = true;
-				on.style.overflow = "auto";
-				on.style.cursor = "text";
-				on.focus();
-				EDIT = on;
+				if (EDIT || TRACK && TRACK.moved) {
+					return;
+				} else {
+					on.focus();
+				}
 			},
 			keydown: function(on, event) {
 				if (event.key == "Enter") {
-					event.preventDefault();
 					event.topic = "";
 				}
+				if (event.key == "Escape") {
+					event.topic = "";
+					on.blur();
+				}
+			},
+			focusin: function(on, event) {
+//				on.contentEditable = true;
+				on.style.overflow = "auto";
+				on.style.cursor = "text";
+				EDIT = on;				
+			},
+			focusout: function(on, event) {
+//				on.contentEditable = false;
+				on.style.overflow = "hidden";
+				on.style.cursor = "";
+				EDIT = null;
 			}
 		}
 	},
