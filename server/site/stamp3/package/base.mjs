@@ -135,5 +135,5 @@ function log(on, event) {
 	for (let topic of DONTLOG) {
 		if (event.topic == topic) return;
 	}
-	console.debug(event.topic + " " + on.nodeName);
+	console.debug(event.topic + " " + on.nodeName + " " + on.className);
 }

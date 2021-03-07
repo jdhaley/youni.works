@@ -8,10 +8,9 @@
 *::-webkit-scrollbar-track {
 	background: ghostwhite;
 }
-* {
-	outline-color: lightSteelBlue;
+*:focus {
+	outline-color: steelblue;
 }
-
 .diagram {
 	top: 300px;
 	left: 0px;
@@ -65,4 +64,8 @@
 	background: window;
 	overflow: auto;
 	cursor: text;
+}
+
+.diagram P {
+	margin: 0;
 }

@@ -117,11 +117,16 @@ export default {
 				}
 				
 			},
+			connect: function(on, event) {
+			},
 			tracking: function(on, event) {
 				if (on.owner.activeElement.parentNode == on) return;
+				on.owner.activeElement.blur();
 				TRACK.moved = true;
 				if (TRACK.vert == "C" && TRACK.horiz == "C") {
 					this.move(on, event);
+				} else if (event.altKey) {
+					this.connect(on, event);
 				} else {
 					this.size(on, event);
 				}
@@ -132,7 +137,7 @@ export default {
 				setZone(on, event);
 				if (event.altKey) {
 					if (event.vert == "C" && event.horiz == "C") {
-						on.style.cursor = "text";
+						on.style.cursor = "move";
 					} else {
 						on.style.cursor = "crosshair";
 					}
@@ -152,8 +157,18 @@ export default {
 				TRACK = event;
 			},
 			mouseup: function(on, event) {
+				if (TRACK && !TRACK.moved) on.firstChild.focus();
 				TRACK = null;
+			},
+			keydown: function(on, event) {
+				if (event.key == "Escape") {
+					if (on.owner.activeElement.parentNode == on) {
+						event.topic = "";
+						on.owner.activeElement.blur();						
+					}
+				}
 			}
+
 		}
 	},
 	Text: {
@@ -165,21 +180,8 @@ export default {
 			view: function(on, event) {
 				on.classList.add("text");
 				on.textContent = "";
-				on.textContent = "" + on.model;
+				on.innerHTML = "<p>" + on.model + "</p>";
 				on.contentEditable = true;
-			},
-			mouseup: function(on, event) {
-				if (TRACK && TRACK.moved) {
-					return;
-				} else if (on.owner.activeElement != on) {
-					on.focus();
-				}
-			},
-			keydown: function(on, event) {
-				if (event.key == "Escape") {
-					event.topic = "";
-					on.blur();
-				}
 			}
 		}
 	},
