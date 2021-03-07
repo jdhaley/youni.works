@@ -12,9 +12,9 @@ export default {
 		keydown: UP,
 		mousedown: function(event) {
 			UP(event);
-			if (event.track) {
+			if (event.track && event.track.actions) {
 				event.preventDefault();
-				TRACK = event.track;
+				TRACK = event;
 			}
 		},
 		mouseup: function(event) {
@@ -25,18 +25,17 @@ export default {
 			UP(event);
 			if (TRACK) {
 				event.topic = "tracking";
-				event.target.owner.actions.send(TRACK, event);
+				event.trackX = event.clientX - TRACK.clientX;
+				event.trackY = event.clientY - TRACK.clientY;
+				TRACK.track.actions.send(TRACK.track, event);
 			}
 		},
-//		mouseleave: function(event) {
-//			UP(event);
-//			if (TRACK) console.log("untrack-leave");
-//			TRACK = null;
-//		},
 		click: UP,
 		dragstart: UP,
 		dragover: UP,
 		drop: UP,
+		mouseover: UP,
+		mouseout: UP,
 		focusin: UP,
 		focusout: UP,
 		focus: UP,

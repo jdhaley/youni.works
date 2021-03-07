@@ -49,6 +49,8 @@ export default {
 	Shape: {
 		super$: "use.app.View",
 		border: 6,
+		minWidth: 48,
+		minHeight: 24,
 		type$defaultContent: "Text",
 		bind: function(view, data) {
 			view.owner.app.observe(view, data);
@@ -87,48 +89,51 @@ export default {
 				}
 			},
 			move: function(on, event) {
-				let diag = on.parentNode.getBoundingClientRect();
-				on.model.x = event.clientX - TRACK.shapeX - diag.x + on.parentNode.scrollLeft;
-				on.model.y = event.clientY - TRACK.shapeY - diag.y + on.parentNode.scrollTop;
+				let model = on.model;
+				let val = TRACK.before.x + event.trackX;
+				model.x = val < 0 ? 0 : val;
+				val = TRACK.before.y + event.trackY;
+				model.y = val < 0 ? 0 : val;
 				this.notify(on, "position");
 			},
 			size: function(on, event) {
-				let diag = on.parentNode.getBoundingClientRect();
-				let diagX = event.clientX - diag.x + on.parentNode.scrollLeft;
-				let diagY = event.clientY - diag.y + on.parentNode.scrollTop;
-
-				let x = diagX - TRACK.shapeX;
-				let y = diagY - TRACK.shapeY;
-				
-				let shape = on.getBoundingClientRect();
-
-				let shapeX = shape.x - diag.x;
-				let shapeY = shape.y - diag.y;
-				
-				let width;
-				let height;
+				let model = on.model;
+				let val;
 				switch (TRACK.horiz) {
-					case "R":
-						width = diagX - shapeX;
-						if (width < on.of.border * 3) width = on.of.border * 3;
-						on.style.width = width + "px";
-						break;
 					case "L":
-						on.style.width = TRACK.rect.right - event.clientX - TRACK.shapeX + "px"
-						on.style.left =  x + "px";
+						if (TRACK.before.width - event.trackX < on.of.minWidth) break;
+						
+						val = TRACK.before.x + event.trackX;
+						if (val < 0) val = 0;
+						model.x = val;
+						val = TRACK.before.width - event.trackX;
+						if (val < on.of.minWidth) val = on.of.minWidth;
+						model.width = val;
+						break;
+					case "R":
+						val = TRACK.before.width + event.trackX;
+						if (val < on.of.minWidth) val = on.of.minWidth;
+						model.width = val;
 						break;
 				}
 				switch (TRACK.vert) {
 					case "T":
-						on.style.height = TRACK.rect.bottom - event.clientY - TRACK.shapeY + "px"
-						on.style.top =  y + "px";
+						if (TRACK.before.height - event.trackY < on.of.minHeight) break;
+						val = TRACK.before.y + event.trackY;
+						if (val < 0) val = 0;
+						model.y = val;
+						if (!val) break;
+						val = TRACK.before.height - event.trackY;
+						if (val < on.of.minHeight) val = on.of.minHeight;
+						model.height = val;
 						break;
 					case "B":
-						height = diagY - shapeY;
-						if (height < on.of.border * 3) height = on.of.border * 3;
-						on.style.height = height + "px";
+						val = TRACK.before.height + event.trackY;
+						if (val < on.of.minHeight) val = on.of.minHeight;
+						model.height = val;
 						break;
 				}
+				this.notify(on, "position");
 				
 			},
 			connect: function(on, event) {
@@ -158,19 +163,33 @@ export default {
 					return;
 				}
 				on.style.cursor = zoneCursor[event.vert + event.horiz];
+				on.style.outline = "3px solid rgba(64, 128, 64, .3)";				
+			},
+			mouseover: function(on, event) {
+				on.style.outline = "3px solid rgba(64, 128, 64, .3)";				
+			},
+			mouseout: function(on, event) {
+				if (on != TRACK) on.style.outline = "";
 			},
 			mousedown: function(on, event) {
 				if (on.owner.activeElement.parentNode == on) return;
 				if (on.owner.activeElement) on.owner.activeElement.blur();
 				setZone(on, event);
+				on.style.outline = "3px solid rgba(64, 128, 64, .3)";
+				on.style.zIndex = "1";
 				on.style.cursor = zoneCursor[event.vert + event.horiz];
 				event.track = on;
-				event.rect = on.getBoundingClientRect();
-				event.shapeX = event.clientX - event.rect.x;
-				event.shapeY = event.clientY - event.rect.y;
+				event.before = {
+					x: on.model.x,
+					y: on.model.y,
+					width: on.model.width || on.of.minWidth,
+					height: on.model.height || on.of.minHeight
+				}
 				TRACK = event;
 			},
 			mouseup: function(on, event) {
+				on.style.outline = "";
+				on.style.zIndex = "0";
 				if (TRACK && !TRACK.moved) on.firstChild.focus();
 				TRACK = null;
 			},

@@ -36,9 +36,7 @@
 	outline: 0;
 	background: lightGrey;
 }
-.shape:hover {
-	outline: 3px solid rgba(64, 128, 64, .3);
-}
+
 .shape * {
 	cursor: inherit;
 }
