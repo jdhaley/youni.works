@@ -15,6 +15,21 @@ export default {
 	use: {
 		package$app: "youni.works/app"
 	},
+	MoveCommand: {
+		super$: "Object",
+		title: "Move Shape",
+		model: null,
+		before: null,
+		after: null,
+		exec: function() {
+			model.x = after.x;
+			model.y = after.y;
+		},
+		undo: function() {
+			model.x = before.x;
+			model.y = before.y;
+		}
+	},
 	Diagram: {
 		super$: "use.app.View",
 		type$shape: "Shape",
@@ -41,13 +56,16 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
+				on.textContent = "";
 				on.classList.add("shape");
+				this.position(on, event);
+				this.viewContent(on, event);
+			},
+			position: function(on, event) {
 				on.style.width = (on.model.width || on.of.border * 3) + "px";
 				on.style.height = (on.model.height || on.of.border * 3) + "px";
 				on.style.top = on.model.y + "px";
 				on.style.left = on.model.x + "px";
-				on.style.overflow = "hidden";
-				this.viewContent(on, event);
 			},
 			viewContent: function(on, event) {
 				switch (typeof on.model.content) {
@@ -70,14 +88,9 @@ export default {
 			},
 			move: function(on, event) {
 				let diag = on.parentNode.getBoundingClientRect();
-				let diagX = event.clientX - diag.x + on.parentNode.scrollLeft;
-				let diagY = event.clientY - diag.y + on.parentNode.scrollTop;
-
-				let y = diagY - TRACK.shapeY;
-				let x = diagX - TRACK.shapeX;
-				
-				on.style.left = x + "px";
-				on.style.top = y + "px";
+				on.model.x = event.clientX - TRACK.shapeX - diag.x + on.parentNode.scrollLeft;
+				on.model.y = event.clientY - TRACK.shapeY - diag.y + on.parentNode.scrollTop;
+				this.notify(on, "position");
 			},
 			size: function(on, event) {
 				let diag = on.parentNode.getBoundingClientRect();

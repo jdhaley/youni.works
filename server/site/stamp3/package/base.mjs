@@ -39,19 +39,20 @@ export default {
 		},
 		extend$actions: {
 			receive: function(on, signal) {
-				signal = prepareSignal(on, signal);
+				signal = prepareSignal(signal);
 				this[signal.topic] && this[signal.topic].call(this, on, signal);
 			},
 			send: function(to, message) {
-				message = prepareSignal(to, message);
+				message = prepareSignal(message);
 				log(to, message);
 				message && down(to, message);
 			},
 			sense: function(on, event) {
-				event = prepareSignal(on, event);
+				event = prepareSignal(event);
 				log(on, event);
 				event && up(on, event);
-			}
+			},
+			notify: notify
 		}
 	},
 	Owner: {
@@ -84,6 +85,18 @@ export default {
 
 Symbol.observers = Symbol("observers");
 
+function notify(control, signal) {
+	let observers = control.model && control.model[Symbol.observers];
+	if (!observers) return;
+	signal = prepareSignal(signal);
+	for (let on of observers) {
+		//Set the following for each iteration in case of a bad behaving control.
+		signal.source = control;
+		signal.model = control.model;
+		on.actions && on.actions.receive(on, signal);			
+	}
+}
+
 function unobserve(control, model) {
 	let list = model ? model[Symbol.observers] : null;
 	if (list) for (let i = 0, len = list.length; i < len; i++) {
@@ -100,7 +113,7 @@ function observe(control, model) {
 	if (typeof model != "object" || model == null) return; //Only observe objects.
 	let observers = model[Symbol.observers];
 	if (observers) {
-		for (let observer in observers) {
+		for (let observer of observers) {
 			if (observer == control) return; //Already observing
 		}					
 	} else {
@@ -110,7 +123,7 @@ function observe(control, model) {
 	observers.push(control);
 }
 
-function prepareSignal(on, signal) {
+function prepareSignal(signal) {
 	if (typeof signal != "object") {
 		signal = {
 			topic: signal

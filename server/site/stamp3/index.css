@@ -25,6 +25,7 @@
 	position: absolute;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
 	/*
 	align-items: stretch;
 	align-content: stretch;
