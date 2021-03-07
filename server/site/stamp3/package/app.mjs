@@ -31,7 +31,6 @@ export default {
 				conf = app.sys.extend(null, conf);
 				app.sys.define(app, "conf", conf);
 				app.open(conf.typeSource, initializeTypes);
-				app.mainFrame.initialize();
 			}
 			function initializeTypes(msg) {
 				let components = JSON.parse(msg.content);
@@ -110,6 +109,7 @@ export default {
 			return this.window.styles.cssRules[index];
 		},
 		initialize: function() {
+			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
 			this.control(this.window);
 			this.control(this.content);
 			this.window.Node.prototype.owner = this;
@@ -117,6 +117,14 @@ export default {
 			this.window.styles = createStyleSheet(this.window.document);
 			addEvents(this.window, this.app.events.windowEvents);
 			addEvents(this.window.document, this.app.events.documentEvents);
+		},
+		toPixels: function(measure) {
+		    let node = this.createNode("div");
+		    node.style.height = measure;
+		    this.content.appendChild(node);
+		    let px = node.getBoundingClientRect().height;
+		    node.parentNode.removeChild(node);
+		    return px;
 		}
 	},
 	View: {

@@ -36,6 +36,7 @@ export default {
 		border: 6,
 		type$defaultContent: "Text",
 		bind: function(view, data) {
+			view.owner.app.observe(view, data);
 			view.model = data;
 		},
 		extend$actions: {
@@ -69,27 +70,27 @@ export default {
 			},
 			move: function(on, event) {
 				let diag = on.parentNode.getBoundingClientRect();
-				let diagX = event.clientX - diag.left + on.parentNode.scrollLeft;
-				let diagY = event.clientY - diag.top + on.parentNode.scrollTop;
+				let diagX = event.clientX - diag.x + on.parentNode.scrollLeft;
+				let diagY = event.clientY - diag.y + on.parentNode.scrollTop;
 
-				let top = diagY - TRACK.shapeY;
-				let left = diagX - TRACK.shapeX;
+				let y = diagY - TRACK.shapeY;
+				let x = diagX - TRACK.shapeX;
 				
-				on.style.top = top + "px";
-				on.style.left = left + "px";
+				on.style.left = x + "px";
+				on.style.top = y + "px";
 			},
 			size: function(on, event) {
 				let diag = on.parentNode.getBoundingClientRect();
-				let diagX = event.clientX - diag.left + on.parentNode.scrollLeft;
-				let diagY = event.clientY - diag.top + on.parentNode.scrollTop;
+				let diagX = event.clientX - diag.x + on.parentNode.scrollLeft;
+				let diagY = event.clientY - diag.y + on.parentNode.scrollTop;
 
-				let top = diagY - TRACK.shapeY;
-				let left = diagX - TRACK.shapeX;
+				let x = diagX - TRACK.shapeX;
+				let y = diagY - TRACK.shapeY;
 				
 				let shape = on.getBoundingClientRect();
 
-				let shapeX = shape.left - diag.left;
-				let shapeY = shape.top - diag.top;
+				let shapeX = shape.x - diag.x;
+				let shapeY = shape.y - diag.y;
 				
 				let width;
 				let height;
@@ -101,13 +102,13 @@ export default {
 						break;
 					case "L":
 						on.style.width = TRACK.rect.right - event.clientX - TRACK.shapeX + "px"
-						on.style.left =  left + "px";
+						on.style.left =  x + "px";
 						break;
 				}
 				switch (TRACK.vert) {
 					case "T":
 						on.style.height = TRACK.rect.bottom - event.clientY - TRACK.shapeY + "px"
-						on.style.top =  top + "px";
+						on.style.top =  y + "px";
 						break;
 					case "B":
 						height = diagY - shapeY;
@@ -152,8 +153,8 @@ export default {
 				on.style.cursor = zoneCursor[event.vert + event.horiz];
 				event.track = on;
 				event.rect = on.getBoundingClientRect();
-				event.shapeX = event.clientX - event.rect.left;
-				event.shapeY = event.clientY - event.rect.top;
+				event.shapeX = event.clientX - event.rect.x;
+				event.shapeY = event.clientY - event.rect.y;
 				TRACK = event;
 			},
 			mouseup: function(on, event) {
@@ -166,6 +167,10 @@ export default {
 						event.topic = "";
 						on.owner.activeElement.blur();						
 					}
+				}
+				if (event.key == "s" && event.ctrlKey) {
+					event.preventDefault();
+					on.owner.app.save();
 				}
 			}
 

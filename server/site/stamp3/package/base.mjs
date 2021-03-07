@@ -15,6 +15,13 @@ export default {
 				method: "GET"
 			});
 		},
+		save: function(pathname, content, receiver) {
+			this.remote.service(receiver, "saved", {
+				url: pathname,
+				content: content,
+				method: "PUT"
+			});
+		},
 		forName: function(name) {
 			return name && name.indexOf("/") < 0 ? this.components[name] : this.sys.forName(name);
 		}
