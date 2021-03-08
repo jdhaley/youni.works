@@ -15,7 +15,7 @@ export default {
 	use: {
 		package$app: "youni.works/app"
 	},
-	MoveCommand: {
+	ShapeCommand: {
 		super$: "Object",
 		title: "Move Shape",
 		model: null,
@@ -24,10 +24,14 @@ export default {
 		exec: function() {
 			model.x = after.x;
 			model.y = after.y;
+			model.width = after.width;
+			model.height = after.height;
 		},
 		undo: function() {
 			model.x = before.x;
 			model.y = before.y;
+			model.width = before.width;
+			model.height = before.height;
 		}
 	},
 	Diagram: {
@@ -40,7 +44,7 @@ export default {
 			view: function(on, event) {
 				on.classList.add("diagram");
 				for (let model of on.model.shapes) {
-					let shape = on.owner.create(model, on.of.shape);
+					let shape = on.owner.create(model, on.kind.shape);
 					on.append(shape);			
 				}
 			},
@@ -64,8 +68,8 @@ export default {
 				this.viewContent(on, event);
 			},
 			position: function(on, event) {
-				on.style.width = (on.model.width || on.of.border * 3) + "px";
-				on.style.height = (on.model.height || on.of.border * 3) + "px";
+				on.style.width = (on.model.width || on.kind.border * 3) + "px";
+				on.style.height = (on.model.height || on.kind.border * 3) + "px";
 				on.style.top = on.model.y + "px";
 				on.style.left = on.model.x + "px";
 			},
@@ -73,7 +77,7 @@ export default {
 				switch (typeof on.model.content) {
 					case "string":
 					case "number":
-						let content = on.owner.create(on.model.content, on.of.defaultContent);
+						let content = on.owner.create(on.model.content, on.kind.defaultContent);
 						on.append(content);
 						break;
 					case "boolean":
@@ -101,35 +105,35 @@ export default {
 				let val;
 				switch (TRACK.horiz) {
 					case "L":
-						if (TRACK.before.width - event.trackX < on.of.minWidth) break;
+						if (TRACK.before.width - event.trackX < on.kind.minWidth) break;
 						
 						val = TRACK.before.x + event.trackX;
 						if (val < 0) val = 0;
 						model.x = val;
 						val = TRACK.before.width - event.trackX;
-						if (val < on.of.minWidth) val = on.of.minWidth;
+						if (val < on.kind.minWidth) val = on.kind.minWidth;
 						model.width = val;
 						break;
 					case "R":
 						val = TRACK.before.width + event.trackX;
-						if (val < on.of.minWidth) val = on.of.minWidth;
+						if (val < on.kind.minWidth) val = on.kind.minWidth;
 						model.width = val;
 						break;
 				}
 				switch (TRACK.vert) {
 					case "T":
-						if (TRACK.before.height - event.trackY < on.of.minHeight) break;
+						if (TRACK.before.height - event.trackY < on.kind.minHeight) break;
 						val = TRACK.before.y + event.trackY;
 						if (val < 0) val = 0;
 						model.y = val;
 						if (!val) break;
 						val = TRACK.before.height - event.trackY;
-						if (val < on.of.minHeight) val = on.of.minHeight;
+						if (val < on.kind.minHeight) val = on.kind.minHeight;
 						model.height = val;
 						break;
 					case "B":
 						val = TRACK.before.height + event.trackY;
-						if (val < on.of.minHeight) val = on.of.minHeight;
+						if (val < on.kind.minHeight) val = on.kind.minHeight;
 						model.height = val;
 						break;
 				}
@@ -182,8 +186,8 @@ export default {
 				event.before = {
 					x: on.model.x,
 					y: on.model.y,
-					width: on.model.width || on.of.minWidth,
-					height: on.model.height || on.of.minHeight
+					width: on.model.width || on.kind.minWidth,
+					height: on.model.height || on.kind.minHeight
 				}
 				TRACK = event;
 			},
@@ -228,7 +232,7 @@ export default {
 }
 
 function setZone(on, event) {
-	let border = on.of.border;
+	let border = on.kind.border;
 	let rect = on.getBoundingClientRect();
 
 	let horiz = event.clientX - rect.x;

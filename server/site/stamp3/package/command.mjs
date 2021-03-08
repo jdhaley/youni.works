@@ -18,7 +18,7 @@ export default {
 			command.undo();
 			this.lastCommand = command.prior;
 		},
-		exec: function() {
+		redo: function() {
 			let command = this.lastCommand;
 			if (!command.next) return;
 			command = command.next;

@@ -139,7 +139,7 @@ export default {
 function view(data, type) {
 	let control = this.owner.create(data, type);
 	this.append(control);
-	this.of.actions.send(control, "view");
+	this.kind.actions.send(control, "view");
 }
 
 function addEvents(control, events) {

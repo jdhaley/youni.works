@@ -32,7 +32,7 @@ export default {
 		initialize: function() {
 		},
 		control: function(object) {
-			object.of = this;
+			object.kind = this;
 			object.actions = this.actions;
 		},
 		bind: function(control, data) {
