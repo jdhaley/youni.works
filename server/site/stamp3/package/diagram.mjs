@@ -9,6 +9,7 @@ const zoneCursor = {
 	BC: "s-resize",
 	BR: "se-resize"
 }
+//moved, vert, horiz, before
 let TRACK;
 export default {
 	package$: "youni.works/diagram",
@@ -17,7 +18,7 @@ export default {
 	},
 	ShapeCommand: {
 		super$: "Object",
-		title: "Move Shape",
+		title: "Move/Size Shape",
 		model: null,
 		before: null,
 		after: null,
@@ -42,6 +43,7 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
+				on.textContent = "";
 				on.classList.add("diagram");
 				for (let model of on.model.shapes) {
 					let shape = on.owner.create(model, on.kind.shape);
@@ -52,6 +54,9 @@ export default {
 	},
 	Shape: {
 		super$: "use.app.View",
+		use: {
+			type$ShapeCommand: "ShapeCommand"
+		},
 		border: 6,
 		minWidth: 48,
 		minHeight: 24,
@@ -64,10 +69,10 @@ export default {
 			view: function(on, event) {
 				on.textContent = "";
 				on.classList.add("shape");
-				this.position(on, event);
+				this.draw(on, event);
 				this.viewContent(on, event);
 			},
-			position: function(on, event) {
+			draw: function(on, event) {
 				on.style.width = (on.model.width || on.kind.border * 3) + "px";
 				on.style.height = (on.model.height || on.kind.border * 3) + "px";
 				on.style.top = on.model.y + "px";
@@ -98,9 +103,10 @@ export default {
 				model.x = val < 0 ? 0 : val;
 				val = TRACK.before.y + event.trackY;
 				model.y = val < 0 ? 0 : val;
-				this.notify(on, "position");
+				this.notify(on, "draw");
 			},
 			size: function(on, event) {
+				setWidth(on, event);
 				let model = on.model;
 				let val;
 				switch (TRACK.horiz) {
@@ -137,7 +143,7 @@ export default {
 						model.height = val;
 						break;
 				}
-				this.notify(on, "position");
+				this.notify(on, "draw");
 				
 			},
 			connect: function(on, event) {
@@ -192,9 +198,10 @@ export default {
 				TRACK = event;
 			},
 			mouseup: function(on, event) {
+				
 				on.style.outline = "";
 				on.style.zIndex = "0";
-				if (TRACK && !TRACK.moved) on.firstChild.focus();
+				if (TRACK && !TRACK.moved && on.firstChild) on.firstChild.focus();
 				TRACK = null;
 			},
 			keydown: function(on, event) {
@@ -253,6 +260,26 @@ function setZone(on, event) {
 	}
 }
 
+
+function setWidth(on, event) {
+	let model = on.model;
+	let val;
+	
+	switch (TRACK.horiz) {
+		case "L":
+			let newWidth = TRACK.before.width - event.trackX;
+			let newX = TRACK.before.x + event.trackX;
+			if (newWidth < on.kind.minWidth || newX < 0) return;
+			model.x = newX;
+			model.width = newWidth;
+			break;
+		case "R":
+			val = TRACK.before.width + event.trackX;
+			if (val < on.kind.minWidth) val = on.kind.minWidth;
+			model.width = val;
+			break;
+	}
+}
 function getPoint(offset, length) {
 	for (let i = 1; i < 4; i++) {
 		let p = length / 4 * i;
