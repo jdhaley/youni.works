@@ -1,4 +1,5 @@
 import util from "./package/util.mjs";
+import command from "./package/command.mjs";
 import base from "./package/base.mjs";
 import app from "./package/app.mjs";
 import grid from "./package/grid.mjs";
@@ -12,6 +13,7 @@ export default {
 	package$: "configuration",
 	use: {
 		util: util,
+		command: command,
 		base: base,
 		app: app,
 		grid: grid,

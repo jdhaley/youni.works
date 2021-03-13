@@ -1,61 +1,118 @@
-const zoneCursor = {
-	TL: "nw-resize",
-	TC: "n-resize",
-	TR: "ne-resize",
-	CL: "w-resize",
-	CC: "move",
-	CR: "e-resize",
-	BL: "sw-resize",
-	BC: "s-resize",
-	BR: "se-resize"
-}
-//moved, vert, horiz, before
-let TRACK;
 export default {
 	package$: "youni.works/diagram",
 	use: {
-		package$app: "youni.works/app"
+		package$app: "youni.works/app",
+		package$command: "youni.works/command"
 	},
-	ShapeCommand: {
-		super$: "Object",
+	DrawCommand: {
+		super$: "use.command.Command",
 		title: "Move/Size Shape",
-		model: null,
+		control: null,
 		before: null,
 		after: null,
+		moveTo: function(x, y) {
+			x = x < 0 ? 0 : x;
+			y = y < 0 ? 0 : y;
+			this.after.x = x;
+			this.after.y = y;
+			this.control.model.x = x;
+			this.control.model.y = y;
+		},
+		size: function(w, h) {
+			let control = this.control;
+			if (w < control.kind.minWidth) w = control.kind.minWidth;
+			if (h < control.kind.minHeight) h = control.kind.minHeight;
+			this.after.width = w;
+			this.after.height = h;
+			control.model.width = w;
+			control.model.height = h;
+		},
 		exec: function() {
+			let model = this.control.model;
+			let after = this.after;
 			model.x = after.x;
 			model.y = after.y;
 			model.width = after.width;
 			model.height = after.height;
+			this.control.actions.notify(this.control, "draw");
 		},
 		undo: function() {
+			let model = this.control.model;
+			let before = this.before;
 			model.x = before.x;
 			model.y = before.y;
 			model.width = before.width;
 			model.height = before.height;
+			this.control.actions.notify(this.control, "draw");
+		},
+		instance: function(control) {
+			let model = control.model;
+			return this.sys.extend(this, {
+				prior: null,
+				next: null,
+				control: control,
+				before: this.sys.extend(null, {
+					x: model.x,
+					y: model.y,
+					width: model.width || control.kind.minWidth,
+					height: model.height || control.kind.minHeight
+				}),
+				after: this.sys.extend(null, {
+					x: model.x,
+					y: model.y,
+					width: model.width || control.kind.minWidth,
+					height: model.height || control.kind.minHeight
+				})
+			});
 		}
 	},
 	Diagram: {
 		super$: "use.app.View",
-		type$shape: "Shape",
+		use: {
+			type$Shape: "Shape",
+			type$Command: "use.command.DrawCommand",
+			type$Commands: "use.command.Commands"
+		},
 		bind: function(view, data) {
 			view.model = data;
+			view.commands = this.use.Commands.instance();
 		},
 		extend$actions: {
 			view: function(on, event) {
 				on.textContent = "";
 				on.classList.add("diagram");
+				on.tabIndex = 0;
 				for (let model of on.model.shapes) {
-					let shape = on.owner.create(model, on.kind.shape);
-					on.append(shape);			
+					let shape = on.owner.create(model, on.kind.use.Shape);
+					shape.diagram = on;
+					on.append(shape);
 				}
 			},
+			keydown: function(on, event) {
+				if (event.key == "Escape") {
+					on.focus();
+				}
+				if (event.key == "s" && event.ctrlKey) {
+					event.preventDefault();
+					
+				}
+				if (event.key == "z" && event.ctrlKey) {
+					event.preventDefault();
+					on.focus();
+					on.commands.undo();
+				}
+				if (event.key == "y" && event.ctrlKey) {
+					event.preventDefault();
+					on.focus();
+					on.commands.redo();
+				}
+			}
 		}
 	},
 	Shape: {
 		super$: "use.app.View",
 		use: {
-			type$ShapeCommand: "ShapeCommand"
+			type$DrawCommand: "DrawCommand"
 		},
 		border: 6,
 		minWidth: 48,
@@ -77,6 +134,40 @@ export default {
 				on.style.height = (on.model.height || on.kind.border * 3) + "px";
 				on.style.top = on.model.y + "px";
 				on.style.left = on.model.x + "px";
+				on.scrollIntoView();
+			},
+			move: function(on, event) {
+				let cmd = on.diagram.command;
+				cmd.moveTo(cmd.before.x + event.trackX, cmd.before.y + event.trackY);
+				this.notify(on, "draw");
+			},
+			size: function(on, event) {
+				let cmd = on.diagram.command;
+				let model = on.model;
+				switch (cmd.horiz) {
+					case "L":
+						if (cmd.before.width - event.trackX < on.kind.minWidth) break;
+						cmd.moveTo(cmd.before.x + event.trackX, model.y);
+						cmd.size(cmd.before.width - event.trackX, model.height);
+						break;
+					case "R":
+						cmd.size(cmd.before.width + event.trackX, model.height);
+						break;
+				}
+				switch (cmd.vert) {
+					case "T":
+						if (cmd.before.height - event.trackY < on.kind.minHeight) break;
+						cmd.moveTo(model.x, cmd.before.y + event.trackY);
+						cmd.size(model.width, cmd.before.height - event.trackY);
+						break;
+					case "B":
+						cmd.size(model.width, cmd.before.height + event.trackY);
+						break;
+				}
+				this.notify(on, "draw");
+				
+			},
+			connect: function(on, event) {
 			},
 			viewContent: function(on, event) {
 				switch (typeof on.model.content) {
@@ -97,62 +188,28 @@ export default {
 						break;
 				}
 			},
-			move: function(on, event) {
-				let model = on.model;
-				let val = TRACK.before.x + event.trackX;
-				model.x = val < 0 ? 0 : val;
-				val = TRACK.before.y + event.trackY;
-				model.y = val < 0 ? 0 : val;
-				this.notify(on, "draw");
-			},
-			size: function(on, event) {
-				setWidth(on, event);
-				let model = on.model;
-				let val;
-				switch (TRACK.horiz) {
-					case "L":
-						if (TRACK.before.width - event.trackX < on.kind.minWidth) break;
-						
-						val = TRACK.before.x + event.trackX;
-						if (val < 0) val = 0;
-						model.x = val;
-						val = TRACK.before.width - event.trackX;
-						if (val < on.kind.minWidth) val = on.kind.minWidth;
-						model.width = val;
-						break;
-					case "R":
-						val = TRACK.before.width + event.trackX;
-						if (val < on.kind.minWidth) val = on.kind.minWidth;
-						model.width = val;
-						break;
-				}
-				switch (TRACK.vert) {
-					case "T":
-						if (TRACK.before.height - event.trackY < on.kind.minHeight) break;
-						val = TRACK.before.y + event.trackY;
-						if (val < 0) val = 0;
-						model.y = val;
-						if (!val) break;
-						val = TRACK.before.height - event.trackY;
-						if (val < on.kind.minHeight) val = on.kind.minHeight;
-						model.height = val;
-						break;
-					case "B":
-						val = TRACK.before.height + event.trackY;
-						if (val < on.kind.minHeight) val = on.kind.minHeight;
-						model.height = val;
-						break;
-				}
-				this.notify(on, "draw");
-				
-			},
-			connect: function(on, event) {
-			},
-			tracking: function(on, event) {
+			mousedown: function(on, event) {
 				if (on.owner.activeElement.parentNode == on) return;
-				on.owner.activeElement.blur();
-				TRACK.moved = true;
-				if (TRACK.vert == "C" && TRACK.horiz == "C") {
+				event.preventDefault();
+				event.track = on; // Tell the listener what to track.
+				setZone(on, event);
+				on.style.outline = "3px solid rgba(64, 128, 64, .3)";
+				on.style.zIndex = "1";
+				on.$hzone = event.horiz;
+				on.$vzone = event.vert;
+				on.diagram.focus();
+				if (on.diagram.command) console.log("no mouse up");
+			},
+			track: function(on, event) {
+				let cmd = on.diagram.command;
+				if (!cmd) {
+					cmd = on.kind.use.DrawCommand.instance(on);
+					cmd.horiz = on.$hzone;
+					cmd.vert = on.$vzone;
+					on.diagram.command = cmd;
+					console.log(cmd);
+				}
+				if (cmd.vert == "C" && cmd.horiz == "C") {
 					this.move(on, event);
 				} else if (event.altKey) {
 					this.connect(on, event);
@@ -160,57 +217,47 @@ export default {
 					this.size(on, event);
 				}
 			},
+			trackEnd: function(on, event) {
+				event.topic = "";
+				on.style.outline = "";
+				on.style.cursor = "";
+				on.style.zIndex = "";
+				if (on.diagram.command) {
+					on.diagram.commands.addCommand(on.diagram.command);
+					on.diagram.command = null;
+				} else if (on.firstChild) {
+					on.firstChild.focus();
+				}
+			},
 			mousemove: function(on, event) {
 				//Don't alter the cursor when a textShape has the focus.
-				if (on.owner.activeElement.parentNode == on) return;
-				setZone(on, event);
-				if (event.altKey) {
-					if (event.vert == "C" && event.horiz == "C") {
-						on.style.cursor = "move";
-					} else {
-						on.style.cursor = "crosshair";
-					}
-					return;
+				//if (on.owner.activeElement.parentNode == on) return;
+				if (!on.diagram.command) {
+					setZone(on, event);		
 				}
-				on.style.cursor = zoneCursor[event.vert + event.horiz];
-				on.style.outline = "3px solid rgba(64, 128, 64, .3)";				
+//				if (event.altKey) {
+//					if (event.vert == "C" && event.horiz == "C") {
+//						on.style.cursor = "move";
+//					} else {
+//						on.style.cursor = "crosshair";
+//					}
+//					return;
+//				}
 			},
-			mouseover: function(on, event) {
-				on.style.outline = "3px solid rgba(64, 128, 64, .3)";				
-			},
-			mouseout: function(on, event) {
-				if (on != TRACK) on.style.outline = "";
-			},
-			mousedown: function(on, event) {
-				if (on.owner.activeElement.parentNode == on) return;
-				if (on.owner.activeElement) on.owner.activeElement.blur();
-				setZone(on, event);
-				on.style.outline = "3px solid rgba(64, 128, 64, .3)";
-				on.style.zIndex = "1";
-				on.style.cursor = zoneCursor[event.vert + event.horiz];
-				event.track = on;
-				event.before = {
-					x: on.model.x,
-					y: on.model.y,
-					width: on.model.width || on.kind.minWidth,
-					height: on.model.height || on.kind.minHeight
-				}
-				TRACK = event;
-			},
-			mouseup: function(on, event) {
-				
-				on.style.outline = "";
-				on.style.zIndex = "0";
-				if (TRACK && !TRACK.moved && on.firstChild) on.firstChild.focus();
-				TRACK = null;
-			},
+//			mouseover: function(on, event) {
+//				on.style.outline = "3px solid rgba(64, 128, 64, .3)";				
+//			},
+//			mouseout: function(on, event) {
+//				let cmd = on.diagram.command
+//				if (cmd && cmd.control != on) on.style.outline = "";
+//			},
 			keydown: function(on, event) {
-				if (event.key == "Escape") {
-					if (on.owner.activeElement.parentNode == on) {
-						event.topic = "";
-						on.owner.activeElement.blur();						
-					}
-				}
+//				if (event.key == "Escape") {
+//					if (on.owner.activeElement.parentNode == on) {
+//						event.topic = "";
+//						on.owner.activeElement.blur();						
+//					}
+//				}
 				if (event.key == "s" && event.ctrlKey) {
 					event.preventDefault();
 					on.owner.app.save();
@@ -230,12 +277,30 @@ export default {
 				on.textContent = "";
 				on.innerHTML = "<p>" + on.model + "</p>";
 				on.contentEditable = true;
+			},
+			focusin: function(on, event) {
+				on.parentNode.style.zIndex = "8";
+			},
+			focusout: function(on, event) {
+				on.parentNode.style.zIndex = "";
 			}
 		}
 	},
 	Connector: {
 		super$: "use.app.View"
 	}
+}
+
+const zoneCursor = {
+	TL: "nw-resize",
+	TC: "n-resize",
+	TR: "ne-resize",
+	CL: "w-resize",
+	CC: "move",
+	CR: "e-resize",
+	BL: "sw-resize",
+	BC: "s-resize",
+	BR: "se-resize"
 }
 
 function setZone(on, event) {
@@ -258,32 +323,5 @@ function setZone(on, event) {
 	} else if (horiz > rect.width - border) {
 		event.horiz = "R"
 	}
-}
-
-
-function setWidth(on, event) {
-	let model = on.model;
-	let val;
-	
-	switch (TRACK.horiz) {
-		case "L":
-			let newWidth = TRACK.before.width - event.trackX;
-			let newX = TRACK.before.x + event.trackX;
-			if (newWidth < on.kind.minWidth || newX < 0) return;
-			model.x = newX;
-			model.width = newWidth;
-			break;
-		case "R":
-			val = TRACK.before.width + event.trackX;
-			if (val < on.kind.minWidth) val = on.kind.minWidth;
-			model.width = val;
-			break;
-	}
-}
-function getPoint(offset, length) {
-	for (let i = 1; i < 4; i++) {
-		let p = length / 4 * i;
-		if (offset >= p - 2.5 && offset <= p + 2.5) return i;
-	}
-	return 0;
+	on.style.cursor = zoneCursor[event.vert + event.horiz];
 }

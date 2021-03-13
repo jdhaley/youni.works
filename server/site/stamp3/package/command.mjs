@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/base/command",
+	package$: "youni.works/command",
 	Command: {
 		super$: "Object",
 		type$prior: "Command",
@@ -7,9 +7,15 @@ export default {
 		exec: function() {
 		},
 		undo: function() {
+		},
+		instance: function() {
+			return this.sys.extend(this, {
+				prior: null,
+				next: null
+			});
 		}
 	},
-	Commander: {
+	Commands: {
 		super$: "Object",
 		type$lastCommand: "Command",
 		undo: function() {
@@ -26,10 +32,15 @@ export default {
 			this.lastCommand = command;
 		},
 		addCommand: function(command) {
-			if (this.lastCommand) this.lastCommand.next = command;
+			this.lastCommand.next = command;
 			command.prior = this.lastCommand;
 			this.lastCommand = command;
 			return command;
+		},
+		instance: function() {
+			return this.sys.extend(this, {
+				lastCommand: this.lastCommand.instance()
+			});
 		}
 	},
 	BatchCommand: {

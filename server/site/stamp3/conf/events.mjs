@@ -12,30 +12,36 @@ export default {
 		keydown: UP,
 		mousedown: function(event) {
 			UP(event);
-			if (event.track && event.track.actions) {
-				event.preventDefault();
+			if (event.track) {
 				TRACK = event;
 			}
-		},
-		mouseup: function(event) {
-			UP(event);
-			TRACK = null;
 		},
 		mousemove: function(event) {
 			UP(event);
 			if (TRACK) {
-				event.topic = "tracking";
+				event.topic = "track";
 				event.trackX = event.clientX - TRACK.clientX;
 				event.trackY = event.clientY - TRACK.clientY;
 				TRACK.track.actions.send(TRACK.track, event);
+				return;
+			}
+		},
+		mouseup: function(event) {
+			UP(event);
+			if (TRACK) {
+				event.topic = "trackEnd"
+				event.trackX = event.clientX - TRACK.clientX;
+				event.trackY = event.clientY - TRACK.clientY;
+				TRACK.track.actions.send(TRACK.track, event);
+				TRACK = null;
 			}
 		},
 		click: UP,
 		dragstart: UP,
 		dragover: UP,
 		drop: UP,
-		mouseover: UP,
-		mouseout: UP,
+//		mouseover: UP,
+//		mouseout: UP,
 		focusin: UP,
 		focusout: UP,
 		focus: UP,

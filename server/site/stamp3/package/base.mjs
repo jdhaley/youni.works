@@ -150,7 +150,7 @@ function up(on, event) {
 	if (event.preventDefault && !event.topic) event.preventDefault();
 }
 
-const DONTLOG = ["receive", "mousemove", "tracking", "selectionchange"];
+const DONTLOG = ["receive", "track", "mousemove", "selectionchange"];
 function log(on, event) {
 	for (let topic of DONTLOG) {
 		if (event.topic == topic) return;

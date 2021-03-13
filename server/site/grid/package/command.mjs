@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/base/command",
+	package$: "youni.works/command",
 	Command: {
 		super$: "Object",
 		type$prior: "Command",
@@ -12,7 +12,7 @@ export default {
 		redo: function() {
 		}
 	},
-	Commander: {
+	Commands: {
 		super$: "Object",
 		type$lastCommand: "Command",
 		undo: function undo() {

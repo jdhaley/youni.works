@@ -9,7 +9,11 @@
 	background: ghostwhite;
 }
 *:focus {
-	outline-color: steelblue;
+	outline: 2px solid steelblue;
+}
+
+INPUT {
+	border: 1px solid black;
 }
 .diagram {
 	top: 300px;
@@ -32,9 +36,7 @@
 	vertical-align: middle;
 	*/
 	border: 0;
-	padding: 0;
-	outline: 0;
-	background: lightGrey;
+	background: lightGray;
 }
 
 .shape * {
@@ -42,7 +44,6 @@
 }
 
 .text {
-	padding: 2px;
 	font-size: 9pt;
 }
 
@@ -53,16 +54,19 @@
 .diagram .text {
 	padding: 6px;
 	text-align: center;
-	/*
-	*/
+	background: ghostWhite;
 	border: 1px solid gray;
-	background: ghostwhite;
 }
-
+.diagram .text {
+}
 .diagram .text:focus {
 	background: window;
+	margin: 2px;
+	border: 0;
 	overflow: auto;
 	cursor: text;
+	outline-width: 6px;
+	z-index: 3;
 }
 
 .diagram P {
