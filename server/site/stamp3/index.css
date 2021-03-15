@@ -60,11 +60,11 @@ INPUT {
 }
 .diagram .text:focus {
 	background: window;
-	margin: 2px;
+	margin: 3px;
 	border: 0;
 	overflow: auto;
 	cursor: text;
-	outline-width: 6px;
+	outline-width: 2px;
 	z-index: 3;
 }
 

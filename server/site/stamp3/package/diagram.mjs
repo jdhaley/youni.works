@@ -2,69 +2,7 @@ export default {
 	package$: "youni.works/diagram",
 	use: {
 		package$app: "youni.works/app",
-		package$command: "youni.works/command"
-	},
-	DrawCommand: {
-		super$: "use.command.Command",
-		title: "Move/Size Shape",
-		control: null,
-		before: null,
-		after: null,
-		moveTo: function(x, y) {
-			x = x < 0 ? 0 : x;
-			y = y < 0 ? 0 : y;
-			this.after.x = x;
-			this.after.y = y;
-			this.control.model.x = x;
-			this.control.model.y = y;
-		},
-		size: function(w, h) {
-			let control = this.control;
-			if (w < control.kind.minWidth) w = control.kind.minWidth;
-			if (h < control.kind.minHeight) h = control.kind.minHeight;
-			this.after.width = w;
-			this.after.height = h;
-			control.model.width = w;
-			control.model.height = h;
-		},
-		exec: function() {
-			let model = this.control.model;
-			let after = this.after;
-			model.x = after.x;
-			model.y = after.y;
-			model.width = after.width;
-			model.height = after.height;
-			this.control.actions.notify(this.control, "draw");
-		},
-		undo: function() {
-			let model = this.control.model;
-			let before = this.before;
-			model.x = before.x;
-			model.y = before.y;
-			model.width = before.width;
-			model.height = before.height;
-			this.control.actions.notify(this.control, "draw");
-		},
-		instance: function(control) {
-			let model = control.model;
-			return this.sys.extend(this, {
-				prior: null,
-				next: null,
-				control: control,
-				before: this.sys.extend(null, {
-					x: model.x,
-					y: model.y,
-					width: model.width || control.kind.minWidth,
-					height: model.height || control.kind.minHeight
-				}),
-				after: this.sys.extend(null, {
-					x: model.x,
-					y: model.y,
-					width: model.width || control.kind.minWidth,
-					height: model.height || control.kind.minHeight
-				})
-			});
-		}
+		package$command: "youni.works/diagram/command"
 	},
 	Diagram: {
 		super$: "use.app.View",
@@ -112,7 +50,7 @@ export default {
 	Shape: {
 		super$: "use.app.View",
 		use: {
-			type$DrawCommand: "DrawCommand"
+			type$DrawCommand: "use.command.DrawCommand"
 		},
 		border: 6,
 		minWidth: 48,
@@ -130,8 +68,8 @@ export default {
 				this.viewContent(on, event);
 			},
 			draw: function(on, event) {
-				on.style.width = (on.model.width || on.kind.border * 3) + "px";
-				on.style.height = (on.model.height || on.kind.border * 3) + "px";
+				on.style.width = (on.model.width || on.kind.minWidth) + "px";
+				on.style.height = (on.model.height || on.kind.minHeight) + "px";
 				on.style.top = on.model.y + "px";
 				on.style.left = on.model.x + "px";
 				on.scrollIntoView();
@@ -207,7 +145,6 @@ export default {
 					cmd.horiz = on.$hzone;
 					cmd.vert = on.$vzone;
 					on.diagram.command = cmd;
-					console.log(cmd);
 				}
 				if (cmd.vert == "C" && cmd.horiz == "C") {
 					this.move(on, event);
@@ -254,19 +191,6 @@ export default {
 //				let cmd = on.diagram.command
 //				if (cmd && cmd.control != on) on.style.outline = "";
 //			},
-			keydown: function(on, event) {
-//				if (event.key == "Escape") {
-//					if (on.owner.activeElement.parentNode == on) {
-//						event.topic = "";
-//						on.owner.activeElement.blur();						
-//					}
-//				}
-				if (event.key == "s" && event.ctrlKey) {
-					event.preventDefault();
-					on.owner.app.save();
-				}
-			}
-
 		}
 	},
 	Text: {
