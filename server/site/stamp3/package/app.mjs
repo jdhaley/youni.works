@@ -44,7 +44,8 @@ export default {
 			function initializeDiagram(msg) {
 				let data = JSON.parse(msg.content);
 				data = app.sys.extend(null, data);
-				app.mainFrame.content.view(data, "youni.works/diagram/Diagram");
+				let view = app.mainFrame.content.view(data, "youni.works/diagram/Diagram");
+				view.file = app.conf.diagram;
 			}
 			function initializeData(msg) {
 				let data = JSON.parse(msg.content);
@@ -140,6 +141,7 @@ function view(data, type) {
 	let control = this.owner.create(data, type);
 	this.append(control);
 	this.kind.actions.send(control, "view");
+	return control;
 }
 
 function addEvents(control, events) {

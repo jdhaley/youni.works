@@ -94,7 +94,7 @@ export default {
 				}
 				if (event.key == "s" && event.ctrlKey) {
 					event.preventDefault();
-					
+					on.owner.app.save(on.file, on.model);
 				}
 				if (event.key == "z" && event.ctrlKey) {
 					event.preventDefault();
@@ -229,6 +229,9 @@ export default {
 					on.firstChild.focus();
 				}
 			},
+			contextmenu: function(on, event) {
+				console.log("context menu here");
+			},
 			mousemove: function(on, event) {
 				//Don't alter the cursor when a textShape has the focus.
 				//if (on.owner.activeElement.parentNode == on) return;
@@ -283,6 +286,9 @@ export default {
 			},
 			focusout: function(on, event) {
 				on.parentNode.style.zIndex = "";
+			},
+			dblclick: function(on, event) {
+				
 			}
 		}
 	},

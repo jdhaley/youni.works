@@ -13,7 +13,7 @@
 }
 
 INPUT {
-	border: 1px solid black;
+	border: 1px solid buttonshadow;
 }
 .diagram {
 	top: 300px;
@@ -22,7 +22,6 @@ INPUT {
 	height: 480px;
 	position: relative;
 	border: 1px solid buttonshadow;
-	border-radius: 2px;
 	overflow: auto;
 }
 .shape {
