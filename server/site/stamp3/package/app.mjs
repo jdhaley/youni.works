@@ -65,8 +65,21 @@ export default {
 			return controller;
 		}
 	},
+	TestControl: {
+		super$: "Object",
+		view: null,
+		model: null,
+		"@iterator": function* iterate() {
+			for (let i = 0, len = this.view.childNodes.length; i < len; i++) yield this.view.childNodes[i].$ctl;
+		},
+		extend$actions: {
+		},
+	},
 	Frame: {
 		super$: "use.base.Owner",
+		use: {
+			type$TestControl: "TestControl"
+		},
 		type$app: "Application",
 		window: null,
 		get$activeElement: function() {
@@ -84,6 +97,14 @@ export default {
 				return selection.getRangeAt(0);
 			}
 			return this.window.document.createRange();
+		},
+		createTestControl: function(controller, data, view) {
+			if (!view) view = this.createNode("div");
+			return this.sys.extend(this.use.TestControl, {
+				kind: controller,
+				view: view,
+				model: data,
+			})
 		},
 		createControl: function(controller, data) {
 			let nodeName = controller.nodeNameFor ? controller.nodeNameFor(data) : "div";

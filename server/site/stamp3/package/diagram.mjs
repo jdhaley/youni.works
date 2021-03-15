@@ -20,11 +20,15 @@ export default {
 				on.textContent = "";
 				on.classList.add("diagram");
 				on.tabIndex = 0;
+				on.$ctl = on.owner.createTestControl(on.kind, on.model, on);
 				for (let model of on.model.shapes) {
 					let shape = on.owner.create(model, on.kind.use.Shape);
 					shape.diagram = on;
 					on.append(shape);
+					shape.$ctl = on.owner.createTestControl(shape.kind, model, shape);
 				}
+				console.log(on.$ctl);
+				for (let ctl of on.$ctl) console.log(ctl);
 			},
 			keydown: function(on, event) {
 				if (event.key == "Escape") {
