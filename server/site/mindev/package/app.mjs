@@ -3,6 +3,102 @@ export default {
 	use: {
 		package$base: "youni.works/base"
 	},
+	View: {
+		super$: "use.base.Control",
+		"@iterator": function* iterate() {
+			for (let i = 0, len = this.view.childNodes.length; i < len; i++) {
+				let view = this.view.childNodes[i];
+				if (view.$ctl) yield view.$ctl;
+			}
+		},
+		once$view: function() {
+			let view = this.owner.createNode("div");
+			view.$ctl = this;
+			return view;
+		},
+		append: function(control) {
+			this.view.append(control.view);
+		},
+		draw: function(data) {
+			this.bind(data);
+			this.actions.send(this, "view");
+		},
+		bind: function(data) {
+		},
+		initialize: function() {
+			//addEvents(view, type.events);
+		}
+	},
+	Frame: {
+		super$: "use.base.Owner",
+		use: {
+			type$Control: "View"
+		},
+		type$app: "Application",
+		window: null,
+		get$activeElement: function() {
+			return this.window.document.activeElement;
+		},
+		get$content: function() {
+			return this.window.document.body;
+		},
+		get$search: function() {
+			return this.window.location.search.substring(1);
+		},
+		get$selectionRange: function() {
+			let selection = this.window.getSelection();
+			if (selection && selection.rangeCount) {
+				return selection.getRangeAt(0);
+			}
+			return this.window.document.createRange();
+		},
+		create: function(type) {
+			if (typeof type != "object") type = this.app.forName(type);
+			let control = this.sys.extend(type, {
+				owner: this,
+				model: null
+			});
+			control.initialize();
+			return control;
+		},
+		createNode: function(name) {
+			let node;
+			if (name.indexOf("/") >= 0) {
+				let idx = name.lastIndexOf("/");
+				node = this.window.document.createElementNs(name.substring(0, idx), name.substring(idx + 1));
+			} else {
+				node = this.window.document.createElement(name);
+			}
+			node.to = node.childNodes; //allows send() message to be generic.
+			return node;
+		},
+		createRule: function(selector, properties) {
+			let out = `${selector} {\n`;
+			out += defineStyleProperties(properties);
+			out += "\n}";
+			let index = this.window.styles.insertRule(out);
+			return this.window.styles.cssRules[index];
+		},
+		initialize: function() {
+			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
+//			this.control(this.window);
+//			this.control(this.content);
+//			this.window.Element.prototype.view = view;
+
+			this.window.Node.prototype.owner = this;
+			this.window.styles = createStyleSheet(this.window.document);
+			addEvents(this.window, this.app.events.windowEvents);
+			addEvents(this.window.document, this.app.events.documentEvents);
+		},
+		toPixels: function(measure) {
+		    let node = this.createNode("div");
+		    node.style.height = measure;
+		    this.content.appendChild(node);
+		    let px = node.getBoundingClientRect().height;
+		    node.parentNode.removeChild(node);
+		    return px;
+		}
+	},
 	Application: {
 		super$: "use.base.Application",
 		type$mainFrame: "Frame",
@@ -44,8 +140,10 @@ export default {
 			function initializeDiagram(msg) {
 				let data = JSON.parse(msg.content);
 				data = app.sys.extend(null, data);
-				let view = app.mainFrame.content.view(data, "youni.works/diagram/Diagram");
+				let view = app.mainFrame.create("youni.works/diagram/Diagram");
 				view.file = app.conf.diagram;
+				app.mainFrame.content.append(view.view);
+				view.draw(data);
 			}
 			function initializeData(msg) {
 				let data = JSON.parse(msg.content);
@@ -64,104 +162,7 @@ export default {
 			controller.initialize();
 			return controller;
 		}
-	},
-	View: {
-		super$: "use.base.Control",
-		"@iterator": function* iterate() {
-			for (let i = 0, len = this.view.childNodes.length; i < len; i++) {
-				let view = this.view.childNodes[i];
-				if (view.$ctl) yield view.$ctl;
-			}
-		},
-		view: null,
-		nodeNameFor: function(data) {
-			return "div";
-		},
-		append: function(control) {
-			this.view.append(control.view);
-		}
-	},
-	Frame: {
-		super$: "use.base.Owner",
-		use: {
-			type$Control: "View"
-		},
-		type$app: "Application",
-		window: null,
-		get$activeElement: function() {
-			return this.window.document.activeElement;
-		},
-		get$content: function() {
-			return this.window.document.body;
-		},
-		get$search: function() {
-			return this.window.location.search.substring(1);
-		},
-		get$selectionRange: function() {
-			let selection = this.window.getSelection();
-			if (selection && selection.rangeCount) {
-				return selection.getRangeAt(0);
-			}
-			return this.window.document.createRange();
-		},
-		create: function(data, type) {
-			type = this.typeFor(data, type);
-			let nodeName = type && type.nodeNameFor(data);
-			let view = this.createNode(nodeName || "div");
-			addEvents(view, type.events);
-			let control = this.sys.extend(type, {
-				owner: this,
-				model: data,
-				view: view
-			});
-			view.$ctl = control;
-			control.initialize();
-			return control;
-		},
-		createNode: function(name) {
-			let node;
-			if (name.indexOf("/") >= 0) {
-				let idx = name.lastIndexOf("/");
-				node = this.window.document.createElementNs(name.substring(0, idx), name.substring(idx + 1));
-			} else {
-				node = this.window.document.createElement(name);
-			}
-			node.to = node.childNodes; //allows send() message to be generic.
-			return node;
-		},
-		createRule: function(selector, properties) {
-			let out = `${selector} {\n`;
-			out += defineStyleProperties(properties);
-			out += "\n}";
-			let index = this.window.styles.insertRule(out);
-			return this.window.styles.cssRules[index];
-		},
-		initialize: function() {
-			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-//			this.control(this.window);
-//			this.control(this.content);
-			this.window.Node.prototype.owner = this;
-			this.window.Element.prototype.view = view;
-			this.window.styles = createStyleSheet(this.window.document);
-			addEvents(this.window, this.app.events.windowEvents);
-			addEvents(this.window.document, this.app.events.documentEvents);
-		},
-		toPixels: function(measure) {
-		    let node = this.createNode("div");
-		    node.style.height = measure;
-		    this.content.appendChild(node);
-		    let px = node.getBoundingClientRect().height;
-		    node.parentNode.removeChild(node);
-		    return px;
-		}
 	}
-}
-
-function view(data, type) {
-	let control = this.owner.create(data, type);
-	this.append(control.view);
-	control.actions.send(control, "view");
-	return control;
 }
 
 function addEvents(control, events) {

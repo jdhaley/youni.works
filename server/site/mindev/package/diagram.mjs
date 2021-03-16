@@ -16,13 +16,18 @@ export default {
 			this.view.classList.add("diagram");
 			this.view.tabIndex = 0;
 		},
+		bind: function(data) {
+			this.owner.app.observe(this, data);
+			this.model = data;
+		},
 		extend$actions: {
 			view: function(on, event) {
 				on.view.textContent = "";
 				for (let model of on.model.shapes) {
-					let shape = on.owner.create(model, on.use.Shape);
+					let shape = on.owner.create(model.type || on.use.Shape);
 					shape.diagram = on;
 					on.append(shape);
+					shape.bind(model);
 				}
 			},
 			keydown: function(on, event) {
@@ -58,9 +63,9 @@ export default {
 			return this.view.style;
 		},
 		type$defaultContent: "Text",
-		bind: function(view, data) {
-			view.owner.app.observe(view, data);
-			view.model = data;
+		bind: function(data) {
+			this.owner.app.observe(this, data);
+			this.model = data;
 		},
 		extend$actions: {
 			view: function(on, event) {
@@ -113,8 +118,9 @@ export default {
 				switch (typeof on.model.content) {
 					case "string":
 					case "number":
-						let content = on.owner.create(on.model.content, on.defaultContent);
+						let content = on.owner.create(on.defaultContent);
 						on.append(content);
+						content.bind(on.model.content);
 						break;
 					case "boolean":
 					case "undefined":
@@ -197,8 +203,8 @@ export default {
 	},
 	Text: {
 		super$: "use.app.View",
-		bind: function(view, data) {
-			view.model = data;
+		bind: function(data) {
+			this.model = data;
 		},
 		extend$actions: {
 			view: function(on, event) {

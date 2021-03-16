@@ -114,7 +114,7 @@ function notify(control, signal) {
 		//Set the following for each iteration in case of a bad behaving control.
 		signal.source = control;
 		signal.model = control.model;
-		on.actions && on.actions.receive(on, signal);			
+		on.receive(signal);			
 	}
 }
 
