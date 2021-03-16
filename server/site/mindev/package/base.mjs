@@ -26,22 +26,18 @@ export default {
 			return name && name.indexOf("/") < 0 ? this.components[name] : this.sys.forName(name);
 		}
 	},
-	Controller: {
+	Control: {
 		super$: "Object",
-		type$app: "Application",
-		initialize: function() {
+		"@iterator": function* iterate() {
 		},
-		control: function(object) {
-			object.kind = this;
-			object.actions = this.actions;
-		},
-		bind: function(control, data) {
+		type$owner: "Owner",
+		model: undefined,
+		receive: function(signal) {
+			signal = prepareSignal(signal);
+			let action = this.actions[signal.topic];
+			action && action.call(this.actions, this, signal);			
 		},
 		extend$actions: {
-			receive: function(on, signal) {
-				signal = prepareSignal(signal);
-				this[signal.topic] && this[signal.topic].call(this, on, signal);
-			},
 			send: function(to, message) {
 				message = prepareSignal(message);
 				log(to, message);
@@ -53,35 +49,60 @@ export default {
 				event && up(on, event);
 			},
 			notify: notify
+		},
+		initialize: function() {
 		}
 	},
 	Owner: {
-		super$: "Controller",
+		super$: "Control",
 		type$app: "Application",
-		create: function(data, type) {
-			let controller;
-			if (typeof type == "object") {
-				controller = type;
-			} else {
-				type = type || data.type;
-				controller = this.app.forName(type);
-				if (!controller) {
-					console.error(`Control type "${type} does not exist.`);
-					return;
-				}
-			}
-			let control = this.createControl(controller, data);
-			controller.control(control);
-			controller.bind(control, data);
-			return control;
+		typeFor: function(data, type) {
+			type = type || data.type;
+			if (typeof type == "object") return type;
+			return this.app.forName(type);
 		},
-		createControl: function(controller, data) {
-			return this.sys.extend({
-				owner: this
+		create: function(data, type) {
+			type = this.typeFor(data, type);
+			type = this.sys.extend(type, {
+				owner: this,
+				model: data
 			});
+			type.initialize();
+			return type;
 		}
 	}
 }
+//
+//Controller: {
+//	super$: "Object",
+//	type$app: "Application",
+//	initialize: function() {
+//	},
+//	control: function(object) {
+//		object.kind = this;
+//		object.actions = this.actions;
+//	},
+//	bind: function(control, data) {
+//	},
+//	extend$actions: {
+//		receive: function(on, signal) {
+//			signal = prepareSignal(signal);
+//			this[signal.topic] && this[signal.topic].call(this, on, signal);
+//		},
+//		send: function(to, message) {
+//			message = prepareSignal(message);
+//			log(to, message);
+//			message && down(to, message);
+//		},
+//		sense: function(on, event) {
+//			event = prepareSignal(event);
+//			log(on, event);
+//			event && up(on, event);
+//		},
+//		notify: notify
+//	}
+//},
+//
 
 Symbol.observers = Symbol("observers");
 
@@ -136,8 +157,9 @@ function prepareSignal(signal) {
 
 function down(on, message) {
 	if (!message.topic) return;
-	on.actions && on.actions.receive(on, message);
-	if (on.to) for (on of on.to) {
+	on.receive(message);
+	if (message.push) message.pushPath(on);
+	for (on of on) {
 		down(on, message);
 	}
 }
@@ -145,7 +167,7 @@ function down(on, message) {
 function up(on, event) {
 	if (event.path) for (let on of event.path) {
 		if (!event.topic) return;
-		on.actions && on.actions.receive(on, event);
+		on.receive(event);
 	}
 	if (event.preventDefault && !event.topic) event.preventDefault();
 }

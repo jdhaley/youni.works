@@ -52,12 +52,12 @@ export default {
 				UP(event);
 			}
 		},
-		resize: DOWN
+//		resize: DOWN
 	},
-	documentEvents: {
-		selectionstart: SELECTION_EVENT,
-		selectionchange: SELECTION_EVENT
-	}
+//	documentEvents: {
+//		selectionstart: SELECTION_EVENT,
+//		selectionchange: SELECTION_EVENT
+//	}
 }
 
 function SELECTION_EVENT(event) {
@@ -65,10 +65,32 @@ function SELECTION_EVENT(event) {
 	event.target.owner.actions.sense(event.range.commonAncestorContainer, event);
 }
 
-function UP(event) {
-	event.target.owner.actions.sense(event.target, event);
+function prepareSignal(signal) {
+	if (typeof signal != "object") {
+		signal = {
+			topic: signal
+		};
+	}
+	signal.stopPropagation && signal.stopPropagation();
+	if (!signal.topic) signal.topic = signal.type;
+	return signal;
 }
 
-function DOWN(event) {
-	event.target.owner.actions.send(event.target, event);
+function UP(event) {
+	event = prepareSignal(event);
+	log(event.target, event);
+	for (let on of event.path) {
+		if (!event.topic) return;
+		on.$ctl && on.$ctl.receive(event);
+	}
+	if (!event.topic) event.preventDefault();
+}
+
+
+const DONTLOG = ["receive", "track", "mousemove", "selectionchange"];
+function log(on, event) {
+	for (let topic of DONTLOG) {
+		if (event.topic == topic) return;
+	}
+	console.debug(event.topic + " " + on.nodeName + " " + on.className);
 }

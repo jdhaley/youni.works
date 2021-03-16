@@ -20,8 +20,8 @@ export default {
 		},
 		size: function(w, h) {
 			let control = this.control;
-			if (w < control.kind.minWidth) w = control.kind.minWidth;
-			if (h < control.kind.minHeight) h = control.kind.minHeight;
+			if (w < control.minWidth) w = control.minWidth;
+			if (h < control.minHeight) h = control.minHeight;
 			this.after.width = w;
 			this.after.height = h;
 			control.model.width = w;
@@ -54,14 +54,14 @@ export default {
 				before: this.sys.extend(null, {
 					x: model.x,
 					y: model.y,
-					width: model.width || control.kind.minWidth,
-					height: model.height || control.kind.minHeight
+					width: model.width || control.minWidth,
+					height: model.height || control.minHeight
 				}),
 				after: this.sys.extend(null, {
 					x: model.x,
 					y: model.y,
-					width: model.width || control.kind.minWidth,
-					height: model.height || control.kind.minHeight
+					width: model.width || control.minWidth,
+					height: model.height || control.minHeight
 				})
 			});
 		}

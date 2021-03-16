@@ -38,7 +38,7 @@ export default {
 				for (let conf of components) {
 					app.components[conf.name] = app.createController(conf);
 				}
-				app.open(app.conf.dataSource, initializeData);
+			//	app.open(app.conf.dataSource, initializeData);
 				app.open(app.conf.diagram, initializeDiagram)
 			}
 			function initializeDiagram(msg) {
@@ -65,20 +65,26 @@ export default {
 			return controller;
 		}
 	},
-	TestControl: {
-		super$: "Object",
-		view: null,
-		model: null,
+	View: {
+		super$: "use.base.Control",
 		"@iterator": function* iterate() {
-			for (let i = 0, len = this.view.childNodes.length; i < len; i++) yield this.view.childNodes[i].$ctl;
+			for (let i = 0, len = this.view.childNodes.length; i < len; i++) {
+				let view = this.view.childNodes[i];
+				if (view.$ctl) yield view.$ctl;
+			}
 		},
-		extend$actions: {
+		view: null,
+		nodeNameFor: function(data) {
+			return "div";
 		},
+		append: function(control) {
+			this.view.append(control.view);
+		}
 	},
 	Frame: {
 		super$: "use.base.Owner",
 		use: {
-			type$TestControl: "TestControl"
+			type$Control: "View"
 		},
 		type$app: "Application",
 		window: null,
@@ -98,18 +104,18 @@ export default {
 			}
 			return this.window.document.createRange();
 		},
-		createTestControl: function(controller, data, view) {
-			if (!view) view = this.createNode("div");
-			return this.sys.extend(this.use.TestControl, {
-				kind: controller,
-				view: view,
+		create: function(data, type) {
+			type = this.typeFor(data, type);
+			let nodeName = type && type.nodeNameFor(data);
+			let view = this.createNode(nodeName || "div");
+			addEvents(view, type.events);
+			let control = this.sys.extend(type, {
+				owner: this,
 				model: data,
-			})
-		},
-		createControl: function(controller, data) {
-			let nodeName = controller.nodeNameFor ? controller.nodeNameFor(data) : "div";
-			let control = this.createNode(nodeName);
-			addEvents(control, controller.events);
+				view: view
+			});
+			view.$ctl = control;
+			control.initialize();
 			return control;
 		},
 		createNode: function(name) {
@@ -132,8 +138,8 @@ export default {
 		},
 		initialize: function() {
 			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-			this.control(this.window);
-			this.control(this.content);
+//			this.control(this.window);
+//			this.control(this.content);
 			this.window.Node.prototype.owner = this;
 			this.window.Element.prototype.view = view;
 			this.window.styles = createStyleSheet(this.window.document);
@@ -148,20 +154,13 @@ export default {
 		    node.parentNode.removeChild(node);
 		    return px;
 		}
-	},
-	View: {
-		super$: "use.base.Controller",
-		type$app: "Application",
-		nodeNameFor: function(data) {
-			return "DIV";
-		}
 	}
 }
 
 function view(data, type) {
 	let control = this.owner.create(data, type);
-	this.append(control);
-	this.kind.actions.send(control, "view");
+	this.append(control.view);
+	control.actions.send(control, "view");
 	return control;
 }
 

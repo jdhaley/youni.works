@@ -11,28 +11,23 @@ export default {
 			type$Command: "use.command.DrawCommand",
 			type$Commands: "use.command.Commands"
 		},
-		bind: function(view, data) {
-			view.model = data;
-			view.commands = this.use.Commands.instance();
+		initialize: function() {
+			this.commands = this.use.Commands.instance();
+			this.view.classList.add("diagram");
+			this.view.tabIndex = 0;
 		},
 		extend$actions: {
 			view: function(on, event) {
-				on.textContent = "";
-				on.classList.add("diagram");
-				on.tabIndex = 0;
-				on.$ctl = on.owner.createTestControl(on.kind, on.model, on);
+				on.view.textContent = "";
 				for (let model of on.model.shapes) {
-					let shape = on.owner.create(model, on.kind.use.Shape);
+					let shape = on.owner.create(model, on.use.Shape);
 					shape.diagram = on;
 					on.append(shape);
-					shape.$ctl = on.owner.createTestControl(shape.kind, model, shape);
 				}
-				console.log(on.$ctl);
-				for (let ctl of on.$ctl) console.log(ctl);
 			},
 			keydown: function(on, event) {
 				if (event.key == "Escape") {
-					on.focus();
+					on.view.focus();
 				}
 				if (event.key == "s" && event.ctrlKey) {
 					event.preventDefault();
@@ -40,12 +35,12 @@ export default {
 				}
 				if (event.key == "z" && event.ctrlKey) {
 					event.preventDefault();
-					on.focus();
+					on.view.focus();
 					on.commands.undo();
 				}
 				if (event.key == "y" && event.ctrlKey) {
 					event.preventDefault();
-					on.focus();
+					on.view.focus();
 					on.commands.redo();
 				}
 			}
@@ -59,6 +54,9 @@ export default {
 		border: 6,
 		minWidth: 48,
 		minHeight: 24,
+		get$style: function() {
+			return this.view.style;
+		},
 		type$defaultContent: "Text",
 		bind: function(view, data) {
 			view.owner.app.observe(view, data);
@@ -66,17 +64,17 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				on.textContent = "";
-				on.classList.add("shape");
+				on.view.textContent = "";
+				on.view.classList.add("shape");
 				this.draw(on, event);
 				this.viewContent(on, event);
 			},
 			draw: function(on, event) {
-				on.style.width = (on.model.width || on.kind.minWidth) + "px";
-				on.style.height = (on.model.height || on.kind.minHeight) + "px";
-				on.style.top = on.model.y + "px";
-				on.style.left = on.model.x + "px";
-				on.scrollIntoView();
+				on.view.style.width = (on.model.width || on.minWidth) + "px";
+				on.view.style.height = (on.model.height || on.minHeight) + "px";
+				on.view.style.top = on.model.y + "px";
+				on.view.style.left = on.model.x + "px";
+				on.view.scrollIntoView();
 			},
 			move: function(on, event) {
 				let cmd = on.diagram.command;
@@ -88,7 +86,7 @@ export default {
 				let model = on.model;
 				switch (cmd.horiz) {
 					case "L":
-						if (cmd.before.width - event.trackX < on.kind.minWidth) break;
+						if (cmd.before.width - event.trackX < on.minWidth) break;
 						cmd.moveTo(cmd.before.x + event.trackX, model.y);
 						cmd.size(cmd.before.width - event.trackX, model.height);
 						break;
@@ -98,7 +96,7 @@ export default {
 				}
 				switch (cmd.vert) {
 					case "T":
-						if (cmd.before.height - event.trackY < on.kind.minHeight) break;
+						if (cmd.before.height - event.trackY < on.minHeight) break;
 						cmd.moveTo(model.x, cmd.before.y + event.trackY);
 						cmd.size(model.width, cmd.before.height - event.trackY);
 						break;
@@ -115,7 +113,7 @@ export default {
 				switch (typeof on.model.content) {
 					case "string":
 					case "number":
-						let content = on.owner.create(on.model.content, on.kind.defaultContent);
+						let content = on.owner.create(on.model.content, on.defaultContent);
 						on.append(content);
 						break;
 					case "boolean":
@@ -125,8 +123,8 @@ export default {
 					case "bigint":
 					case "object":
 					default:
-						on.textContent = "";
-						on.textContent = on.model.content;
+						on.view.textContent = "";
+						on.view.textContent = on.model.content;
 						break;
 				}
 			},
@@ -135,17 +133,17 @@ export default {
 				event.preventDefault();
 				event.track = on; // Tell the listener what to track.
 				setZone(on, event);
-				on.style.outline = "3px solid rgba(64, 128, 64, .3)";
-				on.style.zIndex = "1";
+				on.view.style.outline = "3px solid rgba(64, 128, 64, .3)";
+				on.view.style.zIndex = "1";
 				on.$hzone = event.horiz;
 				on.$vzone = event.vert;
-				on.diagram.focus();
+				on.diagram.view.focus();
 				if (on.diagram.command) console.log("no mouse up");
 			},
 			track: function(on, event) {
 				let cmd = on.diagram.command;
 				if (!cmd) {
-					cmd = on.kind.use.DrawCommand.instance(on);
+					cmd = on.use.DrawCommand.instance(on);
 					cmd.horiz = on.$hzone;
 					cmd.vert = on.$vzone;
 					on.diagram.command = cmd;
@@ -204,16 +202,17 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				on.classList.add("text");
-				on.textContent = "";
-				on.innerHTML = "<p>" + on.model + "</p>";
-				on.contentEditable = true;
+				let view = on.view;
+				view.classList.add("text");
+				view.textContent = "";
+				view.innerHTML = "<p>" + on.model + "</p>";
+				view.contentEditable = true;
 			},
 			focusin: function(on, event) {
-				on.parentNode.style.zIndex = "8";
+				on.view.parentNode.style.zIndex = "8";
 			},
 			focusout: function(on, event) {
-				on.parentNode.style.zIndex = "";
+				on.view.parentNode.style.zIndex = "";
 			},
 			dblclick: function(on, event) {
 				
@@ -238,8 +237,8 @@ const zoneCursor = {
 }
 
 function setZone(on, event) {
-	let border = on.kind.border;
-	let rect = on.getBoundingClientRect();
+	let border = on.border;
+	let rect = on.view.getBoundingClientRect();
 
 	let horiz = event.clientX - rect.x;
 	let vert = event.clientY - rect.y;
@@ -257,5 +256,5 @@ function setZone(on, event) {
 	} else if (horiz > rect.width - border) {
 		event.horiz = "R"
 	}
-	on.style.cursor = zoneCursor[event.vert + event.horiz];
+	on.view.style.cursor = zoneCursor[event.vert + event.horiz];
 }
