@@ -5,16 +5,21 @@ export default {
 	},
 	View: {
 		super$: "use.base.Control",
-		"@iterator": function* iterate() {
-			for (let i = 0, len = this.view.childNodes.length; i < len; i++) {
-				let view = this.view.childNodes[i];
-				if (view.$ctl) yield view.$ctl;
-			}
-		},
 		once$view: function() {
 			let view = this.owner.createNode("div");
 			view.$ctl = this;
 			return view;
+		},
+		once$to: function() {
+			const nodes = this.view.childNodes;
+			return this.sys.extend(null, {
+				"@iterator": function* iterate() {
+					for (let i = 0, len = nodes.length; i < len; i++) {
+						let view = nodes[i];
+						if (view.$ctl) yield view.$ctl;
+					}
+				}				
+			});
 		},
 		append: function(control) {
 			this.view.append(control.view);

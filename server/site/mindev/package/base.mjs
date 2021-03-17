@@ -1,36 +1,9 @@
 export default {
 	package$: "youni.works/base",
 	package$util: "youni.works/util",
-	Application: {
-		super$: "Object",
-		components: null,
-		type$remote: "util.Remote",
-		observe: function(observer, object) {
-			unobserve(observer, observer.model);
-			observe(observer, object);
-		},
-		open: function(pathname, receiver) {
-			this.remote.service(receiver, "opened", {
-				url: pathname,
-				method: "GET"
-			});
-		},
-		save: function(pathname, content, receiver) {
-			this.remote.service(receiver, "saved", {
-				url: pathname,
-				content: content,
-				method: "PUT"
-			});
-		},
-		forName: function(name) {
-			return name && name.indexOf("/") < 0 ? this.components[name] : this.sys.forName(name);
-		}
-	},
 	Control: {
 		super$: "Object",
-		"@iterator": function* iterate() {
-		},
-		type$owner: "Owner",
+		to: Object.freeze([]),
 		model: undefined,
 		receive: function(signal) {
 			signal = prepareSignal(signal);
@@ -69,6 +42,31 @@ export default {
 			});
 			type.initialize();
 			return type;
+		}
+	},
+	Application: {
+		super$: "Object",
+		components: null,
+		type$remote: "util.Remote",
+		observe: function(observer, object) {
+			unobserve(observer, observer.model);
+			observe(observer, object);
+		},
+		open: function(pathname, receiver) {
+			this.remote.service(receiver, "opened", {
+				url: pathname,
+				method: "GET"
+			});
+		},
+		save: function(pathname, content, receiver) {
+			this.remote.service(receiver, "saved", {
+				url: pathname,
+				content: content,
+				method: "PUT"
+			});
+		},
+		forName: function(name) {
+			return name && name.indexOf("/") < 0 ? this.components[name] : this.sys.forName(name);
 		}
 	}
 }
@@ -159,7 +157,7 @@ function down(on, message) {
 	if (!message.topic) return;
 	on.receive(message);
 	if (message.push) message.pushPath(on);
-	for (on of on) {
+	for (on of on.to) {
 		down(on, message);
 	}
 }
