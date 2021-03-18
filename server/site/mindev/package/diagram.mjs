@@ -11,7 +11,7 @@ export default {
 			type$Command: "use.command.DrawCommand",
 			type$Commands: "use.command.Commands"
 		},
-		initialize: function() {
+		start: function() {
 			this.commands = this.use.Commands.instance();
 			this.view.classList.add("diagram");
 			this.view.tabIndex = 0;

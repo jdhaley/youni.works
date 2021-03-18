@@ -23,7 +23,7 @@ export default {
 			},
 			notify: notify
 		},
-		initialize: function() {
+		start: function() {
 		}
 	},
 	Owner: {
@@ -40,7 +40,7 @@ export default {
 				owner: this,
 				model: data
 			});
-			type.initialize();
+			type.start();
 			return type;
 		}
 	},

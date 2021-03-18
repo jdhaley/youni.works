@@ -49,7 +49,7 @@ export default {
 				}
 			}
 		},
-		initialize: function() {
+		start: function() {
 			if (!this.conf.properties) return;
 			let properties = [];
 			for (let conf of this.conf.properties) {

@@ -30,7 +30,7 @@ export default {
 		},
 		bind: function(data) {
 		},
-		initialize: function() {
+		start: function() {
 			//addEvents(view, type.events);
 		}
 	},
@@ -63,7 +63,7 @@ export default {
 				owner: this,
 				model: null
 			});
-			control.initialize();
+			control.start();
 			return control;
 		},
 		createNode: function(name) {
@@ -164,7 +164,7 @@ export default {
 				conf: conf
 			});
 			conf.type = controller;
-			controller.initialize();
+		//	controller.initialize();
 			return controller;
 		}
 	}
