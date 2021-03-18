@@ -163,7 +163,7 @@ export default {
 				}
 			},
 			trackEnd: function(on, event) {
-				event.topic = "";
+				event.subject = "";
 				on.style.outline = "";
 				on.style.cursor = "";
 				on.style.zIndex = "";

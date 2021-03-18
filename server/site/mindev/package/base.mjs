@@ -8,7 +8,7 @@ export default {
 		},
 		receive: function(signal) {
 			signal = prepareSignal(signal);
-			let action = this.actions[signal.topic];
+			let action = this.actions[signal.subject];
 			action && action.call(this.actions, this, signal);			
 		},
 		//Re-think unobserve.
@@ -89,7 +89,7 @@ export default {
 //	extend$actions: {
 //		receive: function(on, signal) {
 //			signal = prepareSignal(signal);
-//			this[signal.topic] && this[signal.topic].call(this, on, signal);
+//			this[signal.subject] && this[signal.subject].call(this, on, signal);
 //		},
 //		send: function(to, message) {
 //			message = prepareSignal(message);
@@ -149,16 +149,16 @@ function observe(control, model) {
 function prepareSignal(signal) {
 	if (typeof signal != "object") {
 		signal = {
-			topic: signal
+			subject: signal
 		};
 	}
 	signal.stopPropagation && signal.stopPropagation();
-	if (!signal.topic) signal.topic = signal.type;
+	if (!signal.subject) signal.subject = signal.type;
 	return signal;
 }
 
 function down(on, message) {
-	if (!message.topic) return;
+	if (!message.subject) return;
 	on.receive(message);
 	if (message.push) message.pushPath(on);
 	for (on of on.to) {
@@ -168,16 +168,16 @@ function down(on, message) {
 
 function up(on, event) {
 	if (event.path) for (let on of event.path) {
-		if (!event.topic) return;
+		if (!event.subject) return;
 		on.receive(event);
 	}
-	if (event.preventDefault && !event.topic) event.preventDefault();
+	if (event.preventDefault && !event.subject) event.preventDefault();
 }
 
 const DONTLOG = ["receive", "track", "mousemove", "selectionchange"];
 function log(on, event) {
-	for (let topic of DONTLOG) {
-		if (event.topic == topic) return;
+	for (let subject of DONTLOG) {
+		if (event.subject == subject) return;
 	}
-	console.debug(event.topic + " " + on.nodeName + " " + on.className);
+	console.debug(event.subject + " " + on.nodeName + " " + on.className);
 }

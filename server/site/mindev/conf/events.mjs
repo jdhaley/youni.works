@@ -19,7 +19,7 @@ export default {
 		mousemove: function(event) {
 			UP(event);
 			if (TRACK) {
-				event.topic = "track";
+				event.subject = "track";
 				event.trackX = event.clientX - TRACK.clientX;
 				event.trackY = event.clientY - TRACK.clientY;
 				TRACK.track.actions.send(TRACK.track, event);
@@ -29,7 +29,7 @@ export default {
 		mouseup: function(event) {
 			UP(event);
 			if (TRACK) {
-				event.topic = "trackEnd"
+				event.subject = "trackEnd"
 				event.trackX = event.clientX - TRACK.clientX;
 				event.trackY = event.clientY - TRACK.clientY;
 				TRACK.track.actions.send(TRACK.track, event);
@@ -68,11 +68,11 @@ function SELECTION_EVENT(event) {
 function prepareSignal(signal) {
 	if (typeof signal != "object") {
 		signal = {
-			topic: signal
+			subject: signal
 		};
 	}
 	signal.stopPropagation && signal.stopPropagation();
-	if (!signal.topic) signal.topic = signal.type;
+	if (!signal.subject) signal.subject = signal.type;
 	return signal;
 }
 
@@ -80,17 +80,17 @@ function UP(event) {
 	event = prepareSignal(event);
 	log(event.target, event);
 	for (let on of event.path) {
-		if (!event.topic) return;
+		if (!event.subject) return;
 		on.$ctl && on.$ctl.receive(event);
 	}
-	if (!event.topic) event.preventDefault();
+	if (!event.subject) event.preventDefault();
 }
 
 
 const DONTLOG = ["receive", "track", "mousemove", "selectionchange"];
 function log(on, event) {
-	for (let topic of DONTLOG) {
-		if (event.topic == topic) return;
+	for (let subject of DONTLOG) {
+		if (event.subject == subject) return;
 	}
-	console.debug(event.topic + " " + on.nodeName + " " + on.className);
+	console.debug(event.subject + " " + on.nodeName + " " + on.className);
 }
