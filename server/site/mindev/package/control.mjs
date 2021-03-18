@@ -1,5 +1,5 @@
 export default {
-	package$: "youni.works/base",
+	package$: "youni.works/control",
 	package$util: "youni.works/util",
 	Control: {
 		super$: "Object",

@@ -1,10 +1,10 @@
 export default {
 	package$: "youni.works/grid",
 	use: {
-		package$app: "youni.works/app"
+		package$view: "youni.works/view"
 	},
 	Property: {
-		super$: "use.app.View",
+		super$: "use.view.View",
 		type$comp: "Component",
 		get$app: function() {
 			return this.comp.app;
@@ -21,7 +21,7 @@ export default {
 		}
 	},
 	Component: {
-		super$: "use.app.View",
+		super$: "use.view.View",
 		conf: {
 			properties: ""
 		},

@@ -1,11 +1,11 @@
 export default {
 	package$: "youni.works/diagram",
 	use: {
-		package$app: "youni.works/app",
+		package$view: "youni.works/view",
 		package$command: "youni.works/diagram/command"
 	},
 	Diagram: {
-		super$: "use.app.View",
+		super$: "use.view.View",
 		use: {
 			type$Shape: "Shape",
 			type$Command: "use.command.DrawCommand",
@@ -52,7 +52,7 @@ export default {
 		}
 	},
 	Shape: {
-		super$: "use.app.View",
+		super$: "use.view.View",
 		use: {
 			type$DrawCommand: "use.command.DrawCommand"
 		},
@@ -202,7 +202,7 @@ export default {
 		}
 	},
 	Text: {
-		super$: "use.app.View",
+		super$: "use.view.View",
 		bind: function(data) {
 			this.sys.define(this, "model", data);
 		},
@@ -226,7 +226,7 @@ export default {
 		}
 	},
 	Connector: {
-		super$: "use.app.View"
+		super$: "use.view.View"
 	}
 }
 

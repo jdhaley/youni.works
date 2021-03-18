@@ -1,6 +1,6 @@
 import util from "./package/util.mjs";
-import base from "./package/base.mjs";
-import app from "./package/app.mjs";
+import control from "./package/control.mjs";
+import view from "./package/view.mjs";
 import grid from "./package/grid.mjs";
 import prop from "./package/property.mjs";
 import diagram from "./package/diagram.mjs";
@@ -17,16 +17,16 @@ export default {
 		util: util,
 		command: command,
 		diagramCommand: diagramCommand,
-		base: base,
-		app: app,
+		control: control,
+		view: view,
 		grid: grid,
 		prop: prop,
 		diagram: diagram
 	},
 	app: {
-		type$: "use.app.Application",
+		type$: "use.view.Application",
 		use: {
-			type$Frame: "use.app.Frame",
+			type$Frame: "use.view.Frame",
 			type$Diagram: "use.diagram.Diagram",
 			type$Component: "use.grid.Component"
 		},

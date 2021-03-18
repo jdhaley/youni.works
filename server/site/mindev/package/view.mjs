@@ -1,11 +1,11 @@
 export default {
-	package$: "youni.works/app",
+	package$: "youni.works/view",
 	use: {
-		package$base: "youni.works/base",
+		package$control: "youni.works/control",
 		package$util: "youni.works/util"
 	},
 	View: {
-		super$: "use.base.Control",
+		super$: "use.control.Control",
 		model: undefined,
 		once$view: function() {
 			let view = this.owner.createNode("div");
@@ -26,18 +26,18 @@ export default {
 		append: function(control) {
 			this.view.append(control.view);
 		},
+		bind: function(model) {
+		},
 		draw: function(data) {
 			this.bind(data);
 			this.actions.send(this, "view");
 		},
-		bind: function(data) {
-		},
-		start: function() {
-			//addEvents(view, type.events);
-		}
+//		start: function() {
+//			addEvents(view, type.events);
+//		}
 	},
 	Frame: {
-		super$: "use.base.Owner",
+		super$: "use.control.Owner",
 		use: {
 			type$Control: "View"
 		},
