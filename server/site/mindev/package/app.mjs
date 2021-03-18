@@ -1,10 +1,12 @@
 export default {
 	package$: "youni.works/app",
 	use: {
-		package$base: "youni.works/base"
+		package$base: "youni.works/base",
+		package$util: "youni.works/util"
 	},
 	View: {
 		super$: "use.base.Control",
+		model: undefined,
 		once$view: function() {
 			let view = this.owner.createNode("div");
 			view.$ctl = this;
@@ -40,6 +42,9 @@ export default {
 			type$Control: "View"
 		},
 		type$app: "Application",
+		get$components: function() {
+			return this.app.components;
+		},
 		window: null,
 		get$activeElement: function() {
 			return this.window.document.activeElement;
@@ -56,15 +61,6 @@ export default {
 				return selection.getRangeAt(0);
 			}
 			return this.window.document.createRange();
-		},
-		create: function(type) {
-			if (typeof type != "object") type = this.app.forName(type);
-			let control = this.sys.extend(type, {
-				owner: this,
-				model: null
-			});
-			control.start();
-			return control;
 		},
 		createNode: function(name) {
 			let node;
@@ -105,7 +101,8 @@ export default {
 		}
 	},
 	Application: {
-		super$: "use.base.Application",
+		super$: "Object",
+		type$remote: "use.util.Remote",
 		type$mainFrame: "Frame",
 		components: null,
 		propertyType: null,
@@ -120,6 +117,19 @@ export default {
 				window.owner.initialize();
 			}
 			return window.owner;
+		},
+		open: function(pathname, receiver) {
+			this.remote.service(receiver, "opened", {
+				url: pathname,
+				method: "GET"
+			});
+		},
+		save: function(pathname, content, receiver) {
+			this.remote.service(receiver, "saved", {
+				url: pathname,
+				content: content,
+				method: "PUT"
+			});
 		},
 		initialize: function(conf) {
 			console.log(this);
@@ -157,15 +167,15 @@ export default {
 			}
 		},
 		createController: function(conf, defaultType) {
-			conf = this.sys.extend(null, conf);
-			let controller = this.forName(conf.type) || defaultType || this.use.Component;
-			controller = this.sys.extend(controller, {
-				app: this,
-				conf: conf
-			});
-			conf.type = controller;
-		//	controller.initialize();
-			return controller;
+//			conf = this.sys.extend(null, conf);
+//			let controller = this.forName(conf.type) || defaultType || this.use.Component;
+//			controller = this.sys.extend(controller, {
+//				app: this,
+//				conf: conf
+//			});
+//			conf.type = controller;
+//			controller.initialize();
+//			return controller;
 		}
 	}
 }

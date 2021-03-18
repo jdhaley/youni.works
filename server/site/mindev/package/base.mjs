@@ -4,11 +4,16 @@ export default {
 	Control: {
 		super$: "Object",
 		to: Object.freeze([]),
-		model: undefined,
+		start: function() {
+		},
 		receive: function(signal) {
 			signal = prepareSignal(signal);
 			let action = this.actions[signal.topic];
 			action && action.call(this.actions, this, signal);			
+		},
+		//Re-think unobserve.
+		observe: function(object) {
+			observe(this, object);
 		},
 		extend$actions: {
 			send: function(to, message) {
@@ -22,54 +27,53 @@ export default {
 				event && up(on, event);
 			},
 			notify: notify
-		},
-		start: function() {
 		}
 	},
 	Owner: {
 		super$: "Control",
-		type$app: "Application",
-		typeFor: function(data, type) {
-			type = type || data.type;
-			if (typeof type == "object") return type;
-			return this.app.forName(type);
-		},
-		create: function(data, type) {
-			type = this.typeFor(data, type);
-			type = this.sys.extend(type, {
-				owner: this,
-				model: data
-			});
-			type.start();
-			return type;
-		}
-	},
-	Application: {
-		super$: "Object",
-		components: null,
-		type$remote: "util.Remote",
-		observe: function(observer, object) {
-			unobserve(observer, observer.model);
-			observe(observer, object);
-		},
-		open: function(pathname, receiver) {
-			this.remote.service(receiver, "opened", {
-				url: pathname,
-				method: "GET"
-			});
-		},
-		save: function(pathname, content, receiver) {
-			this.remote.service(receiver, "saved", {
-				url: pathname,
-				content: content,
-				method: "PUT"
-			});
+		components: {
 		},
 		forName: function(name) {
 			return name && name.indexOf("/") < 0 ? this.components[name] : this.sys.forName(name);
+		},
+//		typeFor: function(data, type) {
+//			type = type || data.type;
+//			if (typeof type == "object") return type;
+//			return this.app.forName(type);
+//		},
+		create: function(type) {
+			if (typeof type != "object") type = this.forName(type);
+			let control = this.sys.extend(type, {
+				owner: this
+			});
+			control.start();
+			return control;
 		}
 	}
 }
+//Application: {
+//	super$: "Object",
+//	components: null,
+//	type$remote: "util.Remote",
+//	observe: function(observer, object) {
+//		unobserve(observer, observer.model);
+//		observe(observer, object);
+//	},
+//	open: function(pathname, receiver) {
+//		this.remote.service(receiver, "opened", {
+//			url: pathname,
+//			method: "GET"
+//		});
+//	},
+//	save: function(pathname, content, receiver) {
+//		this.remote.service(receiver, "saved", {
+//			url: pathname,
+//			content: content,
+//			method: "PUT"
+//		});
+//	}
+//}
+
 //
 //Controller: {
 //	super$: "Object",

@@ -17,8 +17,8 @@ export default {
 			this.view.tabIndex = 0;
 		},
 		bind: function(data) {
-			this.owner.app.observe(this, data);
-			this.model = data;
+			this.observe(data);
+			this.sys.define(this, "model", data);
 		},
 		extend$actions: {
 			view: function(on, event) {
@@ -64,8 +64,8 @@ export default {
 		},
 		type$defaultContent: "Text",
 		bind: function(data) {
-			this.owner.app.observe(this, data);
-			this.model = data;
+			this.observe(data);
+			this.sys.define(this, "model", data);
 		},
 		extend$actions: {
 			view: function(on, event) {
@@ -204,7 +204,7 @@ export default {
 	Text: {
 		super$: "use.app.View",
 		bind: function(data) {
-			this.model = data;
+			this.sys.define(this, "model", data);
 		},
 		extend$actions: {
 			view: function(on, event) {
