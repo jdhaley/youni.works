@@ -20,9 +20,11 @@ export default {
 			UP(event);
 			if (TRACK) {
 				event.subject = "track";
-				event.trackX = event.clientX - TRACK.clientX;
-				event.trackY = event.clientY - TRACK.clientY;
-				TRACK.track.actions.send(TRACK.track, event);
+				event.track = TRACK.track;
+				event.moveX = event.x - TRACK.x;
+				event.moveY = event.y - TRACK.y;
+				event.track.actions.send(event.track, event);
+				TRACK = event;
 				return;
 			}
 		},
@@ -30,8 +32,9 @@ export default {
 			UP(event);
 			if (TRACK) {
 				event.subject = "trackEnd"
-				event.trackX = event.clientX - TRACK.clientX;
-				event.trackY = event.clientY - TRACK.clientY;
+				event.track = TRACK.track;
+				event.moveX = 0;
+				event.moveY = 0;
 				TRACK.track.actions.send(TRACK.track, event);
 				TRACK = null;
 			}

@@ -10,59 +10,33 @@ export default {
 		control: null,
 		before: null,
 		after: null,
-		moveTo: function(x, y) {
-			x = x < 0 ? 0 : x;
-			y = y < 0 ? 0 : y;
-			this.after.x = x;
-			this.after.y = y;
-			this.control.model.x = x;
-			this.control.model.y = y;
-		},
-		size: function(w, h) {
-			let control = this.control;
-			if (w < control.minWidth) w = control.minWidth;
-			if (h < control.minHeight) h = control.minHeight;
-			this.after.width = w;
-			this.after.height = h;
-			control.model.width = w;
-			control.model.height = h;
-		},
 		exec: function() {
-			let model = this.control.model;
-			let after = this.after;
-			model.x = after.x;
-			model.y = after.y;
-			model.width = after.width;
-			model.height = after.height;
-			this.control.actions.notify(this.control, "draw");
+			let control = this.control;
+			control.set(control.model, this.after);
+			control.actions.notify(control, "draw");
 		},
 		undo: function() {
-			let model = this.control.model;
-			let before = this.before;
-			model.x = before.x;
-			model.y = before.y;
-			model.width = before.width;
-			model.height = before.height;
-			this.control.actions.notify(this.control, "draw");
+			let control = this.control;
+			control.set(control.model, this.before);
+			control.actions.notify(control, "draw");
+		},
+		update: function() {
+			let control = this.control;
+			control.set(this.after, control.model);
+			control.actions.notify(control, "draw");
 		},
 		instance: function(control) {
 			let model = control.model;
+			let before = this.sys.extend();
+			control.set(before, model);
+			let after = this.sys.extend();
+			control.set(after, model);
 			return this.sys.extend(this, {
 				prior: null,
 				next: null,
 				control: control,
-				before: this.sys.extend(null, {
-					x: model.x,
-					y: model.y,
-					width: model.width || control.minWidth,
-					height: model.height || control.minHeight
-				}),
-				after: this.sys.extend(null, {
-					x: model.x,
-					y: model.y,
-					width: model.width || control.minWidth,
-					height: model.height || control.minHeight
-				})
+				before: before,
+				after: after
 			});
 		}
 	}

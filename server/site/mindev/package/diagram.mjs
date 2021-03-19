@@ -67,6 +67,34 @@ export default {
 			this.observe(data);
 			this.sys.define(this, "model", data);
 		},
+		moveTo: function(x, y) {
+			this.model.x = x > 0 ? x : 0;
+			this.model.y = y > 0 ? y : 0;
+		},
+		size: function(w, h) {
+			let control = this.control;
+			//control.setSize(w, h);
+			if (w < control.minWidth) w = control.minWidth;
+			if (h < control.minHeight) h = control.minHeight;
+			this.after.width = w;
+			this.after.height = h;
+			control.model.width = w;
+			control.model.height = h;
+		},
+		moveTo: function(x, y) {
+			this.model.x = x > 0 ? x : 0;
+			this.model.y = y > 0 ? y : 0;
+		},
+		sizeTo: function(width, height) {
+			this.model.width = width > this.minWidth ? width : this.minWidth;
+			this.model.height = height > this.minHeight ? height : this.minHeight;
+		},
+		set: function(dest, source) {
+			dest.x = source.x > 0 ? source.x : 0;
+			dest.y = source.y > 0 ? source.y : 0;
+			dest.width = source.width > this.minWidth ? source.width : this.minWidth;
+			dest.height = source.height > this.minHeight ? source.height : this.minHeight;
+		},
 		extend$actions: {
 			view: function(on, event) {
 				on.view.textContent = "";
@@ -82,35 +110,35 @@ export default {
 				on.view.scrollIntoView();
 			},
 			move: function(on, event) {
-				let cmd = on.diagram.command;
-				cmd.moveTo(cmd.before.x + event.trackX, cmd.before.y + event.trackY);
+				let model = on.model;
+				on.moveTo(model.x + event.moveX, model.y + event.moveY);
+				on.set(on.diagram.command.after, model);
 				this.notify(on, "draw");
 			},
 			size: function(on, event) {
-				let cmd = on.diagram.command;
 				let model = on.model;
-				switch (cmd.horiz) {
+				switch (on.horiz) {
 					case "L":
-						if (cmd.before.width - event.trackX < on.minWidth) break;
-						cmd.moveTo(cmd.before.x + event.trackX, model.y);
-						cmd.size(cmd.before.width - event.trackX, model.height);
+//						if (cmd.before.width - event.trackX < on.minWidth) break;
+						on.moveTo(model.x + event.moveX, model.y);
+						on.sizeTo(model.width - event.moveX, model.height);
 						break;
 					case "R":
-						cmd.size(cmd.before.width + event.trackX, model.height);
+						on.sizeTo(model.width + event.moveX, model.height);
 						break;
 				}
-				switch (cmd.vert) {
+				switch (on.vert) {
 					case "T":
-						if (cmd.before.height - event.trackY < on.minHeight) break;
-						cmd.moveTo(model.x, cmd.before.y + event.trackY);
-						cmd.size(model.width, cmd.before.height - event.trackY);
+//						if (cmd.before.height - event.trackY < on.minHeight) break;
+						on.moveTo(model.x, model.y + event.moveY);
+						on.sizeTo(model.width, model.height - event.moveY);
 						break;
 					case "B":
-						cmd.size(model.width, cmd.before.height + event.trackY);
+						on.sizeTo(model.width, model.height + event.moveY);
 						break;
 				}
+				on.set(on.diagram.command.after, model);
 				this.notify(on, "draw");
-				
 			},
 			connect: function(on, event) {
 			},
@@ -141,8 +169,6 @@ export default {
 				setZone(on, event);
 				on.view.style.outline = "3px solid rgba(64, 128, 64, .3)";
 				on.view.style.zIndex = "1";
-				on.$hzone = event.horiz;
-				on.$vzone = event.vert;
 				on.diagram.view.focus();
 				if (on.diagram.command) console.log("no mouse up");
 			},
@@ -150,11 +176,9 @@ export default {
 				let cmd = on.diagram.command;
 				if (!cmd) {
 					cmd = on.use.DrawCommand.instance(on);
-					cmd.horiz = on.$hzone;
-					cmd.vert = on.$vzone;
 					on.diagram.command = cmd;
 				}
-				if (cmd.vert == "C" && cmd.horiz == "C") {
+				if (on.vert == "C" && on.horiz == "C") {
 					this.move(on, event);
 				} else if (event.altKey) {
 					this.connect(on, event);
@@ -249,18 +273,18 @@ function setZone(on, event) {
 	let horiz = event.clientX - rect.x;
 	let vert = event.clientY - rect.y;
 
-	event.vert = "C";
+	on.vert = "C";
 	if (vert < border) {
-		event.vert = "T";
+		on.vert = "T";
 	} else if (vert > rect.height - border) {
-		event.vert = "B";
+		on.vert = "B";
 	}
 	
-	event.horiz = "C"
+	on.horiz = "C"
 	if (horiz < border) {
-		event.horiz = "L"
+		on.horiz = "L"
 	} else if (horiz > rect.width - border) {
-		event.horiz = "R"
+		on.horiz = "R"
 	}
-	on.view.style.cursor = zoneCursor[event.vert + event.horiz];
+	on.view.style.cursor = zoneCursor[on.vert + on.horiz];
 }
