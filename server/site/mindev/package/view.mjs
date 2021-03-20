@@ -23,6 +23,9 @@ export default {
 				}				
 			});
 		},
+		get$style: function() {
+			return this.view.style;
+		},
 		append: function(control) {
 			this.view.append(control.view);
 		},
@@ -180,12 +183,13 @@ export default {
 	}
 }
 
-function addEvents(control, events) {
+function addEvents(view, events) {
 	for (let name in events) {
 		let listener = events[name];
-		control.addEventListener(name, listener);
+		view.addEventListener(name, listener);
 	}
 }
+
 function createStyleSheet(document) {
 	let ele = document.createElement("style");
 	ele.type = "text/css";

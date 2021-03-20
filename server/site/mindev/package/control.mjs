@@ -6,14 +6,14 @@ export default {
 		to: Object.freeze([]),
 		start: function() {
 		},
+		//Re-think unobserve.
+		observe: function(object) {
+			observe(this, object);
+		},
 		receive: function(signal) {
 			signal = prepareSignal(signal);
 			let action = this.actions[signal.subject];
 			action && action.call(this.actions, this, signal);			
-		},
-		//Re-think unobserve.
-		observe: function(object) {
-			observe(this, object);
 		},
 		extend$actions: {
 			send: function(to, message) {
@@ -36,11 +36,6 @@ export default {
 		forName: function(name) {
 			return name && name.indexOf("/") < 0 ? this.components[name] : this.sys.forName(name);
 		},
-//		typeFor: function(data, type) {
-//			type = type || data.type;
-//			if (typeof type == "object") return type;
-//			return this.app.forName(type);
-//		},
 		create: function(type) {
 			if (typeof type != "object") type = this.forName(type);
 			let control = this.sys.extend(type, {
@@ -51,60 +46,6 @@ export default {
 		}
 	}
 }
-//Application: {
-//	super$: "Object",
-//	components: null,
-//	type$remote: "util.Remote",
-//	observe: function(observer, object) {
-//		unobserve(observer, observer.model);
-//		observe(observer, object);
-//	},
-//	open: function(pathname, receiver) {
-//		this.remote.service(receiver, "opened", {
-//			url: pathname,
-//			method: "GET"
-//		});
-//	},
-//	save: function(pathname, content, receiver) {
-//		this.remote.service(receiver, "saved", {
-//			url: pathname,
-//			content: content,
-//			method: "PUT"
-//		});
-//	}
-//}
-
-//
-//Controller: {
-//	super$: "Object",
-//	type$app: "Application",
-//	initialize: function() {
-//	},
-//	control: function(object) {
-//		object.kind = this;
-//		object.actions = this.actions;
-//	},
-//	bind: function(control, data) {
-//	},
-//	extend$actions: {
-//		receive: function(on, signal) {
-//			signal = prepareSignal(signal);
-//			this[signal.subject] && this[signal.subject].call(this, on, signal);
-//		},
-//		send: function(to, message) {
-//			message = prepareSignal(message);
-//			log(to, message);
-//			message && down(to, message);
-//		},
-//		sense: function(on, event) {
-//			event = prepareSignal(event);
-//			log(on, event);
-//			event && up(on, event);
-//		},
-//		notify: notify
-//	}
-//},
-//
 
 Symbol.observers = Symbol("observers");
 

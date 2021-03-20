@@ -59,27 +59,10 @@ export default {
 		border: 6,
 		minWidth: 48,
 		minHeight: 24,
-		get$style: function() {
-			return this.view.style;
-		},
 		type$defaultContent: "Text",
 		bind: function(data) {
 			this.observe(data);
 			this.sys.define(this, "model", data);
-		},
-		moveTo: function(x, y) {
-			this.model.x = x > 0 ? x : 0;
-			this.model.y = y > 0 ? y : 0;
-		},
-		size: function(w, h) {
-			let control = this.control;
-			//control.setSize(w, h);
-			if (w < control.minWidth) w = control.minWidth;
-			if (h < control.minHeight) h = control.minHeight;
-			this.after.width = w;
-			this.after.height = h;
-			control.model.width = w;
-			control.model.height = h;
 		},
 		moveTo: function(x, y) {
 			this.model.x = x > 0 ? x : 0;
@@ -110,10 +93,7 @@ export default {
 				on.view.scrollIntoView();
 			},
 			move: function(on, event) {
-				let model = on.model;
-				on.moveTo(model.x + event.moveX, model.y + event.moveY);
-				on.set(on.diagram.command.after, model);
-				this.notify(on, "draw");
+				on.moveTo(on.model.x + event.moveX, on.model.y + event.moveY);
 			},
 			size: function(on, event) {
 				let model = on.model;
@@ -137,8 +117,6 @@ export default {
 						on.sizeTo(model.width, model.height + event.moveY);
 						break;
 				}
-				on.set(on.diagram.command.after, model);
-				this.notify(on, "draw");
 			},
 			connect: function(on, event) {
 			},
@@ -163,7 +141,7 @@ export default {
 				}
 			},
 			mousedown: function(on, event) {
-				if (on.owner.activeElement.parentNode == on) return;
+				if (on.owner.activeElement.parentNode == on.view) return;
 				event.preventDefault();
 				event.track = on; // Tell the listener what to track.
 				setZone(on, event);
@@ -185,6 +163,7 @@ export default {
 				} else {
 					this.size(on, event);
 				}
+				this.notify(on, "draw");
 			},
 			trackEnd: function(on, event) {
 				event.subject = "";
@@ -192,10 +171,11 @@ export default {
 				on.style.cursor = "";
 				on.style.zIndex = "";
 				if (on.diagram.command) {
+					on.set(on.diagram.command.after, on.model);
 					on.diagram.commands.addCommand(on.diagram.command);
 					on.diagram.command = null;
-				} else if (on.firstChild) {
-					on.firstChild.focus();
+				} else if (on.view.firstChild) {
+					on.view.firstChild.focus();
 				}
 			},
 			contextmenu: function(on, event) {

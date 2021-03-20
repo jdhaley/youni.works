@@ -20,11 +20,6 @@ export default {
 			control.set(control.model, this.before);
 			control.actions.notify(control, "draw");
 		},
-		update: function() {
-			let control = this.control;
-			control.set(this.after, control.model);
-			control.actions.notify(control, "draw");
-		},
 		instance: function(control) {
 			let model = control.model;
 			let before = this.sys.extend();
