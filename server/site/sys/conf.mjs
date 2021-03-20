@@ -1,4 +1,4 @@
-import system		from "../base/package/system.mjs";
+import system		from "./package/system.mjs";
 import compiler		from "./package/compiler.mjs";
 import boot			from "./package/boot.mjs";
 

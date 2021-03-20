@@ -1,0 +1,94 @@
+{
+	"type": "object",
+	"constructor": "package",
+	"part": {
+		"": {
+			"facet": "package",
+			"type": "string",
+			"source": "youni.works/loader/parser"
+		},
+		"use": {
+			"type": "object",
+			"constructor": "type",
+			"part": {
+				"control": {
+					"facet": "package",
+					"type": "string",
+					"source": "youni.works/base/control"
+				}
+			}
+		},
+		"Parser": {
+			"type": "object",
+			"constructor": "super",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "use.control.Controller"
+				},
+				"file": {
+					"type": "string",
+					"source": "/source.json"
+				},
+				"use": {
+					"type": "object",
+					"constructor": "type",
+					"part": {
+						"Member": {
+							"facet": "type",
+							"type": "string",
+							"source": "use.control.Control"
+						}
+					}
+				},
+				"save": {
+					"type": "function",
+					"source": "function(source) {\r\n\t\t\tlet member = this.parse(source);\r\n\t\t\tlet pathname = member.part[\"\"].source + this.file;\r\n\t\t\tthis.fs.save(pathname, JSON.stringify(member, null, \"\\t\"), this);\r\n\t\t\treturn member;\r\n\t\t}"
+				},
+				"saved": {
+					"type": "function",
+					"source": "function(message) {\r\n\t\t\tconsole.log(\"Saved \" + message.request.url);\r\n\t\t}"
+				},
+				"parse": {
+					"type": "function",
+					"source": "function(source, decl) {\r\n\t\t\tlet member = this.sys.extend(this.use.Member, {\r\n\t\t\t\tname: decl === undefined ? undefined : this.nameOf(decl),\r\n\t\t\t\tfacet: this.facetOf(decl) || undefined,\r\n\t\t\t\ttype: typeof source,\r\n\t\t\t\tconstructor: undefined,\r\n\t\t\t\tsource: undefined,\r\n\t\t\t\tpart: undefined\r\n\t\t\t});\r\n\t\t\tthis.parseValue(source, member);\r\n\t\t\treturn member;\r\n\t\t}"
+				},
+				"parseValue": {
+					"type": "function",
+					"source": "function(source, member) {\r\n\t\t\tswitch (typeof source) {\r\n\t\t\t\tcase \"undefined\":\r\n\t\t\t\tcase \"boolean\":\r\n\t\t\t\tcase \"number\":\r\n\t\t\t\tcase \"string\":\r\n\t\t\t\t\tmember.source = source;\r\n\t\t\t\t\treturn;\r\n\t\t\t\tcase \"bigint\":\r\n\t\t\t\tcase \"symbol\":\r\n\t\t\t\tcase \"function\":\r\n\t\t\t\t\tmember.source = source.toString();\r\n\t\t\t\t\treturn;\r\n\t\t\t\tdefault:\r\n\t\t\t\t\tif (source) {\r\n\t\t\t\t\t\tthis.parseObject(source, member);\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t} \r\n\t\t\t\t\tmember.source = source;\r\n\t\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t}"
+				},
+				"parseObject": {
+					"type": "function",
+					"source": "function(source, member) {\r\n\t\t\tlet prototype = this.sys.prototypeOf(source);\r\n\t\t\tswitch (prototype) {\r\n\t\t\t\tcase Object.prototype:\r\n\t\t\t\t\tthis.parseRecord(source, member);\r\n\t\t\t\t\treturn;\r\n\t\t\t\tcase Array.prototype:\r\n\t\t\t\t\tthis.parseArray(source, member);\r\n\t\t\t\t\treturn;\r\n\t\t\t\tcase Date.prototype:\r\n\t\t\t\t\tmember.type = \"date\";\r\n\t\t\t\t\tmember.source = source.toISOString();\r\n\t\t\t\t\treturn;\r\n\t\t\t\tdefault:\r\n\t\t\t\t\tthis.parseOther(source, member)\r\n\t\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t}"
+				},
+				"parseRecord": {
+					"type": "function",
+					"source": "function(source, member) {\r\n\t\t\tmember.part = this.sys.extend();\r\n\t\t\tfor (let decl in source) {\r\n\t\t\t\tlet prop = this.parse(source[decl], decl);\r\n\t\t\t\tmember.part[prop.name] = prop;\r\n\t\t\t\tdelete prop.name;\r\n\t\t\t}\r\n\t\t\tmember.constructor = member.part[\"\"] && member.part[\"\"].facet || \"type\";\r\n\t\t}"
+				},
+				"parseArray": {
+					"type": "function",
+					"source": "function(source, member) {\r\n\t\t\tdelete member.source;\r\n\t\t\tmember.part = this.sys.extend();\r\n\t\t\tlet i = 0;\r\n\t\t\tfor (ele of source) {\r\n\t\t\t\tlet prop = this.parse(ele);\r\n\t\t\t\tmember.part[i++] = prop;\r\n\t\t\t}\r\n\t\t\tmember.constructor = \"array\";\r\n\t\t}"
+				},
+				"parseOther": {
+					"type": "function",
+					"source": "function(source, member) {\r\n\t\t\tconsole.log(\"Other: \", source);\r\n\t\t}"
+				},
+				"facetOf": {
+					"type": "function",
+					"source": "function(declaration) {\r\n\t\t\tif (typeof declaration == \"string\") {\r\n\t\t\t\tlet index = declaration.indexOf(\"$\");\r\n\t\t\t\tif (index < 0) index = declaration.indexOf(\"@\");\r\n\t\t\t\treturn index < 0 ? \"\" : declaration.substr(0, index);\r\n\t\t\t}\r\n\t\t\treturn \"\";\r\n\t\t}"
+				},
+				"nameOf": {
+					"type": "function",
+					"source": "function(declaration) {\r\n\t\t\tif (typeof declaration == \"string\") {\r\n\t\t\t\tif (declaration.indexOf(\"$\") >= 0) {\r\n\t\t\t\t\tdeclaration = declaration.substr(declaration.indexOf(\"$\") + 1);\r\n\t\t\t\t} else if (declaration.indexOf(\"@\") >= 0) {\r\n\t\t\t\t\tdeclaration = declaration.substr(declaration.indexOf(\"@\") + 1);\r\n\t\t\t\t\tif (!this.symbol[declaration]) {\r\n\t\t\t\t\t\tthis.symbol[declaration] = Symbol(declaration);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tdeclaration = this.symbol[declaration];\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\treturn declaration;\r\n\t\t}"
+				},
+				"symbol": {
+					"facet": "var",
+					"type": "object",
+					"constructor": "type",
+					"part": {}
+				}
+			}
+		}
+	}
+}

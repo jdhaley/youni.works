@@ -2,13 +2,43 @@ export default {
 	package$: "youni.works/diagram",
 	use: {
 		package$view: "youni.works/view",
-		package$command: "youni.works/diagram/command"
+		package$command: "youni.works/command"
+	},
+	DrawCommand: {
+		super$: "use.command.Command",
+		title: "Move/Size Shape",
+		control: null,
+		before: null,
+		after: null,
+		exec: function() {
+			let control = this.control;
+			control.set(control.model, this.after);
+			control.actions.notify(control, "draw");
+		},
+		undo: function() {
+			let control = this.control;
+			control.set(control.model, this.before);
+			control.actions.notify(control, "draw");
+		},
+		instance: function(control) {
+			let model = control.model;
+			let before = this.sys.extend();
+			control.set(before, model);
+			let after = this.sys.extend();
+			control.set(after, model);
+			return this.sys.extend(this, {
+				prior: null,
+				next: null,
+				control: control,
+				before: before,
+				after: after
+			});
+		}
 	},
 	Diagram: {
 		super$: "use.view.View",
 		use: {
 			type$Shape: "Shape",
-			type$Command: "use.command.DrawCommand",
 			type$Commands: "use.command.Commands"
 		},
 		start: function() {
@@ -54,7 +84,7 @@ export default {
 	Shape: {
 		super$: "use.view.View",
 		use: {
-			type$DrawCommand: "use.command.DrawCommand"
+			type$DrawCommand: "DrawCommand"
 		},
 		border: 6,
 		minWidth: 48,

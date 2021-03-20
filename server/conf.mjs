@@ -6,7 +6,8 @@ export default {
 	port: 443,
 	key: "ssl/my.key",
 	cert: "ssl/my.crt",
-	files: "/web/repositories/fs/fs/",
+	OLD_files: "/web/repositories/fs/fs/",
+	files: "fs/",
 	site: "site",
 	packages: {
 		express: express,

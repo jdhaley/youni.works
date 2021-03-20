@@ -1,0 +1,7 @@
+{
+	"objectType": "Issues",
+	"title": "Test",
+	"dataSource": "/file/stamp/data3.json",
+	"typeSource": "/file/stamp/types3.json",
+	"diagram": "/file/stamp/diagram1.json"
+}
