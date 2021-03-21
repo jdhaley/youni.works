@@ -7,6 +7,11 @@ export default {
 	View: {
 		super$: "use.control.Control",
 		model: undefined,
+		bind: function(model) {
+			this.unobserve(this.model);
+			this.sys.define(this, "model", model);
+			this.observe(model);
+		},
 		once$view: function() {
 			let view = this.owner.createNode("div");
 			view.$ctl = this;
@@ -20,16 +25,14 @@ export default {
 						let view = nodes[i];
 						if (view.$ctl) yield view.$ctl;
 					}
-				}				
+				}
 			});
-		},
-		get$style: function() {
-			return this.view.style;
 		},
 		append: function(control) {
 			this.view.append(control.view);
 		},
-		bind: function(model) {
+		get$style: function() {
+			return this.view.style;
 		},
 		draw: function(data) {
 			this.bind(data);

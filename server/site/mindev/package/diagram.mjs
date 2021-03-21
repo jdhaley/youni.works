@@ -82,10 +82,6 @@ export default {
 			this.view.classList.add("diagram");
 			this.view.tabIndex = 0;
 		},
-		bind: function(data) {
-			this.observe(data);
-			this.sys.define(this, "model", data);
-		},
 		extend$actions: {
 			view: function(on, event) {
 				on.view.textContent = "";
@@ -126,10 +122,6 @@ export default {
 		minWidth: 48,
 		minHeight: 24,
 		type$defaultContent: "Text",
-		bind: function(data) {
-			this.observe(data);
-			this.sys.define(this, "model", data);
-		},
 		moveTo: function(x, y) {
 			this.model.x = x > 0 ? x : 0;
 			this.model.y = y > 0 ? y : 0;

@@ -1,3 +1,5 @@
+Symbol.observers = Symbol("observers");
+
 export default {
 	package$: "youni.works/control",
 	package$util: "youni.works/util",
@@ -6,9 +8,27 @@ export default {
 		to: Object.freeze([]),
 		start: function() {
 		},
-		//Re-think unobserve.
 		observe: function(object) {
-			observe(this, object);
+			if (typeof object != "object" || object == null) return; //Only observe objects.
+			let observers = object[Symbol.observers];
+			if (observers) {
+				for (let observer of observers) {
+					if (observer == this) return; //Already observing
+				}					
+			} else {
+				observers = [];
+				object[Symbol.observers] = observers;
+			}
+			observers.push(this);
+		},
+		unobserve: function(control, object) {
+			let list = object ? object[Symbol.observers] : null;
+			if (list) for (let i = 0, len = list.length; i < len; i++) {
+				if (this == list[i]) {
+					list.splice(i, 1);
+					break;
+				}
+			}
 		},
 		receive: function(signal) {
 			signal = prepareSignal(signal);
@@ -26,7 +46,17 @@ export default {
 				log(on, event);
 				event && up(on, event);
 			},
-			notify: notify
+			notify: function(on, signal) {
+				let observers = on.model && on.model[Symbol.observers];
+				if (!observers) return;
+				signal = prepareSignal(signal);
+				for (let ctl of observers) {
+					//Set the following for each iteration in case of a bad behaving control.
+					signal.source = on;
+					signal.model = on.model;
+					ctl.receive(signal);
+				}
+			}
 		}
 	},
 	Owner: {
@@ -45,46 +75,6 @@ export default {
 			return control;
 		}
 	}
-}
-
-Symbol.observers = Symbol("observers");
-
-function notify(control, signal) {
-	let observers = control.model && control.model[Symbol.observers];
-	if (!observers) return;
-	signal = prepareSignal(signal);
-	for (let on of observers) {
-		//Set the following for each iteration in case of a bad behaving control.
-		signal.source = control;
-		signal.model = control.model;
-		on.receive(signal);			
-	}
-}
-
-function unobserve(control, model) {
-	let list = model ? model[Symbol.observers] : null;
-	if (list) for (let i = 0, len = list.length; i < len; i++) {
-		if (control == list[i]) {
-			list.splice(i, 1);
-			break;
-		}
-	}
-	//Caller is now responsible to:
-	//delete control.model or re-assign, etc.
-}
-
-function observe(control, model) {
-	if (typeof model != "object" || model == null) return; //Only observe objects.
-	let observers = model[Symbol.observers];
-	if (observers) {
-		for (let observer of observers) {
-			if (observer == control) return; //Already observing
-		}					
-	} else {
-		observers = [];
-		model[Symbol.observers] = observers;
-	}
-	observers.push(control);
 }
 
 function prepareSignal(signal) {
