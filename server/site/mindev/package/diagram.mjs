@@ -1,4 +1,40 @@
+const pvt = {
+	zoneCursor: {
+		TL: "nw-resize",
+		TC: "n-resize",
+		TR: "ne-resize",
+		CL: "w-resize",
+		CC: "move",
+		CR: "e-resize",
+		BL: "sw-resize",
+		BC: "s-resize",
+		BR: "se-resize"
+	},
+	setZone: function(on, event) {
+		let border = on.border;
+		let rect = on.view.getBoundingClientRect();
+
+		let horiz = event.clientX - rect.x;
+		let vert = event.clientY - rect.y;
+
+		on.vert = "C";
+		if (vert < border) {
+			on.vert = "T";
+		} else if (vert > rect.height - border) {
+			on.vert = "B";
+		}
+		
+		on.horiz = "C"
+		if (horiz < border) {
+			on.horiz = "L"
+		} else if (horiz > rect.width - border) {
+			on.horiz = "R"
+		}
+		on.view.style.cursor = pvt.zoneCursor[on.vert + on.horiz];
+	}
+}
 export default {
+	private: pvt,
 	package$: "youni.works/diagram",
 	use: {
 		package$view: "youni.works/view",
@@ -174,7 +210,7 @@ export default {
 				if (on.owner.activeElement.parentNode == on.view) return;
 				event.preventDefault();
 				event.track = on; // Tell the listener what to track.
-				setZone(on, event);
+				pvt.setZone(on, event);
 				on.view.style.outline = "3px solid rgba(64, 128, 64, .3)";
 				on.view.style.zIndex = "1";
 				on.diagram.view.focus();
@@ -215,7 +251,7 @@ export default {
 				//Don't alter the cursor when a textShape has the focus.
 				//if (on.owner.activeElement.parentNode == on) return;
 				if (!on.diagram.command) {
-					setZone(on, event);		
+					pvt.setZone(on, event);		
 				}
 //				if (event.altKey) {
 //					if (event.vert == "C" && event.horiz == "C") {
@@ -262,39 +298,4 @@ export default {
 	Connector: {
 		super$: "use.view.View"
 	}
-}
-
-const zoneCursor = {
-	TL: "nw-resize",
-	TC: "n-resize",
-	TR: "ne-resize",
-	CL: "w-resize",
-	CC: "move",
-	CR: "e-resize",
-	BL: "sw-resize",
-	BC: "s-resize",
-	BR: "se-resize"
-}
-
-function setZone(on, event) {
-	let border = on.border;
-	let rect = on.view.getBoundingClientRect();
-
-	let horiz = event.clientX - rect.x;
-	let vert = event.clientY - rect.y;
-
-	on.vert = "C";
-	if (vert < border) {
-		on.vert = "T";
-	} else if (vert > rect.height - border) {
-		on.vert = "B";
-	}
-	
-	on.horiz = "C"
-	if (horiz < border) {
-		on.horiz = "L"
-	} else if (horiz > rect.width - border) {
-		on.horiz = "R"
-	}
-	on.view.style.cursor = zoneCursor[on.vert + on.horiz];
 }

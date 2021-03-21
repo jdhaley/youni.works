@@ -11,6 +11,9 @@ import events from "./conf/events.mjs";
 
 import diagram from "./package/diagram.mjs";
 
+//import parse from "../devt/parser.mjs";
+//console.log(JSON.stringify(parse(diagram), null, 2));
+
 export default {
 	package$: "configuration",
 	use: {

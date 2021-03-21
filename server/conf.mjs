@@ -7,7 +7,7 @@ export default {
 	key: "ssl/my.key",
 	cert: "ssl/my.crt",
 	OLD_files: "/web/repositories/fs/fs/",
-	files: "fs/",
+	files: "fs",
 	site: "site",
 	packages: {
 		express: express,
