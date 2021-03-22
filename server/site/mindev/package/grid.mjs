@@ -5,59 +5,69 @@ export default {
 	},
 	Property: {
 		super$: "use.view.View",
-		type$comp: "Component",
-		get$app: function() {
-			return this.comp.app;
-		},
+		type$record: "Record",
 		conf: {
 			name: "",
 			dataType: "",
 			title: "",
 			viewWidth: 4
 		},
-		bind: function(view, data) {
-			view.model = undefined;
-			if (data) view.model = data[this.conf.name];
+		labelFor: function(ele) {
+			if (this.record.display == "row") return;
+			let label = this.owner.createNode("label");
+			label.textContent = this.conf.title || this.conf.name;
+			ele.append(label);			
+		},
+		get$editorFor: function() {
+			//Return the function to create the view's property editor.
+			let dataType = this.conf.dataType || typeof this.model;
+			return this.owner.app.editors[dataType];
+		},
+		once$view: function() {
+			let ele = this.owner.createNode("div");
+			ele.classList.add(this.conf.name);
+			ele.classList.add(this.display);
+			ele.$ctl = this;
+			this.labelFor(ele);
+			this.editorFor(ele);
+			return ele;
+		},
+		bind: function(model) {
+			this.sys.define(this, "model", model[this.conf.name]);
 		}
 	},
-	Component: {
+	Record: {
 		super$: "use.view.View",
+		display: "Sheet",
+		to: Object.freeze([]),
 		conf: {
-			properties: ""
+			properties: Object.freeze([])
 		},
-		properties: null,
-		bind: function(view, data) {
-			this.app.observe(view, data)
-			view.model = data;
-		},
-		extend$actions: {
-			view: function(view, event) {
-				view.className = view.conf.name;
-				view.textContent = "";
-				view.parts = view.sys.extend();
-				this.viewProperties(view);
-			},
-			viewProperties: function(view) {
-				for (let prop of view.properties) {
-					let label = view.owner.createNode("label");
-					label.textContent = prop.conf.name;
-					view.view.append(label);
-					let part = view.owner.create(null, prop)
-					part.container = view;
-					view.parts[prop.conf.name] = part;
-					view.append(part);			
+		start: function(conf) {
+			if (!conf) conf = this.sys.extend(null, {
+				name: "Object",
+				properties: []
+			});
+			this.sys.define(this, "conf", conf);
+			if (conf.properties) {
+				this.sys.define(this, "to", []);
+				for (let propConf of conf.properties) {
+					let propType = propConf.controlType || "youni.works/grid/Property";
+					prop = this.owner.create(propType, propConf);
+					this.sys.define(prop, "record", this);
+					this.to.push(prop);
 				}
 			}
 		},
-		start: function() {
-			if (!this.conf.properties) return;
-			let properties = [];
-			for (let conf of this.conf.properties) {
-				let property = this.app.createController(conf, this.app.propertyType[conf.dataType || "string"]);
-				this.sys.define(property, "comp", this);
-				properties.push(property);
+		extend$actions: {
+			view: function(on, event) {
+				let view = on.view;
+				view.className = on.conf.name;
+				for (let prop of on.to) {
+					prop.bind(on.model);
+					on.append(prop);
+				}
 			}
-			this.sys.define(this, "properties", properties);
 		}
 	}
 }

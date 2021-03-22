@@ -6,7 +6,8 @@ export default {
 	Control: {
 		super$: "Object",
 		to: Object.freeze([]),
-		start: function() {
+		start: function(conf) {
+			if (conf) this.sys.define(this, "conf", conf);
 		},
 		observe: function(object) {
 			if (typeof object != "object" || object == null) return; //Only observe objects.
@@ -63,15 +64,14 @@ export default {
 		super$: "Control",
 		components: {
 		},
-		forName: function(name) {
-			return name && name.indexOf("/") < 0 ? this.components[name] : this.sys.forName(name);
-		},
-		create: function(type) {
-			if (typeof type != "object") type = this.forName(type);
-			let control = this.sys.extend(type, {
+		create: function(controlType, conf) {
+			if (typeof controlType != "object") {
+				controlType = this.sys.forName(controlType);
+			}
+			let control = this.sys.extend(controlType, {
 				owner: this
 			});
-			control.start();
+			control.start(conf);
 			return control;
 		}
 	}

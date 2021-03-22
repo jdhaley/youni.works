@@ -79,17 +79,17 @@ export default {
 		},
 		start: function() {
 			this.commands = this.use.Commands.instance();
-			this.view.classList.add("diagram");
-			this.view.tabIndex = 0;
 		},
 		extend$actions: {
 			view: function(on, event) {
 				on.view.textContent = "";
+				on.view.classList.add("diagram");
+				on.view.tabIndex = 0;
 				for (let model of on.model.shapes) {
 					let shape = on.owner.create(model.type || on.use.Shape);
+					shape.bind(model);
 					shape.diagram = on;
 					on.append(shape);
-					shape.bind(model);
 				}
 			},
 			keydown: function(on, event) {
