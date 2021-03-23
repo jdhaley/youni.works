@@ -1,11 +1,11 @@
 export default {
-	package$: "youni.works/grid",
+	package$: "youni.works/object",
 	use: {
 		package$view: "youni.works/view"
 	},
 	Property: {
 		super$: "use.view.View",
-		type$record: "Record",
+		type$object: "Object",
 		conf: {
 			name: "",
 			dataType: "",
@@ -13,7 +13,7 @@ export default {
 			viewWidth: 4
 		},
 		labelFor: function(ele) {
-			if (this.record.display == "row") return;
+			if (this.object.display == "row") return;
 			let label = this.owner.createNode("label");
 			label.textContent = this.conf.title || this.conf.name;
 			ele.append(label);			
@@ -33,10 +33,10 @@ export default {
 			return ele;
 		},
 		bind: function(model) {
-			this.sys.define(this, "model", model[this.conf.name]);
+			this.sys.define(this, "model", model && model[this.conf.name]);
 		}
 	},
-	Record: {
+	Object: {
 		super$: "use.view.View",
 		display: "Sheet",
 		to: Object.freeze([]),
@@ -52,9 +52,9 @@ export default {
 			if (conf.properties) {
 				this.sys.define(this, "to", []);
 				for (let propConf of conf.properties) {
-					let propType = propConf.controlType || "youni.works/grid/Property";
+					let propType = propConf.controlType || "youni.works/object/Property";
 					prop = this.owner.create(propType, propConf);
-					this.sys.define(prop, "record", this);
+					this.sys.define(prop, "object", this);
 					this.to.push(prop);
 				}
 			}

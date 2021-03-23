@@ -2,7 +2,6 @@ export default {
 	package$: "youni.works/view",
 	use: {
 		package$control: "youni.works/control",
-		package$util: "youni.works/util"
 	},
 	View: {
 		super$: "use.control.Control",
@@ -44,19 +43,13 @@ export default {
 	},
 	Frame: {
 		super$: "use.control.Owner",
-		use: {
-			type$Control: "View"
-		},
-		type$app: "Application",
-		get$components: function() {
-			return this.app.components;
-		},
 		window: null,
-		get$activeElement: function() {
-			return this.window.document.activeElement;
-		},
+		events: null,
 		get$content: function() {
 			return this.window.document.body;
+		},
+		get$activeElement: function() {
+			return this.window.document.activeElement;
 		},
 		get$search: function() {
 			return this.window.location.search.substring(1);
@@ -79,24 +72,6 @@ export default {
 			node.to = node.childNodes; //allows send() message to be generic.
 			return node;
 		},
-		createRule: function(selector, properties) {
-			let out = `${selector} {\n`;
-			out += defineStyleProperties(properties);
-			out += "\n}";
-			let index = this.window.styles.insertRule(out);
-			return this.window.styles.cssRules[index];
-		},
-		initialize: function() {
-			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-//			this.control(this.window);
-//			this.control(this.content);
-//			this.window.Element.prototype.view = view;
-
-			this.window.Node.prototype.owner = this;
-			this.window.styles = createStyleSheet(this.window.document);
-			addEvents(this.window, this.app.events.windowEvents);
-			addEvents(this.window.document, this.app.events.documentEvents);
-		},
 		toPixels: function(measure) {
 		    let node = this.createNode("div");
 		    node.style.height = measure;
@@ -104,84 +79,23 @@ export default {
 		    let px = node.getBoundingClientRect().height;
 		    node.parentNode.removeChild(node);
 		    return px;
-		}
-	},
-	Application: {
-		super$: "Object",
-		type$remote: "use.util.Remote",
-		type$mainFrame: "Frame",
-		components: null,
-		propertyType: null,
-		events: null,
-		conf: null,
-		frame: function(window) {
-			if (!window.owner) {
-				window.owner = this.sys.extend(this.use.Frame, {
-					app: this,
-					window: window
-				});
-				window.owner.initialize();
-			}
-			return window.owner;
 		},
-		open: function(pathname, receiver) {
-			this.remote.service(receiver, "opened", {
-				url: pathname,
-				method: "GET"
-			});
+		createRule: function(selector, properties) {
+			let out = `${selector} {\n`;
+			out += defineStyleProperties(properties);
+			out += "\n}";
+			let index = this.window.styles.insertRule(out);
+			return this.window.styles.cssRules[index];
 		},
-		save: function(pathname, content, receiver) {
-			this.remote.service(receiver, "saved", {
-				url: pathname,
-				content: content,
-				method: "PUT"
-			});
-		},
-		initialize: function(conf) {
-			console.log(this);
-			this.sys.define(this, "events", conf.events);
-			this.sys.define(this, "mainFrame", this.frame(conf.window));
-			this.open(this.mainFrame.search + ".json", initializeApp);
-			let app = this;
-			function initializeApp(msg) {
-				let conf = JSON.parse(msg.content);
-				conf = app.sys.extend(null, conf);
-				app.sys.define(app, "conf", conf);
-				app.open(conf.typeSource, initializeTypes);
-			}
-			function initializeTypes(msg) {
-				let components = JSON.parse(msg.content);
-				app.sys.define(app, "components", app.sys.extend());
-				for (let conf of components) {
-					app.components[conf.name] = app.createController(conf);
-				}
-			//	app.open(app.conf.dataSource, initializeData);
-				app.open(app.conf.diagram, initializeDiagram)
-			}
-			function initializeDiagram(msg) {
-				let data = JSON.parse(msg.content);
-				data = app.sys.extend(null, data);
-				let view = app.mainFrame.create("youni.works/diagram/Diagram");
-				view.file = app.conf.diagram;
-				app.mainFrame.content.append(view.view);
-				view.draw(data);
-			}
-			function initializeData(msg) {
-				let data = JSON.parse(msg.content);
-				data = app.sys.extend(null, data);
-				app.mainFrame.content.view(data, app.conf.objectType);
-			}
-		},
-		createController: function(conf, defaultType) {
-//			conf = this.sys.extend(null, conf);
-//			let controller = this.forName(conf.type) || defaultType || this.use.Component;
-//			controller = this.sys.extend(controller, {
-//				app: this,
-//				conf: conf
-//			});
-//			conf.type = controller;
-//			controller.initialize();
-//			return controller;
+		start: function(conf) {
+//			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
+//			this.control(this.window);
+//			this.control(this.content);
+//			this.window.Element.prototype.view = view;
+//			this.window.Node.prototype.owner = this;
+			this.window.styles = createStyleSheet(this.window.document);
+			addEvents(this.window, this.events.windowEvents);
+			addEvents(this.window.document, this.events.documentEvents);
 		}
 	}
 }

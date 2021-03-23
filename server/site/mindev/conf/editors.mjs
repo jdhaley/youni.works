@@ -3,8 +3,9 @@ export default {
 	number: scalar,
 	date: scalar,
 	boolean: scalar,
-	object: link,
-	array: grid
+	object: object,
+	array: grid,
+	link: link
 //	text: {
 //		type$: "use.prop.Text"
 //	},
@@ -22,6 +23,9 @@ export default {
 }
 
 function object(ele) {
+	ele.append("..");
+}
+function link(ele) {
 	ele.append("..");
 }
 function grid(ele) {

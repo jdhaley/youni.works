@@ -98,7 +98,7 @@ export default {
 				}
 				if (event.key == "s" && event.ctrlKey) {
 					event.preventDefault();
-					on.owner.app.save(on.file, on.model);
+					on.owner.save(on.file, on.model);
 				}
 				if (event.key == "z" && event.ctrlKey) {
 					event.preventDefault();

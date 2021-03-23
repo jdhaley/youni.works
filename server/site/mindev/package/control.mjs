@@ -2,9 +2,12 @@ Symbol.observers = Symbol("observers");
 
 export default {
 	package$: "youni.works/control",
-	package$util: "youni.works/util",
+	use: {
+		package$util: "youni.works/util"		
+	},
 	Control: {
 		super$: "Object",
+		type$owner: "Owner",
 		to: Object.freeze([]),
 		start: function(conf) {
 			if (conf) this.sys.define(this, "conf", conf);
@@ -48,13 +51,14 @@ export default {
 				event && up(on, event);
 			},
 			notify: function(on, signal) {
-				let observers = on.model && on.model[Symbol.observers];
+				let model = signal.model || on.model;
+				let observers = model && model[Symbol.observers];
 				if (!observers) return;
 				signal = prepareSignal(signal);
 				for (let ctl of observers) {
 					//Set the following for each iteration in case of a bad behaving control.
 					signal.source = on;
-					signal.model = on.model;
+					signal.model = model;
 					ctl.receive(signal);
 				}
 			}
@@ -62,7 +66,19 @@ export default {
 	},
 	Owner: {
 		super$: "Control",
-		components: {
+		type$remote: "use.util.Remote",
+		open: function(pathname, receiver) {
+			this.remote.service(receiver, "opened", {
+				url: pathname,
+				method: "GET"
+			});
+		},
+		save: function(pathname, content, receiver) {
+			this.remote.service(receiver, "saved", {
+				url: pathname,
+				content: content,
+				method: "PUT"
+			});
 		},
 		create: function(controlType, conf) {
 			if (typeof controlType != "object") {
