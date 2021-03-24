@@ -11,17 +11,7 @@ export default {
 			peer.$ctl = this;
 			return peer;
 		},
-		once$to: function() {
-			const nodes = this.peer.childNodes;
-			return this.sys.extend(null, {
-				"@iterator": function* iterate() {
-					for (let i = 0, len = nodes.length; i < len; i++) {
-						let node = nodes[i];
-						if (node.$ctl) yield node.$ctl;
-					}
-				}
-			});
-		},
+		once$to: View_to,
 		get$style: function() {
 			return this.peer.style;
 		},
@@ -45,9 +35,14 @@ export default {
 		super$: "use.control.Owner",
 		window: null,
 		events: null,
+		get$peer: function() {
+			return this.window.document.body;
+		},
+		get$to: View_to,
 		get$content: function() {
 			return this.window.document.body;
 		},
+		
 		get$activeElement: function() {
 			return this.window.document.activeElement;
 		},
@@ -88,12 +83,27 @@ export default {
 			return this.window.styles.cssRules[index];
 		},
 		start: function(conf) {
+			this.window.document.body.$ctl = this;
+			//T
 //			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
 			this.window.styles = createStyleSheet(this.window.document);
 			addEvents(this.window, this.events.windowEvents);
 			addEvents(this.window.document, this.events.documentEvents);
 		}
 	}
+}
+
+function View_to() {
+	const nodes = this.peer.childNodes;
+	if (!nodes.$to) nodes.$to = this.sys.extend(null, {
+		"@iterator": function* iterate() {
+			for (let i = 0, len = nodes.length; i < len; i++) {
+				let node = nodes[i];
+				if (node.$ctl) yield node.$ctl;
+			}
+		}
+	});
+	return nodes.$to;
 }
 
 function addEvents(peer, events) {
