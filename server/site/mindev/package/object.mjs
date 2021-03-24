@@ -28,7 +28,7 @@ export default {
 			let ele = this.owner.createNode("div");
 			ele.classList.add(this.conf.name);
 			ele.classList.add(this.display);
-			ele.$ctl = this;
+			ele.$peer = this;
 			this.labelFor(ele);
 			this.editorFor(ele);
 			return ele;

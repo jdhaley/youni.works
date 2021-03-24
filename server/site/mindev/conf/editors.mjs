@@ -32,7 +32,7 @@ function grid(ele) {
 	ele.append("...");
 }
 function scalar(ele) {
-	let control = ele.$ctl;
+	let control = ele.$peer;
 	let editor;
 	if (control.conf.protected) {
 		editor = control.owner.createNode("input");

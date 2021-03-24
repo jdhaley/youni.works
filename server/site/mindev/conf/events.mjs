@@ -84,7 +84,7 @@ function UP(event) {
 	log(event.target, event);
 	for (let on of event.path) {
 		if (!event.subject) return;
-		on.$ctl && on.$ctl.receive(event);
+		on.$peer && on.$peer.receive(event);
 	}
 	if (!event.subject) event.preventDefault();
 }

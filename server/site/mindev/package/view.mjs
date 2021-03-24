@@ -8,7 +8,7 @@ export default {
 		model: undefined,
 		once$peer: function() {
 			let peer = this.owner.createNode("div");
-			peer.$ctl = this;
+			peer.$peer = this;
 			return peer;
 		},
 		once$to: View_to,
@@ -83,7 +83,7 @@ export default {
 			return this.window.styles.cssRules[index];
 		},
 		start: function(conf) {
-			this.window.document.body.$ctl = this;
+			this.window.document.body.$peer = this;
 			//T
 //			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
 			this.window.styles = createStyleSheet(this.window.document);
@@ -99,7 +99,7 @@ function View_to() {
 		"@iterator": function* iterate() {
 			for (let i = 0, len = nodes.length; i < len; i++) {
 				let node = nodes[i];
-				if (node.$ctl) yield node.$ctl;
+				if (node.$peer) yield node.$peer;
 			}
 		}
 	});
