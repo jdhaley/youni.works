@@ -87,7 +87,7 @@ export default {
 				on.peer.tabIndex = 0;
 				for (let model of on.model.shapes) {
 					let shape = on.owner.create(model.type || on.use.Shape);
-					shape.bind(model);
+					shape.model = model;
 					shape.diagram = on;
 					on.append(shape);
 				}
@@ -183,8 +183,8 @@ export default {
 					case "string":
 					case "number":
 						let content = on.owner.create(on.defaultContent);
+						content.model = on.model.content;
 						on.append(content);
-						content.bind(on.model.content);
 						break;
 					case "boolean":
 					case "undefined":
@@ -265,9 +265,6 @@ export default {
 	},
 	Text: {
 		super$: "use.view.View",
-		bind: function(data) {
-			this.sys.define(this, "model", data);
-		},
 		extend$actions: {
 			view: function(on, event) {
 				let peer = on.peer;

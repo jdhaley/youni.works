@@ -30,7 +30,7 @@ function initialize(frame, conf) {
 		data = frame.sys.extend(null, data);
 		let view = frame.create(conf.components.Diagram);
 		view.file = conf.diagram;
-		frame.content.append(view.peer);
+		frame.append(view);
 		view.draw(data);
 	}
 	function initializeData(msg) {
@@ -38,7 +38,7 @@ function initialize(frame, conf) {
 		data = frame.sys.extend(null, data);
 		let view = frame.create(conf.components.Object);
 		view.start(conf.types[conf.objectType]);
-		frame.content.append(view.peer);
+		frame.append(view);
 		view.draw(data);
 	}
 }

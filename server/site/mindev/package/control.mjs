@@ -9,6 +9,9 @@ export default {
 		super$: "Object",
 		type$owner: "Owner",
 		to: Object.freeze([]),
+		append: function(control) {
+			this.to.push(control);
+		},
 		start: function(conf) {
 			if (conf) this.sys.define(this, "conf", conf);
 		},

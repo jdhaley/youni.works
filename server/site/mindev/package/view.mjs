@@ -3,46 +3,56 @@ export default {
 	use: {
 		package$control: "youni.works/control",
 	},
-	View: {
+	Ui: {
 		super$: "use.control.Control",
-		model: undefined,
 		once$peer: function() {
 			let peer = this.owner.createNode("div");
 			peer.$peer = this;
 			return peer;
 		},
-		once$to: View_to,
-		get$style: function() {
-			return this.peer.style;
-		},
-		bind: function(model) {
-			this.unobserve(this.model);
-			this.sys.define(this, "model", model);
-			this.observe(model);
+		once$to: Peer_to,
+		get$owner: function() {
+			return this.peer.ownerDocument.body.$peer;
 		},
 		append: function(control) {
 			this.peer.append(control.peer);
 		},
-		draw: function(data) {
-			this.bind(data);
-			this.actions.send(this, "view");
+		get$style: function() {
+			return this.peer.style;
+		}
+	},
+	View: {
+		super$: "Ui",
+		virtual$model: function() {
+			if (!arguments.length) return this.peer.$model;
+			this.unobserve(this.peer.$model);
+			this.peer.$model = arguments[0];
+			this.observe(this.peer.$model);
 		},
-//		start: function() {
-//			addEvents(peer, type.events);
-//		}
+//		virtual$markup: function() {
+//			if (!arguments.length) return this.peer.innerHTML;
+//			this.peer.innerHTML = "" + arguments[0];
+//		},
+		draw: function(model) {
+			this.model = model;
+			this.actions.send(this, "view");
+		}
 	},
 	Frame: {
 		super$: "use.control.Owner",
-		window: null,
-		events: null,
+		owner: null,
+		get$to: Peer_to,
+		append: function(control) {
+			this.peer.append(control.peer);
+		},
 		get$peer: function() {
 			return this.window.document.body;
 		},
-		get$to: View_to,
-		get$content: function() {
-			return this.window.document.body;
+		get$style: function() {
+			return this.peer.style;
 		},
-		
+		window: null,
+		events: null,
 		get$activeElement: function() {
 			return this.window.document.activeElement;
 		},
@@ -70,7 +80,7 @@ export default {
 		toPixels: function(measure) {
 		    let node = this.createNode("div");
 		    node.style.height = measure;
-		    this.content.appendChild(node);
+		    this.peer.appendChild(node);
 		    let px = node.getBoundingClientRect().height;
 		    node.parentNode.removeChild(node);
 		    return px;
@@ -84,7 +94,6 @@ export default {
 		},
 		start: function(conf) {
 			this.window.document.body.$peer = this;
-			//T
 //			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
 			this.window.styles = createStyleSheet(this.window.document);
 			addEvents(this.window, this.events.windowEvents);
@@ -93,7 +102,7 @@ export default {
 	}
 }
 
-function View_to() {
+function Peer_to() {
 	const nodes = this.peer.childNodes;
 	if (!nodes.$to) nodes.$to = this.sys.extend(null, {
 		"@iterator": function* iterate() {
