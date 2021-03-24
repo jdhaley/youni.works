@@ -2,7 +2,7 @@
 	"components": {
 		"Frame": "youni.works/view/Frame",
 		"Diagram": "youni.works/diagram/Diagram",
-		"Object": "youni.works/object/Object"
+		"Object": "youni.works/object/Properties"
 	},
 	"objectType": "Issues",
 	"title": "Test",

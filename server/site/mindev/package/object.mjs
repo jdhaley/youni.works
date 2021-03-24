@@ -5,7 +5,7 @@ export default {
 	},
 	Property: {
 		super$: "use.view.View",
-		type$object: "Object",
+		type$object: "Properties",
 		conf: {
 			name: "",
 			dataType: "",
@@ -21,7 +21,8 @@ export default {
 		get$editorFor: function() {
 			//Return the function to create the view's property editor.
 			let dataType = this.conf.dataType || typeof this.model;
-			return this.owner.app.editors[dataType];
+			let editor = this.owner.editors[dataType] || this.owner.editors["string"];
+			return editor;
 		},
 		once$view: function() {
 			let ele = this.owner.createNode("div");
@@ -36,7 +37,7 @@ export default {
 			this.sys.define(this, "model", model && model[this.conf.name]);
 		}
 	},
-	Object: {
+	Properties: {
 		super$: "use.view.View",
 		display: "Sheet",
 		to: Object.freeze([]),
@@ -53,7 +54,7 @@ export default {
 				this.sys.define(this, "to", []);
 				for (let propConf of conf.properties) {
 					let propType = propConf.controlType || "youni.works/object/Property";
-					prop = this.owner.create(propType, propConf);
+					let prop = this.owner.create(propType, propConf);
 					this.sys.define(prop, "object", this);
 					this.to.push(prop);
 				}

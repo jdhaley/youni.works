@@ -43,7 +43,7 @@ function scalar(ele) {
 		editor.type = inputType(control);
 		editor.value = control.model;
 	} else {
-		editor = on.owner.createNode("div");
+		editor = control.owner.createNode("div");
 		editor.contentEditable = true;
 		editor.textContent = control.model;
 	}

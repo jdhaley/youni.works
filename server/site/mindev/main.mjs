@@ -2,7 +2,8 @@ export default function main(sys, conf) {
 	conf = sys.load(conf);
 	let frame = sys.extend(sys.forName("youni.works/view/Frame"), {
 		window: window,
-		events: conf.app.events
+		events: conf.app.events,
+		editors: conf.app.editors
 	});
 	frame.start(conf.app)
 	initialize(frame, conf.app);
@@ -63,7 +64,7 @@ function initialize(frame, conf) {
 	
 	function initializeTypes(msg) {
 		let types = JSON.parse(msg.content);
-		conf.types = frame.sys.extend(types);
+		conf.types = frame.sys.extend(null, types);
 		frame.open(conf.dataSource, initializeData);
 		frame.open(conf.diagram, initializeDiagram)
 	}
@@ -79,8 +80,9 @@ function initialize(frame, conf) {
 	function initializeData(msg) {
 		let data = JSON.parse(msg.content);
 		data = frame.sys.extend(null, data);
-	//	let view = frame.create(conf.components.Object);
-	//	view.start(conf.types[conf.objectType]);
-	//	frame.content.view(data, conf.objectType);
+		let view = frame.create(conf.components.Object);
+		view.start(conf.types[conf.objectType]);
+		frame.content.append(view.view);
+		view.draw(data);
 	}
 }

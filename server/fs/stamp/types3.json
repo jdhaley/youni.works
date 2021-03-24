@@ -1,6 +1,5 @@
-[
-	{
-		"name": "Issues",
+{
+	"Issues": {
 		"properties": [
 			{
 				"name": "issues",
@@ -27,8 +26,7 @@
 			
 		]
 	},
-	{
-		"name": "Issue",
+	"Issue": {
 		"properties": [
 			{
 				"name": "issued",
@@ -64,4 +62,4 @@
 			}
 		]
 	}
-]
+}
