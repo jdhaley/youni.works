@@ -12,7 +12,7 @@ const pvt = {
 	},
 	setZone: function(on, event) {
 		let border = on.border;
-		let rect = on.view.getBoundingClientRect();
+		let rect = on.peer.getBoundingClientRect();
 
 		let horiz = event.clientX - rect.x;
 		let vert = event.clientY - rect.y;
@@ -30,7 +30,7 @@ const pvt = {
 		} else if (horiz > rect.width - border) {
 			on.horiz = "R"
 		}
-		on.view.style.cursor = pvt.zoneCursor[on.vert + on.horiz];
+		on.style.cursor = pvt.zoneCursor[on.vert + on.horiz];
 	}
 }
 export default {
@@ -82,9 +82,9 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				on.view.textContent = "";
-				on.view.classList.add("diagram");
-				on.view.tabIndex = 0;
+				on.peer.textContent = "";
+				on.peer.classList.add("diagram");
+				on.peer.tabIndex = 0;
 				for (let model of on.model.shapes) {
 					let shape = on.owner.create(model.type || on.use.Shape);
 					shape.bind(model);
@@ -94,7 +94,7 @@ export default {
 			},
 			keydown: function(on, event) {
 				if (event.key == "Escape") {
-					on.view.focus();
+					on.peer.focus();
 				}
 				if (event.key == "s" && event.ctrlKey) {
 					event.preventDefault();
@@ -102,12 +102,12 @@ export default {
 				}
 				if (event.key == "z" && event.ctrlKey) {
 					event.preventDefault();
-					on.view.focus();
+					on.peer.focus();
 					on.commands.undo();
 				}
 				if (event.key == "y" && event.ctrlKey) {
 					event.preventDefault();
-					on.view.focus();
+					on.peer.focus();
 					on.commands.redo();
 				}
 			}
@@ -138,17 +138,17 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				on.view.textContent = "";
-				on.view.classList.add("shape");
+				on.peer.textContent = "";
+				on.peer.classList.add("shape");
 				this.draw(on, event);
 				this.viewContent(on, event);
 			},
 			draw: function(on, event) {
-				on.view.style.width = (on.model.width || on.minWidth) + "px";
-				on.view.style.height = (on.model.height || on.minHeight) + "px";
-				on.view.style.top = on.model.y + "px";
-				on.view.style.left = on.model.x + "px";
-				on.view.scrollIntoView();
+				on.style.width = (on.model.width || on.minWidth) + "px";
+				on.style.height = (on.model.height || on.minHeight) + "px";
+				on.style.top = on.model.y + "px";
+				on.style.left = on.model.x + "px";
+				on.peer.scrollIntoView();
 			},
 			move: function(on, event) {
 				on.moveTo(on.model.x + event.moveX, on.model.y + event.moveY);
@@ -193,19 +193,19 @@ export default {
 					case "bigint":
 					case "object":
 					default:
-						on.view.textContent = "";
-						on.view.textContent = on.model.content;
+						on.peer.textContent = "";
+						on.peer.textContent = on.model.content;
 						break;
 				}
 			},
 			mousedown: function(on, event) {
-				if (on.owner.activeElement.parentNode == on.view) return;
+				if (on.owner.activeElement.parentNode == on.peer) return;
 				event.preventDefault();
 				event.track = on; // Tell the listener what to track.
 				pvt.setZone(on, event);
-				on.view.style.outline = "3px solid rgba(64, 128, 64, .3)";
-				on.view.style.zIndex = "1";
-				on.diagram.view.focus();
+				on.style.outline = "3px solid rgba(64, 128, 64, .3)";
+				on.style.zIndex = "1";
+				on.diagram.peer.focus();
 				if (on.diagram.command) console.log("no mouse up");
 			},
 			track: function(on, event) {
@@ -232,8 +232,8 @@ export default {
 					on.set(on.diagram.command.after, on.model);
 					on.diagram.commands.addCommand(on.diagram.command);
 					on.diagram.command = null;
-				} else if (on.view.firstChild) {
-					on.view.firstChild.focus();
+				} else if (on.peer.firstChild) {
+					on.peer.firstChild.focus();
 				}
 			},
 			contextmenu: function(on, event) {
@@ -270,17 +270,17 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				let view = on.view;
-				view.classList.add("text");
-				view.textContent = "";
-				view.innerHTML = "<p>" + on.model + "</p>";
-				view.contentEditable = true;
+				let peer = on.peer;
+				peer.classList.add("text");
+				peer.textContent = "";
+				peer.innerHTML = "<p>" + on.model + "</p>";
+				peer.contentEditable = true;
 			},
 			focusin: function(on, event) {
-				on.view.parentNode.style.zIndex = "8";
+				on.peer.parentNode.style.zIndex = "8";
 			},
 			focusout: function(on, event) {
-				on.view.parentNode.style.zIndex = "";
+				on.peer.parentNode.style.zIndex = "";
 			},
 			dblclick: function(on, event) {
 				

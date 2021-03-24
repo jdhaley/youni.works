@@ -6,39 +6,39 @@ export default {
 	View: {
 		super$: "use.control.Control",
 		model: undefined,
+		once$peer: function() {
+			let peer = this.owner.createNode("div");
+			peer.$ctl = this;
+			return peer;
+		},
+		once$to: function() {
+			const nodes = this.peer.childNodes;
+			return this.sys.extend(null, {
+				"@iterator": function* iterate() {
+					for (let i = 0, len = nodes.length; i < len; i++) {
+						let node = nodes[i];
+						if (node.$ctl) yield node.$ctl;
+					}
+				}
+			});
+		},
+		get$style: function() {
+			return this.peer.style;
+		},
 		bind: function(model) {
 			this.unobserve(this.model);
 			this.sys.define(this, "model", model);
 			this.observe(model);
 		},
-		once$view: function() {
-			let view = this.owner.createNode("div");
-			view.$ctl = this;
-			return view;
-		},
-		once$to: function() {
-			const nodes = this.view.childNodes;
-			return this.sys.extend(null, {
-				"@iterator": function* iterate() {
-					for (let i = 0, len = nodes.length; i < len; i++) {
-						let view = nodes[i];
-						if (view.$ctl) yield view.$ctl;
-					}
-				}
-			});
-		},
 		append: function(control) {
-			this.view.append(control.view);
-		},
-		get$style: function() {
-			return this.view.style;
+			this.peer.append(control.peer);
 		},
 		draw: function(data) {
 			this.bind(data);
 			this.actions.send(this, "view");
 		},
 //		start: function() {
-//			addEvents(view, type.events);
+//			addEvents(peer, type.events);
 //		}
 	},
 	Frame: {
@@ -89,10 +89,6 @@ export default {
 		},
 		start: function(conf) {
 //			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-//			this.control(this.window);
-//			this.control(this.content);
-//			this.window.Element.prototype.view = view;
-//			this.window.Node.prototype.owner = this;
 			this.window.styles = createStyleSheet(this.window.document);
 			addEvents(this.window, this.events.windowEvents);
 			addEvents(this.window.document, this.events.documentEvents);
@@ -100,10 +96,10 @@ export default {
 	}
 }
 
-function addEvents(view, events) {
+function addEvents(peer, events) {
 	for (let name in events) {
 		let listener = events[name];
-		view.addEventListener(name, listener);
+		peer.addEventListener(name, listener);
 	}
 }
 

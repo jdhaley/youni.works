@@ -9,50 +9,6 @@ export default function main(sys, conf) {
 	initialize(frame, conf.app);
 }
 
-//function frame(window, events) {
-//	if (!window.owner) {
-//		let frame = this.sys.extend(this.use.Frame);
-//		frame.start({
-//			window: window,
-//			events: events
-//		});
-//		window.owner = frame;
-//	}
-//	return window.owner;
-//}
-
-/*
-	components: {
-		Frame: view.Frame,
-		Diagram: diagram.Diagram,
-		Form: grid.Record
-	}
-
-*/
-//import parse from "../devt/parser.mjs";
-//console.log(JSON.stringify(parse(diagram), null, 2));
-
-//app: {
-//	type$: "use.view.Application",
-//	use: {
-//		type$Frame: "use.view.Frame",
-//		type$Diagram: "use.diagram.Diagram",
-//		type$Record: "use.grid.Record"
-//	},
-//	initialize: initialize
-//},
-//conf: {
-//	frame: {
-//		events: events
-//	},
-//	window: window
-//}
-//
-//get$components: function() {
-//	return this.app.components;
-//},
-//type$app: "Application",
-
 function initialize(frame, conf) {
 	frame.open(frame.search + ".json", initializeApp);
 
@@ -74,7 +30,7 @@ function initialize(frame, conf) {
 		data = frame.sys.extend(null, data);
 		let view = frame.create(conf.components.Diagram);
 		view.file = conf.diagram;
-		frame.content.append(view.view);
+		frame.content.append(view.peer);
 		view.draw(data);
 	}
 	function initializeData(msg) {
@@ -82,7 +38,22 @@ function initialize(frame, conf) {
 		data = frame.sys.extend(null, data);
 		let view = frame.create(conf.components.Object);
 		view.start(conf.types[conf.objectType]);
-		frame.content.append(view.view);
+		frame.content.append(view.peer);
 		view.draw(data);
 	}
 }
+
+//import parse from "../devt/parser.mjs";
+//console.log(JSON.stringify(parse(diagram), null, 2));
+
+//function frame(window, events) {
+//	if (!window.owner) {
+//		let frame = this.sys.extend(this.use.Frame);
+//		frame.start({
+//			window: window,
+//			events: events
+//		});
+//		window.owner = frame;
+//	}
+//	return window.owner;
+//}

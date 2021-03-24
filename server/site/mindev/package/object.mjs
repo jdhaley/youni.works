@@ -24,7 +24,7 @@ export default {
 			let editor = this.owner.editors[dataType] || this.owner.editors["string"];
 			return editor;
 		},
-		once$view: function() {
+		once$peer: function() {
 			let ele = this.owner.createNode("div");
 			ele.classList.add(this.conf.name);
 			ele.classList.add(this.display);
@@ -62,8 +62,8 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				let view = on.view;
-				view.className = on.conf.name;
+				let peer = on.peer;
+				peer.className = on.conf.name;
 				for (let prop of on.to) {
 					prop.bind(on.model);
 					on.append(prop);
