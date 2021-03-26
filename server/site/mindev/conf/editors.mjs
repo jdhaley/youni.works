@@ -1,11 +1,11 @@
 export default {
 	string: scalar,
 	number: scalar,
-	date: scalar,
 	boolean: scalar,
-	object: object,
-	array: grid,
-	link: link
+	date: scalar,
+	object: object, //composite part
+	array: grid, //composite part
+	link: link //referenced object
 //	text: {
 //		type$: "use.prop.Text"
 //	},
@@ -23,13 +23,31 @@ export default {
 }
 
 function object(ele) {
-	ele.append("..");
+	let control = ele.$peer;
+	let editor = control.owner.createNode("a");
+	editor.classList.add("widget");
+	editor.classList.add("link");
+	editor.setAttribute("href", "");
+	editor.textContent = "...";
+	ele.append(editor);
 }
 function link(ele) {
-	ele.append("..");
+	let control = ele.$peer;
+	let editor = control.owner.createNode("a");
+	editor.classList.add("widget");
+	editor.classList.add("link");
+	editor.setAttribute("href", "");
+	editor.textContent = "...";
+	ele.append(editor);
 }
 function grid(ele) {
-	ele.append("...");
+	let control = ele.$peer;
+	let editor = control.owner.createNode("a");
+	editor.classList.add("widget");
+	editor.classList.add("link");
+	editor.setAttribute("href", "");
+	editor.textContent = "...";
+	ele.append(editor);
 }
 function scalar(ele) {
 	let control = ele.$peer;
@@ -44,9 +62,11 @@ function scalar(ele) {
 		editor.value = control.model;
 	} else {
 		editor = control.owner.createNode("div");
+		editor.classList.add("input");
 		editor.contentEditable = true;
 		editor.textContent = control.model;
 	}
+	editor.classList.add("widget");
 	ele.append(editor);
 }
 
@@ -62,4 +82,32 @@ function inputType(control) {
 		default:
 			return "text";
 	}
+}
+//"color"
+const types = ["", "other", "string", "number", "boolean", "date", "array", ];
+function typeOf(value) {
+	//'empty' values
+	if (value === undefined || value === null || isNaN(value)) return "";
+	
+	let type = typeof value;
+	switch (type) {
+		case "string":
+			//parse date string
+			//parse color
+			//parse url?
+			return type;
+		case "number":
+		case "boolean":
+			return type;
+		case "bigint":
+			return "number";
+		case "symbol":
+		case "function":
+			return "other";
+	}
+	
+	if (value instanceof Date) return "date";
+	if (value[Symbol.iterable]) return typeof value.length == "number" ? "array" : "sequence";
+	let proto = Object.getPrototypeOf(value);
+	if (proto === null || proto === Object.prototype) return "object";
 }

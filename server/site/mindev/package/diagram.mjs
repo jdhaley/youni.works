@@ -34,12 +34,12 @@ const pvt = {
 	}
 }
 export default {
-	private: pvt,
 	package$: "youni.works/diagram",
 	use: {
 		package$view: "youni.works/view",
 		package$command: "youni.works/command"
 	},
+	private: pvt,
 	DrawCommand: {
 		super$: "use.command.Command",
 		title: "Move/Size Shape",

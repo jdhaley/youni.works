@@ -7,15 +7,16 @@
 				"objectType": "Issue"
 			},
 			{
-				"name": "test",
+				"name": "testAValue",
 				"dataType": "boolean"
 			},
 			{
 				"name": "value",
+				"title": "The Numeric Value",
 				"dataType": "number"
 			},
 			{
-				"name": "code",
+				"name": "code_name",
 				"dataType": "char",
 				"protected": true
 			},
