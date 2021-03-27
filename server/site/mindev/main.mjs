@@ -1,15 +1,16 @@
+let frame;
 export default function main(sys, conf) {
 	conf = sys.load(conf);
-	let frame = sys.extend(sys.forName("youni.works/view/Frame"), {
+	frame = sys.extend(sys.forName("youni.works/view/Frame"), {
 		window: window,
 		events: conf.app.events,
 		editors: conf.app.editors
 	});
 	frame.start(conf.app)
-	initialize(frame, conf.app);
+	initialize(conf.app);
 }
 
-function initialize(frame, conf) {
+function initialize(conf) {
 	frame.open(frame.search + ".json", initializeApp);
 
 	function initializeApp(msg) {
@@ -57,3 +58,23 @@ function initialize(frame, conf) {
 //	}
 //	return window.owner;
 //}
+
+
+function initializeDocument(conf) {
+	if (conf.icon) link.call(this, {
+		rel: "icon",
+		href: conf.icon
+	});
+	if (conf.styles) link.call(this, {
+		rel: "stylesheet",
+		href: conf.styles
+	});
+}
+
+function link(conf) {
+	let ele = this.createNode("link");
+	for (let attr in conf) {
+		ele.setAttribute(attr, link[attr]);
+	}
+	doc.head.append(ele);
+}

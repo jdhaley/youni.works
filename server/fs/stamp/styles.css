@@ -12,7 +12,7 @@
 	outline: 2px solid steelblue;
 }
 
-* {
+ * {
 	outline: 0;
 	margin: 0;
 	border: 0;
@@ -20,14 +20,13 @@
 }
 
 .sheet {
-	border: 1px solid lightgray;
-	margin: 3px;
+	border: 1px solid silver;
 }
 
 .sheet * {
 	border-width: 0;
 	border-style: solid;
-	border-color: lightgray;
+	border-color: silver;
 }
 .sheet>.property {
 	display: flex;
@@ -40,22 +39,22 @@
 }
 .sheet>.property>* {
 	min-width: 100px;
+	padding: 3px;
 }
 .sheet>.property>LABEL {
 	font-size: 9pt;
 	flex: 1 1;
-	border-right: 1px solid lightgray;
-	padding: 3px;
+	border-right-width: 1px;
 }
 .sheet>.property>.widget {
 	font-size: 10pt;
 	flex: 4 4;
-	margin: 2px;
-	padding: 1px;
 }
-
 .widget:focus {
-	outline: 2px solid steelBlue;
+	border: 1px solid steelBlue;
+	padding: 1px;
+	margin: 1px;
+	outline: 0;
 }
 
 .diagram {

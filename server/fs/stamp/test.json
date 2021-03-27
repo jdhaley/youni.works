@@ -1,4 +1,6 @@
 {
+	"icon": "/file/stamp/index.png",
+	"styles": "/file/stamp/styles.css",
 	"components": {
 		"Frame": "youni.works/view/Frame",
 		"Diagram": "youni.works/diagram/Diagram",
