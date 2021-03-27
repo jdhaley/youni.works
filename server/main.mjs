@@ -21,7 +21,13 @@ export default function main(sys, conf) {
 				res.end();
 				return;
 			}
-			res.send(file);
+			if (req.url.endsWith(".css")) {
+				res.writeHead(200, {"Content-Type": "text/css"});
+				res.write(file);
+				res.end();
+			} else {
+				res.send(file);
+			}
 		} else if (req.method == "PUT") {
 			let pathnameIdx = path.lastIndexOf("/");
 			let dir = path.substring(0, pathnameIdx);

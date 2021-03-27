@@ -16,6 +16,7 @@ function initialize(conf) {
 	function initializeApp(msg) {
 		let app = JSON.parse(msg.content);
 		conf = frame.sys.extend(conf, app);
+		initializeDocument(conf);
 		frame.open(conf.typeSource, initializeTypes);
 	}
 	
@@ -61,11 +62,11 @@ function initialize(conf) {
 
 
 function initializeDocument(conf) {
-	if (conf.icon) link.call(this, {
+	if (conf.icon) link.call(frame, {
 		rel: "icon",
 		href: conf.icon
 	});
-	if (conf.styles) link.call(this, {
+	if (conf.styles) link.call(frame, {
 		rel: "stylesheet",
 		href: conf.styles
 	});
@@ -74,7 +75,7 @@ function initializeDocument(conf) {
 function link(conf) {
 	let ele = this.createNode("link");
 	for (let attr in conf) {
-		ele.setAttribute(attr, link[attr]);
+		ele.setAttribute(attr, conf[attr]);
 	}
-	doc.head.append(ele);
+	this.peer.ownerDocument.head.append(ele);
 }
