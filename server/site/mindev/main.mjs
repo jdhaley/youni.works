@@ -78,3 +78,33 @@ function link(conf) {
 	}
 	this.peer.ownerDocument.head.append(ele);
 }
+
+//this.window.styles = createStyleSheet(this.window.document);
+//createRule: function(selector, properties) {
+//	let out = `${selector} {\n`;
+//	out += defineStyleProperties(properties);
+//	out += "\n}";
+//	let index = this.window.styles.insertRule(out);
+//	return this.window.styles.cssRules[index];
+//},
+
+function createStyleSheet(document) {
+	let ele = document.createElement("style");
+	ele.type = "text/css";
+	document.head.appendChild(ele);
+	return ele.sheet;
+}
+
+function defineStyleProperties(object, prefix) {
+	if (!prefix) prefix = "";
+	let out = "";
+	for (let name in object) {
+		let value = object[name];
+		if (typeof value == "object") {
+			out += defineStyleProperties(value, prefix + name + "-");
+		} else {
+			out += "\t" + prefix + name + ": " + value + ";\n"
+		}
+	}
+	return out;
+}

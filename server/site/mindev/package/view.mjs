@@ -3,48 +3,32 @@ export default {
 	use: {
 		package$control: "youni.works/control",
 	},
-	Ui: {
+	View: {
 		super$: "use.control.Control",
+		type$owner: "Frame",
+		once$to: Ui_to,
+		append: Ui_append,
 		once$peer: function() {
-			let peer = this.owner.createNode("div");
+			let peer = this.owner.createNode(this.conf.nodeName || "div");
 			peer.$peer = this;
 			return peer;
 		},
-		once$to: Peer_to,
-		get$owner: function() {
-			return this.peer.ownerDocument.body.$peer;
-		},
-		append: function(control) {
-			this.peer.append(control.peer);
-		},
 		get$style: function() {
 			return this.peer.style;
-		}
-	},
-	View: {
-		super$: "Ui",
-		virtual$model: function() {
-			if (!arguments.length) return this.peer.$model;
-			this.unobserve(this.peer.$model);
-			this.peer.$model = arguments[0];
-			this.observe(this.peer.$model);
 		},
-//		virtual$markup: function() {
-//			if (!arguments.length) return this.peer.innerHTML;
-//			this.peer.innerHTML = "" + arguments[0];
-//		},
+		view: function(data) {
+			this.model = data;
+		},
 		draw: function(model) {
-			this.model = model;
+			this.view(model);
 			this.actions.send(this, "view");
 		}
 	},
 	Frame: {
 		super$: "use.control.Owner",
 		owner: null,
-		get$to: Peer_to,
-		append: function(control) {
-			this.peer.append(control.peer);
-		},
+		get$to: Ui_to,
+		append: Ui_append,
 		get$peer: function() {
 			return this.window.document.body;
 		},
@@ -85,24 +69,26 @@ export default {
 		    node.parentNode.removeChild(node);
 		    return px;
 		},
-		createRule: function(selector, properties) {
-			let out = `${selector} {\n`;
-			out += defineStyleProperties(properties);
-			out += "\n}";
-			let index = this.window.styles.insertRule(out);
-			return this.window.styles.cssRules[index];
-		},
 		start: function(conf) {
 			this.window.document.body.$peer = this;
-//			console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-			this.window.styles = createStyleSheet(this.window.document);
+			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
 			addEvents(this.window, this.events.windowEvents);
 			addEvents(this.window.document, this.events.documentEvents);
 		}
 	}
 }
+//virtual$markup: function() {
+//if (!arguments.length) return this.peer.innerHTML;
+//this.peer.innerHTML = "" + arguments[0];
+//},
+//virtual$model: function() {
+//if (!arguments.length) return this.peer.$model;
+//this.unobserve(this.peer.$model);
+//this.peer.$model = arguments[0];
+//this.observe(this.peer.$model);
+//},
 
-function Peer_to() {
+function Ui_to() {
 	const nodes = this.peer.childNodes;
 	if (!nodes.$to) nodes.$to = this.sys.extend(null, {
 		"@iterator": function* iterate() {
@@ -115,30 +101,13 @@ function Peer_to() {
 	return nodes.$to;
 }
 
+function Ui_append(control) {
+	this.peer.append(control.peer);
+}
+
 function addEvents(peer, events) {
 	for (let name in events) {
 		let listener = events[name];
 		peer.addEventListener(name, listener);
 	}
-}
-
-function createStyleSheet(document) {
-	let ele = document.createElement("style");
-	ele.type = "text/css";
-	document.head.appendChild(ele);
-	return ele.sheet;
-}
-
-function defineStyleProperties(object, prefix) {
-	if (!prefix) prefix = "";
-	let out = "";
-	for (let name in object) {
-		let value = object[name];
-		if (typeof value == "object") {
-			out += defineStyleProperties(value, prefix + name + "-");
-		} else {
-			out += "\t" + prefix + name + ": " + value + ";\n"
-		}
-	}
-	return out;
 }

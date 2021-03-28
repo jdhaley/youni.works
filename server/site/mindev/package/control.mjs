@@ -7,6 +7,7 @@ export default {
 	},
 	Control: {
 		super$: "Object",
+		conf: Object.freeze(Object.create(null)),
 		type$owner: "Owner",
 		to: Object.freeze([]),
 		append: function(control) {
