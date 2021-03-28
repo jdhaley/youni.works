@@ -27,23 +27,22 @@ export default {
 			let editor = this.owner.editors[dataType] || this.owner.editors["string"];
 			return editor;
 		},
-		once$peer: function() {
-			let ele = this.owner.createNode("div");
-			ele.classList.add(this.conf.name);
-			ele.classList.add("property");
-			ele.$peer = this;
-			this.labelFor(ele);
-			this.editorFor(ele);
-			return ele;
-		},
 		bind: function(model) {
 			this.sys.define(this, "model", model && model[this.conf.name]);
+		},
+		extend$actions: {
+			view: function(on, event) {
+				let peer = on.peer;
+				peer.classList.add(on.conf.name);
+				peer.classList.add("property");
+				on.labelFor(peer);
+				on.editorFor(peer);
+			}
 		}
 	},
 	Properties: {
 		super$: "use.view.View",
 		display: "sheet",
-		to: Object.freeze([]),
 		conf: {
 			properties: Object.freeze([])
 		},
@@ -54,12 +53,11 @@ export default {
 			});
 			this.sys.define(this, "conf", conf);
 			if (conf.properties) {
-				this.sys.define(this, "to", []);
 				for (let propConf of conf.properties) {
 					let propType = propConf.controlType || "youni.works/object/Property";
 					let prop = this.owner.create(propType, propConf);
 					this.sys.define(prop, "object", this);
-					this.to.push(prop);
+					this.append(prop);
 				}
 			}
 		},
@@ -70,7 +68,6 @@ export default {
 				peer.classList.add(on.display);
 				for (let prop of on.to) {
 					prop.bind(on.model);
-					on.append(prop);
 				}
 			}
 		}
