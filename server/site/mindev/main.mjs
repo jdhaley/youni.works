@@ -38,8 +38,7 @@ function initialize(conf) {
 	function initializeData(msg) {
 		let data = JSON.parse(msg.content);
 		data = frame.sys.extend(null, data);
-		let view = frame.create(conf.components.Object);
-		view.start(conf.types[conf.objectType]);
+		let view = frame.create(conf.components.Object, conf.types[conf.objectType]);
 		frame.append(view);
 		view.draw(data);
 	}

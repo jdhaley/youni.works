@@ -12,7 +12,7 @@
 			},
 			{
 				"name": "value",
-				"title": "The Numeric Value",
+				"caption": "The Numeric Value",
 				"dataType": "number"
 			},
 			{
@@ -47,7 +47,7 @@
 			},
 			{
 				"name": "denom",
-				"title": "Denomination",
+				"caption": "Denomination",
 				"size": 8
 			},
 			{

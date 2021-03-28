@@ -9,17 +9,25 @@ export default {
 		conf: {
 			name: "",
 			dataType: "",
-			title: "",
+			caption: "",
 			viewWidth: 4
 		},
-		get$title: function() {
-			return this.conf.title || titleize(this.conf.name);
+		get$caption: function() {
+			return this.conf.caption || captionize(this.conf.name);
 		},
-		labelFor: function(ele) {
-			if (this.object.display == "row") return;
-			let label = this.owner.createNode("label");
-			label.textContent = this.title;
-			ele.append(label);
+		start: function(conf) {
+			if (conf) this.sys.define(this, "conf", conf);
+			let peer = this.peer;
+			peer.classList.add(this.conf.name);
+			peer.classList.add("property");
+			if (this.object.display != "row") {
+				let label = this.owner.createNode("label");
+				label.textContent = this.caption;
+				this.peer.append(label);		
+			} else {
+			}
+			this.editor = this.editorFor();
+			this.peer.append(this.editor);
 		},
 		get$editorFor: function() {
 			//Return the function to create the view's property editor.
@@ -28,15 +36,14 @@ export default {
 			return editor;
 		},
 		bind: function(model) {
-			this.sys.define(this, "model", model && model[this.conf.name]);
-		},
-		extend$actions: {
-			view: function(on, event) {
-				let peer = on.peer;
-				peer.classList.add(on.conf.name);
-				peer.classList.add("property");
-				on.labelFor(peer);
-				on.editorFor(peer);
+			if (this.editor.type) {
+				model = model[this.conf.name];
+				if (typeof model == "object") model = "[object]";
+				if (this.editor.nodeName == "INPUT") {
+					this.editor.value = model;
+				} else {
+					this.editor.textContent = model;
+				}
 			}
 		}
 	},
@@ -44,14 +51,14 @@ export default {
 		super$: "use.view.View",
 		display: "sheet",
 		conf: {
+			name: "Object",
 			properties: Object.freeze([])
 		},
 		start: function(conf) {
-			if (!conf) conf = this.sys.extend(null, {
-				name: "Object",
-				properties: []
-			});
-			this.sys.define(this, "conf", conf);
+			if (conf) this.sys.define(this, "conf", conf);
+			let peer = this.peer;
+			peer.classList.add(this.conf.name);
+			peer.classList.add(this.display);
 			if (conf.properties) {
 				for (let propConf of conf.properties) {
 					let propType = propConf.controlType || "youni.works/object/Property";
@@ -63,44 +70,39 @@ export default {
 		},
 		extend$actions: {
 			view: function(on, event) {
-				let peer = on.peer;
-				peer.classList.add(on.conf.name);
-				peer.classList.add(on.display);
-				for (let prop of on.to) {
-					prop.bind(on.model);
-				}
+				for (let prop of on.to) prop.bind(on.model);
 			}
 		}
 	}
 }
 
-function titleize(name) {
-	let title = "";
+function captionize(name) {
+	let caption = "";
 	
 	if (name.indexOf("_") > 0) {
 		name =  name.replace("_", " ");
 		for (let i = 0; i < name.length; i++) {
 			let char = name.charAt(i);
-			if (char == " " && (title == "" || title.endsWith(" "))) {
+			if (char == " " && (caption == "" || caption.endsWith(" "))) {
 				char = "";
-			} else if (isLowerCase(char) && (title == "" | title.endsWith(" "))) {
+			} else if (isLowerCase(char) && (caption == "" | caption.endsWith(" "))) {
 				char = char.toUpperCase();
 			}
-			title += char;
+			caption += char;
 		}
-		return title;
+		return caption;
 	}
 	
-	title = name.substring(0, 1).toUpperCase();
+	caption = name.substring(0, 1).toUpperCase();
 	for (let i = 1; i < name.length; i++) {
 		let char = name.charAt(i);
 		if (isUpperCase(char)) {
-			if (isLowerCase(name.charAt(i - 1))) title += " ";
-			if (isUpperCase(name.charAt(i - 1)) && isLowerCase(name.charAt(i + 1))) title += " ";
+			if (isLowerCase(name.charAt(i - 1))) caption += " ";
+			if (isUpperCase(name.charAt(i - 1)) && isLowerCase(name.charAt(i + 1))) caption += " ";
 		}
-		title += char;
+		caption += char;
 	}
-	return title;
+	return caption;
 }
 
 function isUpperCase(str)

@@ -22,52 +22,50 @@ export default {
 //	}
 }
 
-function object(ele) {
-	let control = ele.$peer;
+function object() {
+	let control = this;
 	let editor = control.owner.createNode("a");
 	editor.classList.add("widget");
 	editor.classList.add("link");
 	editor.setAttribute("href", "");
 	editor.textContent = "...";
-	ele.append(editor);
+	return editor;
 }
-function link(ele) {
-	let control = ele.$peer;
+function link() {
+	let control = this;
 	let editor = control.owner.createNode("a");
 	editor.classList.add("widget");
 	editor.classList.add("link");
 	editor.setAttribute("href", "");
 	editor.textContent = "...";
-	ele.append(editor);
+	return editor;
 }
-function grid(ele) {
-	let control = ele.$peer;
+function grid() {
+	let control = this;
 	let editor = control.owner.createNode("a");
 	editor.classList.add("widget");
 	editor.classList.add("link");
 	editor.setAttribute("href", "");
 	editor.textContent = "...";
-	ele.append(editor);
+	return editor;
 }
-function scalar(ele) {
-	let control = ele.$peer;
+function scalar() {
+	let control = this;
 	let editor;
 	if (control.conf.protected) {
 		editor = control.owner.createNode("input");
 		editor.type = "password";
-		editor.value = control.model;
 	} else if (control.conf.input) {
 		editor = control.owner.createNode("input");
 		editor.type = inputType(control);
-		editor.value = control.model;
 	} else {
 		editor = control.owner.createNode("div");
 		editor.classList.add("input");
+		editor.type = this.conf.dataType;
 		editor.contentEditable = true;
-		editor.textContent = control.model;
 	}
 	editor.classList.add("widget");
-	ele.append(editor);
+	return editor;
 }
 
 function inputType(control) {
