@@ -35,7 +35,7 @@ export default {
 			let editor = this.owner.editors[dataType] || this.owner.editors["string"];
 			return editor;
 		},
-		bind: function(model) {
+		view: function(model) {
 			if (this.editor.type) {
 				model = model[this.conf.name];
 				if (typeof model == "object") model = "[object]";
@@ -68,9 +68,15 @@ export default {
 				}
 			}
 		},
+		view: function(object) {
+			this.unobserve(this.model);
+			this.observe(object);
+			this.model = object;
+		},
 		extend$actions: {
 			view: function(on, event) {
-				for (let prop of on.to) prop.bind(on.model);
+				let model = on.model;
+				for (let prop of on.to) prop.view(model);
 			}
 		}
 	}

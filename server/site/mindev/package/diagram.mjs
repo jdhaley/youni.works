@@ -77,18 +77,24 @@ export default {
 			type$Shape: "Shape",
 			type$Commands: "use.command.Commands"
 		},
-		start: function() {
+		start: function(conf) {
+			if (conf) this.sys.define(this, "conf", conf);
 			this.commands = this.use.Commands.instance();
+			this.peer.classList.add("diagram");
+			this.peer.tabIndex = 0;
+		},
+		view: function(diagram) {
+			this.unobserve(this.model);
+			this.observe(diagram);
+			this.model = diagram;
 		},
 		extend$actions: {
 			view: function(on, event) {
 				on.peer.textContent = "";
-				on.peer.classList.add("diagram");
-				on.peer.tabIndex = 0;
 				for (let model of on.model.shapes) {
 					let shape = on.owner.create(model.type || on.use.Shape);
-					shape.model = model;
 					shape.diagram = on;
+					shape.view(model);
 					on.append(shape);
 				}
 			},
@@ -122,6 +128,14 @@ export default {
 		minWidth: 48,
 		minHeight: 24,
 		type$defaultContent: "Text",
+		view: function(shape) {
+			this.unobserve(this.model);
+			this.observe(shape);
+			this.model = shape;
+			this.peer.textContent = "";
+			this.peer.classList.add("shape");
+			this.viewContent(shape.content);
+		},
 		moveTo: function(x, y) {
 			this.model.x = x > 0 ? x : 0;
 			this.model.y = y > 0 ? y : 0;
@@ -136,12 +150,28 @@ export default {
 			dest.width = source.width > this.minWidth ? source.width : this.minWidth;
 			dest.height = source.height > this.minHeight ? source.height : this.minHeight;
 		},
+		viewContent: function(content) {
+			switch (typeof content) {
+				case "string":
+				case "number":
+					let ctl = this.owner.create(this.defaultContent);
+					this.append(ctl);
+					ctl.view(content);
+					break;
+				case "boolean":
+				case "undefined":
+				case "function":
+				case "symbol":
+				case "bigint":
+				case "object":
+				default:
+					this.peer.textContent = content;
+					break;
+			}
+		},
 		extend$actions: {
 			view: function(on, event) {
-				on.peer.textContent = "";
-				on.peer.classList.add("shape");
 				this.draw(on, event);
-				this.viewContent(on, event);
 			},
 			draw: function(on, event) {
 				on.style.width = (on.model.width || on.minWidth) + "px";
@@ -177,26 +207,6 @@ export default {
 				}
 			},
 			connect: function(on, event) {
-			},
-			viewContent: function(on, event) {
-				switch (typeof on.model.content) {
-					case "string":
-					case "number":
-						let content = on.owner.create(on.defaultContent);
-						content.model = on.model.content;
-						on.append(content);
-						break;
-					case "boolean":
-					case "undefined":
-					case "function":
-					case "symbol":
-					case "bigint":
-					case "object":
-					default:
-						on.peer.textContent = "";
-						on.peer.textContent = on.model.content;
-						break;
-				}
 			},
 			mousedown: function(on, event) {
 				if (on.owner.activeElement.parentNode == on.peer) return;
@@ -265,6 +275,9 @@ export default {
 	},
 	Text: {
 		super$: "use.view.View",
+		view: function(model) {
+			this.model = model;
+		},
 		extend$actions: {
 			view: function(on, event) {
 				let peer = on.peer;

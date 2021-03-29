@@ -31,8 +31,8 @@ function initialize(conf) {
 		let data = JSON.parse(msg.content);
 		data = frame.sys.extend(null, data);
 		let view = frame.create(conf.components.Diagram);
-		view.file = conf.diagram;
 		frame.append(view);
+		view.file = conf.diagram;
 		view.draw(data);
 	}
 	function initializeData(msg) {

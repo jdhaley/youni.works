@@ -16,11 +16,11 @@ export default {
 		get$style: function() {
 			return this.peer.style;
 		},
-		view: function(data) {
-			this.model = data;
+		view: function(model) {
+			this.model = model;
 		},
-		draw: function(model) {
-			this.view(model);
+		draw: function(data) {
+			this.view(data);
 			this.actions.send(this, "view");
 		}
 	},
