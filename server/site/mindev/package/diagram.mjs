@@ -83,7 +83,7 @@ export default {
 			this.peer.classList.add("diagram");
 			this.peer.tabIndex = 0;
 		},
-		view: function(diagram) {
+		bind: function(diagram) {
 			this.unobserve(this.model);
 			this.observe(diagram);
 			this.model = diagram;
@@ -94,7 +94,7 @@ export default {
 				for (let model of on.model.shapes) {
 					let shape = on.owner.create(model.type || on.use.Shape);
 					shape.diagram = on;
-					shape.view(model);
+					shape.bind(model);
 					on.append(shape);
 				}
 			},
@@ -128,7 +128,7 @@ export default {
 		minWidth: 48,
 		minHeight: 24,
 		type$defaultContent: "Text",
-		view: function(shape) {
+		bind: function(shape) {
 			this.unobserve(this.model);
 			this.observe(shape);
 			this.model = shape;
@@ -156,7 +156,7 @@ export default {
 				case "number":
 					let ctl = this.owner.create(this.defaultContent);
 					this.append(ctl);
-					ctl.view(content);
+					ctl.bind(content);
 					break;
 				case "boolean":
 				case "undefined":
@@ -275,7 +275,7 @@ export default {
 	},
 	Text: {
 		super$: "use.view.View",
-		view: function(model) {
+		bind: function(model) {
 			this.model = model;
 		},
 		extend$actions: {
