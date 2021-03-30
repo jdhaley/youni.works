@@ -7,14 +7,18 @@ export default {
 		super$: "use.control.Control",
 		type$owner: "Frame",
 		once$to: Ui_to,
-		append: Ui_append,
-		once$peer: function() {
+		get$peer: function() {
 			let peer = this.owner.createNode(this.conf.nodeName || "div");
+			this.sys.define(this, "peer", peer);
 			peer.$peer = this;
+			this.display();
 			return peer;
 		},
 		get$style: function() {
 			return this.peer.style;
+		},
+		append: Ui_append,
+		display: function() {
 		},
 		bind: function(model) {
 			this.model = model;

@@ -77,11 +77,15 @@ export default {
 			type$Shape: "Shape",
 			type$Commands: "use.command.Commands"
 		},
+		type$commands: "use.command.Commands",
 		start: function(conf) {
 			if (conf) this.sys.define(this, "conf", conf);
-			this.commands = this.use.Commands.instance();
-			this.peer.classList.add("diagram");
-			this.peer.tabIndex = 0;
+			this.sys.define(this, "commands", this.use.Commands.instance());			
+		},
+		display: function() {
+			const peer = this.peer;
+			peer.classList.add("diagram");
+			peer.tabIndex = 0;
 		},
 		bind: function(diagram) {
 			this.unobserve(this.model);
@@ -128,13 +132,14 @@ export default {
 		minWidth: 48,
 		minHeight: 24,
 		type$defaultContent: "Text",
+		display: function() {
+			const peer = this.peer;
+			peer.classList.add("shape");
+		},
 		bind: function(shape) {
 			this.unobserve(this.model);
 			this.observe(shape);
 			this.model = shape;
-			this.peer.textContent = "";
-			this.peer.classList.add("shape");
-			this.viewContent(shape.content);
 		},
 		moveTo: function(x, y) {
 			this.model.x = x > 0 ? x : 0;
@@ -172,6 +177,7 @@ export default {
 		extend$actions: {
 			view: function(on, event) {
 				this.draw(on, event);
+				on.viewContent(on.model.content);
 			},
 			draw: function(on, event) {
 				on.style.width = (on.model.width || on.minWidth) + "px";

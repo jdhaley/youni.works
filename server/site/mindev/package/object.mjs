@@ -15,19 +15,19 @@ export default {
 		get$caption: function() {
 			return this.conf.caption || captionize(this.conf.name);
 		},
-		start: function(conf) {
-			if (conf) this.sys.define(this, "conf", conf);
-			let peer = this.peer;
-			peer.classList.add(this.conf.name);
+		display: function() {
+			const peer = this.peer;
+			const conf = this.conf;
 			peer.classList.add("property");
-			if (this.object.display != "row") {
+			conf.name && peer.classList.add(conf.name);
+			if (this.object.displayType != "row") {
 				let label = this.owner.createNode("label");
 				label.textContent = this.caption;
-				this.peer.append(label);		
+				peer.append(label);		
 			} else {
 			}
 			this.editor = this.editorFor();
-			this.peer.append(this.editor);
+			peer.append(this.editor);
 		},
 		get$editorFor: function() {
 			//Return the function to create the view's property editor.
@@ -49,16 +49,16 @@ export default {
 	},
 	Properties: {
 		super$: "use.view.View",
-		display: "sheet",
+		displayType: "sheet",
 		conf: {
 			name: "Object",
 			properties: Object.freeze([])
 		},
-		start: function(conf) {
-			if (conf) this.sys.define(this, "conf", conf);
-			let peer = this.peer;
-			peer.classList.add(this.conf.name);
-			peer.classList.add(this.display);
+		display: function() {
+			const peer = this.peer;
+			const conf = this.conf;
+			peer.classList.add(this.displayType);
+			conf.name && peer.classList.add(conf.name);
 			if (conf.properties) {
 				for (let propConf of conf.properties) {
 					let propType = propConf.controlType || "youni.works/object/Property";
