@@ -1,6 +1,8 @@
 const OBJECT = Object;
 const INTERFACE = Symbol("interface");
 
+const Nil = OBJECT.freeze(OBJECT.create(null));
+const Map = OBJECT.freeze(OBJECT.create(null));
 const ObjectInterface = OBJECT.create(null);
 const Declaration = OBJECT.create(ObjectInterface);
 
@@ -10,6 +12,8 @@ Declaration.define = function(object) {
 
 export default {
 	package$: "youni.works/base/system",
+	Nil: Nil,
+	Map: Map,
 	Object: ObjectInterface,
 	Declaration: Declaration,
 	System: {

@@ -8,9 +8,10 @@ export default {
 		type$owner: "Frame",
 		once$to: Ui_to,
 		get$peer: function() {
-			let peer = this.owner.createNode(this.conf.nodeName || "div");
+			let peer = this.owner.createNode(this.conf.tag || "div");
 			this.sys.define(this, "peer", peer);
 			peer.$peer = this;
+			if (this.conf.at) setAttributes(peer, this.conf.at);
 			this.display();
 			return peer;
 		},
@@ -80,6 +81,11 @@ export default {
 			addEvents(this.window.document, this.events.documentEvents);
 		}
 	}
+}
+function setAttributes(ele, at) {
+	//TODO if attribute is an object, prefix the path iterator over it.
+	//above can handle the custom data attributes for html.
+	if (at) for (let name in at) peer.setAttribute(name, at[name]);
 }
 //virtual$markup: function() {
 //if (!arguments.length) return this.peer.innerHTML;

@@ -39,7 +39,7 @@
 }
 .sheet>.property>* {
 	min-width: 100px;
-	padding: 3px;
+	padding: 3px 3px 3px 9px;
 }
 .sheet>.property>LABEL {
 	font-size: 9pt;
@@ -49,6 +49,10 @@
 .sheet>.property>.widget {
 	font-size: 10pt;
 	flex: 4 4;
+}
+.dynamic LABEL {
+	font-style: italic;
+	font-weight: bold;
 }
 .widget:focus {
 	border: 1px solid steelBlue;

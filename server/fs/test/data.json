@@ -1,5 +1,7 @@
 {
 	"testModel": "test value",
+	"noproperty": 12,
+	"issueDate": "1955-02-01",
 	"issues": [
 		{
 			"issued": "1960-03-01",

@@ -19,6 +19,7 @@ export default {
 			const peer = this.peer;
 			const conf = this.conf;
 			peer.classList.add("property");
+			if (this.conf.dynamic) peer.classList.add("dynamic");
 			conf.name && peer.classList.add(conf.name);
 			if (this.object.displayType != "row") {
 				let label = this.owner.createNode("label");
@@ -52,21 +53,25 @@ export default {
 		displayType: "sheet",
 		conf: {
 			name: "Object",
-			properties: Object.freeze([])
+			properties: "Nil"
+		},
+		objectProperties: function(object) {
+			let superType = Object.create(null);
+			for (let prop of this.conf.properties) {
+				superType[prop.name] = prop;
+			}
+			let properties = [];
+			for (let name in object) {
+				if (!superType[name]) properties.push(propertyOf.call(this, name, object[name]));
+			}
+			return properties;
 		},
 		display: function() {
 			const peer = this.peer;
 			const conf = this.conf;
 			peer.classList.add(this.displayType);
 			conf.name && peer.classList.add(conf.name);
-			if (conf.properties) {
-				for (let propConf of conf.properties) {
-					let propType = propConf.controlType || "youni.works/object/Property";
-					let prop = this.owner.create(propType, propConf);
-					this.sys.define(prop, "object", this);
-					this.append(prop);
-				}
-			}
+			displayProperties(this, conf.properties);
 		},
 		bind: function(object) {
 			this.unobserve(this.model);
@@ -76,6 +81,7 @@ export default {
 		extend$actions: {
 			view: function(on, event) {
 				let model = on.model;
+				displayProperties(on, on.objectProperties(model));
 				for (let prop of on.to) prop.bind(model);
 			}
 		}
@@ -118,4 +124,88 @@ function isUpperCase(str)
 function isLowerCase(str)
 {
     return str == str.toLowerCase() && str != str.toUpperCase();
+}
+
+function displayProperties(on, properties) {
+	if (!properties) return;
+	for (let propConf of properties) {
+		let propType = propConf.controlType || "youni.works/object/Property";
+		let prop = on.owner.create(propType, propConf);
+		on.sys.define(prop, "object", on);
+		on.append(prop);
+	}
+}
+
+function propertyOf(name, value) {
+	let dataType = propertyType(name, value);
+	let objectType = (dataType == "object" ? objectType(value) : "");
+
+	let property = this.sys.extend(null, {
+		dynamic: true,
+		name: name,
+		dataType: dataType,
+		caption: captionize(name)
+	});
+	if (objectType) property.objectType = objectType;
+	return property;
+}
+
+const typeSuffixes = {
+	link: ["Id", "_id"],
+	hyperlink: ["Loc", "_loc", "Url", "_url"],
+	enum: ["Code", "Cd", "_code", "_cd"],
+	type: ["Type", "_type"],
+	date: ["Date", "_date"],
+	color: ["Color", "_color"],
+	boolean: ["Ind", "_ind", "Flag", "_flag"]
+}
+
+function propertyType(name, value) {
+	for (let type in typeSuffixes) {
+		for (let suffix of typeSuffixes[type]) {
+			if (name.endsWith(suffix)) return type;
+		}
+	}
+	if (name.startsWith("is_") || name.startsWith("is") 
+			&& isUpperCase(name, name.substring(2, 1))) return "boolean";
+	let type = datatypeOf(value);
+	return type == "object" ? objecttypeOf(value) : type;
+}
+
+function kindOf(name) {
+	let kinds = ["link", "enum", "type"];
+	for (let type of kinds) {
+		for (let suffix of typeSuffixes[type]) {
+			if (name.endsWith(suffix)) return name.substring(0, name.length - suffix.length);
+		}
+	}
+}
+//instances also have an interface. add interface itself?
+const datatypes = ["void", "boolean", "number", "date", "string", "array", "object"];
+const objecttypes = ["instance", "source", "record", "map", "function", "symbol", "other"]
+function datatypeOf(value) {
+	if (value === undefined || value === null || isNaN(value)) return "void";
+	
+	switch (typeof value) {
+		case "string":
+		case "number":
+		case "boolean":
+			return typeof value;
+		case "bigint":
+			return "number";
+		case "symbol":
+		case "function":
+		case "object":
+		default:
+			return "object";
+	}
+}
+
+function objectType(value) {
+	if (value instanceof Date) return "date";
+	if (value[Symbol.iterable] && typeof value.length == "number") return "array";
+	if (value.sys) return "instance";
+	let proto = Object.getPrototypeOf(value);
+	if (!proto) return "object";
+	return proto == Object.prototype ? "source" : "other";	
 }
