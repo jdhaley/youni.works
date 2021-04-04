@@ -1,5 +1,3 @@
 import conf from "./conf.mjs";
-import main from "./main.mjs";
-
-export default main(null, conf);
-
+const system = conf.packages[conf.system];
+export default system.start(conf);
