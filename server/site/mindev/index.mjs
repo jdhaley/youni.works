@@ -1,3 +1,5 @@
+import test		from "../sys2/index.mjs";
+console.log(test);
 import sys 		from "../sys/index.mjs";
 
 import conf		from "./conf.mjs";
