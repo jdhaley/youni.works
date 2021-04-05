@@ -4,7 +4,7 @@
 export default {
 	const:{
 		declare: function(name, source) {
-			let decl = create(this, name);
+			let decl = create(this, name, source);
 			decl.enumerable = false;
 			decl.value = source;
 			return Object.freeze(decl);
@@ -23,14 +23,14 @@ export default {
 //	},
 	get: {
 		declare: function(name, source) {
-			let decl = create(this, name);
+			let decl = create(this, name, source);
 			decl.get = source;
 			return Object.freeze(decl);
 		}
 	},
 	virtual: {
 		declare: function(name, source) {
-			let decl = create(this, name);
+			let decl = create(this, name, source);
 			decl.get = source;
 			decl.set = source;
 			return Object.freeze(decl);
@@ -38,7 +38,7 @@ export default {
 	},
 	var: {
 		declare: function(name, source) {
-			let decl = create(this, name);
+			let decl = create(this, name, source);
 			decl.writable = true;
 			decl.value = source;
 //			decl.get = function getVar() {
@@ -57,7 +57,7 @@ export default {
 	},
 	once: {
 		declare: function(name, source) {
-			let decl = create(this, name);
+			let decl = create(this, name, source);
 			decl.set = function setOnce(value) {
 				Reflect.defineProperty(this, name, {
 					configurable: true,
@@ -76,7 +76,7 @@ export default {
 	},
 	type: {
 		declare: function(name, source) {
-			let decl = create(this, name);
+			let decl = create(this, name, source);
 			decl.value = this.sys.forName(source);
 			return Object.freeze(decl);
 		},
@@ -86,7 +86,7 @@ export default {
 	},
 	extend: {
 		declare: function(name, source) {
-			return Object.freeze(create(this, name, source, true));
+			return Object.freeze(create(this, name, source));
 		},
 		define: function(object) {
 			Reflect.defineProperty(object, this.name, {
@@ -102,9 +102,10 @@ export default {
 //	prop.value = this.sys.packages[target];
 //},
 
-function create(facet, name) {
+function create(facet, name, source) {
 	return facet.sys.extend(facet, {
 		name: name,
+		source: source,
 		configurable: true,
 		enumerable: true
 	});

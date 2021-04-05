@@ -1,4 +1,4 @@
-import sys from "../package/sys.mjs";
+import system from "../package/system.mjs";
 export default {
-	"youni.works/sys": sys
+	"youni.works/sys": system
 }
