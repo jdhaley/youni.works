@@ -1,22 +1,31 @@
-
+/*
+ * system - The system package.
+ * System - The system interface.
+ * sys - the System instance.
+ */
 export default function main(conf) {
-	let system = loadSystem(conf);
-	let sys = createSys(system, conf);
-//	//all Objects reference the sys instance:
-//	System.Object.sys = sys;
-	
-	//initialize the facets
-//	for (let facet in conf.facets) {
-//		let type = sys.extend(System.Property, conf.facets[facet]);
-//		sys.facets[facet] = type;
-//	}
-	return sys;
+	const system = loadSystem(conf);
+	const System = system.System;
+	const sys = System.extend(System, {
+		packages: System.extend(system.Table, {
+			[conf.system]: system
+		}),
+		symbols: Object.freeze(System.extend(system.Table, conf.symbols)),
+		facets: System.extend(system.Table)
+	});
+	loadFacets(sys, conf);
+	Object.freeze(sys.facets);
+	system.Object.sys = sys;
+	Object.freeze(system.Object);
+let iface = createInterface(sys, conf.packages[conf.system].System);
+console.log(iface);
+	return Object.freeze(sys);
 }
 
 function loadSystem(conf) {
 	let system = conf.packages[conf.system];
 	const System = system.System;
-	let target = System.extend(system.Table);
+	let pkg = System.extend(system.Table);
 	for (let name in system) {
 		let member = system[name];
 		if (member && typeof member == "object" && Object.getPrototypeOf(member) == Object.prototype) {
@@ -29,23 +38,33 @@ function loadSystem(conf) {
 			//Don't freeze Object because we need to assign sys to it.
 			if (name != "Object") Object.freeze(member);
 		}
-		target[name] = member;
+		pkg[name] = member;
 	}
-	return Object.freeze(target);
+	return Object.freeze(pkg);
 }
 
-function createSys(system, conf) {
-	let sys = system.System;
-	system.Object.sys = sys;
-	Object.freeze(system.Object);
-	//create the System instance:
-	return sys.extend(sys, {
-		packages: sys.extend(system.Table),
-		symbols: sys.extend(system.Table, conf.symbols),
-		facets: createFacets(system, conf)
+function loadFacets(sys, conf) {
+	let Property = sys.packages[conf.system].Property;
+	for (let name in conf.facets) {
+		let facet = sys.extend(Property, conf.facets[name]);
+		sys.facets[name] = Object.freeze(facet);
+	}
+}
+
+function createInterface(sys, source) {
+	let iface = sys.extend("youni.works/system/Interface", {
+		properties: sys.extend("youni.works/system/Table")
 	});
+	for (let decl in source) {
+		let name = sys.nameOf(decl);
+		let facet = sys.facetOf(decl);
+		iface.properties[name] = sys.declare(name, source[decl], facet || "const")
+	}
+	return iface;
 }
 
-function createFacets(system, conf) {
-	//sys.extend(system.Table)
-}
+
+//let iface = sys.create({
+//	type$: "youni.works/system/Interface", 
+//	properties: sys.create("youni.works/system/Table")
+//})

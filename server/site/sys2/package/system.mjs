@@ -21,6 +21,8 @@ export default {
 		type$: OBJECT,
 		facet: "",
 		name: "",
+		configurable: true,
+		enumerable: true,
 		declare: function(name, value) {
 			return this.sys.extend(this, {
 				name: name,
@@ -43,23 +45,23 @@ export default {
 		declare: function(name, source, facet) {
 			let type = this.facets[facet];
 			if (!type) {
-				console.error(`Facet "${facet}" does not exist.`);
-				type = this.facets.const;
+				throw new Error(facet ? `Facet ${facet} does not exist.` : `Missing Facet.`);
 			}
 			return type.declare(name, source);
 		},
 		define: function(object, name, value, facet) {
 			if (facet) {
 				this.declare(name, value, facet).define(object);
+				return;
+			}
+			if (typeof value == "function") {
+				Reflect.defineProperty(object, name, {configurable: true, value: value});
 			} else {
-				try {
-					object[name] = value;
-				} catch (e) {
-					Reflect.defineProperty(object, name, {value: value});
-				}
+				Reflect.defineProperty(object, name, {configurable: true, enumerable: true, writable: true, value: value});				
 			}
 		},
 		extend: function(object, declarations) {
+			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || null);
 			this.implement(object, declarations);
 			return object;
@@ -88,6 +90,26 @@ export default {
 				if (declaration.startsWith("@")) declaration = this.symbol[declaration.slice(1)];
 			}
 			return declaration;
+		},
+		forName: function(name) {
+			let ctx = name.substring(0, name.lastIndexOf("/"));
+			let component = this.packages[ctx];
+			if (!component) {
+				if (ctx) {
+					throw new Error(`Package "${ctx}" does not exist`);
+				} else {
+					throw new Error(`Package origin is missing.`);
+				}
+			}
+			let path = name.substring(name.lastIndexOf("/") + 1).split();
+			for (let name of path) {
+				if (!component[name]) {
+					throw new Error(`Component "${name}" not defined in "${ctx}"`);
+				}
+				component = component[name];
+				ctx += "." + name;
+			}
+			return component;
 		}
 	}
 }

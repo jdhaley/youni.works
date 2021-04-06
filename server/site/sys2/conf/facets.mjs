@@ -104,9 +104,9 @@ export default {
 
 function create(facet, name, source) {
 	return facet.sys.extend(facet, {
-		name: name,
-		source: source,
 		configurable: true,
-		enumerable: true
+		enumerable: true,
+		name: name,
+		source: source
 	});
 }
