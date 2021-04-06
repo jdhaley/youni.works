@@ -7,7 +7,7 @@ export default {
 	},
 	Array: {
 		length: 0,
-		[Symbol.iterator]: function *() {
+		"@iterator": function *() {
 			for (let i = 0; i < this.length; i++) yield this[i];
 		}
 	},
@@ -15,7 +15,11 @@ export default {
 	Object: OBJECT,
 	Interface: {
 		type$: OBJECT,
-		properties: TABLE
+		properties: TABLE,
+		applyTo: function(object) {
+			let props = this.properties;
+			for (let name in props) props[name].define(object);
+		}
 	},
 	Property: {
 		type$: OBJECT,
@@ -27,8 +31,6 @@ export default {
 			return this.sys.extend(this, {
 				name: name,
 				source: value,
-				configurable: true,
-				enumerable: true,
 				writable: true,
 				value: value
 			});
@@ -87,9 +89,16 @@ export default {
 		nameOf: function(declaration) {
 			if (typeof declaration == "string") {
 				if (declaration.indexOf("$") >= 0) declaration = declaration.substr(declaration.indexOf("$") + 1);
-				if (declaration.startsWith("@")) declaration = this.symbol[declaration.slice(1)];
+				if (declaration.startsWith("@")) declaration = Symbol[declaration.slice(1)];
 			}
 			return declaration;
+		},
+		isSource: function(value) {
+			if (value && typeof value == "object") {
+				let proto = Object.getPrototypeOf(value);
+				if (proto == Object.prototype || proto == Array.prototype) return true;
+			}
+			return false;
 		},
 		forName: function(name) {
 			let ctx = name.substring(0, name.lastIndexOf("/"));
@@ -101,15 +110,35 @@ export default {
 					throw new Error(`Package origin is missing.`);
 				}
 			}
-			let path = name.substring(name.lastIndexOf("/") + 1).split();
-			for (let name of path) {
+			let path = name.substring(name.lastIndexOf("/") + 1);
+			if (path) for (let name of path.split()) {
 				if (!component[name]) {
-					throw new Error(`Component "${name}" not defined in "${ctx}"`);
+					console.error(`Component "${name}" not defined in "${ctx}"`);
+					return undefined;
 				}
 				component = component[name];
 				ctx += "." + name;
 			}
 			return component;
 		}
+	}
+}
+
+function compileSource(sys, source) {
+	if (typeof source != "object" || !source) return source;
+	let proto = Object.getPrototypeOf(source);
+	if (proto == Array.prototype) {
+		let array = Object.extend(system.Array, {
+			length: value.length
+		});
+		for (let i = 0; i < value.length; i++) {
+			array[i] = compileSource(sys, value[i]);
+		}
+		value = Object.freeze(array);
+	} else if (proto == Object.prototype) {
+		value = loadSource(sys, value);
+	}
+
+	if (type == "object") {
 	}
 }
