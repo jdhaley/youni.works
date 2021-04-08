@@ -17,10 +17,9 @@ export default function main(conf) {
 	Object.freeze(sys.facets);
 	system.Instance.sys = sys;
 	Object.freeze(system.Instance);
-	console.log(load(sys, conf.packages[conf.system]));
-	
-let iface = createInterface(sys, conf.packages[conf.system]);
-console.log(iface);
+
+	let compiled = compileUnit(sys, conf.packages[conf.system]);
+	console.log(compiled);
 	return Object.freeze(sys);
 }
 
@@ -54,87 +53,141 @@ function loadFacets(sys, conf) {
 	}
 }
 
-function load(sys, source) {
-	let system = sys.forName("youni.works/system/");
+//////////////////////// compilation //////////////////////
+
+function compileUnit(sys, source, contextName) {
 	let value = loadValue(sys, source);
-	sys.packages[""] = value;
-	value = compileValue(sys, value)
-	delete sys.packages[""];
+	
+	if (!sys.statusOf(value)) return value;
+	if (value[sys.symbols.type]) {
+		value = construct(sys, value);
+	}
+	
+	sys.packages["."] = value;
+	compileObject(sys, value)
+	delete sys.packages["."];
+
 	return Object.freeze(value);	
 }
 
-function compileValue(sys, value) {
-	console.log(value);
+function construct(sys, object, type) {
+	object[sys.symbols.status] = "constructing";
+	if (type === undefined) type = object[sys.symbols.type]
+	if (typeof type == "string") type = sys.forName(type);
+	let target = Object.create(type || null);
+	for (let name in object) target[name] = object[name];
+	object[sys.symbols.status] = "constructed";
+	return target;
 }
 
+function compileObject(sys, object) {
+	object[sys.symbols.status] = "compiling";			
+	for (let name in object) {
+		compileProperty(sys, object, name);
+	}
+	object[sys.symbols.status] = "compiled";
+	//TODO finalize compilation (symbols, etc)
+}
+
+function compileProperty(sys, object, propertyName) {
+	let value = object[propertyName];
+	switch (sys.statusOf(value)) {
+		case "loaded":
+			if (value[sys.symbols.type]) {
+				value = construct(sys, value);
+				sys.define(object, propertyName, value);
+			}
+			compileObject(sys, value)
+			return;
+		case "declared":
+			value.define(object);
+			return;
+		case "compiled":
+		case undefined:
+			return;
+		default:
+			console.error(`Invalid compilation status "${sys.statusOf(value)}"`);
+			return;
+	}
+}
+
+
+//////////////////////// loading //////////////////////
+
 function loadValue(sys, value) {
-	let system = sys.forName("youni.works/system/");	
-	let type = typeof value;
-	if (type == "object") {
+	if (value && typeof value == "object") {
 		let proto = Object.getPrototypeOf(value);
 		if (proto == Array.prototype) {
-			let array = Object.extend(system.Array, {
-				length: value.length
-			});
-			for (let i = 0; i < value.length; i++) {
-				array[i] = loadValue(sys, value[i]);
-			}
-			value = Object.freeze(array);
+			value = loadArray(value);
 		} else if (proto == Object.prototype) {
-			if (Reflect.getOwnPropertyDescriptor(value, "type$")) {
-				value = createInterface(sys, value);
-			} else {
-				let parcel = sys.extend(null);
-				for (let decl in value) {
-					let name = sys.nameOf(decl);
-					let facet = sys.facetOf(decl);
-					let x = loadValue(sys, value[decl]);
-					if (facet) {
-						sys.facets[facet].declare(name, x).define(parcel);
-					} else {
-						parcel[name] = x;
-					}
-				}
-				value = Object.freeze(parcel)	
-			}
+			value = loadObject(sys, value);
 		}
 	}
 	return value;
 }
 
-function createArray(sys, source) {
+function loadArray(sys, source) {
 	let system = sys.forName("youni.works/system/");
 	let length = source.length;
-	let array = Object.extend(system.Array, {
+	let array = sys.extend(system.Array, {
 		length: length
 	});
+	array[sys.symbols.status] = "loading";
 	for (let i = 0; i < length; i++) {
 		array[i] = loadValue(sys, source[i]);
 	}
-	return Object.freeze(array);
+	array[sys.symbols.status] = "loaded";
+	return array;
 }
 
-function createDeclarations(sys, source) {
-	let system = sys.forName("youni.works/system/");
-	let decls = sys.extend(system.table);
+function loadObject(sys, source) {
+	let parcel = sys.extend(null);
+	parcel[sys.symbols.status] = "loading";
+	if (source.type$) parcel[sys.symbols.type] = source.type$;
+
 	for (let decl in source) {
 		let name = sys.nameOf(decl);
-		let value = loadValue(sys, source[decl]);
 		let facet = sys.facetOf(decl);
-		if (!facet) {
-			facet = typeof value == "function" ? "const" : "var";
+		let value = loadValue(sys, source[decl]);
+		if (name) {
+			if (facet) {
+				value = sys.declare(name, value, facet);
+				value[sys.symbols.status] = "declared";
+			}
+			parcel[name] = value;
 		}
-		if (name) decls[name] = sys.declare(name, value, facet);
 	}
-	return decls;
+	parcel[sys.symbols.status] = "loaded";
+	//The parcel properties will get defined after either when the package is recursively defined
+	//or when sys.forName() encounters an undefined declaration.
+	return parcel;
 }
-function createInterface(sys, source) {
-	let system = sys.forName("youni.works/system/");
-	return sys.extend(system.Interface, {
-		type: source.type$,
-		properties: createDeclarations(sys, source)
-	});
-}
+
+////////////////////////////// snip /////////////////////////////////
+
+//function createInterface(sys, source) {
+//	let system = sys.forName("youni.works/system/");
+//	return sys.extend(system.Interface, {
+//		type: source.type$,
+//		properties: createDeclarations(sys, source)
+//	});
+//}
+//function createDeclarations(sys, source) {
+//	let system = sys.forName("youni.works/system/");
+//	let decls = sys.extend(system.table);
+//	for (let decl in source) {
+//		let name = sys.nameOf(decl);
+//		let value = loadValue(sys, source[decl]);
+//		let facet = sys.facetOf(decl);
+//		if (!facet) {
+//			facet = typeof value == "function" ? "const" : "var";
+//		}
+//		if (name) {
+//			decls[name] = sys.declare(name, value, facet);
+//		}
+//	}
+//	return decls;
+//}
 
 //function loadSource(sys, source) {
 //	let pkg = Object.create(null);

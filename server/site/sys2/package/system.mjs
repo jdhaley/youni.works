@@ -1,5 +1,28 @@
 const TABLE = Object.freeze(Object.create(null));
 const Instance = Object.create(null);
+Instance.super = function(name, ...args) {
+	const thisValue = this[name];
+	for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
+		let protoValue = proto[name];
+		if (protoValue !== thisValue) {
+			if (typeof protoValue == "function") return protoValue.apply(this, args);
+			break;
+		}
+	}
+	throw new Error(`super "${name}" is not a method.`);
+}
+//option 2:
+Function.prototype.super = function(thisArg, ...args) {
+	for (let proto = Object.getPrototypeOf(thisArg); proto; proto = Object.getPrototypeOf(proto)) {
+		let protoValue = proto[this.name];
+		if (protoValue !== this) {
+			if (typeof protoValue == "function") return protoValue.apply(thisArg, args);
+			break;
+		}
+	}
+	throw new Error(`super "${this.name}" is not a method.`);
+}
+//option 3: a method$ facet puts super on the function.
 
 export default {
 	table: TABLE,
@@ -25,7 +48,6 @@ export default {
 		type$: Instance,
 		name: "",
 		source: undefined,
-		compile: undefined,
 		declare: function(name, value) {
 			return this.sys.extend(this, {
 				name: name,
@@ -34,13 +56,20 @@ export default {
 				enumerable: true
 			});
 		},
-		define: function(object) {
-			if (this.compile) {
-				this.compile();
-				delete this.compile;
-				Object.freeze(this);
+		compile: null,
+		define: function(object, contextName) {
+			try {
+				if (this.compile) {
+					this.compile(contextName);
+					delete this.compile;
+					Object.freeze(this);
+				}
+				Reflect.defineProperty(object, this.name, this);
+			} catch (error) {
+				contextName = contextName ? contextName + "/" + this.name : this.name;
+				error.message = `When defining "${contextName}": ${error.message}`;
+				throw error;
 			}
-			Reflect.defineProperty(object, this.name, this);
 		}
 	},
 	System: {
@@ -104,52 +133,61 @@ export default {
 			}
 			return false;
 		},
-		forName: function(name) {
-			let ctx = name.substring(0, name.lastIndexOf("/"));
-			let component = this.packages[ctx];
-			if (!component) {
-				if (ctx) {
-					throw new Error(`Package "${ctx}" does not exist`);
-				} else {
-					throw new Error(`Package origin is missing.`);
-				}
+		forName: function(name, component) {
+			if (arguments.length < 2) {
+				component = this.packages;
 			}
-			let path = name.substring(name.lastIndexOf("/") + 1);
-			if (path) for (let name of path.split()) {
-				component = checkComponent(this, component);
-				if (!component[name]) {
-					console.error(`Component "${name}" not defined in "${ctx}"`);
+			let context = "";
+			let path = name.split("/");
+			for (let prop of path.split()) {
+				if (component === undefined || component === null) {
+					console.error(`"${context}" does not exist for name "${name}".`);
 					return undefined;
 				}
-				component = component[name];
-				ctx += "." + name;
+				if (typeof component != "object") {
+					console.error(`"${context}" is not an object for name "${name}".`);
+					return undefined;
+				}
+				if (component[this.symbols.status] && component[this.symbols.type]) {
+					console.error(`"${context}" is an uncompiled object for name "${name}".`);
+					return undefined;										
+				}
+				if (!Reflect.getOwnPropertyDescriptor(component, prop)) {
+					console.error(`"${context}" does not define "${prop}" for name "${name}"`);
+					return undefined;					
+				}
+				let value = component[prop];
+				if (this.statusOf(value)) {
+					value = compile.call(this, component, prop, context);
+				}
+				component = value;
+				context += "/" + prop;
 			}
-			return checkComponent(this, component);
+			return component;
+		},
+		statusOf: function(value) {
+			if (value && typeof value == "object") return value[this.symbols.status];
 		}
 	}
 }
 
-function checkComponent(sys, component) {
-	return component;
-//	if (component && typeof component == "object" && component[sys.symbol.status] == "uncompiled") {
-//		let type = component
-//	}
+function compile(component, name, context) {
+	let prop = component[name];
+	switch (prop[this.symbols.status]) {
+		case "declared":
+			prop.define(component, context);
+			return component[name];
+		case "loaded":
+			value[STATUS] = "compiling";
+			let object = value;
+			let type = value[sys.symbols.type];
+			if (type) {
+				if (typeof type == "string") type = sys.forName(type);
+				object = Object.create(type || null);
+			}
+			for (let name in value) {
+				object[name] = compileValue(sys, value[name]);
+			}
+			return object;			
+	}
 }
-//function compileSource(sys, source) {
-//	if (typeof source != "object" || !source) return source;
-//	let proto = Object.getPrototypeOf(source);
-//	if (proto == Array.prototype) {
-//		let array = Object.extend(system.Array, {
-//			length: value.length
-//		});
-//		for (let i = 0; i < value.length; i++) {
-//			array[i] = compileSource(sys, value[i]);
-//		}
-//		value = Object.freeze(array);
-//	} else if (proto == Object.prototype) {
-//		value = loadSource(sys, value);
-//	}
-//
-//	if (type == "object") {
-//	}
-//}
