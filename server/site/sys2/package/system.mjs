@@ -1,8 +1,8 @@
-const OBJECT = Object.create(null);
-const TABLE = Object.create(null);
+const TABLE = Object.freeze(Object.create(null));
+const Instance = Object.create(null);
 
 export default {
-	Table: TABLE,
+	table: TABLE,
 	Record: {
 	},
 	Array: {
@@ -12,9 +12,9 @@ export default {
 		}
 	},
 	//The Object.sys property is implicitly defined when the system boots.
-	Object: OBJECT,
+	Instance: Instance,
 	Interface: {
-		type$: OBJECT,
+		type$: Instance,
 		properties: TABLE,
 		applyTo: function(object) {
 			let props = this.properties;
@@ -22,25 +22,29 @@ export default {
 		}
 	},
 	Property: {
-		type$: OBJECT,
-		facet: "",
+		type$: Instance,
 		name: "",
-		configurable: true,
-		enumerable: true,
+		source: undefined,
+		compile: undefined,
 		declare: function(name, value) {
 			return this.sys.extend(this, {
 				name: name,
 				source: value,
-				writable: true,
-				value: value
+				configurable: true,
+				enumerable: true
 			});
 		},
 		define: function(object) {
+			if (this.compile) {
+				this.compile();
+				delete this.compile;
+				Object.freeze(this);
+			}
 			Reflect.defineProperty(object, this.name, this);
 		}
 	},
 	System: {
-		type$: OBJECT,
+		type$: Instance,
 		packages: TABLE,
 		facets: TABLE,
 		symbols: TABLE,
@@ -112,6 +116,7 @@ export default {
 			}
 			let path = name.substring(name.lastIndexOf("/") + 1);
 			if (path) for (let name of path.split()) {
+				component = checkComponent(this, component);
 				if (!component[name]) {
 					console.error(`Component "${name}" not defined in "${ctx}"`);
 					return undefined;
@@ -119,26 +124,32 @@ export default {
 				component = component[name];
 				ctx += "." + name;
 			}
-			return component;
+			return checkComponent(this, component);
 		}
 	}
 }
 
-function compileSource(sys, source) {
-	if (typeof source != "object" || !source) return source;
-	let proto = Object.getPrototypeOf(source);
-	if (proto == Array.prototype) {
-		let array = Object.extend(system.Array, {
-			length: value.length
-		});
-		for (let i = 0; i < value.length; i++) {
-			array[i] = compileSource(sys, value[i]);
-		}
-		value = Object.freeze(array);
-	} else if (proto == Object.prototype) {
-		value = loadSource(sys, value);
-	}
-
-	if (type == "object") {
-	}
+function checkComponent(sys, component) {
+	return component;
+//	if (component && typeof component == "object" && component[sys.symbol.status] == "uncompiled") {
+//		let type = component
+//	}
 }
+//function compileSource(sys, source) {
+//	if (typeof source != "object" || !source) return source;
+//	let proto = Object.getPrototypeOf(source);
+//	if (proto == Array.prototype) {
+//		let array = Object.extend(system.Array, {
+//			length: value.length
+//		});
+//		for (let i = 0; i < value.length; i++) {
+//			array[i] = compileSource(sys, value[i]);
+//		}
+//		value = Object.freeze(array);
+//	} else if (proto == Object.prototype) {
+//		value = loadSource(sys, value);
+//	}
+//
+//	if (type == "object") {
+//	}
+//}

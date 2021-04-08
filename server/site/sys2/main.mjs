@@ -7,16 +7,16 @@ export default function main(conf) {
 	const system = loadSystem(conf);
 	const System = system.System;
 	const sys = System.extend(System, {
-		packages: System.extend(system.Table, {
+		packages: System.extend(system.table, {
 			[conf.system]: system
 		}),
-		symbols: Object.freeze(System.extend(system.Table, conf.symbols)),
-		facets: System.extend(system.Table)
+		symbols: Object.freeze(System.extend(system.table, conf.symbols)),
+		facets: System.extend(system.table)
 	});
 	loadFacets(sys, conf);
 	Object.freeze(sys.facets);
-	system.Object.sys = sys;
-	Object.freeze(system.Object);
+	system.Instance.sys = sys;
+	Object.freeze(system.Instance);
 	console.log(load(sys, conf.packages[conf.system]));
 	
 let iface = createInterface(sys, conf.packages[conf.system]);
@@ -27,7 +27,7 @@ console.log(iface);
 function loadSystem(conf) {
 	let system = conf.packages[conf.system];
 	const System = system.System;
-	let pkg = System.extend(system.Table);
+	let pkg = System.extend(system.table);
 	for (let name in system) {
 		let member = system[name];
 		if (member && typeof member == "object" && Object.getPrototypeOf(member) == Object.prototype) {
@@ -38,7 +38,7 @@ function loadSystem(conf) {
 		if (name.charAt(0) == name.charAt(0).toUpperCase()) {
 			System.define(member, conf.symbols.name, name);
 			//Don't freeze Object because we need to assign sys to it.
-			if (name != "Object") Object.freeze(member);
+			if (name != "Instance") Object.freeze(member);
 		}
 		pkg[name] = member;
 	}
@@ -81,7 +81,22 @@ function loadValue(sys, value) {
 			}
 			value = Object.freeze(array);
 		} else if (proto == Object.prototype) {
-			value = createInterface(sys, value);
+			if (Reflect.getOwnPropertyDescriptor(value, "type$")) {
+				value = createInterface(sys, value);
+			} else {
+				let parcel = sys.extend(null);
+				for (let decl in value) {
+					let name = sys.nameOf(decl);
+					let facet = sys.facetOf(decl);
+					let x = loadValue(sys, value[decl]);
+					if (facet) {
+						sys.facets[facet].declare(name, x).define(parcel);
+					} else {
+						parcel[name] = x;
+					}
+				}
+				value = Object.freeze(parcel)	
+			}
 		}
 	}
 	return value;
@@ -99,12 +114,9 @@ function createArray(sys, source) {
 	return Object.freeze(array);
 }
 
-function createInterface(sys, source) {
+function createDeclarations(sys, source) {
 	let system = sys.forName("youni.works/system/");
-	let iface = sys.extend(system.Interface, {
-		properties: sys.extend(system.Table),
-		type: source.type$
-	});
+	let decls = sys.extend(system.table);
 	for (let decl in source) {
 		let name = sys.nameOf(decl);
 		let value = loadValue(sys, source[decl]);
@@ -112,11 +124,16 @@ function createInterface(sys, source) {
 		if (!facet) {
 			facet = typeof value == "function" ? "const" : "var";
 		}
-		if (name) {
-			iface.properties[name] = sys.declare(name, value, facet);
-		}
+		if (name) decls[name] = sys.declare(name, value, facet);
 	}
-	return iface;
+	return decls;
+}
+function createInterface(sys, source) {
+	let system = sys.forName("youni.works/system/");
+	return sys.extend(system.Interface, {
+		type: source.type$,
+		properties: createDeclarations(sys, source)
+	});
 }
 
 //function loadSource(sys, source) {
