@@ -1,4 +1,6 @@
 import system from "../package/system.mjs";
+import test from "./test.mjs";
 export default {
-	"youni.works/system": system
+	"system.youni.works": system,
+	"test": test
 }

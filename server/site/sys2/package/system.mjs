@@ -34,7 +34,7 @@ export default {
 			for (let i = 0; i < this.length; i++) yield this[i];
 		}
 	},
-	//The Object.sys property is implicitly defined when the system boots.
+	//The Instance.sys property is implicitly defined when the system boots.
 	Instance: Instance,
 	Interface: {
 		type$: Instance,
@@ -96,6 +96,7 @@ export default {
 			}
 		},
 		extend: function(object, declarations) {
+			if (object === undefined) object = TABLE;
 			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || null);
 			this.implement(object, declarations);
@@ -138,8 +139,7 @@ export default {
 				component = this.packages;
 			}
 			let context = "";
-			let path = name.split("/");
-			for (let prop of path.split()) {
+			for (let prop of name.split("/")) {
 				if (component === undefined || component === null) {
 					console.error(`"${context}" does not exist for name "${name}".`);
 					return undefined;
@@ -158,7 +158,7 @@ export default {
 				}
 				let value = component[prop];
 				if (this.statusOf(value)) {
-					value = compile.call(this, component, prop, context);
+					value = this.compiler.compileProperty(component, prop, context);
 				}
 				component = value;
 				context += "/" + prop;
@@ -167,6 +167,126 @@ export default {
 		},
 		statusOf: function(value) {
 			if (value && typeof value == "object") return value[this.symbols.status];
+		},
+		compiler: {
+			compile: function(source, contextName) {
+				throw new Error("Unimplemented");
+			}
+		},
+		loader: {
+			load: function(source, contextName) {
+				throw new Error("Unimplemented");				
+			}
+		}
+	},
+	Loader: {
+		type$: Instance,
+		loadValue: function(value) {
+			if (value && typeof value == "object") {
+				let proto = Object.getPrototypeOf(value);
+				if (proto == Array.prototype) {
+					value = this.loadArray(value);
+				} else if (proto == Object.prototype) {
+					value = this.loadObject(value);
+				}
+			}
+			return value;
+		},
+		loadArray: function(source) {
+			const sys = this.sys;
+			let system = sys.forName("system.youni.works");
+			let length = source.length;
+			let array = sys.extend(system.Array, {
+				length: length
+			});
+			array[sys.symbols.status] = "loading";
+			for (let i = 0; i < length; i++) {
+				array[i] = this.loadValue(source[i]);
+			}
+			array[sys.symbols.status] = "loaded";
+			return array;
+		},
+		loadObject: function(source) {
+			const sys = this.sys;
+			let parcel = sys.extend(null);
+			parcel[sys.symbols.status] = "loading";
+			if (source.type$) parcel[sys.symbols.type] = source.type$;
+
+			for (let decl in source) {
+				let name = sys.nameOf(decl);
+				let facet = sys.facetOf(decl);
+				let value = this.loadValue(source[decl]);
+				if (name) {
+					if (facet) {
+						value = sys.declare(name, value, facet);
+						value[sys.symbols.status] = "declared";
+					}
+					parcel[name] = value;
+				}
+			}
+			parcel[sys.symbols.status] = "loaded";
+			//The parcel properties will get defined after either when the package is recursively defined
+			//or when sys.forName() encounters an undefined declaration.
+			return parcel;
+		}
+	},
+	Compiler: {
+		type$: Instance,
+		compile: function(source, contextName) {
+			const sys = this.sys;
+			let value = sys.loader.loadValue(source);
+			
+			if (!sys.statusOf(value)) return value;
+			if (value[sys.symbols.type]) {
+				value = this.construct(value);
+			}
+			
+			sys.packages["."] = value;
+			this.compileObject(value)
+			delete sys.packages["."];
+
+			return Object.freeze(value);	
+		},
+		construct: function(object, type) {
+			const sys = this.sys;
+			object[sys.symbols.status] = "constructing";
+			if (type === undefined) type = object[sys.symbols.type]
+			if (typeof type == "string") type = sys.forName(type);
+			let target = Object.create(type || null);
+			for (let name in object) target[name] = object[name];
+			object[sys.symbols.status] = "constructed";
+			return target;
+		},
+		compileObject: function(object) {
+			const sys = this.sys;
+			object[sys.symbols.status] = "compiling";			
+			for (let name in object) {
+				this.compileProperty(object, name);
+			}
+			object[sys.symbols.status] = "compiled";
+			//TODO finalize compilation (symbols, etc)
+		},
+		compileProperty: function(object, propertyName, contextName) {
+			const sys = this.sys;
+			let value = object[propertyName];
+			switch (sys.statusOf(value)) {
+				case "loaded":
+					if (value[sys.symbols.type]) {
+						value = this.construct(value);
+						sys.define(object, propertyName, value);
+					}
+					this.compileObject(value)
+					return;
+				case "declared":
+					value.define(object);
+					return;
+				case "compiled":
+				case undefined:
+					return;
+				default:
+					console.error(`Invalid compilation status "${sys.statusOf(value)}"`);
+					return;
+			}
 		}
 	}
 }

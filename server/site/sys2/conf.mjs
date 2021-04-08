@@ -6,5 +6,5 @@ export default {
 	packages: packages,
 	facets: facets,
 	symbols: symbols,
-	system: "youni.works/system"
+	system: "system.youni.works"
 }
