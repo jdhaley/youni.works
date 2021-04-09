@@ -61,7 +61,7 @@ export default {
 			try {
 				if (this.compile) {
 					this.compile(contextName);
-					delete this.compile;
+					this.sys.define(this, "compile", undefined);
 					Object.freeze(this);
 				}
 				Reflect.defineProperty(object, this.name, this);
@@ -156,12 +156,11 @@ export default {
 					console.error(`"${context}" does not define "${prop}" for name "${name}"`);
 					return undefined;					
 				}
-				let value = component[prop];
-				if (this.statusOf(value)) {
-					value = this.compiler.compileProperty(component, prop, context);
+				if (this.statusOf(component[prop])) {
+					this.compiler.compileProperty(component, prop, context);
 				}
-				component = value;
-				context += "/" + prop;
+				component = component[prop];
+				context += prop + "/";
 			}
 			return component;
 		},
@@ -280,6 +279,8 @@ export default {
 				case "declared":
 					value.define(object);
 					return;
+				case "compiling":
+				//	console.log(`compiling "${propertyName}" with parent status "${sys.statusOf(object)}"`);
 				case "compiled":
 				case undefined:
 					return;
@@ -288,26 +289,5 @@ export default {
 					return;
 			}
 		}
-	}
-}
-
-function compile(component, name, context) {
-	let prop = component[name];
-	switch (prop[this.symbols.status]) {
-		case "declared":
-			prop.define(component, context);
-			return component[name];
-		case "loaded":
-			value[STATUS] = "compiling";
-			let object = value;
-			let type = value[sys.symbols.type];
-			if (type) {
-				if (typeof type == "string") type = sys.forName(type);
-				object = Object.create(type || null);
-			}
-			for (let name in value) {
-				object[name] = compileValue(sys, value[name]);
-			}
-			return object;			
 	}
 }
