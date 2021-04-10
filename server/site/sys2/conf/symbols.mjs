@@ -1,6 +1,6 @@
 export default {
 	name: Symbol.toStringTag,
 	iterator: Symbol.iterator,
-	status: Symbol("status"),
+	compile: Symbol("compile"),
 	type: Symbol("type"),
 }
