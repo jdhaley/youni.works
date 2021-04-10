@@ -5,21 +5,8 @@
  */
 export default function main(conf) {
 	const system = createSystemPackage(conf);
-	const System = system.System;
-	const sys = System.extend(System, {
-		packages: System.extend(system.table, {
-			[conf.system]: system
-		}),
-		symbols: Object.freeze(System.extend(system.table, conf.symbols)),
-		facets: System.extend(system.table),
-		loader: System.extend(system.Loader),
-		compiler: System.extend(system.Compiler)
-	});
-	loadFacets(sys, conf);
-	Object.freeze(sys.facets);
-	system.Instance.sys = sys;
-	Object.freeze(system.Instance);
-	Object.freeze(sys);
+	const sys = createSys(system, conf);
+	
 	conf.packages[conf.system] = sys.compiler.compile(conf.packages[conf.system], conf.system);
 	let test = sys.compiler.compile(conf.packages["test"], "test");
 	console.log(test);
@@ -45,6 +32,24 @@ function createSystemPackage(conf) {
 		pkg[name] = member;
 	}
 	return Object.freeze(pkg);
+}
+
+function createSys(system, conf) {
+	const System = system.System;
+	const sys = System.extend(System, {
+		packages: System.extend(system.table, {
+			[conf.system]: system
+		}),
+		symbols: Object.freeze(System.extend(system.table, conf.symbols)),
+		facets: System.extend(system.table),
+		loader: System.extend(system.Loader),
+		compiler: System.extend(system.Compiler)
+	});
+	loadFacets(sys, conf);
+	Object.freeze(sys.facets);
+	system.Instance.sys = sys;
+	Object.freeze(system.Instance);
+	return Object.freeze(sys);
 }
 
 function loadFacets(sys, conf) {

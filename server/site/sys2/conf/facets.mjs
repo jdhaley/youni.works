@@ -3,6 +3,12 @@
 
 export default {
 	const:{
+		process: function(decl) {
+			decl.configurable = true;
+			decl.enumerable = true;
+			decl.value = decl.expr;
+			return decl;
+		},
 		compile: function() {
 			this.enumerable = false;
 			this.value = compileValue(this);
@@ -20,6 +26,17 @@ export default {
 //		}
 //	},
 	get: {
+		process: function(decl) {
+			decl.configurable = true;
+			decl.enumerable = true;
+			if (typeof decl.expr == "function") {
+				decl.get = decl.expr;				
+			} else {
+				console.warn("get facet requires a function. Creating a value property instead.");
+				decl.value = decl.expr;
+			}
+			return decl;
+		},	
 		compile: function() {
 			if (typeof this.source == "function") {
 				this.get = source;
@@ -30,6 +47,18 @@ export default {
 		}
 	},
 	virtual: {
+		process: function(decl) {
+			decl.configurable = true;
+			decl.enumerable = true;
+			if (typeof decl.expr == "function") {
+				decl.get = decl.expr;
+				decl.set = decl.expr;
+			} else {
+				console.warn("virtual facet requires a function. Creating a value property instead.");
+				decl.value = decl.expr;
+			}
+			return decl;
+		},	
 		compile: function() {
 			if (typeof this.source == "function") {
 				this.get = source;
@@ -41,6 +70,13 @@ export default {
 		}
 	},
 	var: {
+		process: function(decl) {
+			decl.configurable = true;
+			decl.enumerable = true;
+			decl.writable = true;
+			decl.value = decl.expr;				
+			return decl;
+		},	
 		compile: function() {
 			this.writable = true;
 			this.value = compileValue(this);
@@ -58,6 +94,26 @@ export default {
 		}
 	},
 	once: {
+		process: function(decl) {
+			const source = decl.expr;
+			if (typeof source != "function") {
+				console.error("once facet requires a function. Creating a value property instead.");
+			}
+			decl.set = function setOnce(value) {
+				Reflect.defineProperty(this, name, {
+					configurable: true,
+					enumerable: true,
+					writable: true,
+					value: value
+				});
+			}
+			decl.get = function getOnce() {
+				let value = source.call(this);
+				decl.set.call(this, value);
+				return value;
+			};
+			return decl;
+		},
 		compile: function() {
 			const source = this.source;
 			if (typeof source != "function") throw new Error("once facet requires a function.");
@@ -78,6 +134,11 @@ export default {
 		}
 	},
 	type: {
+		process: function(decl) {
+			if (typeof decl.expr != "string") throw new Error("type facet requires a string.");
+			decl.value = this.sys.forName(decl.expr);
+			return decl;
+		},
 		compile: function() {
 			if (typeof this.source != "string") throw new Error("type facet requires a string.");
 			this.value = this.sys.forName(this.source);
@@ -88,6 +149,9 @@ export default {
 //		}
 	},
 	extend: {
+		process: function(decl) {
+			if (typeof decl.expr != "object") throw new Error("extend facet requires an object.");			
+		},
 		compile: function() {
 			if (typeof this.source != "object") throw new Error("extend facet requires an object.");
 		},
@@ -95,7 +159,7 @@ export default {
 			Reflect.defineProperty(object, this.name, {
 				configurable: true,
 				enumerable: true,
-				value: this.sys.extend(object[this.name] || null, this.source)
+				value: this.sys.extend(object[this.name] || null, this.expr)
 			});			
 		}
 	},
