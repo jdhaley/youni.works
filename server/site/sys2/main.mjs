@@ -40,13 +40,11 @@ function createSys(system, conf) {
 		packages: System.extend(system.table, {
 			[conf.system]: system
 		}),
-		symbols: Object.freeze(System.extend(system.table, conf.symbols)),
-		facets: System.extend(system.table),
+		symbols: Object.freeze(System.extend(system.Parcel, conf.symbols)),
+		facets: Object.freeze(System.extend(system.Parcel, conf.facets)),
 		loader: System.extend(system.Loader),
 		compiler: System.extend(system.Compiler)
 	});
-	loadFacets(sys, conf);
-	Object.freeze(sys.facets);
 	system.Instance.sys = sys;
 	Object.freeze(system.Instance);
 	return Object.freeze(sys);

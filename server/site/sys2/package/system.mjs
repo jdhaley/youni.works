@@ -1,31 +1,7 @@
-const TABLE = Object.freeze(Object.create(null));
+const PARCEL = Object.freeze(Object.create(null));
 const Instance = Object.create(null);
-Instance.super = function(name, ...args) {
-	const thisValue = this[name];
-	for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
-		let protoValue = proto[name];
-		if (protoValue !== thisValue) {
-			if (typeof protoValue == "function") return protoValue.apply(this, args);
-			break;
-		}
-	}
-	throw new Error(`super "${name}" is not a method.`);
-}
-//option 2:
-Function.prototype.super = function(thisArg, ...args) {
-	for (let proto = Object.getPrototypeOf(thisArg); proto; proto = Object.getPrototypeOf(proto)) {
-		let protoValue = proto[this.name];
-		if (protoValue !== this) {
-			if (typeof protoValue == "function") return protoValue.apply(thisArg, args);
-			break;
-		}
-	}
-	throw new Error(`super "${this.name}" is not a method.`);
-}
-//option 3: a method$ facet puts super on the function.
-
 export default {
-	table: TABLE,
+	Parcel: PARCEL,
 	Record: {
 	},
 	Array: {
@@ -36,63 +12,11 @@ export default {
 	},
 	//The Instance.sys property is implicitly defined when the system boots.
 	Instance: Instance,
-	Interface: {
-		type$: Instance,
-		properties: TABLE,
-		applyTo: function(object) {
-			let props = this.properties;
-			for (let name in props) props[name].define(object);
-		}
-	},
-	Declaration: {
-		//type$: Instance,
-		//definedIn: null,
-		name: "",
-		facet: "",
-		expr: undefined,
-		define: function(object, contextName) {
-			try {
-				Reflect.defineProperty(object, this.name, this);
-			} catch (error) {
-				contextName = contextName ? contextName + "/" + this.name : this.name;
-				error.message = `When defining "${contextName}": ${error.message}`;
-				throw error;
-			}
-		}
-	},
-	Property: {
-		type$: Instance,
-		name: "",
-		source: undefined,
-		declare: function(name, value) {
-			return this.sys.extend(this, {
-				name: name,
-				source: value,
-				configurable: true,
-				enumerable: true
-			});
-		},
-		compile: null,
-		define: function(object, contextName) {
-			try {
-				if (this.compile) {
-					this.compile(contextName);
-					this.sys.define(this, "compile", undefined);
-					Object.freeze(this);
-				}
-				Reflect.defineProperty(object, this.name, this);
-			} catch (error) {
-				contextName = contextName ? contextName + "/" + this.name : this.name;
-				error.message = `When defining "${contextName}": ${error.message}`;
-				throw error;
-			}
-		}
-	},
 	System: {
 		type$: Instance,
-		packages: TABLE,
-		facets: TABLE,
-		symbols: TABLE,
+		packages: PARCEL,
+		facets: PARCEL,
+		symbols: PARCEL,
 		declare: function(name, source, facet) {
 			let type = this.facets[facet];
 			if (!type) {
@@ -112,7 +36,7 @@ export default {
 			}
 		},
 		extend: function(object, declarations) {
-			if (object === undefined) object = TABLE;
+			if (object === undefined) object = PARCEL;
 			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || null);
 			this.implement(object, declarations);
@@ -208,6 +132,12 @@ export default {
 			}
 		}
 	},
+	Declaration: {
+		type$: Instance,
+		name: "",
+		facet: "",
+		expr: undefined
+	},
 	Loader: {
 		type$: Instance,
 		loadValue: function(value) {
@@ -240,12 +170,13 @@ export default {
 			const sys = this.sys;
 			let object = sys.extend(null);
 			object[sys.symbols.compile] = "object";
+			let Declaration = this.sys.forName("system.youni.works/Declaration");
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
 				let value = this.loadValue(source[decl]);
 				if (facet) {
-					value = sys.extend(null, {
+					value = sys.extend(Declaration, {
 						facet: facet,
 						name: name,
 						expr: value
@@ -306,7 +237,7 @@ export default {
 						this.compileProperties(value.expr);
 					}
 					let facet = this.sys.facets[value.facet];
-					let descr = facet.process(value);
+					let descr = facet(value);
 					Reflect.defineProperty(object, propertyName, descr);
 					return;
 				case "object":
@@ -329,3 +260,75 @@ export default {
 		}
 	}
 }
+//Interface: {
+//	type$: Instance,
+//	properties: PARCEL,
+//	applyTo: function(object) {
+//		let props = this.properties;
+//		for (let name in props) props[name].define(object);
+//	}
+//},
+
+//Property: {
+//type$: Instance,
+//name: "",
+//source: undefined,
+//declare: function(name, value) {
+//	return this.sys.extend(this, {
+//		name: name,
+//		source: value,
+//		configurable: true,
+//		enumerable: true
+//	});
+//},
+//compile: null,
+//define: function(object, contextName) {
+//	try {
+//		if (this.compile) {
+//			this.compile(contextName);
+//			this.sys.define(this, "compile", undefined);
+//			Object.freeze(this);
+//		}
+//		Reflect.defineProperty(object, this.name, this);
+//	} catch (error) {
+//		contextName = contextName ? contextName + "/" + this.name : this.name;
+//		error.message = `When defining "${contextName}": ${error.message}`;
+//		throw error;
+//	}
+//}
+//},
+
+//define: function(object, contextName) {
+//	try {
+//		Reflect.defineProperty(object, this.name, this);
+//	} catch (error) {
+//		contextName = contextName ? contextName + "/" + this.name : this.name;
+//		error.message = `When defining "${contextName}": ${error.message}`;
+//		throw error;
+//	}
+//}
+
+Instance.super = function(name, ...args) {
+	const thisValue = this[name];
+	for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
+		let protoValue = proto[name];
+		if (protoValue !== thisValue) {
+			if (typeof protoValue == "function") return protoValue.apply(this, args);
+			break;
+		}
+	}
+	throw new Error(`super "${name}" is not a method.`);
+}
+//option 2:
+Function.prototype.super = function(thisArg, ...args) {
+	for (let proto = Object.getPrototypeOf(thisArg); proto; proto = Object.getPrototypeOf(proto)) {
+		let protoValue = proto[this.name];
+		if (protoValue !== this) {
+			if (typeof protoValue == "function") return protoValue.apply(thisArg, args);
+			break;
+		}
+	}
+	throw new Error(`super "${this.name}" is not a method.`);
+}
+//option 3: a method$ facet puts super on the function.
+
