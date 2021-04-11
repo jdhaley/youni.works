@@ -7,8 +7,8 @@ export default function main(conf) {
 	const system = createSystemPackage(conf);
 	const sys = createSys(system, conf);
 	
-	conf.packages[conf.system] = sys.compiler.compile(conf.packages[conf.system], conf.system);
-	let test = sys.compiler.compile(conf.packages["test"], "test");
+	conf.packages[conf.system] = sys.compile(conf.packages[conf.system], conf.system);
+	let test = sys.compile(conf.packages["test"], "test");
 	console.log(test);
 	return sys;
 }

@@ -44,9 +44,9 @@ export default {
 			for (let name in props) props[name].define(object);
 		}
 	},
-	P2: {
-		type$: Instance,
-		definedIn: null,
+	Declaration: {
+		//type$: Instance,
+		//definedIn: null,
 		name: "",
 		facet: "",
 		expr: undefined
@@ -146,11 +146,8 @@ export default {
 				component = this.packages;
 			}
 			let context = "";
-			for (let prop of name.split("/")) {
-				if (component === undefined || component === null) {
-					console.error(`For name "${name}": "${context}" does not exist.`);
-					return undefined;
-				}
+			let path = name.split("/");
+			for (let prop of path) {
 				if (typeof component != "object") {
 					console.error(`For name "${name}": "${context}" is not an object.`);
 					return undefined;
@@ -159,15 +156,7 @@ export default {
 					console.error(`For name "${name}": "${context}" does not define "${prop}".`);
 					return undefined;
 				}
-//				if (component[this.symbols.compille] && component[this.symbols.type]) {
-//					console.error(`"${context}" is an uncompiled object for name "${name}".`);
-//					return undefined;										
-//				}
 				if (this.statusOf(component[prop])) {
-					if (this.statusOf(component[prop]) == "declared") {
-						console.error(`For name "${name}": "${context}" property "${prop}": Faceted property cannot be referenced when compiling.`);						
-						return undefined;
-					}
 					this.compiler.compileProperty(component, prop, context);
 				}
 				component = component[prop];
@@ -176,11 +165,32 @@ export default {
 			return component;
 		},
 		statusOf: function(value) {
-			if (value && typeof value == "object") return value[this.symbols.compille];
+			if (value && typeof value == "object") return value[this.symbols.compile];
+		},
+		compile: function(value, contextName) {
+			if (this.packages["."]) {
+				throw new Error("Compilation in progress.");
+			}
+			value = this.loader.loadValue(value);
+			if (this.statusOf(value)) {
+				if (value[""]) {
+					value = this.compiler.construct(value, contextName);
+				}
+				this.packages["."] = value;
+				this.compiler.compileProperties(value, contextName)
+				delete this.packages["."];
+			}
+			return value;
 		},
 		compiler: {
-			compile: function(source, contextName) {
+			construct: function(object, contextName) {
 				throw new Error("Unimplemented");
+			},
+			compileProperties: function(object, contextName) {
+				throw new Error("Unimplemented");
+			},
+			compileProperty: function(object, propertyName, contextName) {
+				throw new Error("Unimplemented");		
 			}
 		},
 		loader: {
@@ -192,6 +202,8 @@ export default {
 	Loader: {
 		type$: Instance,
 		loadValue: function(value) {
+			if (this.sys.statusOf(value)) throw new Error("Possible recursion.");
+
 			if (value && typeof value == "object") {
 				let proto = Object.getPrototypeOf(value);
 				if (proto == Array.prototype) {
@@ -209,77 +221,48 @@ export default {
 			let array = sys.extend(system.Array, {
 				length: length
 			});
+			array[sys.symbols.compile] = "array";
 			for (let i = 0; i < length; i++) {
 				array[i] = this.loadValue(source[i]);
 			}
-			array[sys.symbols.compile] = "array";
 			return array;
-		},
-		declare: function(name, expr, facet) {
-			let system = this.sys.forName("system.youni.works");
-			return this.sys.extend(system.P2, {
-				facet: facet,
-				expr: expr,
-			});
 		},
 		loadObject: function(source) {
 			const sys = this.sys;
 			let object = sys.extend(null);
-			if (source.type$) {
-				object[sys.symbols.type] = source.type$;
-				object[sys.symbols.compile] = "object";
-			} else {
-				object[sys.symbols.compile] = "parcel";
-			}
+			object[sys.symbols.compile] = "object";
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
 				let value = this.loadValue(source[decl]);
-				if (name) {
-					if (facet) {
-						value = this.declare(name, value, facet);
-						value[sys.symbols.compile] = "property";
-					}
-					object[name] = value;
+				if (facet) {
+					value = sys.extend(null, {
+						facet: facet,
+						name: name,
+						expr: value
+					});
+					value[sys.symbols.compile] = "property";
 				}
+				object[name] = value;
 			}
 			return object;
 		}
 	},
 	Compiler: {
 		type$: Instance,
-		compile: function(source, contextName) {
-			const sys = this.sys;
-			let value = sys.loader.loadValue(source);
-			
-			if (!sys.statusOf(value)) return value;
-			if (value[sys.symbols.type]) {
-				value = this.construct(value);
-			}
-			
-			sys.packages["."] = value;
-			this.compileObject(value)
-			delete sys.packages["."];
-
-			return Object.freeze(value);	
-		},
-		construct: function(object, type) {
+		construct: function(object, contextName) {
 			const sys = this.sys;
 			object[sys.symbols.compile] = "constructing";
-			if (type === undefined) type = object[sys.symbols.type]
-			if (typeof type == "string") type = sys.forName(type);
+			let type = object[""];
+			if (sys.statusOf(type) && typeof type.expr == "string") {
+				type = sys.forName(type.expr);
+			}
 			let target = Object.create(type || null);
-			for (let name in object) target[name] = object[name];
+			for (let name in object) {
+				if (name) target[name] = object[name];
+			}
 			object[sys.symbols.compile] = "constructed";
 			return target;
-		},
-		compileObject: function(object) {
-			object[this.sys.symbols.compile] = "compiling";
-			for (let name in object) {
-				this.compileProperty(object, name);
-			}
-			object[this.sys.symbols.compile] = "";
-			//TODO finalize compilation (symbols, etc)
 		},
 		compileArray: function(array) {
 			const sys = this.sys;
@@ -287,36 +270,46 @@ export default {
 			for (let i = 0; i < array.length; i++) {
 				let value = array[i];
 				if (sys.statusOf(value)) {
-					if (value[sys.symbols.type]) {
-						value = this.construct(value);
-					}
-					this.compileObject(value);
+					if (value[""]) value = this.construct(value);
+					this.compileProperties(value);
 					array[i] = value;
 				}
 			}
 			array[sys.symbols.compile] = "";	
 			Object.freeze(array);
 		},
+		compileProperties: function(object, contextName) {
+			object[this.sys.symbols.compile] = "compiling";
+			for (let name in object) {
+				this.compileProperty(object, name, contextName);
+			}
+			object[this.sys.symbols.compile] = "";
+			//TODO finalize compilation (symbols, etc)
+		},
 		compileProperty: function(object, propertyName, contextName) {
 			let value = object[propertyName];
 			switch (this.sys.statusOf(value)) {
 				case "property":
+					if (this.sys.statusOf(value.expr)) {
+						if (value.expr[""]) {
+							value.expr = this.construct(value.expr, contextName);
+						}
+						this.compileProperties(value.expr);
+					}
 					let facet = this.sys.facets[value.facet];
-					object[propertyName] = facet.process(value);
+					let descr = facet.process(value);
+					facet.define(object, propertyName, descr);
 					return;
 				case "object":
-					value = this.construct(value);
-					object[propertyName] = value;
-					this.compileObject(value)
-					return;
-				case "parcel":
-					this.compileObject(value);
+					if (value[""]) {
+						value = this.construct(value, contextName);
+						object[propertyName] = value;
+					}
+					this.compileProperties(value);
 					return;
 				case "array":
 					this.compileArray(value);
 					return;
-				case "compiling":
-					console.log(`compiling "${propertyName}" with parent status "${this.sys.statusOf(object)}"`);
 				case "":
 				case undefined:
 					return;
