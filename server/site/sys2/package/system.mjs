@@ -49,7 +49,16 @@ export default {
 		//definedIn: null,
 		name: "",
 		facet: "",
-		expr: undefined
+		expr: undefined,
+		define: function(object, contextName) {
+			try {
+				Reflect.defineProperty(object, this.name, this);
+			} catch (error) {
+				contextName = contextName ? contextName + "/" + this.name : this.name;
+				error.message = `When defining "${contextName}": ${error.message}`;
+				throw error;
+			}
+		}
 	},
 	Property: {
 		type$: Instance,
@@ -298,7 +307,7 @@ export default {
 					}
 					let facet = this.sys.facets[value.facet];
 					let descr = facet.process(value);
-					facet.define(object, propertyName, descr);
+					Reflect.defineProperty(object, propertyName, descr);
 					return;
 				case "object":
 					if (value[""]) {

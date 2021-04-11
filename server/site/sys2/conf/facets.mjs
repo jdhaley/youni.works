@@ -151,17 +151,19 @@ export default {
 	extend: {
 		process: function(decl) {
 			if (typeof decl.expr != "object") throw new Error("extend facet requires an object expression.");
-			decl.extend = function extendValue(object) {
-				return decl.sys.extend(object[decl.name] || null, decl.expr);
-			}
-			function define(object) {
-				Reflect.defineProperty(object, decl.name, {
+			decl.configurable = true;
+			decl.enumerable = true;
+			decl.get = function() {
+				let value = Object.getPrototypeOf(this)[decl.name];
+				value = this.sys.extend(value || null, decl.expr);
+				Reflect.defineProperty(this, decl.name, {
 					configurable: true,
 					enumerable: true,
-					value: decl.sys.extend(object[decl.name] || null, decl.expr)
+					value: value
 				});
+				return value;
 			}
-			decl.sys.define(decl, "define", define);
+			return decl;
 		},
 		compile: function() {
 			if (typeof this.source != "object") throw new Error("extend facet requires an object.");
