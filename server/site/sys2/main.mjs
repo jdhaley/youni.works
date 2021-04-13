@@ -4,7 +4,8 @@
  * sys - the System instance.
  */
 export default function main(conf) {
-	let sys = createSys(conf);
+	const sys = createSys(conf);
+	
 	sys.packages[conf.system] = sys.compile(conf.packages[conf.system]);
 	
 	let test = sys.compile(conf.packages["test"], "test");
@@ -15,6 +16,7 @@ function createSys(conf) {
 	let system = conf.packages[conf.system];
 	let System = system.System;
 	System = System.extend(system.Instance, System);
+	System[Symbol.toStringTag] = "System";
 	const sys = System.extend(System, {
 		packages: System.extend(),
 		symbols: Object.freeze(System.extend(null, conf.symbols)),

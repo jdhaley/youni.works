@@ -1,9 +1,11 @@
 const PARCEL = Object.freeze(Object.create(null));
-const Instance = Object.create(null);
-const DECLARATION = Object.create(Instance);
+const INSTANCE = Object.create(null);
+INSTANCE[Symbol.toStringTag] = "Instance";
+const DECLARATION = Object.create(INSTANCE);
 DECLARATION.name = "";
 DECLARATION.facet = "";
 DECLARATION.expr = undefined;
+DECLARATION[Symbol.toStringTag] = "Declaration";
 
 export default {
 	Parcel: PARCEL,
@@ -16,10 +18,10 @@ export default {
 		}
 	},
 	//The Instance.sys property is implicitly defined when the system boots.
-	Instance: Instance,
+	Instance: INSTANCE,
 	Declaration: DECLARATION,
 	System: {
-		type$: Instance,
+		type$: INSTANCE,
 		packages: PARCEL,
 		facets: PARCEL,
 		symbols: PARCEL,
@@ -144,7 +146,7 @@ export default {
 		}
 	},
 	Loader: {
-		type$: Instance,
+		type$: INSTANCE,
 		loadValue: function(value) {
 			if (this.sys.statusOf(value)) throw new Error("Possible recursion.");
 
@@ -189,7 +191,7 @@ export default {
 		}
 	},
 	Compiler: {
-		type$: Instance,
+		type$: INSTANCE,
 		construct: function(object, contextName) {
 			const sys = this.sys;
 			object[sys.symbols.compile] = "constructing";
@@ -244,6 +246,10 @@ export default {
 					if (value[""]) {
 						value = this.construct(value, contextName);
 						object[propertyName] = value;
+						let firstChar = propertyName.charAt(0)
+						if (firstChar.toUpperCase() == firstChar) {
+							value[Symbol.toStringTag] = propertyName;
+						}
 					}
 					this.compileProperties(value);
 					return;
@@ -308,7 +314,7 @@ export default {
 //	}
 //}
 
-Instance.super = function(name, ...args) {
+INSTANCE.super = function(name, ...args) {
 	const thisValue = this[name];
 	for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
 		let protoValue = proto[name];
