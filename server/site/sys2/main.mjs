@@ -5,14 +5,26 @@
  */
 export default function main(conf) {
 	const sys = createSys(conf);
-	
-	sys.packages[conf.system] = sys.compile(conf.packages[conf.system]);
-	
 	let test = sys.compile(conf.packages["test"], "test");
 	console.log(test);
 	return sys;
 }
 function createSys(conf) {
+	let sys = bootSys(conf);
+	let system = sys.compile(conf.packages[conf.system]);
+	sys = sys.extend(system.System, {
+		packages: sys.packages,
+		symbols: sys.symbols,
+		facets: sys.facets,
+		loader: system.Loader,
+		compiler: system.Compiler
+	});
+	system.Instance.sys = sys;
+	sys.packages[conf.system] = system;
+	return sys;
+}
+
+function bootSys(conf) {
 	let system = conf.packages[conf.system];
 	let System = system.System;
 	System = System.extend(system.Instance, System);
@@ -25,7 +37,6 @@ function createSys(conf) {
 		compiler: System.extend(system.Instance, system.Compiler)
 	});
 	system.Instance.sys = sys;
-//	Object.freeze(system.Instance);
-//	return Object.freeze(sys);
 	return sys;
 }
+

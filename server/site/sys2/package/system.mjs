@@ -196,8 +196,11 @@ export default {
 			const sys = this.sys;
 			object[sys.symbols.compile] = "constructing";
 			let type = object[""];
-			if (sys.statusOf(type) && typeof type.expr == "string") {
-				type = sys.forName(type.expr);
+			if (sys.statusOf(type)) {
+				type = type.expr;
+				if (typeof type == "string") {
+					type = sys.forName(type);
+				}
 			}
 			let target = Object.create(type || null);
 			for (let name in object) {
@@ -225,8 +228,8 @@ export default {
 			for (let name in object) {
 				this.compileProperty(object, name, contextName);
 			}
-			object[this.sys.symbols.compile] = "";
-			//TODO finalize compilation (symbols, etc)
+			delete object[this.sys.symbols.compile];
+			Object.freeze(object);
 		},
 		compileProperty: function(object, propertyName, contextName) {
 			let value = object[propertyName];
