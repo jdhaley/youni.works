@@ -1,39 +1,50 @@
 const PARCEL = Object.freeze(Object.create(null));
 const Instance = Object.create(null);
+const DECLARATION = Object.create(Instance);
+DECLARATION.name = "";
+DECLARATION.facet = "";
+DECLARATION.expr = undefined;
+
 export default {
 	Parcel: PARCEL,
 	Record: {
 	},
 	Array: {
 		length: 0,
-		"@iterator": function *() {
+		symbol$iterator: function *() {
 			for (let i = 0; i < this.length; i++) yield this[i];
 		}
 	},
 	//The Instance.sys property is implicitly defined when the system boots.
 	Instance: Instance,
+	Declaration: DECLARATION,
 	System: {
 		type$: Instance,
 		packages: PARCEL,
 		facets: PARCEL,
 		symbols: PARCEL,
-		declare: function(name, source, facet) {
-			let type = this.facets[facet];
-			if (!type) {
-				throw new Error(facet ? `Facet ${facet} does not exist.` : `Missing Facet.`);
-			}
-			return type.declare(name, source);
+		declare: function(facet, name, value) {
+			return this.extend(DECLARATION, {
+				facet: facet,
+				name: name,
+				expr: value
+			});			
 		},
-		define: function(object, name, value, facet) {
-			if (facet) {
-				this.declare(name, value, facet).define(object);
-				return;
-			}
-			if (typeof value == "function") {
-				Reflect.defineProperty(object, name, {configurable: true, value: value});
+		define: function(object, name, value, facetName) {
+			let decl;
+			if (facetName) {
+				let facet = this.facets[facetName];
+				if (!facet) {
+					throw new Error(facetName ? `Facet ${facetName} does not exist.` : `Missing Facet.`);
+				}
+				decl = this.declare(facetName, name, value);
+				decl = facet(decl);
+			} else if (typeof value == "function") {
+				decl = {configurable: true, value: value};
 			} else {
-				Reflect.defineProperty(object, name, {configurable: true, enumerable: true, writable: true, value: value});				
+				decl = {configurable: true, enumerable: true, writable: true, value: value};				
 			}
+			Reflect.defineProperty(object, name, decl);
 		},
 		extend: function(object, declarations) {
 			if (object === undefined) object = PARCEL;
@@ -132,12 +143,6 @@ export default {
 			}
 		}
 	},
-	Declaration: {
-		type$: Instance,
-		name: "",
-		facet: "",
-		expr: undefined
-	},
 	Loader: {
 		type$: Instance,
 		loadValue: function(value) {
@@ -170,17 +175,12 @@ export default {
 			const sys = this.sys;
 			let object = sys.extend(null);
 			object[sys.symbols.compile] = "object";
-			let Declaration = this.sys.forName("system.youni.works/Declaration");
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
 				let value = this.loadValue(source[decl]);
 				if (facet) {
-					value = sys.extend(Declaration, {
-						facet: facet,
-						name: name,
-						expr: value
-					});
+					value = sys.declare(facet, name, value);
 					value[sys.symbols.compile] = "property";
 				}
 				object[name] = value;

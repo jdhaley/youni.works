@@ -89,5 +89,12 @@ export default {
 			return value;
 		}
 		return decl;
+	},
+	symbol: function(decl) {
+		let symbol = decl.sys.symbols[decl.name];
+		if (!symbol) throw new Error("symbol is not defined.");
+		decl.name = symbol;
+		decl.value = decl.expr;
+		return decl;
 	}
 };

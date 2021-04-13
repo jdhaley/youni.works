@@ -4,57 +4,26 @@
  * sys - the System instance.
  */
 export default function main(conf) {
-	const system = createSystemPackage(conf);
-	const sys = createSys(system, conf);
+	let sys = createSys(conf);
+	sys.packages[conf.system] = sys.compile(conf.packages[conf.system]);
 	
-	conf.packages[conf.system] = sys.compile(conf.packages[conf.system], conf.system);
 	let test = sys.compile(conf.packages["test"], "test");
 	console.log(test);
 	return sys;
 }
-
-function createSystemPackage(conf) {
+function createSys(conf) {
 	let system = conf.packages[conf.system];
-	const System = system.System;
-	let pkg = System.extend(system.table);
-	for (let name in system) {
-		let member = system[name];
-		if (member && typeof member == "object" && Object.getPrototypeOf(member) == Object.prototype) {
-			let type = member.type$ || null;
-			//delete member.type$; //so we don't get the object-facet warning.
-			member = System.extend(type, member);
-		}
-		if (name.charAt(0) == name.charAt(0).toUpperCase()) {
-			System.define(member, conf.symbols.name, name);
-			//Don't freeze Object because we need to assign sys to it.
-			if (name != "Instance") Object.freeze(member);
-		}
-		pkg[name] = member;
-	}
-	return Object.freeze(pkg);
-}
-
-function createSys(system, conf) {
-	const System = system.System;
+	let System = system.System;
+	System = System.extend(system.Instance, System);
 	const sys = System.extend(System, {
-		packages: System.extend(system.table, {
-			[conf.system]: system
-		}),
-		symbols: Object.freeze(System.extend(system.Parcel, conf.symbols)),
-		facets: Object.freeze(System.extend(system.Parcel, conf.facets)),
-		loader: System.extend(system.Loader),
-		compiler: System.extend(system.Compiler)
+		packages: System.extend(),
+		symbols: Object.freeze(System.extend(null, conf.symbols)),
+		facets: Object.freeze(System.extend(null, conf.facets)),
+		loader: System.extend(system.Instance, system.Loader),
+		compiler: System.extend(system.Instance, system.Compiler)
 	});
 	system.Instance.sys = sys;
-	Object.freeze(system.Instance);
-	return Object.freeze(sys);
-}
-
-function loadFacets(sys, conf) {
-	let Property = sys.packages[conf.system].Property;
-	for (let name in conf.facets) {
-		let facet = sys.extend(Property, conf.facets[name]);
-		sys.define(facet, Symbol.toStringTag, name);
-		sys.facets[name] = Object.freeze(facet);
-	}
+//	Object.freeze(system.Instance);
+//	return Object.freeze(sys);
+	return sys;
 }
