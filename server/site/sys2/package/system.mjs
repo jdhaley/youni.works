@@ -239,8 +239,9 @@ export default {
 						this.compileProperties(value.expr);
 					}
 					let facet = this.sys.facets[value.facet];
-					let descr = facet(value);
-					Reflect.defineProperty(object, propertyName, descr);
+					value = facet(value);
+					Reflect.defineProperty(object, value.name, value);
+					//TODO if the facet is a symbol$, need to delete the decl from the loaded object.
 					return;
 				case "object":
 					if (value[""]) {
@@ -256,6 +257,7 @@ export default {
 				case "array":
 					this.compileArray(value);
 					return;
+				case "compiling":
 				case "":
 				case undefined:
 					return;
