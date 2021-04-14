@@ -1,14 +1,14 @@
 Symbol.observers = Symbol("observers");
 
 export default {
-	package$: "youni.works/control",
 	use: {
-		package$util: "youni.works/util"		
+		type$sys: "system.youni.works",
+		type$util: "base.youni.works/util"		
 	},
 	Control: {
-		super$: "Object",
+		type$: "./use/sys/Instance",
 		conf: Object.freeze(Object.create(null)),
-		type$owner: "Owner",
+		type$owner: "./Owner",
 		to: Object.freeze([]),
 		append: function(control) {
 			this.to.push(control);
@@ -69,8 +69,8 @@ export default {
 		}
 	},
 	Owner: {
-		super$: "Control",
-		type$remote: "use.util.Remote",
+		type$: "./Control",
+		type$remote: "./use/util/Remote",
 		open: function(pathname, receiver) {
 			this.remote.service(receiver, "opened", {
 				url: pathname,

@@ -34,14 +34,14 @@ const pvt = {
 	}
 }
 export default {
-	package$: "youni.works/diagram",
 	use: {
-		package$view: "youni.works/view",
-		package$command: "youni.works/command"
+		type$sys: "system.youni.works",
+		type$view: "base.youni.works/view",
+		type$command: "base.youni.works/command"
 	},
 	private: pvt,
 	DrawCommand: {
-		super$: "use.command.Command",
+		type$: "./use/command/Command",
 		title: "Move/Size Shape",
 		control: null,
 		before: null,
@@ -72,12 +72,12 @@ export default {
 		}
 	},
 	Diagram: {
-		super$: "use.view.View",
+		type$: "./use/view/View",
 		use: {
-			type$Shape: "Shape",
-			type$Commands: "use.command.Commands"
+			type$Shape: "./Shape",
+			type$Commands: "./use/command/Commands"
 		},
-		type$commands: "use.command.Commands",
+		type$commands: "./use/command/Commands",
 		start: function(conf) {
 			if (conf) this.sys.define(this, "conf", conf);
 			this.sys.define(this, "commands", this.use.Commands.instance());			
@@ -124,14 +124,14 @@ export default {
 		}
 	},
 	Shape: {
-		super$: "use.view.View",
+		type$: "./use/view/View",
 		use: {
-			type$DrawCommand: "DrawCommand"
+			type$DrawCommand: "./DrawCommand"
 		},
 		border: 6,
 		minWidth: 48,
 		minHeight: 24,
-		type$defaultContent: "Text",
+		type$defaultContent: "./Text",
 		display: function() {
 			const peer = this.peer;
 			peer.classList.add("shape");
@@ -280,7 +280,7 @@ export default {
 		}
 	},
 	Text: {
-		super$: "use.view.View",
+		type$: "./use/view/View",
 		bind: function(model) {
 			this.model = model;
 		},
@@ -304,6 +304,6 @@ export default {
 		}
 	},
 	Connector: {
-		super$: "use.view.View"
+		type$: "./use/view/View"
 	}
 }

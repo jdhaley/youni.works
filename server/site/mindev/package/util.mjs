@@ -1,7 +1,9 @@
 export default {
-	package$: "youni.works/util",
+	use: {
+		type$sys: "system.youni.works",
+	},
 	Remote: {
-		super$: "Object",
+		type$: "./use/sys/Instance",
 		method: "HEAD",
 		url: "",
 		service: function(receiver, subject, request) {

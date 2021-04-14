@@ -2,9 +2,9 @@
 	"icon": "/file/test/index.png",
 	"styles": "/file/test/styles.css",
 	"components": {
-		"Frame": "youni.works/view/Frame",
-		"Diagram": "youni.works/diagram/Diagram",
-		"Object": "youni.works/object/Properties"
+		"Frame": "base.youni.works/view/Frame",
+		"Diagram": "base.youni.works/diagram/Diagram",
+		"Object": "base.youni.works/object/Properties"
 	},
 	"objectType": "Issues",
 	"title": "Test",

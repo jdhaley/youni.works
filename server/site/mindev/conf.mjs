@@ -1,23 +1,10 @@
-import util from "./package/util.mjs";
-import command from "./package/command.mjs";
-import control from "./package/control.mjs";
-import view from "./package/view.mjs";
-
-import diagram from "./package/diagram.mjs";
-import object from "./package/object.mjs";
-
+import packages from "./conf/packages.mjs";
 import events from "./conf/events.mjs";
 import editors from "./conf/editors.mjs";
 
 export default {
-	use: {
-		util: util,
-		command: command,
-		control: control,
-		view: view,
-		diagram: diagram,
-		object: object
-	},
+	base: "base.youni.works",
+	packages: packages,
 	app: {
 		events: events,
 		editors: editors

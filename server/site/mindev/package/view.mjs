@@ -1,23 +1,22 @@
 export default {
-	package$: "youni.works/view",
 	use: {
-		package$control: "youni.works/control",
+		type$control: "base.youni.works/control",
 	},
 	View: {
-		super$: "use.control.Control",
-		type$owner: "Frame",
-		once$to: Ui_to,
-		get$peer: function() {
-			let peer = this.owner.createNode(this.conf.tag || "div");
-			this.sys.define(this, "peer", peer);
-			peer.$peer = this;
-			if (this.conf.at) setAttributes(peer, this.conf.at);
-			this.display();
-			return peer;
-		},
-		get$style: function() {
-			return this.peer.style;
-		},
+		type$: "./use/control/Control",
+		type$owner: "./Frame",
+//		once$to: Ui_to,
+//		get$peer: function() {
+//			let peer = this.owner.createNode(this.conf.tag || "div");
+//			this.sys.define(this, "peer", peer);
+//			peer.$peer = this;
+//			if (this.conf.at) setAttributes(peer, this.conf.at);
+//			this.display();
+//			return peer;
+//		},
+//		get$style: function() {
+//			return this.peer.style;
+//		},
 		append: Ui_append,
 		display: function() {
 		},
@@ -30,7 +29,7 @@ export default {
 		}
 	},
 	Frame: {
-		super$: "use.control.Owner",
+		type$: "./use/control/Owner",
 		owner: null,
 		get$to: Ui_to,
 		append: Ui_append,

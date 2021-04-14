@@ -1,11 +1,10 @@
 export default {
-	package$: "youni.works/object",
 	use: {
-		package$view: "youni.works/view"
+		type$view: "base.youni.works/view"
 	},
 	Property: {
-		super$: "use.view.View",
-		type$object: "Properties",
+		super$: "./use/view/View",
+		type$object: "./Properties",
 		conf: {
 			name: "",
 			dataType: "",
@@ -49,7 +48,7 @@ export default {
 		}
 	},
 	Properties: {
-		super$: "use.view.View",
+		type$: "./use/view/View",
 		displayType: "sheet",
 		conf: {
 			name: "Object",
@@ -129,7 +128,7 @@ function isLowerCase(str)
 function displayProperties(on, properties) {
 	if (!properties) return;
 	for (let propConf of properties) {
-		let propType = propConf.controlType || "youni.works/object/Property";
+		let propType = propConf.controlType || "base.youni.works/object/Property";
 		let prop = on.owner.create(propType, propConf);
 		on.sys.define(prop, "object", on);
 		on.append(prop);
