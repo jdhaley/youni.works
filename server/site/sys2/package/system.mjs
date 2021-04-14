@@ -203,8 +203,9 @@ export default {
 				}
 			}
 			let target = Object.create(type || null);
+			//TODO may cause side-effects reading properties?
 			for (let name in object) {
-				if (name) target[name] = object[name];
+				if (name) sys.define(target, name, object[name]);
 			}
 			object[sys.symbols.compile] = "constructed";
 			return target;
@@ -252,7 +253,7 @@ export default {
 						object[propertyName] = value;
 						let firstChar = propertyName.charAt(0)
 						if (firstChar.toUpperCase() == firstChar) {
-							value[Symbol.toStringTag] = propertyName;
+							this.sys.define(value, Symbol.toStringTag, propertyName);
 						}
 					}
 					this.compileProperties(value);
