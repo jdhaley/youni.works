@@ -3,8 +3,9 @@ export default function main(sys, conf) {
 	sys.packages[conf.base] = sys.extend();
 	let base = conf.packages[conf.base];
 	for (let pkg in base) {
-		console.log(`Compiling "${conf.base}/${pkg}"...`)
-		sys.packages[conf.base][pkg] = sys.compile(base[pkg]);
+		let ctx = `${conf.base}/${pkg}`;
+		console.log(`Compiling "${ctx}"...`)
+		sys.packages[conf.base][pkg] = sys.compile(base[pkg], ctx);
 		console.log("Compiled.");
 	}
 

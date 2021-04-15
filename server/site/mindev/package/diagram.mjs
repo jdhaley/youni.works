@@ -34,12 +34,11 @@ const pvt = {
 	}
 }
 export default {
+	private: pvt,
 	use: {
-		type$sys: "system.youni.works",
 		type$view: "base.youni.works/view",
 		type$command: "base.youni.works/command"
 	},
-	private: pvt,
 	DrawCommand: {
 		type$: "./use/command/Command",
 		title: "Move/Size Shape",
