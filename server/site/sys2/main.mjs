@@ -1,15 +1,4 @@
-/*
- * system - The system package.
- * System - The system interface.
- * sys - the System instance.
- */
 export default function main(conf) {
-	const sys = createSys(conf);
-	let test = sys.compile(conf.packages["test"], "test");
-	console.log(test);
-	return sys;
-}
-function createSys(conf) {
 	let sys = bootSys(conf);
 	let system = sys.compile(conf.packages[conf.system]);
 	sys = sys.extend(system.System, {
@@ -19,12 +8,22 @@ function createSys(conf) {
 		loader: system.Loader,
 		compiler: system.Compiler
 	});
+	return initSys(sys, system, conf.system);
+}
+
+function initSys(sys, system, moduleId) {
 	system.Instance.sys = sys;
-	sys.packages[conf.system] = system;
+	sys.packages[moduleId] = system;
 	return sys;
 }
 
 function bootSys(conf) {
+/*
+ * system - The system package.
+ * System - The system interface.
+ * sys - the System instance.
+ */
+
 	let system = conf.packages[conf.system];
 	let System = system.System;
 	System = System.extend(system.Instance, System);

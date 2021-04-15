@@ -63,6 +63,11 @@ export default {
 			});
 		}
 		decl.get = function getOnce() {
+			//sys2 rollout 
+			if (this[this.sys.symbols.compile]) {
+				console.error("once$ called during compile.");
+				return;
+			}
 			let value = source.call(this);
 			decl.set.call(this, value);
 			return value;

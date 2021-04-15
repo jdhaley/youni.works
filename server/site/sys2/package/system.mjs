@@ -88,6 +88,7 @@ export default {
 			return false;
 		},
 		forName: function(name, component) {
+			console.log(`forName("${name}")`);
 			if (arguments.length < 2) {
 				component = this.packages;
 			}
@@ -102,12 +103,13 @@ export default {
 					console.error(`For name "${name}": "${context}" does not define "${prop}".`);
 					return undefined;
 				}
+				context += (context ? "/" : "") + prop;
 				if (this.statusOf(component[prop])) {
 					this.compiler.compileProperty(component, prop, context);
 				}
 				component = component[prop];
-				context += prop + "/";
 			}
+			console.log(`got forName("${name}")`, component);
 			return component;
 		},
 		statusOf: function(value) {
@@ -210,14 +212,14 @@ export default {
 			object[sys.symbols.compile] = "constructed";
 			return target;
 		},
-		compileArray: function(array) {
+		compileArray: function(array, contextName) {
 			const sys = this.sys;
 			array[sys.symbols.compile] = "compiling";			
 			for (let i = 0; i < array.length; i++) {
 				let value = array[i];
 				if (sys.statusOf(value)) {
-					if (value[""]) value = this.construct(value);
-					this.compileProperties(value);
+					if (value[""]) value = this.construct(value, contextName);
+					this.compileProperties(value, contextName);
 					array[i] = value;
 				}
 			}
@@ -225,9 +227,12 @@ export default {
 			Object.freeze(array);
 		},
 		compileProperties: function(object, contextName) {
+			if (object[this.sys.symbols.compile] == "compiling") {
+//				throw new Error("Object is compiling.");
+			}
 			object[this.sys.symbols.compile] = "compiling";
 			for (let name in object) {
-				this.compileProperty(object, name, contextName);
+				if (name) this.compileProperty(object, name, contextName + "/" + name);
 			}
 			delete object[this.sys.symbols.compile];
 			Object.freeze(object);
@@ -240,7 +245,7 @@ export default {
 						if (value.expr[""]) {
 							value.expr = this.construct(value.expr, contextName);
 						}
-						this.compileProperties(value.expr);
+						this.compileProperties(value.expr, contextName);
 					}
 					let facet = this.sys.facets[value.facet];
 					value = facet(value);
@@ -256,7 +261,7 @@ export default {
 							this.sys.define(value, Symbol.toStringTag, propertyName);
 						}
 					}
-					this.compileProperties(value);
+					this.compileProperties(value, contextName);
 					return;
 				case "array":
 					this.compileArray(value);
