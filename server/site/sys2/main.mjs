@@ -1,6 +1,6 @@
 export default function main(conf) {
 	let sys = bootSys(conf);
-	let system = sys.compile(conf.packages[conf.system]);
+	let system = sys.compile(conf.packages[conf.system], conf.system);
 	sys = sys.extend(system.System, {
 		packages: sys.packages,
 		symbols: sys.symbols,

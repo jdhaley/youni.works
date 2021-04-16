@@ -96,7 +96,7 @@ export default {
 		return decl;
 	},
 	symbol: function(decl) {
-		let symbol = decl.sys.symbols[decl.name];
+		let symbol = typeof decl.name == "symbol" ? decl.name : decl.sys.symbols[decl.name];
 		if (!symbol) throw new Error("symbol is not defined.");
 		decl.name = symbol;
 		decl.value = decl.expr;

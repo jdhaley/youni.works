@@ -1,55 +1,45 @@
-const PARCEL = Object.freeze(Object.create(null));
-const INSTANCE = Object.create(null);
-INSTANCE[Symbol.toStringTag] = "Instance";
-const DECLARATION = Object.create(INSTANCE);
-DECLARATION.name = "";
-DECLARATION.facet = "";
-DECLARATION.expr = undefined;
-DECLARATION[Symbol.toStringTag] = "Declaration";
-
 export default {
-	Parcel: PARCEL,
+	Object: {
+		symbol$sys: null
+	},
+	Parcel: {
+		type$: "./Object"
+	},
 	Record: {
+		type$: "./Object"
 	},
 	Array: {
+		type$: "./Object",
 		length: 0,
 		symbol$iterator: function *() {
 			for (let i = 0; i < this.length; i++) yield this[i];
 		}
 	},
-	//The Instance.sys property is implicitly defined when the system boots.
-	Instance: INSTANCE,
-	Declaration: DECLARATION,
-	System: {
-		type$: INSTANCE,
-		packages: PARCEL,
-		facets: PARCEL,
-		symbols: PARCEL,
-		declare: function(facet, name, value) {
-			return this.extend(DECLARATION, {
-				facet: facet,
-				name: name,
-				expr: value
-			});			
-		},
-		define: function(object, name, value, facetName) {
-			let decl;
-			if (facetName) {
-				let facet = this.facets[facetName];
-				if (!facet) {
-					throw new Error(facetName ? `Facet ${facetName} does not exist.` : `Missing Facet.`);
+	Instance: {
+		type$: "./Object",
+		sys: null,
+		super: function(name, ...args) {
+			const thisValue = this[name];
+			for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
+				let protoValue = proto[name];
+				if (protoValue !== thisValue) {
+					if (typeof protoValue == "function") return protoValue.apply(this, args);
+					break;
 				}
-				decl = this.declare(facetName, name, value);
-				decl = facet(decl);
-			} else if (typeof value == "function") {
-				decl = {configurable: true, value: value};
-			} else {
-				decl = {configurable: true, enumerable: true, writable: true, value: value};				
 			}
-			Reflect.defineProperty(object, name, decl);
+			throw new Error(`super "${name}" is not a method.`);
+		}
+	},
+	System: {
+		type$: "./Instance",
+		packages: {
+		},
+		facets: {
+		},
+		symbols: {
 		},
 		extend: function(object, declarations) {
-			if (object === undefined) object = PARCEL;
+//			if (object === undefined) object = OBJECT;
 			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || null);
 			this.implement(object, declarations);
@@ -67,6 +57,26 @@ export default {
 				}
 			}
 		},
+		define: function(object, name, value, facetName) {
+			let decl;
+			if (facetName) {
+				let facet = this.facets[facetName];
+				if (!facet) {
+					throw new Error(facetName ? `Facet ${facetName} does not exist.` : `Missing Facet.`);
+				}
+				decl = facet({
+					sys: this,
+					facet: facet,
+					name: name,
+					expr: value
+				});
+//			} else if (typeof value == "function") {
+//				decl = {configurable: true, value: value};
+			} else {
+				decl = {configurable: true, enumerable: true, writable: true, value: value};				
+			}
+			Reflect.defineProperty(object, name, decl);
+		},
 		facetOf: function(declaration) {
 			if (typeof declaration == "string") {
 				return declaration.indexOf("$") >= 0 ? declaration.substr(0, declaration.indexOf("$")) : "";
@@ -79,13 +89,6 @@ export default {
 				if (declaration.startsWith("@")) declaration = Symbol[declaration.slice(1)];
 			}
 			return declaration;
-		},
-		isSource: function(value) {
-			if (value && typeof value == "object") {
-				let proto = Object.getPrototypeOf(value);
-				if (proto == Object.prototype || proto == Array.prototype) return true;
-			}
-			return false;
 		},
 		forName: function(name, component) {
 			console.log(`forName("${name}")`);
@@ -112,14 +115,11 @@ export default {
 			console.log(`got forName("${name}")`, component);
 			return component;
 		},
-		statusOf: function(value) {
-			if (value && typeof value == "object") return value[this.symbols.compile];
-		},
 		compile: function(value, contextName) {
 			if (this.packages["."]) {
 				throw new Error("Compilation in progress.");
 			}
-			value = this.loader.loadValue(value);
+			value = this.loader.loadValue(value, contextName);
 			if (this.statusOf(value)) {
 				if (value[""]) {
 					value = this.compiler.construct(value, contextName);
@@ -129,6 +129,25 @@ export default {
 				delete this.packages["."];
 			}
 			return value;
+		},
+		////for compilation/////
+		declare: function(facet, name, value) {
+			return this.extend(null, {
+				sys: this,
+				facet: facet,
+				name: name,
+				expr: value
+			});			
+		},
+		isSource: function(value) {
+			if (value && typeof value == "object") {
+				let proto = Object.getPrototypeOf(value);
+				if (proto == Object.prototype || proto == Array.prototype) return true;
+			}
+			return false;
+		},
+		statusOf: function(value) {
+			if (value && typeof value == "object") return value[this.symbols.compile];
 		},
 		compiler: {
 			construct: function(object, contextName) {
@@ -147,22 +166,28 @@ export default {
 			}
 		}
 	},
+	Declaration: {
+		type$: "./Instance",
+		facet: "",
+		name: "",
+		expr: undefined
+	},
 	Loader: {
-		type$: INSTANCE,
-		loadValue: function(value) {
+		type$: "./Instance",
+		loadValue: function(value, componentName) {
 			if (this.sys.statusOf(value)) throw new Error("Possible recursion.");
 
 			if (value && typeof value == "object") {
 				let proto = Object.getPrototypeOf(value);
 				if (proto == Array.prototype) {
-					value = this.loadArray(value);
+					value = this.loadArray(value, componentName);
 				} else if (proto == Object.prototype) {
-					value = this.loadObject(value);
+					value = this.loadObject(value, componentName);
 				}
 			}
 			return value;
 		},
-		loadArray: function(source) {
+		loadArray: function(source, componentName) {
 			const sys = this.sys;
 			let system = sys.forName("system.youni.works");
 			let length = source.length;
@@ -171,19 +196,24 @@ export default {
 			});
 			array[sys.symbols.compile] = "array";
 			for (let i = 0; i < length; i++) {
-				array[i] = this.loadValue(source[i]);
+				array[i] = this.loadValue(source[i], componentName + "/" + i);
 			}
 			return array;
 		},
-		loadObject: function(source) {
+		loadObject: function(source, componentName) {
+//			console.log("Loading " + componentName);
 			const sys = this.sys;
 			let object = sys.extend(null);
 			object[sys.symbols.compile] = "object";
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
-				let value = this.loadValue(source[decl]);
+				let value = this.loadValue(source[decl], componentName + "/" + name);
 				if (facet) {
+					if (facet == "type" && typeof value == "string") {
+						console.log(componentName + "/" + name + " --> " + value);
+					}
+//					console.log("  " + (name || "[type]") + " " + facet + (facet == "type" && typeof value == "string" ? " " + value : ""));
 					value = sys.declare(facet, name, value);
 					value[sys.symbols.compile] = "property";
 				}
@@ -193,7 +223,7 @@ export default {
 		}
 	},
 	Compiler: {
-		type$: INSTANCE,
+		type$: "./Instance",
 		construct: function(object, contextName) {
 			const sys = this.sys;
 			object[sys.symbols.compile] = "constructing";
@@ -235,7 +265,8 @@ export default {
 				if (name) this.compileProperty(object, name, contextName + "/" + name);
 			}
 			delete object[this.sys.symbols.compile];
-			Object.freeze(object);
+//TODO put back in
+//			Object.freeze(object);
 		},
 		compileProperty: function(object, propertyName, contextName) {
 			let value = object[propertyName];
@@ -279,7 +310,7 @@ export default {
 }
 //Interface: {
 //	type$: Instance,
-//	properties: PARCEL,
+//	properties: OBJECT,
 //	applyTo: function(object) {
 //		let props = this.properties;
 //		for (let name in props) props[name].define(object);
@@ -325,27 +356,16 @@ export default {
 //	}
 //}
 
-INSTANCE.super = function(name, ...args) {
-	const thisValue = this[name];
-	for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
-		let protoValue = proto[name];
-		if (protoValue !== thisValue) {
-			if (typeof protoValue == "function") return protoValue.apply(this, args);
-			break;
-		}
-	}
-	throw new Error(`super "${name}" is not a method.`);
-}
-//option 2:
-Function.prototype.super = function(thisArg, ...args) {
-	for (let proto = Object.getPrototypeOf(thisArg); proto; proto = Object.getPrototypeOf(proto)) {
-		let protoValue = proto[this.name];
-		if (protoValue !== this) {
-			if (typeof protoValue == "function") return protoValue.apply(thisArg, args);
-			break;
-		}
-	}
-	throw new Error(`super "${this.name}" is not a method.`);
-}
+//
+//Function.prototype.super = function(thisArg, ...args) {
+//	for (let proto = Object.getPrototypeOf(thisArg); proto; proto = Object.getPrototypeOf(proto)) {
+//		let protoValue = proto[this.name];
+//		if (protoValue !== this) {
+//			if (typeof protoValue == "function") return protoValue.apply(thisArg, args);
+//			break;
+//		}
+//	}
+//	throw new Error(`super "${this.name}" is not a method.`);
+//}
 //option 3: a method$ facet puts super on the function.
 
