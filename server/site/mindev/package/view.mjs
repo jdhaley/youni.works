@@ -5,18 +5,18 @@ export default {
 	View: {
 		type$: "./use/control/Control",
 		type$owner: "./Frame",
-//		once$to: Ui_to,
-//		get$peer: function() {
-//			let peer = this.owner.createNode(this.conf.tag || "div");
-//			this.sys.define(this, "peer", peer);
-//			peer.$peer = this;
-//			if (this.conf.at) setAttributes(peer, this.conf.at);
-//			this.display();
-//			return peer;
-//		},
-//		get$style: function() {
-//			return this.peer.style;
-//		},
+		once$to: Ui_to,
+		get$peer: function() {
+			let peer = this.owner.createNode(this.conf.tag || "div");
+			this.sys.define(this, "peer", peer);
+			peer.$peer = this;
+			if (this.conf.at) setAttributes(peer, this.conf.at);
+			this.display();
+			return peer;
+		},
+		get$style: function() {
+			return this.peer.style;
+		},
 		append: Ui_append,
 		display: function() {
 		},
@@ -100,7 +100,7 @@ function setAttributes(ele, at) {
 function Ui_to() {
 	const nodes = this.peer.childNodes;
 	if (!nodes.$to) nodes.$to = this.sys.extend(null, {
-		"@iterator": function* iterate() {
+		"symbol$iterator": function* iterate() {
 			for (let i = 0, len = nodes.length; i < len; i++) {
 				let node = nodes[i];
 				if (node.$peer) yield node.$peer;
