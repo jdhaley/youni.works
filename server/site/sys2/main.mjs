@@ -1,64 +1,44 @@
 export default function main(conf) {
 	let sys = bootSys(conf);
+	return runtimeSys(sys, conf);
+}
+
+function runtimeSys(sys, conf) {
 	let system = sys.compile(conf.packages[conf.system], conf.system);
 	sys = sys.extend(system.System, {
-		packages: sys.packages,
+		packages: sys.extend(null, {
+			[conf.system]: system
+		}),
 		symbols: sys.symbols,
 		facets: sys.facets,
 		loader: system.Loader,
 		compiler: system.Compiler
 	});
-	return initSys(sys, system, conf.system);
-}
-
-function initSys(sys, system, moduleId) {
-	sys.define(system.Object, sys.symbols.sys, sys);
-	sys.packages[moduleId] = system;
+	sys.implement(system.Object, {
+		symbol$sys: sys
+	});
 	return sys;
 }
 
 function bootSys(conf) {
-/*
- * system - The system package.
- * System - The system interface.
- * sys - the System instance.
- */
-//	Symbol.sys = conf.symbols.sys;
-//	let Obj = Object.create(null);
-//	let Instance = Object.create()
-//	let system = conf.packages[conf.system];
-//	let System = system.System;
-//	System.facets = conf.facets;
-//	System.symbols = conf.symbols;
-//	
-//	system.Object = System.extend(null, system.Object);
-//	system.Object[Symbol.sys] = System;
-//	system.Instance = System.extend(system.Object, system.Instance);
-//
-//	System = System.extend(system.Instance, System);
-////	System[Symbol.toStringTag] = "System";
 	Symbol.sys = conf.symbols.sys;
 	
 	let system = conf.packages[conf.system];
-	let System = system.System;
-	System.facets = conf.facets;
-	System.symbols = conf.symbols;
-	
-	system.Object = System.extend(null, system.Object);
-//	system.Object[Symbol.sys] = System;
-	system.Instance = System.extend(system.Object, system.Instance);
-	system.Instance[Symbol.toStringTag] = "Instance";
-	System = System.extend(system.Instance, System);
-//	System[Symbol.toStringTag] = "System";
 
-	const sys = System.extend(System, {
-		packages: System.extend(),
-		symbols: Object.freeze(System.extend(null, conf.symbols)),
-		facets: Object.freeze(System.extend(null, conf.facets)),
-		loader: System.extend(system.Instance, system.Loader),
-		compiler: System.extend(system.Instance, system.Compiler)
+	let object = Object.create(null);
+	let instance = Object.create(object);
+	let sys = system.System.extend(instance, system.System);
+	sys.facets = Object.freeze(sys.extend(null, conf.facets));
+	sys.symbols = Object.freeze(sys.extend(null, conf.symbols));
+	sys.packages = sys.extend();
+	sys.loader = sys.extend(instance, system.Loader);
+	sys.compiler = sys.extend(instance, system.Compiler);
+
+	sys.implement(instance, system.Instance);
+	sys.implement(object, system.Object);
+	sys.implement(object, {
+		symbol$sys: sys
 	});
-	Reflect.defineProperty(system.Object, Symbol.sys, {configurable: true, value: sys});
+	
 	return sys;
 }
-
