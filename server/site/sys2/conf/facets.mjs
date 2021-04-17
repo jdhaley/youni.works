@@ -4,8 +4,25 @@
 export default {
 	const:function(decl) {
 		decl.configurable = true;
-		decl.enumerable = true;
+		//Making const non-enumerable.
+		//decl.enumerable = true;
 		decl.value = decl.expr;
+		return decl;
+	},
+	var: function(decl) {
+		decl.configurable = true;
+		decl.enumerable = true;
+		decl.get = function getVar() {
+			return decl.expr;
+		}
+		decl.set = function setVar(value) {
+			Reflect.defineProperty(this, decl.name, {
+				configurable: true,
+				enumerable: true,
+				writable: true,
+				value: value
+			});
+		}
 		return decl;
 	},
 	get: function(decl) {
@@ -31,24 +48,6 @@ export default {
 		}
 		return decl;
 	},
-	var: function(decl) {
-		decl.configurable = true;
-		decl.enumerable = true;
-		decl.writable = true;
-		decl.value = decl.expr;				
-		return decl;
-	},
-//			decl.get = function getVar() {
-//				return source;
-//			}
-//			decl.set = function setVar(value) {
-//				Reflect.defineProperty(this, name, {
-//					configurable: true,
-//					enumerable: true,
-//					writable: true,
-//					value: value
-//				});
-//			}
 	once: function(decl) {
 		const source = decl.expr;
 		if (typeof source != "function") {
@@ -76,6 +75,7 @@ export default {
 	},
 	type: function(decl) {
 		if (typeof decl.expr != "string") throw new Error("type facet requires a string.");
+		decl.configurable = true;
 		decl.value = decl.sys.forName(decl.expr);
 		return decl;
 	},
