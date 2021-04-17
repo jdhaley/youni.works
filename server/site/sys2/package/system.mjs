@@ -1,6 +1,6 @@
 export default {
 	Object: {
-		symbol$sys: null				//sys - initialized by bootstrap
+		symbol$sys: null				//sys is initialized during bootstrap
 	},
 	Parcel: {
 		type$: "./Object"
@@ -125,6 +125,9 @@ export default {
 			}
 			return value;
 		},
+		statusOf: function(value) {
+			if (value && typeof value == "object") return value[Symbol.status];
+		},
 		////for compilation/////
 		declare: function(facet, name, value) {
 			return this.extend(null, {
@@ -140,9 +143,6 @@ export default {
 				if (proto == Object.prototype || proto == Array.prototype) return true;
 			}
 			return false;
-		},
-		statusOf: function(value) {
-			if (value && typeof value == "object") return value[Symbol.status];
 		},
 		compiler: {
 			construct: function(object, contextName) {
@@ -230,7 +230,6 @@ export default {
 				}
 			}
 			let target = Object.create(type || null);
-			//TODO may cause side-effects reading properties?
 			for (let name in object) {
 				if (name) sys.define(target, name, object[name]);
 			}
@@ -256,12 +255,13 @@ export default {
 //				throw new Error("Object is compiling.");
 			}
 			object[Symbol.status] = "compiling";
-			for (let name in object) {
+			//NB Don't include the prototype's enumerable properties!
+			for (let name of Object.getOwnPropertyNames(object)) {
 				if (name) this.compileProperty(object, name, contextName + "/" + name);
 			}
 			delete object[Symbol.status];
-//TODO put back in
-//			Object.freeze(object);
+			//Can't freeze object because we need to assign sys to it.
+			if (object[this.sys.symbols.type != "Object"]) Object.freeze(object);
 		},
 		compileProperty: function(object, propertyName, contextName) {
 			let value = object[propertyName];
@@ -269,7 +269,6 @@ export default {
 				case "property":
 					//Faceted properties will be defined at the end of this case.
 					//Delete the property to handle symbol facets.
-					//TODO might also eliminate side-effects of  having a the declared facet??
 					delete object[propertyName];
 					if (this.sys.statusOf(value.expr)) {
 						if (value.expr[""]) {

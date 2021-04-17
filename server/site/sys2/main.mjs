@@ -22,6 +22,7 @@ function runtimeSys(sys, conf) {
 	sys.implement(system.Object, {
 		symbol$sys: sys
 	});
+	Object.freeze(system.Object);
 	return sys;
 }
 
