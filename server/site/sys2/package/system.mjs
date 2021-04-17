@@ -40,18 +40,18 @@ export default {
 		},
 		symbols: {
 		},
-		extend: function(object, declarations) {
+		extend: function(object, decls) {
 //			if (object === undefined) object = OBJECT;
 			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || null);
-			this.implement(object, declarations);
+			this.implement(object, decls);
 			return object;
 		},
-		implement: function(object, declarations) {
-			for (let decl in declarations) {
+		implement: function(object, decls) {
+			for (let decl in decls) {
 				let facet = this.facetOf(decl);
 				let name = this.nameOf(decl);	
-				let value = declarations[decl];
+				let value = decls[decl];
 				if (name) {
 					this.define(object, name, value, facet);
 				} else {
@@ -64,34 +64,26 @@ export default {
 			if (facetName) {
 				let facet = this.facets[facetName];
 				if (!facet) {
-					throw new Error(facetName ? `Facet ${facetName} does not exist.` : `Missing Facet.`);
+					throw new Error(`Facet "${facetName}" does not exist.`);
 				}
-				decl = facet({
-					sys: this,
-					facet: facet,
-					name: name,
-					expr: value
-				});
-				name = decl.name; //In case the facet (e.g. symbol) changes it.
-//			} else if (typeof value == "function") {
-//				decl = {configurable: true, value: value};
+				decl = facet({sys: this, facet: facet, name: name, expr: value});
+				name = decl.name; //In case the facet (e.g. symbol$) changes it.
 			} else {
 				decl = {configurable: true, enumerable: true, writable: true, value: value};				
 			}
 			Reflect.defineProperty(object, name, decl);
 		},
-		facetOf: function(declaration) {
-			if (typeof declaration == "string") {
-				return declaration.indexOf("$") >= 0 ? declaration.substr(0, declaration.indexOf("$")) : "";
-			}
-			return "";
+		facetOf: function(decl) {
+			if (typeof decl == "symbol") return "";
+			decl = "" + decl;
+			let index = decl.indexOf("$");
+			return index >= 0 ? decl.substr(0, index) : "";
 		},
-		nameOf: function(declaration) {
-			if (typeof declaration == "string") {
-				if (declaration.indexOf("$") >= 0) declaration = declaration.substr(declaration.indexOf("$") + 1);
-				if (declaration.startsWith("@")) declaration = Symbol[declaration.slice(1)];
-			}
-			return declaration;
+		nameOf: function(decl) {
+			if (typeof decl == "symbol") return decl;
+			decl = "" + decl;
+			let index = decl.indexOf("$");
+			return index >= 0 ? decl.substring(index + 1) : decl;
 		},
 		forName: function(name, component) {
 			console.log(`forName("${name}")`);
