@@ -54,7 +54,7 @@ export default {
 				let value = decls[decl];
 				if (name) {
 					this.define(object, name, value, facet);
-				} else {
+				} else if (!object[Symbol.status]) {
 					console.warn("Object declaration ignored in System.implement()");
 				}
 			}
@@ -142,7 +142,7 @@ export default {
 			return false;
 		},
 		statusOf: function(value) {
-			if (value && typeof value == "object") return value[this.symbols.compile];
+			if (value && typeof value == "object") return value[Symbol.status];
 		},
 		compiler: {
 			construct: function(object, contextName) {
@@ -189,7 +189,7 @@ export default {
 			let array = sys.extend(system.Array, {
 				length: length
 			});
-			array[sys.symbols.compile] = "array";
+			array[Symbol.status] = "array";
 			for (let i = 0; i < length; i++) {
 				array[i] = this.loadValue(source[i], componentName + "/" + i);
 			}
@@ -199,7 +199,7 @@ export default {
 //			console.log("Loading " + componentName);
 			const sys = this.sys;
 			let object = sys.extend(null);
-			object[sys.symbols.compile] = "object";
+			object[Symbol.status] = "object";
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
@@ -210,7 +210,7 @@ export default {
 					}
 //					console.log("  " + (name || "[type]") + " " + facet + (facet == "type" && typeof value == "string" ? " " + value : ""));
 					value = sys.declare(facet, name, value);
-					value[sys.symbols.compile] = "property";
+					value[Symbol.status] = "property";
 				}
 				object[name] = value;
 			}
@@ -221,7 +221,7 @@ export default {
 		type$: "./Instance",
 		construct: function(object, contextName) {
 			const sys = this.sys;
-			object[sys.symbols.compile] = "constructing";
+			object[Symbol.status] = "constructing";
 			let type = object[""];
 			if (sys.statusOf(type)) {
 				type = type.expr;
@@ -234,12 +234,12 @@ export default {
 			for (let name in object) {
 				if (name) sys.define(target, name, object[name]);
 			}
-			object[sys.symbols.compile] = "constructed";
+			object[Symbol.status] = "constructed";
 			return target;
 		},
 		compileArray: function(array, contextName) {
 			const sys = this.sys;
-			array[sys.symbols.compile] = "compiling";			
+			array[Symbol.status] = "compiling";			
 			for (let i = 0; i < array.length; i++) {
 				let value = array[i];
 				if (sys.statusOf(value)) {
@@ -248,18 +248,18 @@ export default {
 					array[i] = value;
 				}
 			}
-			array[sys.symbols.compile] = "";	
+			array[Symbol.status] = "";	
 			Object.freeze(array);
 		},
 		compileProperties: function(object, contextName) {
-			if (object[this.sys.symbols.compile] == "compiling") {
+			if (object[Symbol.status] == "compiling") {
 //				throw new Error("Object is compiling.");
 			}
-			object[this.sys.symbols.compile] = "compiling";
+			object[Symbol.status] = "compiling";
 			for (let name in object) {
 				if (name) this.compileProperty(object, name, contextName + "/" + name);
 			}
-			delete object[this.sys.symbols.compile];
+			delete object[Symbol.status];
 //TODO put back in
 //			Object.freeze(object);
 		},
@@ -287,7 +287,7 @@ export default {
 						object[propertyName] = value;
 						let firstChar = propertyName.charAt(0)
 						if (firstChar.toUpperCase() == firstChar) {
-							this.sys.define(value, Symbol.toStringTag, propertyName);
+							this.sys.define(value, this.sys.symbols.type, propertyName);
 						}
 					}
 					this.compileProperties(value, contextName);

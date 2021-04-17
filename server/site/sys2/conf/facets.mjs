@@ -63,7 +63,7 @@ export default {
 		}
 		decl.get = function getOnce() {
 			//sys2 rollout 
-			if (this[this.sys.symbols.compile]) {
+			if (this[Symbol.status]) {
 				console.error("once$ called during compile.");
 				return;
 			}

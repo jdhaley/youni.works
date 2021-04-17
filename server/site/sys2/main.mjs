@@ -4,6 +4,11 @@ export default function main(conf) {
 }
 
 function runtimeSys(sys, conf) {
+	/*
+	 * The sys symbol is attached to Symbol so that Instance.get$sys can reference it.
+	 */
+	Symbol.sys = sys.symbols.sys;
+	
 	let system = sys.compile(conf.packages[conf.system], conf.system);
 	sys = sys.extend(system.System, {
 		packages: sys.extend(null, {
@@ -21,13 +26,21 @@ function runtimeSys(sys, conf) {
 }
 
 function bootSys(conf) {
-	Symbol.sys = conf.symbols.sys;
-	
+	/*
+	 * status symbol manages the compilation status and should not be defined in the
+	 * sys.symbols.
+	 */
+	Symbol.status = Symbol("status");
+
 	let system = conf.packages[conf.system];
 
 	let object = Object.create(null);
 	let instance = Object.create(object);
-	let sys = system.System.extend(instance, system.System);
+	let sys = Object.create(instance);
+
+	object[Symbol.status] = "booting";
+
+	system.System.implement(sys, system.System);
 	sys.facets = Object.freeze(sys.extend(null, conf.facets));
 	sys.symbols = Object.freeze(sys.extend(null, conf.symbols));
 	sys.packages = sys.extend();
@@ -39,6 +52,8 @@ function bootSys(conf) {
 	sys.implement(object, {
 		symbol$sys: sys
 	});
+	
+	delete object[Symbol.status];
 	
 	return sys;
 }

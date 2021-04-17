@@ -1,7 +1,5 @@
 export default {
-	name: Symbol.toStringTag,
-	iterator: Symbol.iterator,
-	sys: Symbol("sys"),
-	compile: Symbol("compile"),
-	type: Symbol("type"),
+	const$type: Symbol.toStringTag,
+	const$iterator: Symbol.iterator,
+	const$sys: Symbol("sys")
 }
