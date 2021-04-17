@@ -12,7 +12,7 @@ export default function main(conf) {
 }
 
 function initSys(sys, system, moduleId) {
-	system.Instance.sys = sys;
+	sys.define(system.Object, sys.symbols.sys, sys);
 	sys.packages[moduleId] = system;
 	return sys;
 }
@@ -23,11 +23,34 @@ function bootSys(conf) {
  * System - The system interface.
  * sys - the System instance.
  */
-
+//	Symbol.sys = conf.symbols.sys;
+//	let Obj = Object.create(null);
+//	let Instance = Object.create()
+//	let system = conf.packages[conf.system];
+//	let System = system.System;
+//	System.facets = conf.facets;
+//	System.symbols = conf.symbols;
+//	
+//	system.Object = System.extend(null, system.Object);
+//	system.Object[Symbol.sys] = System;
+//	system.Instance = System.extend(system.Object, system.Instance);
+//
+//	System = System.extend(system.Instance, System);
+////	System[Symbol.toStringTag] = "System";
+	Symbol.sys = conf.symbols.sys;
+	
 	let system = conf.packages[conf.system];
 	let System = system.System;
+	System.facets = conf.facets;
+	System.symbols = conf.symbols;
+	
+	system.Object = System.extend(null, system.Object);
+//	system.Object[Symbol.sys] = System;
+	system.Instance = System.extend(system.Object, system.Instance);
+	system.Instance[Symbol.toStringTag] = "Instance";
 	System = System.extend(system.Instance, System);
-	System[Symbol.toStringTag] = "System";
+//	System[Symbol.toStringTag] = "System";
+
 	const sys = System.extend(System, {
 		packages: System.extend(),
 		symbols: Object.freeze(System.extend(null, conf.symbols)),
@@ -35,7 +58,7 @@ function bootSys(conf) {
 		loader: System.extend(system.Instance, system.Loader),
 		compiler: System.extend(system.Instance, system.Compiler)
 	});
-	system.Instance.sys = sys;
+	Reflect.defineProperty(system.Object, Symbol.sys, {configurable: true, value: sys});
 	return sys;
 }
 

@@ -99,6 +99,8 @@ export default {
 		let symbol = typeof decl.name == "symbol" ? decl.name : decl.sys.symbols[decl.name];
 		if (!symbol) throw new Error("symbol is not defined.");
 		decl.name = symbol;
+
+		decl.configurable = true;
 		decl.value = decl.expr;
 		return decl;
 	}

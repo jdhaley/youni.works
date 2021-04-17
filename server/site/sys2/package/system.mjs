@@ -1,6 +1,6 @@
 export default {
 	Object: {
-		symbol$sys: null
+		symbol$sys: null				//sys - initialized by bootstrap
 	},
 	Parcel: {
 		type$: "./Object"
@@ -17,7 +17,9 @@ export default {
 	},
 	Instance: {
 		type$: "./Object",
-		sys: null,
+		get$sys: function() {
+			return this[Symbol.sys];	//Symbol.sys - initialized by bootstrap
+		},
 		super: function(name, ...args) {
 			const thisValue = this[name];
 			for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
@@ -70,6 +72,7 @@ export default {
 					name: name,
 					expr: value
 				});
+				name = decl.name; //In case the facet (e.g. symbol) changes it.
 //			} else if (typeof value == "function") {
 //				decl = {configurable: true, value: value};
 			} else {
@@ -272,6 +275,10 @@ export default {
 			let value = object[propertyName];
 			switch (this.sys.statusOf(value)) {
 				case "property":
+					//Faceted properties will be defined at the end of this case.
+					//Delete the property to handle symbol facets.
+					//TODO might also eliminate side-effects of  having a the declared facet??
+					delete object[propertyName];
 					if (this.sys.statusOf(value.expr)) {
 						if (value.expr[""]) {
 							value.expr = this.construct(value.expr, contextName);
@@ -281,7 +288,6 @@ export default {
 					let facet = this.sys.facets[value.facet];
 					value = facet(value);
 					Reflect.defineProperty(object, value.name, value);
-					//TODO if the facet is a symbol$, need to delete the decl from the loaded object.
 					return;
 				case "object":
 					if (value[""]) {
