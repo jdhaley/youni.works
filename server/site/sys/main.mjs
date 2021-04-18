@@ -4,15 +4,16 @@ export default function main(conf) {
 }
 
 function runtimeSys(sys, conf) {
+	let module = conf.module;
 	/*
 	 * The sys symbol is attached to Symbol so that Instance.get$sys can reference it.
 	 */
 	Symbol.sys = sys.symbols.sys;
 	
-	let system = sys.compile(conf.packages[conf.system], conf.system);
+	let system = sys.compile(module.package, module.id);
 	sys = sys.extend(system.System, {
 		packages: sys.extend(null, {
-			[conf.system]: system
+			[module.id]: system
 		}),
 		symbols: sys.symbols,
 		facets: sys.facets,
@@ -27,13 +28,14 @@ function runtimeSys(sys, conf) {
 }
 
 function bootSys(conf) {
+	let module = conf.module;
 	/*
 	 * status symbol manages the compilation status and should not be defined in the
 	 * sys.symbols.
 	 */
 	Symbol.status = Symbol("status");
 
-	let system = conf.packages[conf.system];
+	let system = module.package;
 
 	let object = Object.create(null);
 	let instance = Object.create(object);

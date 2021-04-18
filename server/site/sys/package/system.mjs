@@ -303,6 +303,37 @@ export default {
 					return;
 			}
 		}
+	},
+	Module: {
+		type$: "./Instance",
+		id: "",
+		version: "",
+		moduleType: "",
+		compile: function() {
+			let sys = this.sys;
+			let target;
+			if (!this.packages && this.package) {
+				console.debug(`Compiling "${this.id}"...`);
+				target = sys.compile(this.package, this.id);
+				sys.define(this, "package", target);
+				sys.packages[this.id] = target;
+				console.debug("Compiled.");
+			} else {
+				target = sys.extend();
+				//Need to define the module packages here to support in-module package deps.
+				sys.packages[this.id] = target;
+				for (let name in this.packages) {
+					let ctxName = this.id + "/" + name;
+					let pkg = this.packages[name];
+					console.debug(`Compiling "${ctxName}"...`);
+					target[name] = sys.compile(pkg, ctxName);
+					console.debug("Compiled.");
+				}
+				sys.define(this, "packages", target);				
+			}
+			Object.freeze(this);
+			console.debug(this);
+		}
 	}
 }
 //Interface: {

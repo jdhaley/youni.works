@@ -1,5 +1,6 @@
 export default {
 	const$type: Symbol.toStringTag,
 	const$iterator: Symbol.iterator,
-	const$sys: Symbol("sys")
+	const$sys: Symbol("sys"),
+	const$observers: Symbol("observers")
 }
