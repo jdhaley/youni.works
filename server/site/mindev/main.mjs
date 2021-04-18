@@ -1,16 +1,6 @@
 let frame;
-export default function main(sys, conf) {
-	sys.packages[conf.base] = sys.extend();
-	let base = conf.packages[conf.base];
-	for (let pkg in base) {
-		let ctx = `${conf.base}/${pkg}`;
-		console.log(`Compiling "${ctx}"...`)
-		sys.packages[conf.base][pkg] = sys.compile(base[pkg], ctx);
-		console.log("Compiled.");
-	}
-
-//conf = sys.load(conf);
-	frame = sys.extend(sys.forName("base.youni.works/view/Frame"), {
+export default function main(conf) {
+	frame = conf.sys.extend(conf.sys.forName("ui.youni.works/view/Frame"), {
 		window: window,
 		events: conf.app.events,
 		editors: conf.app.editors

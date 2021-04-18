@@ -86,7 +86,7 @@ export default {
 			return index >= 0 ? decl.substring(index + 1) : decl;
 		},
 		forName: function(name, component) {
-			console.log(`forName("${name}")`);
+			//console.log(`forName("${name}")`);
 			if (arguments.length < 2) {
 				component = this.packages;
 			}
@@ -107,7 +107,7 @@ export default {
 				}
 				component = component[prop];
 			}
-			console.log(`got forName("${name}")`, component);
+			//console.log(`got forName("${name}")`, component);
 			return component;
 		},
 		compile: function(value, contextName) {

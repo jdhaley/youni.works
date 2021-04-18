@@ -36,7 +36,7 @@ const pvt = {
 export default {
 	private: pvt,
 	use: {
-		type$view: "base.youni.works/view",
+		type$view: "ui.youni.works/view",
 		type$command: "base.youni.works/command"
 	},
 	DrawCommand: {

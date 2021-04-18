@@ -51,7 +51,7 @@ export default {
 				event && up(on, event);
 			},
 			notify: function(on, signal) {
-				const OBSERVERS = this.sys.symbols.observers;
+				const OBSERVERS = on.sys.symbols.observers;
 				let model = signal.model || on.model;
 				let observers = model && model[OBSERVERS];
 				if (!observers) return;

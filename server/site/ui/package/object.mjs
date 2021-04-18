@@ -1,6 +1,6 @@
 export default {
 	use: {
-		type$view: "base.youni.works/view"
+		type$view: "ui.youni.works/view"
 	},
 	Property: {
 		super$: "./use/view/View",
@@ -128,7 +128,7 @@ function isLowerCase(str)
 function displayProperties(on, properties) {
 	if (!properties) return;
 	for (let propConf of properties) {
-		let propType = propConf.controlType || "base.youni.works/object/Property";
+		let propType = propConf.controlType || "ui.youni.works/object/Property";
 		let prop = on.owner.create(propType, propConf);
 		on.sys.define(prop, "object", on);
 		on.append(prop);
