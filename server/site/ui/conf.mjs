@@ -1,7 +1,7 @@
 import module from "./module.mjs";
-import sys from "../sys/index.mjs";
+import system from "../sys/index.mjs";
 
 export default {
-	sys: sys,
+	sys: system.sys,
 	module: module
 }

@@ -196,7 +196,6 @@ export default {
 			return array;
 		},
 		loadObject: function(source, componentName) {
-//			console.log("Loading " + componentName);
 			const sys = this.sys;
 			let object = sys.extend(null);
 			object[Symbol.status] = "object";
@@ -206,9 +205,8 @@ export default {
 				let value = this.loadValue(source[decl], componentName + "/" + name);
 				if (facet) {
 					if (facet == "type" && typeof value == "string") {
-						console.log(componentName + "/" + name + " --> " + value);
+						console.info(componentName + "/" + name + " --> " + value);
 					}
-//					console.log("  " + (name || "[type]") + " " + facet + (facet == "type" && typeof value == "string" ? " " + value : ""));
 					value = sys.declare(facet, name, value);
 					value[Symbol.status] = "property";
 				}

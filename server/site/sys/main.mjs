@@ -1,12 +1,19 @@
 export default function main(conf) {
+	let module = conf.module;
 	let sys = bootSys(conf);
-	return runtimeSys(sys, conf);
+	sys = runtimeSys(sys, conf);
+	module = sys.extend("system.youni.works/Module", module);
+	//Don't compile the module.
+	sys.define(module, "packages", sys.packages, "const");
+	return module;
 }
 
 function runtimeSys(sys, conf) {
 	let module = conf.module;
 	/*
-	 * The sys symbol is attached to Symbol so that Instance.get$sys can reference it.
+	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
+	 * code. (Otherwise you need a sys reference to get sys.symbols).
+	 * As a minimum, Instance.get$sys uses it.
 	 */
 	Symbol.sys = sys.symbols.sys;
 	
@@ -20,6 +27,8 @@ function runtimeSys(sys, conf) {
 		loader: system.Loader,
 		compiler: system.Compiler
 	});
+	//If we move to module.compile() for sys we need to make sure
+	//that the following is executed when module.type == "system".
 	sys.implement(system.Object, {
 		symbol$sys: sys
 	});
