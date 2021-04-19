@@ -30,10 +30,37 @@ export default {
 				}
 			}
 			throw new Error(`super "${name}" is not a method.`);
+		},
+		extend: function(decls) {
+			return this.sys.extend(this, decls);
+		},
+		implement: function(decls) {
+			return this.sys.implement(this, decls);
+		},
+		define: function(name, value, facetName) {
+			return this.sys.define(this, name, value, facetName);
+		},
+		toString: function() {
+			return Object.prototype.toString.call(this);
 		}
 	},
+	//This is the public interface of System.
+	Engine: {
+		type$: "./Object",
+		extend: function(object, decls) {
+			return null;
+		},
+		implement: function(object, decls) {
+		},
+		define: function(object, name, value, facetName) {
+		},
+		forName: function(name, component) {
+			return null;
+		}
+	},
+	//Implementation follows...
 	System: {
-		type$: "./Instance",
+		type$: "./Engine",
 		packages: {
 		},
 		facets: {
@@ -205,7 +232,7 @@ export default {
 				let value = this.loadValue(source[decl], componentName + "/" + name);
 				if (facet) {
 					if (facet == "type" && typeof value == "string") {
-						console.info(componentName + "/" + name + " --> " + value);
+						console.debug(componentName + "/" + name + " --> " + value);
 					}
 					value = sys.declare(facet, name, value);
 					value[Symbol.status] = "property";
@@ -315,7 +342,7 @@ export default {
 				target = sys.compile(this.package, this.id);
 				sys.define(this, "package", target);
 				sys.packages[this.id] = target;
-				console.debug("Compiled.");
+				console.debug(`Compiled "${this.id}".`);
 			} else {
 				target = sys.extend();
 				//Need to define the module packages here to support in-module package deps.
@@ -325,12 +352,12 @@ export default {
 					let pkg = this.packages[name];
 					console.debug(`Compiling "${ctxName}"...`);
 					target[name] = sys.compile(pkg, ctxName);
-					console.debug("Compiled.");
+					console.debug(`Compiled "${ctxName}".`);
 				}
 				sys.define(this, "packages", target);				
 			}
 			Object.freeze(this);
-			console.debug(this);
+			console.info("Loaded", this);
 		}
 	}
 }
