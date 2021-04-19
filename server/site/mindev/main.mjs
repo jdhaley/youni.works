@@ -1,6 +1,7 @@
 let frame;
 export default function main(conf) {
-	frame = conf.sys.extend(conf.sys.forName("ui.youni.works/view/Frame"), {
+	let sys = conf.system.sys;
+	frame = sys.extend("ui.youni.works/view/Frame", {
 		window: window,
 		events: conf.app.events,
 		editors: conf.app.editors

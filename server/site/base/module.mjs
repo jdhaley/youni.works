@@ -1,4 +1,4 @@
-import system from "../sys/index.mjs";
+import system from "../system/index.mjs";
 import util from "./package/util.mjs";
 import command from "./package/command.mjs";
 import control from "./package/control.mjs";
