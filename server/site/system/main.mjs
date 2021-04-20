@@ -1,50 +1,44 @@
 export default function main(conf) {
-	let module = conf.module;
 	let sys = bootSys(conf);
 	sys = runtimeSys(sys, conf);
-	module = sys.extend("/system.youni.works/Module", module);
-	//Don't compile the module.
-	sys.define(module, "packages", sys.packages, "const");
+	let module = conf.module;
+	module = sys.extend("/system.youni.works/engine/Module", module);
+	module.compile();
+	let object = module.packages.core.Object;
+	sys.define(object, sys.symbols.sys, sys);
+	Object.freeze(object);
 	return module;
 }
 
 function runtimeSys(sys, conf) {
 	let module = conf.module;
-	/*
-	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
-	 * code. (Otherwise you need a sys reference to get sys.symbols).
-	 * As a minimum, Instance.get$sys uses it.
-	 */
-	Symbol.sys = sys.symbols.sys;
-	
-	let system = sys.compile(module.package, module.id);
-	sys = sys.extend(system.System, {
+	module = sys.extend(module.packages.engine.Module, module);
+	sys.define(module, "sys", sys);
+	module.compile();
+	sys = sys.extend("/system.youni.works/engine/Engine", {
 		packages: sys.extend(null, {
-			[module.id]: system
+			[module.id]: module.packages
 		}),
 		symbols: sys.symbols,
-		facets: sys.facets,
-		loader: system.Loader,
-		compiler: system.Compiler
+		facets: sys.facets
 	});
-	//If we move to module.compile() for sys we need to make sure
-	//that the following is executed when module.type == "system".
-	sys.implement(system.Object, {
-		symbol$sys: sys
-	});
-	Object.freeze(system.Object);
+	// core/Object references the system...
+	let object = sys.forName("/system.youni.works/core/Object")
+	sys.define(object, sys.symbols.sys, sys);
+	Object.freeze(object);
 	return sys;
 }
 
 function bootSys(conf) {
-	let module = conf.module;
 	/*
 	 * status symbol manages the compilation status and should not be defined in the
 	 * sys.symbols.
 	 */
 	Symbol.status = Symbol("status");
 
-	let system = module.package;
+	let module = conf.module;
+	let core = module.packages.core;
+	let engine = module.packages.engine;
 
 	let object = Object.create(null);
 	object[Symbol.status] = "booting";
@@ -52,22 +46,29 @@ function bootSys(conf) {
 	let instance = Object.create(object);
 	let sys = Object.create(instance);
 
-	system.System.implement(sys, system.System);
+	engine.Engine.implement(sys, engine.Engine);
 	sys.implement(sys, {
 		facets: Object.freeze(sys.extend(null, conf.facets))
 	});
 	sys.implement(sys, {
 		symbols: Object.freeze(sys.extend(null, conf.symbols)),
 		packages: sys.extend(),
-		loader: sys.extend(instance, system.Loader),
-		compiler: sys.extend(instance, system.Compiler)	
+		loader: sys.extend(instance, engine.Loader),
+		compiler: sys.extend(instance, engine.Compiler)	
 	});
 
-	sys.implement(instance, system.Instance);
-	sys.implement(object, system.Object);
+	sys.implement(object, core.Object);
 	sys.implement(object, {
 		symbol$sys: sys
 	});
+	/*
+	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
+	 * code. (Otherwise you need a sys reference to get sys.symbols).
+	 * As a minimum, Instance.get$sys uses it.
+	 */
+	Symbol.sys = sys.symbols.sys;
+
+	sys.implement(instance, core.Instance);
 	
 	delete object[Symbol.status];
 	

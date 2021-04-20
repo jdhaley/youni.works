@@ -1,5 +1,5 @@
 export default {
-	type$: "/system.youni.works",
+	type$: "/system.youni.works/core",
 	Component: {
 		type$: "Instance",
 		super: function(name, ...args) {

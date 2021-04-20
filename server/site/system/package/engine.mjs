@@ -1,46 +1,7 @@
 export default {
-	Object: {
-		symbol$sys: null				//sys is initialized during bootstrap
-	},
-	Parcel: {
-		type$: "Object"
-	},
-	Record: {
-		type$: "Object"
-	},
-	Array: {
-		type$: "Object",
-		length: 0,
-		symbol$iterator: function *() {
-			for (let i = 0; i < this.length; i++) yield this[i];
-		}
-	},
-	Instance: {
-		type$: "Object",
-		get$sys: function() {
-			return this[Symbol.sys];	//Symbol.sys - initialized by bootstrap
-		},
-		toString: function() {
-			return Object.prototype.toString.call(this);
-		}
-	},
-	//This is the public interface of System.
+	type$: "/system.youni.works/core",
 	Engine: {
-		type$: "Object",
-		extend: function(object, decls) {
-			return null;
-		},
-		implement: function(object, decls) {
-		},
-		define: function(object, name, value, facetName) {
-		},
-		forName: function(name, component) {
-			return null;
-		}
-	},
-	//Implementation follows...
-	System: {
-		type$: "Engine",
+		type$: "System",
 		packages: {
 		},
 		facets: {
@@ -68,7 +29,7 @@ export default {
 				if (name) {
 					this.define(object, name, value, facet);
 				} else if (!object[Symbol.status]) {
-					console.warn("Object declaration ignored in System.implement()");
+					console.warn("Object declaration ignored in Engine.implement()");
 				}
 			}
 		},
@@ -175,7 +136,7 @@ export default {
 		loadArray: function(source, componentName) {
 			const sys = this.sys;
 			let length = source.length;
-			let array = sys.extend("/system.youni.works/Array", {
+			let array = sys.extend("/system.youni.works/core/Array", {
 				length: length
 			});
 			array[Symbol.status] = "array";
@@ -304,27 +265,19 @@ export default {
 		moduleType: "",
 		compile: function() {
 			let sys = this.sys;
-			let target;
-			if (!this.packages && this.package) {
-				console.debug(`Compiling "${this.id}"...`);
-				target = sys.compile(this.package, this.id);
-				sys.define(this, "package", target);
-				sys.packages[this.id] = target;
-				console.debug(`Compiled "${this.id}".`);
-			} else {
-				target = sys.extend();
-				//Need to define the module packages here to support in-module package deps.
-				sys.packages[this.id] = target;
-				for (let name in this.packages) {
-					let ctxName = this.id + "/" + name;
-					let pkg = this.packages[name];
-					console.debug(`Compiling "${ctxName}"...`);
-					target[name] = sys.compile(pkg, ctxName);
-					console.debug(`Compiled "${ctxName}".`);
-				}
-				sys.define(this, "packages", target);				
+			let target = sys.extend();
+			//Need to define the module packages here to support in-module package deps.
+			sys.packages[this.id] = target;
+			for (let name in this.packages) {
+				let ctxName = this.id + "/" + name;
+				let pkg = this.packages[name];
+				console.debug(`Compiling "${ctxName}"...`);
+				pkg = sys.compile(pkg, ctxName);
+				target[name] = pkg;
+				console.debug(`Compiled "${ctxName}".`);
 			}
-			Object.freeze(this);
+			sys.define(this, "packages", target);				
++			Object.freeze(this);
 			console.info("Loaded", this);
 		}
 	}

@@ -1,6 +1,7 @@
 export default {
+	type$core: "/system.youni.works/core",
 	Command: {
-		type$: "/system.youni.works/Instance",
+		type$: "core/Instance",
 		type$prior: "Command",
 		type$next: "Command",
 		exec: function() {
@@ -15,7 +16,7 @@ export default {
 		}
 	},
 	Commands: {
-		type$: "/system.youni.works/Instance",
+		type$: "core/Instance",
 		type$lastCommand: "Command",
 		undo: function() {
 			let command = this.lastCommand;
