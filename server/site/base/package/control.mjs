@@ -1,7 +1,7 @@
 export default {
 	Control: {
-		type$: "system.youni.works/Instance",
-		conf: Object.freeze(Object.create(null)),
+		type$: "base.youni.works/component/Component",
+		type$conf: "system.youni.works/Record",
 		type$owner: "./Owner",
 		to: Object.freeze([]),
 		append: function(control) {
