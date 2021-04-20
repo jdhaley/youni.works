@@ -1,9 +1,7 @@
 export default {
-	use: {
-		type$control: "/base.youni.works/control",
-	},
+	type$: "/base.youni.works/control",
 	View: {
-		type$: "use/control/Control",
+		type$: "Control",
 		type$owner: "Frame",
 		once$to: Ui_to,
 		get$peer: function() {
@@ -29,7 +27,7 @@ export default {
 		}
 	},
 	Frame: {
-		type$: "use/control/Owner",
+		type$: "Owner",
 		owner: null,
 		get$to: Ui_to,
 		append: Ui_append,

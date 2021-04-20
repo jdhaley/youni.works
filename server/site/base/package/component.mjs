@@ -1,6 +1,7 @@
 export default {
+	type$: "/system.youni.works",
 	Component: {
-		type$: "/system.youni.works/Instance",
+		type$: "Instance",
 		super: function(name, ...args) {
 			const thisValue = this[name];
 			for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {

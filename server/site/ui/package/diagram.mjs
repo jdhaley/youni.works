@@ -34,13 +34,11 @@ const pvt = {
 	}
 }
 export default {
+	type$: "/ui.youni.works/view",
+	type$command: "/base.youni.works/command",
 	private: pvt,
-	use: {
-		type$view: "/ui.youni.works/view",
-		type$command: "/base.youni.works/command"
-	},
 	DrawCommand: {
-		type$: "use/command/Command",
+		type$: "command/Command",
 		title: "Move/Size Shape",
 		control: null,
 		before: null,
@@ -71,12 +69,12 @@ export default {
 		}
 	},
 	Diagram: {
-		type$: "use/view/View",
+		type$: "View",
 		use: {
 			type$Shape: "Shape",
-			type$Commands: "use/command/Commands"
+			type$Commands: "command/Commands"
 		},
-		type$commands: "use/command/Commands",
+		type$commands: "command/Commands",
 		start: function(conf) {
 			if (conf) this.sys.define(this, "conf", conf);
 			this.sys.define(this, "commands", this.use.Commands.instance());			
@@ -123,7 +121,7 @@ export default {
 		}
 	},
 	Shape: {
-		type$: "use/view/View",
+		type$: "View",
 		use: {
 			type$DrawCommand: "DrawCommand"
 		},
@@ -279,7 +277,7 @@ export default {
 		}
 	},
 	Text: {
-		type$: "use/view/View",
+		type$: "View",
 		bind: function(model) {
 			this.model = model;
 		},
@@ -303,6 +301,6 @@ export default {
 		}
 	},
 	Connector: {
-		type$: "use/view/View"
+		type$: "View"
 	}
 }

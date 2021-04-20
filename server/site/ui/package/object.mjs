@@ -1,9 +1,7 @@
 export default {
-	use: {
-		type$view: "/ui.youni.works/view"
-	},
+	type$: "/ui.youni.works/view",
 	Property: {
-		super$: "use/view/View",
+		super$: "View",
 		type$object: "Properties",
 		conf: {
 			name: "",
@@ -48,7 +46,7 @@ export default {
 		}
 	},
 	Properties: {
-		type$: "use/view/View",
+		type$: "View",
 		displayType: "sheet",
 		conf: {
 			name: "Object",
