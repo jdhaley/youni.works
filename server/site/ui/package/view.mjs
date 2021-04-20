@@ -1,10 +1,10 @@
 export default {
 	use: {
-		type$control: "base.youni.works/control",
+		type$control: "/base.youni.works/control",
 	},
 	View: {
-		type$: "./use/control/Control",
-		type$owner: "./Frame",
+		type$: "use/control/Control",
+		type$owner: "Frame",
 		once$to: Ui_to,
 		get$peer: function() {
 			let peer = this.owner.createNode(this.conf.tag || "div");
@@ -29,7 +29,7 @@ export default {
 		}
 	},
 	Frame: {
-		type$: "./use/control/Owner",
+		type$: "use/control/Owner",
 		owner: null,
 		get$to: Ui_to,
 		append: Ui_append,

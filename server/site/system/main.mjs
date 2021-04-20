@@ -2,7 +2,7 @@ export default function main(conf) {
 	let module = conf.module;
 	let sys = bootSys(conf);
 	sys = runtimeSys(sys, conf);
-	module = sys.extend("system.youni.works/Module", module);
+	module = sys.extend("/system.youni.works/Module", module);
 	//Don't compile the module.
 	sys.define(module, "packages", sys.packages, "const");
 	return module;

@@ -1,6 +1,6 @@
 export default {
 	Remote: {
-		type$: "system.youni.works/Instance",
+		type$: "/system.youni.works/Instance",
 		method: "HEAD",
 		url: "",
 		service: function(receiver, subject, request) {

@@ -1,8 +1,8 @@
 export default {
 	Control: {
-		type$: "base.youni.works/component/Component",
-		type$conf: "system.youni.works/Record",
-		type$owner: "./Owner",
+		type$: "/base.youni.works/component/Component",
+		type$conf: "/system.youni.works/Record",
+		type$owner: "Owner",
 		to: Object.freeze([]),
 		append: function(control) {
 			this.to.push(control);
@@ -66,8 +66,8 @@ export default {
 		}
 	},
 	Owner: {
-		type$: "./Control",
-		type$remote: "base.youni.works/util/Remote",
+		type$: "Control",
+		type$remote: "/base.youni.works/util/Remote",
 		open: function(pathname, receiver) {
 			this.remote.service(receiver, "opened", {
 				url: pathname,

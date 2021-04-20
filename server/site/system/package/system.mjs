@@ -3,20 +3,20 @@ export default {
 		symbol$sys: null				//sys is initialized during bootstrap
 	},
 	Parcel: {
-		type$: "./Object"
+		type$: "Object"
 	},
 	Record: {
-		type$: "./Object"
+		type$: "Object"
 	},
 	Array: {
-		type$: "./Object",
+		type$: "Object",
 		length: 0,
 		symbol$iterator: function *() {
 			for (let i = 0; i < this.length; i++) yield this[i];
 		}
 	},
 	Instance: {
-		type$: "./Object",
+		type$: "Object",
 		get$sys: function() {
 			return this[Symbol.sys];	//Symbol.sys - initialized by bootstrap
 		},
@@ -26,7 +26,7 @@ export default {
 	},
 	//This is the public interface of System.
 	Engine: {
-		type$: "./Object",
+		type$: "Object",
 		extend: function(object, decls) {
 			return null;
 		},
@@ -40,9 +40,7 @@ export default {
 	},
 	//Implementation follows...
 	System: {
-		type$: "./Engine",
-		types: {
-		},
+		type$: "Engine",
 		packages: {
 		},
 		facets: {
@@ -53,8 +51,8 @@ export default {
 		},
 		symbols: {
 		},
-		type$compiler: "./Compiler",
-		type$loader: "./Loader",
+		type$compiler: "Compiler",
+		type$loader: "Loader",
 		extend: function(object, decls) {
 //			if (object === undefined) object = OBJECT;
 			if (typeof object == "string") object = this.forName(object);
@@ -88,12 +86,17 @@ export default {
 			}
 			Reflect.defineProperty(object, name, decl);
 		},
-		forName: function(name, component) {
+		forName: function(name) {
 			//console.log(`forName("${name}")`);
-			if (arguments.length < 2) {
-				component = this.packages;
-			}
+			name = "" + (name || ""); //coerce/guard name arg.
+			let component = this.packages;
 			let context = "";
+			if (name.startsWith("/")) {
+				name = name.substring(1);
+				context = "/";
+			} else {
+				component = component["."];
+			}
 			let path = name.split("/");
 			for (let prop of path) {
 				if (typeof component != "object") {
@@ -147,7 +150,7 @@ export default {
 		}
 	},
 	Loader: {
-		type$: "./Instance",
+		type$: "Instance",
 		declare: function(facet, name, value) {
 			return this.sys.extend(null, {
 				sys: this.sys,
@@ -171,9 +174,8 @@ export default {
 		},
 		loadArray: function(source, componentName) {
 			const sys = this.sys;
-			let system = sys.forName("system.youni.works");
 			let length = source.length;
-			let array = sys.extend(system.Array, {
+			let array = sys.extend("/system.youni.works/Array", {
 				length: length
 			});
 			array[Symbol.status] = "array";
@@ -203,7 +205,7 @@ export default {
 		}
 	},
 	Compiler: {
-		type$: "./Instance",
+		type$: "Instance",
 		construct: function(object, contextName) {
 			const sys = this.sys;
 			object[Symbol.status] = "constructing";
@@ -290,13 +292,13 @@ export default {
 		}
 	},
 	Declaration: {
-		type$: "./Instance",
+		type$: "Instance",
 		facet: "",
 		name: "",
 		expr: undefined
 	},
 	Module: {
-		type$: "./Instance",
+		type$: "Instance",
 		id: "",
 		version: "",
 		moduleType: "",

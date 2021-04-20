@@ -1,8 +1,8 @@
 export default {
 	Command: {
-		type$: "system.youni.works/Instance",
-		type$prior: "./Command",
-		type$next: "./Command",
+		type$: "/system.youni.works/Instance",
+		type$prior: "Command",
+		type$next: "Command",
 		exec: function() {
 		},
 		undo: function() {
@@ -15,8 +15,8 @@ export default {
 		}
 	},
 	Commands: {
-		type$: "system.youni.works/Instance",
-		type$lastCommand: "./Command",
+		type$: "/system.youni.works/Instance",
+		type$lastCommand: "Command",
 		undo: function() {
 			let command = this.lastCommand;
 			if (!command.prior) return;
@@ -43,7 +43,7 @@ export default {
 		}
 	},
 	BatchCommand: {
-		type$: "./Command",
+		type$: "Command",
 		commands: null,
 		undo: function() {
 			//To undo a batch, each command must be done in reverse order.
