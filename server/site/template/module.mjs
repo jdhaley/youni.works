@@ -1,7 +1,7 @@
 import ui from "../ui/index.mjs";
 
 export default {
-	id: "app.youni.works",
+	id: "template.youni.works",
 	version: "1",
 	moduleType: "ui",
 	uses: [ui]

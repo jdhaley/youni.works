@@ -252,6 +252,11 @@ export default {
 			}
 		}
 	},
+	Interface: {
+		type$: "Instance",
+		properties: {
+		}
+	},
 	Declaration: {
 		type$: "Instance",
 		facet: "",
@@ -263,6 +268,9 @@ export default {
 		id: "",
 		version: "",
 		moduleType: "",
+		uses: [],
+		packages: {
+		},
 		compile: function() {
 			let sys = this.sys;
 			let target = sys.extend();
@@ -277,7 +285,7 @@ export default {
 				console.debug(`Compiled "${ctxName}".`);
 			}
 			sys.define(this, "packages", target);				
-+			Object.freeze(this);
+			Object.freeze(this);
 			console.info("Loaded", this);
 		}
 	}
