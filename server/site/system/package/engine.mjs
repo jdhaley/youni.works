@@ -2,6 +2,9 @@ export default {
 	type$: "/system.youni.works/core",
 	Engine: {
 		type$: "System",
+		use: {
+			type$Object: "Object"
+		},
 		packages: {
 		},
 		facets: {
@@ -15,14 +18,14 @@ export default {
 		type$compiler: "Compiler",
 		type$loader: "Loader",
 		extend: function(object, decls) {
-//			if (object === undefined) object = OBJECT;
+			if (object === undefined) object = this.use.Object;
 			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || null);
 			this.implement(object, decls);
 			return object;
 		},
 		implement: function(object, decls) {
-			for (let decl in decls) {
+			if (decls && typeof decls == "object") for (let decl of Object.getOwnPropertyNames(decls)) {
 				let facet = this.facetOf(decl);
 				let name = this.nameOf(decl);
 				let value = decls[decl];
@@ -35,6 +38,10 @@ export default {
 					console.warn("Object declaration ignored in Engine.implement()");
 				}
 			}
+			if (decls && typeof decls == "object") for (let symbol of Object.getOwnPropertySymbols(decls)) {
+				this.define(object, symbol, decls[symbol]);				
+			}
+			
 		},
 		define: function(object, name, value, facetName) {
 			let decl;
@@ -123,8 +130,9 @@ export default {
 				sys: this.sys,
 				facet: facet,
 				name: name,
-				expr: value
-			});			
+				expr: value,
+				[Symbol.status]: "property"
+			});
 		},
 		loadValue: function(value, componentName) {
 			if (this.sys.statusOf(value)) throw new Error("Possible recursion.");
@@ -135,6 +143,8 @@ export default {
 					value = this.loadArray(value, componentName);
 				} else if (proto == Object.prototype) {
 					value = this.loadObject(value, componentName);
+				} else if (proto == Function.prototype && value.name == "expr$") {
+					value[Symbol.status] = "expr";
 				}
 			}
 			return value;
@@ -164,7 +174,6 @@ export default {
 						console.debug(componentName + "/" + name + " --> " + value);
 					}
 					value = this.declare(facet, name, value);
-					value[Symbol.status] = "property";
 				}
 				object[name] = value;
 			}
@@ -244,6 +253,9 @@ export default {
 					return;
 				case "array":
 					this.compileArray(value);
+					return;
+				case "expr":
+					value.call(this, object, propertyName);
 					return;
 				case "compiling":
 				case "":
