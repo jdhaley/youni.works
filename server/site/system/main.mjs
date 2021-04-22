@@ -1,32 +1,33 @@
 export default function main(conf) {
 	let sys = bootSys(conf);
-	sys = runtimeSys(sys, conf);
-	let module = conf.module;
-	module = sys.extend("/system.youni.works/engine/Module", module);
-	module.compile();
-	let object = module.packages.core.Object;
-	sys.define(object, sys.symbols.sys, sys);
-	Object.freeze(object);
-	return module;
+	return system(sys, conf);
 }
 
-function runtimeSys(sys, conf) {
+function system(sys, conf) {
 	let module = conf.module;
-	module = sys.extend(module.packages.engine.Module, module);
-	sys.define(module, "sys", sys);
-	module.compile();
-	sys = sys.extend("/system.youni.works/engine/Engine", {
-		packages: sys.extend(null, {
-			[module.id]: module.packages
-		}),
+	let target = sys.extend();
+	sys.packages[module.id] = target;
+
+	target.core = sys.compile(module.packages.core, module.id + "/core");
+	sys.define(target.core.Object, sys.symbols.sys, sys);
+	target.engine = sys.compile(module.packages.engine, module.id + "/engine");
+	sys = sys.extend(target.engine.Engine, {
+		packages: sys.packages,
 		symbols: sys.symbols,
 		facets: sys.facets
 	});
-	// core/Object references the system...
-	let object = sys.forName("/system.youni.works/core/Object")
-	sys.define(object, sys.symbols.sys, sys);
-	Object.freeze(object);
-	return sys;
+	/*
+	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
+	 * code. (Otherwise you need a sys reference to get sys.symbols).
+	 * As a minimum, Instance.get$sys uses it.
+	 */
+	Symbol.sys = sys.symbols.sys;
+	sys.define(target.core.Object, sys.symbols.sys, sys);
+	Object.freeze(target.core.Object);
+	module.packages = target;
+	module = sys.extend(target.engine.Module, module);
+	sys.define(module, "packages", target);
+	return Object.freeze(module);
 }
 
 function bootSys(conf) {
@@ -36,41 +37,27 @@ function bootSys(conf) {
 	 */
 	Symbol.status = Symbol("status");
 
-	let module = conf.module;
-	let core = module.packages.core;
-	let engine = module.packages.engine;
-
-	let object = Object.create(null);
-	object[Symbol.status] = "booting";
-
-	let instance = Object.create(object);
-	let sys = Object.create(instance);
-
-	engine.Engine.implement(sys, engine.Engine);
-	sys.implement(sys, {
-		facets: Object.freeze(sys.extend(null, conf.facets))
-	});
-	sys.implement(sys, {
-		symbols: Object.freeze(sys.extend(null, conf.symbols)),
-		packages: sys.extend(),
-		loader: sys.extend(instance, engine.Loader),
-		compiler: sys.extend(instance, engine.Compiler)	
-	});
-
-	sys.implement(object, core.Object);
-	sys.implement(object, {
-		symbol$sys: sys
-	});
-	/*
-	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
-	 * code. (Otherwise you need a sys reference to get sys.symbols).
-	 * As a minimum, Instance.get$sys uses it.
-	 */
-	Symbol.sys = sys.symbols.sys;
-
-	sys.implement(instance, core.Instance);
+	let engine = conf.module.packages.engine;
+	let Instance = Object.create(null);
 	
-	delete object[Symbol.status];
+	Instance.sys = Object.create(Instance);
+	implement(Instance.sys, engine.Engine);
+	implement(Instance.sys, {
+		facets: implement(Object.create(null), conf.facets),
+		symbols: implement(Object.create(null), conf.symbols),
+		packages: Object.create(null),
+		loader: implement(Object.create(Instance), engine.Loader),
+		compiler: implement(Object.create(Instance), engine.Compiler)
+	});
 	
-	return sys;
+	return Instance.sys;
+}
+
+function implement(object, decls) {
+	for (let decl in decls) {
+		if (decl.indexOf("$") < 0) {
+			object[decl] = decls[decl];
+		}
+	}
+	return object;
 }

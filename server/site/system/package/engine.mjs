@@ -24,8 +24,11 @@ export default {
 		implement: function(object, decls) {
 			for (let decl in decls) {
 				let facet = this.facetOf(decl);
-				let name = this.nameOf(decl);	
+				let name = this.nameOf(decl);
 				let value = decls[decl];
+				if (value && typeof value == "object" && Object.getPrototypeOf(value) == Object.prototype) {
+					console.warn("Source object specified in implement():", value);
+				}
 				if (name) {
 					this.define(object, name, value, facet);
 				} else if (!object[Symbol.status]) {
@@ -90,6 +93,9 @@ export default {
 			decl = "" + decl;
 			let index = decl.indexOf("$");
 			return index >= 0 ? decl.substring(index + 1) : decl;
+		},
+		load: function(value, contextName) {
+			
 		},
 		compile: function(value, contextName) {
 			if (this.packages["."]) {
@@ -199,16 +205,13 @@ export default {
 			Object.freeze(array);
 		},
 		compileProperties: function(object, contextName) {
-			if (object[Symbol.status] == "compiling") {
-//				throw new Error("Object is compiling.");
-			}
 			object[Symbol.status] = "compiling";
 			//NB Don't include the prototype's enumerable properties!
 			for (let name of Object.getOwnPropertyNames(object)) {
 				if (name) this.compileProperty(object, name, contextName + "/" + name);
 			}
 			delete object[Symbol.status];
-			//Can't freeze object because we need to assign sys to it.
+			//Can't freeze core/Object because we need to assign sys to it.
 			if (object[this.sys.symbols.type != "Object"]) Object.freeze(object);
 		},
 		compileProperty: function(object, propertyName, contextName) {
@@ -252,17 +255,6 @@ export default {
 			}
 		}
 	},
-	Interface: {
-		type$: "Instance",
-		properties: {
-		}
-	},
-	Declaration: {
-		type$: "Instance",
-		facet: "",
-		name: "",
-		expr: undefined
-	},
 	Module: {
 		type$: "Instance",
 		id: "",
@@ -272,21 +264,23 @@ export default {
 		packages: {
 		},
 		compile: function() {
-			let sys = this.sys;
-			let target = sys.extend();
+			let target = this.sys.extend();
 			//Need to define the module packages here to support in-module package deps.
-			sys.packages[this.id] = target;
+			this.sys.packages[this.id] = target;
 			for (let name in this.packages) {
-				let ctxName = this.id + "/" + name;
-				let pkg = this.packages[name];
-				console.debug(`Compiling "${ctxName}"...`);
-				pkg = sys.compile(pkg, ctxName);
-				target[name] = pkg;
-				console.debug(`Compiled "${ctxName}".`);
+				target[name] = this.compilePackage(name);
 			}
-			sys.define(this, "packages", target);				
+			this.sys.define(this, "packages", target);				
 			Object.freeze(this);
 			console.info("Loaded", this);
+		},
+		compilePackage: function(name) {
+			let pkg = this.packages[name];
+			let ctxName = this.id + "/" + name;
+			console.debug(`Compiling "${ctxName}"...`);
+			pkg = this.sys.compile(pkg, ctxName);
+			console.debug(`Compiled "${ctxName}".`);
+			return pkg;
 		}
 	}
 }
