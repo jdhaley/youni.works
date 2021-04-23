@@ -101,9 +101,6 @@ export default {
 			let index = decl.indexOf("$");
 			return index >= 0 ? decl.substring(index + 1) : decl;
 		},
-		load: function(value, contextName) {
-			
-		},
 		compile: function(value, contextName) {
 			if (this.packages["."]) {
 				throw new Error("Compilation in progress.");
@@ -121,21 +118,24 @@ export default {
 		},
 		statusOf: function(value) {
 			if (value && typeof value == "object") return value[Symbol.status];
+		},
+		declare: function(facet, name, value) {
+			return this.extend(null, {
+				sys: this,
+				facet: facet,
+				name: name,
+				expr: value,
+				[Symbol.status]: "Property"
+			});
 		}
 	},
 	Loader: {
 		type$: "Instance",
-		declare: function(facet, name, value) {
-			return this.sys.extend(null, {
-				sys: this.sys,
-				facet: facet,
-				name: name,
-				expr: value,
-				[Symbol.status]: "property"
-			});
-		},
 		loadValue: function(value, componentName) {
-			if (this.sys.statusOf(value)) throw new Error("Possible recursion.");
+			if (this.sys.statusOf(value)) {
+				console.warn("Loading cycle detected.");
+				return value;
+			}
 
 			if (value && typeof value == "object") {
 				let proto = Object.getPrototypeOf(value);
@@ -143,16 +143,19 @@ export default {
 					value = this.loadArray(value, componentName);
 				} else if (proto == Object.prototype) {
 					value = this.loadObject(value, componentName);
-				} else if (proto == Function.prototype) {
-					value = this.loadFunction(value, componentName);
 				}
+			} else if (typeof value == "function") {
+				value = this.loadFunction(value, componentName);
 			}
 			return value;
 		},
 		loadFunction: function(source, componentName) {
 			 if (source.name == "expr$") {
-				 source[Symbol.status] = "expr";
+				 source[Symbol.status] = "Expr";
+			 } else if (componentName) {
+				 source[this.sys.symbols.name] = componentName;
 			 }
+			 return source;
 		},
 		loadArray: function(source, componentName) {
 			const sys = this.sys;
@@ -160,35 +163,35 @@ export default {
 			let array = sys.extend("/system.youni.works/core/Array", {
 				length: length
 			});
-			array[Symbol.status] = "array";
+			array[Symbol.status] = "Array";
 			for (let i = 0; i < length; i++) {
 				array[i] = this.loadValue(source[i], componentName + "/" + i);
 			}
+			if (componentName) array[sys.symbols.name] = componentName;
 			return array;
 		},
 		loadObject: function(source, componentName) {
 			const sys = this.sys;
 			let object = sys.extend(null);
-			object[Symbol.status] = "parcel";
-			if (componentName) object[sys.symbols.name] = componentName;
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
+				//	if (facet == "type" && typeof value == "string") {
+				//		console.debug(componentName + "/" + name + " --> " + value);
+				//	}
 				let value = this.loadValue(source[decl], componentName + "/" + name);
-				if (facet) {
-					if (facet == "type" && typeof value == "string") {
-						console.debug(componentName + "/" + name + " --> " + value);
-					}
-					value = this.declare(facet, name, value);
-				}
+				if (facet) value = this.sys.declare(facet, name, value);
 				object[name] = value;
-				if (!name) object[Symbol.status] = "object";
 			}
+			object[Symbol.status] = object[""] ? "Object" : "Properties";
+			if (componentName) object[sys.symbols.name] = componentName;
 			return object;
 		}
 	},
 	Compiler: {
 		type$: "Instance",
+		compileValue: function(value, contextName) {
+		},
 		compileObject: function(object, contextName) {
 			const sys = this.sys;
 			const tag = object[sys.symbols.type];
@@ -213,7 +216,7 @@ export default {
 		},
 		compileArray: function(array, contextName) {
 			const sys = this.sys;
-			array[Symbol.status] = "compiling";			
+			delete array[Symbol.status];	
 			for (let i = 0; i < array.length; i++) {
 				let value = array[i];
 				if (sys.statusOf(value)) {
@@ -222,26 +225,28 @@ export default {
 					array[i] = value;
 				}
 			}
-			array[Symbol.status] = "";	
 			Object.freeze(array);
+			return array;
 		},
 		compileProperties: function(object, contextName) {
-			object[Symbol.status] = "compiling";
+			delete object[Symbol.status];
 			//NB Don't include the prototype's enumerable properties!
 			for (let name of Object.getOwnPropertyNames(object)) {
-				if (name) this.compileProperty(object, name, contextName + "/" + name);
+				if (name) {
+					this.compileProperty(object, name, contextName + "/" + name);
+				}
 			}
-			delete object[Symbol.status];
 			//Can't freeze core/Object because we need to assign sys to it.
 			if (object[this.sys.symbols.type != "Object"]) Object.freeze(object);
+			return object;
 		},
 		compileProperty: function(object, propertyName, contextName) {
 			let value = object[propertyName];
 			switch (this.sys.statusOf(value)) {
-				case "property":
+				case "Property":
 					//Faceted properties will be defined at the end of this case.
 					//Delete the property to handle symbol facets.
-					delete object[propertyName];
+					delete object[value.name];
 					if (this.sys.statusOf(value.expr)) {
 						if (value.expr[""]) {
 							value.expr = this.compileObject(value.expr, contextName);
@@ -252,7 +257,10 @@ export default {
 					value = facet(value);
 					Reflect.defineProperty(object, value.name, value);
 					return;
-				case "object":
+				case "Properties":
+					this.compileProperties(value);
+					return;
+				case "Object":
 					if (!value[""]) console.error("No type property for 'object' status.");
 					let firstChar = propertyName.charAt(0)
 					if (firstChar.toUpperCase() == firstChar) {
@@ -262,17 +270,12 @@ export default {
 					object[propertyName] = value;
 					this.compileProperties(value, contextName);
 					return;
-				case "parcel":
-					this.compileProperties(value, contextName);
-					return;
-				case "array":
+				case "Array":
 					this.compileArray(value);
 					return;
-				case "expr":
-					value.call(this, object, propertyName);
+				case "Expr":
+					value.call(this.sys, object, propertyName);
 					return;
-				case "compiling":
-				case "":
 				case undefined:
 					return;
 				default:
