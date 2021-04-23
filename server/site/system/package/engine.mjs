@@ -111,7 +111,7 @@ export default {
 			value = this.loader.loadValue(value, contextName);
 			if (this.statusOf(value)) {
 				if (value[""]) {
-					value = this.compiler.construct(value, contextName);
+					value = this.compiler.compileObject(value, contextName);
 				}
 				this.packages["."] = value;
 				this.compiler.compileProperties(value, contextName)
@@ -143,11 +143,16 @@ export default {
 					value = this.loadArray(value, componentName);
 				} else if (proto == Object.prototype) {
 					value = this.loadObject(value, componentName);
-				} else if (proto == Function.prototype && value.name == "expr$") {
-					value[Symbol.status] = "expr";
+				} else if (proto == Function.prototype) {
+					value = this.loadFunction(value, componentName);
 				}
 			}
 			return value;
+		},
+		loadFunction: function(source, componentName) {
+			 if (source.name == "expr$") {
+				 source[Symbol.status] = "expr";
+			 }
 		},
 		loadArray: function(source, componentName) {
 			const sys = this.sys;
@@ -164,7 +169,8 @@ export default {
 		loadObject: function(source, componentName) {
 			const sys = this.sys;
 			let object = sys.extend(null);
-			object[Symbol.status] = "object";
+			object[Symbol.status] = "parcel";
+			if (componentName) object[sys.symbols.name] = componentName;
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
@@ -176,14 +182,17 @@ export default {
 					value = this.declare(facet, name, value);
 				}
 				object[name] = value;
+				if (!name) object[Symbol.status] = "object";
 			}
 			return object;
 		}
 	},
 	Compiler: {
 		type$: "Instance",
-		construct: function(object, contextName) {
+		compileObject: function(object, contextName) {
 			const sys = this.sys;
+			const tag = object[sys.symbols.type];
+			const name = object[sys.symbols.name];
 			object[Symbol.status] = "constructing";
 			let type = object[""];
 			if (sys.statusOf(type)) {
@@ -193,10 +202,13 @@ export default {
 				}
 			}
 			let target = Object.create(type || null);
+			if (tag) target[sys.symbols.type] = tag;
+			if (name) target[sys.symbols.name] = name;
 			for (let name in object) {
 				if (name) sys.define(target, name, object[name]);
 			}
 			object[Symbol.status] = "constructed";
+
 			return target;
 		},
 		compileArray: function(array, contextName) {
@@ -205,7 +217,7 @@ export default {
 			for (let i = 0; i < array.length; i++) {
 				let value = array[i];
 				if (sys.statusOf(value)) {
-					if (value[""]) value = this.construct(value, contextName);
+					if (value[""]) value = this.compileObject(value, contextName);
 					this.compileProperties(value, contextName);
 					array[i] = value;
 				}
@@ -232,7 +244,7 @@ export default {
 					delete object[propertyName];
 					if (this.sys.statusOf(value.expr)) {
 						if (value.expr[""]) {
-							value.expr = this.construct(value.expr, contextName);
+							value.expr = this.compileObject(value.expr, contextName);
 						}
 						this.compileProperties(value.expr, contextName);
 					}
@@ -241,14 +253,16 @@ export default {
 					Reflect.defineProperty(object, value.name, value);
 					return;
 				case "object":
-					if (value[""]) {
-						value = this.construct(value, contextName);
-						object[propertyName] = value;
-						let firstChar = propertyName.charAt(0)
-						if (firstChar.toUpperCase() == firstChar) {
-							this.sys.define(value, this.sys.symbols.type, propertyName);
-						}
+					if (!value[""]) console.error("No type property for 'object' status.");
+					let firstChar = propertyName.charAt(0)
+					if (firstChar.toUpperCase() == firstChar) {
+						value[this.sys.symbols.type] = propertyName;
 					}
+					value = this.compileObject(value, contextName);
+					object[propertyName] = value;
+					this.compileProperties(value, contextName);
+					return;
+				case "parcel":
 					this.compileProperties(value, contextName);
 					return;
 				case "array":
