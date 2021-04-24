@@ -69,23 +69,30 @@ export default {
 				component = component["."];
 			}
 			let path = name.split("/");
-			for (let prop of path) {
+			for (let propertyName of path) {
 				if (typeof component != "object") {
 					console.error(`For name "${name}": "${context}" is not an object.`);
 					return undefined;
 				}
-//allow prototype properties. The following was added when debugging system to reduce side-effects.
-// if (!Reflect.getOwnPropertyDescriptor(component, prop)) {
-				if (!component[prop]) {
-					console.error(`For name "${name}": "${context}" does not define "${prop}".`);
+				switch (this.statusOf(component)) {
+					case "Parcel":
+					case undefined:
+						break;
+					default:
+						console.warn(`For name "${name}: "${context}" has status of "${this.statusOf(component)}"`);
+				}
+				//allow prototype properties. The following was added when debugging system to reduce side-effects.
+				// if (!Reflect.getOwnPropertyDescriptor(component, propertyName)) {
+				if (!component[propertyName]) {
+					console.error(`For name "${name}": "${context}" does not define "${propertyName}".`);
 					return undefined;
 				}
-				context += (context ? "/" : "") + prop;
-				if (this.statusOf(component[prop])) {
+				context += (context ? "/" : "") + propertyName;
+				if (this.statusOf(component[propertyName])) {
 					//the property name is extracted from the context:
 					this.compiler.compileProperty(component, context);
 				}
-				component = component[prop];
+				component = component[propertyName];
 			}
 			//console.log(`got forName("${name}")`, component);
 			return component;
@@ -128,6 +135,41 @@ export default {
 				expr: value,
 				[Symbol.status]: "Property"
 			});
+		},
+		resolve: function(value, parent, name) {
+			switch (this.statusOf(value)) {
+				case "Object":
+					let extend = value[""];
+					if (this.statusOf(extend) == "Property") {
+						if (typeof extend.expr == "string") {
+							extend = this.forName(extend.expr);
+						}
+					}
+					let target = Object.create(extend);
+					for (let name in value) {
+						if (name) this.define(target, name, value[name]);
+					}
+					target[Symbol.status] = "Parcel";
+					parent[name] = target;
+					console.debug(`Created Object "${name}" in `, parent);
+					this.resolve(target);
+					break;
+				case "Array":
+					for (let ele of value) this.resolve(ele);
+					break;
+				case "Parcel":
+					for (let name of Object.getOwnPropertyNames(value)) {
+						this.resolve(value[name], value, name);
+					}
+					break;
+				case "Property":
+					if (value.name && value.facet == "type" && typeof value.expr == "string") {
+						console.debug(value.name + " --> " + value.expr);
+					} else {
+						this.resolve(value.expr);
+					}
+					break;
+			}
 		}
 	},
 	Loader: {
@@ -183,10 +225,10 @@ export default {
 				if (facet) value = this.sys.declare(facet, name, value);
 				object[name] = value;
 			}
-			object[Symbol.status] = object[""] ? "Object" : "Properties";
+			object[Symbol.status] = object[""] ? "Object" : "Parcel";
 			if (componentName) object[sys.symbols.name] = componentName;
 			return object;
-		}
+		},
 	},
 	Compiler: {
 		type$: "Instance",
@@ -259,7 +301,7 @@ export default {
 					value = facet(value);
 					Reflect.defineProperty(object, value.name, value);
 					return;
-				case "Properties":
+				case "Parcel":
 					this.compileProperties(value);
 					return;
 				case "Object":
