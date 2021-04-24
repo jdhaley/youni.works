@@ -136,7 +136,6 @@ export default {
 				console.warn("Loading cycle detected.");
 				return value;
 			}
-
 			if (value && typeof value == "object") {
 				let proto = Object.getPrototypeOf(value);
 				if (proto == Array.prototype) {
@@ -193,6 +192,7 @@ export default {
 		compileValue: function(value, contextName) {
 		},
 		compileObject: function(object, contextName) {
+			if (!object[""]) console.error("No type property for 'Object' status.");
 			const sys = this.sys;
 			const tag = object[sys.symbols.type];
 			const name = object[sys.symbols.name];
@@ -261,7 +261,6 @@ export default {
 					this.compileProperties(value);
 					return;
 				case "Object":
-					if (!value[""]) console.error("No type property for 'object' status.");
 					let firstChar = propertyName.charAt(0)
 					if (firstChar.toUpperCase() == firstChar) {
 						value[this.sys.symbols.type] = propertyName;
