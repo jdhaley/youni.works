@@ -2,10 +2,14 @@
 //facet_name - public
 
 export default {
-	const:function(decl) {
+	static: function(decl) { //or protected?
 		decl.configurable = true;
-		//Making const non-enumerable.
-		//decl.enumerable = true;
+		decl.value = decl.expr;
+		return decl;
+	},
+	const: function(decl) {
+		decl.configurable = true;
+		decl.enumerable = true;
 		decl.value = decl.expr;
 		return decl;
 	},
@@ -76,6 +80,7 @@ export default {
 	type: function(decl) {
 		if (typeof decl.expr != "string") throw new Error("type facet requires a string.");
 		decl.configurable = true;
+		decl.enumerable = true;
 		decl.value = decl.sys.forName(decl.expr);
 		return decl;
 	},
