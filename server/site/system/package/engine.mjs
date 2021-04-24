@@ -82,7 +82,8 @@ export default {
 				}
 				context += (context ? "/" : "") + prop;
 				if (this.statusOf(component[prop])) {
-					this.compiler.compileProperty(component, prop, context);
+					//the property name is extracted from the context:
+					this.compiler.compileProperty(component, context);
 				}
 				component = component[prop];
 			}
@@ -233,14 +234,15 @@ export default {
 			//NB Don't include the prototype's enumerable properties!
 			for (let name of Object.getOwnPropertyNames(object)) {
 				if (name) {
-					this.compileProperty(object, name, contextName + "/" + name);
+					this.compileProperty(object, contextName + "/" + name);
 				}
 			}
 			//Can't freeze core/Object because we need to assign sys to it.
 			if (object[this.sys.symbols.type != "Object"]) Object.freeze(object);
 			return object;
 		},
-		compileProperty: function(object, propertyName, contextName) {
+		compileProperty: function(object, contextName) {
+			const propertyName = contextName.substring(contextName.lastIndexOf("/") + 1);
 			let value = object[propertyName];
 			switch (this.sys.statusOf(value)) {
 				case "Property":
