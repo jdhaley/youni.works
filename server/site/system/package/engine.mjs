@@ -49,15 +49,11 @@ export default {
 			if (this.packages["."]) {
 				throw new Error("Compilation in progress.");
 			}
-			value = this.loader.loadValue(value, componentName);
-			if (this.statusOf(value)) {
-				if (value[""]) {
-					value = this.compiler.compileObject(value);
-				}
-				this.packages["."] = value;
-				this.compiler.compileProperties(value)
-				delete this.packages["."];
-			}
+			value = this.loader.load(value, componentName);
+			this.packages["."] = value;
+			this.compiler.compileProperty(this.packages, ".");
+			value = this.packages["."];
+			delete this.packages["."];
 			return value;
 		},
 		statusOf: function(value) {
@@ -75,7 +71,7 @@ export default {
 	},
 	Loader: {
 		type$: "Instance",
-		loadValue: function(value, componentName) {
+		load: function(value, componentName) {
 			if (this.sys.statusOf(value)) {
 				console.warn("Loading cycle detected.");
 				return value;
@@ -109,7 +105,7 @@ export default {
 			array[Symbol.status] = "Array";
 			for (let i = 0; i < length; i++) {
 				//Array elements do not have a componentName, although they could, e.g. ".../8"
-				array[i] = this.loadValue(source[i]);
+				array[i] = this.load(source[i]);
 			}
 			if (componentName) sys.define(array, sys.symbols.name, componentName);
 			return array;
@@ -120,7 +116,7 @@ export default {
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
-				let value = this.loadValue(source[decl], componentName + "/" + name);
+				let value = this.load(source[decl], componentName + "/" + name);
 				if (facet) value = this.sys.declare(facet, name, value);
 				object[name] = value;
 			}
@@ -131,7 +127,7 @@ export default {
 	},
 	Compiler: {
 		type$: "Instance",
-		compileObject: function(object) {
+		constructObject: function(object) {
 			if (!object[""]) console.error("No type property for 'Object' status.");
 			const sys = this.sys;
 			const tag = object[sys.symbols.type];
@@ -161,7 +157,7 @@ export default {
 				let value = array[i];
 				if (sys.statusOf(value)) {
 					//TODO WRONG - need to check status on what to compile.
-					if (value[""]) value = this.compileObject(value);
+					if (value[""]) value = this.constructObject(value);
 					this.compileProperties(value);
 					array[i] = value;
 				}
@@ -183,30 +179,28 @@ export default {
 			let value = object[propertyName];
 			switch (this.sys.statusOf(value)) {
 				case "Property":
-					//Faceted properties will be defined at the end of this case.
-					//Delete the property to handle symbol facets.
-					delete object[value.name];
-					//TODO implement & call compileValue...
-					if (this.sys.statusOf(value.expr)) {
-						if (value.expr[""]) {
-							value.expr = this.compileObject(value.expr);
-						}
-						this.compileProperties(value.expr);
-					}
+					this.compileProperty(value, "expr");
 					let facet = this.sys.facets[value.facet];
-					value = facet(value);
+					if (facet) {
+						value = facet(value);
+					} else {
+						console.error(`For "${object[sys.symbols.name]}/${propertyName}": Facet "${value.facet}" not defined`);
+						value.value = value.expr;
+					}
+					//Delete the property to handle symbol facets (it is defined below)....
+					delete object[value.name];
 					Reflect.defineProperty(object, value.name, value);
-					return;
-				case "Properties":
-					this.compileProperties(value);
 					return;
 				case "Object":
 					let firstChar = propertyName.charAt(0)
 					if (firstChar.toUpperCase() == firstChar) {
 						value[this.sys.symbols.type] = propertyName;
 					}
-					value = this.compileObject(value);
-					object[propertyName] = value;
+					value = this.constructObject(value);
+					this.sys.define(object, propertyName, value);
+					this.compileProperties(value);
+					return;
+				case "Properties":
 					this.compileProperties(value);
 					return;
 				case "Array":
