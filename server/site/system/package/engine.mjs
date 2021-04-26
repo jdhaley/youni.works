@@ -10,17 +10,17 @@ export default {
 			//console.log(`forName("${name}")`);
 			name = "" + (name || ""); //coerce/guard name arg.
 			let component = this.packages;
-			let context = "";
+			let componentName = "";
 			if (name.startsWith("/")) {
 				name = name.substring(1);
-				context = "/";
+				componentName = "/";
 			} else {
 				component = component["."];
 			}
 			let path = name.split("/");
 			for (let propertyName of path) {
 				if (typeof component != "object") {
-					console.error(`For name "${name}": "${context}" is not an object.`);
+					console.error(`For name "${name}": "${componentName}" is not an object.`);
 					return undefined;
 				}
 				switch (this.statusOf(component)) {
@@ -28,29 +28,28 @@ export default {
 					case undefined:
 						break;
 					default:
-						console.warn(`For name "${name}: "${context}" has status of "${this.statusOf(component)}"`);
+						console.warn(`For name "${name}: "${componentName}" has status of "${this.statusOf(component)}"`);
 				}
 				//allow prototype properties. The following was added when debugging system to reduce side-effects.
 				// if (!Reflect.getOwnPropertyDescriptor(component, propertyName)) {
 				if (!component[propertyName]) {
-					console.error(`For name "${name}": "${context}" does not define "${propertyName}".`);
+					console.error(`For name "${name}": "${componentName}" does not define "${propertyName}".`);
 					return undefined;
 				}
-				context += (context ? "/" : "") + propertyName;
+				componentName += (componentName ? "/" : "") + propertyName;
 				if (this.statusOf(component[propertyName])) {
-					//the property name is extracted from the context:
-					this.compiler.compileProperty(component, context);
+					this.compiler.compileProperty(component, propertyName);
 				}
 				component = component[propertyName];
 			}
 			//console.log(`got forName("${name}")`, component);
 			return component;
 		},
-		compile: function(value, contextName) {
+		compile: function(value, componentName) {
 			if (this.packages["."]) {
 				throw new Error("Compilation in progress.");
 			}
-			value = this.loader.loadValue(value, contextName);
+			value = this.loader.loadValue(value, componentName);
 			if (this.statusOf(value)) {
 				if (value[""]) {
 					value = this.compiler.compileObject(value);
@@ -73,41 +72,6 @@ export default {
 				[Symbol.status]: "Property"
 			});
 		}
-//		resolve: function(value, parent, name) {
-//			switch (this.statusOf(value)) {
-//				case "Object":
-//					let extend = value[""];
-//					if (this.statusOf(extend) == "Property") {
-//						if (typeof extend.expr == "string") {
-//							extend = this.forName(extend.expr);
-//						}
-//					}
-//					let target = Object.create(extend);
-//					for (let name in value) {
-//						if (name) this.define(target, name, value[name]);
-//					}
-//					target[Symbol.status] = "Properties";
-//					parent[name] = target;
-//					console.debug(`Created Object "${name}" in `, parent);
-//					this.resolve(target);
-//					break;
-//				case "Array":
-//					for (let ele of value) this.resolve(ele);
-//					break;
-//				case "Properties":
-//					for (let name of Object.getOwnPropertyNames(value)) {
-//						this.resolve(value[name], value, name);
-//					}
-//					break;
-//				case "Property":
-//					if (value.name && value.facet == "type" && typeof value.expr == "string") {
-//						console.debug(value.name + " --> " + value.expr);
-//					} else {
-//						this.resolve(value.expr);
-//					}
-//					break;
-//			}
-//		}
 	},
 	Loader: {
 		type$: "Instance",
@@ -167,8 +131,6 @@ export default {
 	},
 	Compiler: {
 		type$: "Instance",
-		compileValue: function(value) {
-		},
 		compileObject: function(object) {
 			if (!object[""]) console.error("No type property for 'Object' status.");
 			const sys = this.sys;
@@ -211,9 +173,7 @@ export default {
 			delete object[Symbol.status];
 			//NB Don't include the prototype's enumerable properties!
 			for (let name of Object.getOwnPropertyNames(object)) {
-				if (name) {
-					this.compileProperty(object, name);
-				}
+				this.compileProperty(object, name);
 			}
 			//Can't freeze core/Object because we need to assign sys to it.
 			if (object[this.sys.symbols.type != "Object"]) Object.freeze(object);
@@ -226,6 +186,7 @@ export default {
 					//Faceted properties will be defined at the end of this case.
 					//Delete the property to handle symbol facets.
 					delete object[value.name];
+					//TODO implement & call compileValue...
 					if (this.sys.statusOf(value.expr)) {
 						if (value.expr[""]) {
 							value.expr = this.compileObject(value.expr);
