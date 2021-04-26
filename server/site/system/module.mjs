@@ -1,4 +1,5 @@
 import core from "./package/core.mjs";
+import reflect from "./package/reflect.mjs";
 import engine from "./package/engine.mjs";
 
 export default {
@@ -8,6 +9,7 @@ export default {
 	uses: [],
 	packages: {
 		core: core,
+		reflect: reflect,
 		engine: engine
 	}
 }

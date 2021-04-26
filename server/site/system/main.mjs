@@ -10,6 +10,7 @@ function system(sys, conf) {
 
 	target.core = sys.compile(module.packages.core, module.id + "/core");
 	sys.define(target.core.Object, sys.symbols.sys, sys);
+	target.reflect = sys.compile(module.packages.reflect, module.id + "/reflect");
 	target.engine = sys.compile(module.packages.engine, module.id + "/engine");
 	sys = sys.extend(target.engine.Engine, {
 		packages: sys.packages,

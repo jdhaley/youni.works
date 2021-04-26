@@ -1,13 +1,11 @@
 export default {
-	type$: "/system.youni.works/core",
+	type$: "/system.youni.works/reflect",
 	Engine: {
 		type$: "System",
-		packages: {
-		},
-		symbols: {
-		},
 		type$compiler: "Compiler",
 		type$loader: "Loader",
+		packages: {
+		},
 		forName: function(name) {
 			//console.log(`forName("${name}")`);
 			name = "" + (name || ""); //coerce/guard name arg.
@@ -262,34 +260,6 @@ export default {
 					console.error(`Invalid compilation status "${this.sys.statusOf(value)}"`);
 					return;
 			}
-		}
-	},
-	Module: {
-		type$: "Instance",
-		id: "",
-		version: "",
-		moduleType: "",
-		uses: [],
-		packages: {
-		},
-		compile: function() {
-			let target = this.sys.extend();
-			//Need to define the module packages here to support in-module package deps.
-			this.sys.packages[this.id] = target;
-			for (let name in this.packages) {
-				target[name] = this.compilePackage(name);
-			}
-			this.sys.define(this, "packages", target);				
-			Object.freeze(this);
-			console.info("Loaded", this);
-		},
-		compilePackage: function(name) {
-			let pkg = this.packages[name];
-			let ctxName = this.id + "/" + name;
-			console.debug(`Compiling "${ctxName}"...`);
-			pkg = this.sys.compile(pkg, ctxName);
-			console.debug(`Compiled "${ctxName}".`);
-			return pkg;
 		}
 	}
 }

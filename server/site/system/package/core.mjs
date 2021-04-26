@@ -28,6 +28,8 @@ export default {
 		type$: "Instance",
 		facets: {
 		},
+		symbols: {
+		},
 		extend: function(object, decls) {
 			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || null);

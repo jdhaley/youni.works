@@ -15,13 +15,41 @@ export default {
 		name: "",
 		expr: undefined
 	},
+//	Module: {
+//		type$: "Instance",
+//		id: "",
+//		version: "",
+//		moduleType: "",
+//		type$uses: "Array",
+//		type$packages: "Parcel"
+//	},
 	Module: {
 		type$: "Instance",
 		id: "",
 		version: "",
 		moduleType: "",
-		type$uses: "Array",
-		type$packages: "Parcel"
+		uses: [],
+		packages: {
+		},
+		compile: function() {
+			let target = this.sys.extend();
+			//Need to define the module packages here to support in-module package deps.
+			this.sys.packages[this.id] = target;
+			for (let name in this.packages) {
+				target[name] = this.compilePackage(name);
+			}
+			this.sys.define(this, "packages", target);				
+			Object.freeze(this);
+			console.info("Loaded", this);
+		},
+		compilePackage: function(name) {
+			let pkg = this.packages[name];
+			let ctxName = this.id + "/" + name;
+			console.debug(`Compiling "${ctxName}"...`);
+			pkg = this.sys.compile(pkg, ctxName);
+			console.debug(`Compiled "${ctxName}".`);
+			return pkg;
+		}
 	},
 	Modules: {
 		type$: "Instance",
