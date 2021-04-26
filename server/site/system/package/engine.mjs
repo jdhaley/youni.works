@@ -2,61 +2,12 @@ export default {
 	type$: "/system.youni.works/core",
 	Engine: {
 		type$: "System",
-		use: {
-			type$Object: "Object"
-		},
 		packages: {
-		},
-		facets: {
-			type: function(decl) {
-				decl.configurable = true;
-				return decl;
-			}
 		},
 		symbols: {
 		},
 		type$compiler: "Compiler",
 		type$loader: "Loader",
-		extend: function(object, decls) {
-			if (object === undefined) object = this.use.Object;
-			if (typeof object == "string") object = this.forName(object);
-			object = Object.create(object || null);
-			this.implement(object, decls);
-			return object;
-		},
-		implement: function(object, decls) {
-			if (decls && typeof decls == "object") for (let decl of Object.getOwnPropertyNames(decls)) {
-				let facet = this.facetOf(decl);
-				let name = this.nameOf(decl);
-				let value = decls[decl];
-				if (value && typeof value == "object" && Object.getPrototypeOf(value) == Object.prototype) {
-					console.warn("Source object specified in implement():", value);
-				}
-				if (name) {
-					this.define(object, name, value, facet);
-				} else if (!object[Symbol.status]) {
-					console.warn("Object declaration ignored in Engine.implement()");
-				}
-			}
-			if (decls && typeof decls == "object") for (let symbol of Object.getOwnPropertySymbols(decls)) {
-				this.define(object, symbol, decls[symbol]);				
-			}
-			
-		},
-		define: function(object, name, value, facetName) {
-			let decl;
-			if (facetName) {
-				let facet = this.facets[facetName];
-				if (!facet) {
-					throw new Error(`Facet "${facetName}" does not exist.`);
-				}
-				decl = facet({sys: this, facet: facet, name: name, expr: value});
-				name = decl.name; //In case the facet (e.g. symbol$) changes it.
-			} else {
-				decl = {configurable: true, enumerable: true, writable: true, value: value};				
-			}
-			Reflect.defineProperty(object, name, decl);
-		},
 		forName: function(name) {
 			//console.log(`forName("${name}")`);
 			name = "" + (name || ""); //coerce/guard name arg.
@@ -75,7 +26,7 @@ export default {
 					return undefined;
 				}
 				switch (this.statusOf(component)) {
-					case "Parcel":
+					case "Properties":
 					case undefined:
 						break;
 					default:
@@ -96,18 +47,6 @@ export default {
 			}
 			//console.log(`got forName("${name}")`, component);
 			return component;
-		},
-		facetOf: function(decl) {
-			if (typeof decl == "symbol") return "";
-			decl = "" + decl;
-			let index = decl.indexOf("$");
-			return index >= 0 ? decl.substr(0, index) : "";
-		},
-		nameOf: function(decl) {
-			if (typeof decl == "symbol") return decl;
-			decl = "" + decl;
-			let index = decl.indexOf("$");
-			return index >= 0 ? decl.substring(index + 1) : decl;
 		},
 		compile: function(value, contextName) {
 			if (this.packages["."]) {
@@ -135,42 +74,42 @@ export default {
 				expr: value,
 				[Symbol.status]: "Property"
 			});
-		},
-		resolve: function(value, parent, name) {
-			switch (this.statusOf(value)) {
-				case "Object":
-					let extend = value[""];
-					if (this.statusOf(extend) == "Property") {
-						if (typeof extend.expr == "string") {
-							extend = this.forName(extend.expr);
-						}
-					}
-					let target = Object.create(extend);
-					for (let name in value) {
-						if (name) this.define(target, name, value[name]);
-					}
-					target[Symbol.status] = "Parcel";
-					parent[name] = target;
-					console.debug(`Created Object "${name}" in `, parent);
-					this.resolve(target);
-					break;
-				case "Array":
-					for (let ele of value) this.resolve(ele);
-					break;
-				case "Parcel":
-					for (let name of Object.getOwnPropertyNames(value)) {
-						this.resolve(value[name], value, name);
-					}
-					break;
-				case "Property":
-					if (value.name && value.facet == "type" && typeof value.expr == "string") {
-						console.debug(value.name + " --> " + value.expr);
-					} else {
-						this.resolve(value.expr);
-					}
-					break;
-			}
 		}
+//		resolve: function(value, parent, name) {
+//			switch (this.statusOf(value)) {
+//				case "Object":
+//					let extend = value[""];
+//					if (this.statusOf(extend) == "Property") {
+//						if (typeof extend.expr == "string") {
+//							extend = this.forName(extend.expr);
+//						}
+//					}
+//					let target = Object.create(extend);
+//					for (let name in value) {
+//						if (name) this.define(target, name, value[name]);
+//					}
+//					target[Symbol.status] = "Properties";
+//					parent[name] = target;
+//					console.debug(`Created Object "${name}" in `, parent);
+//					this.resolve(target);
+//					break;
+//				case "Array":
+//					for (let ele of value) this.resolve(ele);
+//					break;
+//				case "Properties":
+//					for (let name of Object.getOwnPropertyNames(value)) {
+//						this.resolve(value[name], value, name);
+//					}
+//					break;
+//				case "Property":
+//					if (value.name && value.facet == "type" && typeof value.expr == "string") {
+//						console.debug(value.name + " --> " + value.expr);
+//					} else {
+//						this.resolve(value.expr);
+//					}
+//					break;
+//			}
+//		}
 	},
 	Loader: {
 		type$: "Instance",
@@ -207,9 +146,10 @@ export default {
 			});
 			array[Symbol.status] = "Array";
 			for (let i = 0; i < length; i++) {
+				//Array elements do not have a componentName, although they could, e.g. ".../8"
 				array[i] = this.loadValue(source[i]);
 			}
-			if (componentName) array[sys.symbols.name] = componentName;
+			if (componentName) sys.define(array, sys.symbols.name, componentName);
 			return array;
 		},
 		loadObject: function(source, componentName) {
@@ -218,14 +158,11 @@ export default {
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
-				//	if (facet == "type" && typeof value == "string") {
-				//		console.debug(componentName + "/" + name + " --> " + value);
-				//	}
 				let value = this.loadValue(source[decl], componentName + "/" + name);
 				if (facet) value = this.sys.declare(facet, name, value);
 				object[name] = value;
 			}
-			object[Symbol.status] = object[""] ? "Object" : "Parcel";
+			object[Symbol.status] = object[""] ? "Object" : "Properties";
 			if (componentName) sys.define(object, sys.symbols.name, componentName);
 			return object;
 		},
@@ -301,7 +238,7 @@ export default {
 					value = facet(value);
 					Reflect.defineProperty(object, value.name, value);
 					return;
-				case "Parcel":
+				case "Properties":
 					this.compileProperties(value);
 					return;
 				case "Object":

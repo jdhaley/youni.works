@@ -37,20 +37,24 @@ function bootSys(conf) {
 	 */
 	Symbol.status = Symbol("status");
 
+	let core = conf.module.packages.core;
 	let engine = conf.module.packages.engine;
+
 	let Instance = Object.create(null);
+	let sys = Object.create(Instance);
 	
-	Instance.sys = Object.create(Instance);
-	implement(Instance.sys, engine.Engine);
-	implement(Instance.sys, {
+	implement(sys, core.System);
+	sys = Object.create(sys);
+	implement(sys, engine.Engine);
+	implement(sys, {
 		facets: implement(Object.create(null), conf.facets),
 		symbols: implement(Object.create(null), conf.symbols),
 		packages: Object.create(null),
 		loader: implement(Object.create(Instance), engine.Loader),
 		compiler: implement(Object.create(Instance), engine.Compiler)
 	});
-	
-	return Instance.sys;
+	Instance.sys = sys;
+	return sys;
 }
 
 function implement(object, decls) {
