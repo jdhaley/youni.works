@@ -1,7 +1,7 @@
 export default {
 	type$: "/ui.youni.works/view",
 	Property: {
-		super$: "View",
+		type$: "View",
 		type$object: "Properties",
 		conf: {
 			name: "",
