@@ -207,14 +207,14 @@ export default {
 			});
 			array[Symbol.status] = "Array";
 			for (let i = 0; i < length; i++) {
-				array[i] = this.loadValue(source[i], componentName + "/" + i);
+				array[i] = this.loadValue(source[i]);
 			}
 			if (componentName) array[sys.symbols.name] = componentName;
 			return array;
 		},
 		loadObject: function(source, componentName) {
 			const sys = this.sys;
-			let object = sys.extend(null);
+			let object = sys.extend();
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
@@ -226,7 +226,7 @@ export default {
 				object[name] = value;
 			}
 			object[Symbol.status] = object[""] ? "Object" : "Parcel";
-			if (componentName) object[sys.symbols.name] = componentName;
+			if (componentName) sys.define(object, sys.symbols.name, componentName);
 			return object;
 		},
 	},
