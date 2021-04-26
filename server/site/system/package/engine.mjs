@@ -53,10 +53,10 @@ export default {
 			value = this.loader.loadValue(value, contextName);
 			if (this.statusOf(value)) {
 				if (value[""]) {
-					value = this.compiler.compileObject(value, contextName);
+					value = this.compiler.compileObject(value);
 				}
 				this.packages["."] = value;
-				this.compiler.compileProperties(value, contextName)
+				this.compiler.compileProperties(value)
 				delete this.packages["."];
 			}
 			return value;
@@ -167,9 +167,9 @@ export default {
 	},
 	Compiler: {
 		type$: "Instance",
-		compileValue: function(value, contextName) {
+		compileValue: function(value) {
 		},
-		compileObject: function(object, contextName) {
+		compileObject: function(object) {
 			if (!object[""]) console.error("No type property for 'Object' status.");
 			const sys = this.sys;
 			const tag = object[sys.symbols.type];
@@ -192,34 +192,34 @@ export default {
 
 			return target;
 		},
-		compileArray: function(array, contextName) {
+		compileArray: function(array) {
 			const sys = this.sys;
 			delete array[Symbol.status];	
 			for (let i = 0; i < array.length; i++) {
 				let value = array[i];
 				if (sys.statusOf(value)) {
-					if (value[""]) value = this.compileObject(value, contextName);
-					this.compileProperties(value, contextName);
+					//TODO WRONG - need to check status on what to compile.
+					if (value[""]) value = this.compileObject(value);
+					this.compileProperties(value);
 					array[i] = value;
 				}
 			}
 			Object.freeze(array);
 			return array;
 		},
-		compileProperties: function(object, contextName) {
+		compileProperties: function(object) {
 			delete object[Symbol.status];
 			//NB Don't include the prototype's enumerable properties!
 			for (let name of Object.getOwnPropertyNames(object)) {
 				if (name) {
-					this.compileProperty(object, contextName + "/" + name);
+					this.compileProperty(object, name);
 				}
 			}
 			//Can't freeze core/Object because we need to assign sys to it.
 			if (object[this.sys.symbols.type != "Object"]) Object.freeze(object);
 			return object;
 		},
-		compileProperty: function(object, contextName) {
-			const propertyName = contextName.substring(contextName.lastIndexOf("/") + 1);
+		compileProperty: function(object, propertyName) {
 			let value = object[propertyName];
 			switch (this.sys.statusOf(value)) {
 				case "Property":
@@ -228,9 +228,9 @@ export default {
 					delete object[value.name];
 					if (this.sys.statusOf(value.expr)) {
 						if (value.expr[""]) {
-							value.expr = this.compileObject(value.expr, contextName);
+							value.expr = this.compileObject(value.expr);
 						}
-						this.compileProperties(value.expr, contextName);
+						this.compileProperties(value.expr);
 					}
 					let facet = this.sys.facets[value.facet];
 					value = facet(value);
@@ -244,9 +244,9 @@ export default {
 					if (firstChar.toUpperCase() == firstChar) {
 						value[this.sys.symbols.type] = propertyName;
 					}
-					value = this.compileObject(value, contextName);
+					value = this.compileObject(value);
 					object[propertyName] = value;
-					this.compileProperties(value, contextName);
+					this.compileProperties(value);
 					return;
 				case "Array":
 					this.compileArray(value);
