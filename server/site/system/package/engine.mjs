@@ -8,39 +8,37 @@ export default {
 		},
 		forName: function(name) {
 			//console.log(`forName("${name}")`);
-			name = "" + (name || ""); //coerce/guard name arg.
+			if (typeof name != "string") {
+				throw new TypeError(`"name" argument must be a "string".`);
+			}
 			let component = this.packages;
-			let componentName = "";
+			let componentName = "/";
 			if (name.startsWith("/")) {
 				name = name.substring(1);
-				componentName = "/";
 			} else {
 				component = component["."];
+				componentName = "";
 			}
 			let path = name.split("/");
 			for (let propertyName of path) {
+				//name, component, componentName, propertyName
 				if (typeof component != "object") {
 					console.error(`For name "${name}": "${componentName}" is not an object.`);
 					return undefined;
 				}
-				switch (this.statusOf(component)) {
-					case "Properties":
-					case undefined:
-						break;
-					default:
-						console.warn(`For name "${name}: "${componentName}" has status of "${this.statusOf(component)}"`);
-				}
 				//allow prototype properties. The following was added when debugging system to reduce side-effects.
-				// if (!Reflect.getOwnPropertyDescriptor(component, propertyName)) {
 				if (!component[propertyName]) {
 					console.error(`For name "${name}": "${componentName}" does not define "${propertyName}".`);
 					return undefined;
 				}
-				componentName += (componentName ? "/" : "") + propertyName;
+				if (this.statusOf(component)) {
+					console.warn(`For name "${name}: "${componentName}" has status of "${this.statusOf(component)}"`);
+				}
 				if (this.statusOf(component[propertyName])) {
 					this.compiler.compileProperty(component, propertyName);
 				}
 				component = component[propertyName];
+				componentName += (componentName ? "/" : "") + propertyName;
 			}
 			//console.log(`got forName("${name}")`, component);
 			return component;
@@ -58,15 +56,6 @@ export default {
 		},
 		statusOf: function(value) {
 			if (value && typeof value == "object") return value[Symbol.status];
-		},
-		declare: function(facet, name, value) {
-			return this.extend(null, {
-				sys: this,
-				facet: facet,
-				name: name,
-				expr: value,
-				[Symbol.status]: "Property"
-			});
 		}
 	},
 	Loader: {
@@ -104,8 +93,7 @@ export default {
 			});
 			array[Symbol.status] = "Array";
 			for (let i = 0; i < length; i++) {
-				//Array elements do not have a componentName, although they could, e.g. ".../8"
-				array[i] = this.load(source[i]);
+				array[i] = this.load(source[i], componentName + "/" + i);
 			}
 			if (componentName) sys.define(array, sys.symbols.name, componentName);
 			return array;
@@ -117,13 +105,22 @@ export default {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
 				let value = this.load(source[decl], componentName + "/" + name);
-				if (facet) value = this.sys.declare(facet, name, value);
+				if (facet) value = this.declare(facet, name, value);
 				object[name] = value;
 			}
 			object[Symbol.status] = object[""] ? "Object" : "Properties";
 			if (componentName) sys.define(object, sys.symbols.name, componentName);
 			return object;
 		},
+		declare: function(facet, name, value) {
+			return this.sys.extend(null, {
+				sys: this.sys,
+				facet: facet,
+				name: name,
+				expr: value,
+				[Symbol.status]: "Property"
+			});
+		}
 	},
 	Compiler: {
 		type$: "Instance",
@@ -141,8 +138,8 @@ export default {
 				}
 			}
 			let target = Object.create(type || null);
-			if (tag) target[sys.symbols.type] = tag;
-			if (name) target[sys.symbols.name] = name;
+			if (tag) sys.define(target, sys.symbols.type, tag);
+			if (name) sys.define(target, sys.symbols.name, name);
 			for (let name in object) {
 				if (name) sys.define(target, name, object[name]);
 			}
@@ -162,6 +159,7 @@ export default {
 					array[i] = value;
 				}
 			}
+			delete array[sys.symbols.name];
 			Object.freeze(array);
 			return array;
 		},
@@ -171,8 +169,13 @@ export default {
 			for (let name of Object.getOwnPropertyNames(object)) {
 				this.compileProperty(object, name);
 			}
+			let componentName = object[this.sys.symbols.name];
+			delete object[this.sys.symbols.name];
 			//Can't freeze core/Object because we need to assign sys to it.
-			if (object[this.sys.symbols.type != "Object"]) Object.freeze(object);
+			if (componentName != "system.youni.works/core/Object") {
+				// console.debug("Freeze " + componentName);
+				Object.freeze(object);
+			}
 			return object;
 		},
 		compileProperty: function(object, propertyName) {
@@ -182,13 +185,12 @@ export default {
 					this.compileProperty(value, "expr");
 					let facet = this.sys.facets[value.facet];
 					if (facet) {
+						delete object[value.name]; //First delete the property (to handle symbol facets).
 						value = facet(value);
 					} else {
 						console.error(`For "${object[sys.symbols.name]}/${propertyName}": Facet "${value.facet}" not defined`);
 						value.value = value.expr;
 					}
-					//Delete the property to handle symbol facets (it is defined below)....
-					delete object[value.name];
 					Reflect.defineProperty(object, value.name, value);
 					return;
 				case "Object":
