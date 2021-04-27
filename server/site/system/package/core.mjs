@@ -1,6 +1,6 @@
 export default {
 	Object: {
-		symbol$sys: null				//sys is initialized during bootstrap
+		symbol$sys: null //sys is defined through bootstrapping.
 	},
 	Parcel: {
 		type$: "Object"
@@ -18,10 +18,11 @@ export default {
 	Instance: {
 		type$: "Object",
 		get$sys: function() {
-			return this[Symbol.sys];	//Symbol.sys - initialized by bootstrap
+			return this[Symbol.sys]; //Symbol.sys is defined through bootstrapping.
 		},
 		toString: function() {
-			return Object.prototype.toString.call(this);
+			//TODO test using Symbol.toPrimitive instead.
+			return "";
 		}
 	},
 	System: {
