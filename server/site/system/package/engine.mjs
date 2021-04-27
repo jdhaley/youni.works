@@ -147,22 +147,52 @@ export default {
 
 			return target;
 		},
+		compileValue: function(value) {
+			switch (this.sys.statusOf(value)) {
+				case "Object":
+					value = this.constructObject(value);
+					this.compileProperties(value);
+					break;
+				case "Properties":
+					this.compileProperties(value);					
+					break;
+				case "Array":
+					this.compileArray(value);
+					break;
+				case undefined:
+					break;
+				default:
+					console.error("invalid status.");
+					break;
+			}
+			return value;
+		},
 		compileArray: function(array) {
 			const sys = this.sys;
 			delete array[Symbol.status];	
 			for (let i = 0; i < array.length; i++) {
-				let value = array[i];
-				if (sys.statusOf(value)) {
-					//TODO WRONG - need to check status on what to compile.
-					if (value[""]) value = this.constructObject(value);
-					this.compileProperties(value);
-					array[i] = value;
-				}
+				array[i] = this.compileValue(array[i]);
 			}
 			delete array[sys.symbols.name];
 			Object.freeze(array);
 			return array;
 		},
+//		compileArray: function(array) {
+//			const sys = this.sys;
+//			delete array[Symbol.status];	
+//			for (let i = 0; i < array.length; i++) {
+//				let value = array[i];
+//				if (sys.statusOf(value)) {
+//					//TODO WRONG - need to check status on what to compile.
+//					if (value[""]) value = this.constructObject(value);
+//					this.compileProperties(value);
+//					array[i] = value;
+//				}
+//			}
+//			delete array[sys.symbols.name];
+//			Object.freeze(array);
+//			return array;
+//		},
 		compileProperties: function(object) {
 			delete object[Symbol.status];
 			//NB Don't include the prototype's enumerable properties!
