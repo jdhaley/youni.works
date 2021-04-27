@@ -101,12 +101,16 @@ export default {
 		return decl;
 	},
 	symbol: function(decl) {
-		let symbol = typeof decl.name == "symbol" ? decl.name : decl.sys.symbols[decl.name];
-		if (!symbol) throw new Error("symbol is not defined.");
-		decl.name = symbol;
-
+		decl.symbol = decl.sys.symbols[decl.name];
+		if (!decl.symbol) throw new Error(`Symbol "${decl.name}" is not defined.`);
 		decl.configurable = true;
 		decl.value = decl.expr;
+		decl.sys.define(decl, "define", defineSymbol);
 		return decl;
+		
+		function defineSymbol(object) {
+			delete object[this.name];
+			Reflect.defineProperty(object, this.symbol, this);
+		}
 	}
 };

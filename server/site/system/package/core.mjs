@@ -76,12 +76,17 @@ export default {
 				if (!facet) {
 					throw new Error(`Facet "${facetName}" does not exist.`);
 				}
-				decl = facet({sys: this, facet: facet, name: name, expr: value});
-				name = decl.name; //In case the facet (e.g. symbol$) changes it.
+				decl = this.declare(facet, name, value);
+				decl = facet(decl);
+				decl.define(object);
 			} else {
-				decl = {configurable: true, enumerable: true, writable: true, value: value};				
+				Reflect.defineProperty(object, name, {
+					configurable: true,
+					enumerable: true,
+					writable: true,
+					value: value
+				});
 			}
-			Reflect.defineProperty(object, name, decl);
 		},
 		declare: function(facet, name, value) {
 			return this.extend(this.use.Property, {

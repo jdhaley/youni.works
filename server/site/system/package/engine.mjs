@@ -141,31 +141,11 @@ export default {
 
 			return target;
 		},
-		compileValue: function(value) {
-			switch (this.sys.statusOf(value)) {
-				case "Object":
-					value = this.constructObject(value);
-					this.compileProperties(value);
-					break;
-				case "Properties":
-					this.compileProperties(value);					
-					break;
-				case "Array":
-					this.compileArray(value);
-					break;
-				case undefined:
-					break;
-				default:
-					console.error("invalid status.");
-					break;
-			}
-			return value;
-		},
 		compileArray: function(array) {
 			const sys = this.sys;
 			delete array[Symbol.status];	
 			for (let i = 0; i < array.length; i++) {
-				array[i] = this.compileValue(array[i]);
+				this.compileProperty(array, i);
 			}
 			delete array[sys.symbols.name];
 			Object.freeze(array);
@@ -177,6 +157,14 @@ export default {
 			for (let name of Object.getOwnPropertyNames(object)) {
 				this.compileProperty(object, name);
 			}
+//			for (let name of Object.getOwnPropertyNames(object)) {
+//				let value = object[name];
+//				console.log(name, value);
+//				if (typeof value == "object" && Object.getPrototypeOf(value) == this.sys.use.Property) {
+//					value.define(object);
+//				}
+//			}
+			
 			let componentName = object[this.sys.symbols.name];
 			delete object[this.sys.symbols.name];
 			//Can't freeze core/Object because we need to assign sys to it.
@@ -186,28 +174,33 @@ export default {
 			}
 			return object;
 		},
-		compileProperty: function(object, propertyName) {
-			let value = object[propertyName];
+//		implementProperties: function(object, properties) {
+//			for (let name in properties) {
+//				
+//			}
+//		},
+		compileProperty: function(object, key) {
+			let value = object[key];
 			switch (this.sys.statusOf(value)) {
 				case "Property":
 					this.compileProperty(value, "expr");
 					let facet = this.sys.facets[value.facet];
 					if (facet) {
-						delete object[value.name]; //First delete the property (to handle symbol facets).
 						value = facet(value);
+						object[key] = value;
 					} else {
-						console.error(`For "${object[sys.symbols.name]}/${propertyName}": Facet "${value.facet}" not defined`);
+						console.error(`For "${object[sys.symbols.name]}/${key}": Facet "${value.facet}" not defined`);
 						value.value = value.expr;
 					}
-					Reflect.defineProperty(object, value.name, value);
+					value.define(object);
 					return;
 				case "Object":
-					let firstChar = propertyName.charAt(0)
+					let firstChar = key.charAt(0)
 					if (firstChar.toUpperCase() == firstChar) {
-						value[this.sys.symbols.type] = propertyName;
+						value[this.sys.symbols.type] = key;
 					}
 					value = this.constructObject(value);
-					this.sys.define(object, propertyName, value);
+					this.sys.define(object, key, value);
 					this.compileProperties(value);
 					return;
 				case "Properties":
@@ -217,7 +210,7 @@ export default {
 					this.compileArray(value);
 					return;
 				case "Expr":
-					value.call(this.sys, object, propertyName);
+					value.call(this.sys, object, key);
 					return;
 				case undefined:
 					return;
