@@ -25,8 +25,21 @@ export default {
 			return "";
 		}
 	},
+	Property: {
+		type$: "Instance",
+		facet: "",
+		name: "",
+		expr: undefined,
+		//ECMAScript descriptor properties are added through the facet.
+		define: function(object) {
+			Reflect.defineProperty(object, this.name, this);
+		}
+	},
 	System: {
 		type$: "Instance",
+		use: {
+			type$Property: "Property"
+		},
 		facets: {
 		},
 		symbols: {
@@ -69,6 +82,13 @@ export default {
 				decl = {configurable: true, enumerable: true, writable: true, value: value};				
 			}
 			Reflect.defineProperty(object, name, decl);
+		},
+		declare: function(facet, name, value) {
+			return this.extend(this.use.Property, {
+				facet: facet,
+				name: name,
+				expr: value
+			});
 		},
 		forName: function(name, component) {
 			throw new Error("Unimplemented");

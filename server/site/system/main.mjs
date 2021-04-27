@@ -48,6 +48,9 @@ function bootSys(conf) {
 	sys = Object.create(sys);
 	implement(sys, engine.Engine);
 	implement(sys, {
+		use: {
+			Property: implement(Object.create(Instance), core.Property)
+		},
 		facets: implement(Object.create(null), conf.facets),
 		symbols: implement(Object.create(null), conf.symbols),
 		packages: Object.create(null),

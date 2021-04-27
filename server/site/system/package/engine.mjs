@@ -105,21 +105,15 @@ export default {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
 				let value = this.load(source[decl], componentName + "/" + name);
-				if (facet) value = this.declare(facet, name, value);
+				if (facet) {
+					value = this.sys.declare(facet, name, value);
+					value[Symbol.status] = "Property";
+				}
 				object[name] = value;
 			}
 			object[Symbol.status] = object[""] ? "Object" : "Properties";
 			if (componentName) sys.define(object, sys.symbols.name, componentName);
 			return object;
-		},
-		declare: function(facet, name, value) {
-			return this.sys.extend(null, {
-				sys: this.sys,
-				facet: facet,
-				name: name,
-				expr: value,
-				[Symbol.status]: "Property"
-			});
 		}
 	},
 	Compiler: {
@@ -177,22 +171,6 @@ export default {
 			Object.freeze(array);
 			return array;
 		},
-//		compileArray: function(array) {
-//			const sys = this.sys;
-//			delete array[Symbol.status];	
-//			for (let i = 0; i < array.length; i++) {
-//				let value = array[i];
-//				if (sys.statusOf(value)) {
-//					//TODO WRONG - need to check status on what to compile.
-//					if (value[""]) value = this.constructObject(value);
-//					this.compileProperties(value);
-//					array[i] = value;
-//				}
-//			}
-//			delete array[sys.symbols.name];
-//			Object.freeze(array);
-//			return array;
-//		},
 		compileProperties: function(object) {
 			delete object[Symbol.status];
 			//NB Don't include the prototype's enumerable properties!
