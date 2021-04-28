@@ -1,5 +1,6 @@
 export default {
 	Object: {
+		type$: null,
 		symbol$sys: null //sys is defined through bootstrapping.
 	},
 	Parcel: {

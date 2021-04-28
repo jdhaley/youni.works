@@ -35,7 +35,7 @@ export default {
 					console.warn(`For name "${name}: "${componentName}" has status of "${this.statusOf(component)}"`);
 				}
 				if (this.statusOf(component[propertyName])) {
-					this.compiler.compileProperty(component, propertyName);
+					this.compiler.compile(component, propertyName);
 				}
 				component = component[propertyName];
 				componentName += (componentName ? "/" : "") + propertyName;
@@ -49,7 +49,7 @@ export default {
 			}
 			value = this.loader.load(value, componentName);
 			this.packages["."] = value;
-			this.compiler.compileProperty(this.packages, ".");
+			this.compiler.compile(this.packages, ".");
 			value = this.packages["."];
 			delete this.packages["."];
 			return value;
@@ -111,106 +111,37 @@ export default {
 				}
 				object[name] = value;
 			}
-			object[Symbol.status] = object[""] ? "Object" : "Properties";
+			object[Symbol.status] = object[""] ? "Object" : "Parcel";
 			if (componentName) sys.define(object, sys.symbols.name, componentName);
 			return object;
 		}
 	},
 	Compiler: {
 		type$: "Instance",
-		constructObject: function(object) {
-			if (!object[""]) console.error("No type property for 'Object' status.");
-			const sys = this.sys;
-			object[Symbol.status] = "constructing";
-			let type = object[""];
-			if (sys.statusOf(type)) {
-				type = type.expr;
-				if (typeof type == "string") {
-					type = sys.forName(type);
-				}
-			}
-			let target = Object.create(type || null);
-			const tag = object[sys.symbols.type];
-			if (tag) sys.define(target, sys.symbols.type, tag);
-			const name = object[sys.symbols.name];
-			if (name) sys.define(target, sys.symbols.name, name);
-			for (let name in object) {
-				if (name) sys.define(target, name, object[name]);
-			}
-			object[Symbol.status] = "constructed";
-
-			return target;
-		},
-		compileArray: function(array) {
-			const sys = this.sys;
-			delete array[Symbol.status];	
-			for (let i = 0; i < array.length; i++) {
-				this.compileProperty(array, i);
-			}
-			delete array[sys.symbols.name];
-			Object.freeze(array);
-			return array;
-		},
-		compileProperties: function(object) {
-			delete object[Symbol.status];
-			//NB Don't include the prototype's enumerable properties!
-			for (let name of Object.getOwnPropertyNames(object)) {
-				this.compileProperty(object, name);
-			}
-//			for (let name of Object.getOwnPropertyNames(object)) {
-//				let value = object[name];
-//				console.log(name, value);
-//				if (typeof value == "object" && Object.getPrototypeOf(value) == this.sys.use.Property) {
-//					value.define(object);
-//				}
-//			}
-			
-			let componentName = object[this.sys.symbols.name];
-			delete object[this.sys.symbols.name];
-			//Can't freeze core/Object because we need to assign sys to it.
-			if (componentName != "system.youni.works/core/Object") {
-				// console.debug("Freeze " + componentName);
-				Object.freeze(object);
-			}
-			return object;
-		},
-//		implementProperties: function(object, properties) {
-//			for (let name in properties) {
-//				
-//			}
-//		},
-		compileProperty: function(object, key) {
+		compile: function(object, key) {
 			let value = object[key];
 			switch (this.sys.statusOf(value)) {
-				case "Property":
-					this.compileProperty(value, "expr");
-					let facet = this.sys.facets[value.facet];
-					if (facet) {
-						value = facet(value);
-						object[key] = value;
-					} else {
-						console.error(`For "${object[sys.symbols.name]}/${key}": Facet "${value.facet}" not defined`);
-						value.value = value.expr;
-					}
-					value.define(object);
-					return;
-				case "Object":
-					let firstChar = key.charAt(0)
-					if (firstChar.toUpperCase() == firstChar) {
-						value[this.sys.symbols.type] = key;
-					}
-					value = this.constructObject(value);
-					this.sys.define(object, key, value);
-					this.compileProperties(value);
-					return;
-				case "Properties":
-					this.compileProperties(value);
-					return;
-				case "Array":
-					this.compileArray(value);
-					return;
 				case "Expr":
 					value.call(this.sys, object, key);
+					return;
+				case "Property":
+					this.compileProperty(value);
+					value.define(object);
+					return;
+				case "Parcel":
+				case "Array":
+					this.compileParcel(value);
+					return;
+				case "Object":
+					let target = this.constructObject(value);
+					this.sys.define(object, key, target);
+					let firstChar = key.charAt(0)
+					if (firstChar.toUpperCase() == firstChar) {
+						target[this.sys.symbols.type] = key;
+						this.compileClass(target, value);
+					} else {
+						this.compileTarget(target, value);
+					}
 					return;
 				case undefined:
 					return;
@@ -218,6 +149,58 @@ export default {
 					console.error(`Invalid compilation status "${this.sys.statusOf(value)}"`);
 					return;
 			}
+		},
+		compileProperty: function(value) {
+			this.compile(value, "expr");
+			let facet = this.sys.facets[value.facet];
+			if (facet) {
+				facet(value);
+			} else {
+				console.error(`For "${object[sys.symbols.name]}/${key}": Facet "${value.facet}" not defined`);
+				value.value = value.expr;
+			}
+		},
+		compileParcel: function(object) {
+			delete object[Symbol.status];
+			for (let name in object) {
+				this.compile(object, name);
+			}
+			delete object[this.sys.symbols.name];
+			Object.freeze(object);
+		},
+		compileClass: function(target, properties) {
+			this.compileTarget(target, properties);
+//			const sys = this.sys;
+//			const tag = properties[sys.symbols.type];
+//			if (tag) sys.define(target, sys.symbols.type, tag);
+//			const name = properties[sys.symbols.name];
+//			if (name) sys.define(target, sys.symbols.name, name);
+//			
+//			//Can't freeze core/Object because we need to assign sys to it.
+//			if (componentName != "system.youni.works/core/Object") {
+//				// console.debug("Freeze " + componentName);
+//				Object.freeze(object);
+//			}
+		},
+		compileTarget: function(target, properties) {
+			for (let name in properties) {
+				if (name) this.sys.define(target, name, properties[name]);
+			}
+			//NB! Only iterate over the target's own properties
+			for (let name of Object.getOwnPropertyNames(target)) {
+				this.compile(target, name);
+			}
+		},
+		constructObject: function(object) {
+			object[Symbol.status] = "[Constructing]";
+			let proto = object[""];
+			if (this.sys.statusOf(proto) == "Property") {
+				proto = proto.expr;
+				if (typeof proto == "string") {
+					proto = this.sys.forName(proto);
+				}
+			}
+			return Object.create(proto || null);
 		}
 	}
 }
