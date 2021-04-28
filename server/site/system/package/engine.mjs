@@ -121,8 +121,6 @@ export default {
 		constructObject: function(object) {
 			if (!object[""]) console.error("No type property for 'Object' status.");
 			const sys = this.sys;
-			const tag = object[sys.symbols.type];
-			const name = object[sys.symbols.name];
 			object[Symbol.status] = "constructing";
 			let type = object[""];
 			if (sys.statusOf(type)) {
@@ -132,7 +130,9 @@ export default {
 				}
 			}
 			let target = Object.create(type || null);
+			const tag = object[sys.symbols.type];
 			if (tag) sys.define(target, sys.symbols.type, tag);
+			const name = object[sys.symbols.name];
 			if (name) sys.define(target, sys.symbols.name, name);
 			for (let name in object) {
 				if (name) sys.define(target, name, object[name]);

@@ -3,18 +3,15 @@
 
 export default {
 	static: function(decl) { //or protected?
-		decl.configurable = true;
 		decl.value = decl.expr;
 		return decl;
 	},
 	const: function(decl) {
-		decl.configurable = true;
 		decl.enumerable = true;
 		decl.value = decl.expr;
 		return decl;
 	},
 	var: function(decl) {
-		decl.configurable = true;
 		decl.enumerable = true;
 		decl.get = function getVar() {
 			return decl.expr;
@@ -30,7 +27,6 @@ export default {
 		return decl;
 	},
 	get: function(decl) {
-		decl.configurable = true;
 		decl.enumerable = true;
 		if (typeof decl.expr == "function") {
 			decl.get = decl.expr;				
@@ -41,7 +37,6 @@ export default {
 		return decl;
 	},
 	virtual: function(decl) {
-		decl.configurable = true;
 		decl.enumerable = true;
 		if (typeof decl.expr == "function") {
 			decl.get = decl.expr;
@@ -79,14 +74,12 @@ export default {
 	},
 	type: function(decl) {
 		if (typeof decl.expr != "string") throw new Error("type facet requires a string.");
-		decl.configurable = true;
 		decl.enumerable = true;
 		decl.value = decl.sys.forName(decl.expr);
 		return decl;
 	},
 	extend: function(decl) {
 		if (typeof decl.expr != "object") throw new Error("extend facet requires an object expression.");
-		decl.configurable = true;
 		decl.enumerable = true;
 		decl.get = function() {
 			let value = Object.getPrototypeOf(this)[decl.name];
@@ -103,7 +96,6 @@ export default {
 	symbol: function(decl) {
 		decl.symbol = decl.sys.symbols[decl.name];
 		if (!decl.symbol) throw new Error(`Symbol "${decl.name}" is not defined.`);
-		decl.configurable = true;
 		decl.value = decl.expr;
 		decl.sys.define(decl, "define", defineSymbol);
 		return decl;

@@ -30,7 +30,11 @@ export default {
 		facet: "",
 		name: "",
 		expr: undefined,
-		//ECMAScript descriptor properties are added through the facet.
+		configurable: true,
+		/*
+		 * ECMAScript descriptor properties are added through the facet.
+		 * define() will fail if the facet isn't first called.
+		 */
 		define: function(object) {
 			Reflect.defineProperty(object, this.name, this);
 		}
@@ -105,13 +109,13 @@ export default {
 			if (typeof decl == "symbol") return "";
 			decl = "" + decl;
 			let index = decl.indexOf("$");
-			return index >= 0 ? decl.substr(0, index) : "";
+			return index < 0 ? "" : decl.substr(0, index);
 		},
 		nameOf: function(decl) {
 			if (typeof decl == "symbol") return decl;
 			decl = "" + decl;
 			let index = decl.indexOf("$");
-			return index >= 0 ? decl.substring(index + 1) : decl;
-		},
+			return index < 0 ? decl : decl.substring(index + 1);
+		}
 	}
 }
