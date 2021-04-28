@@ -1,5 +1,5 @@
 export default {
-	type: Symbol.toStringTag,
+	tag: Symbol.toStringTag,
 	iterator: Symbol.iterator,
 	sys: Symbol("sys"),
 	name: Symbol("name"),

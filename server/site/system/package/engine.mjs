@@ -138,7 +138,7 @@ export default {
 					this.sys.define(object, key, target);
 					let firstChar = key.charAt(0)
 					if (firstChar.toUpperCase() == firstChar && firstChar.toLowerCase() != firstChar) {
-						this.sys.define(target, this.sys.symbols.type, key);
+						this.sys.define(target, this.sys.symbols.tag, key);
 						this.compileClass(target, value);
 					} else {
 						this.compileTarget(target, value);
@@ -185,14 +185,14 @@ export default {
 					this.compile(properties, name);
 				}
 			}
-
 			let name = properties[this.sys.symbols.name];
 			delete properties[this.sys.symbols.name];
 			delete properties[Symbol.status];
 			Object.freeze(properties);
+			
 			let iface = this.sys.extend(this.sys.use.Interface, {
-				id: name,
-				target: target,
+				name: name,
+				prototype: target,
 				properties: properties
 			});
 			this.sys.define(target, this.sys.symbols.interface, iface);

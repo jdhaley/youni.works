@@ -57,6 +57,18 @@ export default {
 			return object;
 		},
 		implement: function(object, decls) {
+			if (decls && Object.getPrototypeOf(decls) == this.use.Interface) {
+				for (let name in decls.properties) {
+					if (name) {
+						let value = decls.properties[name];
+						if (value && Object.getPrototypeOf(value) == this.use.Property) {
+							value.define(object);
+						} else {
+							this.define(object, name, value);
+						}
+					}
+				}
+			}
 			if (decls && typeof decls == "object") for (let decl of Object.getOwnPropertyNames(decls)) {
 				let facet = this.facetOf(decl);
 				let name = this.nameOf(decl);

@@ -20,6 +20,7 @@ function system(sys, conf) {
 		symbols: sys.symbols,
 		facets: sys.facets
 	});
+	
 	/*
 	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
 	 * code. (Otherwise you need a sys reference to get sys.symbols).
