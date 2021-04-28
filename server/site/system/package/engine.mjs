@@ -111,7 +111,7 @@ export default {
 				}
 				object[name] = value;
 			}
-			object[Symbol.status] = object[""] ? "Object" : "Parcel";
+			object[Symbol.status] = object[""] ? "Instance" : "Parcel";
 			if (componentName) sys.define(object, sys.symbols.name, componentName);
 			return object;
 		}
@@ -128,12 +128,12 @@ export default {
 					this.compileProperty(value);
 					value.define(object);
 					return;
-				case "Parcel":
 				case "Array":
-					this.compileParcel(value);
+				case "Parcel":
+					this.compileStructure(value);
 					return;
-				case "Object":
-					let target = this.constructObject(value);
+				case "Instance":
+					let target = this.constructInstance(value);
 					this.sys.define(object, key, target);
 					let firstChar = key.charAt(0)
 					if (firstChar.toUpperCase() == firstChar) {
@@ -160,7 +160,7 @@ export default {
 				value.value = value.expr;
 			}
 		},
-		compileParcel: function(object) {
+		compileStructure: function(object) {
 			delete object[Symbol.status];
 			for (let name in object) {
 				this.compile(object, name);
@@ -191,7 +191,7 @@ export default {
 				this.compile(target, name);
 			}
 		},
-		constructObject: function(object) {
+		constructInstance: function(object) {
 			object[Symbol.status] = "[Constructing]";
 			let proto = object[""];
 			if (this.sys.statusOf(proto) == "Property") {
