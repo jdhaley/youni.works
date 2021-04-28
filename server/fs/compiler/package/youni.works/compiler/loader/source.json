@@ -1,0 +1,88 @@
+{
+	"type": "object",
+	"constructor": "package",
+	"part": {
+		"": {
+			"facet": "package",
+			"type": "string",
+			"source": "youni.works/compiler/loader"
+		},
+		"use": {
+			"type": "object",
+			"constructor": "type",
+			"part": {
+				"control": {
+					"facet": "package",
+					"type": "string",
+					"source": "youni.works/base/control"
+				}
+			}
+		},
+		"Loader": {
+			"type": "object",
+			"constructor": "super",
+			"part": {
+				"": {
+					"facet": "super",
+					"type": "string",
+					"source": "use.control.Processor"
+				},
+				"controller": {
+					"facet": "type",
+					"type": "string",
+					"source": "use.control.Owner"
+				},
+				"use": {
+					"type": "object",
+					"constructor": "type",
+					"part": {
+						"Member": {
+							"facet": "type",
+							"type": "string",
+							"source": "use.control.Control"
+						},
+						"Part": {
+							"facet": "type",
+							"type": "string",
+							"source": "use.control.Record"
+						}
+					}
+				},
+				"file": {
+					"type": "string",
+					"source": "/source.json"
+				},
+				"forName": {
+					"type": "function",
+					"source": "function(name) {\r\n\t\t\tlet pkg = this.package[name];\r\n\t\t\tif (pkg !== undefined) return pkg;\r\n\t\t\tthis.package[name] = null;\r\n\t\t\tthis.fs.service(this, \"load\", {\r\n\t\t\t\tpkgName: name,\r\n\t\t\t\turl: name + this.file,\r\n\t\t\t\tmethod: \"GET\"\r\n\t\t\t});\r\n\t\t}"
+				},
+				"load": {
+					"type": "function",
+					"source": "function(message) {\r\n\t\t\tlet pkg = this.loadPackage(message);\r\n\t\t\tlet pkgName = message.request.pkgName;\r\n\t\t\tif (pkg.name != pkgName) {\r\n\t\t\t\tconsole.warn(`Package name \"${pkg.name}\" does not match package path \"${pkgName}\"`)\r\n\t\t\t}\r\n\t\t\tif (this.package[pkgName] === null) {\r\n\t\t\t\tthis.package[pkgName] = pkg;\r\n\t\t\t\tthis.send(pkg, {\r\n\t\t\t\t\taction: \"openDependencies\"\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t}"
+				},
+				"loadPackage": {
+					"type": "function",
+					"source": "function(message) {\r\n\t\t\tlet response = message.content;\r\n\t\t\tif (message.status != 200) {\r\n\t\t\t\tthis.log.error(message.status, message.content);\r\n\t\t\t\tresponse = \"{}\";\r\n\t\t\t}\r\n\t\t\tlet pkg = JSON.parse(response);\r\n\t\t\tpkg = this.createMember(pkg);\r\n\t\t\tpkg.name = pkg.part[\"\"].source;\r\n\t\t\treturn pkg;\r\n\t\t}"
+				},
+				"createMember": {
+					"type": "function",
+					"source": "function createMember(member) {\r\n\t\t\tlet part = member.part;\r\n\t\t\t\r\n\t\t\tmember.part = this.sys.extend(this.use.Part);\r\n\t\t\tmember.controller = this;\r\n\t\t\tmember = this.sys.extend(this.use.Member, member);\r\n\t\t\tfor (let name in part) {\r\n\t\t\t\tpart[name].name = name;\r\n\t\t\t\tmember.part[name] = this.createMember(part[name]);\r\n\t\t\t}\r\n\t\t\treturn member;\r\n\t\t}"
+				},
+				"send": {
+					"type": "function",
+					"source": "function(to, message) {\r\n\t\t\tthis.controller.transmit.down(to, message);\r\n\t\t}"
+				},
+				"action": {
+					"type": "object",
+					"constructor": "type",
+					"part": {
+						"openDependencies": {
+							"type": "function",
+							"source": "function(on, message) {\r\n\t\t\t\tif (on.name && on.facet == \"package\" && on.source.indexOf(\"/\") >= 0) {\r\n\t\t\t\t\tthis.forName(on.source);\r\n\t\t\t\t}\r\n\t\t\t}"
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,101 @@
+.album {
+	font-size: 10pt;
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+}
+.album * {
+	text-align: center;
+}
+.pages {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	padding: 2mm;
+}
+.page {
+	background: linen;
+	max-width: 216mm;
+	max-height: 280mm;
+	padding: 5mm;
+	flex: 4;
+	box-shadow: 2px 2px 3px silver;
+}
+.content {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: flex-end;
+	flex-wrap: wrap;
+}
+.issue {
+	display: flex;
+	flex-direction: column;
+	margin: 0 2mm 0 2mm;
+}
+
+.sheets {
+	flex: 0;
+	overflow: auto;
+}
+.region {
+	font-size: 14pt;
+	font-weight: bold;
+}
+.group {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+.shape {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	justify-content: center;
+	align-items: center;
+	border: 1px solid black;
+	color: black;
+	margin: 1mm;
+	padding: 0;
+	flex: 0;
+	overflow: hidden;
+}
+.data {
+	color: rgba(0, 0, 0, .75);
+}
+.shape>input {
+	width: 100%;
+}
+.title {
+	flex: 0;
+	margin-top: 1mm;
+}
+.items {
+	display: flex;
+	flex: 0;
+	justify-content: center;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	margin: 0 2mm 0 2mm;
+}
+
+@media print {
+	BODY, .pages {
+		margin: 0;
+		padding: 0;
+	}
+	.page {
+		background: white;
+		box-shadow: none;
+		min-width: 216mm;
+		max-width: 216mm;
+		min-height: 280mm;
+		max-height: 280mm;
+		background: linen;
+		padding: 10mm 5mm 5mm 10mm;
+	}
+	.window, .window * {
+		display: none;
+		max-height: 0;
+	}
+}

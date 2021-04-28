@@ -1,0 +1,31 @@
+{
+	"testModel": "test value",
+	"noproperty": 12,
+	"issueDate": "1955-02-01",
+	"issues": [
+		{
+			"issued": "1960-03-01",
+			"design": "GB1A",
+			"denom": "1d",
+			"colors": "black",
+			"subject": "",
+			"image": "/file/stamp/GB1As.png"
+		},
+		{
+			"issued": "1960-03-01",
+			"design": "GB1D",
+			"denom": "2d",
+			"colors": "blue",
+			"subject": "",
+			"image": "/file/stamp/GB1Ds.png"
+		},
+		{
+			"issued": "1960-03-01",
+			"design": "GB1A",
+			"denom": "3d",
+			"colors": "red",
+			"subject": "",
+			"image": "/file/stamp/x.png"
+		}
+	]
+}

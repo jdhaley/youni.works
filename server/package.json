@@ -1,18 +1,15 @@
 {
   "name": "server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "youni server",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "/web/repositories/youni.works"
-  },
-  "author": "jdhaley@gmail.com",
-  "license": "UNLICENSED",
+  "main": "index.mjs",
   "dependencies": {
     "express": "^4.17.1"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jdh",
+  "license": "UNLICENSED"
 }

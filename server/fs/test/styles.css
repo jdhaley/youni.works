@@ -1,0 +1,119 @@
+*::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+*::-webkit-scrollbar-thumb {
+    background: lightsteelblue;
+}
+*::-webkit-scrollbar-track {
+	background: ghostwhite;
+}
+*:focus {
+	outline: 2px solid steelblue;
+}
+
+ * {
+	outline: 0;
+	margin: 0;
+	border: 0;
+	padding: 0;
+}
+
+.sheet {
+	border: 1px solid silver;
+}
+
+.sheet * {
+	border-width: 0;
+	border-style: solid;
+	border-color: silver;
+}
+.sheet>.property {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+	border-top-width: 1px;
+}
+.sheet>.property:first-child {
+	border-top-width: 0;
+}
+.sheet>.property>* {
+	min-width: 100px;
+	padding: 3px 3px 3px 9px;
+}
+.sheet>.property>LABEL {
+	font-size: 9pt;
+	flex: 1 1;
+	border-right-width: 1px;
+}
+.sheet>.property>.widget {
+	font-size: 10pt;
+	flex: 4 4;
+}
+.dynamic LABEL {
+	font-style: italic;
+	font-weight: bold;
+}
+.widget:focus {
+	border: 1px solid steelBlue;
+	padding: 1px;
+	margin: 1px;
+	outline: 0;
+}
+
+.diagram {
+	top: 300px;
+	left: 0px;
+	width: 640px;
+	height: 480px;
+	position: relative;
+	border: 1px solid buttonshadow;
+	overflow: auto;
+}
+.shape {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	/*
+	align-items: stretch;
+	align-content: stretch;
+	vertical-align: middle;
+	*/
+	border: 0;
+	background: lightGray;
+}
+
+.shape * {
+	cursor: inherit;
+}
+
+.text {
+	font-size: 9pt;
+}
+
+.shape>* {
+	flex: 1 1;
+	overflow: hidden;
+}
+.diagram .text {
+	padding: 6px;
+	text-align: center;
+	background: ghostWhite;
+	border: 1px solid gray;
+}
+.diagram .text {
+}
+.diagram .text:focus {
+	background: window;
+	margin: 3px;
+	border: 0;
+	overflow: auto;
+	cursor: text;
+	outline-width: 2px;
+	z-index: 3;
+}
+
+.diagram P {
+	margin: 0;
+}

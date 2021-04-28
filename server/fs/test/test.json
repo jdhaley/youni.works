@@ -1,0 +1,14 @@
+{
+	"icon": "/file/test/index.png",
+	"styles": "/file/test/styles.css",
+	"components": {
+		"Frame": "base.youni.works/view/Frame",
+		"Diagram": "base.youni.works/diagram/Diagram",
+		"Object": "base.youni.works/object/Properties"
+	},
+	"objectType": "Issues",
+	"title": "Test",
+	"dataSource": "/file/test/data.json",
+	"typeSource": "/file/test/types.json",
+	"diagram": "/file/test/diagram.json"
+}

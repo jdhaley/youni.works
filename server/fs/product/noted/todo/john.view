@@ -1,0 +1,28 @@
+<div contenteditable="true" tabindex="1" class="body-part">
+	<h1>Tasks - John</h1>
+	<ol>
+		<li><b>done</b>. Improve UI (styling)
+			<ul>
+				<li>Flex the Ribbon, Body, Status [optional - add later]</li>
+				<li>Padding on the Body, remove padding/margin on the container</li>
+				<li>Set the frame title to the file name.</li>
+			</ul>
+		</li>
+		<li><b>done</b>. I/O
+			<ul>
+				<li>Have the editor read the location for the file
+					to edit.</li>
+				<li>Add save command
+					<ul>
+						<li><b><u>NO</u></b>. Sniff the file name from the first line ... note we may
+							need to think about this as a directory is required.</li>
+					</ul>
+				</li>
+			</ul>
+		</li>
+		<li>Clean-up and factor dependencies to make it more modular.</li><ul><li><b>200514 </b>in progress.</li></ul>
+		<li>Add dataset attributes to the article when saving.</li>
+		<li>Test local version with GIT push for content sharing.</li>
+		<li>Prepare and deploy to a server.</li>
+		<li>Test on mobile.</li><li><br></li></ol>
+</div>

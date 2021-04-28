@@ -1,0 +1,10 @@
+@import url("../grid/res/app.css");
+@import url("../grid/res/grid.css");
+
+body {
+	display: flex;
+	flex-direction: column;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+}

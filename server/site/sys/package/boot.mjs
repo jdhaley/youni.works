@@ -22,6 +22,7 @@ export default {
 				sys: {
 					type$: "System",
 					packages: sys.packages,
+					environment: conf.environment,
 					log: conf.log
 				},
 				constructors: conf.constructors,
