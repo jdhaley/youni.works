@@ -11,6 +11,7 @@ export default {
 			if (typeof name != "string") {
 				throw new TypeError(`"name" argument must be a "string".`);
 			}
+			if (!name) return null;
 			let component = this.packages;
 			let componentName = "/";
 			if (name.startsWith("/")) {
@@ -137,10 +138,11 @@ export default {
 					this.sys.define(object, key, target);
 					let firstChar = key.charAt(0)
 					if (firstChar.toUpperCase() == firstChar) {
-						target[this.sys.symbols.type] = key;
+						this.sys.define(target, this.sys.symbols.type, key);
 						this.compileClass(target, value);
 					} else {
 						this.compileTarget(target, value);
+						Object.freeze(target);
 					}
 					return;
 				case undefined:
@@ -170,17 +172,27 @@ export default {
 		},
 		compileClass: function(target, properties) {
 			this.compileTarget(target, properties);
+			for (let name in properties) {
+				let value = properties[name];
+				if (this.sys.statusOf(value) == "Property") {
+					this.compileProperty(value);
+				} else {
+					this.compile(properties, name);
+				}
+			}
+			delete properties[Symbol.status];
+			this.sys.define(target, this.sys.symbols.interface, properties);
+			//Can't freeze core/Object because we need to assign sys to it.
+			if (properties[this.sys.symbols.name] != "system.youni.works/core/Object") {
+				Object.freeze(target);
+			}
+
 //			const sys = this.sys;
 //			const tag = properties[sys.symbols.type];
 //			if (tag) sys.define(target, sys.symbols.type, tag);
 //			const name = properties[sys.symbols.name];
 //			if (name) sys.define(target, sys.symbols.name, name);
 //			
-//			//Can't freeze core/Object because we need to assign sys to it.
-//			if (componentName != "system.youni.works/core/Object") {
-//				// console.debug("Freeze " + componentName);
-//				Object.freeze(object);
-//			}
 		},
 		compileTarget: function(target, properties) {
 			for (let name in properties) {

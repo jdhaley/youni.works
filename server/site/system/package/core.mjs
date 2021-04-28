@@ -1,6 +1,6 @@
 export default {
 	Object: {
-		type$: null,
+		type$: "",
 		symbol$sys: null //sys is defined through bootstrapping.
 	},
 	Parcel: {
@@ -82,7 +82,7 @@ export default {
 					throw new Error(`Facet "${facetName}" does not exist.`);
 				}
 				decl = this.declare(facet, name, value);
-				decl = facet(decl);
+				facet(decl);
 				decl.define(object);
 			} else {
 				Reflect.defineProperty(object, name, {
