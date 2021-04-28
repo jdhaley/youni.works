@@ -43,7 +43,8 @@ export default {
 	System: {
 		type$: "Instance",
 		use: {
-			type$Property: "Property"
+			type$Property: "Property",
+			Interface: null //Interfaces are not created for Types by default.
 		},
 		facets: {
 		},

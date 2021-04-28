@@ -137,7 +137,7 @@ export default {
 					let target = this.constructInstance(value);
 					this.sys.define(object, key, target);
 					let firstChar = key.charAt(0)
-					if (firstChar.toUpperCase() == firstChar) {
+					if (firstChar.toUpperCase() == firstChar && firstChar.toLowerCase() != firstChar) {
 						this.sys.define(target, this.sys.symbols.type, key);
 						this.compileClass(target, value);
 					} else {
@@ -172,27 +172,34 @@ export default {
 		},
 		compileClass: function(target, properties) {
 			this.compileTarget(target, properties);
+			
+			if (!this.sys.use.Interface) return;
+
 			for (let name in properties) {
 				let value = properties[name];
 				if (this.sys.statusOf(value) == "Property") {
 					this.compileProperty(value);
+					delete value[Symbol.status];
+					Object.freeze(value);
 				} else {
 					this.compile(properties, name);
 				}
 			}
+
+			let name = properties[this.sys.symbols.name];
+			delete properties[this.sys.symbols.name];
 			delete properties[Symbol.status];
-			this.sys.define(target, this.sys.symbols.interface, properties);
+			Object.freeze(properties);
+			let iface = this.sys.extend(this.sys.use.Interface, {
+				id: name,
+				target: target,
+				properties: properties
+			});
+			this.sys.define(target, this.sys.symbols.interface, iface);
 			//Can't freeze core/Object because we need to assign sys to it.
 			if (properties[this.sys.symbols.name] != "system.youni.works/core/Object") {
 				Object.freeze(target);
 			}
-
-//			const sys = this.sys;
-//			const tag = properties[sys.symbols.type];
-//			if (tag) sys.define(target, sys.symbols.type, tag);
-//			const name = properties[sys.symbols.name];
-//			if (name) sys.define(target, sys.symbols.name, name);
-//			
 		},
 		compileTarget: function(target, properties) {
 			for (let name in properties) {
