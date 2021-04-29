@@ -2,6 +2,9 @@ export default {
 	type$: "/system.youni.works/reflect",
 	Engine: {
 		type$: "System",
+		extend$use: {
+			type$Interface: "Interface"
+		},
 		type$compiler: "Compiler",
 		type$loader: "Loader",
 		packages: {
@@ -197,7 +200,7 @@ export default {
 			});
 			this.sys.define(target, this.sys.symbols.interface, iface);
 			//Can't freeze core/Object because we need to assign sys to it.
-			if (properties[this.sys.symbols.name] != "system.youni.works/core/Object") {
+			if (name != "system.youni.works/core/Object") {
 				Object.freeze(target);
 			}
 		},
