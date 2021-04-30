@@ -50,12 +50,14 @@ function bootSys(conf) {
 	let reflect = conf.module.packages.reflect;
 	let engine = conf.module.packages.engine;
 
-	let Instance = Object.create(null);
+	let Obj = Object.create(null);
+	let Instance = Object.create(Obj);
 	
 	let sys = implement(Object.create(Instance), reflect.System);
 	implement(sys, engine.Engine);
 	implement(sys, {
 		use: {
+			Object: Obj,
 			Property: implement(Object.create(Instance), reflect.Property)
 		},
 		facets: implement(Object.create(null), conf.facets),

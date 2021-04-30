@@ -1,5 +1,19 @@
 export default {
 	type$: "/system.youni.works/core",
+	Property: {
+		type$: "Instance",
+		facet: "",
+		name: "",
+		expr: undefined,
+		configurable: true,
+		/*
+		 * ECMAScript descriptor properties are added through the facet.
+		 * define() will fail if the facet isn't first called.
+		 */
+		define: function(object) {
+			Reflect.defineProperty(object, this.name, this);
+		}
+	},
 	Interface: {
 		type$: "Instance",
 		name: "",
@@ -74,23 +88,10 @@ export default {
 			return pkg;
 		}
 	},
-	Property: {
-		type$: "Instance",
-		facet: "",
-		name: "",
-		expr: undefined,
-		configurable: true,
-		/*
-		 * ECMAScript descriptor properties are added through the facet.
-		 * define() will fail if the facet isn't first called.
-		 */
-		define: function(object) {
-			Reflect.defineProperty(object, this.name, this);
-		}
-	},
 	System: {
 		type$: "Instance",
 		use: {
+			type$Object: "Object",
 			type$Property: "Property",
 			Interface: null //Interfaces are not created for Types by default.
 		},

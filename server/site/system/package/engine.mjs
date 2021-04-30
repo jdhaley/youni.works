@@ -199,9 +199,10 @@ export default {
 				properties: properties
 			});
 			this.sys.define(target, this.sys.symbols.interface, iface);
-			//Can't freeze core/Object because we need to assign sys to it.
-			if (name != "system.youni.works/core/Object") {
-				Object.freeze(target);
+			if (target == this.sys.use.Object) {
+				this.sys.define(target, this.sys.symbols.sys, this.sys);
+			} else {
+				Object.freeze(target);				
 			}
 		},
 		compileTarget: function(target, properties) {
@@ -214,6 +215,9 @@ export default {
 			}
 		},
 		constructInstance: function(object) {
+			if (object[this.sys.symbols.name] == "system.youni.works/core/Object") {
+				return this.sys.use.Object;
+			}
 			object[Symbol.status] = "[Constructing]";
 			let proto = object[""];
 			if (this.sys.statusOf(proto) == "Property") {
