@@ -1,12 +1,15 @@
 export default {
 	type$: "/base.youni.works/component",
-	type$Remote: "/base.youni.works/util/Remote",
 	Example: {
 		type$: "Component",
-		x: 0,
-		y: 0,
+		type$twin: "Example",
+		x: 3,
+		y: 1,
 		get$area: function() {
 			return this.x * this.y || 0;
+		},
+		once$total: function() {
+			return this.area + this.twin.area;
 		}
 	}
 }
