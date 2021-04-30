@@ -5,17 +5,29 @@ export default function main(conf) {
 	module.compile();
 	let pkg = module.packages;
 	sys = sys.extend(pkg.engine.Engine, {
+		use: {
+			Object: pkg.core.Object,
+			Instance: pkg.core.Instance,
+			Property: pkg.reflect.Property,
+			Interface: pkg.reflect.Interface
+		},
 		packages: {
-			[module.id]: pkg
 		},
 		symbols: sys.symbols,
 		facets: sys.facets
 	});
 	sys.define(pkg.core.Object, sys.symbols.sys, sys);
 	Object.freeze(pkg.core.Object);
-	Object.freeze(sys);
 	module = sys.extend(pkg.reflect.Module, conf.module);
-	module.packages = pkg;
+	module.compile();
+	pkg = module.packages;
+	sys.use = sys.extend(null, {
+		Object: pkg.core.Object,
+		Instance: pkg.core.Instance,
+		Property: pkg.reflect.Property,
+		Interface: pkg.reflect.Interface		
+	});
+	Object.freeze(sys);
 	return module;
 }
 
@@ -67,47 +79,47 @@ function bootSys(conf) {
 	}
 }
 
-function old_compileSystem(sys, module) {
-	sys.packages[module.id] = {
-	};
-	let core = sys.compile(module.packages.core);
-	sys.define(core.Object, sys.symbols.sys, sys);
-	sys.packages[module.id].core = core;
-	let reflect = sys.compile(module.packages.reflect);
-	sys.use.Interface = reflect.Interface;
-	module = sys.extend(reflect.Module, module);
-	sys.packages = {
-	}
-	module.compile();
-	return module;
-}
-
-function old_system(sys, conf) {
-	let module = conf.module;
-	
-	let target = sys.extend();
-	sys.packages[module.id] = target;
-
-	target.core = sys.compile(module.packages.core, module.id + "/core");
-	sys.define(target.core.Object, sys.symbols.sys, sys);
-	target.reflect = sys.compile(module.packages.reflect, module.id + "/reflect");
-	target.engine = sys.compile(module.packages.engine, module.id + "/engine");
-	sys = sys.extend(target.engine.Engine, {
-		packages: sys.packages,
-		symbols: sys.symbols,
-		facets: sys.facets
-	});
-	
-	/*
-	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
-	 * code. (Otherwise you need a sys reference to get sys.symbols).
-	 * As a minimum, Instance.get$sys uses it.
-	 */
-	Symbol.sys = sys.symbols.sys;
-	sys.define(target.core.Object, sys.symbols.sys, sys);
-	Object.freeze(target.core.Object);
-	module.packages = target;
-	module = sys.extend(target.engine.Module, module);
-	sys.define(module, "packages", target);
-	return Object.freeze(module);
-}
+//function old_compileSystem(sys, module) {
+//	sys.packages[module.id] = {
+//	};
+//	let core = sys.compile(module.packages.core);
+//	sys.define(core.Object, sys.symbols.sys, sys);
+//	sys.packages[module.id].core = core;
+//	let reflect = sys.compile(module.packages.reflect);
+//	sys.use.Interface = reflect.Interface;
+//	module = sys.extend(reflect.Module, module);
+//	sys.packages = {
+//	}
+//	module.compile();
+//	return module;
+//}
+//
+//function old_system(sys, conf) {
+//	let module = conf.module;
+//	
+//	let target = sys.extend();
+//	sys.packages[module.id] = target;
+//
+//	target.core = sys.compile(module.packages.core, module.id + "/core");
+//	sys.define(target.core.Object, sys.symbols.sys, sys);
+//	target.reflect = sys.compile(module.packages.reflect, module.id + "/reflect");
+//	target.engine = sys.compile(module.packages.engine, module.id + "/engine");
+//	sys = sys.extend(target.engine.Engine, {
+//		packages: sys.packages,
+//		symbols: sys.symbols,
+//		facets: sys.facets
+//	});
+//	
+//	/*
+//	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
+//	 * code. (Otherwise you need a sys reference to get sys.symbols).
+//	 * As a minimum, Instance.get$sys uses it.
+//	 */
+//	Symbol.sys = sys.symbols.sys;
+//	sys.define(target.core.Object, sys.symbols.sys, sys);
+//	Object.freeze(target.core.Object);
+//	module.packages = target;
+//	module = sys.extend(target.engine.Module, module);
+//	sys.define(module, "packages", target);
+//	return Object.freeze(module);
+//}
