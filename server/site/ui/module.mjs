@@ -4,6 +4,8 @@ import view from "./package/view.mjs";
 import diagram from "./package/diagram.mjs";
 import object from "./package/object.mjs";
 
+import example from "./package/example.mjs";
+
 export default {
 	id: "ui.youni.works",
 	version: "1",
@@ -12,6 +14,7 @@ export default {
 	packages: {
 		view: view,
 		diagram: diagram,
-		object: object
+		object: object,
+		example: example
 	}
 }
