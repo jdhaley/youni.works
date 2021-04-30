@@ -47,15 +47,16 @@ function bootSys(conf) {
 	Symbol.status = Symbol("status");
 
 	let core = conf.module.packages.core;
+	let reflect = conf.module.packages.reflect;
 	let engine = conf.module.packages.engine;
 
 	let Instance = Object.create(null);
 	
-	let sys = implement(Object.create(Instance), core.System);
+	let sys = implement(Object.create(Instance), reflect.System);
 	implement(sys, engine.Engine);
 	implement(sys, {
 		use: {
-			Property: implement(Object.create(Instance), core.Property)
+			Property: implement(Object.create(Instance), reflect.Property)
 		},
 		facets: implement(Object.create(null), conf.facets),
 		symbols: implement(Object.create(null), conf.symbols),
