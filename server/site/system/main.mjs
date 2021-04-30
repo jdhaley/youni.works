@@ -1,6 +1,8 @@
 export default function main(conf) {
 	let sys = bootSys(conf);
-	let module = compileSystem(sys, conf.module);
+	let module = sys.extend(sys.use.Instance, conf.module.packages.reflect.Module);
+	module = sys.extend(module, conf.module);
+	module.compile();
 	let pkg = module.packages;
 	sys = sys.extend(pkg.engine.Engine, {
 		packages: {
@@ -14,21 +16,6 @@ export default function main(conf) {
 	Object.freeze(sys);
 	module = sys.extend(pkg.reflect.Module, conf.module);
 	module.packages = pkg;
-	return module;
-}
-
-function compileSystem(sys, module) {
-	sys.packages[module.id] = {
-	};
-	let core = sys.compile(module.packages.core);
-	sys.define(core.Object, sys.symbols.sys, sys);
-	sys.packages[module.id].core = core;
-	let reflect = sys.compile(module.packages.reflect);
-	sys.use.Interface = reflect.Interface;
-	module = sys.extend(reflect.Module, module);
-	sys.packages = {
-	}
-	module.compile();
 	return module;
 }
 
@@ -58,6 +45,7 @@ function bootSys(conf) {
 	implement(sys, {
 		use: {
 			Object: Obj,
+			Instance: Instance,
 			Property: implement(Object.create(Instance), reflect.Property)
 		},
 		facets: implement(Object.create(null), conf.facets),
@@ -77,6 +65,21 @@ function bootSys(conf) {
 		}
 		return object;
 	}
+}
+
+function old_compileSystem(sys, module) {
+	sys.packages[module.id] = {
+	};
+	let core = sys.compile(module.packages.core);
+	sys.define(core.Object, sys.symbols.sys, sys);
+	sys.packages[module.id].core = core;
+	let reflect = sys.compile(module.packages.reflect);
+	sys.use.Interface = reflect.Interface;
+	module = sys.extend(reflect.Module, module);
+	sys.packages = {
+	}
+	module.compile();
+	return module;
 }
 
 function old_system(sys, conf) {
