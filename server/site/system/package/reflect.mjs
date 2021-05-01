@@ -21,9 +21,17 @@ export default {
 		properties: {
 		},
 		get$extends: function() {
+			const sym = this.sys.symbols.interface;
 			let sup = Object.getPrototypeOf(this.prototype);
-			let sym = this.sys.symbols.interface;
-			if (sup && Object.hasOwnProperty.call(sup, sym)) return sup[sym];
+			if (sup && Object.prototype.hasOwnProperty.call(sup, sym)) return sup[sym];
+		},
+		isOn: function(object) {
+			const sym = this.sys.symbols.interface;
+			if (typeof object == "object") while (object) {
+				if (object[sym] == this) return true;
+				object = Object.getPrototypeOf(object);
+			}
+			return false;
 		}
 //		type$module: "Module",
 //		type$implements: "Array", //of Interface

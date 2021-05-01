@@ -20,10 +20,6 @@ export default {
 		type$: "Object",
 		get$sys: function() {
 			return this[Symbol.sys]; //Symbol.sys is defined through bootstrapping.
-		},
-		toString: function() {
-			//TODO test using Symbol.toPrimitive instead.
-			return "";
 		}
 	}
 }

@@ -21,6 +21,16 @@ export default {
 		},
 		define: function(name, value, facetName) {
 			return this.sys.define(this, name, value, facetName);
+		},
+		get$interface: function() {
+			return this.sys[this.sys.symbols.interface];
+		},
+		instanceOf: function(object) {
+			return object && typeof object == "object" && Object.prototype.isPrototypeOf.call(object, this);
+		},
+		toString: function() {
+			//TODO test using Symbol.toPrimitive instead.
+			return "";
 		}
 	}
 }
