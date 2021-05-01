@@ -2,50 +2,22 @@ export default {
 	type$: "/system.youni.works/reflect",
 	Engine: {
 		type$: "System",
-		extend$use: {
-			type$Interface: "Interface"
+		packages: {
 		},
 		type$compiler: "Compiler",
 		type$loader: "Loader",
-		packages: {
-		},
 		forName: function(name) {
-			//console.log(`forName("${name}")`);
 			if (typeof name != "string") {
 				throw new TypeError(`"name" argument must be a "string".`);
 			}
 			if (!name) return null;
 			let component = this.packages;
-			let componentName = "/";
 			if (name.startsWith("/")) {
 				name = name.substring(1);
 			} else {
 				component = component["."];
-				componentName = "";
 			}
-			let path = name.split("/");
-			for (let propertyName of path) {
-				//name, component, componentName, propertyName
-				if (typeof component != "object") {
-					console.error(`For name "${name}": "${componentName}" is not an object.`);
-					return undefined;
-				}
-				//allow prototype properties. The following was added when debugging system to reduce side-effects.
-				if (!component[propertyName]) {
-					console.error(`For name "${name}": "${componentName}" does not define "${propertyName}".`);
-					return undefined;
-				}
-				if (this.statusOf(component)) {
-					console.warn(`For name "${name}: "${componentName}" has status of "${this.statusOf(component)}"`);
-				}
-				if (this.statusOf(component[propertyName])) {
-					this.compiler.compile(component, propertyName);
-				}
-				component = component[propertyName];
-				componentName += (componentName ? "/" : "") + propertyName;
-			}
-			//console.log(`got forName("${name}")`, component);
-			return component;
+			return this.compiler.resolve(component, name);
 		},
 		compile: function(value, componentName) {
 			if (this.packages["."]) {
@@ -154,6 +126,30 @@ export default {
 					console.error(`Invalid compilation status "${this.sys.statusOf(value)}"`);
 					return;
 			}
+		},
+		resolve: function(component, name) {
+			let componentName = ""; //(component == this.sys.packages ? "/" : "");
+			for (let propertyName of name.split("/")) {
+				//name, component, componentName, propertyName
+				if (typeof component != "object") {
+					console.error(`For name "${name}": "${componentName}" is not an object.`);
+					return undefined;
+				}
+				//allow prototype properties. The following was added when debugging system to reduce side-effects.
+				if (!component[propertyName]) {
+					console.error(`For name "${name}": "${componentName}" does not define "${propertyName}".`);
+					return undefined;
+				}
+				if (this.sys.statusOf(component)) {
+					console.warn(`For name "${name}: "${componentName}" has status of "${this.statusOf(component)}"`);
+				}
+				if (this.sys.statusOf(component[propertyName])) {
+					this.compile(component, propertyName);
+				}
+				component = component[propertyName];
+				componentName += (componentName ? "/" : "") + propertyName;
+			}
+			return component;
 		},
 		compileProperty: function(value) {
 			this.compile(value, "expr");
