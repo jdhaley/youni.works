@@ -17,21 +17,17 @@ export default {
 	Interface: {
 		type$: "Instance",
 		name: "",
-//		type$module: "Module",
-//		type$extends: "Interface",
-//		type$implements: "Array", //of Interface
 		type$prototype: "Object",
 		properties: {
+		},
+		get$extends: function() {
+			let sup = Object.getPrototypeOf(this.prototype);
+			let sym = this.sys.symbols.interface;
+			if (sup && Object.hasOwnProperty.call(sup, sym)) return sup[sym];
 		}
+//		type$module: "Module",
+//		type$implements: "Array", //of Interface
 	},
-//	Module: {
-//		type$: "Instance",
-//		id: "",
-//		version: "",
-//		moduleType: "",
-//		type$uses: "Array",
-//		type$packages: "Parcel"
-//	},
 	Module: {
 		type$: "Instance",
 		id: "",
@@ -66,7 +62,7 @@ export default {
 			type$Module: "Module"
 		},
 		compile: function(source) {
-			let module = this.sys.extend(this.use.Module, module);
+			let module = this.sys.extend(this.use.Module, source);
 			let pkgs = this.sys.extend();
 			//Need to define the module packages prior to compiling packages to support in-module package deps.
 			this.sys.packages[module.id] = pkgs;
@@ -92,6 +88,7 @@ export default {
 		type$: "Instance",
 		use: {
 			type$Object: "Object",
+			type$Instance: "Instance",
 			type$Property: "Property",
 			Interface: null //Interfaces are not created for Types by default.
 		},

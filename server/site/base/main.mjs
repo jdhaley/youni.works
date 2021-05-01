@@ -4,7 +4,9 @@ export default function main(conf) {
 	module.compile();
 
 	let test = sys.extend("/base.youni.works/command/Command");
-	sys.implement(test, sys.forName("/base.youni.works/control/Owner")[sys.symbols.interface]);
+	let Iowner = sys.forName("/base.youni.works/control/Owner")[sys.symbols.interface];
+	console.log(Iowner.extends);
+	sys.implement(test, Iowner);
 	console.log("test", test);
 
 	return module;
