@@ -1,12 +1,16 @@
-import system from "../system/index.mjs";
-import module from "./module.mjs";
+import ui from "../ui/index.mjs";
 
 import events from "./conf/events.mjs";
 import editors from "./conf/editors.mjs";
 
 export default {
-	system: system,
-	module: module,
+	sys: ui.sys,
+	module: {
+		id: "app.youni.works",
+		version: "1",
+		moduleType: "ui",
+		uses: [ui]
+	},
 	app: {
 		events: events,
 		editors: editors

@@ -96,4 +96,4 @@ export default {
 			Reflect.defineProperty(object, this.symbol, this);
 		}
 	}
-};
+}
