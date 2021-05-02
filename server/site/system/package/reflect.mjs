@@ -67,10 +67,7 @@ export default {
 	System: {
 		type$: "Instance",
 		use: {
-			type$Object: "Object",
-			type$Instance: "Instance",
-			type$Property: "Property",
-			Interface: null //Interfaces are not created for Types by default.
+			type$Property: "Property"
 		},
 		extend: function(object, decls) {
 			if (typeof object == "string") object = this.forName(object);
@@ -86,15 +83,15 @@ export default {
 				if (!facet && name) this.define(object, name, value, facet);
 			}
 		},
-		define: function(object, name, value, facetName) {
+		define: function(object, name, value, facet) {
 			let decl;
-			if (facetName) {
-				let facet = this.facets[facetName];
-				if (!facet) {
-					throw new Error(`Facet "${facetName}" does not exist.`);
+			if (facet) {
+				let fn = this.facets[facet];
+				if (!fn) {
+					throw new Error(`Facet "${facet}" does not exist.`);
 				}
 				decl = this.declare(facet, name, value);
-				facet(decl);
+				fn(decl);
 				decl.define(object);
 			} else {
 				Reflect.defineProperty(object, name, {
