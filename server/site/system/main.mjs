@@ -1,8 +1,7 @@
 export default function main(conf) {
-	let sys = bootSys(conf);
-	let module = sys.extend(sys.use.Instance, conf.module.packages.reflect.Module);
-	module = sys.extend(module, conf.module);
-	module.compile();
+	let module = bootModule(conf);
+	let sys = module.sys;
+	
 	let pkg = module.packages;
 	sys = sys.extend(pkg.engine.Engine, {
 		use: {
@@ -31,7 +30,7 @@ export default function main(conf) {
 	return module;
 }
 
-function bootSys(conf) {
+function bootModule(conf) {
 	/*
 	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
 	 * code. (Otherwise you need a sys reference to get sys.symbols).
@@ -50,13 +49,13 @@ function bootSys(conf) {
 	let engine = conf.module.packages.engine;
 
 	let Obj = Object.create(null);
+	Obj[Symbol.status] = "[Booting]";
 	let Instance = Object.create(Obj);
 	let sys = reflect.System.extend(Obj, reflect.System);
 	sys = sys.extend(sys, engine.Engine);
 	sys = sys.extend(sys, {
 		use: {
 			Object: Obj,
-			Instance: Instance,
 			Property: sys.extend(Instance, reflect.Property)
 		},
 		facets: Object.seal(sys.extend(null, conf.facets)),
@@ -66,5 +65,11 @@ function bootSys(conf) {
 		compiler: sys.extend(Instance, engine.Compiler)
 	});
 	Instance.sys = sys;
-	return sys;
+	
+	let module = sys.extend(Instance, conf.module.packages.reflect.Module);
+	module = sys.extend(module, conf.module);
+	
+	delete Obj[Symbol.status];
+	module.compile();
+	return module;
 }
