@@ -51,30 +51,20 @@ function bootSys(conf) {
 
 	let Obj = Object.create(null);
 	let Instance = Object.create(Obj);
-	
-	let sys = implement(Object.create(Instance), reflect.System);
-	implement(sys, engine.Engine);
-	implement(sys, {
+	let sys = reflect.System.extend(Obj, reflect.System);
+	sys = sys.extend(sys, engine.Engine);
+	sys = sys.extend(sys, {
 		use: {
 			Object: Obj,
 			Instance: Instance,
-			Property: implement(Object.create(Instance), reflect.Property)
+			Property: sys.extend(Instance, reflect.Property)
 		},
-		facets: implement(Object.create(null), conf.facets),
-		symbols: implement(Object.create(null), conf.symbols),
-		packages: Object.create(null),
-		loader: implement(Object.create(Instance), engine.Loader),
-		compiler: implement(Object.create(Instance), engine.Compiler)
+		facets: Object.seal(sys.extend(null, conf.facets)),
+		symbols: Object.seal(sys.extend(null, conf.symbols)),
+		packages: sys.extend(),
+		loader: sys.extend(Instance, engine.Loader),
+		compiler: sys.extend(Instance, engine.Compiler)
 	});
 	Instance.sys = sys;
 	return sys;
-	
-	function implement(object, decls) {
-		for (let decl in decls) {
-			if (decl.indexOf("$") < 0) {
-				object[decl] = decls[decl];
-			}
-		}
-		return object;
-	}
 }

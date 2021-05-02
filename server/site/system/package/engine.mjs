@@ -2,10 +2,45 @@ export default {
 	type$: "/system.youni.works/reflect",
 	Engine: {
 		type$: "System",
+		facets: {
+		},
+		symbols: {
+		},
 		packages: {
 		},
 		type$compiler: "Compiler",
 		type$loader: "Loader",
+		implement: function(object, decls) {
+			if (decls && Object.getPrototypeOf(decls) == this.use.Interface) {
+				for (let name in decls.properties) {
+					if (name) {
+						let value = decls.properties[name];
+						if (value && Object.getPrototypeOf(value) == this.use.Property) {
+							value.define(object);
+						} else {
+							this.define(object, name, value);
+						}
+					}
+				}
+			}
+			if (decls && typeof decls == "object") for (let decl of Object.getOwnPropertyNames(decls)) {
+				let facet = this.facetOf(decl);
+				let name = this.nameOf(decl);
+				let value = decls[decl];
+				if (value && typeof value == "object" && Object.getPrototypeOf(value) == Object.prototype) {
+					console.warn("Source object specified in implement():", value);
+				}
+				if (name) {
+					this.define(object, name, value, facet);
+				} else if (!object[Symbol.status]) {
+					console.warn("Object declaration ignored in Engine.implement()");
+				}
+			}
+			if (decls && typeof decls == "object") for (let symbol of Object.getOwnPropertySymbols(decls)) {
+				this.define(object, symbol, decls[symbol]);				
+			}
+			
+		},
 		forName: function(name) {
 			if (typeof name != "string") {
 				throw new TypeError(`"name" argument must be a "string".`);
