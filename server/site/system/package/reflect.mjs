@@ -32,6 +32,21 @@ export default {
 				object = Object.getPrototypeOf(object);
 			}
 			return false;
+		},
+		implementOn: function(object) {
+			if (this.isOn(object)) {
+				console.warn(`Interface "${this.name}" already implemented on object.`);
+				return;
+			}
+			for (let name in this.properties) {
+				if (!name) break;
+				let value = this.properties[name];
+				if (value && Object.getPrototypeOf(value) == this.sys.use.Property) {
+					value.define(object);
+				} else {
+					this.sys.define(object, name, value);
+				}
+			}
 		}
 //		type$module: "Module",
 //		type$implements: "Array", //of Interface
@@ -44,24 +59,20 @@ export default {
 		uses: [],
 		packages: {
 		},
-		compile: function() {
+		compile: function(packages) {
 			let target = this.sys.extend();
 			//Need to define the module packages here to support in-module package deps.
 			this.sys.packages[this.id] = target;
-			for (let name in this.packages) {
-				target[name] = this.compilePackage(name);
+			for (let name in packages) {
+				let ctxName = this.id + "/" + name;
+				console.debug(`Compiling "${ctxName}"...`);
+				target[name] = this.sys.compile(packages[name], ctxName);
+				console.debug(`Compiled "${ctxName}".`);
 			}
-			this.sys.define(this, "packages", target);				
+			Object.freeze(target);
+			this.sys.define(this, "packages", target);
 			Object.freeze(this);
-			console.info("Loaded", this);
-		},
-		compilePackage: function(name) {
-			let pkg = this.packages[name];
-			let ctxName = this.id + "/" + name;
-			console.debug(`Compiling "${ctxName}"...`);
-			pkg = this.sys.compile(pkg, ctxName);
-			console.debug(`Compiled "${ctxName}".`);
-			return pkg;
+			console.info(`Compiled "${this.id}"`, this);
 		}
 	},
 	System: {

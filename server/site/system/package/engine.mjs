@@ -12,34 +12,33 @@ export default {
 		type$loader: "Loader",
 		implement: function(object, decls) {
 			if (decls && Object.getPrototypeOf(decls) == this.use.Interface) {
-				for (let name in decls.properties) {
-					if (name) {
-						let value = decls.properties[name];
-						if (value && Object.getPrototypeOf(value) == this.use.Property) {
-							value.define(object);
-						} else {
-							this.define(object, name, value);
-						}
-					}
-				}
+				decls.implementOn(object);
+				return;
 			}
-			if (decls && typeof decls == "object") for (let decl of Object.getOwnPropertyNames(decls)) {
+			if (decls && typeof decls == "object") {
+				this.implementDecls(object, decls);
+				return;
+			}			
+		},
+		implementDecls: function(object, decls) {
+			for (let decl of Object.getOwnPropertyNames(decls)) {
 				let facet = this.facetOf(decl);
 				let name = this.nameOf(decl);
-				let value = decls[decl];
-				if (value && typeof value == "object" && Object.getPrototypeOf(value) == Object.prototype) {
-					console.warn("Source object specified in implement():", value);
-				}
-				if (name) {
-					this.define(object, name, value, facet);
-				} else if (!object[Symbol.status]) {
+				if (!name && !object[Symbol.status]) {
 					console.warn("Object declaration ignored in Engine.implement()");
+					break;
 				}
+				let value = decls[decl];
+				if (this.loader) value = this.loader.load(value);
+				if (this.sys.statusOf(value)) {
+					this.compiler.compile(decls, decl);
+					value = decls[decl];
+				}
+				this.define(object, name, value, facet);
 			}
-			if (decls && typeof decls == "object") for (let symbol of Object.getOwnPropertySymbols(decls)) {
+			for (let symbol of Object.getOwnPropertySymbols(decls)) {
 				this.define(object, symbol, decls[symbol]);				
 			}
-			
 		},
 		forName: function(name) {
 			if (typeof name != "string") {
@@ -99,7 +98,7 @@ export default {
 		loadArray: function(source, componentName) {
 			const sys = this.sys;
 			let length = source.length;
-			let array = sys.extend("/system.youni.works/core/Array", {
+			let array = sys.extend(sys.use.Array, {
 				length: length
 			});
 			array[Symbol.status] = "Array";
