@@ -187,9 +187,9 @@ export default {
 		},
 		compileProperty: function(value) {
 			this.compile(value, "expr");
-			let facet = this.sys.facets[value.facet];
-			if (facet) {
-				facet(value);
+			let fn = this.sys.facets[value.facet];
+			if (fn) {
+				fn(value);
 			} else {
 				console.error(`For "${object[sys.symbols.name]}/${key}": Facet "${value.facet}" not defined`);
 				value.value = value.expr;
