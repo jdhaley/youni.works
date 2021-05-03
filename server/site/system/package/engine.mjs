@@ -253,31 +253,30 @@ export default {
 			object[Symbol.status] = "[Constructing]";
 			let type = object[""];
 			if (this.sys.statusOf(type) == "Property") {
-				if (Object.getPrototypeOf(type.expr) == this.sys.use.Array) {
-					let proto = type.expr[0];
-					if (typeof proto == "string") {
-						proto = this.sys.forName(proto);
-					}
-					let target = Object.create(proto  || null);
-					for (let i = 1; i < type.expr.length; i++) {
-						let iface = type.expr[i];
-						iface = this.sys.forName(iface);
-						if (iface[this.sys.symbols.interface]) {
-							iface = iface[this.sys.symbols.interface];
-							iface.implementOn(target);
-						} else {
-							console.log("No interface");
-						}
-					}
-					return target;
+				type = type.expr;
+			}
+			if (typeof type == "string") {
+				type = this.sys.forName(type);
+			}
+			if (!type || Object.getPrototypeOf(type) != this.sys.use.Array) {
+				return Object.create(type || null);
+			}
+			let proto = type[0];
+			if (typeof proto == "string") {
+				proto = this.sys.forName(proto);
+			}
+			let target = Object.create(proto  || null);
+			for (let i = 1; i < type.length; i++) {
+				let iface = type[i];
+				if (typeof iface == "string") iface = this.sys.forName(iface);
+				if (iface) iface = iface[this.sys.symbols.interface];
+				if (iface) {
+					iface.implementOn(target);
 				} else {
-					type = type.expr;
-					if (typeof type == "string") {
-						type = this.sys.forName(type);
-					}
-					return Object.create(type || null);
+					console.error(`No interface for "${type[i]}"`);
 				}
 			}
+			return target;
 		}
 	}
 }

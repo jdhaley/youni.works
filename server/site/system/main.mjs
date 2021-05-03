@@ -24,6 +24,7 @@ export default function main(conf) {
 	pkg = module.packages;
 	sys.use = sys.extend(null, {
 		Object: pkg.core.Object,
+		Array: pkg.core.Array,
 		Instance: pkg.core.Instance,
 		Property: pkg.reflect.Property,
 		Interface: pkg.reflect.Interface		
