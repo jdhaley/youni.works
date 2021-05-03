@@ -1,5 +1,16 @@
 export default {
 	type$: "/system.youni.works/core",
+	A: {
+		type$: "",
+		x: "x"
+	},
+	B: {
+		type$: "",
+		y: "y"
+	},
+	Test: {
+		type$: ["Instance", "A", "B"]
+	},
 	Component: {
 		type$: "Instance",
 		super: function(name, ...args) {

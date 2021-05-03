@@ -39,7 +39,7 @@ export default {
 				return;
 			}
 			for (let name in this.properties) {
-				if (!name) break;
+				if (!name) continue;
 				let value = this.properties[name];
 				if (value && Object.getPrototypeOf(value) == this.sys.use.Property) {
 					value.define(object);

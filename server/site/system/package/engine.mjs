@@ -210,7 +210,9 @@ export default {
 
 			for (let name in properties) {
 				let value = properties[name];
-				if (this.sys.statusOf(value) == "Property") {
+				if (!name) {
+
+				} else if (this.sys.statusOf(value) == "Property") {
 					this.compileProperty(value);
 					delete value[Symbol.status];
 					Object.freeze(value);
@@ -249,14 +251,33 @@ export default {
 				return this.sys.use.Object;
 			}
 			object[Symbol.status] = "[Constructing]";
-			let proto = object[""];
-			if (this.sys.statusOf(proto) == "Property") {
-				proto = proto.expr;
-				if (typeof proto == "string") {
-					proto = this.sys.forName(proto);
+			let type = object[""];
+			if (this.sys.statusOf(type) == "Property") {
+				if (Object.getPrototypeOf(type.expr) == this.sys.use.Array) {
+					let proto = type.expr[0];
+					if (typeof proto == "string") {
+						proto = this.sys.forName(proto);
+					}
+					let target = Object.create(proto  || null);
+					for (let i = 1; i < type.expr.length; i++) {
+						let iface = type.expr[i];
+						iface = this.sys.forName(iface);
+						if (iface[this.sys.symbols.interface]) {
+							iface = iface[this.sys.symbols.interface];
+							iface.implementOn(target);
+						} else {
+							console.log("No interface");
+						}
+					}
+					return target;
+				} else {
+					type = type.expr;
+					if (typeof type == "string") {
+						type = this.sys.forName(type);
+					}
+					return Object.create(type || null);
 				}
 			}
-			return Object.create(proto || null);
 		}
 	}
 }
