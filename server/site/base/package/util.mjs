@@ -42,6 +42,9 @@ export default {
 	},
 	Typing: {
 		type$: "Instance",
+		use: {
+			type$Naming: "Naming"
+		},
 		//instances also have an interface. add interface itself?
 		datatypes: ["void", "boolean", "number", "date", "string", "array", "object"],
 		objecttypes: ["instance", "source", "record", "map", "function", "symbol", "other"],	
@@ -53,6 +56,19 @@ export default {
 			date: ["Date", "_date"],
 			color: ["Color", "_color"],
 			boolean: ["Ind", "_ind", "Flag", "_flag"]
+		},
+		propertyOf: function(name, value) {
+			let dataType = this.propertyType(name, value);
+			let objectType = (dataType == "object" ? this.objectType(value) : "");
+		
+			let property = this.sys.extend(null, {
+				dynamic: true,
+				name: name,
+				dataType: dataType,
+				caption: this.use.Naming.captionize(name)
+			});
+			if (objectType) property.objectType = objectType;
+			return property;
 		},
 		datatypeOf: function(value) {
 			if (value === undefined || value === null || isNaN(value)) return "void";

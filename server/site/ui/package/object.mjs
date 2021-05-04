@@ -50,39 +50,26 @@ export default {
 	},
 	Properties: {
 		type$: "View",
-		use: {
-			type$Naming: "/base.youni.works/util/Naming"
-		},
 		type$typing: "/base.youni.works/util/Typing",
 		displayType: "sheet",
 		conf: {
 			name: "Object",
 			properties: "Nil"
 		},
-		objectProperties: function(object) {
+		dynamicProperties: function(object) {
 			let superType = Object.create(null);
 			for (let prop of this.conf.properties) {
 				superType[prop.name] = prop;
 			}
 			let properties = [];
 			for (let name in object) {
-				if (!superType[name]) properties.push(this.propertyOf(name, object[name]));
+				if (!superType[name]) {
+					let prop = this.typing.propertyOf(name, object[name]);
+					properties.push(prop);
+				}
 			}
 			return properties;
 		},
-		propertyOf: function(name, value) {
-			let dataType = this.typing.propertyType(name, value);
-			let objectType = (dataType == "object" ? objectType(value) : "");
-		
-			let property = this.sys.extend(null, {
-				dynamic: true,
-				name: name,
-				dataType: dataType,
-				caption: this.use.Naming.captionize(name)
-			});
-			if (objectType) property.objectType = objectType;
-			return property;
-		},		
 		display: function() {
 			const peer = this.peer;
 			const conf = this.conf;
@@ -107,7 +94,7 @@ export default {
 		extend$actions: {
 			view: function(on, event) {
 				let model = on.model;
-				on.displayProperties(on.objectProperties(model));
+				on.displayProperties(on.dynamicProperties(model));
 				for (let prop of on.to) prop.bind(model);
 			}
 		}
