@@ -17,6 +17,6 @@ export default {
 		util: util,
 		component: component,
 		command: command,
-		control: control
+		control: control,
 	}
 }

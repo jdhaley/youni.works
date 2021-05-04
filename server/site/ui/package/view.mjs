@@ -42,12 +42,9 @@ export default {
 	},
 	Frame: {
 		type$: ["View", "Owner"],
-		owner: null,
+		type$owner: "",
 		get$peer: function() {
 			return this.window.document.body;
-		},
-		get$style: function() {
-			return this.peer.style;
 		},
 		window: null,
 		events: null,
@@ -65,15 +62,12 @@ export default {
 			return this.window.document.createRange();
 		},
 		createNode: function(name) {
-			let node;
 			if (name.indexOf("/") >= 0) {
 				let idx = name.lastIndexOf("/");
-				node = this.window.document.createElementNs(name.substring(0, idx), name.substring(idx + 1));
+				return this.window.document.createElementNs(name.substring(0, idx), name.substring(idx + 1));
 			} else {
-				node = this.window.document.createElement(name);
+				return this.window.document.createElement(name);
 			}
-			node.to = node.childNodes; //allows send() message to be generic.
-			return node;
 		},
 		toPixels: function(measure) {
 		    let node = this.createNode("div");
