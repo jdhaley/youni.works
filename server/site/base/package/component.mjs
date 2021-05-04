@@ -13,6 +13,9 @@ export default {
 	},
 	Component: {
 		type$: "Instance",
+		get$interface: function() {
+			return this.sys[this.sys.symbols.interface];
+		},
 		super: function(name, ...args) {
 			const thisValue = this[name];
 			for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
@@ -24,17 +27,11 @@ export default {
 			}
 			throw new Error(`super "${name}" is not a method.`);
 		},
-		extend: function(decls) {
-			return this.sys.extend(this, decls);
-		},
 		implement: function(decls) {
 			return this.sys.implement(this, decls);
 		},
 		define: function(name, value, facetName) {
 			return this.sys.define(this, name, value, facetName);
-		},
-		get$interface: function() {
-			return this.sys[this.sys.symbols.interface];
 		},
 		instanceOf: function(object) {
 			return object && typeof object == "object" && Object.prototype.isPrototypeOf.call(object, this);
