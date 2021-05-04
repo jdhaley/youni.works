@@ -67,7 +67,7 @@ export default {
 		}
 	},
 	Owner: {
-		type$: "Control",
+		type$: "",
 		type$remote: "/base.youni.works/util/Remote",
 		open: function(pathname, receiver) {
 			this.remote.service(receiver, "opened", {

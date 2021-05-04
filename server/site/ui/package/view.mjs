@@ -3,9 +3,21 @@ export default {
 	View: {
 		type$: "Control",
 		type$owner: "Frame",
-		once$to: Ui_to,
-		get$peer: function() {
+		get$to: function Ui_to() {
+			const nodes = this.peer.childNodes;
+			if (!nodes.$to) nodes.$to = this.sys.extend(null, {
+				"symbol$iterator": function* iterate() {
+					for (let i = 0, len = nodes.length; i < len; i++) {
+						let node = nodes[i];
+						if (node.$peer) yield node.$peer;
+					}
+				}
+			});
+			return nodes.$to;
+		},
+		once$peer: function() {
 			let peer = this.owner.createNode(this.conf.tag || "div");
+			//Define peer up-front (even before the once$ does) in case .display() references it.
 			this.sys.define(this, "peer", peer);
 			peer.$peer = this;
 			if (this.conf.at) setAttributes(peer, this.conf.at);
@@ -15,7 +27,9 @@ export default {
 		get$style: function() {
 			return this.peer.style;
 		},
-		append: Ui_append,
+		append: function(control) {
+			this.peer.append(control.peer);
+		},
 		display: function() {
 		},
 		bind: function(model) {
@@ -27,10 +41,8 @@ export default {
 		}
 	},
 	Frame: {
-		type$: "Owner",
+		type$: ["View", "Owner"],
 		owner: null,
-		get$to: Ui_to,
-		append: Ui_append,
 		get$peer: function() {
 			return this.window.document.body;
 		},
@@ -83,33 +95,6 @@ function setAttributes(ele, at) {
 	//TODO if attribute is an object, prefix the path iterator over it.
 	//above can handle the custom data attributes for html.
 	if (at) for (let name in at) peer.setAttribute(name, at[name]);
-}
-//virtual$markup: function() {
-//if (!arguments.length) return this.peer.innerHTML;
-//this.peer.innerHTML = "" + arguments[0];
-//},
-//virtual$model: function() {
-//if (!arguments.length) return this.peer.$model;
-//this.unobserve(this.peer.$model);
-//this.peer.$model = arguments[0];
-//this.observe(this.peer.$model);
-//},
-
-function Ui_to() {
-	const nodes = this.peer.childNodes;
-	if (!nodes.$to) nodes.$to = this.sys.extend(null, {
-		"symbol$iterator": function* iterate() {
-			for (let i = 0, len = nodes.length; i < len; i++) {
-				let node = nodes[i];
-				if (node.$peer) yield node.$peer;
-			}
-		}
-	});
-	return nodes.$to;
-}
-
-function Ui_append(control) {
-	this.peer.append(control.peer);
 }
 
 function addEvents(peer, events) {
