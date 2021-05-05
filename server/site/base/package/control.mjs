@@ -4,12 +4,13 @@ export default {
 		type$: "Component",
 		type$conf: "Record",
 		type$owner: "Owner",
-		to: Object.freeze([]),
+		type$to: "Array",
+		start: function(conf) {
+			this.super("start", conf);
+			if (conf) this.sys.define(this, "conf", conf);
+		},
 		append: function(control) {
 			this.to.push(control);
-		},
-		start: function(conf) {
-			if (conf) this.sys.define(this, "conf", conf);
 		},
 		observe: function(object) {
 			const OBSERVERS = this.sys.symbols.observers;
