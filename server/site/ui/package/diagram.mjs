@@ -69,7 +69,7 @@ export default {
 		}
 	},
 	Diagram: {
-		type$: "View",
+		type$: ["View", "Observer"],
 		use: {
 			type$Shape: "Shape",
 			type$Commands: "command/Commands"
@@ -90,38 +90,39 @@ export default {
 			this.model = diagram;
 		},
 		extend$actions: {
-			view: function(on, event) {
-				on.peer.textContent = "";
-				for (let model of on.model.shapes) {
-					let shape = on.owner.create(model.type || on.use.Shape);
-					shape.diagram = on;
+			view: function(event) {
+				this.peer.textContent = "";
+				for (let model of this.model.shapes) {
+					let shape = this.owner.create(model.type || this.use.Shape);
+					shape.diagram = this;
 					shape.bind(model);
-					on.append(shape);
+					this.append(shape);
 				}
 			},
-			keydown: function(on, event) {
+			keydown: function(event) {
 				if (event.key == "Escape") {
-					on.peer.focus();
+					this.peer.focus();
 				}
 				if (event.key == "s" && event.ctrlKey) {
 					event.preventDefault();
-					on.owner.save(on.file, on.model);
+					throw new Error("fix save");
+					this.owner.save(this.file, this.model);
 				}
 				if (event.key == "z" && event.ctrlKey) {
 					event.preventDefault();
-					on.peer.focus();
-					on.commands.undo();
+					this.peer.focus();
+					this.commands.undo();
 				}
 				if (event.key == "y" && event.ctrlKey) {
 					event.preventDefault();
-					on.peer.focus();
-					on.commands.redo();
+					this.peer.focus();
+					this.commands.redo();
 				}
 			}
 		}
 	},
 	Shape: {
-		type$: "View",
+		type$: ["View", "Observer"],
 		use: {
 			type$DrawCommand: "DrawCommand"
 		},
@@ -172,107 +173,111 @@ export default {
 			}
 		},
 		extend$actions: {
-			view: function(on, event) {
-				this.draw(on, event);
-				on.viewContent(on.model.content);
+			view: function(event) {
+				this.viewContent(this.model.content);
+				event.subject = "draw";
+				this.receive(event);
 			},
-			draw: function(on, event) {
-				on.style.width = (on.model.width || on.minWidth) + "px";
-				on.style.height = (on.model.height || on.minHeight) + "px";
-				on.style.top = on.model.y + "px";
-				on.style.left = on.model.x + "px";
-				on.peer.scrollIntoView();
+			draw: function(event) {
+				this.style.width = (this.model.width || this.minWidth) + "px";
+				this.style.height = (this.model.height || this.minHeight) + "px";
+				this.style.top = this.model.y + "px";
+				this.style.left = this.model.x + "px";
+				this.peer.scrollIntoView();
 			},
-			move: function(on, event) {
-				on.moveTo(on.model.x + event.moveX, on.model.y + event.moveY);
+			move: function(event) {
+				this.moveTo(this.model.x + event.moveX, this.model.y + event.moveY);
 			},
-			size: function(on, event) {
-				let model = on.model;
-				switch (on.horiz) {
+			size: function(event) {
+				let model = this.model;
+				switch (this.horiz) {
 					case "L":
-//						if (cmd.before.width - event.trackX < on.minWidth) break;
-						on.moveTo(model.x + event.moveX, model.y);
-						on.sizeTo(model.width - event.moveX, model.height);
+//						if (cmd.before.width - event.trackX < this.minWidth) break;
+						this.moveTo(model.x + event.moveX, model.y);
+						this.sizeTo(model.width - event.moveX, model.height);
 						break;
 					case "R":
-						on.sizeTo(model.width + event.moveX, model.height);
+						this.sizeTo(model.width + event.moveX, model.height);
 						break;
 				}
-				switch (on.vert) {
+				switch (this.vert) {
 					case "T":
-//						if (cmd.before.height - event.trackY < on.minHeight) break;
-						on.moveTo(model.x, model.y + event.moveY);
-						on.sizeTo(model.width, model.height - event.moveY);
+//						if (cmd.before.height - event.trackY < this.minHeight) break;
+						this.moveTo(model.x, model.y + event.moveY);
+						this.sizeTo(model.width, model.height - event.moveY);
 						break;
 					case "B":
-						on.sizeTo(model.width, model.height + event.moveY);
+						this.sizeTo(model.width, model.height + event.moveY);
 						break;
 				}
 			},
-			connect: function(on, event) {
+			connect: function(event) {
 			},
-			mousedown: function(on, event) {
-				if (on.owner.activeElement.parentNode == on.peer) return;
+			mousedown: function(event) {
+				if (this.owner.activeElement.parentNode == this.peer) return;
 				event.preventDefault();
-				event.track = on; // Tell the listener what to track.
-				pvt.setZone(on, event);
-				on.style.outline = "3px solid rgba(64, 128, 64, .3)";
-				on.style.zIndex = "1";
-				on.diagram.peer.focus();
-				if (on.diagram.command) console.log("no mouse up");
+				event.track = this; // Tell the listener what to track.
+				pvt.setZone(this, event);
+				this.style.outline = "3px solid rgba(64, 128, 64, .3)";
+				this.style.zIndex = "1";
+				this.diagram.peer.focus();
+				if (this.diagram.command) console.log("no mouse up");
 			},
-			track: function(on, event) {
-				let cmd = on.diagram.command;
+			track: function(event) {
+				let cmd = this.diagram.command;
 				if (!cmd) {
-					cmd = on.use.DrawCommand.instance(on);
-					on.diagram.command = cmd;
+					cmd = this.use.DrawCommand.instance(this);
+					this.diagram.command = cmd;
 				}
-				if (on.vert == "C" && on.horiz == "C") {
-					this.move(on, event);
+				if (this.vert == "C" && this.horiz == "C") {
+					event.subject = "move";
+					this.receive(event);
 				} else if (event.altKey) {
-					this.connect(on, event);
+					event.subject = "connect";
+					this.receive(event);
 				} else {
-					this.size(on, event);
+					event.subject = "size";
+					this.receive(event);
 				}
-				this.notify(on, "draw");
+				this.owner.notify(this, "draw");
 			},
-			trackEnd: function(on, event) {
+			trackEnd: function(event) {
 				event.subject = "";
-				on.style.outline = "";
-				on.style.cursor = "";
-				on.style.zIndex = "";
-				if (on.diagram.command) {
-					on.set(on.diagram.command.after, on.model);
-					on.diagram.commands.addCommand(on.diagram.command);
-					on.diagram.command = null;
-				} else if (on.peer.firstChild) {
-					on.peer.firstChild.focus();
+				this.style.outline = "";
+				this.style.cursor = "";
+				this.style.zIndex = "";
+				if (this.diagram.command) {
+					this.set(this.diagram.command.after, this.model);
+					this.diagram.commands.addCommand(this.diagram.command);
+					this.diagram.command = null;
+				} else if (this.peer.firstChild) {
+					this.peer.firstChild.focus();
 				}
 			},
-			contextmenu: function(on, event) {
+			contextmenu: function(event) {
 				console.log("context menu here");
 			},
-			mousemove: function(on, event) {
+			mousemove: function(event) {
 				//Don't alter the cursor when a textShape has the focus.
-				//if (on.owner.activeElement.parentNode == on) return;
-				if (!on.diagram.command) {
-					pvt.setZone(on, event);		
+				//if (this.owner.activeElement.parentNode == this) return;
+				if (!this.diagram.command) {
+					pvt.setZone(this, event);		
 				}
 //				if (event.altKey) {
 //					if (event.vert == "C" && event.horiz == "C") {
-//						on.style.cursor = "move";
+//						this.style.cursor = "move";
 //					} else {
-//						on.style.cursor = "crosshair";
+//						this.style.cursor = "crosshair";
 //					}
 //					return;
 //				}
 			},
-//			mouseover: function(on, event) {
-//				on.style.outline = "3px solid rgba(64, 128, 64, .3)";				
+//			mouseover: function(event) {
+//				this.style.outline = "3px solid rgba(64, 128, 64, .3)";				
 //			},
-//			mouseout: function(on, event) {
-//				let cmd = on.diagram.command
-//				if (cmd && cmd.control != on) on.style.outline = "";
+//			mouseout: function(event) {
+//				let cmd = this.diagram.command
+//				if (cmd && cmd.control != this) this.style.outline = "";
 //			},
 		}
 	},
@@ -282,20 +287,20 @@ export default {
 			this.model = model;
 		},
 		extend$actions: {
-			view: function(on, event) {
-				let peer = on.peer;
+			view: function(event) {
+				let peer = this.peer;
 				peer.classList.add("text");
 				peer.textContent = "";
-				peer.innerHTML = "<p>" + on.model + "</p>";
+				peer.innerHTML = "<p>" + this.model + "</p>";
 				peer.contentEditable = true;
 			},
-			focusin: function(on, event) {
-				on.peer.parentNode.style.zIndex = "8";
+			focusin: function(event) {
+				this.peer.parentNode.style.zIndex = "8";
 			},
-			focusout: function(on, event) {
-				on.peer.parentNode.style.zIndex = "";
+			focusout: function(event) {
+				this.peer.parentNode.style.zIndex = "";
 			},
-			dblclick: function(on, event) {
+			dblclick: function(event) {
 				
 			}
 		}

@@ -19,41 +19,41 @@ export default {
             });
         },
         extend$actions: {
-            initializeApp: function(on, msg) {
-                let conf = on.conf;
-                const frame = on.sys.extend(conf.ownerType || on.owner, {
+            initializeApp: function(msg) {
+                let conf = this.conf;
+                const frame = this.sys.extend(conf.ownerType || this.owner, {
                     window: conf.window,
                     events: conf.events,
                     editors: conf.editors
                 });
-                on.sys.define(on, "owner", frame);
+                this.sys.define(this, "owner" , frame);
                 frame.start(conf)        
     
                 let app = JSON.parse(msg.response);
                 conf = frame.sys.extend(conf, app);
-                on.conf = conf;
-                on.initializeDocument(conf);
-                on.open(conf.typeSource, "initializeTypes");
-                on.open(conf.dataSource, "initializeData");
-                on.open(conf.diagram, "initializeDiagram");
+                this.conf = conf;
+                this.initializeDocument(conf);
+                this.open(conf.typeSource, "initializeTypes");
+                this.open(conf.dataSource, "initializeData");
+                this.open(conf.diagram, "initializeDiagram");
             },
-            initializeTypes: function(on, msg) {
+            initializeTypes: function(msg) {
                 let types = JSON.parse(msg.response);
-                on.types = on.sys.extend(null, types);
+                this.types = this.sys.extend(null, types);
             },
-            initializeData: function(on, msg) {
+            initializeData: function(msg) {
                 let data = JSON.parse(msg.response);
-                data = on.sys.extend(null, data);
-                let view = on.owner.create(on.conf.components.Object, on.types[on.conf.objectType]);
-                on.owner.append(view);
+                data = this.sys.extend(null, data);
+                let view = this.owner.create(this.conf.components.Object, this.types[this.conf.objectType]);
+                this.owner.append(view);
                 view.view(data);
             },
-            initializeDiagram: function(on, msg) {
+            initializeDiagram: function(msg) {
                 let data = JSON.parse(msg.response);
-                data = on.sys.extend(null, data);
-                let view = on.owner.create(on.conf.components.Diagram);
-                on.owner.append(view);
-                view.file = on.conf.diagram;
+                data = this.sys.extend(null, data);
+                let view = this.owner.create(this.conf.components.Diagram);
+                this.owner.append(view);
+                view.file = this.conf.diagram;
                 view.view(data);
             }       
         }

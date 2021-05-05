@@ -1,8 +1,9 @@
 export default {
 	type$: "/base.youni.works/control",
 	View: {
-		type$: "Control",
+		type$: "Node",
 		type$owner: "Frame",
+		type$conf: "Record",
 		get$to: function Ui_to() {
 			const nodes = this.peer.childNodes;
 			if (!nodes.$to) nodes.$to = this.sys.extend(null, {
@@ -37,8 +38,12 @@ export default {
 		},
 		view: function(data) {
 			this.bind(data);
-			this.actions.send(this, "view");
-		}
+			this.owner.send(this, "view");
+		},
+		start: function(conf) {
+			this.super("start", conf);
+			if (conf) this.sys.define(this, "conf", conf);
+		},
 	},
 	Frame: {
 		type$: ["View", "Owner"],

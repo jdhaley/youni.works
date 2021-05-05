@@ -49,7 +49,7 @@ export default {
 		}
 	},
 	Properties: {
-		type$: "View",
+		type$: ["View", "Observer"],
 		type$typing: "/base.youni.works/util/Typing",
 		displayType: "sheet",
 		conf: {
@@ -92,10 +92,10 @@ export default {
 			this.model = object;
 		},
 		extend$actions: {
-			view: function(on, event) {
-				let model = on.model;
-				on.displayProperties(on.dynamicProperties(model));
-				for (let prop of on.to) prop.bind(model);
+			view: function(event) {
+				let model = this.model;
+				this.displayProperties(this.dynamicProperties(model));
+				for (let prop of this.to) prop.bind(model);
 			}
 		}
 	},
