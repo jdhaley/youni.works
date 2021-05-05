@@ -1,5 +1,16 @@
 export default {
 	type$: "/base.youni.works/component",
+	A: {
+		type$: "",
+		x: "x"
+	},
+	B: {
+		type$: "",
+		y: "y"
+	},
+	Test: {
+		type$: ["Instance", "A", "B"]
+	},
 	Example: {
 		type$: "Component",
 		type$twin: "Example",

@@ -51,8 +51,8 @@ export default {
 		get$activeElement: function() {
 			return this.window.document.activeElement;
 		},
-		get$search: function() {
-			return this.window.location.search.substring(1);
+		get$location: function() {
+			return this.window.location;
 		},
 		get$selectionRange: function() {
 			let selection = this.window.getSelection();
@@ -61,6 +61,13 @@ export default {
 			}
 			return this.window.document.createRange();
 		},
+		link: function(attrs) {
+            let ele = this.createNode("link");
+            for (let attr in attrs) {
+                ele.setAttribute(attr, attrs[attr]);
+            }
+            this.peer.ownerDocument.head.append(ele);
+        },              
 		createNode: function(name) {
 			if (name.indexOf("/") >= 0) {
 				let idx = name.lastIndexOf("/");
