@@ -172,18 +172,20 @@ export default {
 					break;
 			}
 		},
+		draw: function() {
+			this.style.width = (this.model.width || this.minWidth) + "px";
+			this.style.height = (this.model.height || this.minHeight) + "px";
+			this.style.top = this.model.y + "px";
+			this.style.left = this.model.x + "px";
+			this.peer.scrollIntoView();
+		},
 		extend$actions: {
 			view: function(event) {
+				this.draw();
 				this.viewContent(this.model.content);
-				event.subject = "draw";
-				this.receive(event);
 			},
 			draw: function(event) {
-				this.style.width = (this.model.width || this.minWidth) + "px";
-				this.style.height = (this.model.height || this.minHeight) + "px";
-				this.style.top = this.model.y + "px";
-				this.style.left = this.model.x + "px";
-				this.peer.scrollIntoView();
+				this.draw();
 			},
 			move: function(event) {
 				this.moveTo(this.model.x + event.moveX, this.model.y + event.moveY);

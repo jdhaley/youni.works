@@ -23,7 +23,7 @@ export default {
 				event.track = TRACK.track;
 				event.moveX = event.x - TRACK.x;
 				event.moveY = event.y - TRACK.y;
-				event.track.actions.send(event.track, event);
+				event.track.owner.send(event.track, event);
 				TRACK = event;
 				return;
 			}
@@ -35,7 +35,7 @@ export default {
 				event.track = TRACK.track;
 				event.moveX = 0;
 				event.moveY = 0;
-				TRACK.track.actions.send(TRACK.track, event);
+				TRACK.track.owner.send(TRACK.track, event);
 				TRACK = null;
 			}
 		},
