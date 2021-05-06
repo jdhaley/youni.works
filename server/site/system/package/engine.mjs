@@ -1,79 +1,9 @@
 export default {
 	type$: "/system.youni.works/reflect",
-	Engine: {
-		type$: "System",
-		facets: {
-		},
-		symbols: {
-		},
-		packages: {
-		},
-		type$compiler: "Compiler",
-		type$loader: "Loader",
-		implement: function(object, decls) {
-			if (decls && Object.getPrototypeOf(decls) == this.use.Interface) {
-				decls.implementOn(object);
-				return;
-			}
-			if (decls && typeof decls == "object") {
-				this.implementDecls(object, decls);
-				return;
-			}			
-		},
-		implementDecls: function(object, decls) {
-			for (let decl of Object.getOwnPropertyNames(decls)) {
-				let facet = this.facetOf(decl);
-				let name = this.nameOf(decl);
-				if (!name && !object[Symbol.status]) {
-					console.warn("Object declaration ignored in Engine.implement()");
-					break;
-				}
-				let value = decls[decl];
-				if (this.loader) value = this.loader.load(value);
-				if (this.sys.statusOf(value)) {
-					this.compiler.compile(decls, decl);
-					value = decls[decl];
-				}
-				this.define(object, name, value, facet);
-			}
-			for (let symbol of Object.getOwnPropertySymbols(decls)) {
-				this.define(object, symbol, decls[symbol]);				
-			}
-		},
-		forName: function(name, fromName) {
-			if (typeof name != "string") {
-				throw new TypeError(`"name" argument must be a "string".`);
-			}
-			if (!name) return null;
-			let component = this.packages;
-			if (name.startsWith("/")) {
-				name = name.substring(1);
-			} else {
-				component = component["."];
-			}
-			return this.compiler.resolve(component, name, fromName);
-		},
-		compile: function(value, componentName) {
-			if (this.packages["."]) {
-				throw new Error("Compilation in progress.");
-			}
-			value = this.loader.load(value, componentName);
-			this.packages["."] = value;
-			this.compiler.compile(this.packages, ".");
-			value = this.packages["."];
-			delete this.packages["."];
-			return value;
-		},
-		statusOf: function(value) {
-			if (value && (typeof value == "object" || typeof value == "function")) {
-				return value[Symbol.status];
-			} 
-		}
-	},
 	Loader: {
 		type$: "Instance",
 		load: function(value, componentName) {
-			if (this.sys.statusOf(value)) {
+			if (this.sys.compiler.statusOf(value)) {
 				console.warn("Loading cycle detected.");
 				return value;
 			}
@@ -134,9 +64,54 @@ export default {
 	},
 	Compiler: {
 		type$: "Instance",
+		statusOf: function(value) {
+			if (value && (typeof value == "object" || typeof value == "function")) {
+				return value[Symbol.status];
+			} 
+		},
+		implement: function(object, decls) {
+			for (let decl of Object.getOwnPropertyNames(decls)) {
+				let facet = this.sys.facetOf(decl);
+				let name = this.sys.nameOf(decl);
+				if (!name && !object[Symbol.status]) {
+					console.warn("Object declaration ignored in Engine.implement()");
+					break;
+				}
+				let value = decls[decl];
+				if (this.loader) value = this.sys.loader.load(value);
+				if (this.statusOf(value)) {
+					this.compile(decls, decl);
+					value = decls[decl];
+				}
+				this.sys.define(object, name, value, facet);
+			}
+			for (let symbol of Object.getOwnPropertySymbols(decls)) {
+				this.sys.define(object, symbol, decls[symbol]);				
+			}
+		},
+		resolve: function(component, name, fromName) {
+			let componentName = "";
+			for (let propertyName of name.split("/")) {
+				if (typeof component != "object") return error("is not an object.");
+				if (!component[propertyName]) return error(`does not define "${propertyName}".`);
+				if (this.statusOf(component)) return error(`has status of "${this.statusOf(component)}"`);
+				if (this.statusOf(component[propertyName])) {
+					this.compile(component, propertyName);
+				}
+				component = component[propertyName];
+				componentName += (componentName ? "/" : "") + propertyName;
+			}
+			return component;
+
+			function error(msg) {
+				let err = fromName ? `From "${fromName}"... ` : "For ";
+				err += `name "${name}": "${componentName}" ` + msg;
+				console.error(err);
+			}
+		},
 		compile: function(object, key) {
 			let value = object[key];
-			switch (this.sys.statusOf(value)) {
+			switch (this.statusOf(value)) {
 				case "Property":
 					this.compileProperty(value);
 					value.define(object);
@@ -161,34 +136,13 @@ export default {
 					value.call(this.sys, object, key);
 					return;
 				case "Method":
-					console.debug("Compile", object[key]);
 					this.compileMethod(object, key);
 					return;
 				case undefined:
 					return;
 				default:
-					console.error(`Invalid compilation status "${this.sys.statusOf(value)}"`);
+					console.error(`Invalid compilation status "${this.statusOf(value)}"`);
 					return;
-			}
-		},
-		resolve: function(component, name, fromName) {
-			let componentName = "";
-			for (let propertyName of name.split("/")) {
-				if (typeof component != "object") return error("is not an object.");
-				if (!component[propertyName]) return error(`does not define "${propertyName}".`);
-				if (this.sys.statusOf(component)) return error(`has status of "${this.statusOf(component)}"`);
-				if (this.sys.statusOf(component[propertyName])) {
-					this.compile(component, propertyName);
-				}
-				component = component[propertyName];
-				componentName += (componentName ? "/" : "") + propertyName;
-			}
-			return component;
-
-			function error(msg) {
-				let err = fromName ? `From "${fromName}"... ` : "For ";
-				err += `name "${name}": "${componentName}" ` + msg;
-				console.error(err);
 			}
 		},
 		compileMethod: function(object, name) {
@@ -235,7 +189,7 @@ export default {
 				let value = properties[name];
 				if (!name) {
 
-				} else if (this.sys.statusOf(value) == "Property") {
+				} else if (this.statusOf(value) == "Property") {
 					this.compileProperty(value);
 					delete value[Symbol.status];
 					Object.freeze(value);
@@ -267,7 +221,7 @@ export default {
 			}
 			object[Symbol.status] = "[Constructing]";
 			let type = object[""];
-			if (this.sys.statusOf(type) == "Property") {
+			if (this.statusOf(type) == "Property") {
 				type = type.expr;
 			}
 			if (typeof type == "string") {

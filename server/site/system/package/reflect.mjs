@@ -80,8 +80,17 @@ export default {
 	System: {
 		type$: "Instance",
 		use: {
-			type$Property: "Property"
+			type$Object: "Object",
+			type$Array: "Array",
+			type$Property: "Property",
+			type$Interface: "Interface",
+			type$Module: "Module"
 		},
+		facets: {},
+		symbols: {},
+		packages: {},
+		type$compiler: "Compiler",
+		type$loader: "Loader",
 		extend: function(object, decls) {
 			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || null);
@@ -89,12 +98,14 @@ export default {
 			return object;
 		},
 		implement: function(object, decls) {
-			if (decls && typeof decls == "object") for (let decl of Object.getOwnPropertyNames(decls)) {
-				let facet = this.facetOf(decl);
-				let name = this.nameOf(decl);
-				let value = decls[decl];
-				if (!facet && name) this.define(object, name, value, facet);
+			if (decls && Object.getPrototypeOf(decls) == this.use.Interface) {
+				decls.implementOn(object);
+				return;
 			}
+			if (decls && typeof decls == "object") {
+				this.compiler.implement(object, decls);
+				return;
+			}			
 		},
 		define: function(object, name, value, facet) {
 			let decl;
@@ -122,8 +133,18 @@ export default {
 				expr: value
 			});
 		},
-		forName: function(name, component) {
-			throw new Error("Unimplemented");
+		forName: function(name, fromName) {
+			if (typeof name != "string") {
+				throw new TypeError(`"name" argument must be a "string".`);
+			}
+			if (!name) return null;
+			let component = this.packages;
+			if (name.startsWith("/")) {
+				name = name.substring(1);
+			} else {
+				component = component["."];
+			}
+			return this.compiler.resolve(component, name, fromName);
 		},
 		getSuper: function(object, name) {
 			if (!object) return;
@@ -134,8 +155,16 @@ export default {
 				if (sup !== sub) return sup;
 			}
 		},
-		compile: function(value, contextName) {
-			throw new Error("Unimplemented");
+		compile: function(value, componentName) {
+			if (this.packages["."]) {
+				throw new Error("Compilation in progress.");
+			}
+			value = this.loader.load(value, componentName);
+			this.packages["."] = value;
+			this.compiler.compile(this.packages, ".");
+			value = this.packages["."];
+			delete this.packages["."];
+			return value;
 		},
 		facetOf: function(decl) {
 			if (typeof decl == "symbol") return "";
@@ -148,6 +177,24 @@ export default {
 			decl = "" + decl;
 			let index = decl.indexOf("$");
 			return index < 0 ? decl : decl.substring(index + 1);
+		}
+	},
+	Loader: {
+		load: function(value, componentName) {
+			throw new Error("Abstract");
+		}
+	},
+	Compiler: {
+		type$: "Instance",
+		//Instead of being abstract, a simple implementation is defined for booting the system.
+		implement: function(object, decls) {
+			throw new Error("Abstract");
+		},
+		resolve: function(name, fromName) {
+			throw new Error("Abstract");
+		},
+		compile: function(value, name) {
+			throw new Error("Astract");
 		}
 	}
 }

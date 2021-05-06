@@ -1,39 +1,26 @@
 export default function main(conf) {
-	let sys = bootSys(conf);
+	let sys = bootInstance(conf).sys;
 	let module = sys.extend(sys.use.Module, conf.module);
 	module.compile(conf.packages);
 
 	let pkg = module.packages;
-	sys = sys.extend(pkg.engine.Engine, {
-		use: {
-			Object: pkg.core.Object,
-			Array: pkg.core.Array,
-			Instance: pkg.core.Instance,
-			Property: pkg.reflect.Property,
-			Interface: pkg.reflect.Interface
-		},
-		packages: {
-		},
+	sys = sys.extend(pkg.reflect.System, {
+		packages: sys.packages,
 		symbols: sys.symbols,
-		facets: sys.facets
+		facets: sys.facets,
+		compiler: pkg.engine.Compiler,
+		loader: pkg.engine.Loader
 	});
-	sys.define(pkg.core.Object, sys.symbols.sys, sys);
-	Object.freeze(pkg.core.Object);
 	module = sys.extend(pkg.reflect.Module, conf.module);
 	module.compile(conf.packages);
-	pkg = module.packages;
-	sys.use = sys.extend(null, {
-		Object: pkg.core.Object,
-		Array: pkg.core.Array,
-		Instance: pkg.core.Instance,
-		Property: pkg.reflect.Property,
-		Interface: pkg.reflect.Interface		
-	});
+	sys.define(pkg.core.Object, sys.symbols.sys, sys);
+	Object.freeze(pkg.core.Object);
 	Object.freeze(sys);
 	return module;
 }
 
-function bootSys(conf) {
+
+function bootInstance(conf) {
 	/*
 	 * The sys symbol is attached to Symbol so that it can be retrieved from any arbitrary
 	 * code. (Otherwise you need a sys reference to get sys.symbols).
@@ -48,29 +35,34 @@ function bootSys(conf) {
 	Symbol.status = Symbol("status");
 
 	const pkg = conf.packages;
-	
-	let Obj = Object.create(null);
-	Obj[Symbol.status] = "[Booting]";
-	
-	let Instance = Object.create(Obj);
-	let sys = pkg.reflect.System.extend(Instance, pkg.reflect.System);
-	let state = {
+
+	let Obj = extend(null);
+	let Instance = extend(Obj, pkg.core.Instance);
+	Instance.sys = extend(Instance, pkg.reflect.System);
+	implement(Instance.sys, {
 		use: {
 			Object: Obj,
-			Array: sys.extend(Obj, pkg.core.Array),
-			Property: sys.extend(Instance, pkg.reflect.Property),
-			Module: sys.extend(Instance, pkg.reflect.Module)
+			Array: extend(Obj, pkg.core.Array),
+			Property: extend(Instance, pkg.reflect.Property),
+			Interface: extend(Instance, pkg.reflect.Interface),
+			Module: extend(Instance, pkg.reflect.Module)
 		},
-		facets: Object.seal(sys.extend(null, conf.facets)),
-		symbols: Object.seal(sys.extend(null, conf.symbols)),
-		packages: sys.extend(),
-		loader: sys.extend(Instance, pkg.engine.Loader),
-		compiler: sys.extend(Instance, pkg.engine.Compiler)
-	}
-	//nested extend because we need first sys instance to extend state in:
-	sys = sys.extend(sys.extend(sys, pkg.engine.Engine), state);
-	Instance.sys = sys;
-	delete Obj[Symbol.status];
+		facets: Object.seal(extend(null, conf.facets)),
+		symbols: Object.seal(extend(null, conf.symbols)),
+		packages: extend(null),
+		compiler: extend(Instance, pkg.engine.Compiler),
+		loader: extend(Instance, pkg.engine.Loader)	
+	});
 
-	return sys;
+	return Instance;
+
+	function implement(object, decls) {
+		for (let decl in decls) object[decl] = decls[decl];
+	}
+
+	function extend(object, decls) {
+		object = Object.create(object);
+		implement(object, decls);
+		return object;
+	}
 }
