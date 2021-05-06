@@ -1,8 +1,8 @@
 export default {
 	type$: "/base.youni.works/util",
     App: {
-        type$: "Origin",
-        type$owner: "/ui.youni.works/view/Frame",
+        type$: ["Control", "Origin"],
+        type$owner: "Owner",
         start: function(conf) {
             this.conf = conf;
             let manifest = "/file/" + conf.window.location.search.substring(1) + "/app.json";
