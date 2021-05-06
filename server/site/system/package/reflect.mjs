@@ -38,6 +38,8 @@ export default {
 				console.warn(`Interface "${this.name}" already implemented on object.`);
 				return;
 			}
+			let sup = this.extends;
+			if (sup) sup.implementOn(object);
 			for (let name in this.properties) {
 				if (!name) continue;
 				let value = this.properties[name];
@@ -122,6 +124,15 @@ export default {
 		},
 		forName: function(name, component) {
 			throw new Error("Unimplemented");
+		},
+		getSuper: function(object, name) {
+			if (!object) return;
+			const sub = object[name];
+			const OGP = Object.getPrototypeOf;
+			if (sub) for (object = OGP(object); object; object = OGP(object)) {
+				let sup = object[name];
+				if (sup !== sub) return sup;
+			}
 		},
 		compile: function(value, contextName) {
 			throw new Error("Unimplemented");

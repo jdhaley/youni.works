@@ -40,7 +40,7 @@ export default {
 				this.define(object, symbol, decls[symbol]);				
 			}
 		},
-		forName: function(name) {
+		forName: function(name, fromName) {
 			if (typeof name != "string") {
 				throw new TypeError(`"name" argument must be a "string".`);
 			}
@@ -51,7 +51,7 @@ export default {
 			} else {
 				component = component["."];
 			}
-			return this.compiler.resolve(component, name);
+			return this.compiler.resolve(component, name, fromName);
 		},
 		compile: function(value, componentName) {
 			if (this.packages["."]) {
@@ -65,7 +65,9 @@ export default {
 			return value;
 		},
 		statusOf: function(value) {
-			if (value && typeof value == "object") return value[Symbol.status];
+			if (value && (typeof value == "object" || typeof value == "function")) {
+				return value[Symbol.status];
+			} 
 		}
 	},
 	Loader: {
@@ -88,12 +90,16 @@ export default {
 			return value;
 		},
 		loadFunction: function(source, componentName) {
-			 if (source.name == "expr$") {
-				 source[Symbol.status] = "Expr";
-			 } else if (componentName) {
-				 source[this.sys.symbols.name] = componentName;
-			 }
-			 return source;
+			if (source.name == "expr$") {
+				source[Symbol.status] = "Expr";
+			} else if (componentName) {
+				if (Object.isFrozen(source)) {
+					return source;
+				}	
+				source[Symbol.status] = "Method";
+				source[this.sys.symbols.name] = componentName;
+			}
+			return source;
 		},
 		loadArray: function(source, componentName) {
 			const sys = this.sys;
@@ -131,9 +137,6 @@ export default {
 		compile: function(object, key) {
 			let value = object[key];
 			switch (this.sys.statusOf(value)) {
-				case "Expr":
-					value.call(this.sys, object, key);
-					return;
 				case "Property":
 					this.compileProperty(value);
 					value.define(object);
@@ -154,6 +157,13 @@ export default {
 						Object.freeze(target);
 					}
 					return;
+				case "Expr":
+					value.call(this.sys, object, key);
+					return;
+				case "Method":
+					console.debug("Compile", object[key]);
+					this.compileMethod(object, key);
+					return;
 				case undefined:
 					return;
 				default:
@@ -161,22 +171,12 @@ export default {
 					return;
 			}
 		},
-		resolve: function(component, name) {
-			let componentName = ""; //(component == this.sys.packages ? "/" : "");
+		resolve: function(component, name, fromName) {
+			let componentName = "";
 			for (let propertyName of name.split("/")) {
-				//name, component, componentName, propertyName
-				if (typeof component != "object") {
-					console.error(`For name "${name}": "${componentName}" is not an object.`);
-					return undefined;
-				}
-				//allow prototype properties. The following was added when debugging system to reduce side-effects.
-				if (!component[propertyName]) {
-					console.error(`For name "${name}": "${componentName}" does not define "${propertyName}".`);
-					return undefined;
-				}
-				if (this.sys.statusOf(component)) {
-					console.warn(`For name "${name}: "${componentName}" has status of "${this.statusOf(component)}"`);
-				}
+				if (typeof component != "object") return error("is not an object.");
+				if (!component[propertyName]) return error(`does not define "${propertyName}".`);
+				if (this.sys.statusOf(component)) return error(`has status of "${this.statusOf(component)}"`);
 				if (this.sys.statusOf(component[propertyName])) {
 					this.compile(component, propertyName);
 				}
@@ -184,6 +184,20 @@ export default {
 				componentName += (componentName ? "/" : "") + propertyName;
 			}
 			return component;
+
+			function error(msg) {
+				let err = fromName ? `From "${fromName}"... ` : "For ";
+				err += `name "${name}": "${componentName}" ` + msg;
+				console.error(err);
+			}
+		},
+		compileMethod: function(object, name) {
+			let method = object[name];
+			method.$super = this.sys.getSuper(object, name);
+			method.definedIn = object;
+			delete method[Symbol.status];
+			delete method[this.sys.symbols.name];
+			Object.freeze(method);
 		},
 		compileProperty: function(value) {
 			this.compile(value, "expr");
@@ -202,6 +216,15 @@ export default {
 			}
 			delete object[this.sys.symbols.name];
 			Object.freeze(object);
+		},
+		compileTarget: function(target, properties) {
+			for (let name in properties) {
+				if (name) this.sys.define(target, name, properties[name]);
+			}
+			//NB! Only iterate over the target's own properties
+			for (let name of Object.getOwnPropertyNames(target)) {
+				this.compile(target, name);
+			}
 		},
 		compileClass: function(target, properties) {
 			this.compileTarget(target, properties);
@@ -237,17 +260,9 @@ export default {
 				Object.freeze(target);				
 			}
 		},
-		compileTarget: function(target, properties) {
-			for (let name in properties) {
-				if (name) this.sys.define(target, name, properties[name]);
-			}
-			//NB! Only iterate over the target's own properties
-			for (let name of Object.getOwnPropertyNames(target)) {
-				this.compile(target, name);
-			}
-		},
 		constructInstance: function(object) {
-			if (object[this.sys.symbols.name] == "system.youni.works/core/Object") {
+			let iname = object[this.sys.symbols.name];
+			if (iname == "system.youni.works/core/Object") {
 				return this.sys.use.Object;
 			}
 			object[Symbol.status] = "[Constructing]";
@@ -256,19 +271,19 @@ export default {
 				type = type.expr;
 			}
 			if (typeof type == "string") {
-				type = this.sys.forName(type);
+				type = this.sys.forName(type, iname);
 			}
 			if (!type || Object.getPrototypeOf(type) != this.sys.use.Array) {
 				return Object.create(type || null);
 			}
 			let proto = type[0];
 			if (typeof proto == "string") {
-				proto = this.sys.forName(proto);
+				proto = this.sys.forName(proto, iname);
 			}
 			let target = Object.create(proto  || null);
 			for (let i = 1; i < type.length; i++) {
 				let iface = type[i];
-				if (typeof iface == "string") iface = this.sys.forName(iface);
+				if (typeof iface == "string") iface = this.sys.forName(iface, iname);
 				if (iface) iface = iface[this.sys.symbols.interface];
 				if (iface) {
 					iface.implementOn(target);

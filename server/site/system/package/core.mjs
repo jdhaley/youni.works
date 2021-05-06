@@ -25,15 +25,9 @@ export default {
 			return this.sys[this.sys.symbols.interface];
 		},
 		super: function(name, ...args) {
-			const thisValue = this[name];
-			for (let proto = Object.getPrototypeOf(this); proto; proto = Object.getPrototypeOf(proto)) {
-				let protoValue = proto[name];
-				if (protoValue !== thisValue) {
-					if (typeof protoValue == "function") return protoValue.apply(this, args);
-					break;
-				}
-			}
-			throw new Error(`super "${name}" is not a method.`);
+			let method = this[name] && this[name].$super;
+			if (method) return method.apply(this, args);
+			console.error(`super("${name}" ...) is not a method.`);
 		},
 		toString: Object.prototype.toString,
 		valueOf: Object.prototype.valueOf,
