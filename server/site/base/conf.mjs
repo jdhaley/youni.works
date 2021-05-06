@@ -1,9 +1,8 @@
 import system from "../system/index.mjs";
 
-import component from "./package/component.mjs";
-import util from "./package/util.mjs";
-import command from "./package/command.mjs";
 import control from "./package/control.mjs";
+import command from "./package/command.mjs";
+import util from "./package/util.mjs";
 
 export default {
 	sys: system.sys,
@@ -14,9 +13,8 @@ export default {
 		uses: [system]
 	},
 	packages: {
-		component: component,
-		util: util,
+		control: control,
 		command: command,
-		control: control
+		util: util
 	}
 }

@@ -1,5 +1,5 @@
 export default {
-	type$: "/base.youni.works/component",
+	type$: "/base.youni.works/control",
 	Naming: {
 		type$: "",
 		captionize: function(name) {
@@ -116,7 +116,7 @@ export default {
 		}	
 	},
 	Origin: {
-        type$: "Component",
+        type$: "",
         type$remote: "Remote",
         origin: "",
         open: function(pathname, subject) {
