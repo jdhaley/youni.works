@@ -46,7 +46,7 @@ export default {
 		},
 	},
 	Frame: {
-		type$: ["View", "Owner"],
+		type$: ["View", "DomOwner"],
 		type$owner: "",
 		get$peer: function() {
 			return this.window.document.body;
@@ -73,14 +73,6 @@ export default {
             }
             this.peer.ownerDocument.head.append(ele);
         },              
-		createNode: function(name) {
-			if (name.indexOf("/") >= 0) {
-				let idx = name.lastIndexOf("/");
-				return this.window.document.createElementNs(name.substring(0, idx), name.substring(idx + 1));
-			} else {
-				return this.window.document.createElement(name);
-			}
-		},
 		toPixels: function(measure) {
 		    let node = this.createNode("div");
 		    node.style.height = measure;

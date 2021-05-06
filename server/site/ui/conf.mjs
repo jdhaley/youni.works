@@ -4,8 +4,6 @@ import view from "./package/view.mjs";
 import diagram from "./package/diagram.mjs";
 import object from "./package/object.mjs";
 
-import example from "./package/example.mjs";
-
 export default {
 	sys: base.sys,
 	module: {
@@ -18,6 +16,5 @@ export default {
 		view: view,
 		diagram: diagram,
 		object: object,
-		example: example
 	}
 }

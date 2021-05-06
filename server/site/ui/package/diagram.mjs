@@ -46,12 +46,12 @@ export default {
 		exec: function() {
 			let control = this.control;
 			control.set(control.model, this.after);
-			control.actions.notify(control, "draw");
+			control.owner.notify(control, "draw");
 		},
 		undo: function() {
 			let control = this.control;
 			control.set(control.model, this.before);
-			control.actions.notify(control, "draw");
+			control.owner.notify(control, "draw");
 		},
 		instance: function(control) {
 			let model = control.model;
