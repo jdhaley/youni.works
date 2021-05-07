@@ -8,6 +8,10 @@ export default {
             let manifest = "/file/" + conf.window.location.search.substring(1) + "/app.json";
             this.open(manifest, "initializeApp");
         },
+        createView: function() {
+            this.view = this.owner.create(this.conf.components.Object, this.types[this.conf.objectType]);
+            this.owner.append(this.view);
+        },
         initializeDocument: function() {
             if (this.conf.icon) this.owner.link({
                 rel: "icon",
@@ -19,34 +23,31 @@ export default {
             });
         },
         extend$actions: {
+            view: function(msg) {
+                this.view.view(this.data);
+            },
             initializeApp: function(msg) {
+                this.conf = this.sys.extend(this.conf, JSON.parse(msg.response));
                 let conf = this.conf;
-                const frame = this.sys.extend(conf.ownerType || this.owner, {
-                    window: conf.window,
-                    events: conf.events,
-                    editors: conf.editors
-                });
-                this.sys.define(this, "owner" , frame);
-                frame.start(conf)        
-    
-                let app = JSON.parse(msg.response);
-                conf = frame.sys.extend(conf, app);
-                this.conf = conf;
-                this.initializeDocument(conf);
                 this.open(conf.typeSource, "initializeTypes");
                 this.open(conf.dataSource, "initializeData");
                 this.open(conf.diagram, "initializeDiagram");
+ 
+                this.sys.define(this, "owner" , this.sys.extend(conf.ownerType || this.owner));
+                this.owner.editors = conf.editors;
+                this.owner.start(conf);
+                this.initializeDocument(conf);
             },
             initializeTypes: function(msg) {
                 let types = JSON.parse(msg.response);
                 this.types = this.sys.extend(null, types);
+                this.createView();
+                if (this.data) this.receive("view");
             },
             initializeData: function(msg) {
                 let data = JSON.parse(msg.response);
-                data = this.sys.extend(null, data);
-                let view = this.owner.create(this.conf.components.Object, this.types[this.conf.objectType]);
-                this.owner.append(view);
-                view.view(data);
+                this.data = this.sys.extend(null, data);
+                if (this.view) this.receive("view");
             },
             initializeDiagram: function(msg) {
                 let data = JSON.parse(msg.response);
@@ -55,7 +56,7 @@ export default {
                 this.owner.append(view);
                 view.file = this.conf.diagram;
                 view.view(data);
-            }       
+            }
         }
     }
 }

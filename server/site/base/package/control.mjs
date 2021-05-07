@@ -85,13 +85,13 @@ export default {
 	},
 	DomOwner: {
 		type$: "Owner",
-		window: null,
+		document: null,
 		createNode: function(name) {
 			if (name.indexOf("/") >= 0) {
 				let idx = name.lastIndexOf("/");
-				return this.window.document.createElementNs(name.substring(0, idx), name.substring(idx + 1));
+				return this.document.createElementNs(name.substring(0, idx), name.substring(idx + 1));
 			} else {
-				return this.window.document.createElement(name);
+				return this.document.createElement(name);
 			}
 		},
 		sense: function(on, event) {

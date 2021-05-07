@@ -49,23 +49,25 @@ const pkg = {
 		Frame: {
 			type$: ["View", "DomOwner"],
 			type$owner: "",
-			get$peer: function() {
-				return this.window.document.body;
+			$window: null,
+			get$document: function() {
+				return this.$window.document;
 			},
-			window: null,
-			events: null,
-			get$activeElement: function() {
-				return this.window.document.activeElement;
+			get$peer: function() {
+				return this.document.body;
 			},
 			get$location: function() {
-				return this.window.location;
+				return this.$window.location;
+			},
+			get$activeElement: function() {
+				return this.document.activeElement;
 			},
 			get$selectionRange: function() {
-				let selection = this.window.getSelection();
+				let selection = this.$window.getSelection();
 				if (selection && selection.rangeCount) {
 					return selection.getRangeAt(0);
 				}
-				return this.window.document.createRange();
+				return this.document.createRange();
 			},
 			link: function(attrs) {
 				let ele = this.createNode("link");
@@ -83,10 +85,11 @@ const pkg = {
 				return px;
 			},
 			start: function(conf) {
-				this.window.document.body.$peer = this;
+				this.sys.define(this, "$window", conf.window);
+				this.document.body.$peer = this;
 				//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-				pkg.addEvents(this.window, this.events.windowEvents);
-				pkg.addEvents(this.window.document, this.events.documentEvents);
+				pkg.addEvents(this.$window, conf.events.windowEvents);
+				pkg.addEvents(this.document, conf.events.documentEvents);
 			}
 		}
 	},
