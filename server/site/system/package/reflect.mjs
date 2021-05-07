@@ -68,7 +68,8 @@ export default {
 			for (let name in packages) {
 				let ctxName = this.id + "/" + name;
 				console.debug(`Compiling "${ctxName}"...`);
-				target[name] = this.sys.compile(packages[name], ctxName);
+				let pkg = packages[name];
+				target[name] = this.sys.compile(pkg.$public ? pkg.$public : pkg, ctxName);
 				console.debug(`Compiled "${ctxName}".`);
 			}
 			Object.freeze(target);
