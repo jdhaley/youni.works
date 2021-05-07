@@ -1,6 +1,6 @@
 {
 	"title": "Test",
-	"icon": "/file/test/index.png",
+	"icon": "/file/test/icon.png",
 	"styles": "/file/test/styles.css",
 	"components": {
 		"Frame": "/ui.youni.works/view/Frame",

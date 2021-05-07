@@ -1,5 +1,5 @@
-export default function main(sys, conf) {
-	const pkg = conf.packages;
+export default function main(conf) {
+	const pkg = conf.node_modules;
 	
 	const app = pkg.express();
 	app.use("/prd", pkg.express.static(conf.site));
@@ -25,7 +25,11 @@ export default function main(sys, conf) {
 				res.writeHead(200, {"Content-Type": "text/css"});
 				res.write(file);
 				res.end();
-			} else {
+			// } else if (req.url.endsWith(".png")) {
+			// 	res.writeHead(200, {"Content-Type": "image/png"});
+			// 	res.write(file);
+			// 	res.end();
+			}else {
 				res.send(file);
 			}
 		} else if (req.method == "PUT") {
