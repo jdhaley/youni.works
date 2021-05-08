@@ -1,44 +1,53 @@
 export default {
 	type$: "/ui.youni.works/view",
-	Property: {
-		type$: "View",
+	UserInterface: {
+		type$: "",
+		
+		dataType: "object",
+		properties: {}
+	},
+	Decl: {
 		use: {
 			type$Naming: "/base.youni.works/util/Naming"
 		},
-		type$object: "Properties",
-		conf: {
-			name: "",
-			dataType: "",
-			caption: "",
-			viewWidth: 4
-		},
+		type$: "",
+		name: "",
+		dataType: "",
 		get$caption: function() {
-			return this.conf.caption || this.use.Naming.captionize(this.conf.name);
+			return this.use.Naming.captionize(this.name);
+		},
+		viewWidth: 4
+	},
+	Part: {
+		type$: "View",
+		type$object: "Properties",
+		type$conf: "Decl",
+		get$desc: function() {
+			return this.conf;
+		},
+		displayEditor: function() {
+			//Return the function to create the view's property editor.
+			let dataType = this.des.dataType || typeof this.model;
+			let editor = this.owner.editors[dataType] || this.owner.editors["string"];
+			return editor();
 		},
 		display: function() {
 			const peer = this.peer;
-			const conf = this.conf;
 			peer.classList.add("property");
-			if (this.conf.dynamic) peer.classList.add("dynamic");
-			conf.name && peer.classList.add(conf.name);
+			if (this.des.dynamic) peer.classList.add("dynamic");
+			this.des.name && peer.classList.add(this.des.name);
 			if (this.object.displayType != "row") {
 				let label = this.owner.createNode("label");
-				label.textContent = this.caption;
+				label.textContent = this.des.caption;
 				peer.append(label);		
 			} else {
 			}
-			this.editor = this.editorFor();
+			this.editor = this.displayEditor();
 			peer.append(this.editor);
-		},
-		get$editorFor: function() {
-			//Return the function to create the view's property editor.
-			let dataType = this.conf.dataType || typeof this.model;
-			let editor = this.owner.editors[dataType] || this.owner.editors["string"];
-			return editor;
 		},
 		bind: function(model) {
 			if (this.editor.type) {
-				model = model[this.conf.name];
+				model = model[this.des.name];
 				if (typeof model == "object") model = "[object]";
 				if (this.editor.nodeName == "INPUT") {
 					this.editor.value = model;
@@ -80,7 +89,7 @@ export default {
 		displayProperties: function(properties) {
 			if (!properties) return;
 			for (let propConf of properties) {
-				let propType = propConf.controlType || "/ui.youni.works/object/Property";
+				let propType = propConf.controlType || "/ui.youni.works/object/Part";
 				let prop = this.owner.create(propType, propConf);
 				this.sys.define(prop, "object", this);
 				this.append(prop);

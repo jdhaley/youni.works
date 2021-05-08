@@ -1,9 +1,20 @@
 export default {
 	type$: "/system.youni.works/core",
-	Property: {
-		type$: "Instance",
-		facet: "",
+	Element: {
+		type$: "Object",
+		type$of: "Element",
 		name: "",
+		get$id: function() {
+			return this.of.id + "/" + this.name;
+		},
+		get$sys: function() {
+			return this[Symbol.sys]; //Symbol.sys is defined through bootstrapping.
+		}
+	},
+	Property: {
+		type$: "Element",
+		type$of: "Interface",
+		facet: "",
 		expr: undefined,
 		configurable: true,
 		/*
@@ -15,9 +26,11 @@ export default {
 		}
 	},
 	Interface: {
-		type$: "Instance",
-		name: "",
+		type$: "Element",
+		type$of: "Package",
 		type$prototype: "Object",
+		type$extends: "Interface",
+		implements: [], //Array of Interface or string types.
 		properties: {
 		},
 		get$extends: function() {
@@ -53,10 +66,20 @@ export default {
 //		type$module: "Module",
 //		type$implements: "Array", //of Interface
 	},
+	Package: {
+		type$: "Element",
+		type$of: "Module",
+		source: {
+		},
+		public: {
+		}
+	},
 	Module: {
-		type$: "Instance",
-		id: "",
-		version: "",
+		type$: "Element",
+		get$id: function() {
+			return this.name + ":" + this.version
+		},
+		version: "0.0.0",
 		moduleType: "",
 		uses: [],
 		packages: {
