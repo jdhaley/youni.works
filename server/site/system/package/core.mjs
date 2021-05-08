@@ -11,7 +11,7 @@ export default {
 	},
 	Array: {
 		type$: "Object",
-		length: 0,
+		var$length: 0,
 		symbol$iterator: function *() {
 			for (let i = 0; i < this.length; i++) yield this[i];
 		}
@@ -22,7 +22,7 @@ export default {
 			return this[Symbol.sys]; //Symbol.sys is defined through bootstrapping.
 		},
 		get$interface: function() {
-			return this.sys[this.sys.symbols.interface];
+			return this[this.sys.symbols.interface];
 		},
 		super: function(name, ...args) {
 			let method = this[name] && this[name].$super;
