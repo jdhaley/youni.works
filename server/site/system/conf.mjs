@@ -3,7 +3,8 @@ import symbols from "./conf/symbols.mjs";
 
 import core from "./package/core.mjs";
 import reflect from "./package/reflect.mjs";
-import engine from "./package/engine.mjs";
+import parser from "./package/parser.mjs";
+import compiler from "./package/compiler.mjs";
 
 export default {
 	module: {
@@ -14,7 +15,8 @@ export default {
 	packages: {
 		core: core,
 		reflect: reflect,
-		engine: engine
+		compiler: compiler,
+		parser: parser
 	},
 	facets: facets,
 	symbols: symbols

@@ -175,8 +175,8 @@ export default {
 		facets: {},
 		symbols: {},
 		packages: {},
+		type$parser: "Parser",
 		type$compiler: "Compiler",
-		type$loader: "Loader",
 		extend: function(object, decls) {
 			if (typeof object == "string") object = this.forName(object);
 			object = Object.create(object || this.use.Object || null);
@@ -245,7 +245,7 @@ export default {
 			if (this.packages["."]) {
 				throw new Error("Compilation in progress.");
 			}
-			value = this.loader.load(value, componentName);
+			value = this.parser.parse(value, componentName);
 			this.packages["."] = value;
 			this.compiler.compile(this.packages, ".");
 			value = this.packages["."];
@@ -265,8 +265,8 @@ export default {
 			return index < 0 ? decl : decl.substring(index + 1);
 		}
 	},
-	Loader: {
-		load: function(value, componentName) {
+	Parser: {
+		parse: function(source, componentName) {
 			throw new Error("Abstract");
 		}
 	},

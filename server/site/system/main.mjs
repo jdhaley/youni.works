@@ -8,8 +8,8 @@ export default function main(conf) {
 		packages: sys.packages,
 		symbols: sys.symbols,
 		facets: sys.facets,
-		compiler: pkg.engine.Compiler,
-		loader: pkg.engine.Loader
+		parser: pkg.parser.Parser,
+		compiler: pkg.compiler.Compiler
 	});
 	module = sys.extend(pkg.reflect.Module, conf.module);
 	module.compile(conf.packages);
@@ -51,8 +51,8 @@ function bootInstance(conf) {
 		facets: Object.seal(extend(null, conf.facets)),
 		symbols: Object.seal(extend(null, conf.symbols)),
 		packages: extend(null),
-		compiler: extend(Instance, pkg.engine.Compiler),
-		loader: extend(Instance, pkg.engine.Loader)	
+		compiler: extend(Instance, pkg.compiler.Compiler),
+		parser: extend(Instance, pkg.parser.Parser)	
 	});
 
 	return Instance;
