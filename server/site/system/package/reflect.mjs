@@ -28,14 +28,13 @@ export default {
 	Interface: {
 		type$: "Element",
 		type$of: "Package",
-		type$prototype: "Object",
-		type$extends: "Interface",
+		type$class: "",
 		implements: [], //Array of Interface or string types.
 		properties: {
 		},
 		get$extends: function() {
 			const sym = this.sys.symbols.interface;
-			let sup = Object.getPrototypeOf(this.prototype);
+			let sup = Object.getPrototypeOf(this.class);
 			if (sup && Object.prototype.hasOwnProperty.call(sup, sym)) return sup[sym];
 		},
 		isOn: function(object) {
@@ -62,9 +61,57 @@ export default {
 					this.sys.define(object, name, value);
 				}
 			}
+		},
+		compile: function(properties) {
+			this.properties = properties;
+			let type = properties[""];
+			delete properties[""];
+			delete properties[this.sys.symbols.name];
+			delete properties[Symbol.status];
+
+			this.implements = this.compileImplements(type),
+			this.compileInterfaceProperties();
+			this.sys.define(this.class, this.sys.symbols.interface, this);
+			
+			if (this.class == this.sys.use.Object) {
+				this.sys.define(this.class, this.sys.symbols.sys, this.sys);
+			} else {
+				Object.freeze(this.class);				
+			}
+
+		},
+		compileImplements: function(type) {
+			let types = this.sys.extend(this.sys.use.Array);
+			if (type && Object.getPrototypeOf(type.expr) == this.sys.use.Array) {
+				type = type.expr;
+				types = this.sys.extend(types);
+				for (let i = 1; i < type.length; i++) {
+					let itype = type[i];
+					if (typeof itype == "string") itype = this.sys.forName(itype);
+					if (itype) itype = itype[this.sys.symbols.interface];
+					if (itype) {
+						Array.prototype.push.call(types, itype);
+					}
+				}
+			}
+			Object.freeze(types);
+			return types;
+		},
+		compileInterfaceProperties: function() {
+			let properties = this.properties;
+			for (let name in properties) {
+				let value = properties[name];
+				if (value && typeof value == "object" && Object.getPrototypeOf(value) == this.sys.use.Property) {
+					this.sys.define(value, "of", this);
+					delete value[Symbol.status];
+					Object.freeze(value);
+				}
+				//  else {
+				// 	this.compile(properties, name);
+				// }
+			}
+			Object.freeze(properties);
 		}
-//		type$module: "Module",
-//		type$implements: "Array", //of Interface
 	},
 	Package: {
 		type$: "Element",
@@ -72,6 +119,14 @@ export default {
 		source: {
 		},
 		public: {
+		},
+		compile: function() {			
+			let src = this.source.$public || this.source;
+			let ctxName = this.of.id + "/" + this.name;
+			console.debug(`Compiling "${ctxName}"...`);
+			this.public = this.sys.compile(src, ctxName);
+			console.debug(`Compiled "${ctxName}".`);
+			return Object.freeze(this);
 		}
 	},
 	Module: {
@@ -84,19 +139,25 @@ export default {
 		uses: [],
 		packages: {
 		},
+		public: {
+		},
 		compile: function(packages) {
-			let target = this.sys.extend();
+			this.sys.define(this, "packages", this.sys.extend());
+			this.sys.define(this, "public", this.sys.extend());
 			//Need to define the module packages here to support in-module package deps.
-			this.sys.packages[this.id] = target;
+			this.sys.packages[this.id] = this.public;
 			for (let name in packages) {
-				let ctxName = this.id + "/" + name;
-				console.debug(`Compiling "${ctxName}"...`);
-				let pkg = packages[name];
-				target[name] = this.sys.compile(pkg.$public ? pkg.$public : pkg, ctxName);
-				console.debug(`Compiled "${ctxName}".`);
+				let pkg = this.sys.extend(this.sys.use.Package, {
+					of: this,
+					name: name,
+					source: packages[name],
+					public: null
+				});
+				this.packages[name] = pkg.compile();
+				this.public[name] = pkg.public;
 			}
-			Object.freeze(target);
-			this.sys.define(this, "packages", target);
+			Object.freeze(this.packages);
+			Object.freeze(this.public);
 			Object.freeze(this);
 			console.info(`Compiled "${this.id}"`, this);
 		}
@@ -108,6 +169,7 @@ export default {
 			type$Array: "Array",
 			type$Property: "Property",
 			type$Interface: "Interface",
+			type$Package: "Package",
 			type$Module: "Module"
 		},
 		facets: {},
@@ -117,7 +179,7 @@ export default {
 		type$loader: "Loader",
 		extend: function(object, decls) {
 			if (typeof object == "string") object = this.forName(object);
-			object = Object.create(object || null);
+			object = Object.create(object || this.use.Object || null);
 			this.implement(object, decls);
 			return object;
 		},

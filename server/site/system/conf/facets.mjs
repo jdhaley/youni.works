@@ -67,7 +67,9 @@ export default {
 		};
 	},
 	type: function(decl) {
-		if (typeof decl.expr != "string") throw new Error("type facet requires a string.");
+		if (typeof decl.expr != "string") {
+			throw new Error("type facet requires a string.");
+		}
 		decl.enumerable = true;
 		decl.value = decl.expr ? decl.sys.forName(decl.expr, decl[decl.sys.symbols.name]) : null;
 	},

@@ -3,7 +3,7 @@ export default function main(conf) {
 	let module = sys.extend(sys.use.Module, conf.module);
 	module.compile(conf.packages);
 
-	let pkg = module.packages;
+	let pkg = module.public;
 	sys = sys.extend(pkg.reflect.System, {
 		packages: sys.packages,
 		symbols: sys.symbols,
@@ -45,6 +45,7 @@ function bootInstance(conf) {
 			Array: extend(Obj, pkg.core.Array),
 			Property: extend(Instance, pkg.reflect.Property),
 			Interface: extend(Instance, pkg.reflect.Interface),
+			Package: extend(Instance, pkg.reflect.Package),
 			Module: extend(Instance, pkg.reflect.Module)
 		},
 		facets: Object.seal(extend(null, conf.facets)),

@@ -185,34 +185,14 @@ export default {
 			
 			if (!this.sys.use.Interface) return;
 
-			for (let name in properties) {
-				let value = properties[name];
-				if (!name) {
-
-				} else if (this.statusOf(value) == "Property") {
-					this.compileProperty(value);
-					delete value[Symbol.status];
-					Object.freeze(value);
-				} else {
-					this.compile(properties, name);
-				}
-			}
-			let name = properties[this.sys.symbols.name];
-			delete properties[this.sys.symbols.name];
-			delete properties[Symbol.status];
-			Object.freeze(properties);
-			
 			let iface = this.sys.extend(this.sys.use.Interface, {
-				name: name,
-				prototype: target,
-				properties: properties
+				of: null,
+				name: properties[this.sys.symbols.name],
+				class: target,
+				implements: null,
+				properties: null
 			});
-			this.sys.define(target, this.sys.symbols.interface, iface);
-			if (target == this.sys.use.Object) {
-				this.sys.define(target, this.sys.symbols.sys, this.sys);
-			} else {
-				Object.freeze(target);				
-			}
+			iface.compile(properties);
 		},
 		constructInstance: function(object) {
 			let iname = object[this.sys.symbols.name];
@@ -236,9 +216,9 @@ export default {
 			}
 			let target = Object.create(proto  || null);
 			for (let i = 1; i < type.length; i++) {
-				let iface = type[i];
-				if (typeof iface == "string") iface = this.sys.forName(iface, iname);
-				if (iface) iface = iface[this.sys.symbols.interface];
+				let proto = type[i];
+				if (typeof proto == "string") proto = this.sys.forName(proto, iname);
+				let iface = proto ? proto[this.sys.symbols.interface] : undefined;
 				if (iface) {
 					iface.implementOn(target);
 				} else {
