@@ -4,7 +4,7 @@ export default {
 		type$: "Instance",
 		parse: function(value, componentName) {
 			if (this.sys.compiler.statusOf(value)) {
-				console.warn("Loading cycle detected.");
+				console.warn(`Possible parsing cycle detected in "${componentName}"`);
 				return value;
 			}
 			if (value && typeof value == "object") {
