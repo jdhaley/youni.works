@@ -20,25 +20,31 @@ export default {
 	},
 	Part: {
 		type$: "View",
+		use: {
+			type$Naming: "/base.youni.works/util/Naming"
+		},
 		type$object: "Properties",
 		type$conf: "Decl",
 		get$desc: function() {
 			return this.conf;
 		},
+		getCaption: function() {
+			return this.desc.caption || this.use.Naming.captionize(this.desc.name);
+		},
 		displayEditor: function() {
 			//Return the function to create the view's property editor.
-			let dataType = this.des.dataType || typeof this.model;
+			let dataType = this.desc.dataType || typeof this.model;
 			let editor = this.owner.editors[dataType] || this.owner.editors["string"];
-			return editor();
+			return editor.call(this);
 		},
 		display: function() {
 			const peer = this.peer;
 			peer.classList.add("property");
-			if (this.des.dynamic) peer.classList.add("dynamic");
-			this.des.name && peer.classList.add(this.des.name);
+			if (this.desc.dynamic) peer.classList.add("dynamic");
+			this.desc.name && peer.classList.add(this.desc.name);
 			if (this.object.displayType != "row") {
 				let label = this.owner.createNode("label");
-				label.textContent = this.des.caption;
+				label.textContent = this.getCaption();
 				peer.append(label);		
 			} else {
 			}
@@ -47,7 +53,7 @@ export default {
 		},
 		bind: function(model) {
 			if (this.editor.type) {
-				model = model[this.des.name];
+				model = model[this.desc.name];
 				if (typeof model == "object") model = "[object]";
 				if (this.editor.nodeName == "INPUT") {
 					this.editor.value = model;
