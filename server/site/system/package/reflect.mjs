@@ -123,9 +123,9 @@ export default {
 		compile: function() {			
 			let src = this.source.$public || this.source;
 			let ctxName = this.of.id + "/" + this.name;
-			console.debug(`Compiling "${ctxName}"...`);
+		//	console.debug(`Compiling "${ctxName}"...`);
 			this.public = this.sys.compile(src, ctxName);
-			console.debug(`Compiled "${ctxName}".`);
+		//	console.debug(`Compiled "${ctxName}".`);
 			return Object.freeze(this);
 		}
 	},
