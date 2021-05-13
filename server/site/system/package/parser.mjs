@@ -37,10 +37,10 @@ export default {
 			let array = sys.extend(sys.use.Array, {
 				length: length
 			});
-			array[Symbol.status] = "Array";
 			for (let i = 0; i < length; i++) {
 				array[i] = this.parse(source[i], componentName + "/" + i);
 			}
+			array[Symbol.status] = "Array";
 			if (componentName) sys.define(array, sys.symbols.name, componentName);
 			return array;
 		},

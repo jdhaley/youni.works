@@ -52,11 +52,13 @@ export default {
 			switch (this.statusOf(value)) {
 				case "Property":
 					this.compileProperty(value);
+					this.sys.define(value, "of", object);
 					value.define(object);
 					return;
 				case "Array":
 				case "Parcel":
 					this.compileStructure(value);
+					value[this.sys.symbols.of] = object;
 					return;
 				case "Instance":
 					let target = this.constructInstance(value);
@@ -64,7 +66,8 @@ export default {
 					let firstChar = key.charAt(0)
 					if (firstChar.toUpperCase() == firstChar && firstChar.toLowerCase() != firstChar) {
 						this.sys.define(target, this.sys.symbols.tag, key);
-						this.compileClass(target, value);
+						let cls = this.compileClass(target, value);
+						cls[this.sys.symbols.of] = object;
 					} else {
 						this.compileTarget(target, value);
 						Object.freeze(target);
@@ -86,7 +89,7 @@ export default {
 		compileMethod: function(object, name) {
 			let method = object[name];
 			method.$super = this.sys.getSuper(object, name);
-			method.definedIn = object;
+			method.of = object;
 			delete method[Symbol.status];
 			delete method[this.sys.symbols.name];
 			Object.freeze(method);
@@ -107,7 +110,7 @@ export default {
 				this.compile(object, name);
 			}
 			delete object[this.sys.symbols.name];
-			Object.freeze(object);
+			//Object.freeze(object);
 		},
 		compileTarget: function(target, properties) {
 			for (let name in properties) {
@@ -131,6 +134,7 @@ export default {
 				properties: null
 			});
 			iface.compile(properties);
+			return iface;
 		},
 		constructInstance: function(object) {
 			let iname = object[this.sys.symbols.name];
