@@ -47,19 +47,39 @@ export default {
 		parseObject: function(source, componentName) {
 			const sys = this.sys;
 			let object = sys.extend();
+			sys.define(object, sys.symbols.name, componentName || "");
 			for (let decl in source) {
 				let name = sys.nameOf(decl);
 				let facet = sys.facetOf(decl);
-				let value = this.parse(source[decl], componentName + "/" + name);
-				if (facet) {
-					value = this.sys.declare(facet, name, value);
-					value[Symbol.status] = "Property";
-				}
-				object[name] = value;
+				let value = source[decl];
+				this.parseProperty(object, name, value, facet);
 			}
 			object[Symbol.status] = object[""] ? "Instance" : "Parcel";
-			if (componentName) sys.define(object, sys.symbols.name, componentName);
 			return object;
+		},
+		parseProperty: function(object, name, value, facet) {
+			const sys = this.sys;
+			let componentName = name ? object[this.sys.symbols.name] + "/" + name : "";
+			value = this.parse(value, componentName);
+			if (facet) {
+				value = this.sys.declare(facet, name, value);
+				value[Symbol.status] = "Property";
+			}
+			if (this.sys.compiler.statusOf(value)) {
+				value[this.sys.symbols.of] = object;
+				if (name) value[this.sys.symbols.pn] = name;
+				if (componentName) value[this.sys.symbols.name] = componentName;
+			}
+			object[name] = value;
+		},
+		pathName: function(value) {
+			if (this.sys.statusOf(value)) {
+				let of = value[this.sys.symbols.of];
+				let name = value[this.sys.symbols.pn];				
+				return of ? this.pathName(of) + "/" + name : name;
+			}
+			return "";
 		}
+
 	}
 }
