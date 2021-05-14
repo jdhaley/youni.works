@@ -63,18 +63,18 @@ export default {
 			}
 		},
 		compile: function(properties) {
-			this.properties = properties;
-			let type = properties[""];
-			delete properties[""];
-			delete properties[this.sys.symbols.name];
-			delete properties[Symbol.status];
-
-			this.implements = this.compileImplements(type),
-			this.compileInterfaceProperties();
-			this.sys.define(this.class, this.sys.symbols.interface, this);
+			const sym =  this.sys.symbols;
 			
+			this.properties = properties;
+			this.of = properties[sym.of];
+			this.name = properties[sym.name];
+			this.implements = this.compileImplements(properties[""]),
+
+			this.compileInterfaceProperties();
+
+			this.sys.define(this.class, sym.interface, this);
 			if (this.class == this.sys.use.Object) {
-				this.sys.define(this.class, this.sys.symbols.sys, this.sys);
+				this.sys.define(this.class, sym.sys, this.sys);
 			} else {
 				Object.freeze(this.class);				
 			}
@@ -99,6 +99,8 @@ export default {
 		},
 		compileInterfaceProperties: function() {
 			let properties = this.properties;
+			delete properties[""];
+
 			for (let name in properties) {
 				let value = properties[name];
 				if (value && typeof value == "object" && Object.getPrototypeOf(value) == this.sys.use.Property) {
@@ -110,6 +112,11 @@ export default {
 				// 	this.compile(properties, name);
 				// }
 			}
+
+			//delete properties[this.sys.symbols.name];
+			delete properties[Symbol.status];
+			
+			
 			Object.freeze(properties);
 		}
 	},
@@ -123,9 +130,9 @@ export default {
 		compile: function() {			
 			let src = this.source.$public || this.source;
 			let ctxName = this.of.id + "/" + this.name;
-		//	console.debug(`Compiling "${ctxName}"...`);
+			console.debug(`Compiling "${ctxName}"...`);
 			this.public = this.sys.compile(src, ctxName);
-		//	console.debug(`Compiled "${ctxName}".`);
+			console.debug(`Compiled "${ctxName}".`);
 			return Object.freeze(this);
 		}
 	},

@@ -67,7 +67,7 @@ export default {
 					if (firstChar.toUpperCase() == firstChar && firstChar.toLowerCase() != firstChar) {
 						this.sys.define(target, this.sys.symbols.tag, key);
 						let cls = this.compileClass(target, value);
-						cls[this.sys.symbols.of] = object;
+						//cls[this.sys.symbols.of] = object;
 					} else {
 						this.compileTarget(target, value);
 						Object.freeze(target);
@@ -122,13 +122,15 @@ export default {
 			}
 		},
 		compileClass: function(target, properties) {
+			const sym = this.sys.symbols;
+
 			this.compileTarget(target, properties);
 			
 			if (!this.sys.use.Interface) return;
 
 			let iface = this.sys.extend(this.sys.use.Interface, {
 				of: null,
-				name: properties[this.sys.symbols.name],
+				name: "",
 				class: target,
 				implements: null,
 				properties: null
