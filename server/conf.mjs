@@ -1,15 +1,15 @@
 import express		from "express";
 import fs			from "fs";
 import https		from "https";
-import base			from "./site/base/index.mjs";
+//import base			from "./site/base/index.mjs";
 
 export default {
-	sys: base.sys,
+//	sys: base.sys,
 	module: {
 		id: "server.youni.works",
 		version: "1",
 		moduleType: "system",
-		uses: [base]
+//		uses: [base]
 	},
 	port: 443,
 	key: "ssl/my.key",
