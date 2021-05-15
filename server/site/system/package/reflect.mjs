@@ -64,7 +64,7 @@ export default {
 		},
 		compile: function(properties) {
 			const sym =  this.sys.symbols;
-			
+
 			this.properties = properties;
 			this.of = properties[sym.of];
 			this.name = properties[sym.name];
@@ -149,8 +149,9 @@ export default {
 		public: {
 		},
 		compile: function(packages) {
-			this.sys.define(this, "packages", this.sys.extend());
 			this.sys.define(this, "public", this.sys.extend());
+
+			this.sys.define(this, "packages", this.sys.extend());
 			//Need to define the module packages here to support in-module package deps.
 			this.sys.packages[this.id] = this.public;
 			for (let name in packages) {
@@ -167,7 +168,28 @@ export default {
 			Object.freeze(this.public);
 			Object.freeze(this);
 			console.info(`Compiled "${this.id}"`, this);
-		}
+		},
+		//Development & Experimental follows:
+		create: function(prototype, decls) {
+			if (typeof prototype == "string") prototype = this.forName(prototype);
+			//TODO this.use.Object needs to be fixed.
+			prototype = Object.create(prototype || this.use.Object || null);
+			this.sys.implement(prototype, decls);
+			return prototype;
+		},
+		forName: function(name, fromName) {
+			if (typeof name != "string") {
+				throw new TypeError(`"name" argument must be a "string".`);
+			}
+			if (!name) return null;
+			let component = this.public;
+			if (name.startsWith("/")) {
+				name = name.substring(1);
+			} else {
+				component = component["."];
+			}
+			return this.sys.compiler.resolve(component, name, fromName);
+		},
 	},
 	System: {
 		type$: "Instance",
