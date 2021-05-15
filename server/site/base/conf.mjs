@@ -10,7 +10,10 @@ export default {
 		id: "base.youni.works",
 		version: "1",
 		moduleType: "library",
-		uses: [system]
+		uses: {
+			system: system,
+			example: "youni.works/system:2.1"
+		}
 	},
 	packages: {
 		control: control,
