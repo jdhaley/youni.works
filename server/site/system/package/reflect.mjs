@@ -123,12 +123,10 @@ export default {
 	Package: {
 		type$: "Element",
 		type$of: "Module",
-		source: {
-		},
 		public: {
 		},
-		compile: function() {			
-			let src = this.source.$public || this.source;
+		compile: function(source) {			
+			let src = source.$public || source;
 			let ctxName = this.of.id + "/" + this.name;
 			console.debug(`Compiling "${ctxName}"...`);
 			this.public = this.sys.compile(src, ctxName);
@@ -158,10 +156,9 @@ export default {
 				let pkg = this.sys.extend(this.sys.use.Package, {
 					of: this,
 					name: name,
-					source: packages[name],
 					public: null
 				});
-				this.packages[name] = pkg.compile();
+				this.packages[name] = pkg.compile(packages[name]);
 				this.public[name] = pkg.public;
 			}
 			Object.freeze(this.packages);

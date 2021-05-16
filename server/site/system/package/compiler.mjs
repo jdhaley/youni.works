@@ -15,17 +15,26 @@ export default {
 					console.warn("Object declaration ignored in Engine.implement()");
 					break;
 				}
-				let value = decls[decl];
-				if (this.loader) value = this.sys.loader.load(value);
-				if (this.statusOf(value)) {
-					this.compile(decls, decl);
-					value = decls[decl];
-				}
+				let value = this.sys.parser.parse(decls[decl]);
 				this.sys.define(object, name, value, facet);
+				if (this.statusOf(value)) this.compile(object, name);
 			}
 			for (let symbol of Object.getOwnPropertySymbols(decls)) {
 				this.sys.define(object, symbol, decls[symbol]);				
 			}
+		},
+		getValue: function(name, fromName) {
+			if (typeof name != "string") {
+				throw new TypeError(`"name" argument must be a "string".`);
+			}
+			if (!name) return null;
+			let component = this.public;
+			if (name.startsWith("/")) {
+				name = name.substring(1);
+			} else {
+				component = component["."];
+			}
+			return this.sys.compiler.resolve(component, name, fromName);
 		},
 		resolve: function(component, name, fromName) {
 			let componentName = "";
