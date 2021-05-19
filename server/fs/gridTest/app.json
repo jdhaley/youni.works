@@ -1,0 +1,12 @@
+{
+	"title": "Test",
+	"icon": "/file/gridTest/icon.png",
+	"styles": "/file/gridTest/styles.css",
+	"components": {
+		"Frame": "/ui.youni.works/view/Frame",
+		"Object": "/ui.youni.works/object/Grid"
+	},
+	"objectType": "Issue",
+	"dataSource": "/file/gridTest/data.json",
+	"typeSource": "/file/gridTest/types.json"
+}

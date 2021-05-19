@@ -1,0 +1,69 @@
+{
+	"Issues": {
+		"properties": [
+			{
+				"name": "issues",
+				"dataType": "array",
+				"objectType": "Issue"
+			},
+			{
+				"name": "testAValue",
+				"dataType": "boolean"
+			},
+			{
+				"name": "value",
+				"caption": "The Numeric Value",
+				"dataType": "number"
+			},
+			{
+				"name": "code_name",
+				"dataType": "char",
+				"protected": true
+			},
+			{
+				"name": "action",
+				"dataType": "action"
+			},
+			{
+				"name": "testModel",
+				"dataType": "string"
+			}
+		]
+	},
+	"Issue": {
+		"properties": [
+			{
+				"name": "issued",
+				"dataType": "date",
+				"size": 6,
+				"style": {
+					"background": "wheat"
+				}
+			},
+			{
+				"name": "design",
+				"size": 6,
+				"maxLength": 6
+			},
+			{
+				"name": "denom",
+				"caption": "Denomination",
+				"size": 8
+			},
+			{
+				"name": "colors",
+				"size": 16
+			},
+			{
+				"name": "subject",
+				"size": 16
+			},
+			{
+				"name": "image",
+				"dataType": "media",
+				"mediaType": "image",
+				"size": 0
+			}
+		]
+	}
+}

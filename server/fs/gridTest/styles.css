@@ -1,0 +1,48 @@
+*::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+*::-webkit-scrollbar-thumb {
+    background: lightsteelblue;
+}
+*::-webkit-scrollbar-track {
+	background: ghostwhite;
+}
+*:focus {
+	outline: 2px solid steelblue;
+}
+
+* {
+	outline: 0;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	display: flex;
+}
+BODY {
+	flex: 1 1;
+}
+
+.Grid {
+	border: 1px solid silver;
+	flex-direction: column;
+	flex: 1 1;
+}
+.Grid * {
+	border-width: 0;
+	border-style: solid;
+	border-color: silver;
+	flex: 1 1;
+}
+
+.Header {
+	flex-direction: row;
+}
+.Column {
+	padding: 3px;
+	border-right-width: 1px;
+	flex: 1 1;
+}
+.Column:last-child {
+	border-right-width: 0px;
+}
