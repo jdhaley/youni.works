@@ -114,4 +114,71 @@ export default {
 			}
 		}
 	},
+	Grid: {
+		type$: ["View", "Observer"],
+		use: {
+			type$Header: "Header",
+			type$Row: "Row",
+			type$Cell: "Cell"
+		},
+		conf: {
+			name: "Object",
+			properties: []
+		},
+		display: function() {
+			this.super("display");
+			this.header = this.owner.create(this.use.Header, this.conf);
+			this.append(this.header);
+		},
+	},
+	Header: {
+		type$: "View",
+		use: {
+			type$Column: "Column",
+		},
+		display: function () {
+			this.super("display");
+			for (let prop of this.conf.properties) {
+				let column = this.owner.create(this.use.Column, prop);
+				this.append(column);		
+			}
+		}
+	},
+	Column: {
+		type$: "View",
+		use: {
+			type$Naming: "/base.youni.works/util/Naming"
+		},
+		getCaption: function() {
+			return this.conf.caption || this.use.Naming.captionize(this.conf.name);
+		},
+		display: function(properties) {
+			this.super("display");
+			this.peer.innerText = this.getCaption();
+		}
+	},
+	Row: {
+		type$: "View",
+		use: {
+			type$Cell: "Cell",
+		},
+		display: function () {
+			this.super("display");
+			for (let prop of this.conf.properties) {
+				let cell = this.owner.create(this.use.Cell, prop);
+				this.append(cell);		
+			}
+		}
+	},
+	Cell: {
+		type$: "View",
+		display: function() {
+			this.super("display");
+		},
+		bind: function(model) {
+			model = model[this.conf.name];
+			if (typeof model == "object") model = "...";
+			this.peer.textContent = model;
+		}
+	}
 }
