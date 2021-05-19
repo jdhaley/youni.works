@@ -4,7 +4,7 @@ export default {
 		type$: "Container",
 		use: {
 			type$Header: "Header",
-			type$Body: "Body",
+			type$Body: "Rows",
 			type$Footer: "View"
 		},
 		conf: {
@@ -15,21 +15,10 @@ export default {
 			this.body.bind(object);
 		}
 	},
-	Body: {
-		type$: ["View", "Observer"],
+	Rows: {
+		type$: "Body",
 		use: {
-			type$Row: "Row",
-		},
-		bind: function(model) {
-			this.unobserve(this.model);
-			this.observe(model);
-			this.model = model;
-			this.peer.textContent = "";
-			for (let i = 0; i < model.length; i++) {
-				let row = this.owner.create(this.use.Row, this.conf);
-				this.append(row);
-				row.bind(model[i]);
-			}
+			type$Content: "Row",
 		}
 	},
 	Row: {
@@ -50,6 +39,12 @@ export default {
 	},
 	Cell: {
 		type$: "View",
+		display: function() {
+			this.super("display");
+			this.peer.contentEditable = true;
+			let s = this.conf.size || "0";
+			this.style.minWidth = `${s}mm`;
+		},
 		bind: function(model) {
 			model = model[this.conf.name];
 			if (typeof model == "object") model = "...";
@@ -74,6 +69,8 @@ export default {
 		},
 		display: function(properties) {
 			this.super("display");
+			let s = this.conf.size || "0";
+			this.style.minWidth = `${s}mm`;
 			this.peer.innerText = this.getCaption();
 		}
 	}
