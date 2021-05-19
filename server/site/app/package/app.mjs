@@ -31,7 +31,7 @@ export default {
                 let conf = this.conf;
                 this.open(conf.typeSource, "initializeTypes");
                 this.open(conf.dataSource, "initializeData");
-                this.open(conf.diagram, "initializeDiagram");
+                if (conf.diagram) this.open(conf.diagram, "initializeDiagram");
  
                 this.sys.define(this, "owner" , this.sys.extend(conf.ownerType || this.owner));
                 this.owner.editors = conf.editors;

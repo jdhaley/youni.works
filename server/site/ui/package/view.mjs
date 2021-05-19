@@ -33,6 +33,7 @@ const pkg = {
 				this.peer.append(control.peer);
 			},
 			display: function() {
+				this.peer.classList.add(this[Symbol.toStringTag]);
 			},
 			bind: function(model) {
 				this.model = model;
