@@ -4,7 +4,7 @@
 	"styles": "/file/gridTest/styles.css",
 	"components": {
 		"Frame": "/ui.youni.works/view/Frame",
-		"Object": "/ui.youni.works/object/Grid"
+		"Object": "/ui.youni.works/grid/Grid"
 	},
 	"objectType": "Issue",
 	"dataSource": "/file/gridTest/data.json",
