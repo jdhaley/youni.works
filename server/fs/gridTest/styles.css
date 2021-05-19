@@ -34,15 +34,25 @@ BODY {
 	border-color: silver;
 	flex: 1 1;
 }
-
-.Header {
+.Header, .Row {
 	flex-direction: row;
+	border-bottom-width: 1px;
 }
-.Column {
+.Row:last-child {
+	border-bottom-width: 0;
+}
+.Column, .Cell {
 	padding: 3px;
 	border-right-width: 1px;
 	flex: 1 1;
 }
-.Column:last-child {
+.Column:last-child, .Cell:last-child {
 	border-right-width: 0px;
+}
+.Column {
+	background-color: aliceblue;
+	color: steelblue;
+}
+.Body {
+	flex-direction: column;
 }
