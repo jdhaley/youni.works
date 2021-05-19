@@ -115,11 +115,10 @@ export default {
 		}
 	},
 	Grid: {
-		type$: ["View", "Observer"],
+		type$: "View",
 		use: {
 			type$Header: "Header",
-			type$Row: "Row",
-			type$Cell: "Cell"
+			type$Body: "Body"
 		},
 		conf: {
 			name: "Object",
@@ -128,8 +127,13 @@ export default {
 		display: function() {
 			this.super("display");
 			this.header = this.owner.create(this.use.Header, this.conf);
+			this.body = this.owner.create(this.use.Body, this.conf);
 			this.append(this.header);
+			this.append(this.body);
 		},
+		bind: function(object) {
+			this.body.bind(object);
+		}
 	},
 	Header: {
 		type$: "View",
@@ -157,17 +161,37 @@ export default {
 			this.peer.innerText = this.getCaption();
 		}
 	},
+	Body: {
+		type$: ["View", "Observer"],
+		use: {
+			type$Row: "Row",
+		},
+		bind: function(model) {
+			this.unobserve(this.model);
+			this.observe(model);
+			this.model = model;
+			this.peer.textContent = "";
+			for (let i = 0; i < model.length; i++) {
+				let row = this.owner.create(this.use.Row, this.conf);
+				this.append(row);
+				row.bind(model[i]);
+			}
+		}
+	},
 	Row: {
 		type$: "View",
 		use: {
 			type$Cell: "Cell",
 		},
-		display: function () {
+		display: function() {
 			this.super("display");
 			for (let prop of this.conf.properties) {
 				let cell = this.owner.create(this.use.Cell, prop);
 				this.append(cell);		
 			}
+		},
+		bind: function(model) {
+			for (let cell of this.to) cell.bind(model);
 		}
 	},
 	Cell: {
