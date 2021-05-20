@@ -15,7 +15,10 @@ export default {
         var$body: null,
         var$footer: null,
 		display: function() {
-			this.super("display");
+			this.dc();
+		},
+		dc: function() {
+			this.peer.classList.add(this[Symbol.toStringTag]);
 			this.header = this.owner.create(this.use.Header, this.conf);
 			this.append(this.header);
 			this.body = this.owner.create(this.use.Body, this.conf);

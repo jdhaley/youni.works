@@ -25,31 +25,39 @@ BODY {
 .Grid {
 	display: flex;
 	flex-direction: column;
-	flex: 1 1;
+	flex: 1;
 	border: 1px solid silver;
 	font-size: 13px;
 }
 .Rows {
 	display: flex;
 	flex-direction: column;
-	flex: 1 1;
+	flex: 1;
 }
 .Grid * {
 	border-width: 0;
 	border-style: solid;
 	border-color: silver;
 }
-.Header, .Row {
+.Header, .Row { 
 	display: flex;
 	flex-direction: row;
-	flex: 1 1;
+	flex: 1;
 	border-bottom-width: 1px;
+}
+.Header>.View, .Footer>.View {
+	display: none;
+}
+.Row>.Body, .Header>.Body {
+	display: flex;
+	flex: 1;
+	flex-direction: row;
 }
 .Row:last-child {
 	border-bottom-width: 0;
 }
 .Column, .Cell {
-	flex: 1 1;
+	flex: 1;
 	padding: 3px;
 	border-right-width: 1px;
 }

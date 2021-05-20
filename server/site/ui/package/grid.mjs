@@ -22,19 +22,22 @@ export default {
 		}
 	},
 	Row: {
-		type$: "View",
+		type$: "Container",
 		use: {
+			type$Header: "View",
+			type$Body: "Body",
+			type$Footer: "View",
 			type$Cell: "Cell",
 		},
 		display: function() {
-			this.super("display");
+			this.dc();
 			for (let prop of this.conf.properties) {
 				let cell = this.owner.create(this.use.Cell, prop);
-				this.append(cell);		
+				this.body.append(cell);		
 			}
 		},
 		bind: function(model) {
-			for (let cell of this.to) cell.bind(model);
+			for (let cell of this.body.to) cell.bind(model);
 		}
 	},
 	Cell: {
@@ -54,6 +57,9 @@ export default {
 	Header: {
 		type$: "Row",
 		use: {
+			type$Header: "View",
+			type$Body: "Body",
+			type$Footer: "View",
 			type$Cell: "Column",
 		},
 		bind: function(model) {

@@ -35,20 +35,20 @@
 			{
 				"name": "issued",
 				"dataType": "date",
-				"size": 4,
+				"size": 6,
 				"style": {
-					"background": "wheat"
+					"backgrounds": "wheat"
 				}
 			},
 			{
 				"name": "design",
 				"size": 4,
-				"maxLength": 6
+				"maxLength": 4
 			},
 			{
 				"name": "denom",
 				"caption": "Denomination",
-				"size": 6
+				"size": 7
 			},
 			{
 				"name": "colors",
