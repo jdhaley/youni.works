@@ -43,7 +43,7 @@ export default {
 			this.super("display");
 			this.peer.contentEditable = true;
 			let s = this.conf.size || "0";
-			this.style.minWidth = `${s}mm`;
+			this.style.minWidth = `${s}em`;
 		},
 		bind: function(model) {
 			model = model[this.conf.name];
@@ -70,7 +70,7 @@ export default {
 		display: function(properties) {
 			this.super("display");
 			let s = this.conf.size || "0";
-			this.style.minWidth = `${s}mm`;
+			this.style.minWidth = `${s}em`;
 			this.peer.innerText = this.getCaption();
 		}
 	}

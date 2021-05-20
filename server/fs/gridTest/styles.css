@@ -27,6 +27,7 @@ BODY {
 	flex-direction: column;
 	flex: 1 1;
 	border: 1px solid silver;
+	font-size: 13px;
 }
 .Rows {
 	display: flex;
