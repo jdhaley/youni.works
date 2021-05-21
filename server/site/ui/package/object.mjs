@@ -39,6 +39,7 @@ export default {
 		},
 		display: function() {
 			const peer = this.peer;
+			peer.$peer = this;
 			peer.classList.add("property");
 			if (this.desc.dynamic) peer.classList.add("dynamic");
 			this.desc.name && peer.classList.add(this.desc.name);
@@ -52,7 +53,6 @@ export default {
 			peer.append(this.editor);
 		},
 		bind: function(model) {
-			this.display();
 			if (this.editor.type) {
 				model = model[this.desc.name];
 				if (typeof model == "object") model = "[object]";
@@ -89,6 +89,7 @@ export default {
 		display: function() {
 			const peer = this.peer;
 			const conf = this.conf;
+			peer.$peer = this;
 			peer.classList.add(this.displayType);
 			conf.name && peer.classList.add(conf.name);
 			this.displayProperties(conf.properties);
@@ -102,18 +103,18 @@ export default {
 				this.append(prop);
 			}
 		},
-		bind: function(object) {
-			this.display();
+		bind: function(model) {
 			this.unobserve(this.model);
-			this.observe(object);
-			this.model = object;
+			this.observe(model);
+			this.model = model;
+			this.displayProperties(this.dynamicProperties(model));
 		},
 		extend$actions: {
-			view: function(event) {
-				let model = this.model;
-				this.displayProperties(this.dynamicProperties(model));
-				for (let prop of this.to) prop.bind(model);
-			}
+			// view: function(event) {
+			// 	let model = this.model;
+			// 	this.displayProperties(this.dynamicProperties(model));
+			// 	for (let prop of this.to) prop.bind(model);
+			// }
 		}
 	}
 }

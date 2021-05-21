@@ -4,6 +4,7 @@ const pkg = {
 		View: {
 			type$: "Node",
 			type$owner: "Frame",
+			tag: "div",
 			type$conf: "Record",
 			get$to: function Ui_to() {
 				const nodes = this.peer.childNodes;
@@ -18,13 +19,9 @@ const pkg = {
 				return nodes.$to;
 			},
 			once$peer: function() {
-				let peer = this.owner.createNode(this.conf.tag || "div");
+				let peer = this.owner.createNode(this.tag || "div");
 				peer.$peer = this;
 				return peer;
-				// this.sys.define(this, "peer", peer);
-				// if (this.conf.at) pkg.setAttributes(peer, this.conf.at);
-				// this.display();
-				// return peer;
 			},
 			get$style: function() {
 				return this.peer.style;
@@ -36,10 +33,10 @@ const pkg = {
 				this.peer.classList.add(this[Symbol.toStringTag]);
 			},
 			bind: function(model) {
-				this.display();
 				this.model = model;
 			},
 			view: function(data) {
+				this.display();
 				this.bind(data);
 				this.owner.send(this, "view");
 			},
@@ -47,6 +44,15 @@ const pkg = {
 				this.super(start, conf);
 				if (conf) this.sys.define(this, "conf", conf);
 			},
+			extend$actions: {
+				view: function(event) {
+					let model = this.model;
+					for (let view of this.to) {
+						view.display();
+						view.bind(model);
+					}
+				}
+			}	
 		},
 		Frame: {
 			type$: ["View", "DomOwner"],
