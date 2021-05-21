@@ -48,7 +48,7 @@ export default {
 			console.error("once facet requires a function. Creating a value property instead.");
 		}
 		decl.set = function setOnce(value) {
-			Reflect.defineProperty(this, name, {
+			Reflect.defineProperty(this, decl.name, {
 				configurable: true,
 				enumerable: true,
 				writable: true,
