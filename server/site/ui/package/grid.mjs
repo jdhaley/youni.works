@@ -1,18 +1,20 @@
 export default {
 	type$: "/ui.youni.works/container",
-	Grid: {
-		type$: "Container",
+	Body: {
+		type$: ["View", "Observer"],
 		use: {
-			type$Header: "Header",
-			type$Body: "Rows",
-			type$Footer: "View"
+			type$Content: "View",
 		},
-		conf: {
-			name: "Object",
-			properties: []
-		},
-		bind: function(object) {
-			this.body.bind(object);
+		bind: function(model) {
+			this.unobserve(this.model);
+			this.observe(model);
+			this.model = model;
+			this.peer.textContent = "";
+			for (let i = 0; i < model.length; i++) {
+				let content = this.owner.create(this.use.Content, this.conf);
+				this.append(content);
+				content.bind(model[i]);
+			}
 		}
 	},
 	Rows: {
@@ -21,23 +23,40 @@ export default {
 			type$Content: "Row",
 		}
 	},
+	Grid: {
+		type$: "Component",
+		parts: {
+			type$header: "Header",
+			type$body: "Rows",
+			type$footer: "View"
+		},
+		conf: {
+			name: "Object",
+			properties: []
+		},
+		bind: function(object) {
+			this.parts.body.bind(object);
+		}
+	},
 	Row: {
-		type$: "Container",
+		type$: "Component",
 		use: {
-			type$Header: "View",
-			type$Body: "Body",
-			type$Footer: "View",
 			type$Cell: "Cell",
 		},
+		parts: {
+			type$header: "View",
+			type$body: "Body",
+			type$footer: "View",
+		},
 		display: function() {
-			this.dc();
+			this.super("display");
 			for (let prop of this.conf.properties) {
 				let cell = this.owner.create(this.use.Cell, prop);
-				this.body.append(cell);		
+				this.parts.body.append(cell);		
 			}
 		},
 		bind: function(model) {
-			for (let cell of this.body.to) cell.bind(model);
+			for (let cell of this.parts.body.to) cell.bind(model);
 		}
 	},
 	Cell: {
@@ -57,9 +76,6 @@ export default {
 	Header: {
 		type$: "Row",
 		use: {
-			type$Header: "View",
-			type$Body: "Body",
-			type$Footer: "View",
 			type$Cell: "Column",
 		},
 		bind: function(model) {

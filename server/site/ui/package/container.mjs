@@ -1,5 +1,22 @@
 export default {
 	type$: "/ui.youni.works/view",
+	Component: {
+		type$: "View",
+		parts: {
+		},
+		display: function() {
+			this.super("display");
+			this.displayParts();
+		},
+		displayParts: function() {
+			for (let name in this.parts) {
+				let part = this.owner.create(this.parts[name], this.conf);
+				part.peer.classList.add(name);
+				this.sys.define(part, "of", this);
+				this.sys.define(this.parts, name, part);
+			}
+		}
+	},
 	Container: {
 		type$: "View",
 		use: {
@@ -30,21 +47,4 @@ export default {
 			this.body.bind(object);
 		}
 	},
-	Body: {
-		type$: ["View", "Observer"],
-		use: {
-			type$Content: "View",
-		},
-		bind: function(model) {
-			this.unobserve(this.model);
-			this.observe(model);
-			this.model = model;
-			this.peer.textContent = "";
-			for (let i = 0; i < model.length; i++) {
-				let content = this.owner.create(this.use.Content, this.conf);
-				this.append(content);
-				content.bind(model[i]);
-			}
-		}
-	}
 }
