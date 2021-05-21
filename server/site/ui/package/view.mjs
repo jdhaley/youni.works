@@ -43,8 +43,8 @@ const pkg = {
 				this.bind(data);
 				this.owner.send(this, "view");
 			},
-			start: function(conf) {
-				this.super("start", conf);
+			start: function start(conf) {
+				this.super(start, conf);
 				if (conf) this.sys.define(this, "conf", conf);
 			},
 		},

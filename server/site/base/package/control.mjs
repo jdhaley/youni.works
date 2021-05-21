@@ -94,12 +94,12 @@ export default {
 				return this.document.createElement(name);
 			}
 		},
-		sense: function(on, event) {
-			this.super("sense", on, event);
+		sense: function sense(on, event) {
+			this.super(sense, on, event);
 			if (event.preventDefault && !event.subject) event.preventDefault();
 		},
-		prepareSignal: function(signal) {
-			signal = this.super("prepareSignal", signal);
+		prepareSignal: function prepareSignal(signal) {
+			signal = this.super(prepareSignal, signal);
 			signal.stopPropagation && signal.stopPropagation();
 			if (!signal.subject) signal.subject = signal.type;
 			return signal;

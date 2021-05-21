@@ -24,10 +24,13 @@ export default {
 		get$interface: function() {
 			return this[this.sys.symbols.interface];
 		},
-		super: function(name, ...args) {
-			let method = this[name] && this[name].$super;
-			if (method) return method.apply(this, args);
-			console.error(`super("${name}" ...) is not a method.`);
+		super: function(method, ...args) {
+			if (method && typeof method == "function") {
+				if (method.$super) return method.$super.apply(this, args);
+				console.error(`super("${method.name}" ...) is not a method.`);
+				return;
+			}
+			throw new TypeError("Invalid method argument.");
 		},
 		toString: Object.prototype.toString,
 		valueOf: Object.prototype.valueOf,
