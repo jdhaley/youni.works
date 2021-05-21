@@ -6,6 +6,7 @@ export default {
 			type$Content: "View",
 		},
 		bind: function(model) {
+	//		this.display();
 			this.unobserve(this.model);
 			this.observe(model);
 			this.model = model;
@@ -33,9 +34,6 @@ export default {
 		conf: {
 			name: "Object",
 			properties: []
-		},
-		bind: function(object) {
-			this.parts.body.bind(object);
 		}
 	},
 	Row: {
@@ -48,26 +46,28 @@ export default {
 			type$body: "Body",
 			type$footer: "View",
 		},
-		display: function() {
-			this.super("display");
+		display: function display() {
+			this.super(display);
 			for (let prop of this.conf.properties) {
 				let cell = this.owner.create(this.use.Cell, prop);
 				this.parts.body.append(cell);		
 			}
 		},
 		bind: function(model) {
+			this.display();
 			for (let cell of this.parts.body.to) cell.bind(model);
 		}
 	},
 	Cell: {
 		type$: "View",
-		display: function() {
-			this.super("display");
+		display: function display() {
+			this.super(display);
 			this.peer.contentEditable = true;
 			let s = this.conf.size || "0";
 			this.style.minWidth = `${s}em`;
 		},
 		bind: function(model) {
+			this.display();
 			model = model[this.conf.name];
 			if (typeof model == "object") model = "...";
 			this.peer.textContent = model;
@@ -77,8 +77,6 @@ export default {
 		type$: "Row",
 		use: {
 			type$Cell: "Column",
-		},
-		bind: function(model) {
 		}
 	},
 	Column: {
@@ -89,11 +87,14 @@ export default {
 		getCaption: function() {
 			return this.conf.caption || this.use.Naming.captionize(this.conf.name);
 		},
-		display: function(properties) {
-			this.super("display");
+		display: function display(properties) {
+			this.super(display);
 			let s = this.conf.size || "0";
 			this.style.minWidth = `${s}em`;
 			this.peer.innerText = this.getCaption();
+		},
+		bind: function(model) {
+			this.display();
 		}
 	}
 }
