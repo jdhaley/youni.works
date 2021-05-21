@@ -52,6 +52,7 @@ export default {
 			peer.append(this.editor);
 		},
 		bind: function(model) {
+			this.display();
 			if (this.editor.type) {
 				model = model[this.desc.name];
 				if (typeof model == "object") model = "[object]";
@@ -102,6 +103,7 @@ export default {
 			}
 		},
 		bind: function(object) {
+			this.display();
 			this.unobserve(this.model);
 			this.observe(object);
 			this.model = object;

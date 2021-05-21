@@ -55,6 +55,7 @@ const pkg = {
 				peer.tabIndex = 0;
 			},
 			bind: function(diagram) {
+				this.display();
 				this.unobserve(this.model);
 				this.observe(diagram);
 				this.model = diagram;
@@ -105,6 +106,7 @@ const pkg = {
 				peer.classList.add("shape");
 			},
 			bind: function(shape) {
+				this.display();
 				this.unobserve(this.model);
 				this.observe(shape);
 				this.model = shape;
@@ -256,6 +258,7 @@ const pkg = {
 		Text: {
 			type$: "View",
 			bind: function(model) {
+				this.display();
 				this.model = model;
 			},
 			extend$actions: {

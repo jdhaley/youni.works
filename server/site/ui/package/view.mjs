@@ -19,12 +19,12 @@ const pkg = {
 			},
 			once$peer: function() {
 				let peer = this.owner.createNode(this.conf.tag || "div");
-				//Define peer up-front (even before the once$ does) in case .display() references it.
-				this.sys.define(this, "peer", peer);
 				peer.$peer = this;
-				if (this.conf.at) pkg.setAttributes(peer, this.conf.at);
-				this.display();
 				return peer;
+				// this.sys.define(this, "peer", peer);
+				// if (this.conf.at) pkg.setAttributes(peer, this.conf.at);
+				// this.display();
+				// return peer;
 			},
 			get$style: function() {
 				return this.peer.style;
@@ -36,6 +36,7 @@ const pkg = {
 				this.peer.classList.add(this[Symbol.toStringTag]);
 			},
 			bind: function(model) {
+				this.display();
 				this.model = model;
 			},
 			view: function(data) {
