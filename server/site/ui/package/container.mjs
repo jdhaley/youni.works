@@ -17,19 +17,13 @@ export default {
 			}
 		}
 	},
-	Body: {
+	Collection: {
 		type$: ["View", "Observer"],
 		use: {
 			type$Content: "View",
 		},
-		/**
-		 * @returns the number of children to display.
-		 */
 		get$count: function() {
 			return this.model ? this.model.length : 0;
-		},
-		display: function display() {
-			this.super(display);
 		},
 		bind: function(model) {
 			this.unobserve(this.model);

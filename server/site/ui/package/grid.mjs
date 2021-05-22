@@ -1,12 +1,5 @@
 export default {
 	type$: "/ui.youni.works/container",
-	Rows: {
-		type$: "Body",
-		use: {
-			type$Content: "Row",
-		},
-		tag: "section"
-	},
 	Grid: {
 		type$: "Component",
 		tag: "section",
@@ -28,7 +21,7 @@ export default {
 		tag: "section",
 		parts: {
 			type$header: "View",
-			type$body: "Body",
+			type$body: "Collection",
 		//	type$footer: "View",
 		},
 		display: function display() {
@@ -41,6 +34,13 @@ export default {
 		bind: function(model) {
 			this.model = model[this.key];
 		}
+	},
+	Rows: {
+		type$: "Collection",
+		use: {
+			type$Content: "Row",
+		},
+		tag: "section"
 	},
 	Cell: {
 		type$: "View",
