@@ -5,6 +5,9 @@ const pkg = {
 			type$: "Node",
 			type$owner: "Frame",
 			tag: "div",
+			get$className: function() {
+				return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
+			},
 			type$conf: "Record",
 			get$to: function Ui_to() {
 				const nodes = this.peer.childNodes;
@@ -30,7 +33,7 @@ const pkg = {
 				this.peer.append(control.peer);
 			},
 			display: function() {
-				this.peer.classList.add(this[Symbol.toStringTag]);
+				this.peer.classList.add(this.className);
 			},
 			bind: function(model) {
 				this.model = model;

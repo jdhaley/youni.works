@@ -22,52 +22,57 @@ BODY {
 	flex: 1 1;
 }
 
-.Grid {
+.grid {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
 	border: 1px solid silver;
 	font-size: 13px;
 }
-.Rows {
+.rows {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
 }
-.Grid * {
+.grid * {
 	border-width: 0;
 	border-style: solid;
 	border-color: silver;
 }
-.Header, .Row { 
+.grid>.header, .row { 
 	display: flex;
 	flex-direction: row;
 	flex: 1;
 	border-bottom-width: 1px;
 }
-.Header>.View, .Footer>.View {
-	display: none;
+.header>.header, .row>.header {
+	flex: 1;
+	max-width: 2em;
+	border-right-width: 1px;
 }
-.Row>.Body, .Header>.Body {
+.header>.body, .row>.body {
 	display: flex;
 	flex: 1;
 	flex-direction: row;
 }
-.Row:last-child {
+.row>.header {
+	background-color: aliceblue;
+}
+.row:last-child {
 	border-bottom-width: 0;
 }
-.Column, .Cell {
+.column, .cell {
 	flex: 1;
 	padding: 3px;
 	border-right-width: 1px;
 }
-.Column:last-child, .Cell:last-child {
+.column:last-child, .cell:last-child {
 	border-right-width: 0px;
 }
-.Column {
+.column {
 	background-color: aliceblue;
 	color: steelblue;
 }
-.Cell {
+.cell {
 	overflow: auto;
 }
