@@ -1,35 +1,19 @@
 export default {
 	type$: "/ui.youni.works/container",
-	Body: {
-		type$: ["View", "Observer"],
-		use: {
-			type$Content: "View",
-		},
-		bind: function(model) {
-	//		this.display();
-			this.unobserve(this.model);
-			this.observe(model);
-			this.model = model;
-			this.peer.textContent = "";
-			for (let i = 0; i < model.length; i++) {
-				let content = this.owner.create(this.use.Content, this.conf);
-				this.append(content);
-				content.bind(model[i]);
-			}
-		}
-	},
 	Rows: {
 		type$: "Body",
 		use: {
 			type$Content: "Row",
-		}
+		},
+		tag: "section"
 	},
 	Grid: {
 		type$: "Component",
+		tag: "section",
 		parts: {
 			type$header: "Header",
 			type$body: "Rows",
-			type$footer: "View"
+			type$footer: "Footer"
 		},
 		conf: {
 			name: "Object",
@@ -41,10 +25,11 @@ export default {
 		use: {
 			type$Cell: "Cell",
 		},
+		tag: "section",
 		parts: {
 			type$header: "View",
 			type$body: "Body",
-			type$footer: "View",
+		//	type$footer: "View",
 		},
 		display: function display() {
 			this.super(display);
@@ -54,8 +39,7 @@ export default {
 			}
 		},
 		bind: function(model) {
-			this.display();
-			for (let cell of this.parts.body.to) cell.bind(model);
+			this.model = model[this.key];
 		}
 	},
 	Cell: {
@@ -67,17 +51,21 @@ export default {
 			this.style.minWidth = `${s}em`;
 		},
 		bind: function(model) {
-			this.display();
-			model = model[this.conf.name];
+			model = model && model[this.conf.name];
 			if (typeof model == "object") model = "...";
-			this.peer.textContent = model;
+			this.peer.textContent = model || "";
 		}
 	},
 	Header: {
 		type$: "Row",
 		use: {
 			type$Cell: "Column",
-		}
+		},
+		tag: "header"
+	},
+	Footer: {
+		type$: "View",
+		tag: "footer"
 	},
 	Column: {
 		type$: "View",
@@ -94,7 +82,6 @@ export default {
 			this.peer.innerText = this.getCaption();
 		},
 		bind: function(model) {
-			this.display();
 		}
 	}
 }
