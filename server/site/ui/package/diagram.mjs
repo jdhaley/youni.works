@@ -14,12 +14,12 @@ const pkg = {
 			exec: function() {
 				let control = this.control;
 				control.set(control.model, this.after);
-				control.owner.notify(control, "draw");
+				control.owner.notify(control, "drawShape");
 			},
 			undo: function() {
 				let control = this.control;
 				control.set(control.model, this.before);
-				control.owner.notify(control, "draw");
+				control.owner.notify(control, "drawShape");
 			},
 			instance: function(control) {
 				let model = control.model;
@@ -49,27 +49,25 @@ const pkg = {
 				if (conf) this.sys.define(this, "conf", conf);
 				this.sys.define(this, "commands", this.use.Commands.instance());			
 			},
-			display: function() {
-				const peer = this.peer;
-				peer.classList.add("diagram");
-				peer.tabIndex = 0;
+			draw: function draw() {
+				this.peer.textContent = "";
+				this.super(draw);
+				this.peer.tabIndex = 0;
 			},
 			bind: function(diagram) {
-				this.display();
 				this.unobserve(this.model);
 				this.observe(diagram);
 				this.model = diagram;
+				let shapes = diagram.shapes;
+				for (let i = 0; i < shapes.length; i++) {
+					let model = shapes[i];
+					let shape = this.owner.create(model.type || this.use.Shape);
+					shape.diagram = this;
+					shape.key = i;
+					this.append(shape);
+				}
 			},
 			extend$actions: {
-				view: function(event) {
-					this.peer.textContent = "";
-					for (let model of this.model.shapes) {
-						let shape = this.owner.create(model.type || this.use.Shape);
-						shape.diagram = this;
-						shape.bind(model);
-						this.append(shape);
-					}
-				},
 				keydown: function(event) {
 					if (event.key == "Escape") {
 						this.peer.focus();
@@ -101,15 +99,16 @@ const pkg = {
 			minWidth: 48,
 			minHeight: 24,
 			type$defaultContent: "Text",
-			display: function() {
-				const peer = this.peer;
-				peer.classList.add("shape");
+			draw: function draw() {
+				this.super(draw);
 			},
-			bind: function(shape) {
-				this.display();
+			bind: function(model) {
+				let shape = model.shapes[this.key];
 				this.unobserve(this.model);
 				this.observe(shape);
 				this.model = shape;
+				this.drawShape();
+				this.viewContent(this.model.content);
 			},
 			moveTo: function(x, y) {
 				this.model.x = x > 0 ? x : 0;
@@ -144,7 +143,7 @@ const pkg = {
 						break;
 				}
 			},
-			draw: function() {
+			drawShape: function() {
 				this.style.width = (this.model.width || this.minWidth) + "px";
 				this.style.height = (this.model.height || this.minHeight) + "px";
 				this.style.top = this.model.y + "px";
@@ -152,12 +151,8 @@ const pkg = {
 				this.peer.scrollIntoView();
 			},
 			extend$actions: {
-				view: function(event) {
-					this.draw();
-					this.viewContent(this.model.content);
-				},
-				draw: function(event) {
-					this.draw();
+				drawShape: function(event) {
+					this.drawShape();
 				},
 				move: function(event) {
 					this.moveTo(this.model.x + event.moveX, this.model.y + event.moveY);
@@ -213,7 +208,7 @@ const pkg = {
 						event.subject = "size";
 						this.receive(event);
 					}
-					this.owner.notify(this, "draw");
+					this.owner.notify(this, "drawShape");
 				},
 				trackEnd: function(event) {
 					event.subject = "";
@@ -258,8 +253,7 @@ const pkg = {
 		Text: {
 			type$: "View",
 			bind: function(model) {
-				this.display();
-				this.model = model;
+				this.model = model.content;
 			},
 			extend$actions: {
 				view: function(event) {

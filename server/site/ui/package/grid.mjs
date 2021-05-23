@@ -39,8 +39,8 @@ export default {
 			type$header: "View",
 			type$body: "Collection",
 		},
-		display: function display() {
-			this.super(display);
+		draw: function draw() {
+			this.super(draw);
 			for (let prop of this.type.properties) {
 				let cell = this.owner.create(this.use.Cell, prop);
 				this.parts.body.append(cell);		
@@ -58,8 +58,8 @@ export default {
 	},
 	Cell: {
 		type$: "View",
-		display: function display() {
-			this.super(display);
+		draw: function draw() {
+			this.super(draw);
 			this.peer.contentEditable = true;
 			let s = this.conf.size || "0";
 			this.style.minWidth = `${s}em`;
@@ -95,8 +95,8 @@ export default {
 		getCaption: function() {
 			return this.conf.caption || this.use.Naming.captionize(this.conf.name);
 		},
-		display: function display(properties) {
-			this.super(display);
+		draw: function draw(properties) {
+			this.super(draw);
 			let s = this.conf.size || "0";
 			this.style.minWidth = `${s}em`;
 			this.style.maxWidth = `${s}em`;

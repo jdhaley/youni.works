@@ -10,14 +10,14 @@ const pkg = {
 			get$style: function() {
 				return this.peer.style;
 			},
-			display: function() {
+			draw: function() {
 				this.peer.classList.add(this.className);
 			},
 			bind: function(model) {
 				this.model = model;
 			},
 			view: function(data) {
-				this.display();
+				this.draw();
 				this.bind(data);
 				this.owner.send(this, "view");
 			},
@@ -29,7 +29,7 @@ const pkg = {
 				view: function(event) {
 					let model = this.model;
 					for (let view of this.to) {
-						view.display();
+						view.draw();
 						view.bind(model);
 					}
 				}

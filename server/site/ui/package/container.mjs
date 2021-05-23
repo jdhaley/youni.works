@@ -45,7 +45,7 @@ export default {
 		use: {
 			type$Content: "View",
 		},
-		display: function() {
+		draw: function() {
 			this.peer.textContext = "";
 		},
 		bind: function(model) {

@@ -37,7 +37,7 @@ export default {
 			let editor = this.owner.editors[dataType] || this.owner.editors["string"];
 			return editor.call(this);
 		},
-		display: function() {
+		draw: function() {
 			const peer = this.peer;
 			peer.$peer = this;
 			peer.classList.add("property");
@@ -90,7 +90,7 @@ export default {
 			}
 			return properties;
 		},
-		display: function() {
+		draw: function() {
 			const peer = this.peer;
 			const conf = this.conf;
 			peer.$peer = this;
