@@ -24,7 +24,7 @@ export default {
 			type$Naming: "/base.youni.works/util/Naming"
 		},
 		type$object: "Properties",
-		type$conf: "Decl",
+		conf: null,
 		get$desc: function() {
 			return this.conf;
 		},
@@ -62,6 +62,10 @@ export default {
 					this.editor.textContent = model;
 				}
 			}
+		},
+		start: function start(conf) {
+			this.super(start, conf);
+			if (conf) this.sys.define(this, "conf", conf);
 		}
 	},
 	Properties: {
@@ -108,6 +112,10 @@ export default {
 			this.observe(model);
 			this.model = model;
 			this.displayProperties(this.dynamicProperties(model));
+		},
+		start: function start(conf) {
+			this.super(start, conf);
+			if (conf) this.sys.define(this, "conf", conf);
 		},
 		extend$actions: {
 			// view: function(event) {
