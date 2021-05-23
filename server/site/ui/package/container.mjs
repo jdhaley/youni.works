@@ -1,20 +1,43 @@
 export default {
 	type$: "/ui.youni.works/view",
-	Component: {
-		type$: "View",
+	Composite: {
+		type$: ["View", "Observer"],
+		use: {
+			type$Part: "Control"
+		},
 		parts: {
 		},
-		display: function display() {
-			this.super(display);
-			let parts = this.parts;
+		start: function start(partsConf) {
+			this.super(start, partsConf);
 			this.sys.define(this, "parts", this.sys.extend());
-			for (let name in parts) {
-				let part = this.owner.create(parts[name], this.conf);
-				this.append(part);
-				part.peer.classList.add(name);
-				this.sys.define(part, "of", this);
-				this.sys.define(this.parts, name, part);
+			this.createParts(partsConf);
+		},
+		createParts: function(parts) {
+			if (parts[Symbol.toStringTag] == "Array") {
+				for (let i = 0, length = parts.length; i < length; i++) {
+					this.createPart(parts[i].name, parts[i]);
+				}
+			} else {
+				for (let name in parts) {
+					this.createPart(name, parts[name]);
+				}	
 			}
+		},
+		createPart: function(name, value) {
+			let part = this.owner.create(this.partTypeOf(value), this.partConfOf(name, value));
+			part.peer.classList.add(name);
+			this.sys.define(part, "of", this);
+			this.parts[name] = part;
+			this.append(part);
+		},
+		partTypeOf: function(value) {
+			if (value && typeof value == "object") {
+				return value.receive ? value : value.controlType || this.use.Part;
+			}
+			return this.sys.forName("" + value) || this.use.Part;
+		},
+		partConfOf: function(name, value) {
+			if (value && typeof value == "object" && !value.receive) return value;
 		}
 	},
 	Collection: {
@@ -22,19 +45,22 @@ export default {
 		use: {
 			type$Content: "View",
 		},
-		get$count: function() {
-			return this.model ? this.model.length : 0;
+		display: function() {
+			this.peer.textContext = "";
 		},
 		bind: function(model) {
 			this.unobserve(this.model);
 			this.observe(model);
 			this.model = model;
-			this.peer.textContext = "";
-			for (let i = 0, count = this.count; i < count; i++) {
+			if (model) for (let i = 0, count = model.length; i < count; i++) {
 				let content = this.owner.create(this.use.Content, this.conf);
 				content.key = i;
 				this.append(content);
 			}
+		},
+		start: function start(conf) {
+			this.super(start, conf);
+			this.sys.define(this, "conf", conf);
 		}
 	}
 }
