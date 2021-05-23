@@ -2,35 +2,13 @@ const pkg = {
 	$public: {
 		type$: "/base.youni.works/control",
 		View: {
-			type$: "Node",
+			type$: "DomNode",
 			type$owner: "Frame",
-			tag: "div",
 			get$className: function() {
 				return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
 			},
-			type$conf: "Record",
-			get$to: function Ui_to() {
-				const nodes = this.peer.childNodes;
-				if (!nodes.$to) nodes.$to = this.sys.extend(null, {
-					"symbol$iterator": function* iterate() {
-						for (let i = 0, len = nodes.length; i < len; i++) {
-							let node = nodes[i];
-							if (node.$peer) yield node.$peer;
-						}
-					}
-				});
-				return nodes.$to;
-			},
-			once$peer: function() {
-				let peer = this.owner.createNode(this.tag || "div");
-				peer.$peer = this;
-				return peer;
-			},
 			get$style: function() {
 				return this.peer.style;
-			},
-			append: function(control) {
-				this.peer.append(control.peer);
 			},
 			display: function() {
 				this.peer.classList.add(this.className);
@@ -43,10 +21,10 @@ const pkg = {
 				this.bind(data);
 				this.owner.send(this, "view");
 			},
-			start: function start(conf) {
-				this.super(start, conf);
-				if (conf) this.sys.define(this, "conf", conf);
-			},
+			// start: function start(conf) {
+			// 	this.super(start, conf);
+			// 	if (conf) this.sys.define(this, "conf", conf);
+			// },
 			extend$actions: {
 				view: function(event) {
 					let model = this.model;

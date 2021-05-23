@@ -2,11 +2,11 @@ export default {
 	type$: "/system.youni.works/core",
 	Control: {
 		type$: "Instance",
+		start: function(conf) {
+		},
 		receive: function(signal) {
 			let action = this.actions[typeof signal == "string" ? signal : signal.subject];
 			action && action.call(this, signal);			
-		},
-		start: function(conf) {
 		},
 		actions: {	
 		}
@@ -105,6 +105,30 @@ export default {
 			return signal;
 		}
 	},
+	DomNode: {
+		type$: "Node",
+		tag: "div",
+		get$to: function() {
+			const nodes = this.peer.childNodes;
+			if (!nodes.$to) nodes.$to = this.sys.extend(null, {
+				symbol$iterator: function*() {
+					for (let i = 0, len = nodes.length; i < len; i++) {
+						let node = nodes[i];
+						if (node.$peer) yield node.$peer;
+					}
+				}
+			});
+			return nodes.$to;
+		},
+		once$peer: function() {
+			let peer = this.owner.createNode(this.tag);
+			peer.$peer = this;
+			return peer;
+		},
+		append: function(control) {
+			this.peer.append(control.peer);
+		},
+	},
 	Observer: {
 		type$: "",
 		observe: function(object) {
@@ -130,6 +154,45 @@ export default {
 					break;
 				}
 			}
+		}
+	},
+	Composite: {
+		type$: "Control",
+		use: {
+			type$Part: "Control"
+		},
+		parts: {
+		},
+		start: function start(conf) {
+			this.super(start, conf);
+			this.sys.define(this, "parts", this.sys.extend());
+			this.createParts(conf.parts);
+		},
+		createParts: function(parts) {
+			if (parts[Symbol.toStringTag] == "Array") {
+				for (let i = 0, length = parts.length; i < length; i++) {
+					this.createPart(parts[i].name, parts[i]);
+				}
+			} else {
+				for (let name in parts) {
+					this.createPart(name, parts[name]);
+				}	
+			}
+		},
+		createPart: function(name, value) {
+			let part = this.owner.create(this.partTypeOf(value), this.partConfOf(name, value));
+			this.sys.define(part, "of", this);
+			this.parts[name] = part;
+			this.append(part);
+		},
+		partTypeOf: function(value) {
+			if (value && typeof value == "object") {
+				return value.receive ? value : value.controlType || this.use.Part;
+			}
+			return this.sys.forName("" + value) || this.use.Part;
+		},
+		partConfOf: function(name, value) {
+			if (value && typeof value == "object" && !value.receive) return value;
 		}
 	}
 }
