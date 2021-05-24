@@ -1,7 +1,26 @@
 export default {
 	type$: "/ui.youni.works/view",
-	Composite: {
+	Container: {
 		type$: ["View", "Observer"],
+		forEach: function(object, method) {
+			if (object && typeof object.length == "number") {
+				for (let i = 0, length = object.length; i < length; i++) {
+					method.call(this, object[i], i, object);
+				}
+			} else {
+				for (let name in object) {
+					method.call(this, object[name], name, object);
+				}	
+			}
+		},
+		bind: function(model) {
+			this.unobserve(this.model);
+			this.observe(model);
+			this.model = model;
+		}
+	},
+	Composite: {
+		type$: "Container",
 		use: {
 			type$Part: "Control"
 		},
@@ -10,21 +29,12 @@ export default {
 		start: function start(partsConf) {
 			this.super(start, partsConf);
 			this.sys.define(this, "parts", this.sys.extend());
-			this.createParts(partsConf);
+			this.forEach(partsConf, this.createPart);
 		},
-		createParts: function(parts) {
-			if (parts[Symbol.toStringTag] == "Array") {
-				for (let i = 0, length = parts.length; i < length; i++) {
-					this.createPart(parts[i].name, parts[i]);
-				}
-			} else {
-				for (let name in parts) {
-					this.createPart(name, parts[name]);
-				}	
-			}
-		},
-		createPart: function(name, value) {
+		createPart: function(value, index, object) {
+			let name = typeof index == "number" ? value.name : index;
 			let part = this.owner.create(this.partTypeOf(value), this.partConfOf(name, value));
+			part.peer.$index = index;
 			part.peer.classList.add(name);
 			this.sys.define(part, "of", this);
 			this.parts[name] = part;
@@ -41,22 +51,23 @@ export default {
 		}
 	},
 	Collection: {
-		type$: ["View", "Observer"],
+		type$: "Container",
 		use: {
 			type$Content: "View",
 		},
 		draw: function() {
 			this.peer.textContext = "";
 		},
-		bind: function(model) {
-			this.unobserve(this.model);
-			this.observe(model);
-			this.model = model;
+		bind: function bind(model) {
+			this.super(bind, model);
 			if (model) for (let i = 0, count = model.length; i < count; i++) {
 				let content = this.owner.create(this.use.Content, this.conf);
 				content.key = i;
 				this.append(content);
 			}
+		},
+		createElement: function(value, key, object) {
+
 		},
 		start: function start(conf) {
 			this.super(start, conf);
