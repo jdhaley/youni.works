@@ -4,8 +4,12 @@ const pkg = {
 		View: {
 			type$: "DomNode",
 			type$owner: "Frame",
-			get$className: function() {
-				return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
+			nodeName: "div",
+			virtual$model: function() {
+				if (arguments.length) {
+					this.peer.$model = arguments[0];
+				}
+				return this.peer.$model;
 			},
 			get$style: function() {
 				return this.peer.style;
