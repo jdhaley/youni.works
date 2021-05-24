@@ -57,13 +57,13 @@ export default {
 		use: {
 			type$Cell: "Column",
 		},
-		tag: "header",
+		nodeName: "header",
 		bind: function(model) {
 		}
 	},
 	Footer: {
 		type$: "View",
-		tag: "footer"
+		nodeName: "footer"
 	},
 	Column: {
 		type$: "View",

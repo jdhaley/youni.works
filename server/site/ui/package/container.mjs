@@ -60,13 +60,12 @@ export default {
 		},
 		bind: function bind(model) {
 			this.super(bind, model);
-			if (model) for (let i = 0, count = model.length; i < count; i++) {
-				let content = this.owner.create(this.use.Content, this.conf);
-				content.key = i;
-				this.append(content);
-			}
+			this.forEach(model, this.createElement);
 		},
 		createElement: function(value, key, object) {
+			let content = this.owner.create(this.use.Content, this.conf);
+			content.key = key;
+			this.append(content);
 
 		},
 		start: function start(conf) {
@@ -79,18 +78,13 @@ export default {
 		properties: null
 	},
 	TypeView: {
-		type$: ["Composite", "Observer"],
+		type$: "Composite",
 		type$type: "Type",
 		conf: {
 		},
 		start: function start(type) {
 			this.sys.define(this, "type", type);
 			this.super(start, this.conf);
-		},
-		bind: function(model) {
-			this.unobserve(this.model);
-			this.observe(model);
-			this.model = model;
 		},
 		partConfOf: function(name) {
 			return this.type;
