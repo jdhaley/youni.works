@@ -62,5 +62,27 @@ export default {
 			this.super(start, conf);
 			this.sys.define(this, "conf", conf);
 		}
+	},
+	Type: {
+		name: "Object",
+		properties: null
+	},
+	TypeView: {
+		type$: ["Composite", "Observer"],
+		type$type: "Type",
+		conf: {
+		},
+		start: function start(type) {
+			this.sys.define(this, "type", type);
+			this.super(start, this.conf);
+		},
+		bind: function(model) {
+			this.unobserve(this.model);
+			this.observe(model);
+			this.model = model;
+		},
+		partConfOf: function(name) {
+			return this.type;
+		}
 	}
 }
