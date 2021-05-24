@@ -34,13 +34,5 @@ export default {
 		},
 		toString: Object.prototype.toString,
 		valueOf: Object.prototype.valueOf,
-		// Not sure if wanted or needed...
-		// implement: function(decls) {
-		// 	return this.sys.implement(this, decls);
-		// },
-		// define: function(name, value, facetName) {
-		// 	return this.sys.define(this, name, value, facetName);
-		// },
-
 	}
 }
