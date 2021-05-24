@@ -107,7 +107,13 @@ export default {
 	},
 	DomNode: {
 		type$: "Node",
-		tag: "div",
+		type$owner: "DomOwner",
+		once$nodeName: function() {
+			return this.className;
+		},
+		once$className: function() {
+			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
+		},
 		get$to: function() {
 			const nodes = this.peer.childNodes;
 			if (!nodes.$to) nodes.$to = this.sys.extend(null, {
@@ -121,13 +127,13 @@ export default {
 			return nodes.$to;
 		},
 		once$peer: function() {
-			let peer = this.owner.createNode(this.tag);
+			let peer = this.owner.createNode(this.nodeName);
 			peer.$peer = this;
 			return peer;
 		},
 		append: function(control) {
 			this.peer.append(control.peer);
-		},
+		}
 	},
 	Observer: {
 		type$: "",
