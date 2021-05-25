@@ -1,13 +1,26 @@
 export default {
 	type$: "/ui.youni.works/view",
-	Part: {
+	Content: {
 		type$: "",
 		get$of: function() {
 			return this.peer.parentNode.$peer;
+		},
+		get$key : function() {
+			return this.peer.$key;
+		}
+	},
+	Part: {
+		type$: "Content",
+		get$name: function() {
+			return this.peer.$name;
 		}
 	},
 	Container: {
 		type$: ["View", "Observer"],
+		use: {
+			type$Control: "View",			//The type (or default type) of Control to create.
+			type$Content: "Content"		//The Content interface to use for content views.
+		},
 		forEach: function(object, method) {
 			if (object && typeof object.length == "number") {
 				for (let i = 0, length = object.length; i < length; i++) {
@@ -31,29 +44,33 @@ export default {
 	Composite: {
 		type$: "Container",
 		use: {
-			type$Part: "Control"
+			type$Control: "View",
+			type$Content: "Part"
 		},
 		parts: {
 		},
 		start: function start(partsConf) {
 			this.super(start, partsConf);
 			this.sys.define(this, "parts", this.sys.extend(), "const");
-			this.forEach(partsConf, this.createPart);
+			this.forEach(partsConf, this.createContent);
 		},
-		createPart: function(value, key, object) {
+		createContent: function(value, key, object) {
 			let name = typeof key == "number" ? value.name : key;
 			let part = this.owner.create(this.partTypeOf(value), this.partConfOf(name, value));
-			part.peer.$index = key;
+			this.sys.implement(part, this.use.Content[this.sys.symbols.interface])
+
+			//this.sys.define(part, "of", this);
+			part.peer.$key = key;
+			part.peer.$name = name;
 			part.peer.classList.add(name);
-			this.sys.define(part, "of", this);
 			this.parts[name] = part;
 			this.append(part);
 		},
 		partTypeOf: function(value) {
 			if (value && typeof value == "object") {
-				return value.receive ? value : value.controlType || this.use.Part;
+				return value.receive ? value : value.controlType || this.use.Control;
 			}
-			return this.sys.forName("" + value) || this.use.Part;
+			return this.sys.forName("" + value) || this.use.Control;
 		},
 		partConfOf: function(name, value) {
 			if (value && typeof value == "object" && !value.receive) return value;
@@ -61,19 +78,17 @@ export default {
 	},
 	Collection: {
 		type$: "Container",
-		use: {
-			type$Content: "View",
-		},
 		draw: function() {
 			this.peer.textContext = "";
 		},
 		bind: function bind(model) {
 			this.super(bind, model);
-			this.forEach(model, this.createElement);
+			this.forEach(model, this.createContent);
 		},
-		createElement: function(value, key, object) {
-			let content = this.owner.create(this.use.Content, this.conf);
-			content.key = key;
+		createContent: function(value, key, object) {
+			let content = this.owner.create(this.use.Control, this.conf);
+			content.peer.$key = key;
+			this.sys.implement(content, this.use.Content[this.sys.symbols.interface])
 			this.append(content);
 		},
 		start: function start(conf) {
