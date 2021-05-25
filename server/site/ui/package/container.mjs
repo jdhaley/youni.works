@@ -1,5 +1,11 @@
 export default {
 	type$: "/ui.youni.works/view",
+	Part: {
+		type$: "",
+		get$of: function() {
+			return this.peer.parentNode.$peer;
+		}
+	},
 	Container: {
 		type$: ["View", "Observer"],
 		forEach: function(object, method) {
@@ -10,13 +16,16 @@ export default {
 			} else {
 				for (let name in object) {
 					method.call(this, object[name], name, object);
-				}	
+				}
 			}
 		},
 		bind: function(model) {
-			this.unobserve(this.model);
 			this.observe(model);
 			this.model = model;
+		},
+		unbind: function() {
+			this.unobserve(this.model);
+			this.model = undefined;
 		}
 	},
 	Composite: {
@@ -28,13 +37,13 @@ export default {
 		},
 		start: function start(partsConf) {
 			this.super(start, partsConf);
-			this.sys.define(this, "parts", this.sys.extend());
+			this.sys.define(this, "parts", this.sys.extend(), "const");
 			this.forEach(partsConf, this.createPart);
 		},
-		createPart: function(value, index, object) {
-			let name = typeof index == "number" ? value.name : index;
+		createPart: function(value, key, object) {
+			let name = typeof key == "number" ? value.name : key;
 			let part = this.owner.create(this.partTypeOf(value), this.partConfOf(name, value));
-			part.peer.$index = index;
+			part.peer.$index = key;
 			part.peer.classList.add(name);
 			this.sys.define(part, "of", this);
 			this.parts[name] = part;
@@ -66,7 +75,6 @@ export default {
 			let content = this.owner.create(this.use.Content, this.conf);
 			content.key = key;
 			this.append(content);
-
 		},
 		start: function start(conf) {
 			this.super(start, conf);

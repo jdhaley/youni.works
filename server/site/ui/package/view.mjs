@@ -5,35 +5,36 @@ const pkg = {
 			type$: "DomNode",
 			type$owner: "Frame",
 			nodeName: "div",
+			get$style: function() {
+				return this.peer.style;
+			},
 			virtual$model: function() {
 				if (arguments.length) {
 					this.peer.$model = arguments[0];
 				}
 				return this.peer.$model;
 			},
-			get$style: function() {
-				return this.peer.style;
+			bind: function(model) {
+				this.model = model;
+			},
+			unbind: function() {
+				this.model = undefined;
 			},
 			draw: function() {
 				this.peer.classList.add(this.className);
 			},
-			bind: function(model) {
-				this.model = model;
-			},
 			view: function(data) {
 				this.draw();
+				this.unbind();
 				this.bind(data);
 				this.owner.send(this, "view");
 			},
-			// start: function start(conf) {
-			// 	this.super(start, conf);
-			// 	if (conf) this.sys.define(this, "conf", conf);
-			// },
 			extend$actions: {
 				view: function(event) {
 					let model = this.model;
 					for (let view of this.to) {
 						view.draw();
+						view.unbind();
 						view.bind(model);
 					}
 				}

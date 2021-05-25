@@ -8,6 +8,12 @@ export default {
 			type$footer: "Footer"
 		}
 	},
+	Rows: {
+		type$: "Collection",
+		use: {
+			type$Content: "Row",
+		}
+	},
 	Row: {
 		type$: "TypeView",
 		use: {
@@ -26,12 +32,6 @@ export default {
 		},
 		bind: function(model) {
 			this.model = model[this.key];
-		}
-	},
-	Rows: {
-		type$: "Collection",
-		use: {
-			type$Content: "Row",
 		}
 	},
 	Cell: {
@@ -61,10 +61,6 @@ export default {
 		bind: function(model) {
 		}
 	},
-	Footer: {
-		type$: "View",
-		nodeName: "footer"
-	},
 	Column: {
 		type$: "View",
 		use: {
@@ -85,5 +81,9 @@ export default {
 		start: function(conf) {
 			this.conf = conf;
 		}
+	},
+	Footer: {
+		type$: "View",
+		nodeName: "footer"
 	}
 }
