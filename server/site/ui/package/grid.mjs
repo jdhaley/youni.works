@@ -11,14 +11,13 @@ export default {
 	Rows: {
 		type$: "Collection",
 		use: {
-			type$Content: "Row",
+			type$Control: "Row",
+			type$Content: "Content"
 		}
 	},
 	Row: {
 		type$: "TypeView",
-		use: {
-			type$Cell: "Cell",
-		},
+		type$cellType: "Cell",
 		conf: {
 			type$header: "View",
 			type$body: "Collection",
@@ -26,7 +25,7 @@ export default {
 		draw: function draw() {
 			this.super(draw);
 			for (let prop of this.type.properties) {
-				let cell = this.owner.create(this.use.Cell, prop);
+				let cell = this.owner.create(this.cellType, prop);
 				this.parts.body.append(cell);		
 			}
 		},
@@ -54,9 +53,7 @@ export default {
 	},
 	Header: {
 		type$: "Row",
-		use: {
-			type$Cell: "Column",
-		},
+		type$cellType: "Column",
 		nodeName: "header",
 		bind: function(model) {
 		}
