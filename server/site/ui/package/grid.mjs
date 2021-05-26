@@ -1,5 +1,22 @@
 export default {
 	type$: "/ui.youni.works/container",
+	Type: {
+		name: "Object",
+		properties: null
+	},
+	TypeView: {
+		type$: "Composite",
+		type$type: "Type",
+		conf: {
+		},
+		start: function start(type) {
+			this.sys.define(this, "type", type);
+			this.super(start, this.conf);
+		},
+		partConfOf: function(name) {
+			return this.type;
+		}
+	},
 	Grid: {
 		type$: "TypeView",
 		conf: {

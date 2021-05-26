@@ -18,7 +18,7 @@ export default {
 	Container: {
 		type$: ["View", "Observer"],
 		use: {
-			type$Control: "View",			//The type (or default type) of Control to create.
+			type$Control: "View",		//The type (or default type) of Control to create.
 			type$Content: "Content"		//The Content interface to use for content views.
 		},
 		forEach: function(object, method) {
@@ -103,23 +103,6 @@ export default {
 		},
 		partConfOf: function(name, value) {
 			if (value && typeof value == "object" && !value.receive) return value;
-		}
-	},
-	Type: {
-		name: "Object",
-		properties: null
-	},
-	TypeView: {
-		type$: "Composite",
-		type$type: "Type",
-		conf: {
-		},
-		start: function start(type) {
-			this.sys.define(this, "type", type);
-			this.super(start, this.conf);
-		},
-		partConfOf: function(name) {
-			return this.type;
 		}
 	}
 }
