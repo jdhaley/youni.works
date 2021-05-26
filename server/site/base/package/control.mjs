@@ -14,7 +14,7 @@ export default {
 	Node: {
 		type$: "Control",
 		type$owner: "Owner",	//The graph.
-		type$to: "Array",		//The arcs.  Each arc should be a Node.
+		type$to: "Array",		//The arcs. Each arc should be a Node.
 		append: function(component) {
 			Array.prototype.push.call(this.to, component);
 		}
@@ -54,7 +54,6 @@ export default {
 				if (!event.subject) return;
 				on.receive(event);
 			}
-			//DOM-specific .preventDefault() logic moved to Frame.
 		},
 		notify: function(on, signal) {
 			const OBSERVERS = on.sys.symbols.observers;
@@ -72,7 +71,7 @@ export default {
 		prepareSignal: function(signal) {
 			if (typeof signal != "object") return {
 				subject: signal
-			};
+			}
 			return signal;
 		},
 		log: function(on, event) {
