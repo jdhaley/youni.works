@@ -22,41 +22,33 @@ BODY {
 	flex: 1 1;
 }
 
-.grid {
+.grid, .header, .body, .footer, .body>.composite {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	flex: 1;
+	border-bottom-width: 1px;
+}
+
+.grid {
+	flex-direction: column;
 	border: 1px solid silver;
 	font-size: 13px;
 }
-.rows {
-	display: flex;
+.grid>.body {
 	flex-direction: column;
-	flex: 1;
 }
 .grid * {
 	border-width: 0;
 	border-style: solid;
 	border-color: silver;
 }
-.grid>.header, .row { 
-	display: flex;
-	flex-direction: row;
+.header>.header, .handle {
+	color: steelblue;
+	background-color: aliceblue;
 	flex: 1;
-	border-bottom-width: 1px;
-}
-.header>.header, .row>.header {
-	flex: 1;
+	min-width: 2em;
 	max-width: 2em;
 	border-right-width: 1px;
-}
-.header>.body, .row>.body {
-	display: flex;
-	flex: 1;
-	flex-direction: row;
-}
-.row>.header {
-	background-color: aliceblue;
 }
 .row:last-child {
 	border-bottom-width: 0;
