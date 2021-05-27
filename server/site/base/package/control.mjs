@@ -2,7 +2,10 @@ export default {
 	type$: "/system.youni.works/core",
 	Control: {
 		type$: "Instance",
+		conf: {
+		},
 		start: function(conf) {
+			if (conf) this.sys.define(this, "conf", conf, "const");
 		},
 		receive: function(signal) {
 			let action = this.actions[typeof signal == "string" ? signal : signal.subject];
@@ -124,6 +127,13 @@ export default {
 				}
 			});
 			return nodes.$to;
+		},
+		/**
+		 * Dom Nodes are rooted tree nodes, i.e. more-or-less equivalent to an undirected graph.
+		 * "of" is a generic whole-part relationship and for Dom Nodes the default is its parentNode.
+		 */
+		get$of: function() {
+			return this.peer.parentNode.$peer;
 		},
 		once$peer: function() {
 			let peer = this.owner.createNode(this.nodeName);
