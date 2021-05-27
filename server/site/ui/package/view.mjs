@@ -29,16 +29,18 @@ const pkg = {
 				this.bind(data);
 				this.owner.send(this, "view");
 			},
+			bindElement: function(view) {
+				view.bind(this.model);
+			},
 			extend$actions: {
 				view: function(event) {
-					let model = this.model;
 					for (let view of this.to) {
-						view.draw();
 						view.unbind();
-						view.bind(model);
+						view.draw();
+						this.bindElement(view);
 					}
 				}
-			}	
+			}
 		},
 		Frame: {
 			type$: ["View", "DomOwner"],
