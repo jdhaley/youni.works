@@ -4,7 +4,7 @@ export default {
         type$: ["Control", "Origin"],
         type$owner: "Owner",
         start: function(conf) {
-            this.conf = conf;
+            this.let("conf", conf);
             let manifest = "/file/" + conf.window.location.search.substring(1) + "/app.json";
             this.open(manifest, "initializeApp");
         },
@@ -33,7 +33,7 @@ export default {
                 this.open(conf.dataSource, "initializeData");
                 if (conf.diagram) this.open(conf.diagram, "initializeDiagram");
  
-                this.sys.define(this, "owner" , this.sys.extend(conf.ownerType || this.owner));
+                this.let("owner", this.sys.extend(conf.ownerType || this.owner));
                 this.owner.editors = conf.editors;
                 this.owner.start(conf);
                 this.initializeDocument(conf);
