@@ -24,6 +24,9 @@ export default {
 		get$interface: function() {
 			return this[this.sys.symbols.interface];
 		},
+		let: function(name, value, facet) {
+			this.sys.define(this, name, value, facet);
+		},
 		super: function(method, ...args) {
 			if (method && typeof method == "function") {
 				if (method.$super) return method.$super.apply(this, args);
