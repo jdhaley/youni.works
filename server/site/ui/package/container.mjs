@@ -1,28 +1,19 @@
 export default {
 	type$: "/ui.youni.works/view",
-	Content: {
-		type$: "",
-		get$of: function() {
-			return this.peer.parentNode.$peer;
-		},
-		get$key : function() {
-			return this.peer.$key;
-		}
-	},
-	Part: {
-		type$: "Content",
-		get$name: function() {
-			return this.peer.$name;
-		}
-	},
 	Container: {
 		type$: ["View", "Observer"],
-		use: {
-			type$Control: "View",		//The type (or default type) of Control to create.
-			type$Content: "Content"		//The Content interface to use for content views.
+		get$elementType: function() {
+			return this.conf.elementType;
+		},
+		bind: function(model) {
+			this.observe(model);
+			this.model = model;
+		},
+		unbind: function() {
+			this.unobserve(this.model);
+			this.model = undefined;
 		},
 		forEach: function(object, method) {
-			if (method === undefined) method = this.createContent;
 			if (object && typeof object.length == "number") {
 				for (let i = 0, length = object.length; i < length; i++) {
 					method.call(this, object[i], i, object);
@@ -33,76 +24,64 @@ export default {
 				}
 			}
 		},
-		createContent: function(value, key, object) {
-			let control = this.createControl(value, key, object);
-			this.sys.implement(control, this.use.Content[this.sys.symbols.interface])
+		createElement: function(value, key, object) {
+			let type = this.typeFor(value, key);
+			let conf = this.configurationFor(value, key);
+			let control = this.owner.create(type, conf);
+			control.peer.$key = this.keyFor(value, key);
 			this.append(control);
-		},
-		createControl: function(value, key, object) {
-			let control = this.owner.create(this.use.Control);
-			control.peer.$key = key;
 			return control;
 		},
-		bind: function(model) {
-			this.observe(model);
-			this.model = model;
+		keyFor: function(value, key) {
+			return key;
 		},
-		unbind: function() {
-			this.unobserve(this.model);
-			this.model = undefined;
-		}
-	},
-	Collection: {
-		type$: "Container",
-		unbind: function unbind() {
-			this.super(unbind);
-			this.peer.textContext = "";
+		typeFor: function(value, key) {
+			return this.elementType;
 		},
-		bind: function bind(model) {
-			this.super(bind, model);
-			this.forEach(model);
-		},
-		createControl: function(value, key, object) {
-			let control = this.owner.create(this.use.Control, this.conf);
-			control.peer.$key = key;
-			return control;
-		},
-		start: function start(conf) {
-			this.super(start, conf);
-			this.sys.define(this, "conf", conf);
+		configurationFor: function(value, key) {
+			return this.conf;
 		}
 	},
 	Composite: {
 		type$: "Container",
-		use: {
-			type$Control: "View",
-			type$Content: "Part"
+		get$members: function() {
+			return this.conf.members;
 		},
 		parts: {
 		},
 		start: function start(conf) {
 			this.super(start, conf);
-			this.sys.define(this, "conf", conf);
-			this.sys.define(this, "parts", this.sys.extend(), "const");
-			this.forEach(conf);
+			this.let("parts", this.sys.extend(), "const");
 		},
-		createControl: function(value, key, object) {
-			let name = typeof key == "number" ? value.name : key;
-			let control = this.owner.create(this.partTypeOf(value), this.partConfOf(name, value));
-			control.peer.$key = key;
-			control.peer.$name = name;
-			control.peer.classList.add(name);
-			this.parts[name] = control;
-			return control;
+		draw: function draw() {
+			this.super(draw);
+			this.forEach(this.members, this.createElement);
 		},
-		partTypeOf: function(value) {
+		append: function append(control) {
+			this.super(append, control);
+			let key = control.peer.$key;
+			control.peer.classList.add(key);
+			this.parts[key] = control;
+		},
+		typeFor: function(value, key) {
 			if (value && typeof value == "object") {
-				return value.receive ? value : value.controlType || this.use.Control;
+				return value.receive ? value : value.elementType || this.elementType;
 			}
-			return this.sys.forName("" + value) || this.use.Control;
+			return this.sys.forName("" + value) || this.elementType;
+		}
+	},
+	Collection: {
+		type$: "Container",
+		draw: function() {
+			//Collection views are "model driven" so content will be created by bind().
+			this.peer.textContext = "";
 		},
-		partConfOf: function(name, value) {
-			if (value && typeof value == "object" && !value.receive) return value;
+		bind: function bind(model) {
+			this.super(bind, model);
+			this.forEach(model, this.createElement);
+		},
+		bindElement: function(view) {
+			view.bind(this.model[view.peer.$key]);
 		}
 	}
 }

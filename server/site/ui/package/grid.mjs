@@ -1,53 +1,49 @@
 export default {
 	type$: "/ui.youni.works/container",
-	Type: {
-		name: "Object",
-		properties: null
-	},
-	TypeView: {
+	Properties: {
 		type$: "Composite",
-		type$type: "Type",
-		conf: {
-		},
-		start: function start(type) {
-			this.sys.define(this, "type", type);
-			this.super(start, this.conf);
-		},
-		partConfOf: function(name) {
-			return this.type;
+		configurationFor: function(value, key) {
+			return value;
 		}
+		// bindElement: function(view) {
+		// 	view.bind(this.model[view.conf.name]);
+		// }
 	},
 	Grid: {
-		type$: "TypeView",
-		conf: {
-			type$header: "Header",
-			type$body: "Rows",
-			type$footer: "Footer"
+		type$: "Composite",
+		members: {
+			header: {
+				type$: "Composite",
+				members: {
+					header: "/ui.youni.works/view/View",
+					body: {
+						type$: "Properties",
+						type$elementType: "Column"
+					}
+				}
+			},
+			body: {
+				type$: "Collection",
+				elementType: {
+					type$: "Composite",
+					members: {
+						header: {
+							type$: "Handle"
+						},
+						body: {
+							type$: "Properties",
+							type$elementType: "Cell"
+						}
+					}
+				}
+			},
+			footer: "/ui.youni.works/view/View"
 		}
 	},
-	Rows: {
-		type$: "Collection",
-		use: {
-			type$Control: "Row",
-			type$Content: "Content"
-		}
-	},
-	Row: {
-		type$: "TypeView",
-		type$cellType: "Cell",
-		conf: {
-			type$header: "View",
-			type$body: "Collection",
-		},
-		draw: function draw() {
-			this.super(draw);
-			for (let prop of this.type.properties) {
-				let cell = this.owner.create(this.cellType, prop);
-				this.parts.body.append(cell);		
-			}
-		},
+	Handle: {
+		type$: "View",
 		bind: function(model) {
-			this.model = model[this.key];
+			console.log(this.of.peer.$key, model);
 		}
 	},
 	Cell: {
@@ -65,14 +61,7 @@ export default {
 			this.peer.textContent = model || "";
 		},
 		start: function(conf) {
-			this.conf = conf;
-		}
-	},
-	Header: {
-		type$: "Row",
-		type$cellType: "Column",
-		nodeName: "header",
-		bind: function(model) {
+			this.let("conf", conf, "const");
 		}
 	},
 	Column: {
@@ -83,7 +72,7 @@ export default {
 		getCaption: function() {
 			return this.conf.caption || this.use.Naming.captionize(this.conf.name);
 		},
-		draw: function draw(properties) {
+		draw: function draw() {
 			this.super(draw);
 			let s = this.conf.size || "0";
 			this.style.minWidth = `${s}em`;
@@ -93,11 +82,7 @@ export default {
 		bind: function(model) {
 		},
 		start: function(conf) {
-			this.conf = conf;
+			this.let("conf", conf, "const");
 		}
-	},
-	Footer: {
-		type$: "View",
-		nodeName: "footer"
 	}
 }
