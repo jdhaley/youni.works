@@ -68,6 +68,9 @@ export default {
 				return value.receive ? value : value.elementType || this.elementType;
 			}
 			return this.sys.forName("" + value) || this.elementType;
+		},
+		configurationFor: function(value, key) {
+			return value && typeof value == "object" && !value.receive ? value : this.conf;
 		}
 	},
 	Collection: {

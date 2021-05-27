@@ -1,10 +1,10 @@
 export default {
 	type$: "/ui.youni.works/container",
-	Properties: {
+	Parts: {
 		type$: "Composite",
-		configurationFor: function(value, key) {
-			return value;
-		}
+		// configurationFor: function(value, key) {
+		// 	return value;
+		// }
 		// bindElement: function(view) {
 		// 	view.bind(this.model[view.conf.name]);
 		// }
@@ -17,8 +17,8 @@ export default {
 				members: {
 					header: "/ui.youni.works/view/View",
 					body: {
-						type$: "Properties",
-						type$elementType: "Column"
+						type$: "Composite",
+						type$elementType: "Caption"
 					}
 				}
 			},
@@ -31,7 +31,7 @@ export default {
 							type$: "Handle"
 						},
 						body: {
-							type$: "Properties",
+							type$: "Composite",
 							type$elementType: "Cell"
 						}
 					}
@@ -46,15 +46,18 @@ export default {
 			console.log(this.of.peer.$key, model);
 		}
 	},
-	Cell: {
+	Property: {
 		type$: "View",
 		draw: function draw() {
 			this.super(draw);
-			this.peer.contentEditable = true;
+			this.let("className", this.conf.name);
 			let s = this.conf.size || "0";
 			this.style.minWidth = `${s}em`;
 			this.style.maxWidth = `${s}em`;
-		},
+		}
+	},
+	Cell: {
+		type$: "Property",
 		bind: function(model) {
 			model = model && model[this.conf.name];
 			if (typeof model == "object") model = "...";
@@ -62,10 +65,11 @@ export default {
 		},
 		start: function(conf) {
 			this.let("conf", conf, "const");
+			this.peer.contentEditable = true;
 		}
 	},
-	Column: {
-		type$: "View",
+	Caption: {
+		type$: "Property",
 		use: {
 			type$Naming: "/base.youni.works/util/Naming"
 		},
@@ -74,9 +78,6 @@ export default {
 		},
 		draw: function draw() {
 			this.super(draw);
-			let s = this.conf.size || "0";
-			this.style.minWidth = `${s}em`;
-			this.style.maxWidth = `${s}em`;
 			this.peer.innerText = this.getCaption();
 		},
 		bind: function(model) {
