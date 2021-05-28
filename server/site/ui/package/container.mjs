@@ -1,5 +1,6 @@
 export default {
 	type$: "/ui.youni.works/view",
+	
 	Container: {
 		type$: ["View", "Observer"],
 		get$elementType: function() {
