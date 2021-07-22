@@ -4,7 +4,7 @@ export default {
 	key: "conf/server.key",
 	cert: "conf/server.crt",
 	
-	fileDir: "fs",
+	fileDir: "../fs",
 	siteDir: "site",
 	siteEnv: "/prd",
 	fileAlias: "/file"
