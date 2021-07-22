@@ -1,0 +1,247 @@
+export default {
+	Box: {
+		top: 0,
+		right: 0,
+		bottom: 0,
+		left: 0
+	},
+	C: {
+		rx: 0,
+		rx: 0
+	},
+	XXX: {
+		var$markup: "",
+		draw() {
+			this.markup = "";
+		},
+		get$top() {
+			return this.y;
+		},
+		get$right() {
+			return this.x + this.width;
+		},
+		get$bottom() {
+			return this.y + this.height;
+		},
+		get$left() {
+			return this.x;
+		}
+	},
+	Circle: {
+		var$x: 0,
+		var$y: 0,
+		var$r: 0,
+		get$markup() {
+			return `<circle cx="${this.x}" cy="${this.y}" r="${this.r}"/>`
+		}
+	},
+	Rect: {
+		var$x: 0,
+		var$y: 0,
+		var$width: 0,
+		var$height: 0,
+		get$markup() {
+			return `<rect x="${this.x}" y="${this.y}" width="${this.width}" height="${this.height}"/>`
+		}
+	},
+	Ellipse: {
+		type$: "Rect",
+		var$x: 0,
+		var$y: 0,
+		var$width: 0,
+		var$height: 0,
+		get$markup() {
+			let rx = this.width / 2;
+			let ry = this.height / 2;
+			let x = this.x + rx;
+			let y = this.y + ry;
+			return `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}"/>`
+		}
+	},
+	Path: {
+		var$path: "",
+		get$markup() {
+			this.draw();
+			return `<path d="${this.path}"/>`
+		},
+		mv(x, y) {
+			this.path += `M${x},${y} `;
+		},
+		ln(x, y) {
+			this.path += `L${x},${y} `;
+		},
+		v(x, y) {
+			this.path += `l${x},${y} `;
+		},
+		c(cx, cy, x, y) {
+			this.path += `Q${cx},${cy} ${x},${y} `;
+		},
+	},
+	Shape: {
+		type$: "/display/Display",
+		namespace: "http://www.w3.org/2000/svg",
+		get$image() {
+			for (let node = this.peer; node; node = node.parentNode) {
+				if (node.nodeName == "svg") return node.$peer;
+			}
+		}
+	},
+	Point: {
+		type$: ["Shape", "Circle"],
+		nodeName: "circle",
+		get$next() {
+			let p;
+			for (let point of this.vector.points) {
+				if (p == this) return point;
+				p = point;
+			}
+		},
+		get$index() {
+			let i = 0;
+			for (let point of this.vector.points) {
+				if (point == this) return i;
+				i++;
+			}
+		},
+		toString() {
+			return this.cmd + " " + this.get("cx") + " " + this.get("cy") + " ";
+		},
+		var$vector: null,
+		virtual$cmd() {
+			if (arguments.length == 0) return this.peer.dataset.cmd;
+			this.peer.dataset.cmd = arguments[0];
+		},
+		at: {
+			r: 3,
+		},
+		virtual$x() {
+			if (!arguments.length) return this.get("cx");
+			this.set("cx", arguments[0]);
+		},
+		virtual$y() {
+			if (!arguments.length) return this.get("cy");
+			this.set("cy", arguments[0]);
+		},
+		extend$actions: {
+			grab(event) {
+				event.track = this;
+				event.preventDefault();
+			},
+			drag(event) {
+				let b = this.image.bounds;
+				this.x = Math.round((event.x - b.left) / b.width * 32) * 10;
+				this.y = Math.round((event.y - b.top) / b.height * 32) * 10;
+				this.vector.display();
+			},
+			dblclick(event) {
+				event.subject = "";
+				let next = this.next;
+				if (!next) return;
+				if (this.cmd == "L" && next.cmd == "L") {
+					this.cmd = "S";
+					next.cmd = "";
+				} else if (this.cmd == "S") {
+					
+					//this.cmd = "S";
+					// let pt = this.vector.add(this.x, this.y, "L");
+					// pt.cmd = "";
+					// this.cmd = "C";
+					// this.vector.points.splice(this.index, 0, pt);
+				}
+				this.vector.display();
+			}
+		}
+	},
+	Vector: {
+		type$: "Shape",
+		nodeName: "path",
+		var$points: null,
+		display() {
+			this.super(display);
+			let path = "";
+			if (this.points) for (let point of this.points) {
+				path += point.toString();
+			}
+			this.set("d", path);
+		},
+		add(x, y, type) {
+			let point = this.owner.create("/pen/Point");
+			this.image.append(point);
+			console.log(point.peer.getAttribute("r"));
+			point.x = x;
+			point.y = y;
+			point.vector = this;
+			if (!this.points) {
+				this.points = [point];
+				point.cmd = "M";
+			} else if (this.points[this.points.length - 1].cmd == "Q") {
+				point.cmd = "";
+				this.points.push(point);
+			} else {
+				point.cmd = type || "L";
+				this.points.push(point);
+			}
+			point.display();
+			this.display();
+			return point;
+		},
+		extend$actions: {
+			moveover(event) {
+				console.log("over");
+			}
+		}
+	},
+	Image: {
+		type$: "Shape",
+		nodeName: "svg",
+		at: {
+			class: "icon",
+			viewBox: "0 0 320 320"
+		},
+		type$grid: "Grid",
+		display() {
+			let grid = this[Symbol.for("owner")].create(this.grid);
+			this.peer.innerHTML = grid.markup;
+			this.vector = this.owner.create("/pen/Vector");
+			this.append(this.vector);
+		},
+		var$points: null,
+		var$vector: "",
+		extend$actions: {
+			// moveover(event) {
+			// 	let r = this.bounds;
+			// 	let x = Math.round((event.x - r.left) / r.width * 320);
+			// 	let y = Math.round((event.y - r.top) / r.height * 320);
+			// },
+			dblclick(event) {
+				let b = this.bounds;
+				let x = Math.round((event.x - b.left) / b.width * 32) * 10;
+				let y = Math.round((event.y - b.top) / b.height * 32) * 10;
+				this.vector.add(x, y, event.shiftKey ? "Q" : undefined);
+			}
+		}
+
+	},
+	Grid: {
+		type$: "Path",
+		draw() {
+			for (let y = 0; y <= 320; y += 10) {
+				this.mv(0, y);
+				this.ln(320, y);
+			}
+			for (let x = 0; x <= 320; x += 10) {
+				this.mv(x, 0);
+				this.ln(x, 320);
+			}
+		},
+	},
+	Canvas: {
+		type$: "/display/Display",
+		var$shape: null,
+		display() {
+			this.super(display);
+			this.shape = this.owner.create("/pen/Image");
+			this.append(this.shape);
+		},
+	}
+}
