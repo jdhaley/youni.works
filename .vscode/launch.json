@@ -1,0 +1,14 @@
+{
+	"configurations": [
+		{
+			"name": "youni.works",
+			"cwd": "${workspaceFolder}/server",
+			"program": "index.mjs",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "pwa-node"
+		}
+	]
+}
