@@ -1,6 +1,4 @@
 
-// import fs from "fs";
-// import system from "./target/system.youni.works-2.1.mjs";
 export default function load(path) {
     const dir = Object.create(null);
     dir[Symbol.for("dir")] = path;

@@ -7,12 +7,12 @@ import compile		from "./compile.mjs";
 import loader 		from "./loader.mjs";
 
 export default function main(conf) {
-	compile("../source", "target");
+	compile("../source", "../target");
 	const app = express();
 	app.use("/app", express.static("app"));
 	app.use("/res", express.static("res"));
 	app.use(conf.siteEnv, express.static(conf.siteDir));
-	app.use("/target", express.static("target"));
+	app.use("/target", express.static("../target"));
 	app.use(conf.fileAlias, filer(conf.fileDir));
 	app.use("/sources", loader("../source"));
 	
