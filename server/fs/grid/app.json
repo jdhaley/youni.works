@@ -1,0 +1,13 @@
+{
+	"title": "Test",
+	"icon": "/file/grid/icon.png",
+	"styles": "/file/grid/styles.css",
+	"components": {
+		"Frame": "/display/Frame",
+		"Object": "/grid/Table"
+	},
+	"objectType": "Issue",
+	"dataset": "Issue",
+	"dataSource": "/file/grid/data.json",
+	"typeSource": "/file/grid/types.json"
+}

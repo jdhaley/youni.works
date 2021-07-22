@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+*::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+*::-webkit-scrollbar-thumb {
+    background: lightsteelblue;
+}
+*::-webkit-scrollbar-track {
+	background: ghostwhite;
+}
+*:focus {
+	outline: 2px solid steelblue;
+}
+
+ * {
+	outline: 0;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.sheet {
+	border: 1px solid silver;
+}
+
+.sheet * {
+	border-width: 0;
+	border-style: solid;
+	border-color: silver;
+}
+.sheet>.property {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+	border-top-width: 1px;
+}
+.sheet>.property:first-child {
+	border-top-width: 0;
+}
+.sheet>.property>* {
+	min-width: 100px;
+	padding: 3px 3px 3px 9px;
+}
+.sheet>.property>LABEL {
+	font-size: 9pt;
+	flex: 1 1;
+	border-right-width: 1px;
+}
+.sheet>.property>.widget {
+	font-size: 10pt;
+	flex: 4 4;
+}
+.dynamic LABEL {
+	font-style: italic;
+	font-weight: bold;
+}
+.widget:focus {
+	border: 1px solid steelBlue;
+	padding: 1px;
+	margin: 1px;
+	outline: 0;
+}
+
+.diagram {
+	width: 640px;
+	height: 480px;
+	position: relative;
+	border: 1px solid buttonshadow;
+	overflow: auto;
+}
+.shape {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	/*
+	align-items: stretch;
+	align-content: stretch;
+	vertical-align: middle;
+	*/
+	border: 0;
+	background: lightGray;
+}
+
+.shape * {
+	cursor: inherit;
+}
+
+.text {
+	font-size: 9pt;
+}
+
+.shape>* {
+	flex: 1 1;
+	overflow: hidden;
+}
+.diagram .text {
+	padding: 6px;
+	text-align: center;
+	background: ghostWhite;
+	border: 1px solid gray;
+}
+.diagram .text {
+}
+.diagram .text:focus {
+	background: window;
+	margin: 3px;
+	border: 0;
+	overflow: auto;
+	cursor: text;
+	outline-width: 2px;
+	z-index: 3;
+}
+
+.diagram P {
+	margin: 0;
+}
+
+.sheet {
+	display: grid;
+	grid-template-columns: 1fr 3fr;
+}
+.part {
+	display: contents;
+}
+.grid {
+	display: grid;
+	grid-template-columns: 2fr 6fr 4fr 6fr 10fr 10fr 6fr;
+}
+.grid>.header, .grid>.header>.body, .grid>.body, .grid>.body>.body {
+	display: contents;
+}
+.grid>.header {
+	display: contents;
+	position: sticky;
+}
+.grid>.body {
+	display: contents;
+}
+.grid>.footer {
+	border: 2px solid salmon;
+	content: "sdfasdf";
+}
+.composite, .object, .record {
+	display: contents;
+}
+.grid * {
+	border-width: 0;
+	border-style: solid;
+	border-color: silver;
+}
+.handle, .caption, .cell {
+	padding: 3px;
+	border-left-width: 1px;
+	border-bottom-width: 1px;
+}
+.caption, .handle {
+	color: steelblue;
+	background-color: ghostwhite;
+}
+.handle {
+	border-left-width: 0;
+	text-align: right;
+	color: silver;
+	overflow: hidden;
+}
+.cell {
+	overflow: auto;
+}
+.dynamic {
+	font-style: italic;
+	font-weight: 100;
+}

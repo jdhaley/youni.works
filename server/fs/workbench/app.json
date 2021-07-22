@@ -1,0 +1,13 @@
+{
+	"title": "Test",
+	"icon": "/file/workbench/icon.png",
+	"styles": "/file/workbench/styles.css",
+	"components": {
+		"Frame": "/display/Frame",
+		"Object": "/workbench/Workbench"
+	},
+	"objectType": "Module",
+	"dataset": "source",
+	"dataSource": "/sources",
+	"typeSource": "/file/workbench/types.json"
+}
