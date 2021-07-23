@@ -128,14 +128,26 @@ SVG {
 }
 .point {
 	stroke-width: 0;
-	fill: green;
+	fill: silver;
 }
 .vector {
-	stroke: green;
+	stroke: seagreen;
 	stroke-width: 2px;
-	fill: rgba(0, 255, 0, .1)
+	fill: rgba(0, 128, 0, .3)
+}
+.point[data-cmd="M"] {
+	fill: green;
+}
+.point[data-cmd="L"] {
+	fill: darkslategrey;
+}
+.point[data-cmd="Q"] {
+	fill:lightskyblue;
+}
+.point[data-cmd="S"] {
+	fill:salmon;
 }
 .point:hover {
-	stroke-width: 0;
-	fill: orange;
+	stroke: steelblue;
+	stroke-width: 1;
 }

@@ -129,6 +129,13 @@ export default {
 			},
 			drag(event) {
 				let b = this.image.bounds;
+				this.x = (event.x - b.left) / b.width * 320;
+				this.y = (event.y - b.top) / b.height * 320;
+				this.vector.display();
+			},
+			release(event) {
+				if (event.ctrlKey) return;
+				let b = this.image.bounds;
 				this.x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				this.y = Math.round((event.y - b.top) / b.height * 32) * 10;
 				this.vector.display();
@@ -137,16 +144,18 @@ export default {
 				event.subject = "";
 				let next = this.next;
 				if (!next) return;
+
+				if (!this.cmd) this.cmd = "";
+				console.log("cmd:", this.cmd, "next:", next.cmd);
+
 				if (this.cmd == "L" && next.cmd == "L") {
-					this.cmd = "S";
+					this.cmd = "Q";
 					next.cmd = "";
+				} else if (this.cmd == "Q") {
+					this.cmd = "S";
 				} else if (this.cmd == "S") {
-					
-					//this.cmd = "S";
-					// let pt = this.vector.add(this.x, this.y, "L");
-					// pt.cmd = "";
-					// this.cmd = "C";
-					// this.vector.points.splice(this.index, 0, pt);
+					this.cmd = "L";
+					next.cmd = "L";
 				}
 				this.vector.display();
 			}
@@ -167,27 +176,23 @@ export default {
 		add(x, y, type) {
 			let point = this.owner.create("/pen/Point");
 			this.image.append(point);
-			console.log(point.peer.getAttribute("r"));
-			point.x = x;
-			point.y = y;
 			point.vector = this;
 			if (!this.points) {
 				this.points = [point];
 				point.cmd = "M";
-			} else if (this.points[this.points.length - 1].cmd == "Q") {
-				point.cmd = "";
-				this.points.push(point);
 			} else {
 				point.cmd = type || "L";
+				
 				this.points.push(point);
 			}
+			point.x = x;
+			point.y = y;
 			point.display();
 			this.display();
 			return point;
 		},
 		extend$actions: {
 			moveover(event) {
-				console.log("over");
 			}
 		}
 	},
