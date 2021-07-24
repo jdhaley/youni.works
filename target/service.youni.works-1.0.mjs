@@ -27,8 +27,9 @@ const pkg = {
 		"wire": function wire(path, node) {
             let f;
             if (typeof node == "string") {
-                f = engine.static(node);
+                f = this.engine.static(node);
             } else {
+                node = this.create(node);
                 f = function receive(req, res) {
                     node.owner.send(node, {
                         subject: "service",
@@ -47,9 +48,7 @@ const pkg = {
 
             let to = this.endpoints;
             for (let path in to) {
-                let node = to[path];
-                node = this.create(node);
-                this.wire(path, node);
+                this.wire(path, to[path]);
             }
             return engine;
         }
