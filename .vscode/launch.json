@@ -9,6 +9,17 @@
 				"<node_internals>/**"
 			],
 			"type": "pwa-node"
-		}
+		},
+		{
+			"name": "test server",
+			"cwd": "${workspaceFolder}/service/test",
+			"program": "index.mjs",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "node"
+		},
+		
 	]
 }

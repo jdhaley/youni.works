@@ -266,16 +266,16 @@ const pkg = {
 	},
 	"Component": {
 		"forName": function forName(name) {
-            this[Symbol.for("owner")].forName(name);
+            return this[Symbol.for("owner")].forName(name);
         },
 		"create": function create(from) {
-            this[Symbol.for("owner")].create(from);
+            return this[Symbol.for("owner")].create(from);
         },
 		"extend": function extend(object, extension) {
-            this[Symbol.for("owner")].extend(object, extension);
+            return this[Symbol.for("owner")].extend(object, extension);
         },
 		"define": function define(object, name, value, facet) {
-            this[Symbol.for("owner")].define(object, name, value, facet);
+            return this[Symbol.for("owner")].define(object, name, value, facet);
         }
 	}
 }
