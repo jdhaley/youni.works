@@ -3,11 +3,12 @@ export default {
         type$: "/service/service/Service",
         engine: "express",
         endpoints: {
-            "/app": "../framework/app",
-            "/res": "../framework/res",
-            "/target": "../../target",
-            "/file": "../framework/fs",
-            "/sources": "sources.txt",
+            "/workbench.html": "static/workbench.html",
+            "/module/index.mjs": "../../target/app.youni.works-1.1.mjs",
+            "/module": "../../target",
+            "/res": "static/res",
+            "/file": "static/fs",
+            "/sources": "static/sources.txt",
             "/test1": {
                 type$: "/service/service/Test",
                 value: "one"
