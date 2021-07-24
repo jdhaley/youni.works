@@ -12,6 +12,16 @@
 			"type": "pwa-node"
 		},
 		{
+			"name": "compiler",
+			"cwd": "${workspaceFolder}/compiler",
+			"program": "index.mjs",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "pwa-node"
+		},
+		{
 			"name": "workbench",
 			"cwd": "${workspaceFolder}/server/workbench",
 			"program": "index.mjs",

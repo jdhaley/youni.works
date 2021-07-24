@@ -26,10 +26,6 @@
 .tabs>.header:hover::-webkit-scrollbar-thumb {
     background: lightsteelblue;
 }
-.tabs>.body {
-	color: darkslategrey;
-	padding: 8px;
-}
 .tab {
 	flex: 1 1;
 	cursor: pointer;
@@ -50,5 +46,6 @@
 }
 .tabs>.body {
 	flex: 1 1;
+	color: darkslategrey;
 	border-bottom: 1px solid gainsboro;
 }

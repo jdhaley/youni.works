@@ -38,6 +38,14 @@ export default {
             this.super(display);
             this.add("Tree");
             this.draw(this.add("Draw", this.owner.create("/pen/Canvas")));
+            let grid = this.owner.create({
+                type$: "/display/Display",
+                nodeName: "iframe",
+                display() {
+                    this.peer.src = "https://localhost/app/test/grid.html"
+                }
+            })
+            this.draw(this.add("Grid (iframe)", grid));
             this.add("Other One");
             this.add("Other Two");
             this.add("Other Three");

@@ -1,0 +1,8 @@
+{
+	"name": "compiler",
+	"version": "1.0",
+	"description": "compiler (no server)",
+	"author": "jdh",
+	"license": "UNLICENSED",
+	"main": "index.mjs"
+}

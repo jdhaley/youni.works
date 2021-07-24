@@ -3,11 +3,9 @@ import fs			from "fs";
 import https		from "https";
 
 import filer		from "./filer.mjs";
-import compile		from "./compile.mjs";
 import loader 		from "./loader.mjs";
 
 export default function main(conf) {
-	compile("../../source", "../../target");
 	const app = express();
 	app.use("/app", express.static("app"));
 	app.use("/res", express.static("res"));
