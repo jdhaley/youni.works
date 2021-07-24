@@ -1,9 +1,10 @@
 import fs		from "fs";
 import https	from "https";
+import express 	from "express";
 
 export default function main(conf) {
 	let service = conf.service.start({
-		engine: conf.engine
+		engine: express
 	});
 	const credentials = {
 		key: fs.readFileSync(conf.key),

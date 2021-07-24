@@ -1,8 +1,8 @@
 {
 	"configurations": [
 		{
-			"name": "youni.works",
-			"cwd": "${workspaceFolder}/server",
+			"name": "framework",
+			"cwd": "${workspaceFolder}/server/framework",
 			"program": "index.mjs",
 			"request": "launch",
 			"skipFiles": [
@@ -11,8 +11,8 @@
 			"type": "pwa-node"
 		},
 		{
-			"name": "test server",
-			"cwd": "${workspaceFolder}/service/test",
+			"name": "test",
+			"cwd": "${workspaceFolder}/server/test",
 			"program": "index.mjs",
 			"request": "launch",
 			"skipFiles": [
