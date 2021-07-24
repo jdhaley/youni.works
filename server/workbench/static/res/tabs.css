@@ -1,0 +1,54 @@
+
+.tabs {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1;
+	overflow: hidden;
+}
+.tabs>.header {
+	display: flex;
+	flex: 0 0;
+	min-height: 36px;
+	color: darkgray;
+	background-color: ghostwhite;
+	overflow: scroll;
+}
+.tabs>.header::-webkit-scrollbar {
+	width: 2px;
+	height: 2px;
+}
+.tabs>.header::-webkit-scrollbar-track {
+	background: white;
+}
+.tabs>.header::-webkit-scrollbar-thumb {
+    background: none;
+}
+.tabs>.header:hover::-webkit-scrollbar-thumb {
+    background: lightsteelblue;
+}
+.tabs>.body {
+	color: darkslategrey;
+	padding: 8px;
+}
+.tab {
+	flex: 1 1;
+	cursor: pointer;
+	max-width: 150px;
+	min-width: 100px;
+	color: gray;
+	padding: 8px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	border-right: 1px solid gainsboro;
+	border-bottom: 1px solid gainsboro;
+}
+.activeTab {
+	color: seagreen;
+	background-color: white;
+	border-bottom-color: white;
+}
+.tabs>.body {
+	flex: 1 1;
+	border-bottom: 1px solid gainsboro;
+}

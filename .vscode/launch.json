@@ -12,8 +12,8 @@
 			"type": "pwa-node"
 		},
 		{
-			"name": "test",
-			"cwd": "${workspaceFolder}/server/test",
+			"name": "workbench",
+			"cwd": "${workspaceFolder}/server/workbench",
 			"program": "index.mjs",
 			"request": "launch",
 			"skipFiles": [
