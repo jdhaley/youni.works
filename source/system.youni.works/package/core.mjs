@@ -42,16 +42,16 @@ const pkg = {
     },
     Component: {
         forName(name) {
-            this[Symbol.for("owner")].forName(name);
+            return this[Symbol.for("owner")].forName(name);
         },
         create(from) {
-            this[Symbol.for("owner")].create(from);
+            return this[Symbol.for("owner")].create(from);
         },
         extend(object, extension) {
-            this[Symbol.for("owner")].extend(object, extension);
+            return this[Symbol.for("owner")].extend(object, extension);
         },
         define(object, name, value, facet) {
-            this[Symbol.for("owner")].define(object, name, value, facet);
+            return this[Symbol.for("owner")].define(object, name, value, facet);
         }
     }
 }
