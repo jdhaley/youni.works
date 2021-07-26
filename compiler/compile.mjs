@@ -89,6 +89,10 @@ function compileValue(value, depth) {
         case "function":
             let source = value.toString();
             if (source.startsWith("function(") || source.startsWith("function ") ) return source;
+            if (source.startsWith("async ")) {
+                source = source.substring("async ".length);
+                return "async function " + source;
+            }
             return "function " + source;
         case "object":
             if (!value) return "null";
