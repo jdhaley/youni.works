@@ -2,6 +2,16 @@
 	
 	"configurations": [
 		{
+			"name": "new compiler",
+			"cwd": "${workspaceFolder}/server/compiler",
+			"program": "index.mjs",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "pwa-node"
+		},
+		{
 			"name": "framework",
 			"cwd": "${workspaceFolder}/server/framework",
 			"program": "index.mjs",
