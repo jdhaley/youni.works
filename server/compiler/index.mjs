@@ -15,6 +15,6 @@ function main(conf) {
 	compiler.load("../../source");
 
 	const httpsServer = https.createServer();
-	// let info = `Service listening on HTTPS port "${conf.port}"`;
-	// httpsServer.listen(conf.port, () => console.info(info));
+	let info = `Compiler listening on HTTPS port "${conf.port}"`;
+	httpsServer.listen(conf.port, () => console.info(info));
 };
