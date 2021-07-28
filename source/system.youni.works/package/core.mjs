@@ -38,6 +38,15 @@ const pkg = {
         perform: function(name, ...args) {
 			let method = this[Symbol.for("owner")].forName(name);
 			return method.apply(this, args);
+        },
+        extend() {
+            let inst = this[Symbol.for("owner")].create(this);
+            inst.implement.apply(inst, arguments);
+            return inst;
+        },
+        implement() {
+            let owner = this[Symbol.for("owner")];
+            for (let i = 0; i < arguments.length; i++) owner.extend(this, arguments[i]);
         }
     },
     Component: {
