@@ -1,10 +1,17 @@
-export default {
+const pkg = {
 	type$: "/system/core",
-	Loader: {
+	ModuleLoader: {
 		type$: "Instance",
 		fs: null,
+		context: "",
+		type$x: "Loader",
 		async load(sourceDir) {
-			let sources = await this.fs.readdir(sourceDir);
+			console.log(this.context);
+			let loader = this.x.extend({
+				fs: this.fss
+			});
+			console.log(loader.load(this.context, "source"));
+			let sources = await this.fs.readdir(this.context + sourceDir);
 			let modules = [];
 			for (let name of sources) {
 				if (!name.startsWith(".")) {
@@ -119,7 +126,7 @@ export default {
 		},
 	},
 	ModuleCompiler: {
-		type$: ["Loader", "Transcoder"],
+		type$: ["ModuleLoader", "Transcoder"],
 		var$context: "",
 		targetDir: "/tmp/target.youni.works",
 		async load(sourceDir) {
@@ -184,5 +191,88 @@ export default {
 		main_loadModule(module) {
 			return module.use.system.load(module);
 		}
+	},
+	Loader: {
+		type$: "Instance",
+		fs: null,
+		status(pathname) {
+			return this.fs.statSync(pathname);
+		},
+		entries(pathname) {
+			return this.fs.readdirSync(pathname)
+		},
+		load(path, name) {
+			path += "/" + name;
+			let stats;
+			try {
+				stats = this.status(path);
+			} catch (e) {
+				return this.newNode("error", name, e);
+			}
+			let node;
+			if (stats.isDirectory()) {
+				node = this.loadFolder(path, name, stats);
+			} else if (stats.isFile()) {
+				node = this.loadFile(path, name, stats);
+			}
+			return node;
+		},
+		loadFolder(pathname, name, stats) {
+			let folder = this.newNode("folder", name, stats);
+			folder.to = [];
+			for (let name of this.entries(pathname)) {
+				if (!name.startsWith(".")) {
+					let entry;
+					try {
+						entry = this.load(pathname, name);
+					} catch (e) {
+						entry = this.newNode("error", name, e)
+					}
+					if (entry) folder.to.push(entry);
+				}
+			}
+			return folder;
+		},
+		loadFile(pathname, name, stats) {
+			let file = this.newNode("file", name, stats);
+			let index = name.lastIndexOf(".") + 1;
+			if (index) {
+				let ext = name.substring(index);
+				let mediaType = this.fileTypes[ext];
+				if (mediaType) {
+					file.mediaType = mediaType;
+					this.contentLoaders[mediaType](pathname, file);
+				}
+			}
+			return file;
+		},
+		newNode(type, name, data) {
+			let node = {
+				type: type,
+				name: name,
+			}
+			if (type == "error") {
+				node.error = {
+					message: data.message,
+					code: data.code
+				}
+			} else {
+				node.stats = {
+					created: data.birthtimeMs,
+					modified: data.mtimeMs,
+					size: data.size	
+				}
+			}
+			return node;
+		},
+		fileTypes: {
+			"mjs": "text/javascript"
+		},
+		contentLoaders: {
+			"text/javascript": function(pathname, node) {
+				import(pathname).then(expr => {node.expr = expr.default}).catch(err => node.error = err);
+			}
+		}
 	}
 }
+export default pkg;

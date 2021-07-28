@@ -10,9 +10,11 @@ function main(conf) {
 	let module = conf.compiler;
 	let compiler = module.create({
 		type$: "/compiler/ModuleCompiler",
-		fs: fsp
+		context: fs.realpathSync("../.."),
+		fs: fsp,
+		fss: fs
 	});
-	compiler.load("../../source");
+	compiler.load("source");
 
 	const httpsServer = https.createServer();
 	let info = `Compiler listening on HTTPS port "${conf.port}"`;
