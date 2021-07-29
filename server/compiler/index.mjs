@@ -1,7 +1,5 @@
 import fs		from "fs";
-import fsp		from "fs/promises";
 import https	from "https";
-import express 	from "express";
 import conf		from "./conf.mjs";
 
 main(conf);
@@ -11,8 +9,7 @@ function main(conf) {
 	let compiler = module.create({
 		type$: "/compiler/ModuleCompiler",
 		context: fs.realpathSync("../.."),
-		fs: fsp,
-		fss: fs
+		fs: fs
 	});
 	compiler.load("source");
 

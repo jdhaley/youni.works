@@ -1,129 +1,48 @@
 const pkg = {
-	type$: "/system/core",
+	type$: "/loader",
 	ModuleLoader: {
 		type$: "Instance",
+		type$loader: "Loader",
 		fs: null,
 		context: "",
-		type$x: "Loader",
 		async load(sourceDir) {
 			console.log(this.context);
-			let loader = this.x.extend({
-				fs: this.fss
+			let loader = this.loader.extend({
+				context: this.context,
+				fs: this.fs
 			});
-			console.log(loader.load(this.context, "source"));
-			let sources = await this.fs.readdir(this.context + sourceDir);
+			let sourceNode = await loader.load(this.context, "source");
+
+			console.log(sourceNode.content);
 			let modules = [];
-			for (let name of sources) {
-				if (!name.startsWith(".")) {
-					try {
-						modules.push(await this.importModule(sourceDir, name));
-					} catch (error) {
-						modules.push({
-							name: name,
-							error: error
-						});
-					}
-				}
+			for (let name in sourceNode.content) {
+				console.log(this.loadModule(sourceNode.content[name]));
 			}
 			return modules;
+			
 		},
-		async importModule(sourceDir, name) {
-			let module = (await import("../source/" + name + "/module.mjs")).default;
-			if (module.name && module.name != name) {
-				log(`Warning: module.name "${module.name}" doesn't match folder name "${name}". Using "${name}"`);
+		loadModule(folder) {
+			let module = folder.content["module.mjs"];
+			module = module && module.content || null;
+			if (!module) {
+				console.log("no module.mjs, skipping");
+				return;
 			}
-			module.name = name;
+			if (module.name && module.name != folder.name) {
+				console.log(`Warning: module.name "${module.name}" doesn't match folder name "${folder.name}". Using "${folder.name}"`);
+			}
+			module.name = folder.name;
 			module.package = Object.create(null);
-
-			let pkgPath = sourceDir + "/" + name + "/package";
-			for (let name of await this.fs.readdir(pkgPath)) {
-				let pkg = null;
+			let pkgs = folder.content.package;
+			if (pkgs) for (let name in pkgs.content) {
+				let pkg = pkgs.content[name];
 				if (name.endsWith(".mjs")) {
-					pkg = (await import("../source/" + module.name + "/package" + "/" + name)).default;
 					name = name.substring(0, name.lastIndexOf(".mjs"));
 				}
-				module.package[name] = pkg;
+				module.package[name] = pkg.content;
 			}
 			return module;
 		}
-	},
-	Transcoder: {
-		context: "",
-		isReference(key) {
-			return this.facetOf(key) == "type" || key == "type$";
-		},
-		transcode(value, depth) {
-			if (!depth) depth = 0;
-			switch (typeof value) {
-				case "undefined":
-				case "boolean":
-				case "number":
-					return value;
-				case "string":
-					return JSON.stringify(value);
-				case "function":
-					let source = value.toString();
-					if (source.startsWith("function(") || source.startsWith("function ") ) return source;
-
-					if (source.startsWith("async ")) {
-						source = source.substring("async ".length);
-						return "async function " + source;
-					}
-					return "function " + source;
-				case "object":
-					if (!value) return "null";
-					if (Object.getPrototypeOf(value) == Array.prototype) return this.compileArray(value, depth);
-					return this.compileObject(value, depth);
-			}
-		},
-		compileArray(value, depth) {
-			depth++;
-			let out = "";
-			for (let name in value) {
-				out += this.transcode(value[name], depth) + ", "
-			}
-			if (out.endsWith(", ")) out = out.substring(0, out.length - 2);
-			return "[" + out + "]";
-		},
-		compileObject(value, depth) {
-			depth++;
-			let out = "";
-			for (let name in value) {
-				out += this.compileProperty(name, value[name], depth);
-			}
-			if (out.endsWith(",")) out = out.substring(0, out.length - 1);
-			return "{" + out + this.indent(depth - 1) + "}";
-		},
-		compileProperty(key, value, depth) {
-			if (this.isReference(key)) {
-				value = this.compileReference(value);
-			}
-			value = this.transcode(value, depth);
-			return this.indent(depth) + JSON.stringify(key) + ": " +  value + ",";
-		},
-		compileReference(value) {
-			if (!this.context) return value;
-			if (typeof value == "string" && !value.startsWith("/")) {
-				value = this.context + value;
-			} else if (value && Object.getPrototypeOf(value) == Array.prototype) {
-				for (let i = 0, len = value.length; i < len; i++) {
-					let type = value[i];
-					if (typeof type == "string" && !type.startsWith("/")) {
-						value[i] = this.context + type;
-					}
-				}
-			}
-			return value;
-		},
-		facetOf(key) {
-			let index = key.indexOf("$");
-			return index < 1 ? "" : key.substr(0, index);
-		},
-		indent(depth) {
-			let out = "\n";
-			for (let i = 0; i < depth; i++) out += "\t";
-			return out;
-		},
 	},
 	ModuleCompiler: {
 		type$: ["ModuleLoader", "Transcoder"],
@@ -190,88 +109,6 @@ const pkg = {
 		//TODO this is dependent on naming system.youni.works "system".
 		main_loadModule(module) {
 			return module.use.system.load(module);
-		}
-	},
-	Loader: {
-		type$: "Instance",
-		fs: null,
-		status(pathname) {
-			return this.fs.statSync(pathname);
-		},
-		entries(pathname) {
-			return this.fs.readdirSync(pathname)
-		},
-		load(path, name) {
-			path += "/" + name;
-			let stats;
-			try {
-				stats = this.status(path);
-			} catch (e) {
-				return this.newNode("error", name, e);
-			}
-			let node;
-			if (stats.isDirectory()) {
-				node = this.loadFolder(path, name, stats);
-			} else if (stats.isFile()) {
-				node = this.loadFile(path, name, stats);
-			}
-			return node;
-		},
-		loadFolder(pathname, name, stats) {
-			let folder = this.newNode("folder", name, stats);
-			folder.to = [];
-			for (let name of this.entries(pathname)) {
-				if (!name.startsWith(".")) {
-					let entry;
-					try {
-						entry = this.load(pathname, name);
-					} catch (e) {
-						entry = this.newNode("error", name, e)
-					}
-					if (entry) folder.to.push(entry);
-				}
-			}
-			return folder;
-		},
-		loadFile(pathname, name, stats) {
-			let file = this.newNode("file", name, stats);
-			let index = name.lastIndexOf(".") + 1;
-			if (index) {
-				let ext = name.substring(index);
-				let mediaType = this.fileTypes[ext];
-				if (mediaType) {
-					file.mediaType = mediaType;
-					this.contentLoaders[mediaType](pathname, file);
-				}
-			}
-			return file;
-		},
-		newNode(type, name, data) {
-			let node = {
-				type: type,
-				name: name,
-			}
-			if (type == "error") {
-				node.error = {
-					message: data.message,
-					code: data.code
-				}
-			} else {
-				node.stats = {
-					created: data.birthtimeMs,
-					modified: data.mtimeMs,
-					size: data.size	
-				}
-			}
-			return node;
-		},
-		fileTypes: {
-			"mjs": "text/javascript"
-		},
-		contentLoaders: {
-			"text/javascript": function(pathname, node) {
-				import(pathname).then(expr => {node.expr = expr.default}).catch(err => node.error = err);
-			}
 		}
 	}
 }
