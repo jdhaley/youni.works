@@ -1,7 +1,7 @@
 const pkg = {
 	type$: "/system/core",
 	Transcoder: {
-		context: "",
+		pkgContext: "",
 		isReference(key) {
 			return this.facetOf(key) == "type" || key == "type$";
 		},
@@ -55,14 +55,14 @@ const pkg = {
 			return this.indent(depth) + JSON.stringify(key) + ": " +  value + ",";
 		},
 		compileReference(value) {
-			if (!this.context) return value;
+			if (!this.pkgContext) return value;
 			if (typeof value == "string" && !value.startsWith("/")) {
-				value = this.context + value;
+				value = this.pkgContext + value;
 			} else if (value && Object.getPrototypeOf(value) == Array.prototype) {
 				for (let i = 0, len = value.length; i < len; i++) {
 					let type = value[i];
 					if (typeof type == "string" && !type.startsWith("/")) {
-						value[i] = this.context + type;
+						value[i] = this.pkgContext + type;
 					}
 				}
 			}
