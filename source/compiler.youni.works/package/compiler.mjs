@@ -11,12 +11,13 @@ const pkg = {
 				context: this.context,
 				fs: this.fs
 			});
-			loader.load(this.context, "source").then(node => this.loadModules(node));		
+			loader.load(this.context, sourceDir).then(node => this.loadModules(node));		
 		},
 		loadModules(node) {
 			console.log(node.content);
 			for (let name in node.content) {
-				console.log(this.loadModule(node.content[name]));
+				let module = this.loadModule(node.content[name]);
+				if (module) this.target(module);
 			}
 		},
 		loadModule(folder) {
@@ -40,20 +41,15 @@ const pkg = {
 				module.package[name] = pkg.content;
 			}
 			return module;
+		},
+		target(module) {
+			console.log(module);
 		}
 	},
 	ModuleCompiler: {
 		type$: ["ModuleLoader", "Transcoder"],
-		var$context: "",
+		var$pkgContext: "",
 		targetDir: "/tmp/target.youni.works",
-		async load(sourceDir) {
-			try {
-				let modules = await this.super(load, sourceDir);
-				for (let module of modules) this.target(module);
-			} catch (err) {
-				console.log(err);
-			}
-		},
 		target(module) {
 			console.log("Compiling: " + module.name + "-" + module.version);
 			let imports = this.compileImports(module.use);
@@ -63,7 +59,8 @@ const pkg = {
 			let mod = this.compileModule(module);
 
 			let out = imports + mod + use + pkg + pkgs;
-			this.fs.writeFile(`${this.targetDir}/${module.name}-${module.version || "0.0"}.mjs`, out);
+			console.log(out);
+			this.fs.writeFile(`${this.targetDir}/${module.name}-${module.version || "0.0"}.mjs`, out, () => null);
 		},
 		compileImports(use) {
 			let out = "";
@@ -92,7 +89,7 @@ const pkg = {
 		compilePackages(pkg) {
 			let out = "";
 			for (let name in pkg) {
-				this.context = "/" + name + "/";
+				this.pkgContext = "/" + name + "/";
 				let body = `\tconst pkg = ${this.transcode(pkg[name])}\nreturn pkg;`;
 				out += `function ${name}() {\n${body}\n}\n\n`;
 			}
