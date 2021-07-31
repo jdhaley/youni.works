@@ -40,6 +40,10 @@ const pkg = {
 				}
 				module.package[name] = pkg.content;
 			}
+			let conf = folder.content["conf.mjs"];
+			if (conf) module.conf = conf.content;
+			let main = folder.content["main.mjs"];
+			if (main) module.main = main.content;
 			return module;
 		},
 		target(module) {
@@ -57,8 +61,8 @@ const pkg = {
 			let pkg = this.compilePackage(module.package);
 			let pkgs = this.compilePackages(module.package);
 			let mod = this.compileModule(module);
-
-			let out = imports + mod + use + pkg + pkgs;
+			let init = this.compileInit(module);
+			let out = imports + mod + use + pkg + init + pkgs;
 			console.log(out);
 			this.fs.writeFile(`${this.targetDir}/${module.name}-${module.version || "0.0"}.mjs`, out, () => null);
 		},
@@ -95,11 +99,20 @@ const pkg = {
 			}
 			return out;
 		},
+		compileInit(module) {
+			let conf = module.conf;
+			let main = module.main || this.main_loadModule;
+			let out = `const conf = ${this.transcode(conf)};\n`;
+			out += `const main = ${this.transcode(main)};\n`;
+			out += `main(module, conf);\n`;
+			return out;
+		},
 		compileModule(module) {
 			delete module.use;
 			delete module.package;
-			module = this.transcode(module);
-			return `const module = ${module};\n`;
+			delete module.conf;
+			delete module.main;
+			return `const module = ${this.transcode(module)};\n`;
 		},
 		//TODO this is dependent on naming system.youni.works "system".
 		main_loadModule(module) {
