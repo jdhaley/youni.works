@@ -5,21 +5,19 @@ const pkg = {
 		type$loader: "Loader",
 		fs: null,
 		context: "",
-		async load(sourceDir) {
+		load(sourceDir) {
 			console.log(this.context);
 			let loader = this.loader.extend({
 				context: this.context,
 				fs: this.fs
 			});
-			let sourceNode = await loader.load(this.context, "source");
-
-			console.log(sourceNode.content);
-			let modules = [];
-			for (let name in sourceNode.content) {
-				console.log(this.loadModule(sourceNode.content[name]));
+			loader.load(this.context, "source").then(node => this.loadModules(node));		
+		},
+		loadModules(node) {
+			console.log(node.content);
+			for (let name in node.content) {
+				console.log(this.loadModule(node.content[name]));
 			}
-			return modules;
-			
 		},
 		loadModule(folder) {
 			let module = folder.content["module.mjs"];

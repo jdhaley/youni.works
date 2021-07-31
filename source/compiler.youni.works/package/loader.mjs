@@ -78,6 +78,32 @@ const pkg = {
 			return out;
 		},
 	},
+	FileNode: {
+		name: "",
+		created: 0,
+		modified: 0,
+		size: 0,
+		contentType: "",
+		var$content: undefined,
+		once$to() {
+			if (typeof this.content == "object") {
+				return this[Symbol.for("owner")].create({
+					symbol$iterator: function*() {
+						for (let name in this.content) {
+							return this.content[name];
+						}
+					}
+				});
+			}
+		},
+		loadContent() {
+		},
+		extend$actions: {
+			contentLoaded(event) {
+				this.content = event.content;
+			}
+		}
+	},
 	Loader: {
 		type$: "Instance",
 		fs: null,
@@ -89,48 +115,48 @@ const pkg = {
 		},
 		async load(path, name) {
 			path += "/" + name;
-			let stats;
 			try {
-				stats = this.status(path);
+				let stats = this.status(path);
+				let node;
+				if (stats.isDirectory()) {
+					node = await this.loadFolder(path, name, stats);
+				} else if (stats.isFile()) {
+					node = await this.loadFile(path, name, stats);
+				}
+				return node;	
 			} catch (e) {
 				return this.newNode("error", name, e);
 			}
-			let node;
-			if (stats.isDirectory()) {
-				node = await this.loadFolder(path, name, stats);
-			} else if (stats.isFile()) {
-				node = await this.loadFile(path, name, stats);
-			}
-			return node;
 		},
 		async loadFolder(pathname, name, stats) {
 			let folder = this.newNode("folder", name, stats);
+			folder.mediaType = "folder";
 			folder.content = Object.create(null);
 			for (let name of this.entries(pathname)) {
 				if (!name.startsWith(".")) {
-					let entry;
-					try {
-						entry = await this.load(pathname, name);
-					} catch (e) {
-						entry = this.newNode("error", name, e)
-					}
-					if (entry) folder.content[name] = entry;
+					folder.content[name] = await this.load(pathname, name);
 				}
 			}
 			return folder;
 		},
 		async loadFile(pathname, name, stats) {
+			let mediaType = this.getMediaType(pathname) || "file";
+
 			let file = this.newNode("file", name, stats);
+			if (mediaType) {
+				file.mediaType = mediaType;
+				let loader = this.contentLoaders[mediaType](pathname);
+				file.content = await loader();
+			}
+			return file;
+		},
+		getMediaType(pathname) {
+			let name = pathname.substring(pathname.lastIndexOf("/") + 1);
 			let index = name.lastIndexOf(".") + 1;
 			if (index) {
 				let ext = name.substring(index);
-				let mediaType = this.fileTypes[ext];
-				if (mediaType) {
-					file.mediaType = mediaType;
-					await this.contentLoaders[mediaType](pathname, file)();
-				}
+				return this.fileTypes[ext];
 			}
-			return file;
 		},
 		newNode(type, name, data) {
 			let node = {
@@ -155,12 +181,11 @@ const pkg = {
 			"mjs": "text/javascript"
 		},
 		contentLoaders: {
-			"text/javascript": function(pathname, node) {
-				async function imp() {
+			"text/javascript": function(pathname) {
+				return async function importJs() {
 					let content = await import(pathname);
-					node.content = content.default;
+					return content.default;
 				}
-				return imp;
 			}
 		}
 	}
