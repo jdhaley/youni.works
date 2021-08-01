@@ -6,12 +6,13 @@ const pkg = {
 		fs: null,
 		context: "",
 		load(sourceDir) {
-			console.log(this.context);
+			let context = this.fs.realpathSync(this.context)
+			console.log(this.context, context);
 			let loader = this.loader.extend({
-				context: this.context,
+				context: context,
 				fs: this.fs
 			});
-			loader.load(this.context, sourceDir).then(node => this.loadModules(node));		
+			loader.load(context, sourceDir).then(node => this.loadModules(node));		
 		},
 		loadModules(node) {
 			console.log(node.content);
@@ -63,8 +64,7 @@ const pkg = {
 			let mod = this.compileModule(module);
 			let init = this.compileInit(module);
 			let out = imports + mod + use + pkg + init + pkgs;
-			console.log(out);
-			this.fs.writeFile(`${this.targetDir}/${module.name}-${module.version || "0.0"}.mjs`, out, () => null);
+			this.fs.writeFile(`${this.context}/target/${module.name}-${module.version || "0.0"}.mjs`, out, () => null);
 		},
 		compileImports(use) {
 			let out = "";
@@ -104,7 +104,7 @@ const pkg = {
 			let main = module.main || this.main_loadModule;
 			let out = `const conf = ${this.transcode(conf)};\n`;
 			out += `const main = ${this.transcode(main)};\n`;
-			out += `main(module, conf);\n`;
+			out += `export default main(module, conf);\n`;
 			return out;
 		},
 		compileModule(module) {

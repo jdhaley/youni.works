@@ -8,7 +8,7 @@ function main(conf) {
 	let module = conf.compiler;
 	let compiler = module.create({
 		type$: "/compiler/ModuleCompiler",
-		context: fs.realpathSync("../.."),
+		context: "../..",
 		fs: fs
 	});
 	compiler.load("source");
