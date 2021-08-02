@@ -171,7 +171,7 @@ export default {
 			if (this.points) for (let point of this.points) {
 				path += point.toString();
 			}
-			this.set("d", path);
+			this.set("d", path + "z");
 		},
 		add(x, y, type) {
 			let point = this.owner.create("/pen/Point");
