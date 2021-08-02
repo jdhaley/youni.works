@@ -1,5 +1,6 @@
 const pkg = {
 	type$: "/loader",
+	type$Transcoder: "/transcoder/Transcoder",
 	ModuleLoader: {
 		type$: "Instance",
 		type$loader: "Loader",
@@ -61,8 +62,9 @@ const pkg = {
 			let use = this.compileUse(module.use);
 			let pkg = this.compilePackage(module.package);
 			let pkgs = this.compilePackages(module.package);
-			let mod = this.compileModule(module);
 			let init = this.compileInit(module);
+			let mod = this.compileModule(module);
+			
 			let out = imports + mod + use + pkg + init + pkgs;
 			this.fs.writeFile(`${this.context}/target/${module.name}-${module.version || "0.0"}.mjs`, out, () => null);
 		},
