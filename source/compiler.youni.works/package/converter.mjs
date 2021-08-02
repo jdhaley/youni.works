@@ -1,14 +1,5 @@
 export default {
     type$: "/system/core",
-    Member: {
-        // declaredBy: object,
-        facet: "",
-        name: "",
-        type: "",
-        expr: null,
-        configurable: true,
-        enumerable: true
-    },
     Converter: {
         type$util: "/base/util",
         facetOf(decl) {
