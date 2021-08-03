@@ -9,8 +9,8 @@ export default {
 			type$footer: "Display"
 		},
 		size(x, y) {
-			for (let part of this.to) {
-				if (part != this.parts.body) y -= part.bounds.height;
+			for (let node of this.to) {
+				if (node != this.parts.body) y -= node.bounds.height;
 			}
 			this.style.minWidth = x + "px";
 			this.parts.body.style.minHeight = y + "px";

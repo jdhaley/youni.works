@@ -1,5 +1,23 @@
 export default {
 	type$: "/system/core",
+	Sender: {
+		send(to, message) {
+			if (!message) return;
+			if (typeof message == "string") message = {
+				subject: message
+			}
+			
+			Promise.resolve(message).then(message => down(to, message));
+
+			function down(on, message) {
+				if (!message.subject) return;
+				on.receive(message);
+				if (on.to) for (on of on.to) {
+					down(on, message);
+				}
+			}
+		}
+	},
 	Receiver: {
 		start(conf) {
 		},

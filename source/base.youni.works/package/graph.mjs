@@ -1,45 +1,11 @@
 export default {
 	type$: "/control",
 	Graph: {
-		type$: "Component",
-		send(to, message) {
-			if (to.owner != this) console.warn("sending to a node not owned by this.");
-			message = this.prepareSignal(message);
-			if (!message) return;
-			
-			// Promise.resolve(message).then(msg => down(to, msg), rej => null);
-			Promise.resolve(to).then(on => down(on, message));
-			// console.log("sent", to, message);
-
-			function down(on, message) {
-				//console.log("down", message.subject);
-				if (!message.subject) return;
-				on.receive(message);
-				if (on.to) for (on of on.to) {
-					down(on, message);
-				}
-			}
-		},
-		// send(to, msg) {
-		// 	if (to.owner != this) console.warn("sending to a node not owned by this.");
-		// 	msg = this.prepareSignal(msg);
-		// 	this.log(to, msg);
-		// 	msg && down(to, msg);
-
-		// 	function down(on, message) {
-		// 		if (!message.subject) return;
-		// 		on.receive(message);
-		// 		if (message.pushPath) message.pushPath(on);
-		// 		if (on.to) for (on of on.to) {
-		// 			down(on, message);
-		// 		}
-		// 	}
-		// },
+		type$: ["Component", "Sender"],
 		sense(on, event) {
 			if (on.owner != this) console.warn("sensing on a node not owned by this.");
 			event = this.prepareSignal(event);
 			this.log(on, event);
-			let ele = on.peer
 			//can't use event.path - it is chrome-specific.
 			while (on) {
 				if (!event.subject) return;
