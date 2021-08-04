@@ -13,7 +13,7 @@ const pkg = {
 				context: context,
 				fs: this.fs
 			});
-			loader.load(context, sourceDir).then(node => this.loadModules(node));		
+			loader.load(context, sourceDir).then(node => this.loadModules(node));
 		},
 		loadModules(node) {
 			console.log(node.content);
@@ -46,7 +46,31 @@ const pkg = {
 			if (conf) module.conf = conf.content;
 			let main = folder.content["main.mjs"];
 			if (main) module.main = main.content;
+try {
+	let context = this.fs.realpathSync(this.context)
+	this.copy(context + "/source/" + module.name + "/static", context + "/target/" + module.name + "-" + (module.version || "0.0"));
+} catch (err) {
+	console.log(err);
+}
 			return module;
+		},
+		copy(src, dest) {
+			let isDir;
+			try {
+				isDir = this.fs.statSync(src).isDirectory();
+			} catch (err) {
+				return;
+			}
+			if (isDir) {
+				this.fs.mkdirSync(dest, {
+					recursive: true
+				});
+				for (let name of this.fs.readdirSync(src)) {
+					this.copy(src + "/" + name, dest + "/" + name);
+				}	
+			} else {
+				this.fs.copyFileSync(src, dest);
+			}
 		},
 		target(module) {
 			console.log(module);
