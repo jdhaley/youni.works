@@ -1,0 +1,16 @@
+.item>.header {
+	padding: 3px;
+	cursor: default;
+}
+.item>.header>I {
+	color: lightsteelblue;
+}
+.item>.header>SPAN {
+	color: seagreen;
+}
+.item>.header>IMG {
+	width: 14px;
+}
+.item>.body {
+	padding-left: 20px;
+}

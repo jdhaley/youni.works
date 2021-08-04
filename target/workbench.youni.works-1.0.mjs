@@ -3,7 +3,13 @@ import service from "./service.youni.works-1.0.mjs";
 const module = {
 	"name": "workbench.youni.works",
 	"version": "1.0",
-	"moduleType": "service"
+	"moduleType": "service",
+	"author": "youniworks.com",
+	"description": "workbench",
+	"license": "UNLICENSED",
+	"dependencies": {
+		"express": "^4.17.1"
+	}
 };
 module.use = {
 	system: system,
