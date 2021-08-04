@@ -1,10 +1,11 @@
 import system from "./system.youni.works-2.1.mjs";
 import service from "./service.youni.works-1.0.mjs";
+import compiler from "./compiler.youni.works-1.0.mjs";
 const module = {
 	"name": "workbench.youni.works",
+	"author": "youni.works",
 	"version": "1.0",
 	"moduleType": "service",
-	"author": "youniworks.com",
 	"description": "workbench",
 	"license": "UNLICENSED",
 	"dependencies": {
@@ -13,7 +14,8 @@ const module = {
 };
 module.use = {
 	system: system,
-	service: service
+	service: service,
+	compiler: compiler
 }
 module.package = {
 }
