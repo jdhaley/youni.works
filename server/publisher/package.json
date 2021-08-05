@@ -1,0 +1,11 @@
+{
+	"name": "publisher",
+	"version": "1.0",
+	"description": "publisher",
+	"author": "youni.works",
+	"license": "UNLICENSED",
+	"main": "main.mjs",
+	"dependencies": {
+		"express": "^4.17.1"
+	}
+}
