@@ -17,11 +17,14 @@ module.package = {
 	app: app(),
 	diagram: diagram(),
 	display: display(),
+	editable_mjs_devt: editable_mjs_devt(),
 	editors: editors(),
 	gdr: gdr(),
 	grid: grid(),
+	keybd: keybd(),
 	panel: panel(),
 	pen: pen(),
+	range: range(),
 	record: record(),
 	shape: shape(),
 	tabs: tabs(),
@@ -589,6 +592,11 @@ function display() {
 return pkg;
 }
 
+function editable_mjs_devt() {
+	const pkg = undefined
+return pkg;
+}
+
 function editors() {
 	const pkg = {
 	"type$": "/record",
@@ -721,6 +729,18 @@ return pkg;
 function gdr() {
 	const pkg = {
 	"$public": {
+		"keydown": function keydown(event) {
+            let shortcut = pkg.getShortcut(event);
+            if (shortcut) {
+                console.log(shortcut);
+                event.subject = "command";
+                event.shortcut = shortcut;
+            } else {
+                console.log(event.key);
+                event.subject = "charpress";
+            }
+            pkg.sense(event);
+        },
 		"mousedown": function mousedown(event) {
             event.subject = "grab";
             pkg.sense(event);
@@ -762,6 +782,24 @@ function gdr() {
         }
 	},
 	"TRACK": null,
+	"getShortcut": function getShortcut(event) {
+        let command = event.key;
+        if (command == " ") command = "Space";
+        if (command == "Meta") command = "Control";
+        // switch (command) {
+        //     case "Control":
+        //     case "Alt":
+        //     case "Shift":
+        //     case "Meta":
+        //         return;
+        //     case " ":
+        //         command = "Space";
+        // }
+        if (event.shiftKey && command.indexOf("Shift") < 0) command = "Shift+" + command;
+        if (event.altKey && command.indexOf("Alt") < 0) command = "Alt+" + command;
+        if ((event.ctrlKey || event.metaKey) && command.indexOf("Control") < 0) command = "Control+" + command;
+        return command.length > 1 ? command : "";
+    },
 	"sense": function sense(event) {
 		let ctl = pkg.getControl(event.target);
 		ctl && ctl.owner.sense(ctl, event);
@@ -917,6 +955,49 @@ function grid() {
 			this.peer.id = "I" + this.owner.createId();
 		}
 	}
+}
+return pkg;
+}
+
+function keybd() {
+	const pkg = {
+	"$public": {
+		"keydown": function keydown(event) {
+            let shortcut = pkg.getShortcut(event);
+            if (shortcut) {
+                event.subject = "command";
+                event.shortcut = shortcut;
+            } else {
+                event.subject = "press";
+            }
+            pkg.sense(event);
+        }
+	},
+	"getShortcut": function getShortcut(event) {
+        let command = event.key;
+        switch (command) {
+            case "Control":
+            case "Alt":
+            case "Shift":
+                return;
+            case " ":
+                command = "Space";
+        }
+        if (event.shiftKey && command.length > 1) command = "Shift+" + command;
+        if (event.altKey) command = "Alt+" + command;
+        if (event.ctrlKey) command = "Control+" + command;
+        return command;
+    },
+	"sense": function sense(event) {
+        let ctl = pkg.getControl(event.target);
+        ctl && ctl.owner.sense(ctl, event);
+    },
+	"getControl": function getControl(node) {
+        while(node) {
+            if (node.$peer) return node.$peer;
+            node = node.parentNode;
+        }
+    }
 }
 return pkg;
 }
@@ -1183,15 +1264,24 @@ function pen() {
 			this.peer.innerHTML = grid.markup;
 			this.vector = this.owner.create("/pen/Vector");
 			this.append(this.vector);
+			this.set("tabindex", 1);
+			this.peer.focus();
 		},
 		"var$points": null,
 		"var$vector": "",
 		"extend$actions": {
 			"dblclick": function dblclick(event) {
+				this.peer.focus();
 				let b = this.bounds;
 				let x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				let y = Math.round((event.y - b.top) / b.height * 32) * 10;
 				this.vector.add(x, y, event.shiftKey ? "Q" : undefined);
+			},
+			"click": function click(event) {
+				this.peer.focus();
+			},
+			"command": function command(event) {
+				console.log("image: ", event.shortcut);
 			}
 		}
 	},
@@ -1216,6 +1306,156 @@ function pen() {
 			this.shape = this.owner.create("/pen/Image");
 			this.append(this.shape);
 		}
+	}
+}
+return pkg;
+}
+
+function range() {
+	const pkg = {
+	"Range": {
+		"get$container": function get$container() {
+			let target = this.commonAncestorContainer;
+			while (target && target.nodeType != Node.ELEMENT_NODE) target = target.parentNode;
+			return target;         
+		},
+		"get$textContainer": function() {
+			let node = this.commonAncestorContainer;
+			return node.nodeType == Node.TEXT_NODE ? node : null;
+		},
+		"get$isFullSelection": function get$isFullSelection() {
+			return this.startOffset == 0 && this.isEnd(this.endContainer, this.endOffset);
+		},
+		"select": function select() {
+			//Note: 'window' is the argument in the enclosing fill function:
+			let selection = window.getSelection();
+			selection.removeAllRanges();
+			selection.addRange(this);
+		},
+		"replace": function(markup) {
+			this.select();
+			//Note: 'window' is the argument in the enclosing fill function:
+			try {
+				markup = arguments.length ? markup : "<BR>";
+				markup =  markup && markup.toString() || "";
+				window.document.execCommand("insertHTML", false, markup);   				
+			} catch (error) {
+				console.error("replace error", this.markup, markup);
+				throw error;
+			}
+			return this.container.owner.selection;
+		},
+		"get$markup": function() {
+			return markup(this.content);
+		},
+		"isEnd": function isEnd(node, offset) {
+			return node.nodeType == Node.TEXT_NODE && offset == node.data.length
+				|| node.nodeType == Node.ELEMENT_NODE && node.childNodes.length == offset;
+		},
+		"get$content": function() {
+			return this.cloneContents().childNodes;
+		},
+		"get$textContent": function() {
+			return text(this.content);
+		},
+		"get$outerMarkup": function outerMarkup() {
+	let range = this.cloneRange();
+	range.setEnd(range.startContainer, range.startOffset);
+	range.setStartBefore(this.container.firstChild);
+	let markup = range.textContent ? range.markup : "";
+	range = this.cloneRange();
+	range.setStart(range.endContainer, range.endOffset);
+	range.setEndAfter(this.container.lastChild);
+	markup += range.textContent ? range.markup : "";
+	return markup;
+},
+		"get$atStart": function() {
+			if (this.startOffset > 0) return false;
+			for (let node = this.startContainer; node != this.container; node = node.parentNode) {
+				if (node != node.parentNode.firstChild) return false;
+			}
+			return true;
+		},
+		"get$atEnd": function() {
+			if (this.endOffset < this.endContainer.count) return false;
+			for (let node = this.endContainer; node != this.container; node = node.parentNode) {
+				if (node != node.parentNode.lastChild) return false;
+			}
+			return true;
+		},
+		"toMarkup": function() {
+			let nodes = this.cloneContents().childNodes;
+			let markup = "";
+			for (let i = 0; i < nodes.length; i++) {
+				let node = nodes[i];
+				markup += (node.nodeType === Node.TEXT_NODE ? node.textContent : node.outerHTML);
+			}
+			return markup;
+		},
+		"textStart": function() {
+			let start = 0;
+			for (let node = this.container.firstChild; node; node = node.nextSibling) {
+				if (node === this.startContainer) return start + this.startOffset;
+				start += node.textContent.length;
+			}
+			return undefined; //ERROR
+		},
+		"unmark": function() {
+			if (!this.collapsed) return;
+			let start = this.textStart();
+			if (start === undefined) return;
+			let target = this.container;
+			this.selectNode(target);
+			let container = this.startContainer;
+			let index = this.startOffset;
+			let markup = target.textContent;
+			if (start) {
+				markup = "<" + target.nodeName + ">" + markup.substring(0, start) 
+				+ "</" + target.nodeName + ">" + markup.substring(start);
+				index++;
+			}
+			let range = this.replace(markup);
+			range.setStart(container, index);
+			range.collapse(true);
+			range.select();
+			return;
+		},
+		"mark": function(nodeName) {
+			this.replace(" <" + nodeName + ">" + this.toString() + "</" + nodeName + ">");
+		},
+		"split": function(container, markup) {
+		  if (!this.collapsed) {
+			 console.log("Range is not collapsed.");
+			 return;
+		  }
+		  if (!container) {
+			 console.log("Container is not splittable.");
+			 return;
+		  }
+		  let classAttr = container.className ? " class='" + container.className + "'" : "";
+		  let startTag = "<" + container.nodeName + classAttr + ">";
+		  let endTag = "</" + container.nodeName + ">";
+		  this.setStartBefore(container.firstChild);
+ 
+		  let startSection = this.toMarkup();
+		  this.collapse();
+		  this.setEndAfter(container.lastChild);
+		  let endSection = this.toMarkup();
+		  if (!startSection) {
+			 if (!markup) markup = startTag + "<br>" + endTag;
+			 this.setStartBefore(container);
+			 this.collapse(true);
+		  } else if (!endSection) {
+			 if (!markup) markup = startTag + "<br>" + endTag;
+			 this.setEndAfter(container);
+			 this.collapse();
+		  } else {
+			 if (!markup) markup = "";
+			 this.selectNode(container);
+			 markup = startTag + startSection + endTag + markup + startTag + endSection + endTag;
+		  }
+		  this.replace(markup);     
+	   }
 	}
 }
 return pkg;

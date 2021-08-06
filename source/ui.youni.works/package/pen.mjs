@@ -209,6 +209,8 @@ export default {
 			this.peer.innerHTML = grid.markup;
 			this.vector = this.owner.create("/pen/Vector");
 			this.append(this.vector);
+			this.set("tabindex", 1);
+			this.peer.focus();
 		},
 		var$points: null,
 		var$vector: "",
@@ -219,12 +221,19 @@ export default {
 			// 	let y = Math.round((event.y - r.top) / r.height * 320);
 			// },
 			dblclick(event) {
+				this.peer.focus();
 				let b = this.bounds;
 				let x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				let y = Math.round((event.y - b.top) / b.height * 32) * 10;
 				this.vector.add(x, y, event.shiftKey ? "Q" : undefined);
-			}
-		}
+			},
+			click(event) {
+				this.peer.focus();
+			},
+			command(event) {
+				console.log("image: ", event.shortcut);
+			},
+	}
 
 	},
 	Grid: {

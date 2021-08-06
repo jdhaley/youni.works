@@ -131,6 +131,9 @@ SVG {
 	stroke-linejoin: square;
 	border: 1px solid silver;
 }
+SVG:focus {
+	border-color: steelblue;
+}
 .point {
 	stroke-width: 0;
 	fill: silver;

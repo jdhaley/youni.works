@@ -1,5 +1,17 @@
 const pkg = {
     $public: {
+        keydown(event) {
+            let shortcut = pkg.getShortcut(event);
+            if (shortcut) {
+                console.log(shortcut);
+                event.subject = "command";
+                event.shortcut = shortcut;
+            } else {
+                console.log(event.key);
+                event.subject = "charpress";
+            }
+            pkg.sense(event);
+        },
         mousedown(event) {
             event.subject = "grab";
             pkg.sense(event);
@@ -41,6 +53,24 @@ const pkg = {
         }
     },
     TRACK: null,
+    getShortcut(event) {
+        let command = event.key;
+        if (command == " ") command = "Space";
+        if (command == "Meta") command = "Control";
+        // switch (command) {
+        //     case "Control":
+        //     case "Alt":
+        //     case "Shift":
+        //     case "Meta":
+        //         return;
+        //     case " ":
+        //         command = "Space";
+        // }
+        if (event.shiftKey && command.indexOf("Shift") < 0) command = "Shift+" + command;
+        if (event.altKey && command.indexOf("Alt") < 0) command = "Alt+" + command;
+        if ((event.ctrlKey || event.metaKey) && command.indexOf("Control") < 0) command = "Control+" + command;
+        return command.length > 1 ? command : "";
+    },    
     sense(event) {
 		let ctl = pkg.getControl(event.target);
 		ctl && ctl.owner.sense(ctl, event);
