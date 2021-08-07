@@ -15,29 +15,30 @@ export default {
             if (!body) {
                 body = this.owner.create("/display/Display");
                 body.peer.textContent = title;
-                body.style.display = "none";
             }
+            body.peer.$display = body.style.display;
+            body.style.display = "none";
             let tab = this.owner.create("/tabs/Tab");
             tab.peer.innerText = title;
             tab.body = body;
             this.parts.header.append(tab);
             this.parts.body.append(body);
-            if (!this.activeTab) this.activate(tab);
             return tab;
         },
         activate(tab) {
             if (this.activeTab) {
                 this.activeTab.peer.classList.remove("activeTab");
-                this.activeTab.body.style.display = "none";    
+                this.activeTab.body.style.display = "none";
             }
             this.activeTab = tab;
             this.activeTab.peer.classList.add("activeTab");
-            this.activeTab.body.style.display = "flex";
+            this.activeTab.body.style.display = this.activeTab.body.peer.$display;
         },
         display() {
             this.super(display);
-            this.add("Tree");
-            this.draw(this.add("Draw", this.owner.create("/pen/Canvas")));
+            let tree = this.add("Tree");
+            this.add("Draw", this.owner.create("/pen/Canvas"));
+            this.add("Note", this.owner.create("/note/Note"));
             let grid = this.owner.create({
                 type$: "/display/Display",
                 nodeName: "iframe",
@@ -53,6 +54,7 @@ export default {
             this.add("Other 5");
             this.add("Other 6");
             this.add("Other 7");
+            this.activate(tree);
         },
         draw(tab) {
        //     tab.body.peer.setAttribute("viewBox", "0 0 320 320");

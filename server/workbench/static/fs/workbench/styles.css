@@ -159,3 +159,46 @@ SVG:focus {
 	stroke: steelblue;
 	stroke-width: 1;
 }
+.note {
+	display: block;
+	flex: 1 1;
+	min-height: 100%;
+	padding: 1em;
+}
+.line {
+	padding-bottom: .4em;
+	list-style: none;
+	margin-left: 0;
+}
+
+.line[data-level='1'] {
+	margin-left: 1em;
+}
+
+.line[data-level='2'] {
+	margin-left: 2em;
+}
+
+.line[data-level='3'] {
+	margin-left: 3em;
+}
+
+.section {
+	list-style: none;
+	color: burlywood;
+}
+.section[data-level='0'] {
+	font-size: 18pt;
+}
+
+.section[data-level='1'] {
+	font-size: 16pt;
+}
+
+.section[data-level='2'] {
+	font-size: 14pt;
+}
+
+.section[data-level='3'] {
+	font-size: 12pt;
+}

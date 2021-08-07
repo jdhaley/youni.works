@@ -21,7 +21,7 @@ module.package = {
 	editors: editors(),
 	gdr: gdr(),
 	grid: grid(),
-	keybd: keybd(),
+	note: note(),
 	panel: panel(),
 	pen: pen(),
 	range: range(),
@@ -738,6 +738,7 @@ function gdr() {
             } else {
                 console.log(event.key);
                 event.subject = "charpress";
+                event.character = event.key;
             }
             pkg.sense(event);
         },
@@ -959,45 +960,82 @@ function grid() {
 return pkg;
 }
 
-function keybd() {
+function note() {
 	const pkg = {
-	"$public": {
-		"keydown": function keydown(event) {
-            let shortcut = pkg.getShortcut(event);
-            if (shortcut) {
-                event.subject = "command";
-                event.shortcut = shortcut;
-            } else {
-                event.subject = "press";
-            }
-            pkg.sense(event);
-        }
+	"type$": "/display",
+	"Note": {
+		"type$": "/note/Display",
+		"shortcuts": {
+			"Enter": "split",
+			"Backspace": "erase",
+			"Delete": "erase",
+			"Tab": "demote",
+			"Shift+Tab": "promote"
+		},
+		"view": function view(value) {
+			this.super(view, value);
+			this.peer.innerHTML = "<div class='line'><br></div>";
+			this.peer.contentEditable = this.conf.readOnly ? false : true;
+		},
+		"get$target": function get$target() {
+			return this.getItem(this.owner.selectionRange.commonAncestorContainer);
+		},
+		"getLevel": function getLevel(view) {
+			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
+			return view.dataset.level * 1 || 0;
+		},
+		"getSection": function getSection(node) {
+			node = this.getItem(node)
+			while (node) {
+				if (node.classList && node.classList.contains("section")) return node;
+				node = node.previousSibling;
+			}
+		},
+		"getItem": function getItem(node) {
+			while (node) {
+				if (node.dataset) return node;
+				node = node.parentNode;
+			}
+		},
+		"setLevel": function setLevel(view, level) {
+			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
+			view.dataset.level = level;
+		},
+		"extend$actions": {
+			"command": function command(event) {
+				let cmd = this.shortcuts[event.shortcut];
+				if (cmd) {
+					console.log(cmd);
+					event.subject = cmd;
+					this.owner.sense(event.target.$peer, event);
+				}
+			},
+			"split": function split(event) {
+			},
+			"demote": function demote(event) {
+				event.subject = "";
+				let level = this.getLevel(this.target);
+				if (level < 3) this.setLevel(this.target, level + 1);
+			},
+			"promote": function promote(event) {
+				event.subject = "";
+				let target = this.target;
+				let level = target.dataset.level * 1 || 0;
+				if (level) {
+					target.dataset.level = level - 1;
+				} else if (target.classList.contains("line")) {
+					let section = this.getSection(target);
+					level = section && section.dataset.level * 1 || 0;
+					target.classList.remove("line");
+					target.classList.add("section");
+					target.dataset.level = level + 1;
+				}
+			}
+		}
 	},
-	"getShortcut": function getShortcut(event) {
-        let command = event.key;
-        switch (command) {
-            case "Control":
-            case "Alt":
-            case "Shift":
-                return;
-            case " ":
-                command = "Space";
-        }
-        if (event.shiftKey && command.length > 1) command = "Shift+" + command;
-        if (event.altKey) command = "Alt+" + command;
-        if (event.ctrlKey) command = "Control+" + command;
-        return command;
-    },
-	"sense": function sense(event) {
-        let ctl = pkg.getControl(event.target);
-        ctl && ctl.owner.sense(ctl, event);
-    },
-	"getControl": function getControl(node) {
-        while(node) {
-            if (node.$peer) return node.$peer;
-            node = node.parentNode;
-        }
-    }
+	"Text": {
+		"type$": "/note/Display"
+	}
 }
 return pkg;
 }
@@ -1323,8 +1361,14 @@ function range() {
 			let node = this.commonAncestorContainer;
 			return node.nodeType == Node.TEXT_NODE ? node : null;
 		},
-		"get$isFullSelection": function get$isFullSelection() {
-			return this.startOffset == 0 && this.isEnd(this.endContainer, this.endOffset);
+		"get$content": function() {
+			return this.cloneContents().childNodes;
+		},
+		"get$textContent": function() {
+			return pkg.text(this.content);
+		},
+		"get$markup": function() {
+			return pkg.markup(this.content);
 		},
 		"select": function select() {
 			//Note: 'window' is the argument in the enclosing fill function:
@@ -1344,118 +1388,36 @@ function range() {
 				throw error;
 			}
 			return this.container.owner.selection;
-		},
-		"get$markup": function() {
-			return markup(this.content);
-		},
-		"isEnd": function isEnd(node, offset) {
-			return node.nodeType == Node.TEXT_NODE && offset == node.data.length
-				|| node.nodeType == Node.ELEMENT_NODE && node.childNodes.length == offset;
-		},
-		"get$content": function() {
-			return this.cloneContents().childNodes;
-		},
-		"get$textContent": function() {
-			return text(this.content);
-		},
-		"get$outerMarkup": function outerMarkup() {
-	let range = this.cloneRange();
-	range.setEnd(range.startContainer, range.startOffset);
-	range.setStartBefore(this.container.firstChild);
-	let markup = range.textContent ? range.markup : "";
-	range = this.cloneRange();
-	range.setStart(range.endContainer, range.endOffset);
-	range.setEndAfter(this.container.lastChild);
-	markup += range.textContent ? range.markup : "";
-	return markup;
-},
-		"get$atStart": function() {
-			if (this.startOffset > 0) return false;
-			for (let node = this.startContainer; node != this.container; node = node.parentNode) {
-				if (node != node.parentNode.firstChild) return false;
-			}
-			return true;
-		},
-		"get$atEnd": function() {
-			if (this.endOffset < this.endContainer.count) return false;
-			for (let node = this.endContainer; node != this.container; node = node.parentNode) {
-				if (node != node.parentNode.lastChild) return false;
-			}
-			return true;
-		},
-		"toMarkup": function() {
-			let nodes = this.cloneContents().childNodes;
-			let markup = "";
-			for (let i = 0; i < nodes.length; i++) {
-				let node = nodes[i];
-				markup += (node.nodeType === Node.TEXT_NODE ? node.textContent : node.outerHTML);
-			}
-			return markup;
-		},
-		"textStart": function() {
-			let start = 0;
-			for (let node = this.container.firstChild; node; node = node.nextSibling) {
-				if (node === this.startContainer) return start + this.startOffset;
-				start += node.textContent.length;
-			}
-			return undefined; //ERROR
-		},
-		"unmark": function() {
-			if (!this.collapsed) return;
-			let start = this.textStart();
-			if (start === undefined) return;
-			let target = this.container;
-			this.selectNode(target);
-			let container = this.startContainer;
-			let index = this.startOffset;
-			let markup = target.textContent;
-			if (start) {
-				markup = "<" + target.nodeName + ">" + markup.substring(0, start) 
-				+ "</" + target.nodeName + ">" + markup.substring(start);
-				index++;
-			}
-			let range = this.replace(markup);
-			range.setStart(container, index);
-			range.collapse(true);
-			range.select();
-			return;
-		},
-		"mark": function(nodeName) {
-			this.replace(" <" + nodeName + ">" + this.toString() + "</" + nodeName + ">");
-		},
-		"split": function(container, markup) {
-		  if (!this.collapsed) {
-			 console.log("Range is not collapsed.");
-			 return;
-		  }
-		  if (!container) {
-			 console.log("Container is not splittable.");
-			 return;
-		  }
-		  let classAttr = container.className ? " class='" + container.className + "'" : "";
-		  let startTag = "<" + container.nodeName + classAttr + ">";
-		  let endTag = "</" + container.nodeName + ">";
-		  this.setStartBefore(container.firstChild);
- 
-		  let startSection = this.toMarkup();
-		  this.collapse();
-		  this.setEndAfter(container.lastChild);
-		  let endSection = this.toMarkup();
-		  if (!startSection) {
-			 if (!markup) markup = startTag + "<br>" + endTag;
-			 this.setStartBefore(container);
-			 this.collapse(true);
-		  } else if (!endSection) {
-			 if (!markup) markup = startTag + "<br>" + endTag;
-			 this.setEndAfter(container);
-			 this.collapse();
-		  } else {
-			 if (!markup) markup = "";
-			 this.selectNode(container);
-			 markup = startTag + startSection + endTag + markup + startTag + endSection + endTag;
-		  }
-		  this.replace(markup);     
-	   }
+		}
+	},
+	"markup": function markup(nodes) {
+		let markup = "";
+		for (let i = 0; i < nodes.length; i++) {
+			let node = nodes[i];
+			markup += node.markup;
+		}
+		return markup;
+	},
+	"text": function text(nodes) {
+		let txt = "";
+		for (let i = 0, length = nodes.length; i < length; i++) {
+			let node = nodes[i];
+			let content = node.nodeType == Node.ELEMENT_NODE && text(node.content) || node.textContent;
+			if (txt && !txt.endsWith(" ") && content && !(content.startsWith(" "))) txt += " ";
+			txt += content;
+		}
+		return txt;	
+	},
+	"outerMarkup": function outerMarkup() {
+		let range = this.cloneRange();
+		range.setEnd(range.startContainer, range.startOffset);
+		range.setStartBefore(this.container.firstChild);
+		let markup = range.textContent ? range.markup : "";
+		range = this.cloneRange();
+		range.setStart(range.endContainer, range.endOffset);
+		range.setEndAfter(this.container.lastChild);
+		markup += range.textContent ? range.markup : "";
+		return markup;
 	}
 }
 return pkg;
@@ -1712,29 +1674,30 @@ function tabs() {
             if (!body) {
                 body = this.owner.create("/display/Display");
                 body.peer.textContent = title;
-                body.style.display = "none";
             }
+            body.peer.$display = body.style.display;
+            body.style.display = "none";
             let tab = this.owner.create("/tabs/Tab");
             tab.peer.innerText = title;
             tab.body = body;
             this.parts.header.append(tab);
             this.parts.body.append(body);
-            if (!this.activeTab) this.activate(tab);
             return tab;
         },
 		"activate": function activate(tab) {
             if (this.activeTab) {
                 this.activeTab.peer.classList.remove("activeTab");
-                this.activeTab.body.style.display = "none";    
+                this.activeTab.body.style.display = "none";
             }
             this.activeTab = tab;
             this.activeTab.peer.classList.add("activeTab");
-            this.activeTab.body.style.display = "flex";
+            this.activeTab.body.style.display = this.activeTab.body.peer.$display;
         },
 		"display": function display() {
             this.super(display);
-            this.add("Tree");
-            this.draw(this.add("Draw", this.owner.create("/pen/Canvas")));
+            let tree = this.add("Tree");
+            this.add("Draw", this.owner.create("/pen/Canvas"));
+            this.add("Note", this.owner.create("/note/Note"));
             let grid = this.owner.create({
                 type$: "/display/Display",
                 nodeName: "iframe",
@@ -1750,6 +1713,7 @@ function tabs() {
             this.add("Other 5");
             this.add("Other 6");
             this.add("Other 7");
+            this.activate(tree);
         },
 		"draw": function draw(tab) {
        //     tab.body.peer.setAttribute("viewBox", "0 0 320 320");

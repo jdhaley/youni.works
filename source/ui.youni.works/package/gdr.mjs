@@ -9,6 +9,7 @@ const pkg = {
             } else {
                 console.log(event.key);
                 event.subject = "charpress";
+                event.character = event.key;
             }
             pkg.sense(event);
         },
