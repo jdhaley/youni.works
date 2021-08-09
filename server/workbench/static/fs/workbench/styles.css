@@ -185,13 +185,14 @@ SVG:focus {
 
 .section {
 	list-style: none;
-	color: burlywood;
+	color: tan;
 }
 .section[data-level='0'] {
 	color: orange;
 }
 .section[data-level='1'] {
 	font-size: 16pt;
+	font-weight: bold;
 }
 
 .section[data-level='2'] {

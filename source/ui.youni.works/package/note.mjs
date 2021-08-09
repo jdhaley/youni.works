@@ -7,13 +7,96 @@ export default {
 			"Backspace": "erase",
 			"Delete": "erase",
 			"Tab": "demote",
-			"Shift+Tab": "promote"
+			"Shift+Tab": "promote",
+			"Control+s": "save"
 		},
 		view(value) {
 			this.super(view, value);
-
-			this.peer.innerHTML = "<div class='line'><br></div>";
+			//"<div class='line'><br></div>";
+			let markup = this.toView({
+				"": "Cherry", 
+				"Chapter 1": "Apple",
+				"Chapter 2": {
+					"Billy": ["Orange", ["alpha", "beta", "gamma"], "Banana"],
+					"Sally": "Grape"
+				}
+			});
+			console.log(markup);
+			this.peer.innerHTML = markup;
 			this.peer.contentEditable = this.conf.readOnly ? false : true;
+		},
+		toHtml(view) {
+			let sections = [];
+			for (let node of view.to) {
+			
+			}
+		},
+		toObject(view) {
+			let section = {
+				key: "",
+				level: 0,
+				content: []
+			};
+			let sections = [section];
+			for (let node of view.childNodes) {
+				if (node.className == "section") {
+					section = {
+						key: node.textContent,
+						level: node.dataset.level * 1,
+						content: []
+					};
+					sections.push(section);
+				} else {
+					section.content.push({
+						level: node.dataset.level * 1,
+						type: node.className,
+						content: node.innerHTML
+					});
+				}
+			}
+			// let stack = [];
+			// for (let section of sections) {
+			// 	let current = stack.pop();
+			// 	section.sections = {};
+			// 	if (section.level > current.level) {
+			// 		section.parent = current;
+			// 		current.sections[section.key] = section;
+			// 	}
+
+			// 	current = section;
+			// }
+			return sections;
+		},
+		toView(value, level) {
+			let type = this.valueType(value);
+			switch (type) {
+				case "object": {
+					if (!level) level = 1;
+					let view = "";
+					for (let name in value) {
+						if (name) view += `<div class="section" data-level="${level}">${name}</div>`;
+						view += this.toView(value[name], this.valueType(value[name]) == "object" ? level + 1 : 0);
+					}
+					return view;
+				}
+				case "array": {
+					let view = "";
+					for (let ele of value) {
+						let type = this.valueType(ele);
+						view += this.toView(ele, level + (type == "array" ? 1 : 0));
+					}
+					return view;
+				}
+				default:
+					return `<div class="line" data-level="${level || 0}">${value}</div>`
+			}
+		},
+		valueType(value) {
+			if (value && typeof value == "object") {
+				return value[Symbol.iterator] ? "array" : "object";
+			} else {
+				return "string";
+			}
 		},
 		get$target() {
 			return this.getItem(this.owner.selectionRange.commonAncestorContainer);
@@ -56,6 +139,13 @@ export default {
 					this.owner.sense(event.target.$peer, event);
 				}
 			},
+			copy(event) {
+				console.log("copy", event);
+			},
+			save(event) {
+				event.subject = "";
+				console.log(this.toObject(this.peer));
+			},
 			split(event) {
 			},
 			demote(event) {
@@ -75,7 +165,7 @@ export default {
 						}
 					}
 				} else if (target.classList.contains("line")) {
-					level = target.dataset.level * 1 + 1;
+					level = target.dataset.level * 1 + 1 || 1;
 					if (level > 3) level = 3;
 				}
 				target.dataset.level = level;
@@ -87,13 +177,75 @@ export default {
 				if (target.classList.contains("section")) {
 					if (level < 1) level = 1;
 				} else if (target.classList.contains("line")) {
-					let section = this.getSection(target);
-					level = section && section.dataset.level * 1 + 1 || 1;
-					target.classList.remove("line");
-					target.classList.add("section");
+					if (level < 0) {
+						let section = this.getSection(target);
+						level = section && section.dataset.level * 1 + 1 || 1;
+						target.classList.remove("line");
+						target.classList.add("section");	
+					}
 				}
 				target.dataset.level = level;
 			}
+		}
+	},
+	Clipboard: {
+		setClipboard: function (signal) {
+			let cb = signal.clipboardData;
+			let range = signal.selection;
+			let data = range.markup;
+			data && cb.setData("text/html", data);	
+			data = range.textContent;
+			data && cb.setData("text", data);	
+			data = signal.on.owner.create();
+			data.markupContent = range.markup;
+			data = this.model(data);
+			data = JSON.stringify(data)
+			cb.setData("application/json", data);
+		},
+		getClipboard: function(signal) {
+			let cb = signal.clipboardData;
+			let type = signal.contentType || "application/json";	
+			signal.data = cb.getData(type);
+			
+			switch (type) {
+				case "application/json":
+					if (signal.data) return this.markupJSON(signal);
+					signal.contentType = "text/html";
+					signal.data = cb.getData("text/html");
+					//FALL through
+				case "text/html":
+					if (signal.data) return this.markupHTML(signal);
+					signal.contentType = "text";
+					signal.data = cb.getData("text");
+					//FALL through
+				case "text":
+					return this.markupText(signal);
+				default:
+					return this.markupOther(signal);
+			}
+		},
+		markupJSON: function(signal) {
+			let view = this.createView(signal.on);
+			let model = JSON.parse(signal.data);
+			this.view(view, model);
+			return view.markupContent;
+		},
+		markupHTML: function(signal) {
+			let data = signal.data;
+			let start = data.indexOf(START_FRAGMENT) + START_FRAGMENT.length;
+			let end = data.indexOf(END_FRAGMENT);
+			data = data.substring(start, end);
+			signal.data = signal.on.owner.create("div", "hidden", data);
+			return this.markupElement(signal);
+		},
+		markupElement: function(signal) {
+			return signal.data.textContent.markup;
+		},
+		markupText: function(signal) {
+			return signal.data.markup;
+		},
+		markupOther: function(signal) {
+			return "";
 		}
 	}
 }
