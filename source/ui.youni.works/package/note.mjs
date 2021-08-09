@@ -1,5 +1,103 @@
 export default {
 	type$: "/display",
+	Note: {
+		type$: "Display",
+		shortcuts: {
+			"Enter": "split",
+			"Backspace": "erase",
+			"Delete": "erase",
+			"Tab": "demote",
+			"Shift+Tab": "promote"
+		},
+		view(value) {
+			this.super(view, value);
+
+			this.peer.innerHTML = "<div class='line'><br></div>";
+			this.peer.contentEditable = this.conf.readOnly ? false : true;
+		},
+		get$target() {
+			return this.getItem(this.owner.selectionRange.commonAncestorContainer);
+		},
+		getLevel(view) {
+			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
+			return view.dataset.level * 1 || 0;
+		},
+		getSection(node) {
+			node = this.getItem(node)
+			while (node) {
+				if (node.classList && node.classList.contains("section")) return node;
+				node = node.previousSibling;
+			}
+		},
+		getItem(node) {
+			while (node) {
+				if (node.dataset) return node;
+				node = node.parentNode;
+			}
+		},
+		setLevel(view, level) {
+			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
+			view.dataset.level = level;
+		},
+		forEach(item, method) {
+			for (let node = item.nextSibling; node; node = node.nextSibling) {
+				if (node.role == "heading" ) {
+					// if (item.role == "heading" && item.dataset.level > node.
+					//  method.call(this, node);
+				}
+			}
+		},
+		extend$actions: {
+			command(event) {
+				let cmd = this.shortcuts[event.shortcut];
+				if (cmd) {
+					console.log(cmd);
+					event.subject = cmd;
+					this.owner.sense(event.target.$peer, event);
+				}
+			},
+			split(event) {
+			},
+			demote(event) {
+				event.subject = "";
+				let target = this.target;
+				let level = target.dataset.level * 1 + 1 || 1;
+				if (target.classList.contains("section")) {
+					if (level > 3) {
+						target.classList.remove("section");
+						target.classList.add("line");
+						level = 0;
+					} else {
+						let section = this.getSection(target.previousSibling);
+						let sectionLevel = section && section.dataset.level * 1 + 1 || 1;
+						if (level > sectionLevel) {
+							level = sectionLevel;
+						}
+					}
+				} else if (target.classList.contains("line")) {
+					level = target.dataset.level * 1 + 1;
+					if (level > 3) level = 3;
+				}
+				target.dataset.level = level;
+			},
+			promote(event) {
+				event.subject = "";
+				let target = this.target;
+				let level = target.dataset.level * 1 - 1;
+				if (target.classList.contains("section")) {
+					if (level < 1) level = 1;
+				} else if (target.classList.contains("line")) {
+					let section = this.getSection(target);
+					level = section && section.dataset.level * 1 + 1 || 1;
+					target.classList.remove("line");
+					target.classList.add("section");
+				}
+				target.dataset.level = level;
+			}
+		}
+	}
+}
+
 	// Line: {
 	// 	type$: "Editable",
 	// 	extend$shortcuts: {
@@ -67,77 +165,72 @@ export default {
 	// 		}
 	// 	}
 	// },
-	Note: {
-		type$: "Display",
-		shortcuts: {
-			"Enter": "split",
-			"Backspace": "erase",
-			"Delete": "erase",
-			"Tab": "demote",
-			"Shift+Tab": "promote"
-		},
-		view(value) {
-			this.super(view, value);
-			this.peer.innerHTML = "<div class='line'><br></div>";
-			this.peer.contentEditable = this.conf.readOnly ? false : true;
-		},
-		get$target() {
-			return this.getItem(this.owner.selectionRange.commonAncestorContainer);
-		},
-		getLevel(view) {
-			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
-			return view.dataset.level * 1 || 0;
-		},
-		getSection(node) {
-			node = this.getItem(node)
-			while (node) {
-				if (node.classList && node.classList.contains("section")) return node;
-				node = node.previousSibling;
-			}
-		},
-		getItem(node) {
-			while (node) {
-				if (node.dataset) return node;
-				node = node.parentNode;
-			}
-		},
-		setLevel(view, level) {
-			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
-			view.dataset.level = level;
-		},
-		extend$actions: {
-			command(event) {
-				let cmd = this.shortcuts[event.shortcut];
-				if (cmd) {
-					console.log(cmd);
-					event.subject = cmd;
-					this.owner.sense(event.target.$peer, event);
-				}
-			},
-			split(event) {
-			},
-			demote(event) {
-				event.subject = "";
-				let level = this.getLevel(this.target);
-				if (level < 3) this.setLevel(this.target, level + 1);
-			},
-			promote(event) {
-				event.subject = "";
-				let target = this.target;
-				let level = target.dataset.level * 1 || 0;
-				if (level) {
-					target.dataset.level = level - 1;
-				} else if (target.classList.contains("line")) {
-					let section = this.getSection(target);
-					level = section && section.dataset.level * 1 || 0;
-					target.classList.remove("line");
-					target.classList.add("section");
-					target.dataset.level = level + 1;
-				}
-			}
-		}
-	},
-	Text: {
-		type$: "Display",
-	}
-}
+	// SectionHeader: {
+    //     type$: "Structure",
+	// 	members: {
+    //         type$handle: "Display",
+    //         type$body: "Display"
+    //     },
+    //     states: {
+    //         "collapsed": "/res/icons/chevron-right.svg",
+    //         "expanded": "/res/icons/chevron-bottom.svg",
+    //         "empty": "/res/icons/empty.svg",
+    //         "hidden": ""
+    //     },
+    //     virtual$state(value) {
+    //         if (!arguments.length) return this.peer.$state;
+    //         this.peer.$state = value;
+    //         this.peer.firstChild.src = this.states[value];
+    //     },
+    //     view(model) {
+    //         this.peer.innerHTML = `<img><div>${model}</div>`;
+    //     },
+    //     extend$actions: {
+    //         click(event) {
+    //             event.value = this.model.expr;
+    //             if (this.state === "collapsed") {
+    //                 this.state = "expanded";
+    //             } else if (this.state == "expanded") {
+    //                 this.state = "collapsed";
+    //             }
+    //             event.subject = this.state;
+    //         }
+    //     }
+    // },
+    // ItemBody: {
+    //     type$: "Collection",
+    //     type$contentType: "Item",
+    //     view(model) {
+    //         if (this.peer.$show) {
+    //             // let content = model;
+    //             // if (content.expr && typeof content.expr == "object") content = model.expr;
+    //             this.super(view, model.expr);
+    //             this.owner.send(this, "view");
+    //         } else {
+    //             this.peer.$show = true;
+    //         }
+    //     }
+    // },
+    // Section: {
+	// 	type$: "Structure",
+    //     members: {
+    //         type$handle: "Display",
+    //         type$body: "Display"
+    //     },
+	// 	extend$actions: {
+    //         empty(event) {
+    //             event.subject = "showValue";
+    //         },
+	// 		collapsed(event) {
+    //             this.parts.body.style.display = "none";
+    //             event.subject = "";
+	// 		},
+	// 		expanded(event) {
+    //             if (!this.parts.body.peer.childNodes.length) {
+    //                 this.parts.body.view(this.model);
+    //             }
+    //             this.parts.body.style.removeProperty("display");
+    //             event.subject = "";
+	// 		}
+	// 	}
+    // },

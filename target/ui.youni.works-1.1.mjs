@@ -17,7 +17,6 @@ module.package = {
 	app: app(),
 	diagram: diagram(),
 	display: display(),
-	editable_mjs_devt: editable_mjs_devt(),
 	editors: editors(),
 	gdr: gdr(),
 	grid: grid(),
@@ -592,11 +591,6 @@ function display() {
 return pkg;
 }
 
-function editable_mjs_devt() {
-	const pkg = undefined
-return pkg;
-}
-
 function editors() {
 	const pkg = {
 	"type$": "/record",
@@ -974,6 +968,7 @@ function note() {
 		},
 		"view": function view(value) {
 			this.super(view, value);
+
 			this.peer.innerHTML = "<div class='line'><br></div>";
 			this.peer.contentEditable = this.conf.readOnly ? false : true;
 		},
@@ -1001,6 +996,14 @@ function note() {
 			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
 			view.dataset.level = level;
 		},
+		"forEach": function forEach(item, method) {
+			for (let node = item.nextSibling; node; node = node.nextSibling) {
+				if (node.role == "heading" ) {
+					// if (item.role == "heading" && item.dataset.level > node.
+					//  method.call(this, node);
+				}
+			}
+		},
 		"extend$actions": {
 			"command": function command(event) {
 				let cmd = this.shortcuts[event.shortcut];
@@ -1014,27 +1017,41 @@ function note() {
 			},
 			"demote": function demote(event) {
 				event.subject = "";
-				let level = this.getLevel(this.target);
-				if (level < 3) this.setLevel(this.target, level + 1);
+				let target = this.target;
+				let level = target.dataset.level * 1 + 1 || 1;
+				if (target.classList.contains("section")) {
+					if (level > 3) {
+						target.classList.remove("section");
+						target.classList.add("line");
+						level = 0;
+					} else {
+						let section = this.getSection(target.previousSibling);
+						let sectionLevel = section && section.dataset.level * 1 + 1 || 1;
+						if (level > sectionLevel) {
+							level = sectionLevel;
+						}
+					}
+				} else if (target.classList.contains("line")) {
+					level = target.dataset.level * 1 + 1;
+					if (level > 3) level = 3;
+				}
+				target.dataset.level = level;
 			},
 			"promote": function promote(event) {
 				event.subject = "";
 				let target = this.target;
-				let level = target.dataset.level * 1 || 0;
-				if (level) {
-					target.dataset.level = level - 1;
+				let level = target.dataset.level * 1 - 1;
+				if (target.classList.contains("section")) {
+					if (level < 1) level = 1;
 				} else if (target.classList.contains("line")) {
 					let section = this.getSection(target);
-					level = section && section.dataset.level * 1 || 0;
+					level = section && section.dataset.level * 1 + 1 || 1;
 					target.classList.remove("line");
 					target.classList.add("section");
-					target.dataset.level = level + 1;
 				}
+				target.dataset.level = level;
 			}
 		}
-	},
-	"Text": {
-		"type$": "/note/Display"
 	}
 }
 return pkg;

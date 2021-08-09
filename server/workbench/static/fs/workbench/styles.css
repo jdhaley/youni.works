@@ -188,9 +188,8 @@ SVG:focus {
 	color: burlywood;
 }
 .section[data-level='0'] {
-	font-size: 18pt;
+	color: orange;
 }
-
 .section[data-level='1'] {
 	font-size: 16pt;
 }
