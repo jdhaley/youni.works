@@ -957,8 +957,21 @@ return pkg;
 function note() {
 	const pkg = {
 	"type$": "/display",
+	"Commandable": {
+		"shortcuts": {
+		},
+		"extend$actions": {
+			"command": function command(event) {
+				let cmd = this.shortcuts[event.shortcut];
+				if (cmd) {
+					event.subject = cmd;
+					this.owner.sense(event.target.$peer, event);
+				}
+			}
+		}
+	},
 	"Note": {
-		"type$": "/note/Display",
+		"type$": ["/note/Display", "/note/Commandable"],
 		"shortcuts": {
 			"Enter": "split",
 			"Backspace": "erase",

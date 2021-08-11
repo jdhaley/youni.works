@@ -1,7 +1,20 @@
 export default {
 	type$: "/display",
+	Commandable: {
+		shortcuts: {
+		},
+		extend$actions: {
+			command(event) {
+				let cmd = this.shortcuts[event.shortcut];
+				if (cmd) {
+					event.subject = cmd;
+					this.owner.sense(event.target.$peer, event);
+				}
+			}
+		}
+	},
 	Note: {
-		type$: "Display",
+		type$: ["Display", "Commandable"],
 		shortcuts: {
 			"Enter": "split",
 			"Backspace": "erase",
