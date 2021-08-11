@@ -106,6 +106,8 @@ IFRAME {
 	flex: 1 1;
 	padding-right: 4px;
 	overflow: hidden;
+	background: ghostwhite;
+	border-right: 1px solid gainsboro;
 }
 .sidebar>.tree {
 	flex: 1 1;
@@ -166,7 +168,8 @@ SVG:focus {
 	padding: 1em;
 }
 .line {
-	padding-bottom: .4em;
+	font-family: 'IBM Plex Mono';
+	border-top: 1px dotted gainsboro;
 	list-style: none;
 	margin-left: 0;
 }
@@ -186,6 +189,7 @@ SVG:focus {
 .section {
 	list-style: none;
 	color: tan;
+	padding-top: 4px;
 }
 .section[data-level='0'] {
 	color: orange;
