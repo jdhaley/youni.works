@@ -4,6 +4,12 @@
 	 	<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script type="module" src="/module/index.mjs"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+		<script>
+			let socket = io.connect('https://localhost:8080');
+			socket.emit('receive', "Hello.");
+
+		</script>
 	</head>
 	<body>
 	</body>
