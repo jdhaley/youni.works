@@ -169,34 +169,39 @@ SVG:focus {
 }
 .line {
 	font-family: 'IBM Plex Mono';
-	border-top: 1px dotted gainsboro;
 	list-style: none;
 	margin-left: 0;
+	padding: 2px;
+	/* font-weight: lighter; */
+	color: darkslategray;
+	border-bottom: 1px dotted gainsboro;
 }
-
+/* .line:nth-child(even){
+	background: ghostwhite;
+} */
 .line[data-level='1'] {
-	margin-left: 1em;
+	margin-left: 25px;
 }
 
 .line[data-level='2'] {
-	margin-left: 2em;
+	margin-left: 50px;
 }
 
 .line[data-level='3'] {
-	margin-left: 3em;
+	margin-left: 75px;
 }
 
 .section {
+	font-family: 'IBM Plex Sans';
 	list-style: none;
-	color: tan;
-	padding-top: 4px;
+	color: lightsteelblue;
+	padding-top: 2px;
 }
 .section[data-level='0'] {
 	color: orange;
 }
 .section[data-level='1'] {
 	font-size: 16pt;
-	font-weight: bold;
 }
 
 .section[data-level='2'] {

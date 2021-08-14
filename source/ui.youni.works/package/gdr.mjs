@@ -55,22 +55,16 @@ const pkg = {
     },
     TRACK: null,
     getShortcut(event) {
-        let command = event.key;
-        if (command == " ") command = "Space";
-        if (command == "Meta") command = "Control";
-        // switch (command) {
-        //     case "Control":
-        //     case "Alt":
-        //     case "Shift":
-        //     case "Meta":
-        //         return;
-        //     case " ":
-        //         command = "Space";
-        // }
-        if (event.shiftKey && command.indexOf("Shift") < 0) command = "Shift+" + command;
-        if (event.altKey && command.indexOf("Alt") < 0) command = "Alt+" + command;
-        if ((event.ctrlKey || event.metaKey) && command.indexOf("Control") < 0) command = "Control+" + command;
-        return command.length > 1 ? command : "";
+        let mod = "";
+        let key = event.key;
+        if (key == " ") key = "Space";
+        if (key == "Meta") key = "Control"; // Apple
+        if (event.ctrlKey || event.metaKey) mod += "Control+";
+        if (event.altKey) mod += "Alt+";
+        if (event.shiftKey && (mod || key.length > 1)) mod += "Shift+";
+        if (key == "Control" || key == "Alt" || key == "Shift") return mod.substring(0, mod.length - 1);
+        if (!mod && key.length == 1) return;
+        return mod + key;
     },    
     sense(event) {
 		let ctl = pkg.getControl(event.target);

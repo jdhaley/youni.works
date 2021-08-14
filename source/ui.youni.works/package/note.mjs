@@ -28,8 +28,9 @@ export default {
 			//"<div class='line'><br></div>";
 			let markup = this.toView({
 				"": "Cherry", 
-				"Chapter 1": "Apple",
+				"Chapter 1": ["Apple"],
 				"Chapter 2": {
+					"": "The following sections blah blah...",
 					"Billy": ["Orange", ["alpha", "beta", "gamma"], "Banana"],
 					"Sally": "Grape"
 				}
@@ -62,22 +63,25 @@ export default {
 				} else {
 					section.content.push({
 						level: node.dataset.level * 1,
-						type: node.className,
 						content: node.innerHTML
 					});
 				}
 			}
-			// let stack = [];
-			// for (let section of sections) {
-			// 	let current = stack.pop();
-			// 	section.sections = {};
-			// 	if (section.level > current.level) {
-			// 		section.parent = current;
-			// 		current.sections[section.key] = section;
-			// 	}
-
-			// 	current = section;
-			// }
+			for (let section of sections) {
+				let content = [];
+				let current;
+				for (let line of section.content) {
+					if (!current || current.level != line.level) {
+						current = {
+							level: line.level,
+							content: []
+						};
+						content.push(current);
+					}
+					current.content.push(line.content);
+				}
+				section.content = content;
+			}
 			return sections;
 		},
 		toView(value, level) {
@@ -161,24 +165,24 @@ export default {
 			},
 			split(event) {
 			},
+			charpress(event) {
+				if (event.key == "{") {
+					console.log("insert block");
+				}
+			},
 			demote(event) {
 				event.subject = "";
 				let target = this.target;
 				let level = target.dataset.level * 1 + 1 || 1;
 				if (target.classList.contains("section")) {
-					if (level > 3) {
+					let section = this.getSection(target.previousSibling);
+					let sectionLevel = section && section.dataset.level * 1 || 1;
+					if (level > 3 || level > sectionLevel + 1) {
 						target.classList.remove("section");
 						target.classList.add("line");
 						level = 0;
-					} else {
-						let section = this.getSection(target.previousSibling);
-						let sectionLevel = section && section.dataset.level * 1 + 1 || 1;
-						if (level > sectionLevel) {
-							level = sectionLevel;
-						}
 					}
 				} else if (target.classList.contains("line")) {
-					level = target.dataset.level * 1 + 1 || 1;
 					if (level > 3) level = 3;
 				}
 				target.dataset.level = level;

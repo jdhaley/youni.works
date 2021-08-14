@@ -778,22 +778,16 @@ function gdr() {
 	},
 	"TRACK": null,
 	"getShortcut": function getShortcut(event) {
-        let command = event.key;
-        if (command == " ") command = "Space";
-        if (command == "Meta") command = "Control";
-        // switch (command) {
-        //     case "Control":
-        //     case "Alt":
-        //     case "Shift":
-        //     case "Meta":
-        //         return;
-        //     case " ":
-        //         command = "Space";
-        // }
-        if (event.shiftKey && command.indexOf("Shift") < 0) command = "Shift+" + command;
-        if (event.altKey && command.indexOf("Alt") < 0) command = "Alt+" + command;
-        if ((event.ctrlKey || event.metaKey) && command.indexOf("Control") < 0) command = "Control+" + command;
-        return command.length > 1 ? command : "";
+        let mod = "";
+        let key = event.key;
+        if (key == " ") key = "Space";
+        if (key == "Meta") key = "Control"; // Apple
+        if (event.ctrlKey || event.metaKey) mod += "Control+";
+        if (event.altKey) mod += "Alt+";
+        if (event.shiftKey && (mod || key.length > 1)) mod += "Shift+";
+        if (key == "Control" || key == "Alt" || key == "Shift") return mod.substring(0, mod.length - 1);
+        if (!mod && key.length == 1) return;
+        return mod + key;
     },
 	"sense": function sense(event) {
 		let ctl = pkg.getControl(event.target);
@@ -985,8 +979,9 @@ function note() {
 			//"<div class='line'><br></div>";
 			let markup = this.toView({
 				"": "Cherry", 
-				"Chapter 1": "Apple",
+				"Chapter 1": ["Apple"],
 				"Chapter 2": {
+					"": "The following sections blah blah...",
 					"Billy": ["Orange", ["alpha", "beta", "gamma"], "Banana"],
 					"Sally": "Grape"
 				}
@@ -1019,22 +1014,25 @@ function note() {
 				} else {
 					section.content.push({
 						level: node.dataset.level * 1,
-						type: node.className,
 						content: node.innerHTML
 					});
 				}
 			}
-			// let stack = [];
-			// for (let section of sections) {
-			// 	let current = stack.pop();
-			// 	section.sections = {};
-			// 	if (section.level > current.level) {
-			// 		section.parent = current;
-			// 		current.sections[section.key] = section;
-			// 	}
-
-			// 	current = section;
-			// }
+			for (let section of sections) {
+				let content = [];
+				let current;
+				for (let line of section.content) {
+					if (!current || current.level != line.level) {
+						current = {
+							level: line.level,
+							content: []
+						};
+						content.push(current);
+					}
+					current.content.push(line.content);
+				}
+				section.content = content;
+			}
 			return sections;
 		},
 		"toView": function toView(value, level) {
@@ -1118,24 +1116,24 @@ function note() {
 			},
 			"split": function split(event) {
 			},
+			"charpress": function charpress(event) {
+				if (event.key == "{") {
+					console.log("insert block");
+				}
+			},
 			"demote": function demote(event) {
 				event.subject = "";
 				let target = this.target;
 				let level = target.dataset.level * 1 + 1 || 1;
 				if (target.classList.contains("section")) {
-					if (level > 3) {
+					let section = this.getSection(target.previousSibling);
+					let sectionLevel = section && section.dataset.level * 1 || 1;
+					if (level > 3 || level > sectionLevel + 1) {
 						target.classList.remove("section");
 						target.classList.add("line");
 						level = 0;
-					} else {
-						let section = this.getSection(target.previousSibling);
-						let sectionLevel = section && section.dataset.level * 1 + 1 || 1;
-						if (level > sectionLevel) {
-							level = sectionLevel;
-						}
 					}
 				} else if (target.classList.contains("line")) {
-					level = target.dataset.level * 1 + 1 || 1;
 					if (level > 3) level = 3;
 				}
 				target.dataset.level = level;
