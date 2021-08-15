@@ -88,11 +88,8 @@ return pkg;
 function control() {
 	const pkg = {
 	"type$": "/system/core",
-	"Iterable": {
-		"symbol$iterator": function *iterator() {
-		}
-	},
 	"Receiver": {
+		"type$": "/control/Instance",
 		"start": function start(conf) {
 		},
 		"receive": function receive(signal) {
@@ -114,6 +111,26 @@ function control() {
 	},
 	"Control": {
 		"type$from": "/control/Iterable",
+		"sense": function sense(signal) {
+			if (!signal) return;
+			let message = signal;
+			if (typeof message != "object") {
+				message = Object.create(null);
+				message.subject = signal;
+			}
+			
+			this.receive(message);
+			//Promise.resolve(message).then(message => from(this, message));
+			from(this, message);
+
+			function from(receiver, message) {
+				if (receiver.from) for (receiver of receiver.from) {
+					message.subject && receiver.receive(message);
+					message.subject && from(receiver, message);
+					if (!message.subject) return;
+				}
+			}
+		},
 		"type$to": "/control/Iterable",
 		"send": function send(signal) {
 			if (!signal) return;
@@ -122,62 +139,15 @@ function control() {
 				message = Object.create(null);
 				message.subject = signal;
 			}
+			this.receive(message);
 			Promise.resolve(message).then(message => to(this, message));
 
 			function to(receiver, message) {
 				if (receiver.to) for (receiver of receiver.to) {
-					message.subject && receiver.receive(messsage);
+					message.subject && receiver.receive(message);
 					message.subject && to(receiver, message);
 					if (!message.subject) return;
 				}
-			}
-		},
-		"sense": function sense(signal) {
-			if (!signal) return;
-			let message = signal;
-			if (typeof message != "object") {
-				message = Object.create(null);
-				message.subject = signal;
-			}
-			Promise.resolve(message).then(message => from(this, message));
-
-			function from(receiver, message) {
-				if (receiver.from) for (receiver of receiver.from) {
-					message.subject && receiver.receive(messsage);
-					message.subject && from(receiver, message);
-					if (!message.subject) return;
-				}
-			}
-		}
-	},
-	"Sender": {
-		"send": function send(to, message) {
-			if (!message) return;
-			if (typeof message == "string") message = {
-				subject: message
-			}
-			
-			Promise.resolve(message).then(message => down(to, message));
-
-			function down(on, message) {
-				if (!message.subject) return;
-				on.receive(message);
-				if (on.to) for (on of on.to) {
-					down(on, message);
-				}
-			}
-		}
-	},
-	"Sensor": {
-		"sense": function sense(on, event) {
-			if (on.owner != this) console.warn("sensing on a node not owned by this.");
-			event = this.prepareSignal(event);
-			this.log(on, event);
-			//can't use event.path - it is chrome-specific.
-			while (on) {
-				if (!event.subject) return;
-				on.receive(event);
-				on = on.of;
 			}
 		}
 	},
@@ -232,17 +202,29 @@ function graph() {
 	const pkg = {
 	"type$": "/control",
 	"Graph": {
-		"type$": ["/graph/Component", "/graph/Sender"],
-		"sense": function sense(on, event) {
-			if (on.owner != this) console.warn("sensing on a node not owned by this.");
-			event = this.prepareSignal(event);
-			this.log(on, event);
-			//can't use event.path - it is chrome-specific.
-			while (on) {
-				if (!event.subject) return;
-				on.receive(event);
-				on = on.of;
+		"type$": "/graph/Component",
+		"send": function send(to, signal) {
+			if (typeof signal == "string") signal = {
+				subject: signal
 			}
+			to.receive(signal);
+			to.send(signal);
+		},
+		"sense": function sense(from, signal) {
+			if (typeof signal == "string") signal = {
+				subject: signal
+			}
+			from.receive(signal);
+			from.sense(signal);
+			// if (on.owner != this) console.warn("sensing on a node not owned by this.");
+			// event = this.prepareSignal(event);
+			// this.log(on, event);
+			// //can't use event.path - it is chrome-specific.
+			// while (on) {
+			// 	if (!event.subject) return;
+			// 	on.receive(event);
+			// 	on = on.of;
+			// }
 		},
 		"notify": function notify(on, signal) {
 			let model = signal.model || on.model;
@@ -271,7 +253,7 @@ function graph() {
 		}
 	},
 	"Node": {
-		"type$": ["/graph/Instance", "/graph/Receiver"],
+		"type$": ["/graph/Receiver", "/graph/Control"],
 		"type$owner": "/graph/Graph",
 		"type$to": "/graph/Array",
 		"append": function append(node) {

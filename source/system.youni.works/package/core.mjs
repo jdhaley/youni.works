@@ -1,5 +1,10 @@
 const pkg = {
+    Iterable: {
+		symbol$iterator: function *() {
+		}
+	},
 	Array: {
+        type$: "Iterable",
 		var$length: 0,
 		symbol$iterator: function *() {
 			for (let i = 0; i < this.length; i++) yield this[i];

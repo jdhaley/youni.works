@@ -1,10 +1,7 @@
 export default {
 	type$: "/system/core",
-	Iterable: {
-		symbol$iterator: function *iterator() {
-		}
-	},
 	Receiver: {
+		type$: "Instance",
 		start(conf) {
 		},
 		receive(signal) {
@@ -25,28 +22,10 @@ export default {
 		}
 	},
 	Control: {
-		type$from: "Iterable",
-		type$to: "Iterable",
 		// get$for() {
 		// 	return this
 		// },
-		send(signal) {
-			if (!signal) return;
-			let message = signal;
-			if (typeof message != "object") {
-				message = Object.create(null);
-				message.subject = signal;
-			}
-			Promise.resolve(message).then(message => to(this, message));
-
-			function to(receiver, message) {
-				if (receiver.to) for (receiver of receiver.to) {
-					message.subject && receiver.receive(messsage);
-					message.subject && to(receiver, message);
-					if (!message.subject) return;
-				}
-			}
-		},
+		type$from: "Iterable",
 		sense(signal) {
 			if (!signal) return;
 			let message = signal;
@@ -54,48 +33,70 @@ export default {
 				message = Object.create(null);
 				message.subject = signal;
 			}
-			Promise.resolve(message).then(message => from(this, message));
+			
+			this.receive(message);
+			//Promise.resolve(message).then(message => from(this, message));
+			from(this, message);
 
 			function from(receiver, message) {
 				if (receiver.from) for (receiver of receiver.from) {
-					message.subject && receiver.receive(messsage);
+					message.subject && receiver.receive(message);
 					message.subject && from(receiver, message);
 					if (!message.subject) return;
 				}
 			}
-		}
-	},
-	Sender: {
-		send(to, message) {
-			if (!message) return;
-			if (typeof message == "string") message = {
-				subject: message
+		},
+		type$to: "Iterable",
+		send(signal) {
+			if (!signal) return;
+			let message = signal;
+			if (typeof message != "object") {
+				message = Object.create(null);
+				message.subject = signal;
 			}
-			
-			Promise.resolve(message).then(message => down(to, message));
+			this.receive(message);
+			Promise.resolve(message).then(message => to(this, message));
 
-			function down(on, message) {
-				if (!message.subject) return;
-				on.receive(message);
-				if (on.to) for (on of on.to) {
-					down(on, message);
+			function to(receiver, message) {
+				if (receiver.to) for (receiver of receiver.to) {
+					message.subject && receiver.receive(message);
+					message.subject && to(receiver, message);
+					if (!message.subject) return;
 				}
-			}
-		}
-	},
-	Sensor: {
-		sense(on, event) {
-			if (on.owner != this) console.warn("sensing on a node not owned by this.");
-			event = this.prepareSignal(event);
-			this.log(on, event);
-			//can't use event.path - it is chrome-specific.
-			while (on) {
-				if (!event.subject) return;
-				on.receive(event);
-				on = on.of;
 			}
 		},
 	},
+	// Sender: {
+	// 	send(to, message) {
+	// 		if (!message) return;
+	// 		if (typeof message == "string") message = {
+	// 			subject: message
+	// 		}
+			
+	// 		Promise.resolve(message).then(message => down(to, message));
+
+	// 		function down(on, message) {
+	// 			if (!message.subject) return;
+	// 			on.receive(message);
+	// 			if (on.to) for (on of on.to) {
+	// 				down(on, message);
+	// 			}
+	// 		}
+	// 	}
+	// },
+	// Sensor: {
+	// 	sense(on, event) {
+	// 		if (on.owner != this) console.warn("sensing on a node not owned by this.");
+	// 		event = this.prepareSignal(event);
+	// 		this.log(on, event);
+	// 		//can't use event.path - it is chrome-specific.
+	// 		while (on) {
+	// 			if (!event.subject) return;
+	// 			on.receive(event);
+	// 			on = on.of;
+	// 		}
+	// 	},
+	// },
 	Publisher: {
 		//io: socket.io.Server
         publish(/* (subject | event) [, data]*/) {

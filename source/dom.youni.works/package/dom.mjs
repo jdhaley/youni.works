@@ -31,11 +31,11 @@ export default {
 			return node;
 		},
 		sense(on, event) {
+			event = this.prepareSignal(event);
 			this.super(sense, on, event);
 			if (event.preventDefault && !event.subject) event.preventDefault();
 		},
 		prepareSignal(signal) {
-			signal = this.super(prepareSignal, signal);
 			signal.stopPropagation && signal.stopPropagation();
 			if (!signal.subject) signal.subject = signal.type;
 			return signal;
@@ -81,9 +81,10 @@ export default {
 		 * "of" is a generic whole-part relationship and for Dom Nodes the default is its parentNode.
 		 */
 		once$from() {
+			let from = this.peer.parentNode.$peer;
 			return this[Symbol.for("owner")].create({
 				symbol$iterator: function*() {
-					if (this.parentNode) yield this.parentNode;
+					if (from) yield from;
 				}
 			});
 		},

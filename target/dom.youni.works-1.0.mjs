@@ -51,11 +51,11 @@ function dom() {
 			return node;
 		},
 		"sense": function sense(on, event) {
+			event = this.prepareSignal(event);
 			this.super(sense, on, event);
 			if (event.preventDefault && !event.subject) event.preventDefault();
 		},
 		"prepareSignal": function prepareSignal(signal) {
-			signal = this.super(prepareSignal, signal);
 			signal.stopPropagation && signal.stopPropagation();
 			if (!signal.subject) signal.subject = signal.type;
 			return signal;
@@ -93,9 +93,10 @@ function dom() {
 			return this.peer.parentNode.$peer;
 		},
 		"once$from": function once$from() {
+			let from = this.peer.parentNode.$peer;
 			return this[Symbol.for("owner")].create({
 				symbol$iterator: function*() {
-					if (this.parentNode) yield this.parentNode;
+					if (from) yield from;
 				}
 			});
 		},

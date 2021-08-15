@@ -1,17 +1,29 @@
 export default {
 	type$: "/control",
 	Graph: {
-		type$: ["Component", "Sender"],
-		sense(on, event) {
-			if (on.owner != this) console.warn("sensing on a node not owned by this.");
-			event = this.prepareSignal(event);
-			this.log(on, event);
-			//can't use event.path - it is chrome-specific.
-			while (on) {
-				if (!event.subject) return;
-				on.receive(event);
-				on = on.of;
+		type$: "Component",
+		send(to, signal) {
+			if (typeof signal == "string") signal = {
+				subject: signal
 			}
+			to.receive(signal);
+			to.send(signal);
+		},
+		sense(from, signal) {
+			if (typeof signal == "string") signal = {
+				subject: signal
+			}
+			from.receive(signal);
+			from.sense(signal);
+			// if (on.owner != this) console.warn("sensing on a node not owned by this.");
+			// event = this.prepareSignal(event);
+			// this.log(on, event);
+			// //can't use event.path - it is chrome-specific.
+			// while (on) {
+			// 	if (!event.subject) return;
+			// 	on.receive(event);
+			// 	on = on.of;
+			// }
 		},
 		notify(on, signal) {
 			let model = signal.model || on.model;
@@ -40,7 +52,7 @@ export default {
 		}
 	},
 	Node: {
-		type$: ["Instance", "Receiver"],
+		type$: ["Receiver", "Control"],
 		type$owner: "Graph",
 		type$to: "Array",
 		append(node) {
