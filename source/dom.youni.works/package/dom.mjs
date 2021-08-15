@@ -45,14 +45,14 @@ export default {
 		type$: "Node",
 		type$owner: "Document",
 		namespace: "",
-		once$nodeName() {
-			return this.className;
-		},
 		get(name) {
 			return this.peer.getAttribute(name);
 		},
 		set(name, value) {
 			this.peer.setAttribute(name, value);
+		},
+		once$nodeName() {
+			return this.className;
 		},
 		once$className() {
 			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
@@ -75,6 +75,17 @@ export default {
 		 */
 		get$of() {
 			return this.peer.parentNode.$peer;
+		},
+		/**
+		 * Dom Nodes are rooted tree nodes, i.e. more-or-less equivalent to an undirected graph.
+		 * "of" is a generic whole-part relationship and for Dom Nodes the default is its parentNode.
+		 */
+		once$from() {
+			return this[Symbol.for("owner")].create({
+				symbol$iterator: function*() {
+					if (this.parentNode) yield this.parentNode;
+				}
+			});
 		},
 		once$peer() {
 			let name = (this.namespace ? this.namespace + "/" : "") + this.nodeName;

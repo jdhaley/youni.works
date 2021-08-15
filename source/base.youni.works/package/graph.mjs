@@ -42,9 +42,9 @@ export default {
 	Node: {
 		type$: ["Instance", "Receiver"],
 		type$owner: "Graph",
-		type$to: "Array",	//The arcs. Each arc should be a Node.
-		append(component) {
-			Array.prototype.push.call(this.to, component);
+		type$to: "Array",
+		append(node) {
+			Array.prototype.push.call(this.to, node);
 		},
 		forEach(data, method) {
 			if (data && data[Symbol.iterator]) {
