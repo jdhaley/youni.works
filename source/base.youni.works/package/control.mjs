@@ -21,10 +21,7 @@ export default {
 		extend$actions: {
 		}
 	},
-	Control: {
-		// get$for() {
-		// 	return this
-		// },
+	Sensor: {
 		type$from: "Iterable",
 		sense(signal) {
 			if (!signal) return;
@@ -46,6 +43,8 @@ export default {
 				}
 			}
 		},
+	},
+	Sender: {
 		type$to: "Iterable",
 		send(signal) {
 			if (!signal) return;
@@ -64,39 +63,11 @@ export default {
 					if (!message.subject) return;
 				}
 			}
-		},
+		}
 	},
-	// Sender: {
-	// 	send(to, message) {
-	// 		if (!message) return;
-	// 		if (typeof message == "string") message = {
-	// 			subject: message
-	// 		}
-			
-	// 		Promise.resolve(message).then(message => down(to, message));
-
-	// 		function down(on, message) {
-	// 			if (!message.subject) return;
-	// 			on.receive(message);
-	// 			if (on.to) for (on of on.to) {
-	// 				down(on, message);
-	// 			}
-	// 		}
-	// 	}
-	// },
-	// Sensor: {
-	// 	sense(on, event) {
-	// 		if (on.owner != this) console.warn("sensing on a node not owned by this.");
-	// 		event = this.prepareSignal(event);
-	// 		this.log(on, event);
-	// 		//can't use event.path - it is chrome-specific.
-	// 		while (on) {
-	// 			if (!event.subject) return;
-	// 			on.receive(event);
-	// 			on = on.of;
-	// 		}
-	// 	},
-	// },
+	Control: {
+		type$: ["Receiver", "Sender", "Sensor"]
+	},
 	Publisher: {
 		//io: socket.io.Server
         publish(/* (subject | event) [, data]*/) {
