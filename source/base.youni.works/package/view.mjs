@@ -20,6 +20,18 @@ export default {
 	},
 	Container: {
 		type$: "View",
+		forEach(data, method) {
+			if (data && data[Symbol.iterator]) {
+				let i = 0;
+				for (let datum of data) {
+					method.call(this, datum, i++, data);
+				}
+			} else {
+				for (let name in data) {
+					method.call(this, data[name], name, data);
+				}
+			}
+		},
 		createContent(value, key, object) {
 			let type = this.typeFor(value, key);
 			let conf = this.configurationFor(value, key);
