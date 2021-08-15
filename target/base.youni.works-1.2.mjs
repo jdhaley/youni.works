@@ -88,6 +88,68 @@ return pkg;
 function control() {
 	const pkg = {
 	"type$": "/system/core",
+	"Iterable": {
+		"symbol$iterator": function *iterator() {
+		}
+	},
+	"Receiver": {
+		"start": function start(conf) {
+		},
+		"receive": function receive(signal) {
+			if (!signal) return;
+			let msg = signal;
+			if (typeof msg != "object") {
+				msg = Object.create(null);
+				msg.subject = signal;
+			}
+			let subject = msg.subject;
+			while (subject) {
+				let action = this.actions[subject];
+				action && action.call(this, msg);
+				subject = (subject != msg.subject ? msg.subject : "");
+			}
+		},
+		"extend$actions": {
+		}
+	},
+	"Control": {
+		"type$from": "/control/Iterable",
+		"type$to": "/control/Iterable",
+		"send": function send(signal) {
+			if (!signal) return;
+			let message = signal;
+			if (typeof message != "object") {
+				message = Object.create(null);
+				message.subject = signal;
+			}
+			Promise.resolve(message).then(message => to(this, message));
+
+			function to(receiver, message) {
+				if (receiver.to) for (receiver of receiver.to) {
+					message.subject && receiver.receive(messsage);
+					message.subject && to(receiver, message);
+					if (!message.subject) return;
+				}
+			}
+		},
+		"sense": function sense(signal) {
+			if (!signal) return;
+			let message = signal;
+			if (typeof message != "object") {
+				message = Object.create(null);
+				message.subject = signal;
+			}
+			Promise.resolve(message).then(message => from(this, message));
+
+			function from(receiver, message) {
+				if (receiver.from) for (receiver of receiver.from) {
+					message.subject && receiver.receive(messsage);
+					message.subject && from(receiver, message);
+					if (!message.subject) return;
+				}
+			}
+		}
+	},
 	"Sender": {
 		"send": function send(to, message) {
 			if (!message) return;
@@ -106,15 +168,35 @@ function control() {
 			}
 		}
 	},
-	"Receiver": {
-		"start": function start(conf) {
-		},
-		"receive": function receive(signal) {
-			let action = this.actions[typeof signal == "string" ? signal : signal.subject];
-			action && action.call(this, signal);
-		},
-		"extend$actions": {
+	"Sensor": {
+		"sense": function sense(on, event) {
+			if (on.owner != this) console.warn("sensing on a node not owned by this.");
+			event = this.prepareSignal(event);
+			this.log(on, event);
+			//can't use event.path - it is chrome-specific.
+			while (on) {
+				if (!event.subject) return;
+				on.receive(event);
+				on = on.of;
+			}
 		}
+	},
+	"Publisher": {
+		"publish": function publish(/* (subject | event) [, data]*/) {
+            if (!this.io) {
+                console.error("No socket");
+            }
+            let event = arguments[0];
+            //agruments can be a string, string/object, or an event with a subject.
+            let subject = event && typeof event == "object" ? event.subject : event;
+            if (!subject) {
+                console.error("No subject.", arguments);
+            }
+            if (arguments.length > 1) {
+                event = arguments[1];
+            }
+            this.io.emit(subject, event);
+        }
 	},
 	"Observer": {
 		"observe": function observe(object) {
@@ -192,8 +274,8 @@ function graph() {
 		"type$": ["/graph/Instance", "/graph/Receiver"],
 		"type$owner": "/graph/Graph",
 		"type$to": "/graph/Array",
-		"append": function append(component) {
-			Array.prototype.push.call(this.to, component);
+		"append": function append(node) {
+			Array.prototype.push.call(this.to, node);
 		},
 		"forEach": function forEach(data, method) {
 			if (data && data[Symbol.iterator]) {

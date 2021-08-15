@@ -1,23 +1,8 @@
 export default {
     type$: "/base/graph",
     Service: {
-        type$: "Graph",
+        type$: ["Graph", "Publisher"],
         engine: null,
-        publish() {
-            if (!this.io) {
-                console.error("No socket");
-            }
-            let event = arguments[0];
-            //agruments can be a string, string/object, or an event with a subject.
-            let subject = event && typeof event == "object" ? event.subject : event;
-            if (!subject) {
-                console.error("No subject.", arguments);
-            }
-            if (arguments.length > 1) {
-                event = arguments[1];
-            }
-            this.io.emit(subject, event);
-        },
         wire(path, node) {
             let f;
             if (typeof node == "string") {

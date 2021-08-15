@@ -65,14 +65,14 @@ function dom() {
 		"type$": "/dom/Node",
 		"type$owner": "/dom/Document",
 		"namespace": "",
-		"once$nodeName": function once$nodeName() {
-			return this.className;
-		},
 		"get": function get(name) {
 			return this.peer.getAttribute(name);
 		},
 		"set": function set(name, value) {
 			this.peer.setAttribute(name, value);
+		},
+		"once$nodeName": function once$nodeName() {
+			return this.className;
 		},
 		"once$className": function once$className() {
 			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
@@ -91,6 +91,13 @@ function dom() {
 		},
 		"get$of": function get$of() {
 			return this.peer.parentNode.$peer;
+		},
+		"once$from": function once$from() {
+			return this[Symbol.for("owner")].create({
+				symbol$iterator: function*() {
+					if (this.parentNode) yield this.parentNode;
+				}
+			});
 		},
 		"once$peer": function once$peer() {
 			let name = (this.namespace ? this.namespace + "/" : "") + this.nodeName;
