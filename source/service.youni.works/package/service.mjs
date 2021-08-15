@@ -3,13 +3,29 @@ export default {
     Service: {
         type$: "Graph",
         engine: null,
+        publish() {
+            if (!this.io) {
+                console.error("No socket");
+            }
+            let event = arguments[0];
+            //agruments can be a string, string/object, or an event with a subject.
+            let subject = event && typeof event == "object" ? event.subject : event;
+            if (!subject) {
+                console.error("No subject.", arguments);
+            }
+            if (arguments.length > 1) {
+                event = arguments[1];
+            }
+            this.io.emit(subject, event);
+        },
         wire(path, node) {
             let f;
             if (typeof node == "string") {
                 f = this.engine.static(node);
             } else {
                 node = this.create(node);
-                node.service = this;
+                node.path = path;
+                this.define(node, "owner", this);
                 f = function receive(req, res) {
                     node.owner.send(node, {
                         subject: "service",
@@ -26,9 +42,8 @@ export default {
             engine.static = conf.engine.static;
             this.define(this, "engine", engine, "const");
 
-            let to = this.endpoints;
-            for (let path in to) {
-                this.wire(path, to[path]);
+            for (let path in this.endpoints) {
+                this.wire(path, this.endpoints[path]);
             }
             return this;
         },
@@ -37,7 +52,7 @@ export default {
        type$: "Node",
        extend$actions: {
            service(msg) {
-               this.service.io.emit("test1", this.value);
+               this.owner.publish("test1", this.value);
                msg.response.send(this.value);
            }
        },
