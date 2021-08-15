@@ -8,6 +8,9 @@
 		<script>
 			let socket = io.connect('https://localhost:8080');
 			socket.emit('receive', "Hello.");
+			socket.on('test1', data => {
+				console.log("Receive:", data);
+			});
 
 		</script>
 	</head>

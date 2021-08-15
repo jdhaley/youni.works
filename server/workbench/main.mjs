@@ -12,15 +12,14 @@ export default function main(conf) {
 		key: fs.readFileSync(conf.key),
 		cert: fs.readFileSync(conf.cert)
 	};
-	const httpsServer = https.createServer(credentials, service);
-	let info = `Service listening on HTTPS port "${conf.port}"`;
-	httpsServer.listen(conf.port, () => console.info(info));
+	const httpsServer = https.createServer(credentials, service.engine);
+	httpsServer.listen(conf.port, () => console.info(`Service listening on HTTPS port "${conf.port}"`));
 
-	const io = new Server(httpsServer, {
+	service.io = new Server(httpsServer, {
 		// ...
 	});
-	  
-	io.on('connection', socket => {
+	
+	service.io.on('connection', socket => {
 		console.log("New connection");
 
 		socket.on('receive', data => {

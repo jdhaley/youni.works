@@ -9,6 +9,7 @@ export default {
                 f = this.engine.static(node);
             } else {
                 node = this.create(node);
+                node.service = this;
                 f = function receive(req, res) {
                     node.owner.send(node, {
                         subject: "service",
@@ -29,13 +30,14 @@ export default {
             for (let path in to) {
                 this.wire(path, to[path]);
             }
-            return engine;
+            return this;
         },
    },
    Test: {
        type$: "Node",
        extend$actions: {
            service(msg) {
+               this.service.io.emit("test1", this.value);
                msg.response.send(this.value);
            }
        },
