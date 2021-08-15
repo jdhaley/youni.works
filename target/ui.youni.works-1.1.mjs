@@ -754,7 +754,7 @@ function gdr() {
                 event.track = priorEvent.track;
                 event.moveX = event.x - priorEvent.x;
                 event.moveY = event.y - priorEvent.y;
-                event.track.owner.send(event.track, event);
+                event.track.send(event);
                 pkg.TRACK = event;
                 return;
             } else {
@@ -770,7 +770,7 @@ function gdr() {
                 event.track = priorEvent.track;
                 event.moveX = 0;
                 event.moveY = 0;
-                event.track.owner.send(event.track, event);
+                event.track.send(event);
                 pkg.TRACK = null;
                 return;
             }
@@ -791,7 +791,7 @@ function gdr() {
     },
 	"sense": function sense(event) {
 		let ctl = pkg.getControl(event.target);
-		ctl && ctl.owner.sense(ctl, event);
+		ctl && ctl.sense(event);
 	},
 	"getControl": function getControl(node) {
 		while(node) {

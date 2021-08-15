@@ -32,7 +32,7 @@ function service() {
                 node.path = path;
                 this.define(node, "owner", this);
                 f = function receive(req, res) {
-                    node.owner.send(node, {
+                    node.send({
                         subject: "service",
                         request: req,
                         response: res,
