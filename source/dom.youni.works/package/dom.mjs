@@ -1,7 +1,7 @@
 export default {
-	type$: "/base/graph",
+	type$: "/base/control",
 	Document: {
-		type$: "Graph",
+		type$: "Component",
 		document: null,
 		get$peer() {
 			return this.document.body;
@@ -42,7 +42,7 @@ export default {
 		// }
 	},
 	Element: {
-		type$: "Node",
+		type$: "Control",
 		type$owner: "Document",
 		namespace: "",
 		get(name) {

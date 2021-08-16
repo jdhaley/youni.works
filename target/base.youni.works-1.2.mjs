@@ -10,7 +10,6 @@ module.use = {
 module.package = {
 	command: command(),
 	control: control(),
-	graph: graph(),
 	origin: origin(),
 	util: util(),
 	view: view()
@@ -198,16 +197,8 @@ function control() {
 				}
 			}
 		}
-	}
-}
-return pkg;
-}
-
-function graph() {
-	const pkg = {
-	"type$": "/control",
-	"Graph": {
-		"type$": "/graph/Component",
+	},
+	"Notifier": {
 		"notify": function notify(on, signal) {
 			if (typeof signal == "string") signal = {
 				subject: signal
@@ -222,14 +213,6 @@ function graph() {
 				signal.model = model;
 				ctl.receive(signal);
 			}
-		}
-	},
-	"Node": {
-		"type$": "/graph/Control",
-		"type$owner": "/graph/Graph",
-		"type$to": "/graph/Array",
-		"append": function append(node) {
-			Array.prototype.push.call(this.to, node);
 		}
 	}
 }

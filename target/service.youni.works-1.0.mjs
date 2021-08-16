@@ -19,9 +19,9 @@ const main = function main_loadModule(module) {
 export default main(module, conf);
 function service() {
 	const pkg = {
-	"type$": "/base/graph",
+	"type$": "/base/control",
 	"Service": {
-		"type$": ["/service/Graph", "/service/Publisher"],
+		"type$": ["/service/Component", "/service/Publisher"],
 		"engine": null,
 		"wire": function wire(path, node) {
             let f;
@@ -54,7 +54,7 @@ function service() {
         }
 	},
 	"Test": {
-		"type$": "/service/Node",
+		"type$": "/service/Receiver",
 		"extend$actions": {
 			"service": function service(msg) {
                this.owner.publish("test1", this.value);

@@ -111,5 +111,22 @@ export default {
 				}
 			}
 		}
+	},
+	Notifier: {
+		notify(on, signal) {
+			if (typeof signal == "string") signal = {
+				subject: signal
+			}
+			let model = signal.model || on.model;
+			let observers = model && model[Symbol.for("observers")];
+			if (!observers) return;
+			signal = this.prepareSignal(signal);
+			for (let ctl of observers) {
+				//Set the following for each iteration in case of a bad behaving control.
+				signal.source = on;
+				signal.model = model;
+				ctl.receive(signal);
+			}
+		}
 	}
 }

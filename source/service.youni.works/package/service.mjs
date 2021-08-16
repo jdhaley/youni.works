@@ -1,7 +1,7 @@
 export default {
-    type$: "/base/graph",
+    type$: "/base/control",
     Service: {
-        type$: ["Graph", "Publisher"],
+        type$: ["Component", "Publisher"],
         engine: null,
         wire(path, node) {
             let f;
@@ -34,7 +34,7 @@ export default {
         },
    },
    Test: {
-       type$: "Node",
+       type$: "Receiver",
        extend$actions: {
            service(msg) {
                this.owner.publish("test1", this.value);

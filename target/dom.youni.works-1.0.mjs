@@ -19,9 +19,9 @@ const main = function main_loadModule(module) {
 export default main(module, conf);
 function dom() {
 	const pkg = {
-	"type$": "/base/graph",
+	"type$": "/base/control",
 	"Document": {
-		"type$": "/dom/Graph",
+		"type$": "/dom/Component",
 		"document": null,
 		"get$peer": function get$peer() {
 			return this.document.body;
@@ -52,7 +52,7 @@ function dom() {
 		}
 	},
 	"Element": {
-		"type$": "/dom/Node",
+		"type$": "/dom/Control",
 		"type$owner": "/dom/Document",
 		"namespace": "",
 		"get": function get(name) {
