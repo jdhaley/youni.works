@@ -126,8 +126,12 @@ const pkg = {
 			ele.type = "text/css";
 			this.document.head.appendChild(ele);
 			this.document.$styles = ele.sheet;
+
+			for (let name in conf.events) {
+				let listener = conf.events[name];
+				this.$window.addEventListener(name, listener);
+			}
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-			pkg.addEvents(this.$window, conf.events);
 		},
 		viewOf(node) {
 			while(node) {
@@ -140,23 +144,18 @@ const pkg = {
 			return this.viewOf(target);
 		}
 	},
-	setAttributes(ele, at) {
-		//TODO if attribute is an object, prefix the path iterator over it.
-		//above can handle the custom data attributes for html.
-		if (at) for (let name in at) peer.setAttribute(name, at[name]);
-	},
-	addEvents(peer, events) {
-		for (let name in events) {
-			let listener = events[name];
-			peer.addEventListener(name, listener);
-		}
-	},
 	$public: {
 		type$Display: "Display",
 		type$Frame: "Frame"
 	}
 }
 export default pkg;
+
+	// setAttributes(ele, at) {
+	// 	//TODO if attribute is an object, prefix the path iterator over it.
+	// 	//above can handle the custom data attributes for html.
+	// 	if (at) for (let name in at) peer.setAttribute(name, at[name]);
+	// },
 
 // function defineStyleProperties(object, prefix) {
 // 	if (!prefix) prefix = "";
