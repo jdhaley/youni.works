@@ -2095,14 +2095,14 @@ function workbench() {
 		"direction": "horizontal",
 		"members": {
 			"type$context": "/workbench/Context",
+			"type$content": "/workbench/Content"
+		}
+	},
+	"Content": {
+		"type$": "/workbench/Structure",
+		"members": {
 			"type$sidebar": "/workbench/Sidebar",
-			"main": {
-				"type$": "/workbench/Structure",
-				"members": {
-					"type$tabs": "/workbench/tabs/Tabs",
-					"type$tables": "/workbench/Display"
-				}
-			}
+			"type$tabs": "/workbench/tabs/Tabs"
 		}
 	},
 	"Context": {

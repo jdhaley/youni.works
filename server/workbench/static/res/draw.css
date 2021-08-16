@@ -1,0 +1,36 @@
+SVG {
+	fill: none;
+	stroke: silver;
+	stroke-width: .2;
+	stroke-linecap: square;
+	stroke-linejoin: square;
+	border: 1px solid silver;
+}
+SVG:focus {
+	border-color: steelblue;
+}
+.point {
+	stroke-width: 0;
+	fill: silver;
+}
+.vector {
+	stroke: seagreen;
+	stroke-width: 2px;
+	fill: rgba(0, 128, 0, .3)
+}
+.point[data-cmd="M"] {
+	fill: green;
+}
+.point[data-cmd="L"] {
+	fill: darkslategrey;
+}
+.point[data-cmd="Q"] {
+	fill:lightskyblue;
+}
+.point[data-cmd="S"] {
+	fill:salmon;
+}
+.point:hover {
+	stroke: steelblue;
+	stroke-width: 1;
+}

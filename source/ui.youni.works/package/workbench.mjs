@@ -20,15 +20,16 @@ export default {
 		direction: "horizontal",
 		members: {
 			type$context: "Context",
-			type$sidebar: "Sidebar",
-            main: {
-                type$: "Structure",
-                members: {
-                    type$tabs: "tabs/Tabs",
-                    type$tables: "Display"
-                }
-            }
+            type$content: "Content"
 		}
+    },
+    Content: {
+        type$: "Structure",
+        members: {
+            type$sidebar: "Sidebar",
+            type$tabs: "tabs/Tabs",
+           // type$tables: "Display"
+        }
     },
     Context: {
         type$: "Display",

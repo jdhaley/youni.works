@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+*::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+*::-webkit-scrollbar-thumb {
+    background: lightsteelblue;
+}
+*::-webkit-scrollbar-track {
+	background: ghostwhite;
+}
+*:focus {
+	outline: 2px solid steelblue;
+}
+
+* {
+	outline: 0;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	font-size: 16px;
+}
+BODY {
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+}
+INPUT[type="date" i] {
+	align-items: flex-start;
+}
+.grid {
+	display: grid;
+	grid-template-columns: 2fr 6fr 4fr 6fr 0fr 10fr 6fr;
+}
+.grid>.header, .grid>.header>.body, .grid>.body, .grid>.body>.body {
+	display: contents;
+}
+.grid>.header {
+	display: contents;
+	position: sticky;
+}
+.grid>.body {
+	display: contents;
+}
+.grid>.footer {
+	border: 2px solid salmon;
+	content: "sdfasdf";
+}
+.composite, .object, .record {
+	display: contents;
+}
+.grid *, .sheet * {
+	border-width: 0;
+	border-style: solid;
+	border-color: silver;
+}
+.key, .caption, .value {
+	display: flex;
+	padding: 2px;
+	border-bottom-width: 1px;
+}
+.caption, .value {
+	border-left-width: 1px;
+}
+
+.value>* {
+	flex: 1 1;
+}
+
+.caption, .key {
+	color: steelblue;
+	background-color: ghostwhite;
+	cursor: default;
+}
+.key {
+	border-left-width: 0;
+	text-align: right;
+	color: silver;
+	overflow: hidden;
+}
+.string, .link {
+	overflow: auto;
+	padding: 3px;
+}
+.dynamic {
+	font-style: italic;
+	font-weight: 100;
+}
+.pane {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	background:  ghostwhite;
+	border: 1px solid gainsboro;
+	width: 120px;
+	padding-bottom: 6px;
+	overflow: hidden;
+	box-shadow: 0 0 10px silver;
+	min-width: 24px;
+	min-height: 18px;
+}
+.list {
+	overflow: auto;
+	background: window;
+}
+.list>.value {
+	border-bottom: 1px solid gainsboro;
+	font-size: 16px;
+	padding: 2px;
+	min-height: 24px;
+}
+
+
+.sheet {
+	display: grid;
+	grid-template-columns: 1fr 3fr;
+	background: white;
+	overflow: auto;
+}
+.sheet>.part {
+	display: contents;
+}
+.dynamic LABEL {
+	font-style: italic;
+	font-weight: bold;
+}

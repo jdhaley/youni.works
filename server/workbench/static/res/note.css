@@ -1,0 +1,50 @@
+.note {
+	display: block;
+	flex: 1 1;
+	min-height: 100%;
+	padding: 1em;
+}
+.line {
+	font-family: 'IBM Plex Mono';
+	list-style: none;
+	margin-left: 0;
+	padding: 2px;
+	/* font-weight: lighter; */
+	color: darkslategray;
+	border-bottom: 1px dotted gainsboro;
+}
+/* .line:nth-child(even){
+	background: ghostwhite;
+} */
+.line[data-level='1'] {
+	margin-left: 25px;
+}
+
+.line[data-level='2'] {
+	margin-left: 50px;
+}
+
+.line[data-level='3'] {
+	margin-left: 75px;
+}
+
+.section {
+	font-family: 'IBM Plex Sans';
+	list-style: none;
+	color: lightsteelblue;
+	padding-top: 2px;
+}
+.section[data-level='0'] {
+	color: orange;
+}
+.section[data-level='1'] {
+	font-size: 16pt;
+}
+
+.section[data-level='2'] {
+	font-size: 14pt;
+}
+
+.section[data-level='3'] {
+	font-size: 12pt;
+}

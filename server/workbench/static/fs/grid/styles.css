@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+*::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+*::-webkit-scrollbar-thumb {
+    background: lightsteelblue;
+}
+*::-webkit-scrollbar-track {
+	background: ghostwhite;
+}
+*:focus {
+	outline: 2px solid steelblue;
+}
+
+*, INPUT {
+	box-sizing: border-box;
+	min-width: 0; /*Helps to ensure flex aligns correctly */
+	flex: 1 1 0;
+	outline: 0;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	font-family: Roboto, Arial, Helvetica, sans-serif;
+	font-size: 16px;
+}
+BODY {
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+}
+INPUT {
+	align-items: flex-start;
+	padding: 3px;
+}
+.table {
+	display: flex;
+	flex-direction: column;
+}
+.row, .record {
+	display: flex;
+	flex: 1 1;
+}
+.rows {
+	display: flex;
+	flex-direction: column;
+}
+.propertySheet>.record {
+	flex-direction: column;
+}
+.table *, .sheet * {
+	border-width: 0;
+	border-style: solid;
+	border-color: silver;
+}
+.key, .caption, .property {
+	display: flex;
+	border-bottom-width: 1px;
+	overflow: hidden;
+	min-width: 0;
+	min-height: 0;
+}
+.caption, .property {
+	border-left-width: 1px;
+}
+
+.property *:focus {
+	background: aliceblue;
+	outline: 0;
+}
+.property>*, .property>.link>* {
+	padding: 3px;
+}
+.property>.link {
+	padding: 0;
+}
+
+.caption, .key {
+	padding: 3px;
+	color: steelblue;
+	background-color: ghostwhite;
+	cursor: default;
+}
+.key {
+	border-left-width: 0;
+	flex: 0 0 5mm;
+	text-align: right;
+	color: silver;
+	overflow: hidden;
+}
+.dynamic {
+	font-style: italic;
+	font-weight: 100;
+}
+.pane {
+	position: absolute;
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	background:  ghostwhite;
+	border: 1px solid gainsboro;
+	overflow: hidden;
+	box-shadow: 0 0 10px silver;
+}
+.link {
+	display: flex;
+	align-items: flex-start;
+}
+.link * {
+	flex: 1 1;
+	align-self: stretch;
+}
+.link>IMG {
+	align-self: flex-start;
+	max-width: 24px;
+}
+
+.panel {
+	align-items: stretch;
+	display: flex;
+	flex-direction: column-reverse;
+}
+.panel>.header {
+	font-weight: bold;
+	flex: 0 0;
+	padding: 6px;
+}
+.panel>.footer {
+	display: none;
+}
+.panel>.body {
+	padding: 6px;
+	display: flex;
+	flex-direction: column;
+	flex: 1 1;
+	background: white;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
