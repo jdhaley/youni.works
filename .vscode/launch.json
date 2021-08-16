@@ -23,7 +23,7 @@
 		},
 		{
 			"name": "compiler",
-			"cwd": "${workspaceFolder}/compiler",
+			"cwd": "${workspaceFolder}/server/compiler",
 			"program": "index.mjs",
 			"request": "launch",
 			"skipFiles": [
