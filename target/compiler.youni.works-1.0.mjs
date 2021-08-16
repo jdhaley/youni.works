@@ -1,11 +1,13 @@
 import system from "./system.youni.works-2.1.mjs";
+import base from "./base.youni.works-1.2.mjs";
 const module = {
 	"name": "compiler.youni.works",
 	"version": "1.0",
 	"moduleType": "library"
 };
 module.use = {
-	system: system
+	system: system,
+	base: base
 }
 module.package = {
 	_devt: _devt(),

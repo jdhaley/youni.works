@@ -2,6 +2,7 @@ import fs		from "fs";
 import { Server } from "socket.io";
 import https	from "https";
 import express 	from "express";
+import loader 		from "./loader.mjs";
 
 export default function main(conf) {
 	let module = conf.compiler;
@@ -26,6 +27,7 @@ export default function main(conf) {
 		// 	port: conf.port
 		// }
 	});
+	service.engine.use("/sources", loader("../../source"));
 	const httpsServer = https.createServer(credentials, service.engine);
 	httpsServer.listen(conf.port, () => console.info(`Service listening on HTTPS port "${conf.port}"`));
 
