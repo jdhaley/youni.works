@@ -554,8 +554,12 @@ function display() {
 			ele.type = "text/css";
 			this.document.head.appendChild(ele);
 			this.document.$styles = ele.sheet;
+
+			for (let name in conf.events) {
+				let listener = conf.events[name];
+				this.$window.addEventListener(name, listener);
+			}
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-			pkg.addEvents(this.$window, conf.events);
 		},
 		"viewOf": function viewOf(node) {
 			while(node) {
@@ -566,17 +570,6 @@ function display() {
 		"viewAt": function viewAt(x, y) {
 			let target = this.$window.document.elementFromPoint(x, y);
 			return this.viewOf(target);
-		}
-	},
-	"setAttributes": function setAttributes(ele, at) {
-		//TODO if attribute is an object, prefix the path iterator over it.
-		//above can handle the custom data attributes for html.
-		if (at) for (let name in at) peer.setAttribute(name, at[name]);
-	},
-	"addEvents": function addEvents(peer, events) {
-		for (let name in events) {
-			let listener = events[name];
-			peer.addEventListener(name, listener);
 		}
 	},
 	"$public": {

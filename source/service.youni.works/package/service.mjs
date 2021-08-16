@@ -3,12 +3,12 @@ export default {
     Service: {
         type$: ["Component", "Publisher"],
         engine: null,
-        wire(path, node) {
+        wire(path, conf) {
             let f;
-            if (typeof node == "string") {
-                f = this.engine.static(node);
+            if (typeof conf == "string") {
+                f = this.engine.static(conf);
             } else {
-                node = this.create(node);
+                let node = this.create(conf);
                 node.path = path;
                 this.define(node, "owner", this);
                 f = function receive(req, res) {
@@ -32,17 +32,20 @@ export default {
             }
             return this;
         },
-   },
-   Test: {
-       type$: "Receiver",
-       extend$actions: {
-           service(msg) {
-               this.owner.publish("test1", this.value);
-               msg.response.send(this.value);
-           }
-       },
-       start(conf) {
+    },
+    Endpoint: {
+        type$: ["Receiver", "Sender"],
+    },
+    Test: {
+        type$: "Endpoint",
+        extend$actions: {
+            service(msg) {
+                this.owner.publish("test1", this.value);
+                msg.response.send(this.value);
+            }
+        },
+        start(conf) {
             this.value = conf.value;
-       }
+        }
    }
 }

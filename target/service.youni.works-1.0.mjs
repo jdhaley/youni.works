@@ -23,12 +23,12 @@ function service() {
 	"Service": {
 		"type$": ["/service/Component", "/service/Publisher"],
 		"engine": null,
-		"wire": function wire(path, node) {
+		"wire": function wire(path, conf) {
             let f;
-            if (typeof node == "string") {
-                f = this.engine.static(node);
+            if (typeof conf == "string") {
+                f = this.engine.static(conf);
             } else {
-                node = this.create(node);
+                let node = this.create(conf);
                 node.path = path;
                 this.define(node, "owner", this);
                 f = function receive(req, res) {
@@ -53,17 +53,20 @@ function service() {
             return this;
         }
 	},
+	"Endpoint": {
+		"type$": ["/service/Receiver", "/service/Sender"]
+	},
 	"Test": {
-		"type$": "/service/Receiver",
+		"type$": "/service/Endpoint",
 		"extend$actions": {
 			"service": function service(msg) {
-               this.owner.publish("test1", this.value);
-               msg.response.send(this.value);
-           }
+                this.owner.publish("test1", this.value);
+                msg.response.send(this.value);
+            }
 		},
 		"start": function start(conf) {
             this.value = conf.value;
-       }
+        }
 	}
 }
 return pkg;
