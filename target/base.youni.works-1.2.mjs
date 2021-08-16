@@ -156,7 +156,7 @@ function control() {
 		"type$": ["/control/Receiver", "/control/Sender", "/control/Sensor"]
 	},
 	"Publisher": {
-		"publish": function publish(/* (subject | event) [, data]*/) {
+		"publish": function publish(/* (subject [, data] | event) */) {
             if (!this.io) {
                 console.error("No socket");
             }

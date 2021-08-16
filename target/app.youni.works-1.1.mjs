@@ -18,75 +18,6 @@ const conf = {
 	"ownerType": "/display/Frame",
 	"appType": "/app/App",
 	"window": null,
-	"events": function events() {
-	let NO_CLICK;
-	function TARGET_EVENT(event) {
-		let ctl = getControl(event.target);
-        if (ctl) {
-            event.stopPropagation();
-            if (!event.subject) event.subject = event.type;
-            ctl.sense(event);
-            if (!event.subject) event.preventDefault();    
-        }
-	}
-	function SELECTION_EVENT(event) {
-		let ctl = getControl(event.target);
-		event.range = ctl && ctl.owner.selectionRange;
-		ctl = ctl && event.range.commonAncestorContainer;
-		ctl && ctl.owner.sense(ctl, event);
-	}
-	function getControl(node) {
-		while(node) {
-			if (node.$peer) return node.$peer;
-			node = node.parentNode;
-		}
-	}
-	return {
-		windowEvents: {		
-			input: TARGET_EVENT,
-			cut: TARGET_EVENT,
-			copy: TARGET_EVENT,
-			paste: TARGET_EVENT,
-	
-//			keydown: TARGET_EVENT,
-			dblclick: TARGET_EVENT,
-			click: TARGET_EVENT,		//call it "push"
-			// click: function(event) {
-			// 	if (NO_CLICK) {
-			// 		event.preventDefault();
-			// 		NO_CLICK = false;
-			// 	} else {
-			// 		TARGET_EVENT(event);
-			// 	}
-			// },
-			// dragstart: TARGET_EVENT,
-			// dragover: TARGET_EVENT,
-			// drop: TARGET_EVENT,
-	//		mouseover: TARGET_EVENT,
-	//		mouseout: TARGET_EVENT,
-			focusin: TARGET_EVENT,
-			focusout: TARGET_EVENT,
-			focus: TARGET_EVENT,
-			blur: TARGET_EVENT,
-			contextmenu: function(event) {
-				if (event.ctrlKey) {
-					event.preventDefault();
-					TARGET_EVENT(event);
-				}
-			},
-			// resize: function(event) {
-			// 	let owner = event.target.document.body.$peer.owner;
-			// 	owner.send(owner, event);
-			// },
-			select: TARGET_EVENT, //may not exist
-			change: TARGET_EVENT, //may not exist
-		},
-		// documentEvents: {
-		// 	selectionstart: SELECTION_EVENT,
-		// 	selectionchange: SELECTION_EVENT
-		// }
-	}
-},
 	"editors": {
 		"type$string": "/ui/editors/String",
 		"type$number": "/ui/editors/Number",
@@ -95,7 +26,7 @@ const conf = {
 		"type$link": "/ui/editors/Link",
 		"type$color": "/ui/editors/Color"
 	},
-	"type$gdr": "/gdr"
+	"type$events": "/gdr"
 };
 const main = function main(module, conf) {
 	module = module.use.system.load(module);

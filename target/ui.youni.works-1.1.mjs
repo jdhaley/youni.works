@@ -555,11 +555,7 @@ function display() {
 			this.document.head.appendChild(ele);
 			this.document.$styles = ele.sheet;
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-			let events = conf.events();
-			pkg.addEvents(this.$window, events.windowEvents);
-			pkg.addEvents(this.document, events.documentEvents);
-
-			pkg.addEvents(this.$window, conf.gdr);
+			pkg.addEvents(this.$window, conf.events);
 		},
 		"viewOf": function viewOf(node) {
 			while(node) {
@@ -723,6 +719,16 @@ return pkg;
 function gdr() {
 	const pkg = {
 	"$public": {
+		"type$input": "/gdr/sense",
+		"type$cut": "/gdr/sense",
+		"type$copy": "/gdr/sense",
+		"type$paste": "/gdr/sense",
+		"type$focusin": "/gdr/sense",
+		"type$focusout": "/gdr/sense",
+		"type$focus": "/gdr/sense",
+		"type$blur": "/gdr/sense",
+		"type$click": "/gdr/sense",
+		"type$dblclick": "/gdr/sense",
 		"keydown": function keydown(event) {
             let shortcut = pkg.getShortcut(event);
             if (shortcut) {
@@ -789,6 +795,12 @@ function gdr() {
         if (!mod && key.length == 1) return;
         return mod + key;
     },
+	"getControl": function getControl(node) {
+		while(node) {
+			if (node.$peer) return node.$peer;
+			node = node.parentNode;
+		}
+	},
 	"sense": function sense(event) {
 		let ctl = pkg.getControl(event.target);
         if (ctl) {
@@ -797,12 +809,6 @@ function gdr() {
             ctl.sense(event);
             if (!event.subject) event.preventDefault();    
         }
-	},
-	"getControl": function getControl(node) {
-		while(node) {
-			if (node.$peer) return node.$peer;
-			node = node.parentNode;
-		}
 	}
 }
 return pkg;

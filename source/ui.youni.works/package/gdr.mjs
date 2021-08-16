@@ -1,5 +1,18 @@
 const pkg = {
     $public: {
+        type$input: "sense",
+        type$cut: "sense",
+        type$copy: "sense",
+        type$paste: "sense",
+
+        type$focusin: "sense",
+        type$focusout: "sense",
+        type$focus: "sense",
+        type$blur: "sense",
+
+        type$click: "sense",
+        type$dblclick: "sense",
+
         keydown(event) {
             let shortcut = pkg.getShortcut(event);
             if (shortcut) {
@@ -66,6 +79,12 @@ const pkg = {
         if (!mod && key.length == 1) return;
         return mod + key;
     },    
+	getControl(node) {
+		while(node) {
+			if (node.$peer) return node.$peer;
+			node = node.parentNode;
+		}
+	},
     sense(event) {
 		let ctl = pkg.getControl(event.target);
         if (ctl) {
@@ -74,12 +93,34 @@ const pkg = {
             ctl.sense(event);
             if (!event.subject) event.preventDefault();    
         }
-	},
-	getControl(node) {
-		while(node) {
-			if (node.$peer) return node.$peer;
-			node = node.parentNode;
-		}
 	}
 }
 export default pkg;
+
+// function SELECTION_EVENT(event) {
+//     let ctl = getControl(event.target);
+//     event.range = ctl && ctl.owner.selectionRange;
+//     ctl = ctl && event.range.commonAncestorContainer;
+//     ctl && ctl.owner.sense(ctl, event);
+// }
+// select: TARGET_EVENT, //may not exist
+// change: TARGET_EVENT, //may not exist
+
+// documentEvents: {
+// 	selectionstart: SELECTION_EVENT,
+// 	selectionchange: SELECTION_EVENT
+// }
+
+    // dragstart: TARGET_EVENT,
+    // dragover: TARGET_EVENT,
+    // drop: TARGET_EVENT,
+    // contextmenu: function(event) {
+    //     if (event.ctrlKey) {
+    //         event.preventDefault();
+    //         TARGET_EVENT(event);
+    //     }
+    // },
+    // resize: function(event) {
+    // 	let owner = event.target.document.body.$peer.owner;
+    // 	owner.send(owner, event);
+    // },

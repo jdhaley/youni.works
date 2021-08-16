@@ -127,11 +127,7 @@ const pkg = {
 			this.document.head.appendChild(ele);
 			this.document.$styles = ele.sheet;
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
-			let events = conf.events();
-			pkg.addEvents(this.$window, events.windowEvents);
-			pkg.addEvents(this.document, events.documentEvents);
-
-			pkg.addEvents(this.$window, conf.gdr);
+			pkg.addEvents(this.$window, conf.events);
 		},
 		viewOf(node) {
 			while(node) {
