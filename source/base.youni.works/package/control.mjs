@@ -70,7 +70,7 @@ export default {
 	},
 	Publisher: {
 		//io: socket.io.Server
-        publish(/* (subject | event) [, data]*/) {
+        publish(/* (subject [, data] | event) */) {
             if (!this.io) {
                 console.error("No socket");
             }

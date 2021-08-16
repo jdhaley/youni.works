@@ -30,16 +30,6 @@ export default {
 			this.document.head.append(node);
 			return node;
 		},
-		// sense(on, event) {
-		// 	event = this.prepareSignal(event);
-		// 	this.super(sense, on, event);
-		// 	if (event.preventDefault && !event.subject) event.preventDefault();
-		// },
-		// prepareSignal(signal) {
-		// 	signal.stopPropagation && signal.stopPropagation();
-		// 	if (!signal.subject) signal.subject = signal.type;
-		// 	return signal;
-		// }
 	},
 	Element: {
 		type$: "Control",
@@ -76,10 +66,6 @@ export default {
 		get$of() {
 			return this.peer.parentNode.$peer;
 		},
-		/**
-		 * Dom Nodes are rooted tree nodes, i.e. more-or-less equivalent to an undirected graph.
-		 * "of" is a generic whole-part relationship and for Dom Nodes the default is its parentNode.
-		 */
 		once$from() {
 			let from = this.peer.parentNode.$peer;
 			return this[Symbol.for("owner")].create({
