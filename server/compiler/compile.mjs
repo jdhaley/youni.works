@@ -23,7 +23,7 @@ async function load(sourceDir, name) {
     let module = index && index.module;
     if (!module) throw new Error(`Component "${name}" is missing module.mjs`);
     if (module.name && module.name != name) {
-        log("Warning: module name doesn't match folder name. Using folder name");
+        console.log("Warning: module name doesn't match folder name. Using folder name");
     }
     module.name = name;
     module.package = Object.create(null);
