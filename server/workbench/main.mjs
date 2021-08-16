@@ -4,6 +4,14 @@ import https	from "https";
 import express 	from "express";
 
 export default function main(conf) {
+	let module = conf.compiler;
+	let compiler = module.create({
+		type$: "/compiler/ModuleCompiler",
+		context: "../..",
+		fs: fs
+	});
+	compiler.load("source");
+
 	const credentials = {
 		key: fs.readFileSync(conf.key),
 		cert: fs.readFileSync(conf.cert)
