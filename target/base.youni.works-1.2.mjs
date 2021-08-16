@@ -208,20 +208,6 @@ function graph() {
 	"type$": "/control",
 	"Graph": {
 		"type$": "/graph/Component",
-		"send": function send(to, signal) {
-			if (typeof signal == "string") signal = {
-				subject: signal
-			}
-		//	to.receive(signal);
-			to.send(signal);
-		},
-		"sense": function sense(from, signal) {
-			if (typeof signal == "string") signal = {
-				subject: signal
-			}
-		//	from.receive(signal);
-			from.sense(signal);
-		},
 		"notify": function notify(on, signal) {
 			if (typeof signal == "string") signal = {
 				subject: signal

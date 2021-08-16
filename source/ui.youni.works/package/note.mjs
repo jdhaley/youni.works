@@ -8,7 +8,7 @@ export default {
 				let cmd = this.shortcuts[event.shortcut];
 				if (cmd) {
 					event.subject = cmd;
-					this.owner.sense(event.target.$peer, event);
+					event.target.$peer.sense(event);
 				}
 			}
 		}
@@ -153,7 +153,7 @@ export default {
 				if (cmd) {
 					console.log(cmd);
 					event.subject = cmd;
-					this.owner.sense(event.target.$peer, event);
+					event.target.$peer.sense(event);
 				}
 			},
 			copy(event) {

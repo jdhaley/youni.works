@@ -49,16 +49,6 @@ function dom() {
 			}
 			this.document.head.append(node);
 			return node;
-		},
-		"sense": function sense(on, event) {
-			event = this.prepareSignal(event);
-			this.super(sense, on, event);
-			if (event.preventDefault && !event.subject) event.preventDefault();
-		},
-		"prepareSignal": function prepareSignal(signal) {
-			signal.stopPropagation && signal.stopPropagation();
-			if (!signal.subject) signal.subject = signal.type;
-			return signal;
 		}
 	},
 	"Element": {

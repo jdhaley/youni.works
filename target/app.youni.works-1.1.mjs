@@ -22,7 +22,12 @@ const conf = {
 	let NO_CLICK;
 	function TARGET_EVENT(event) {
 		let ctl = getControl(event.target);
-		ctl && ctl.owner.sense(ctl, event);
+        if (ctl) {
+            event.stopPropagation();
+            if (!event.subject) event.subject = event.type;
+            ctl.sense(event);
+            if (!event.subject) event.preventDefault();    
+        }
 	}
 	function SELECTION_EVENT(event) {
 		let ctl = getControl(event.target);
@@ -43,7 +48,7 @@ const conf = {
 			copy: TARGET_EVENT,
 			paste: TARGET_EVENT,
 	
-			keydown: TARGET_EVENT,
+//			keydown: TARGET_EVENT,
 			dblclick: TARGET_EVENT,
 			click: TARGET_EVENT,		//call it "push"
 			// click: function(event) {

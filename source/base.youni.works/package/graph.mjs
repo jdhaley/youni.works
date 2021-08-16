@@ -2,20 +2,22 @@ export default {
 	type$: "/control",
 	Graph: {
 		type$: "Component",
-		send(to, signal) {
-			if (typeof signal == "string") signal = {
-				subject: signal
-			}
-		//	to.receive(signal);
-			to.send(signal);
-		},
-		sense(from, signal) {
-			if (typeof signal == "string") signal = {
-				subject: signal
-			}
-		//	from.receive(signal);
-			from.sense(signal);
-		},
+		// send(to, signal) {
+		// 	console.log("send");
+		// 	if (typeof signal == "string") signal = {
+		// 		subject: signal
+		// 	}
+		// //	to.receive(signal);
+		// 	to.send(signal);
+		// },
+		// sense(from, signal) {
+		// 	console.log("sense");
+		// 	if (typeof signal == "string") signal = {
+		// 		subject: signal
+		// 	}
+		// //	from.receive(signal);
+		// 	from.sense(signal);
+		// },
 		notify(on, signal) {
 			if (typeof signal == "string") signal = {
 				subject: signal

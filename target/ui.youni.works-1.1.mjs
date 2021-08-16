@@ -74,7 +74,7 @@ function app() {
 		"extend$actions": {
 			"view": function view(msg) {
                 this.view.view(this.data);
-                this.owner.send(this.view, "view");
+                this.view.send("view");
             },
 			"initializeApp": function initializeApp(msg) {
                 if (msg.response) {
@@ -791,7 +791,12 @@ function gdr() {
     },
 	"sense": function sense(event) {
 		let ctl = pkg.getControl(event.target);
-		ctl && ctl.sense(event);
+        if (ctl) {
+            event.stopPropagation();
+            if (!event.subject) event.subject = event.type;
+            ctl.sense(event);
+            if (!event.subject) event.preventDefault();    
+        }
 	},
 	"getControl": function getControl(node) {
 		while(node) {
@@ -959,7 +964,7 @@ function note() {
 				let cmd = this.shortcuts[event.shortcut];
 				if (cmd) {
 					event.subject = cmd;
-					this.owner.sense(event.target.$peer, event);
+					event.target.$peer.sense(event);
 				}
 			}
 		}
@@ -1104,7 +1109,7 @@ function note() {
 				if (cmd) {
 					console.log(cmd);
 					event.subject = cmd;
-					this.owner.sense(event.target.$peer, event);
+					event.target.$peer.sense(event);
 				}
 			},
 			"copy": function copy(event) {

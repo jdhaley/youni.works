@@ -68,7 +68,12 @@ const pkg = {
     },    
     sense(event) {
 		let ctl = pkg.getControl(event.target);
-		ctl && ctl.sense(event);
+        if (ctl) {
+            event.stopPropagation();
+            if (!event.subject) event.subject = event.type;
+            ctl.sense(event);
+            if (!event.subject) event.preventDefault();    
+        }
 	},
 	getControl(node) {
 		while(node) {

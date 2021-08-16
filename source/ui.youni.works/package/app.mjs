@@ -36,7 +36,7 @@ export default {
         extend$actions: {
             view(msg) {
                 this.view.view(this.data);
-                this.owner.send(this.view, "view");
+                this.view.send("view");
             },
             initializeApp(msg) {
                 if (msg.response) {
