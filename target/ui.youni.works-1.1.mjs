@@ -712,16 +712,12 @@ return pkg;
 function gdr() {
 	const pkg = {
 	"$public": {
-		"type$input": "/gdr/sense",
-		"type$cut": "/gdr/sense",
-		"type$copy": "/gdr/sense",
-		"type$paste": "/gdr/sense",
-		"type$focusin": "/gdr/sense",
-		"type$focusout": "/gdr/sense",
-		"type$focus": "/gdr/sense",
-		"type$blur": "/gdr/sense",
-		"type$click": "/gdr/sense",
-		"type$dblclick": "/gdr/sense",
+		"click": function click(event) {
+            pkg.sense(event);
+        },
+		"dblclick": function dblclick(event) {
+            pkg.sense(event);
+        },
 		"keydown": function keydown(event) {
             let shortcut = pkg.getShortcut(event);
             if (shortcut) {
@@ -2078,6 +2074,20 @@ function workbench() {
 	"type$tree": "/tree",
 	"type$tabs": "/tabs",
 	"type$Shape": "/shape/Shape",
+	"ArticleView": {
+		"type$": "/workbench/Display"
+	},
+	"ArticleModel": {
+		"id": "",
+		"title": "",
+		"type": ""
+	},
+	"Dyna": {
+		"panels": {
+			"sidebar": "sidebar/name",
+			"": ""
+		}
+	},
 	"Workbench": {
 		"type$": "/workbench/Section",
 		"direction": "horizontal",

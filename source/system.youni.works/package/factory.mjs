@@ -162,7 +162,8 @@ export default {
             });
 		},
         define(object, name, value, facet) {
-            if (!this.declare(object, name, value, facet).define(object)) {
+            let decl = this.declare(object, name, value, facet);
+            if (!decl.define(object)) {
                 console.warn("Unable to define declaration: ", decl);
                 return false;
             }

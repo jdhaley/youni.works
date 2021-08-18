@@ -1,18 +1,23 @@
 const pkg = {
     $public: {
-        type$input: "sense",
-        type$cut: "sense",
-        type$copy: "sense",
-        type$paste: "sense",
+        //type$input: "sense",
+        // type$cut: "sense",
+        // type$copy: "sense",
+        // type$paste: "sense",
 
-        type$focusin: "sense",
-        type$focusout: "sense",
-        type$focus: "sense",
-        type$blur: "sense",
+        // type$focusin: "sense",
+        // type$focusout: "sense",
+        // type$focus: "sense",
+        // type$blur: "sense",
 
-        type$click: "sense",
-        type$dblclick: "sense",
-
+        // type$click: "sense",
+        // type$dblclick: "sense",
+        click(event) {
+            pkg.sense(event);
+        },
+        dblclick(event) {
+            pkg.sense(event);
+        },
         keydown(event) {
             let shortcut = pkg.getShortcut(event);
             if (shortcut) {

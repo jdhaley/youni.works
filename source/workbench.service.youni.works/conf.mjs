@@ -8,7 +8,6 @@ export default {
             "/module": "../../target",
             "/res": "static/res",
             "/file": "static/fs",
-            "/sources": "static/sources.txt",
             "/test1": {
                 type$: "/service/service/Test",
                 value: "one"

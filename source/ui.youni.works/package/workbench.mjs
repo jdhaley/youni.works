@@ -3,6 +3,28 @@ export default {
     type$tree: "/tree",
     type$tabs: "/tabs",
     type$Shape: "/shape/Shape",
+    ArticleView: {
+        type$: "Display",
+        
+    },
+    ArticleModel: {
+        id: "",
+        title: "",
+        type: "",
+
+        // group
+        // member
+        // revision: "",
+        // priorRevision: "",
+        // status: "",
+        // content: ""          
+    },
+    Dyna: {
+        panels: {
+            "sidebar": "sidebar/name",
+            "": ""
+        }
+    },
 	Workbench: {
         type$: "Section",
 		direction: "horizontal",
