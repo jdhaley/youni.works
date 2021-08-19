@@ -1,4 +1,9 @@
 const pkg = {
+    util: {
+        isUpperCase(str) {
+			return str == str.toUpperCase() && str != str.toLowerCase();
+		}
+    },
     Iterable: {
 		symbol$iterator: function *() {
 		}

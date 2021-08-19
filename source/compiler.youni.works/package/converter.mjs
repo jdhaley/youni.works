@@ -1,7 +1,7 @@
 export default {
     type$: "/system/core",
     Converter: {
-        type$util: "/base/util",
+        type$isUpperCase: "util/isUpperCase",
         facetOf(decl) {
             if (typeof decl == "symbol") return "";
             decl = "" + decl;
@@ -35,7 +35,7 @@ export default {
                     member.expr = this.convert(member.expr);
                 }
             }
-            if (this.util.Text.isUpperCase(member.name.charAt(0)) && !member.facet) {
+            if (this.isUpperCase(member.name.charAt(0)) && !member.facet) {
                 member.facet = "interface";
             }
             if (member.facet == "type") {

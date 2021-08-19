@@ -225,6 +225,11 @@ return pkg;
 
 function core() {
 	const pkg = {
+	"util": {
+		"isUpperCase": function isUpperCase(str) {
+			return str == str.toUpperCase() && str != str.toLowerCase();
+		}
+	},
 	"Iterable": {
 		"symbol$iterator": function *() {
 		}

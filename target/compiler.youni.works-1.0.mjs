@@ -1,13 +1,11 @@
 import system from "./system.youni.works-2.1.mjs";
-import base from "./base.youni.works-1.2.mjs";
 const module = {
 	"name": "compiler.youni.works",
 	"version": "1.0",
 	"moduleType": "library"
 };
 module.use = {
-	system: system,
-	base: base
+	system: system
 }
 module.package = {
 	compiler: compiler(),
@@ -177,7 +175,7 @@ function converter() {
 	const pkg = {
 	"type$": "/system/core",
 	"Converter": {
-		"type$util": "/base/util",
+		"type$isUpperCase": "/converter/util/isUpperCase",
 		"facetOf": function facetOf(decl) {
             if (typeof decl == "symbol") return "";
             decl = "" + decl;
@@ -211,7 +209,7 @@ function converter() {
                     member.expr = this.convert(member.expr);
                 }
             }
-            if (this.util.Text.isUpperCase(member.name.charAt(0)) && !member.facet) {
+            if (this.isUpperCase(member.name.charAt(0)) && !member.facet) {
                 member.facet = "interface";
             }
             if (member.facet == "type") {
