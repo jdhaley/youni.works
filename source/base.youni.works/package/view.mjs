@@ -57,7 +57,7 @@ export default {
 			this.forEach(model, this.createContent);
 		},
 		modelFor(contentView) {
-			return this.model[contentView.key];
+			return this.model && this.model[contentView.key];
 		},
 		typeFor(value, key) {
 			return this.contentType;
