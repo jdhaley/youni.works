@@ -2,19 +2,18 @@ export default {
     App: {
         type$: "/ui/display/App",
         type$frame: "/ui/display/Frame",
-        start(conf) {
+        start() {
             console.log("Starting application");
-            this.let("conf", conf, "extend");
-            this.let("frame", this.create(conf.frame));
+            let conf = this.conf;
             this.define(this.frame, "app", this);
             this.frame.start(this.conf);
 
-            if (conf.typeSource) {
-                this.open(conf.typeSource, "initializeContext");                 
-            } else {
-                this.frame.send(this, "initializeContext");
-            }
-            this.open(conf.dataSource, "initializeData");
+            // if (conf.typeSource) {
+            //     this.open(conf.typeSource, "initializeContext");                 
+            // } else {
+            //     this.frame.send(this, "initializeContext");
+            // }
+            // this.open(conf.dataSource, "initializeData");
         },
         extend$actions: {
             view(msg) {

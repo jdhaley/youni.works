@@ -17,7 +17,15 @@ module.package = {
 	app: app()
 }
 const conf = {
-	"appType": "/app/App",
+	"type$": "/app/App",
+	"title": "Workbench",
+	"view": {
+		"main": {
+			"type": "/ui/workbench/Workbench",
+			"conf": {
+			}
+		}
+	},
 	"frame": {
 		"type$": "/ui/display/Frame",
 		"editors": {
@@ -29,24 +37,22 @@ const conf = {
 			"type$color": "/ui/editors/Color"
 		}
 	},
-	"dataConverter": "/compiler/converter/Converter",
-	"type$events": "/ui/gdr",
-	"title": "Workbench",
-	"icon": "/res/icon.png",
-	"styles": "/res/styles.css",
-	"components": {
-		"Object": "/ui/workbench/Workbench"
-	},
-	"objectType": "Module",
-	"dataset": "source",
-	"dataSource": "/sources",
-	"typeSource": "/file/workbench/types.json"
+	"conf": {
+		"type$events": "/ui/gdr",
+		"icon": "/res/icon.png",
+		"styles": "/res/styles.css",
+		"dataConverter": "/compiler/converter/Converter",
+		"objectType": "Module",
+		"dataset": "source",
+		"dataSource": "/sources",
+		"typeSource": "/file/workbench/types.json"
+	}
 };
 const main = function main(module, conf) {
 	module = module.use.system.load(module);
-	conf.window = window;
-	let app = module.create(conf.appType);
-	app.start(conf);
+	let app = module.create(conf);
+	app.conf.window = window;
+	app.start();
 	return module;
 };
 export default main(module, conf);
@@ -55,19 +61,18 @@ function app() {
 	"App": {
 		"type$": "/ui/display/App",
 		"type$frame": "/ui/display/Frame",
-		"start": function start(conf) {
+		"start": function start() {
             console.log("Starting application");
-            this.let("conf", conf, "extend");
-            this.let("frame", this.create(conf.frame));
+            let conf = this.conf;
             this.define(this.frame, "app", this);
             this.frame.start(this.conf);
 
-            if (conf.typeSource) {
-                this.open(conf.typeSource, "initializeContext");                 
-            } else {
-                this.frame.send(this, "initializeContext");
-            }
-            this.open(conf.dataSource, "initializeData");
+            // if (conf.typeSource) {
+            //     this.open(conf.typeSource, "initializeContext");                 
+            // } else {
+            //     this.frame.send(this, "initializeContext");
+            // }
+            // this.open(conf.dataSource, "initializeData");
         },
 		"extend$actions": {
 			"view": function view(msg) {

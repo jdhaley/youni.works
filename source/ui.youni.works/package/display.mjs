@@ -141,7 +141,11 @@ const pkg = {
                 rel: "stylesheet",
                 href: conf.styles
             });
-
+			let main = this.app.view.main;
+			main = this.create(main.type, main.conf);
+			main.model = {};
+			this.append(main);
+			this.send("view");
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
 		},
 		viewOf(node) {
