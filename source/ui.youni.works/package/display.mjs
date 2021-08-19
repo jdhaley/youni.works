@@ -76,6 +76,12 @@ const pkg = {
 	},
     App: {
         type$: ["Component", "Receiver", "/base/origin/Origin"],
+		start() {
+            console.log("Starting application");
+            let conf = this.conf;
+            this.define(this.frame, "app", this);
+            this.frame.start(this.conf);
+        },
 	},
 	Frame: {
 		type$: ["Display", "Document"],
@@ -121,6 +127,14 @@ const pkg = {
 			let index = this.document.$styles.insertRule(out);
 			return this.document.$styles.cssRules[index];
 		},
+		createView(name) {
+			let view = this.app.view[name];
+			view = this.create(view.type, view.conf);
+			view.model = {};
+			this.append(view);
+			this.send("view");
+			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
+		},
 		start(conf) {
 			this.let("$window", conf.window);
 			this.document.body.$peer = this;
@@ -141,12 +155,7 @@ const pkg = {
                 rel: "stylesheet",
                 href: conf.styles
             });
-			let main = this.app.view.main;
-			main = this.create(main.type, main.conf);
-			main.model = {};
-			this.append(main);
-			this.send("view");
-			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
+			this.createView(this.main);
 		},
 		viewOf(node) {
 			while(node) {

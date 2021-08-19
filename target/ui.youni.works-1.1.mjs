@@ -26,8 +26,7 @@ module.package = {
 	record: record(),
 	shape: shape(),
 	tabs: tabs(),
-	tree: tree(),
-	workbench: workbench()
+	tree: tree()
 }
 const conf = undefined;
 const main = function main_loadModule(module) {
@@ -418,7 +417,13 @@ function display() {
 		}
 	},
 	"App": {
-		"type$": ["/display/Component", "/display/Receiver", "/base/origin/Origin"]
+		"type$": ["/display/Component", "/display/Receiver", "/base/origin/Origin"],
+		"start": function start() {
+            console.log("Starting application");
+            let conf = this.conf;
+            this.define(this.frame, "app", this);
+            this.frame.start(this.conf);
+        }
 	},
 	"Frame": {
 		"type$": ["/display/Display", "/display/Document"],
@@ -463,6 +468,14 @@ function display() {
 			let index = this.document.$styles.insertRule(out);
 			return this.document.$styles.cssRules[index];
 		},
+		"createView": function createView(name) {
+			let view = this.app.view[name];
+			view = this.create(view.type, view.conf);
+			view.model = {};
+			this.append(view);
+			this.send("view");
+			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
+		},
 		"start": function start(conf) {
 			this.let("$window", conf.window);
 			this.document.body.$peer = this;
@@ -483,12 +496,7 @@ function display() {
                 rel: "stylesheet",
                 href: conf.styles
             });
-			let main = this.app.view.main;
-			main = this.create(main.type, main.conf);
-			main.model = {};
-			this.append(main);
-			this.send("view");
-			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
+			this.createView(this.main);
 		},
 		"viewOf": function viewOf(node) {
 			while(node) {
@@ -1991,130 +1999,6 @@ function tree() {
                 this.parts.body.style.removeProperty("display");
                 event.subject = "";
 			}
-		}
-	}
-}
-return pkg;
-}
-
-function workbench() {
-	const pkg = {
-	"type$": "/panel",
-	"type$tree": "/tree",
-	"type$tabs": "/tabs",
-	"type$Shape": "/shape/Shape",
-	"ArticleView": {
-		"type$": "/workbench/Display"
-	},
-	"ArticleModel": {
-		"id": "",
-		"title": "",
-		"type": ""
-	},
-	"Dyna": {
-		"panels": {
-			"sidebar": "sidebar/name",
-			"": ""
-		}
-	},
-	"Workbench": {
-		"type$": "/workbench/Section",
-		"direction": "horizontal",
-		"members": {
-			"type$header": "/workbench/Display",
-			"type$body": "/workbench/WorkbenchBody",
-			"type$footer": "/workbench/WorkbenchFooter"
-		}
-	},
-	"WorkbenchFooter": {
-		"type$": "/workbench/Display"
-	},
-	"WorkbenchBody": {
-		"type$": "/workbench/Structure",
-		"direction": "horizontal",
-		"members": {
-			"type$context": "/workbench/Context",
-			"type$content": "/workbench/Content"
-		}
-	},
-	"Content": {
-		"type$": "/workbench/Structure",
-		"members": {
-			"type$sidebar": "/workbench/Sidebar",
-			"type$tabs": "/workbench/tabs/Tabs"
-		}
-	},
-	"Context": {
-		"type$": "/workbench/Display",
-		"add": function add(icon) {
-            let button = this.owner.create("/ui/pen/Image");
-            this.append(button);
-            return button;
-        },
-		"display": function display() {
-            this.super(display);
-            this.add("/res/icons/folder.svg");
-        }
-	},
-	"Sidebar": {
-		"type$": ["/workbench/Structure", "/workbench/Shape"],
-		"members": {
-			"tree": {
-				"type$": "/workbench/Collection",
-				"type$contentType": "/workbench/tree/Item"
-			},
-			"value": {
-				"type$": ["/workbench/Display", "/workbench/Shape"],
-				"nodeName": "pre",
-				"zones": {
-					"border": {
-						"top": 8
-					},
-					"cursor": {
-						"TC": "ns-resize"
-					},
-					"subject": {
-						"TC": "size"
-					}
-				},
-				"extend$actions": {
-					"showValue": function showValue(event) {
-                        this.peer.innerText = event.value;
-                    },
-					"size": function size(event) {
-                        if (event.track == this) {
-                            let r = this.bounds;
-                            this.bounds = {
-                                height: r.bottom - event.clientY
-                            }
-                        }
-                    }
-				}
-			}
-		},
-		"zones": {
-			"border": {
-				"right": 4
-			},
-			"cursor": {
-				"CR": "ew-resize"
-			},
-			"subject": {
-				"CR": "size"
-			}
-		},
-		"extend$actions": {
-			"showValue": function showValue(event) {
-                this.owner.send(this.parts.value, event);
-            },
-			"size": function size(event) {
-                if (event.track == this) {
-                    let r = this.bounds;
-                    this.bounds = {
-                        width: event.clientX - r.left
-                    }
-                }
-            }
 		}
 	}
 }

@@ -1,8 +1,8 @@
 export default {
-	type$: "/panel",
-    type$tree: "/tree",
-    type$tabs: "/tabs",
-    type$Shape: "/shape/Shape",
+	type$: "/ui/panel",
+    type$tree: "/ui/tree",
+    type$tabs: "/ui/tabs",
+    type$Shape: "/ui/shape/Shape",
     ArticleView: {
         type$: "Display",
         
@@ -25,35 +25,39 @@ export default {
             "": ""
         }
     },
-	Workbench: {
+    App: {
+        type$: "App"
+    },
+    Workbench: {
         type$: "Section",
+        nodeName: "main",
 		direction: "horizontal",
 		members: {
             type$header: "Display",
-			type$body: "WorkbenchBody",
-			type$footer: "WorkbenchFooter"
+			type$body: "workbenchBody",
+			type$footer: "workbenchFooter"
 		}
     },
-    WorkbenchFooter: {
+    workbenchFooter: {
         type$: "Display"
     },
-	WorkbenchBody: {
+	workbenchBody: {
         type$: "Structure",
 		direction: "horizontal",
 		members: {
-			type$context: "Context",
-            type$content: "Content"
+			type$context: "context",
+            type$content: "content"
 		}
     },
-    Content: {
+    content: {
         type$: "Structure",
         members: {
-            type$sidebar: "Sidebar",
+            type$sidebar: "sidebar",
             type$tabs: "tabs/Tabs",
            // type$tables: "Display"
         }
     },
-    Context: {
+    context: {
         type$: "Display",
         add(icon) {
             let button = this.owner.create("/ui/pen/Image");
@@ -65,7 +69,7 @@ export default {
             this.add("/res/icons/folder.svg");
         }
     },
-    Sidebar: {
+    sidebar: {
         type$: ["Structure", "Shape"],
         members: {
             tree: {

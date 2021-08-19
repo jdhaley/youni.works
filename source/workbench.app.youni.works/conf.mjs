@@ -1,17 +1,18 @@
 import editors from "./conf/editors.mjs";
 export default {
-    type$: "/app/App",
+    type$: "/workbench/App",
     title: "Workbench",
     view: {
-        main: {
-            type: "/ui/workbench/Workbench",
+        workbench: {
+            type: "/workbench/Workbench",
             conf: {
             }
         }
     },
     frame: {
         type$: "/ui/display/Frame",
-        editors: editors
+        editors: editors,
+        main: "workbench"
     },
     conf: {
         //window: null,
