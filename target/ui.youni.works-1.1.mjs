@@ -493,9 +493,12 @@ function display() {
 			part.peer.classList.add(key);
 		}
 	},
+	"App": {
+		"type$": ["/display/Component", "/display/Receiver", "/base/origin/Origin"]
+	},
 	"Frame": {
 		"type$": ["/display/Display", "/display/Document"],
-		"type$app": "/app/App",
+		"type$app": "/display/App",
 		"$window": null,
 		"get$owner": function get$owner() {
 			return this;
@@ -514,9 +517,8 @@ function display() {
 			return this.document.createRange();
 		},
 		"create": function create(controlType, conf) {
-			let owner = this[Symbol.for("owner")];
-			let control = owner.create(controlType);
-			owner.define(control, "owner", this, "const");
+			let control = this.app.create(controlType);
+			this.app.define(control, "owner", this, "const");
 			control.start(conf);
 			return control;
 		},
@@ -549,6 +551,15 @@ function display() {
 				let listener = conf.events[name];
 				this.$window.addEventListener(name, listener);
 			}
+			if (conf.icon) this.link({
+                rel: "icon",
+                href: conf.icon
+            });
+            if (conf.styles) this.link({
+                rel: "stylesheet",
+                href: conf.styles
+            });
+
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
 		},
 		"viewOf": function viewOf(node) {
@@ -1437,7 +1448,7 @@ function pen() {
 			this.set("d", path + "z");
 		},
 		"add": function add(x, y, type) {
-			let point = this.owner.create("/pen/Point");
+			let point = this.owner.create("/ui/pen/Point");
 			this.image.append(point);
 			point.vector = this;
 			if (!this.points) {
@@ -1470,7 +1481,7 @@ function pen() {
 		"display": function display() {
 			let grid = this[Symbol.for("owner")].create(this.grid);
 			this.peer.innerHTML = grid.markup;
-			this.vector = this.owner.create("/pen/Vector");
+			this.vector = this.owner.create("/ui/pen/Vector");
 			this.append(this.vector);
 			this.set("tabindex", 1);
 			this.peer.focus();
@@ -1511,7 +1522,7 @@ function pen() {
 		"var$shape": null,
 		"display": function display() {
 			this.super(display);
-			this.shape = this.owner.create("/pen/Image");
+			this.shape = this.owner.create("/ui/pen/Image");
 			this.append(this.shape);
 		}
 	}
@@ -1842,12 +1853,12 @@ function tabs() {
 		},
 		"add": function add(title, body) {
             if (!body) {
-                body = this.owner.create("/display/Display");
+                body = this.owner.create("/ui/display/Display");
                 body.peer.textContent = title;
             }
             body.peer.$display = body.style.display;
             body.style.display = "none";
-            let tab = this.owner.create("/tabs/Tab");
+            let tab = this.owner.create("/ui/tabs/Tab");
             tab.peer.innerText = title;
             tab.body = body;
             this.parts.header.append(tab);
@@ -1866,10 +1877,10 @@ function tabs() {
 		"display": function display() {
             this.super(display);
             let tree = this.add("Tree");
-            this.add("Draw", this.owner.create("/pen/Canvas"));
-            this.add("Note", this.owner.create("/note/Note"));
+            this.add("Draw", this.owner.create("/ui/pen/Canvas"));
+            this.add("Note", this.owner.create("/ui/note/Note"));
             let grid = this.owner.create({
-                type$: "/display/Display",
+                type$: "/ui/display/Display",
                 nodeName: "iframe",
                 display() {
                     this.peer.src = "https://localhost/app/test/grid.html"
@@ -2108,7 +2119,7 @@ function workbench() {
 	"Context": {
 		"type$": "/workbench/Display",
 		"add": function add(icon) {
-            let button = this.owner.create("/pen/Image");
+            let button = this.owner.create("/ui/pen/Image");
             this.append(button);
             return button;
         },

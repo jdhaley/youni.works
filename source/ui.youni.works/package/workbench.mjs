@@ -56,7 +56,7 @@ export default {
     Context: {
         type$: "Display",
         add(icon) {
-            let button = this.owner.create("/pen/Image");
+            let button = this.owner.create("/ui/pen/Image");
             this.append(button);
             return button;
         },

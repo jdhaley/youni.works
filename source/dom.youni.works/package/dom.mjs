@@ -1,7 +1,6 @@
 export default {
 	type$: "/base/control",
 	Document: {
-		type$: "Component",
 		document: null,
 		get$peer() {
 			return this.document.body;

@@ -1,38 +1,41 @@
 import system from "./system.youni.works-2.1.mjs";
+import base from "./base.youni.works-1.2.mjs";
 import ui from "./ui.youni.works-1.1.mjs";
 import compiler from "./compiler.youni.works-1.0.mjs";
 const module = {
 	"name": "workbench.app.youni.works",
 	"version": "1.1",
-	"moduleType": "ui"
+	"moduleType": "app"
 };
 module.use = {
 	system: system,
+	base: base,
 	ui: ui,
 	compiler: compiler
 }
 module.package = {
+	app: app()
 }
 const conf = {
-	"dataConverter": "/compiler/converter/Converter",
-	"ownerType": "/display/Frame",
 	"appType": "/app/App",
-	"window": null,
-	"editors": {
-		"type$string": "/ui/editors/String",
-		"type$number": "/ui/editors/Number",
-		"type$date": "/ui/editors/Date",
-		"type$boolean": "/ui/editors/Boolean",
-		"type$link": "/ui/editors/Link",
-		"type$color": "/ui/editors/Color"
+	"frame": {
+		"type$": "/ui/display/Frame",
+		"editors": {
+			"type$string": "/ui/editors/String",
+			"type$number": "/ui/editors/Number",
+			"type$date": "/ui/editors/Date",
+			"type$boolean": "/ui/editors/Boolean",
+			"type$link": "/ui/editors/Link",
+			"type$color": "/ui/editors/Color"
+		}
 	},
-	"type$events": "/gdr",
+	"dataConverter": "/compiler/converter/Converter",
+	"type$events": "/ui/gdr",
 	"title": "Workbench",
 	"icon": "/res/icon.png",
 	"styles": "/res/styles.css",
 	"components": {
-		"Frame": "/display/Frame",
-		"Object": "/workbench/Workbench"
+		"Object": "/ui/workbench/Workbench"
 	},
 	"objectType": "Module",
 	"dataset": "source",
@@ -42,8 +45,60 @@ const conf = {
 const main = function main(module, conf) {
 	module = module.use.system.load(module);
 	conf.window = window;
-	let app = module.create("/ui/app/App");
+	let app = module.create(conf.appType);
 	app.start(conf);
 	return module;
 };
 export default main(module, conf);
+function app() {
+	const pkg = {
+	"App": {
+		"type$": "/ui/display/App",
+		"type$frame": "/ui/display/Frame",
+		"start": function start(conf) {
+            console.log("Starting application");
+            this.let("conf", conf, "extend");
+            this.let("frame", this.create(conf.frame));
+            this.define(this.frame, "app", this);
+            this.frame.start(this.conf);
+
+            if (conf.typeSource) {
+                this.open(conf.typeSource, "initializeContext");                 
+            } else {
+                this.frame.send(this, "initializeContext");
+            }
+            this.open(conf.dataSource, "initializeData");
+        },
+		"extend$actions": {
+			"view": function view(msg) {
+                this.view.view(this.data);
+                this.view.send("view");
+            },
+			"initializeContext": function initializeContext(msg) {
+                if (msg.response) {
+                    let types = JSON.parse(msg.response);
+                    this.types = this.create(types);
+                } else {
+                    this.types = this.create();
+                }
+                //Create the view after the types have been initialized
+                this.view = this.frame.create(this.conf.components.Object);
+                this.view.start(this.types[this.conf.objectType]);
+                this.view.file =  this.conf.dataSource;
+                this.frame.append(this.view);
+                if (this.data) this.receive("view");
+            },
+			"initializeData": function initializeData(msg) {
+                let data = JSON.parse(msg.response);
+                let converter = this[Symbol.for("owner")].create(this.conf.dataConverter);
+                data = converter.convert(data);
+                console.debug(data);
+                this.data = data; // this.create(data);
+                if (this.view) this.receive("view");
+            }
+		}
+	}
+}
+return pkg;
+}
+

@@ -21,7 +21,6 @@ function dom() {
 	const pkg = {
 	"type$": "/base/control",
 	"Document": {
-		"type$": "/dom/Component",
 		"document": null,
 		"get$peer": function get$peer() {
 			return this.document.body;

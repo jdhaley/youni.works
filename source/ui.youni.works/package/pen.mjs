@@ -174,7 +174,7 @@ export default {
 			this.set("d", path + "z");
 		},
 		add(x, y, type) {
-			let point = this.owner.create("/pen/Point");
+			let point = this.owner.create("/ui/pen/Point");
 			this.image.append(point);
 			point.vector = this;
 			if (!this.points) {
@@ -207,7 +207,7 @@ export default {
 		display() {
 			let grid = this[Symbol.for("owner")].create(this.grid);
 			this.peer.innerHTML = grid.markup;
-			this.vector = this.owner.create("/pen/Vector");
+			this.vector = this.owner.create("/ui/pen/Vector");
 			this.append(this.vector);
 			this.set("tabindex", 1);
 			this.peer.focus();
@@ -254,7 +254,7 @@ export default {
 		var$shape: null,
 		display() {
 			this.super(display);
-			this.shape = this.owner.create("/pen/Image");
+			this.shape = this.owner.create("/ui/pen/Image");
 			this.append(this.shape);
 		},
 	}

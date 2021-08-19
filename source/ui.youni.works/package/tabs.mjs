@@ -13,12 +13,12 @@ export default {
         },
         add(title, body) {
             if (!body) {
-                body = this.owner.create("/display/Display");
+                body = this.owner.create("/ui/display/Display");
                 body.peer.textContent = title;
             }
             body.peer.$display = body.style.display;
             body.style.display = "none";
-            let tab = this.owner.create("/tabs/Tab");
+            let tab = this.owner.create("/ui/tabs/Tab");
             tab.peer.innerText = title;
             tab.body = body;
             this.parts.header.append(tab);
@@ -37,10 +37,10 @@ export default {
         display() {
             this.super(display);
             let tree = this.add("Tree");
-            this.add("Draw", this.owner.create("/pen/Canvas"));
-            this.add("Note", this.owner.create("/note/Note"));
+            this.add("Draw", this.owner.create("/ui/pen/Canvas"));
+            this.add("Note", this.owner.create("/ui/note/Note"));
             let grid = this.owner.create({
-                type$: "/display/Display",
+                type$: "/ui/display/Display",
                 nodeName: "iframe",
                 display() {
                     this.peer.src = "https://localhost/app/test/grid.html"

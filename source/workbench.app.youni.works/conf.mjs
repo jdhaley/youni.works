@@ -1,17 +1,17 @@
 import editors from "./conf/editors.mjs";
 export default {
-    dataConverter: "/compiler/converter/Converter",
-    ownerType: "/display/Frame",
     appType: "/app/App",
-    window: null,
-    editors: editors,
-    type$events: "/gdr",
+    frame: {
+        type$: "/ui/display/Frame",
+        editors: editors
+    },
+    dataConverter: "/compiler/converter/Converter",
+    type$events: "/ui/gdr",
     title: "Workbench",
     icon: "/res/icon.png",
     styles: "/res/styles.css",
     components: {
-        Frame: "/display/Frame",
-        Object: "/workbench/Workbench"
+        Object: "/ui/workbench/Workbench"
     },
 
     "objectType": "Module",

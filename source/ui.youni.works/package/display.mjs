@@ -74,9 +74,12 @@ const pkg = {
 			part.peer.classList.add(key);
 		}
 	},
+    App: {
+        type$: ["Component", "Receiver", "/base/origin/Origin"],
+	},
 	Frame: {
 		type$: ["Display", "Document"],
-		type$app: "/app/App",
+		type$app: "App",
 		$window: null,
 		//
 		get$owner() {
@@ -96,12 +99,11 @@ const pkg = {
 			return this.document.createRange();
 		},
 		create(controlType, conf) {
-			let owner = this[Symbol.for("owner")];
-			let control = owner.create(controlType);
-			owner.define(control, "owner", this, "const");
+			let control = this.app.create(controlType);
+			this.app.define(control, "owner", this, "const");
 			control.start(conf);
 			return control;
-		},     
+		},
 		toPixels(measure) {
 			let node = this.createNode("div");
 			node.style.height = measure;
@@ -131,6 +133,15 @@ const pkg = {
 				let listener = conf.events[name];
 				this.$window.addEventListener(name, listener);
 			}
+			if (conf.icon) this.link({
+                rel: "icon",
+                href: conf.icon
+            });
+            if (conf.styles) this.link({
+                rel: "stylesheet",
+                href: conf.styles
+            });
+
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
 		},
 		viewOf(node) {
