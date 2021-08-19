@@ -7,7 +7,8 @@ const pkg = {
 		fs: null,
 		context: "",
 		load(sourceDir) {
-			let context = this.fs.realpathSync(this.context)
+			let context = this.fs.realpathSync(this.context).replace(/\\/g, "/");
+			context = context.substring(context.indexOf(":") + 1);
 			console.log(this.context, context);
 			let loader = this.loader.extend({
 				context: context,
