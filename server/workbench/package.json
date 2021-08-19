@@ -1,7 +1,6 @@
 {
-	"name": "test",
-	"version": "1.0",
-	"description": "test service",
+	"name": "workbench",
+	"description": "workbench",
 	"author": "jdh",
 	"license": "UNLICENSED",
 	"main": "index.mjs",
