@@ -10,57 +10,17 @@ module.use = {
 	base: base
 }
 module.package = {
-	_devt: _devt(),
 	compiler: compiler(),
 	converter: converter(),
 	loader: loader(),
-	transcoder: transcoder()
+	transcoder: transcoder(),
+	_devt: _devt()
 }
 const conf = undefined;
 const main = function main_loadModule(module) {
 			return module.use.system.load(module);
 		};
 export default main(module, conf);
-function _devt() {
-	const pkg = {
-	"Member": {
-		"facet": "",
-		"name": "",
-		"type": "",
-		"expr": null,
-		"configurable": true,
-		"enumerable": true
-	},
-	"FileNode": {
-		"name": "",
-		"created": 0,
-		"modified": 0,
-		"size": 0,
-		"contentType": "",
-		"var$content": undefined,
-		"once$to": function once$to() {
-			if (typeof this.content == "object") {
-				return this[Symbol.for("owner")].create({
-					symbol$iterator: function*() {
-						for (let name in this.content) {
-							return this.content[name];
-						}
-					}
-				});
-			}
-		},
-		"loadContent": function loadContent() {
-		},
-		"extend$actions": {
-			"contentLoaded": function contentLoaded(event) {
-				this.content = event.content;
-			}
-		}
-	}
-}
-return pkg;
-}
-
 function compiler() {
 	const pkg = {
 	"type$": "/loader",
@@ -71,7 +31,8 @@ function compiler() {
 		"fs": null,
 		"context": "",
 		"load": function load(sourceDir) {
-			let context = this.fs.realpathSync(this.context)
+			let context = this.fs.realpathSync(this.context).replace(/\\/g, "/");
+			context = context.substring(context.indexOf(":") + 1);
 			console.log(this.context, context);
 			let loader = this.loader.extend({
 				context: context,
@@ -465,6 +426,46 @@ function transcoder() {
 			let out = "\n";
 			for (let i = 0; i < depth; i++) out += "\t";
 			return out;
+		}
+	}
+}
+return pkg;
+}
+
+function _devt() {
+	const pkg = {
+	"Member": {
+		"facet": "",
+		"name": "",
+		"type": "",
+		"expr": null,
+		"configurable": true,
+		"enumerable": true
+	},
+	"FileNode": {
+		"name": "",
+		"created": 0,
+		"modified": 0,
+		"size": 0,
+		"contentType": "",
+		"var$content": undefined,
+		"once$to": function once$to() {
+			if (typeof this.content == "object") {
+				return this[Symbol.for("owner")].create({
+					symbol$iterator: function*() {
+						for (let name in this.content) {
+							return this.content[name];
+						}
+					}
+				});
+			}
+		},
+		"loadContent": function loadContent() {
+		},
+		"extend$actions": {
+			"contentLoaded": function contentLoaded(event) {
+				this.content = event.content;
+			}
 		}
 	}
 }
