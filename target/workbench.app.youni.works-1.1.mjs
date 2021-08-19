@@ -26,7 +26,18 @@ const conf = {
 		"type$link": "/ui/editors/Link",
 		"type$color": "/ui/editors/Color"
 	},
-	"type$events": "/gdr"
+	"type$events": "/gdr",
+	"title": "Workbench",
+	"icon": "/res/icon.png",
+	"styles": "/res/styles.css",
+	"components": {
+		"Frame": "/display/Frame",
+		"Object": "/workbench/Workbench"
+	},
+	"objectType": "Module",
+	"dataset": "source",
+	"dataSource": "/sources",
+	"typeSource": "/file/workbench/types.json"
 };
 const main = function main(module, conf) {
 	module = module.use.system.load(module);

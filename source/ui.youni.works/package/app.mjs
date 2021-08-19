@@ -4,21 +4,31 @@ export default {
     App: {
         type$: ["Instance", "Receiver", "Origin", "/base/util/Factory"],
         type$owner: "Component",
-        get$folder() {
-            let name = this.conf.window.location.pathname;
-            name = name.substring(name.lastIndexOf("/") + 1);
-            name = name.substring(0, name.lastIndexOf("."));
-            return "/file/" + name;
-        },
-        runScript(name) {
-            import(name).then(v => {
-                v.default.call(this);
-            });
-        },
+        // get$folder() {
+        //     let name = this.conf.window.location.pathname;
+        //     name = name.substring(name.lastIndexOf("/") + 1);
+        //     name = name.substring(0, name.lastIndexOf("."));
+        //     return "/file/" + name;
+        // },
+        // runScript(name) {
+        //     import(name).then(v => {
+        //         v.default.call(this);
+        //     });
+        //},
         start(conf) {
             this.let("conf", conf, "extend");
-            this.open(this.folder + "/app.json", "initializeApp");
-            this.runScript(this.folder + "/index.mjs");
+            this.let("owner", this.create(conf.ownerType || this.owner));
+            this.initializeOwner();
+
+            if (conf.typeSource) {
+                this.open(conf.typeSource, "initializeContext");                 
+            } else {
+                this.owner.send(this, "initializeContext");
+            }
+            this.open(conf.dataSource, "initializeData");
+
+//            this.open(this.folder + "/app.json", "initializeApp");
+//            this.runScript(this.folder + "/index.mjs");
          },
         initializeOwner() {
             this.owner.origin = this;
@@ -44,15 +54,6 @@ export default {
                 }
                 let conf = this.conf;
                 
-                this.let("owner", this.create(conf.ownerType || this.owner));
-                this.initializeOwner();
-
-                if (conf.typeSource) {
-                    this.open(conf.typeSource, "initializeContext");                 
-                } else {
-                    this.owner.send(this, "initializeContext");
-                }
-                this.open(conf.dataSource, "initializeData");
             },
             initializeContext(msg) {
                 if (msg.response) {

@@ -42,21 +42,20 @@ function app() {
 	"App": {
 		"type$": ["/app/Instance", "/app/Receiver", "/app/Origin", "/base/util/Factory"],
 		"type$owner": "/app/Component",
-		"get$folder": function get$folder() {
-            let name = this.conf.window.location.pathname;
-            name = name.substring(name.lastIndexOf("/") + 1);
-            name = name.substring(0, name.lastIndexOf("."));
-            return "/file/" + name;
-        },
-		"runScript": function runScript(name) {
-            import(name).then(v => {
-                v.default.call(this);
-            });
-        },
 		"start": function start(conf) {
             this.let("conf", conf, "extend");
-            this.open(this.folder + "/app.json", "initializeApp");
-            this.runScript(this.folder + "/index.mjs");
+            this.let("owner", this.create(conf.ownerType || this.owner));
+            this.initializeOwner();
+
+            if (conf.typeSource) {
+                this.open(conf.typeSource, "initializeContext");                 
+            } else {
+                this.owner.send(this, "initializeContext");
+            }
+            this.open(conf.dataSource, "initializeData");
+
+//            this.open(this.folder + "/app.json", "initializeApp");
+//            this.runScript(this.folder + "/index.mjs");
          },
 		"initializeOwner": function initializeOwner() {
             this.owner.origin = this;
@@ -82,15 +81,6 @@ function app() {
                 }
                 let conf = this.conf;
                 
-                this.let("owner", this.create(conf.ownerType || this.owner));
-                this.initializeOwner();
-
-                if (conf.typeSource) {
-                    this.open(conf.typeSource, "initializeContext");                 
-                } else {
-                    this.owner.send(this, "initializeContext");
-                }
-                this.open(conf.dataSource, "initializeData");
             },
 			"initializeContext": function initializeContext(msg) {
                 if (msg.response) {
