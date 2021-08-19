@@ -14,7 +14,6 @@ module.use = {
 	dom: dom
 }
 module.package = {
-	app: app(),
 	diagram: diagram(),
 	display: display(),
 	editors: editors(),
@@ -35,81 +34,6 @@ const main = function main_loadModule(module) {
 			return module.use.system.load(module);
 		};
 export default main(module, conf);
-function app() {
-	const pkg = {
-	"type$": "/base/control",
-	"type$Origin": "/base/origin/Origin",
-	"App": {
-		"type$": ["/app/Instance", "/app/Receiver", "/app/Origin", "/base/util/Factory"],
-		"type$owner": "/app/Component",
-		"start": function start(conf) {
-            this.let("conf", conf, "extend");
-            this.let("owner", this.create(conf.ownerType || this.owner));
-            this.initializeOwner();
-
-            if (conf.typeSource) {
-                this.open(conf.typeSource, "initializeContext");                 
-            } else {
-                this.owner.send(this, "initializeContext");
-            }
-            this.open(conf.dataSource, "initializeData");
-
-//            this.open(this.folder + "/app.json", "initializeApp");
-//            this.runScript(this.folder + "/index.mjs");
-         },
-		"initializeOwner": function initializeOwner() {
-            this.owner.origin = this;
-            this.owner.editors = this.conf.editors;
-            this.owner.start(this.conf);
-            if (this.conf.icon) this.owner.link({
-                rel: "icon",
-                href: this.conf.icon
-            });
-            if (this.conf.styles) this.owner.link({
-                rel: "stylesheet",
-                href: this.conf.styles
-            });
-        },
-		"extend$actions": {
-			"view": function view(msg) {
-                this.view.view(this.data);
-                this.view.send("view");
-            },
-			"initializeApp": function initializeApp(msg) {
-                if (msg.response) {
-                    this[Symbol.for("owner")].define(this, "conf", JSON.parse(msg.response), "extend");
-                }
-                let conf = this.conf;
-                
-            },
-			"initializeContext": function initializeContext(msg) {
-                if (msg.response) {
-                    let types = JSON.parse(msg.response);
-                    this.types = this.create(types);
-                } else {
-                    this.types = this.create();
-                }
-                //Create the view after the types have been initialized
-                this.view = this.owner.create(this.conf.components.Object);
-                this.view.start(this.types[this.conf.objectType]);
-                this.view.file =  this.conf.dataSource;
-                this.owner.append(this.view);
-                if (this.data) this.receive("view");
-            },
-			"initializeData": function initializeData(msg) {
-                let data = JSON.parse(msg.response);
-                let converter = this[Symbol.for("owner")].create(this.conf.dataConverter);
-                data = converter.convert(data);
-                console.debug(data);
-                this.data = data; // this.create(data);
-                if (this.view) this.receive("view");
-            }
-		}
-	}
-}
-return pkg;
-}
-
 function diagram() {
 	const pkg = {
 	"type$": "/display",
