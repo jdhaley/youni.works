@@ -419,7 +419,7 @@ function display() {
 	"App": {
 		"type$": ["/display/Component", "/display/Receiver", "/base/origin/Origin"],
 		"start": function start() {
-            console.log("Starting application");
+            console.log("Starting application", this[Symbol.for("owner")]);
             let conf = this.conf;
             this.define(this.frame, "app", this);
             this.frame.start(this.conf);
@@ -488,14 +488,6 @@ function display() {
 				let listener = conf.events[name];
 				this.$window.addEventListener(name, listener);
 			}
-			if (conf.icon) this.link({
-                rel: "icon",
-                href: conf.icon
-            });
-            if (conf.styles) this.link({
-                rel: "stylesheet",
-                href: conf.styles
-            });
 			this.createView(this.main);
 		},
 		"viewOf": function viewOf(node) {
