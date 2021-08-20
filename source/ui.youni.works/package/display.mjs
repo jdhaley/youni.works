@@ -110,13 +110,11 @@ const pkg = {
 			control.start(conf);
 			return control;
 		},
-		toPixels(measure) {
-			let node = this.createNode("div");
-			node.style.height = measure;
-			this.peer.appendChild(node);
-			let px = node.getBoundingClientRect().height;
-			node.parentNode.removeChild(node);
-			return px;
+		createView(conf) {
+			let view = this.create(conf.type, conf);
+			view.model = {};
+			this.append(view);
+			this.send("view");
 		},
 		createStyle(selector, object) {
 			let out = selector + " {";
@@ -127,13 +125,15 @@ const pkg = {
 			let index = this.document.$styles.insertRule(out);
 			return this.document.$styles.cssRules[index];
 		},
-		createView(name) {
-			let view = this.app.view[name];
-			view = this.create(view.type, view.conf);
-			view.model = {};
-			this.append(view);
-			this.send("view");
+		toPixels(measure) {
+			let node = this.createNode("div");
+			node.style.height = measure;
+			this.peer.appendChild(node);
+			let px = node.getBoundingClientRect().height;
+			node.parentNode.removeChild(node);
+			return px;
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
+
 		},
 		start(conf) {
 			this.let("$window", conf.window);
@@ -147,7 +147,7 @@ const pkg = {
 				let listener = conf.events[name];
 				this.$window.addEventListener(name, listener);
 			}
-			this.createView(this.main);
+			this.let("main", this.createView(this.main));
 		},
 		viewOf(node) {
 			while(node) {
