@@ -50,3 +50,33 @@
 	border-bottom: 1px solid gainsboro;
 	padding: 4px;
 }
+
+.workbench>.tabs {
+	flex-direction: row;
+}
+.workbench>.tabs>.header {
+	display: flex;
+	flex-direction: column;
+	flex: 0 0;
+	min-width: 48px;
+	max-width: 48px;
+	color: darkgray;
+	background-color: black;
+	overflow: scroll;
+}
+.workbench>.tabs>.header>.tab {
+	max-width: 48px;
+	max-height: 48px;
+	min-width: 48px;
+	min-height: 48px;
+	flex: 1 1;
+	background: black;
+	color: white;
+	cursor: pointer;
+	border: 0;
+	padding: 2px;
+	white-space: wrap;
+	border-right: 1px solid gainsboro;
+	border-bottom: 1px solid gainsboro;
+	
+}
