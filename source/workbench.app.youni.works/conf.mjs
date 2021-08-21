@@ -7,6 +7,20 @@ export default {
         editors: editors,
         main: {
             type: "/workbench/Workbench",
+            bodies: {
+                test1: {
+                    title: "",
+                    icon: "/res/bag.svg",
+                    body: {
+                    }
+                },
+                test2: {
+                    title: "",
+                    icon: "/res/bag.svg",
+                    body: {
+                    }                   
+                }
+            }
         }
     },
     conf: {
