@@ -26,6 +26,7 @@ export default {
             return tab;
         },
         activate(tab) {
+            if (tab == this.activeTab) return;
             if (this.activeTab) {
                 this.activeTab.peer.classList.remove("activeTab");
                 this.activeTab.body.style.display = "none";
@@ -34,34 +35,13 @@ export default {
             this.activeTab.peer.classList.add("activeTab");
             this.activeTab.body.style.display = this.activeTab.body.peer.$display;
         },
-        display() {
-            this.super(display);
-            let tree = this.add("Tree");
-            this.add("Draw", this.owner.create("/ui/pen/Canvas"));
-            this.add("Note", this.owner.create("/ui/note/Note"));
-            let grid = this.owner.create({
-                type$: "/ui/display/Display",
-                nodeName: "iframe",
-                display() {
-                    this.peer.src = "https://localhost/app/test/grid.html"
-                }
-            })
-            this.draw(this.add("Grid (iframe)", grid));
-            this.add("Other One");
-            this.add("Other Two");
-            this.add("Other Three");
-            this.add("Other Four");
-            this.add("Other 5");
-            this.add("Other 6");
-            this.add("Other 7");
-            this.activate(tree);
-        },
         draw(tab) {
        //     tab.body.peer.setAttribute("viewBox", "0 0 320 320");
         },
         extend$actions: {
             activateTab(event) {
                 this.activate(event.tab);
+                event.subject = "";
             }
         }
     },
