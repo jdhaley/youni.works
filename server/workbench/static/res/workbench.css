@@ -21,13 +21,13 @@
 	background: ghostwhite;
 	border-top: 1px solid gainsboro;
 }
-.main {
+/* .main {
 	display: flex;
 	flex-direction: column;
 	flex: 1 1;
 	align-content: stretch;
 	overflow: hidden;
-}
+} 
 .workbench>.body>.context {
 	display: flex;
 	flex-direction: column;
@@ -43,14 +43,15 @@
 	align-content: stretch;
 	overflow: hidden;
 }
-.tables {
-	min-height: 48px;
-}
 .context IMG {
 	stroke: green;
 }
 .context .icon {
 	margin-top: 6px;
+}
+*/
+.tables {
+	min-height: 48px;
 }
 .sidebar {
 	display: flex;

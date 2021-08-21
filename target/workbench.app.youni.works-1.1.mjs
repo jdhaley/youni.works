@@ -20,13 +20,6 @@ module.package = {
 const conf = {
 	"type$": "/workbench/App",
 	"title": "Workbench",
-	"view": {
-		"workbench": {
-			"type": "/workbench/Workbench",
-			"conf": {
-			}
-		}
-	},
 	"frame": {
 		"type$": "/ui/display/Frame",
 		"editors": {
@@ -37,12 +30,26 @@ const conf = {
 			"type$link": "/ui/editors/Link",
 			"type$color": "/ui/editors/Color"
 		},
-		"main": "workbench"
+		"main": {
+			"type": "/workbench/Workbench",
+			"contexts": {
+				"tab1": {
+					"title": "",
+					"icon": "/res/bag.svg",
+					"body": {
+					}
+				},
+				"tab2": {
+					"title": "",
+					"icon": "/res/bag.svg",
+					"body": {
+					}
+				}
+			}
+		}
 	},
 	"conf": {
 		"type$events": "/ui/gdr",
-		"icon": "/res/icon.png",
-		"styles": "/res/styles.css",
 		"dataConverter": "/compiler/converter/Converter",
 		"objectType": "Module",
 		"dataset": "source",
@@ -146,19 +153,37 @@ function workbench() {
 		"type$": "/workbench/Display"
 	},
 	"workbenchBody": {
-		"type$": "/workbench/Structure",
-		"direction": "horizontal",
-		"members": {
-			"type$context": "/workbench/context",
-			"type$content": "/workbench/content"
-		}
+		"type$": "/workbench/tabs/Tabs",
+		"display": function display() {
+            this.super(display);
+            let content = this.add("Test", this.owner.create("/workbench/content"));
+            this.activate(content);
+        }
 	},
 	"content": {
-		"type$": "/workbench/Structure",
-		"members": {
-			"type$sidebar": "/workbench/sidebar",
-			"type$tabs": "/workbench/tabs/Tabs"
-		}
+		"type$": "/workbench/tabs/Tabs",
+		"display": function display() {
+            this.super(display);
+            let tree = this.add("Tree");
+            this.add("Draw", this.owner.create("/ui/pen/Canvas"));
+            this.add("Note", this.owner.create("/ui/note/Note"));
+            let grid = this.owner.create({
+                type$: "/ui/display/Display",
+                nodeName: "iframe",
+                display() {
+                    this.peer.src = "https://localhost/app/test/grid.html"
+                }
+            })
+            this.draw(this.add("Grid (iframe)", grid));
+            this.add("Other One");
+            this.add("Other Two");
+            this.add("Other Three");
+            this.add("Other Four");
+            this.add("Other 5");
+            this.add("Other 6");
+            this.add("Other 7");
+            this.activate(tree);
+        }
 	},
 	"context": {
 		"type$": "/workbench/Display",

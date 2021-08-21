@@ -451,13 +451,11 @@ function display() {
 			control.start(conf);
 			return control;
 		},
-		"toPixels": function toPixels(measure) {
-			let node = this.createNode("div");
-			node.style.height = measure;
-			this.peer.appendChild(node);
-			let px = node.getBoundingClientRect().height;
-			node.parentNode.removeChild(node);
-			return px;
+		"createView": function createView(conf) {
+			let view = this.create(conf.type, conf);
+			view.model = {};
+			this.append(view);
+			this.send("view");
 		},
 		"createStyle": function createStyle(selector, object) {
 			let out = selector + " {";
@@ -468,13 +466,15 @@ function display() {
 			let index = this.document.$styles.insertRule(out);
 			return this.document.$styles.cssRules[index];
 		},
-		"createView": function createView(name) {
-			let view = this.app.view[name];
-			view = this.create(view.type, view.conf);
-			view.model = {};
-			this.append(view);
-			this.send("view");
+		"toPixels": function toPixels(measure) {
+			let node = this.createNode("div");
+			node.style.height = measure;
+			this.peer.appendChild(node);
+			let px = node.getBoundingClientRect().height;
+			node.parentNode.removeChild(node);
+			return px;
 			//console.log(this.toPixels("1mm"), this.toPixels("1pt"), this.toPixels("1in"));
+
 		},
 		"start": function start(conf) {
 			this.let("$window", conf.window);
@@ -488,7 +488,7 @@ function display() {
 				let listener = conf.events[name];
 				this.$window.addEventListener(name, listener);
 			}
-			this.createView(this.main);
+			this.let("main", this.createView(this.main));
 		},
 		"viewOf": function viewOf(node) {
 			while(node) {
@@ -1794,6 +1794,7 @@ function tabs() {
             return tab;
         },
 		"activate": function activate(tab) {
+            if (tab == this.activeTab) return;
             if (this.activeTab) {
                 this.activeTab.peer.classList.remove("activeTab");
                 this.activeTab.body.style.display = "none";
@@ -1802,34 +1803,13 @@ function tabs() {
             this.activeTab.peer.classList.add("activeTab");
             this.activeTab.body.style.display = this.activeTab.body.peer.$display;
         },
-		"display": function display() {
-            this.super(display);
-            let tree = this.add("Tree");
-            this.add("Draw", this.owner.create("/ui/pen/Canvas"));
-            this.add("Note", this.owner.create("/ui/note/Note"));
-            let grid = this.owner.create({
-                type$: "/ui/display/Display",
-                nodeName: "iframe",
-                display() {
-                    this.peer.src = "https://localhost/app/test/grid.html"
-                }
-            })
-            this.draw(this.add("Grid (iframe)", grid));
-            this.add("Other One");
-            this.add("Other Two");
-            this.add("Other Three");
-            this.add("Other Four");
-            this.add("Other 5");
-            this.add("Other 6");
-            this.add("Other 7");
-            this.activate(tree);
-        },
 		"draw": function draw(tab) {
        //     tab.body.peer.setAttribute("viewBox", "0 0 320 320");
         },
 		"extend$actions": {
 			"activateTab": function activateTab(event) {
                 this.activate(event.tab);
+                event.subject = "";
             }
 		}
 	},

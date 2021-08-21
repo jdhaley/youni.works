@@ -42,19 +42,36 @@ export default {
         type$: "Display"
     },
 	workbenchBody: {
-        type$: "Structure",
-		direction: "horizontal",
-		members: {
-			type$context: "context",
-            type$content: "content"
-		}
+        type$: "tabs/Tabs",
+        display() {
+            this.super(display);
+            let content = this.add("Test", this.owner.create("/workbench/content"));
+            this.activate(content);
+        },
     },
     content: {
-        type$: "Structure",
-        members: {
-            type$sidebar: "sidebar",
-            type$tabs: "tabs/Tabs",
-           // type$tables: "Display"
+        type$: "tabs/Tabs",
+        display() {
+            this.super(display);
+            let tree = this.add("Tree");
+            this.add("Draw", this.owner.create("/ui/pen/Canvas"));
+            this.add("Note", this.owner.create("/ui/note/Note"));
+            let grid = this.owner.create({
+                type$: "/ui/display/Display",
+                nodeName: "iframe",
+                display() {
+                    this.peer.src = "https://localhost/app/test/grid.html"
+                }
+            })
+            this.draw(this.add("Grid (iframe)", grid));
+            this.add("Other One");
+            this.add("Other Two");
+            this.add("Other Three");
+            this.add("Other Four");
+            this.add("Other 5");
+            this.add("Other 6");
+            this.add("Other 7");
+            this.activate(tree);
         }
     },
     context: {
