@@ -1,7 +1,9 @@
 const pkg = {
-	type$: "/dom/dom",
+	type$: "/base/control",
+	type$view: "/base/view",
+	type$dom: "/dom/dom",
 	Display: {
-		type$: ["Element", "/base/view/View"],
+		type$: ["Control", "view/View", "dom/Element"],
 		type$owner: "Frame",
 		nodeName: "div",
 		extend$conf: {
@@ -44,7 +46,7 @@ const pkg = {
 		}
 	},
 	Collection: {
-		type$: ["Display", "/base/view/Collection"],
+		type$: ["Display", "view/Collection"],
 		extend$conf: {
 			type$contentType: "Display"
 		},
@@ -58,7 +60,7 @@ const pkg = {
 		}
 	},
 	Structure: {
-		type$: ["Display", "/base/view/Structure"],
+		type$: ["Display", "view/Structure"],
 		view(data) {
 			this.display();
 			this.model = data;
@@ -84,7 +86,7 @@ const pkg = {
         },
 	},
 	Frame: {
-		type$: ["Display", "Document"],
+		type$: ["Display", "dom/Document"],
 		type$app: "App",
 		$window: null,
 		//

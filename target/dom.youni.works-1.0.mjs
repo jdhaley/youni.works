@@ -19,7 +19,6 @@ const main = function main_loadModule(module) {
 export default main(module, conf);
 function dom() {
 	const pkg = {
-	"type$": "/base/control",
 	"Document": {
 		"document": null,
 		"get$peer": function get$peer() {
@@ -28,7 +27,7 @@ function dom() {
 		"get$location": function get$location() {
 			return this.document.location;
 		},
-		"createNode": function createNode(name) {
+		"createElement": function createElement(name) {
 			if (name.indexOf("/") >= 0) {
 				let idx = name.lastIndexOf("/");
 				return this.document.createElementNS(name.substring(0, idx), name.substring(idx + 1));
@@ -42,7 +41,7 @@ function dom() {
 			return id;
 		},
 		"link": function link(attrs) {
-			let node = this.createNode("link");
+			let node = this.createElement("link");
 			for (let attr in attrs) {
 				node.setAttribute(attr, attrs[attr]);
 			}
@@ -51,7 +50,6 @@ function dom() {
 		}
 	},
 	"Element": {
-		"type$": "/dom/Control",
 		"type$owner": "/dom/Document",
 		"namespace": "",
 		"get": function get(name) {
@@ -82,16 +80,16 @@ function dom() {
 			return this.peer.parentNode.$peer;
 		},
 		"once$from": function once$from() {
-			let from = this.peer.parentNode.$peer;
+			let of = this.of;
 			return this[Symbol.for("owner")].create({
 				symbol$iterator: function*() {
-					if (from) yield from;
+					if (of) yield of;
 				}
 			});
 		},
 		"once$peer": function once$peer() {
 			let name = (this.namespace ? this.namespace + "/" : "") + this.nodeName;
-			let peer = this.owner.createNode(name);
+			let peer = this.owner.createElement(name);
 			peer.$peer = this;
 			if (typeof this.at == "object") {
 				for (let name in this.at) {

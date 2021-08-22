@@ -1,5 +1,4 @@
 export default {
-	type$: "/base/control",
 	Document: {
 		document: null,
 		get$peer() {
@@ -8,7 +7,7 @@ export default {
 		get$location() {
 			return this.document.location;
 		},
-		createNode(name) {
+		createElement(name) {
 			if (name.indexOf("/") >= 0) {
 				let idx = name.lastIndexOf("/");
 				return this.document.createElementNS(name.substring(0, idx), name.substring(idx + 1));
@@ -22,7 +21,7 @@ export default {
 			return id;
 		},
 		link(attrs) {
-			let node = this.createNode("link");
+			let node = this.createElement("link");
 			for (let attr in attrs) {
 				node.setAttribute(attr, attrs[attr]);
 			}
@@ -31,7 +30,6 @@ export default {
 		},
 	},
 	Element: {
-		type$: "Control",
 		type$owner: "Document",
 		namespace: "",
 		get(name) {
@@ -66,16 +64,16 @@ export default {
 			return this.peer.parentNode.$peer;
 		},
 		once$from() {
-			let from = this.peer.parentNode.$peer;
+			let of = this.of;
 			return this[Symbol.for("owner")].create({
 				symbol$iterator: function*() {
-					if (from) yield from;
+					if (of) yield of;
 				}
 			});
 		},
 		once$peer() {
 			let name = (this.namespace ? this.namespace + "/" : "") + this.nodeName;
-			let peer = this.owner.createNode(name);
+			let peer = this.owner.createElement(name);
 			peer.$peer = this;
 			if (typeof this.at == "object") {
 				for (let name in this.at) {

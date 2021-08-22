@@ -421,6 +421,21 @@ function view() {
 	const pkg = {
 	"type$": "/control",
 	"View": {
+		"forEach": function forEach(value, method, methodObject) {
+			if (!methodObject) methodObject = this;
+			if (value && value[Symbol.iterator]) {
+				let i = 0;
+				for (let datum of value) {
+					method.call(this, datum, i++, value);
+				}
+			} else if (typeof value == "object") {
+				for (let name in value) {
+					method.call(methodObject, value[name], name, value);
+				}
+			} else {
+				method.call(this, value);
+			}
+		},
 		"var$model": undefined,
 		"view": function view(data) {
 			this.model = data;
@@ -438,18 +453,6 @@ function view() {
 	},
 	"Container": {
 		"type$": "/view/View",
-		"forEach": function forEach(data, method) {
-			if (data && data[Symbol.iterator]) {
-				let i = 0;
-				for (let datum of data) {
-					method.call(this, datum, i++, data);
-				}
-			} else {
-				for (let name in data) {
-					method.call(this, data[name], name, data);
-				}
-			}
-		},
 		"createContent": function createContent(value, key, object) {
 			let type = this.typeFor(value, key);
 			let conf = this.configurationFor(value, key);

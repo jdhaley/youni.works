@@ -341,9 +341,11 @@ return pkg;
 
 function display() {
 	const pkg = {
-	"type$": "/dom/dom",
+	"type$": "/base/control",
+	"type$view": "/base/view",
+	"type$dom": "/dom/dom",
 	"Display": {
-		"type$": ["/display/Element", "/base/view/View"],
+		"type$": ["/display/Control", "/display/view/View", "/display/dom/Element"],
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
 		"extend$conf": {
@@ -386,7 +388,7 @@ function display() {
 		}
 	},
 	"Collection": {
-		"type$": ["/display/Display", "/base/view/Collection"],
+		"type$": ["/display/Display", "/display/view/Collection"],
 		"extend$conf": {
 			"type$contentType": "/display/Display"
 		},
@@ -400,7 +402,7 @@ function display() {
 		}
 	},
 	"Structure": {
-		"type$": ["/display/Display", "/base/view/Structure"],
+		"type$": ["/display/Display", "/display/view/Structure"],
 		"view": function view(data) {
 			this.display();
 			this.model = data;
@@ -426,7 +428,7 @@ function display() {
         }
 	},
 	"Frame": {
-		"type$": ["/display/Display", "/display/Document"],
+		"type$": ["/display/Display", "/display/dom/Document"],
 		"type$app": "/display/App",
 		"$window": null,
 		"get$owner": function get$owner() {
