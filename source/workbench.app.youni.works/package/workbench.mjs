@@ -41,12 +41,20 @@ export default {
     workbenchFooter: {
         type$: "Display"
     },
+    WorkbenchTab: {
+        type$: "tabs/Tab"
+    },
+
 	workbenchBody: {
         type$: "tabs/Tabs",
+        extend$conf: {
+            tabType: "/workbench/WorkbenchTab"
+        },
         display() {
             this.super(display);
             let content = this.add("Test", this.owner.create("/workbench/content"));
             this.activate(content);
+            this.add("Test2");
         },
     },
     content: {

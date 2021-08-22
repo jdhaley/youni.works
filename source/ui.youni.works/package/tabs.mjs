@@ -2,6 +2,11 @@ export default {
     type$: "/panel",
     Tabs: {
         type$: "Section",
+        extend$conf: {
+            tabType: "/ui/tabs/Tab",
+            viewType: "/ui/display/Display",
+            icon: "/res/icons/bag.svg"
+        },
         var$activeTab: null,
         members: {
             header: {
@@ -13,20 +18,21 @@ export default {
         },
         add(title, body) {
             if (!body) {
-                body = this.owner.create("/ui/display/Display");
+                body = this.owner.create(this.conf.viewType);
                 body.peer.textContent = title;
             }
             body.peer.$display = body.style.display;
             body.style.display = "none";
-            let tab = this.owner.create("/ui/tabs/Tab");
-            tab.peer.innerText = title;
+            let tab = this.owner.create(this.conf.tabType);
+            let icon = this.conf.icon;
+            tab.peer.innerHTML = `<img src=${icon}><span>${title}</span>`;
             tab.body = body;
             this.parts.header.append(tab);
             this.parts.body.append(body);
             return tab;
         },
         activate(tab) {
-            if (tab == this.activeTab) return;
+            if (!tab || tab == this.activeTab) return;
             if (this.activeTab) {
                 this.activeTab.peer.classList.remove("activeTab");
                 this.activeTab.body.style.display = "none";
@@ -41,6 +47,9 @@ export default {
         extend$actions: {
             activateTab(event) {
                 this.activate(event.tab);
+                event.subject = "";
+            },
+            collapse(event) {
                 event.subject = "";
             }
         }

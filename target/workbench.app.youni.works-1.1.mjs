@@ -32,14 +32,14 @@ const conf = {
 		},
 		"main": {
 			"type": "/workbench/Workbench",
-			"contexts": {
-				"tab1": {
+			"bodies": {
+				"test1": {
 					"title": "",
 					"icon": "/res/bag.svg",
 					"body": {
 					}
 				},
-				"tab2": {
+				"test2": {
 					"title": "",
 					"icon": "/res/bag.svg",
 					"body": {
@@ -152,12 +152,19 @@ function workbench() {
 	"workbenchFooter": {
 		"type$": "/workbench/Display"
 	},
+	"WorkbenchTab": {
+		"type$": "/workbench/tabs/Tab"
+	},
 	"workbenchBody": {
 		"type$": "/workbench/tabs/Tabs",
+		"extend$conf": {
+			"tabType": "/workbench/WorkbenchTab"
+		},
 		"display": function display() {
             this.super(display);
             let content = this.add("Test", this.owner.create("/workbench/content"));
             this.activate(content);
+            this.add("Test2");
         }
 	},
 	"content": {
