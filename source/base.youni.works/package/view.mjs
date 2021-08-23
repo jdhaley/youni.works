@@ -1,27 +1,6 @@
 export default {
     type$: "/control",	
 	View: {
-		/**
-		 * Iterates over an Iterable or Object invoking the method argument
-		 * for each iteration.
-		 * @param value 
-		 * @param method 
-		 */
-		forEach(value, method, methodObject) {
-			if (!methodObject) methodObject = this;
-			if (value && value[Symbol.iterator]) {
-				let i = 0;
-				for (let datum of value) {
-					method.call(this, datum, i++, value);
-				}
-			} else if (typeof value == "object") {
-				for (let name in value) {
-					method.call(methodObject, value[name], name, value);
-				}
-			} else {
-				method.call(this, value);
-			}
-		},	
 		//A View requires a Node prototype.
 		//requires$: "Node",
 		var$model: undefined,
@@ -41,18 +20,7 @@ export default {
 	},
 	Container: {
 		type$: "View",
-		// forEach(data, method) {
-		// 	if (data && data[Symbol.iterator]) {
-		// 		let i = 0;
-		// 		for (let datum of data) {
-		// 			method.call(this, datum, i++, data);
-		// 		}
-		// 	} else {
-		// 		for (let name in data) {
-		// 			method.call(this, data[name], name, data);
-		// 		}
-		// 	}
-		// },
+		type$forEach: "forEach",
 		createContent(value, key, object) {
 			let type = this.typeFor(value, key);
 			let conf = this.configurationFor(value, key);
@@ -108,6 +76,27 @@ export default {
 		},
 		configurationFor(value, key) {
 			return value && typeof value == "object" && !value.receive ? value : this.conf;
+		}
+	},
+	/**
+	 * Iterates over an Iterable or Object invoking the method argument
+	 * for each iteration.
+	 * @param value 
+	 * @param method 
+	 */
+	forEach(value, method, methodObject) {
+		if (!methodObject) methodObject = this;
+		if (value && value[Symbol.iterator]) {
+			let i = 0;
+			for (let datum of value) {
+				method.call(this, datum, i++, value);
+			}
+		} else if (typeof value == "object") {
+			for (let name in value) {
+				method.call(methodObject, value[name], name, value);
+			}
+		} else {
+			method.call(this, value);
 		}
 	}
 }
