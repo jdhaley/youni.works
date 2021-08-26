@@ -29,7 +29,7 @@ export default {
         type$: "App"
     },
     Workbench: {
-        type$: "Section",
+        type$: "Structure",
         nodeName: "main",
 		direction: "horizontal",
 		members: {
@@ -46,24 +46,35 @@ export default {
     },
 
 	workbenchBody: {
-        type$: "tabs/Tabs",
+        type$: "tabs/Stack",
         extend$conf: {
             tabType: "/workbench/WorkbenchTab"
         },
         display() {
             this.super(display);
-            let content = this.add("Test", this.owner.create("/workbench/content"));
+            let content = this.add({
+                title: "Test"
+            }, this.owner.create("/workbench/content"));
+            this.add({
+                title: "Test2",
+                icon: "/res/icons/moon.svg"
+            });
             this.activate(content);
-            this.add("Test2");
         },
     },
     content: {
-        type$: "tabs/Tabs",
+        type$: "tabs/Stack",
         display() {
             this.super(display);
-            let tree = this.add("Tree");
-            this.add("Draw", this.owner.create("/ui/pen/Canvas"));
-            this.add("Note", this.owner.create("/ui/note/Note"));
+            //let tree = this.add("Tree");
+            let draw = this.add({
+                title: "Draw",
+                icon: "/res/icons/photo.svg"
+            }, this.owner.create("/ui/pen/Canvas"));
+            this.add({
+                title: "Note",
+                icon: "/res/icons/inbox.svg"
+            }, this.owner.create("/ui/note/Note"));
             let grid = this.owner.create({
                 type$: "/ui/display/Display",
                 nodeName: "iframe",
@@ -71,15 +82,11 @@ export default {
                     this.peer.src = "https://localhost/app/test/grid.html"
                 }
             })
-            this.draw(this.add("Grid (iframe)", grid));
-            this.add("Other One");
-            this.add("Other Two");
-            this.add("Other Three");
-            this.add("Other Four");
-            this.add("Other 5");
-            this.add("Other 6");
-            this.add("Other 7");
-            this.activate(tree);
+            this.draw(this.add({
+                title: "Grid (iframe)",
+                icon: "/res/icons/book.svg"
+            }, grid));
+            this.activate(draw);
         }
     },
     context: {

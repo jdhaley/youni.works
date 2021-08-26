@@ -1,50 +1,53 @@
 
-.tab>IMG {
-	width: 18px;
-	padding-right: 4px;
-}
-.tabs {
+.stack {
 	display: flex;
 	flex-direction: column;
 	flex: 1 1;
 	align-content: stretch;
 	overflow: hidden;
 }
-.tabs>.header {
+.stack>.header {
 	display: flex;
 	flex: 0 0;
 	min-height: 36px;
-	color: darkgray;
+	/* color: darkgray; */
 	background-color: ghostwhite;
 	overflow: scroll;
 }
-.tabs.body {
-	display: flex;
-	flex-direction: column;
+.stack>.body {
 	flex: 1 1;
 	align-content: stretch;
-	overflow: hidden;
+	overflow: auto;
+/*
+	display: flex;
+	flex-direction: column;
+	 color: darkslategrey;
+	border-bottom: 1px solid gainsboro; */
 } 
-.tabs>.header::-webkit-scrollbar {
+
+.stack>.header::-webkit-scrollbar {
 	width: 2px;
 	height: 2px;
 }
-.tabs>.header::-webkit-scrollbar-track {
+.stack>.header::-webkit-scrollbar-track {
 	background: white;
 }
-.tabs>.header::-webkit-scrollbar-thumb {
+.stack>.header::-webkit-scrollbar-thumb {
     background: none;
 }
-.tabs>.header:hover::-webkit-scrollbar-thumb {
+.stack>.header:hover::-webkit-scrollbar-thumb {
     background: lightsteelblue;
 }
+
 .tab {
+	display: flex;
+	align-content: center;
+	align-items: center;
 	flex: 1 1;
 	cursor: pointer;
 	max-width: 150px;
 	min-width: 100px;
 	color: gray;
-	padding: 8px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -56,17 +59,16 @@
 	background-color: white;
 	border-bottom-color: white;
 }
-.tabs>.body {
-	flex: 1 1;
-	color: darkslategrey;
-	border-bottom: 1px solid gainsboro;
-	padding: 4px;
+.tab>IMG {
+	width: 20px;
+	margin: 0 4px 0 4px;
 }
 
-.workbench>.tabs {
+.workbench>.stack {
 	flex-direction: row;
 }
-.workbench>.tabs>.header {
+
+.workbench>.stack>.header {
 	display: flex;
 	flex-direction: column;
 	align-items: center;

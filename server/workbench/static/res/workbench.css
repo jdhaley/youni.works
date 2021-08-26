@@ -5,7 +5,10 @@
 	max-height: 100%;
 }
 .workbench>.header {
-	display: none;
+	flex: 0 0 24px;
+	min-height: 24px;
+	background: ghostwhite;
+	border-bottom: 1px solid gainsboro;
 }
 .workbench>.body {
 	display: flex;
