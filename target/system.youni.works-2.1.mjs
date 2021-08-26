@@ -228,7 +228,22 @@ function core() {
 	"util": {
 		"isUpperCase": function isUpperCase(str) {
 			return str == str.toUpperCase() && str != str.toLowerCase();
-		}
+		},
+		"forEach": function forEach(value, method, methodObject) {
+            if (!methodObject) methodObject = this;
+            if (value && value[Symbol.iterator]) {
+                let i = 0;
+                for (let datum of value) {
+                    method.call(methodObject, datum, i++, value);
+                }
+            } else if (typeof value == "object") {
+                for (let name in value) {
+                    method.call(methodObject, value[name], name, value);
+                }
+            } else {
+                method.call(methodObject, value, "", value);
+            }
+        }
 	},
 	"Iterable": {
 		"symbol$iterator": function *() {

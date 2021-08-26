@@ -1770,7 +1770,7 @@ return pkg;
 function tabs() {
 	const pkg = {
 	"type$": "/panel",
-	"Tabs": {
+	"Stack": {
 		"type$": "/tabs/Section",
 		"extend$conf": {
 			"tabType": "/ui/tabs/Tab",
@@ -1786,15 +1786,16 @@ function tabs() {
 				"type$": "/tabs/Display"
 			}
 		},
-		"add": function add(title, body) {
+		"add": function add(conf, body) {
             if (!body) {
                 body = this.owner.create(this.conf.viewType);
-                body.peer.textContent = title;
+                body.peer.textContent = conf.title;
             }
             body.peer.$display = body.style.display;
             body.style.display = "none";
             let tab = this.owner.create(this.conf.tabType);
-            let icon = this.conf.icon;
+            let icon = conf.icon || this.conf.icon;
+            let title = conf.title;
             tab.peer.innerHTML = `<img src=${icon}><span>${title}</span>`;
             tab.body = body;
             this.parts.header.append(tab);
