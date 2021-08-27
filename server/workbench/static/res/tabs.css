@@ -17,7 +17,7 @@
 .stack>.body {
 	flex: 1 1;
 	align-content: stretch;
-	overflow: auto;
+	overflow: hidden;
 /*
 	display: flex;
 	flex-direction: column;
@@ -66,6 +66,7 @@
 
 .workbench>.stack {
 	flex-direction: row;
+	overflow: hidden;
 }
 
 .workbench>.stack>.header {

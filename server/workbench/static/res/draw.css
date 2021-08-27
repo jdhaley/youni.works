@@ -9,6 +9,10 @@ SVG {
 SVG:focus {
 	border-color: steelblue;
 }
+.canvas {
+	display: block;
+	overflow: auto;
+}
 .point {
 	stroke-width: 0;
 	fill: silver;

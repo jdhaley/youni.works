@@ -44,11 +44,10 @@ export default {
     WorkbenchTab: {
         type$: "tabs/Tab"
     },
-
 	workbenchBody: {
         type$: "tabs/Stack",
         extend$conf: {
-            tabType: "/workbench/WorkbenchTab"
+            indexType: "/workbench/WorkbenchTab"
         },
         display() {
             this.super(display);

@@ -1773,7 +1773,7 @@ function tabs() {
 	"Stack": {
 		"type$": "/tabs/Section",
 		"extend$conf": {
-			"tabType": "/ui/tabs/Tab",
+			"indexType": "/ui/tabs/Tab",
 			"viewType": "/ui/display/Display",
 			"icon": "/res/icons/bag.svg"
 		},
@@ -1793,7 +1793,7 @@ function tabs() {
             }
             body.peer.$display = body.style.display;
             body.style.display = "none";
-            let tab = this.owner.create(this.conf.tabType);
+            let tab = this.owner.create(this.conf.indexType);
             let icon = conf.icon || this.conf.icon;
             let title = conf.title;
             tab.peer.innerHTML = `<img src=${icon}><span>${title}</span>`;

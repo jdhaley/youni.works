@@ -158,7 +158,7 @@ function workbench() {
 	"workbenchBody": {
 		"type$": "/workbench/tabs/Stack",
 		"extend$conf": {
-			"tabType": "/workbench/WorkbenchTab"
+			"indexType": "/workbench/WorkbenchTab"
 		},
 		"display": function display() {
             this.super(display);
