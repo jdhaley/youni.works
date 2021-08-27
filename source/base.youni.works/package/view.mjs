@@ -21,7 +21,18 @@ export default {
 	Container: {
 		type$: "View",
 		type$forEach: "util/forEach",
-		createContent(value, key, object) {
+		get$parts() {
+			if (!this.peer.$parts) {
+				this.peer.$parts = Object.create(null);
+			}
+			return this.peer.$parts;
+		},
+		/*
+		Currently called in two contexts:
+		value is a property of the model
+		value is a member of the structure.
+		*/
+		createContent(value, key) {
 			let type = this.typeFor(value, key);
 			let conf = this.configurationFor(value, key);
 			let control = this.owner.create(type, conf);
@@ -31,11 +42,28 @@ export default {
 		},
 		control(control, key) {
 			control.key = key;
+			this.parts[key] = control;
 		},
 		typeFor(value, key) {
+			if (this.structure) {
+				return this.structure[key] ? this.structure[key] : "";
+			}
+			return this.contentView ||  "";
 		},
 		configurationFor(value, key) {
 			return this.conf;
+		},
+		view(model) {
+			this.model = model;
+			if (this.observe) this.observe(model);
+			if (this.structure) {
+				this.forEach(this.structure, this.createContent);
+			}
+			//array and map:
+			this.forEach(model, this.createContent);
+		},
+		modelFor(contentView) {
+			return this.model && this.model[contentView.key];
 		}
 	},
 	Collection: {
@@ -57,13 +85,13 @@ export default {
 		members: {
 		},
 		parts: null,
-		view(model) {
-			if (!this.parts) {
-				this.let("parts", Object.create(null));
-				this.forEach(this.members, this.createContent);
-			}
-			this.model = model;
-		},
+		// view(model) {
+		// 	if (!this.parts) {
+		// 		this.let("parts", Object.create(null));
+		// 		this.forEach(this.members, this.createContent);
+		// 	}
+		// 	this.model = model;
+		// },
 		control(part, key) {
 			this.super(control, part, key);
 			this.parts[key] = part;

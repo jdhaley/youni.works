@@ -439,7 +439,13 @@ function view() {
 	"Container": {
 		"type$": "/view/View",
 		"type$forEach": "/view/util/forEach",
-		"createContent": function createContent(value, key, object) {
+		"get$parts": function get$parts() {
+			if (!this.peer.$parts) {
+				this.peer.$parts = Object.create(null);
+			}
+			return this.peer.$parts;
+		},
+		"createContent": function createContent(value, key) {
 			let type = this.typeFor(value, key);
 			let conf = this.configurationFor(value, key);
 			let control = this.owner.create(type, conf);
@@ -449,11 +455,28 @@ function view() {
 		},
 		"control": function control(control, key) {
 			control.key = key;
+			this.parts[key] = control;
 		},
 		"typeFor": function typeFor(value, key) {
+			if (this.structure) {
+				return this.structure[key] ? this.structure[key] : "";
+			}
+			return this.contentView ||  "";
 		},
 		"configurationFor": function configurationFor(value, key) {
 			return this.conf;
+		},
+		"view": function view(model) {
+			this.model = model;
+			if (this.observe) this.observe(model);
+			if (this.structure) {
+				this.forEach(this.structure, this.createContent);
+			}
+			//array and map:
+			this.forEach(model, this.createContent);
+		},
+		"modelFor": function modelFor(contentView) {
+			return this.model && this.model[contentView.key];
 		}
 	},
 	"Collection": {
@@ -475,13 +498,6 @@ function view() {
 		"members": {
 		},
 		"parts": null,
-		"view": function view(model) {
-			if (!this.parts) {
-				this.let("parts", Object.create(null));
-				this.forEach(this.members, this.createContent);
-			}
-			this.model = model;
-		},
 		"control": function control(part, key) {
 			this.super(control, part, key);
 			this.parts[key] = part;
