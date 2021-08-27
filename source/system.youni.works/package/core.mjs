@@ -21,9 +21,10 @@ const pkg = {
                 for (let name in value) {
                     method.call(methodObject, value[name], name, value);
                 }
-            } else {
-                method.call(methodObject, value, "", value);
             }
+            // } else {
+            //     method.call(methodObject, value, "", value);
+            // }
         }
     },
     Iterable: {
