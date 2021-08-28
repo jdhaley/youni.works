@@ -10,7 +10,7 @@ export default {
         var$activeTab: null,
         members: {
             header: {
-                type$: "Collection"
+                type$: "Display"
             },
             body: {
                 type$: "Display"

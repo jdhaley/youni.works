@@ -139,14 +139,14 @@ export default {
 			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
 			view.dataset.level = level;
 		},
-		forEach(item, method) {
-			for (let node = item.nextSibling; node; node = node.nextSibling) {
-				if (node.role == "heading" ) {
-					// if (item.role == "heading" && item.dataset.level > node.
-					//  method.call(this, node);
-				}
-			}
-		},
+		// forEach(item, method) {
+		// 	for (let node = item.nextSibling; node; node = node.nextSibling) {
+		// 		if (node.role == "heading" ) {
+		// 			// if (item.role == "heading" && item.dataset.level > node.
+		// 			//  method.call(this, node);
+		// 		}
+		// 	}
+		// },
 		extend$actions: {
 			command(event) {
 				let cmd = this.shortcuts[event.shortcut];

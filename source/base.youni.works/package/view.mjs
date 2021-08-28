@@ -1,8 +1,21 @@
 export default {
-    type$: "/control",	
+    type$: "/control",
+	Viewer: {
+		type$: ["Receiver", "Sender"],
+		view(model) {
+		},
+		modelFor(part) {
+		},
+		extend$actions: {
+			view(event) {
+				for (let view of this.to) {
+					view.view(this.modelFor(view));
+				}
+			}
+		}
+	},
 	View: {
-		//A View requires a Node prototype.
-		//requires$: "Node",
+		type$: ["Viewer", "Sensor"],
 		var$model: undefined,
 		view(data) {
 			this.model = data;
@@ -21,14 +34,14 @@ export default {
 	Container: {
 		type$: "View",
 		type$forEach: "util/forEach",
+		part(key) {
+			for (let part of this.to) {
+				if (part.key == key) return part;
+			}
+		},
 		get$parts() {
 			return this.peer.$parts;
 		},
-		/*
-		Currently called in two contexts:
-		value is a property of the model
-		value is a member of the structure.
-		*/
 		createContent(value, key) {
 			let type = this.typeFor(value, key);
 			let conf = this.configurationFor(value, key);
@@ -37,9 +50,9 @@ export default {
 			this.append(control);
 			return control;
 		},
-		control(control, key) {
-			control.key = key;
-			this.parts[key] = control;
+		control(part, key) {
+			part.key = key;
+			this.parts[key] = part;
 		},
 		typeFor(value, key) {
 			if (this.members) {
@@ -62,52 +75,10 @@ export default {
 				this.forEach(model, this.createContent);
 			}
 
-			if (this.observe) this.observe(model);
-			//array and map:
-			
+			if (this.observe) this.observe(model);			
 		},
 		modelFor(contentView) {
-			return this.model && this.model[contentView.key];
+			return this.members ? this.model : this.model && this.model[contentView.key];
 		}
-	},
-	Collection: {
-		type$: "Container",
-		type$contentType: "View",
-		view(model) {
-			this.super(view, model);
-			this.forEach(model, this.createContent);
-		},
-		modelFor(contentView) {
-			return this.model && this.model[contentView.key];
-		},
-		typeFor(value, key) {
-			return this.contentType;
-		},
-	},
-    Structure: {
-		type$: "Container",
-		members: {
-		},
-		// parts: null,
-		// view(model) {
-		// 	if (!this.parts) {
-		// 		this.let("parts", Object.create(null));
-		// 		this.forEach(this.members, this.createContent);
-		// 	}
-		// 	this.model = model;
-		// },
-		control(part, key) {
-			this.super(control, part, key);
-			this.parts[key] = part;
-		},
-		typeFor(value, key) {
-			if (value && typeof value == "object") {
-				return value.receive ? value : value.contentType || this.contentType;
-			}
-			return this[Symbol.for("owner")].forName("" + value) || this.contentType;
-		},
-		configurationFor(value, key) {
-			return value && typeof value == "object" && !value.receive ? value : this.conf;
-		}
-	},
+	}
 }

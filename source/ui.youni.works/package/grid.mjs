@@ -53,7 +53,7 @@ export default {
 		}
 	},
 	Row: {
-		type$: "Structure",
+		type$: "Display",
 		direction: "horizontal",
 		members: {
 			type$key: "Key",
@@ -69,7 +69,7 @@ export default {
 		}
 	},
 	Rows: {
-		type$: "Collection",
+		type$: "Display",
 		type$contentType: "Row",
 		direction: "vertical"
 	},

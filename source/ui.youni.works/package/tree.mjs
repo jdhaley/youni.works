@@ -84,7 +84,7 @@ export default {
         }
     },
     ItemBody: {
-        type$: "Collection",
+        type$: "Display",
         type$contentType: "Item",
         view(model) {
             if (this.peer.$show) {
@@ -98,7 +98,7 @@ export default {
         }
     },
     Item: {
-		type$: "Structure",
+		type$: "Display",
         members: {
             type$header: "ItemHeader",
             type$body: "ItemBody"

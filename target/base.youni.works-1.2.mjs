@@ -420,7 +420,22 @@ return pkg;
 function view() {
 	const pkg = {
 	"type$": "/control",
+	"Viewer": {
+		"type$": ["/view/Receiver", "/view/Sender"],
+		"view": function view(model) {
+		},
+		"modelFor": function modelFor(part) {
+		},
+		"extend$actions": {
+			"view": function view(event) {
+				for (let view of this.to) {
+					view.view(this.modelFor(view));
+				}
+			}
+		}
+	},
 	"View": {
+		"type$": ["/view/Viewer", "/view/Sensor"],
 		"var$model": undefined,
 		"view": function view(data) {
 			this.model = data;
@@ -439,10 +454,12 @@ function view() {
 	"Container": {
 		"type$": "/view/View",
 		"type$forEach": "/view/util/forEach",
-		"get$parts": function get$parts() {
-			if (!this.peer.$parts) {
-				this.peer.$parts = Object.create(null);
+		"part": function part(key) {
+			for (let part of this.to) {
+				if (part.key == key) return part;
 			}
+		},
+		"get$parts": function get$parts() {
 			return this.peer.$parts;
 		},
 		"createContent": function createContent(value, key) {
@@ -453,63 +470,35 @@ function view() {
 			this.append(control);
 			return control;
 		},
-		"control": function control(control, key) {
-			control.key = key;
-			this.parts[key] = control;
+		"control": function control(part, key) {
+			part.key = key;
+			this.parts[key] = part;
 		},
 		"typeFor": function typeFor(value, key) {
-			if (this.structure) {
-				return this.structure[key] ? this.structure[key] : "";
+			if (this.members) {
+				return this.members[key] ? this.members[key] : "";
 			}
-			return this.contentView ||  "";
+			return this.contentType ||  "";
 		},
 		"configurationFor": function configurationFor(value, key) {
 			return this.conf;
 		},
 		"view": function view(model) {
 			this.model = model;
-			if (this.observe) this.observe(model);
-			if (this.structure) {
-				this.forEach(this.structure, this.createContent);
+			if (!this.parts) {
+				this.peer.$parts = Object.create(null);
+				if (this.members) {
+					this.forEach(this.members, this.createContent);
+				}	
 			}
-			//array and map:
-			this.forEach(model, this.createContent);
+			if (!this.members) {
+				this.forEach(model, this.createContent);
+			}
+
+			if (this.observe) this.observe(model);			
 		},
 		"modelFor": function modelFor(contentView) {
-			return this.model && this.model[contentView.key];
-		}
-	},
-	"Collection": {
-		"type$": "/view/Container",
-		"type$contentType": "/view/View",
-		"view": function view(model) {
-			this.super(view, model);
-			this.forEach(model, this.createContent);
-		},
-		"modelFor": function modelFor(contentView) {
-			return this.model && this.model[contentView.key];
-		},
-		"typeFor": function typeFor(value, key) {
-			return this.contentType;
-		}
-	},
-	"Structure": {
-		"type$": "/view/Container",
-		"members": {
-		},
-		"parts": null,
-		"control": function control(part, key) {
-			this.super(control, part, key);
-			this.parts[key] = part;
-		},
-		"typeFor": function typeFor(value, key) {
-			if (value && typeof value == "object") {
-				return value.receive ? value : value.contentType || this.contentType;
-			}
-			return this[Symbol.for("owner")].forName("" + value) || this.contentType;
-		},
-		"configurationFor": function configurationFor(value, key) {
-			return value && typeof value == "object" && !value.receive ? value : this.conf;
+			return this.members ? this.model : this.model && this.model[contentView.key];
 		}
 	}
 }

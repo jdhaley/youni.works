@@ -29,7 +29,7 @@ export default {
         type$: "App"
     },
     Workbench: {
-        type$: "Structure",
+        type$: "Display",
         nodeName: "main",
 		direction: "horizontal",
 		members: {
@@ -101,10 +101,10 @@ export default {
         }
     },
     sidebar: {
-        type$: ["Structure", "Shape"],
+        type$: ["Display", "Shape"],
         members: {
             tree: {
-                type$: "Collection",
+                type$: "Display",
                 type$contentType: "tree/Item"
             },
             value: {

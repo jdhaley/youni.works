@@ -1,7 +1,7 @@
 export default {
     type$: "/display",
 	Section: {
-		type$: "Structure",
+		type$: "Display",
 		var$collapsed: "false", //3 states: ["true", "false", "" (non-collapseable)]
 		members: {
 			type$header: "Display",

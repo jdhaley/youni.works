@@ -341,11 +341,10 @@ return pkg;
 
 function display() {
 	const pkg = {
-	"type$": "/base/control",
-	"type$view": "/base/view",
+	"type$": "/base/view",
 	"type$dom": "/dom/dom",
 	"Display": {
-		"type$": ["/display/Control", "/display/view/View", "/display/dom/Element"],
+		"type$": ["/display/Container", "/display/dom/Element"],
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
 		"extend$conf": {
@@ -382,40 +381,13 @@ function display() {
 			this.textContent = "";
 			this.peer.classList.add(this.className);
 		},
-		"view": function view(data) {
-			this.display();
-			this.model = data;
-		}
-	},
-	"Collection": {
-		"type$": ["/display/Display", "/display/view/Collection"],
-		"extend$conf": {
-			"type$contentType": "/display/Display"
-		},
-		"view": function view(data) {
-			this.display();
-			this.model = data;
-			this.forEach(this.model, this.createContent);
-		},
-		"get$contentType": function get$contentType() {
-			return this.conf.contentType;
-		}
-	},
-	"Structure": {
-		"type$": ["/display/Display", "/display/view/Structure"],
-		"view": function view(data) {
-			this.display();
-			this.model = data;
-		},
-		"display": function display() {
-			if (this.parts) return;
-			this.super(display);
-			this.let("parts", Object.create(null));
-			this.forEach(this.members, this.createContent);
-		},
 		"control": function control(part, key) {
-			this.perform("/base/view/Structure/control", part, key);
+			this.super(control, part, key);
 			part.peer.classList.add(key);
+		},
+		"view": function view(data) {
+			this.display();
+			this.super(view, data);
 		}
 	},
 	"App": {
@@ -790,7 +762,7 @@ function grid() {
 		}
 	},
 	"Row": {
-		"type$": "/grid/Structure",
+		"type$": "/grid/Display",
 		"direction": "horizontal",
 		"members": {
 			"type$key": "/grid/Key",
@@ -806,7 +778,7 @@ function grid() {
 		}
 	},
 	"Rows": {
-		"type$": "/grid/Collection",
+		"type$": "/grid/Display",
 		"type$contentType": "/grid/Row",
 		"direction": "vertical"
 	},
@@ -1021,14 +993,6 @@ function note() {
 			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
 			view.dataset.level = level;
 		},
-		"forEach": function forEach(item, method) {
-			for (let node = item.nextSibling; node; node = node.nextSibling) {
-				if (node.role == "heading" ) {
-					// if (item.role == "heading" && item.dataset.level > node.
-					//  method.call(this, node);
-				}
-			}
-		},
 		"extend$actions": {
 			"command": function command(event) {
 				let cmd = this.shortcuts[event.shortcut];
@@ -1155,7 +1119,7 @@ function panel() {
 	const pkg = {
 	"type$": "/display",
 	"Section": {
-		"type$": "/panel/Structure",
+		"type$": "/panel/Display",
 		"var$collapsed": "false",
 		"members": {
 			"type$header": "/panel/Display",
@@ -1538,7 +1502,7 @@ function record() {
 	const pkg = {
 	"type$": "/display",
 	"Record": {
-		"type$": ["/record/Structure", "/record/Observer"],
+		"type$": ["/record/Display", "/record/Observer"],
 		"type$typing": "/util/Typing",
 		"isDynamic": false,
 		"extend$conf": {
@@ -1780,7 +1744,7 @@ function tabs() {
 		"var$activeTab": null,
 		"members": {
 			"header": {
-				"type$": "/tabs/Collection"
+				"type$": "/tabs/Display"
 			},
 			"body": {
 				"type$": "/tabs/Display"
@@ -1949,7 +1913,7 @@ function tree() {
 		}
 	},
 	"ItemBody": {
-		"type$": "/tree/Collection",
+		"type$": "/tree/Display",
 		"type$contentType": "/tree/Item",
 		"view": function view(model) {
             if (this.peer.$show) {
@@ -1963,7 +1927,7 @@ function tree() {
         }
 	},
 	"Item": {
-		"type$": "/tree/Structure",
+		"type$": "/tree/Display",
 		"members": {
 			"type$header": "/tree/ItemHeader",
 			"type$body": "/tree/ItemBody"

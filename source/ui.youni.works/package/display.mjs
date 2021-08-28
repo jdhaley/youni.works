@@ -1,9 +1,8 @@
 const pkg = {
-	type$: "/base/control",
-	type$view: "/base/view",
+	type$: "/base/view",
 	type$dom: "/dom/dom",
 	Display: {
-		type$: ["Control", "view/View", "dom/Element"],
+		type$: ["Container", "dom/Element"],
 		type$owner: "Frame",
 		nodeName: "div",
 		extend$conf: {
@@ -40,40 +39,13 @@ const pkg = {
 			this.textContent = "";
 			this.peer.classList.add(this.className);
 		},
-		view(data) {
-			this.display();
-			this.model = data;
-		}
-	},
-	Collection: {
-		type$: ["Display", "view/Collection"],
-		extend$conf: {
-			type$contentType: "Display"
-		},
-		view(data) {
-			this.display();
-			this.model = data;
-			this.forEach(this.model, this.createContent);
-		},
-		get$contentType() {
-			return this.conf.contentType;
-		}
-	},
-	Structure: {
-		type$: ["Display", "view/Structure"],
-		view(data) {
-			this.display();
-			this.perform("/base/view/Structure/view", data);
-		},
-		// display() {
-		// 	if (this.parts) return;
-		// 	this.super(display);
-		// 	this.let("parts", Object.create(null));
-		// 	this.forEach(this.members, this.createContent);
-		// },
 		control(part, key) {
-			this.perform("/base/view/Structure/control", part, key);
+			this.super(control, part, key);
 			part.peer.classList.add(key);
+		},
+		view(data) {
+			this.display();
+			this.super(view, data);
 		}
 	},
     App: {

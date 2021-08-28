@@ -140,7 +140,7 @@ function workbench() {
 		"type$": "/workbench/App"
 	},
 	"Workbench": {
-		"type$": "/workbench/Structure",
+		"type$": "/workbench/Display",
 		"nodeName": "main",
 		"direction": "horizontal",
 		"members": {
@@ -160,8 +160,8 @@ function workbench() {
 		"extend$conf": {
 			"indexType": "/workbench/WorkbenchTab"
 		},
-		"display": function display() {
-            this.super(display);
+		"view": function view(data) {
+            this.super(view, data);
             let content = this.add({
                 title: "Test"
             }, this.owner.create("/workbench/content"));
@@ -174,8 +174,8 @@ function workbench() {
 	},
 	"content": {
 		"type$": "/workbench/tabs/Stack",
-		"display": function display() {
-            this.super(display);
+		"view": function view(data) {
+            this.super(view, data);
             //let tree = this.add("Tree");
             let draw = this.add({
                 title: "Draw",
@@ -212,10 +212,10 @@ function workbench() {
         }
 	},
 	"sidebar": {
-		"type$": ["/workbench/Structure", "/workbench/Shape"],
+		"type$": ["/workbench/Display", "/workbench/Shape"],
 		"members": {
 			"tree": {
-				"type$": "/workbench/Collection",
+				"type$": "/workbench/Display",
 				"type$contentType": "/workbench/tree/Item"
 			},
 			"value": {

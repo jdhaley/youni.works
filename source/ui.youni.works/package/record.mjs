@@ -4,7 +4,7 @@ export default {
 	 * A Record supports an object model view.
 	 */
 	Record: {
-		type$: ["Structure", "Observer"],
+		type$: ["Display", "Observer"],
 		type$typing: "/util/Typing",
 		isDynamic: false,
 		extend$conf: {
