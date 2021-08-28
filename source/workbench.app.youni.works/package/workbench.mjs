@@ -49,8 +49,8 @@ export default {
         extend$conf: {
             indexType: "/workbench/WorkbenchTab"
         },
-        display() {
-            this.super(display);
+        view(data) {
+            this.super(view, data);
             let content = this.add({
                 title: "Test"
             }, this.owner.create("/workbench/content"));
@@ -63,8 +63,8 @@ export default {
     },
     content: {
         type$: "tabs/Stack",
-        display() {
-            this.super(display);
+        view(data) {
+            this.super(view, data);
             //let tree = this.add("Tree");
             let draw = this.add({
                 title: "Draw",

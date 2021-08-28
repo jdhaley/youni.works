@@ -63,14 +63,14 @@ const pkg = {
 		type$: ["Display", "view/Structure"],
 		view(data) {
 			this.display();
-			this.model = data;
+			this.perform("/base/view/Structure/view", data);
 		},
-		display() {
-			if (this.parts) return;
-			this.super(display);
-			this.let("parts", Object.create(null));
-			this.forEach(this.members, this.createContent);
-		},
+		// display() {
+		// 	if (this.parts) return;
+		// 	this.super(display);
+		// 	this.let("parts", Object.create(null));
+		// 	this.forEach(this.members, this.createContent);
+		// },
 		control(part, key) {
 			this.perform("/base/view/Structure/control", part, key);
 			part.peer.classList.add(key);

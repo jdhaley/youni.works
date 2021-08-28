@@ -22,9 +22,6 @@ export default {
 		type$: "View",
 		type$forEach: "util/forEach",
 		get$parts() {
-			if (!this.peer.$parts) {
-				this.peer.$parts = Object.create(null);
-			}
 			return this.peer.$parts;
 		},
 		/*
@@ -45,22 +42,29 @@ export default {
 			this.parts[key] = control;
 		},
 		typeFor(value, key) {
-			if (this.structure) {
-				return this.structure[key] ? this.structure[key] : "";
+			if (this.members) {
+				return this.members[key] ? this.members[key] : "";
 			}
-			return this.contentView ||  "";
+			return this.contentType ||  "";
 		},
 		configurationFor(value, key) {
 			return this.conf;
 		},
 		view(model) {
 			this.model = model;
-			if (this.observe) this.observe(model);
-			if (this.structure) {
-				this.forEach(this.structure, this.createContent);
+			if (!this.parts) {
+				this.peer.$parts = Object.create(null);
+				if (this.members) {
+					this.forEach(this.members, this.createContent);
+				}	
 			}
+			if (!this.members) {
+				this.forEach(model, this.createContent);
+			}
+
+			if (this.observe) this.observe(model);
 			//array and map:
-			this.forEach(model, this.createContent);
+			
 		},
 		modelFor(contentView) {
 			return this.model && this.model[contentView.key];
@@ -84,7 +88,7 @@ export default {
 		type$: "Container",
 		members: {
 		},
-		parts: null,
+		// parts: null,
 		// view(model) {
 		// 	if (!this.parts) {
 		// 		this.let("parts", Object.create(null));
