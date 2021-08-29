@@ -1,6 +1,6 @@
 const pkg = {
 	type$: "/base/view",
-	type$dom: "/dom/dom",
+	type$dom: "/base/dom",
 	Display: {
 		type$: ["Container", "dom/Element"],
 		type$owner: "Frame",

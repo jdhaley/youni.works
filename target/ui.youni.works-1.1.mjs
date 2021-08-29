@@ -1,7 +1,6 @@
 import system from "./system.youni.works-2.1.mjs";
 import base from "./base.youni.works-1.2.mjs";
 import compiler from "./compiler.youni.works-1.0.mjs";
-import dom from "./dom.youni.works-1.0.mjs";
 const module = {
 	"name": "ui.youni.works",
 	"version": "1.1",
@@ -10,8 +9,7 @@ const module = {
 module.use = {
 	system: system,
 	base: base,
-	compiler: compiler,
-	dom: dom
+	compiler: compiler
 }
 module.package = {
 	diagram: diagram(),
@@ -342,7 +340,7 @@ return pkg;
 function display() {
 	const pkg = {
 	"type$": "/base/view",
-	"type$dom": "/dom/dom",
+	"type$dom": "/base/dom",
 	"Display": {
 		"type$": ["/display/Container", "/display/dom/Element"],
 		"type$owner": "/display/Frame",
