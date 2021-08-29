@@ -34,8 +34,11 @@ export default {
             return tab;
         },
         activate(tab) {
-            if (!tab && this.to[0]) {
-                tab = this.to[0];
+            if (tab === undefined) {
+                for (let first of this.parts.header.to) {
+                    tab = first;
+                    break;
+                }
             }
             if (!tab || tab == this.activeTab) return;
             if (this.activeTab) {

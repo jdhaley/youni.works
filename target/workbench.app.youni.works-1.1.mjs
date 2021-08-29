@@ -153,7 +153,38 @@ return pkg;
 
 function workbench() {
 	const pkg = {
-	"type$": "/ui/panel",
+	"type$": "/ui/display",
+	"App": {
+		"type$": "/workbench/App"
+	},
+	"Workbench": {
+		"type$": "/workbench/Display",
+		"nodeName": "main",
+		"extend$conf": {
+			"views": {
+			}
+		},
+		"members": {
+			"header": {
+				"type$": "/workbench/Display"
+			},
+			"body": {
+				"type$": "/ui/tabs/Stack",
+				"extend$conf": {
+					"indexType": "/workbench/WorkbenchTab"
+				}
+			},
+			"footer": {
+				"type$": "/workbench/Display"
+			}
+		},
+		"modelFor": function modelFor(part) {
+            if (part == this.parts.body) return this.conf.views;
+        }
+	},
+	"WorkbenchTab": {
+		"type$": "/ui/tabs/Tab"
+	},
 	"type$tabs": "/ui/tabs",
 	"type$tree": "/ui/tree",
 	"type$Shape": "/ui/shape/Shape",
@@ -177,37 +208,6 @@ function workbench() {
 			"sidebar": "sidebar/name",
 			"": ""
 		}
-	},
-	"App": {
-		"type$": "/workbench/App"
-	},
-	"Workbench": {
-		"type$": "/workbench/Display",
-		"nodeName": "main",
-		"extend$conf": {
-			"views": {
-			}
-		},
-		"members": {
-			"header": {
-				"type$": "/workbench/Display"
-			},
-			"body": {
-				"type$": "/workbench/tabs/Stack",
-				"extend$conf": {
-					"indexType": "/workbench/WorkbenchTab"
-				}
-			},
-			"footer": {
-				"type$": "/workbench/Display"
-			}
-		},
-		"modelFor": function modelFor(part) {
-            if (part == this.parts.body) return this.conf.views;
-        }
-	},
-	"WorkbenchTab": {
-		"type$": "/workbench/tabs/Tab"
 	},
 	"sidebar": {
 		"type$": ["/workbench/Display", "/workbench/Shape"],

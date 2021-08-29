@@ -1,5 +1,37 @@
 export default {
-	type$: "/ui/panel",
+	type$: "/ui/display",
+    App: {
+        type$: "App"
+    },
+    Workbench: {
+        type$: "Display",
+        nodeName: "main",
+        extend$conf: {
+            views: {
+            }
+        },
+		members: {
+            header: {
+                type$: "Display"
+            },
+			body: {
+                type$: "/ui/tabs/Stack",
+                extend$conf: {
+                    indexType: "/workbench/WorkbenchTab"
+                }        
+            },
+			footer: {
+                type$: "Display"
+            }
+		},
+        modelFor(part) {
+            if (part == this.parts.body) return this.conf.views;
+        }
+    },
+    WorkbenchTab: {
+        type$: "/ui/tabs/Tab"
+    },
+
     type$tabs: "/ui/tabs",
     type$tree: "/ui/tree",
     type$Shape: "/ui/shape/Shape",
@@ -31,66 +63,6 @@ export default {
             "": ""
         }
     },
-    App: {
-        type$: "App"
-    },
-    Workbench: {
-        type$: "Display",
-        nodeName: "main",
-        extend$conf: {
-            views: {
-            }
-        },
-		members: {
-            header: {
-                type$: "Display"
-            },
-			body: {
-                type$: "tabs/Stack",
-                extend$conf: {
-                    indexType: "/workbench/WorkbenchTab"
-                }        
-            },
-			footer: {
-                type$: "Display"
-            }
-		},
-        modelFor(part) {
-            if (part == this.parts.body) return this.conf.views;
-        }
-    },
-    WorkbenchTab: {
-        type$: "tabs/Tab"
-    },
-	// workbenchBody: {
-    //     type$: "tabs/Stack",
-    //     extend$conf: {
-    //         indexType: "/workbench/WorkbenchTab"
-    //     },
-    //     view(data) {
-    //         this.super(view, data);
-    //         let content = this.add({
-    //             title: "Test"
-    //         }, this.owner.create("/workbench/content"));
-    //         this.add({
-    //             title: "Test2",
-    //             icon: "/res/icons/moon.svg"
-    //         });
-    //         this.activate(content);
-    //     },
-    // },
-    // context: {
-    //     type$: "Display",
-    //     add(icon) {
-    //         let button = this.owner.create("/ui/pen/Image");
-    //         this.append(button);
-    //         return button;
-    //     },
-    //     display() {
-    //         this.super(display);
-    //         this.add("/res/icons/folder.svg");
-    //     }
-    // },
     sidebar: {
         type$: ["Display", "Shape"],
         members: {
@@ -323,36 +295,4 @@ export default {
             }
         }
     }
-    // content: {
-    //     type$: "tabs/Stack",
-    //     view(data) {
-    //         this.super(view, data);
-    //         //let tree = this.add("Tree");
-    //         let draw = this.add({
-    //             title: "Draw",
-    //             icon: "/res/icons/photo.svg"
-    //         }, this.owner.create("/ui/pen/Canvas"));
-    //         this.add({
-    //             title: "Note",
-    //             icon: "/res/icons/book.svg"
-    //         }, this.owner.create("/ui/note/Note"));
-    //         this.add({
-    //             title: "Table",
-    //             icon: "/res/icons/work.svg"
-    //         }, this.owner.create({
-    //             type$: "/ui/grid/Table",
-    //             conf: {
-    //                 type$types: "/workbench/types",
-    //                 type$data: "/workbench/data"
-    //             }
-    //         }));
-    //         this.add({
-    //             title: "Tree",
-    //             icon: "/res/icons/folder-open.svg"
-    //         }, this.owner.create({
-    //             type$: "/ui/tree/Item",
-    //          }));            
-    //         this.activate(draw);
-    //     }
-    // }
 }
