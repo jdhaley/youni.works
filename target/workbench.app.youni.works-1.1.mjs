@@ -5,7 +5,7 @@ import compiler from "./compiler.youni.works-1.0.mjs";
 const module = {
 	"name": "workbench.app.youni.works",
 	"version": "1.1",
-	"moduleType": "app"
+	"moduleType": "ui"
 };
 module.use = {
 	system: system,
@@ -32,16 +32,17 @@ const conf = {
 		},
 		"main": {
 			"type": "/workbench/Workbench",
-			"bodies": {
-				"test1": {
-					"title": "",
-					"icon": "/res/bag.svg",
+			"views": {
+				"test": {
+					"title": "Test",
+					"icon": "/res/activity.svg",
 					"body": {
+						"type$": "/workbench/content"
 					}
 				},
-				"test2": {
-					"title": "",
-					"icon": "/res/bag.svg",
+				"dummy": {
+					"title": "Dummy",
+					"icon": "/res/moon.svg",
 					"body": {
 					}
 				}
@@ -149,12 +150,22 @@ function workbench() {
 	"Workbench": {
 		"type$": "/workbench/Display",
 		"nodeName": "main",
-		"direction": "horizontal",
+		"extend$conf": {
+			"views": {
+			}
+		},
 		"members": {
 			"type$header": "/workbench/Display",
 			"type$body": "/workbench/workbenchBody",
 			"type$footer": "/workbench/workbenchFooter"
-		}
+		},
+		"start": function start(conf) {
+            this.super(start, conf);
+            console.log(conf);
+        },
+		"modelof": function modelof(part) {
+            if (part == this.parts.body) return this.conf.views;
+        }
 	},
 	"workbenchFooter": {
 		"type$": "/workbench/Display"

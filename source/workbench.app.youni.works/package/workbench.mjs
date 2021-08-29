@@ -37,12 +37,22 @@ export default {
     Workbench: {
         type$: "Display",
         nodeName: "main",
-		direction: "horizontal",
+        extend$conf: {
+            views: {
+            }
+        },
 		members: {
             type$header: "Display",
 			type$body: "workbenchBody",
 			type$footer: "workbenchFooter"
-		}
+		},
+        start(conf) {
+            this.super(start, conf);
+            console.log(conf);
+        },
+        modelof(part) {
+            if (part == this.parts.body) return this.conf.views;
+        }
     },
     workbenchFooter: {
         type$: "Display"

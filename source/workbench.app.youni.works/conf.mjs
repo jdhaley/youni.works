@@ -7,16 +7,17 @@ export default {
         editors: editors,
         main: {
             type: "/workbench/Workbench",
-            bodies: {
-                test1: {
-                    title: "",
-                    icon: "/res/bag.svg",
+            views: {
+                test: {
+                    title: "Test",
+                    icon: "/res/activity.svg",
                     body: {
+                        type$: "/workbench/content"
                     }
                 },
-                test2: {
-                    title: "",
-                    icon: "/res/bag.svg",
+                dummy: {
+                    title: "Dummy",
+                    icon: "/res/moon.svg",
                     body: {
                     }                   
                 }

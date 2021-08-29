@@ -18,8 +18,9 @@ export default {
         },
         add(conf, body) {
             if (!body) {
-                body = this.owner.create(this.conf.viewType);
-                body.peer.textContent = conf.title;
+                body = conf.body || this.conf.viewType;
+                body = this.owner.create(body);
+                //body.peer.textContent = conf.title;
             }
             body.peer.$display = body.style.display;
             body.style.display = "none";
@@ -33,6 +34,9 @@ export default {
             return tab;
         },
         activate(tab) {
+            if (!tab && this.to[0]) {
+                tab = this.to[0];
+            }
             if (!tab || tab == this.activeTab) return;
             if (this.activeTab) {
                 this.activeTab.peer.classList.remove("activeTab");
@@ -44,6 +48,11 @@ export default {
         },
         draw(tab) {
        //     tab.body.peer.setAttribute("viewBox", "0 0 320 320");
+        },
+        view(views) {
+            this.super(view);
+            if (views) for (let view in views) this.add(view);
+            this.activate();
         },
         extend$actions: {
             activateTab(event) {

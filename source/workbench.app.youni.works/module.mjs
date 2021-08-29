@@ -1,7 +1,7 @@
 export default {
     name: "workbench.app.youni.works",
     version: "1.1",
-    moduleType: "app",
+    moduleType: "ui",
     use: {
         system: "system.youni.works-2.1",
         base: "base.youni.works-1.2",
