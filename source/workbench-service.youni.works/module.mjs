@@ -1,5 +1,5 @@
 export default {
-    name: "workbench.service.youni.works",
+    name: "workbench-service.youni.works",
     author: "youni.works",
     version: "1.0",
     moduleType: "service",

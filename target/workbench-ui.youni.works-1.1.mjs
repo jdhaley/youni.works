@@ -3,7 +3,7 @@ import base from "./base.youni.works-1.2.mjs";
 import ui from "./ui.youni.works-1.1.mjs";
 import compiler from "./compiler.youni.works-1.0.mjs";
 const module = {
-	"name": "workbench.app.youni.works",
+	"name": "workbench-ui.youni.works",
 	"version": "1.1",
 	"moduleType": "ui"
 };

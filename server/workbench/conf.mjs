@@ -1,4 +1,4 @@
-import service	from "../../target/workbench.service.youni.works-1.0.mjs";
+import service	from "../../target/workbench-service.youni.works-1.0.mjs";
 import compiler	from "../../target/compiler.youni.works-1.0.mjs";
 
 export default {

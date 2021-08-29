@@ -2,7 +2,7 @@ import system from "./system.youni.works-2.1.mjs";
 import service from "./service.youni.works-1.0.mjs";
 import compiler from "./compiler.youni.works-1.0.mjs";
 const module = {
-	"name": "workbench.service.youni.works",
+	"name": "workbench-service.youni.works",
 	"author": "youni.works",
 	"version": "1.0",
 	"moduleType": "service",
@@ -22,7 +22,7 @@ const conf = {
 		"engine": "express",
 		"endpoints": {
 			"/workbench.html": "static/workbench.html",
-			"/module/index.mjs": "../../target/workbench.app.youni.works-1.1.mjs",
+			"/module/index.mjs": "../../target/workbench-ui.youni.works-1.1.mjs",
 			"/module": "../../target",
 			"/res": "static/res",
 			"/file": "static/fs",

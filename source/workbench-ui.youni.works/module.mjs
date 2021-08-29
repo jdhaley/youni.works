@@ -1,5 +1,5 @@
 export default {
-    name: "workbench.app.youni.works",
+    name: "workbench-ui.youni.works",
     version: "1.1",
     moduleType: "ui",
     use: {
