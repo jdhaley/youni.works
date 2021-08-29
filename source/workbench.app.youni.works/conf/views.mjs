@@ -1,3 +1,4 @@
+import grid from "./grid.mjs";
 export default {
 	test: {
 		title: "Test",
@@ -22,8 +23,8 @@ export default {
 						body: {
 							type$: "/ui/grid/Table",
 							extend$conf: {
-								type$types: "/workbench/types",
-								type$data: "/workbench/data"
+								types: grid.types,
+								data: grid.data
 							}
 						}
 					},
