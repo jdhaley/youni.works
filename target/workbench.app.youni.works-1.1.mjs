@@ -37,7 +37,43 @@ const conf = {
 					"title": "Test",
 					"icon": "/res/icons/activity.svg",
 					"body": {
-						"type$": "/workbench/content"
+						"type$": "/ui/tabs/Stack",
+						"extend$conf": {
+							"views": {
+								"draw": {
+									"title": "Draw",
+									"icon": "/res/icons/photo.svg",
+									"type$body": "/ui/pen/Canvas"
+								},
+								"note": {
+									"title": "Note",
+									"icon": "/res/icons/book.svg",
+									"type$body": "/ui/note/Note"
+								},
+								"table": {
+									"title": "Table",
+									"icon": "/res/icons/work.svg",
+									"body": {
+										"type$": "/ui/grid/Table",
+										"extend$conf": {
+											"type$types": "/workbench/types",
+											"type$data": "/workbench/data"
+										}
+									}
+								},
+								"tree": {
+									"title": "Tree",
+									"icon": "/res/icons/folder-open.svg",
+									"body": {
+										"type$": "/ui/tree/Item"
+									}
+								}
+							}
+						},
+						"view": function view() {
+				this.super(view, this.conf.views);
+				this.activate();
+			}
 					}
 				},
 				"dummy": {
@@ -392,38 +428,6 @@ function workbench() {
 				"image": "/file/stamp/x.png"
 			}
 		}
-	},
-	"content": {
-		"type$": "/workbench/tabs/Stack",
-		"view": function view(data) {
-            this.super(view, data);
-            //let tree = this.add("Tree");
-            let draw = this.add({
-                title: "Draw",
-                icon: "/res/icons/photo.svg"
-            }, this.owner.create("/ui/pen/Canvas"));
-            this.add({
-                title: "Note",
-                icon: "/res/icons/book.svg"
-            }, this.owner.create("/ui/note/Note"));
-            this.add({
-                title: "Table",
-                icon: "/res/icons/work.svg"
-            }, this.owner.create({
-                type$: "/ui/grid/Table",
-                conf: {
-                    type$types: "/workbench/types",
-                    type$data: "/workbench/data"
-                }
-            }));
-            this.add({
-                title: "Tree",
-                icon: "/res/icons/folder-open.svg"
-            }, this.owner.create({
-                type$: "/ui/tree/Item",
-             }));            
-            this.activate(draw);
-        }
 	}
 }
 return pkg;

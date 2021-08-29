@@ -322,37 +322,37 @@ export default {
                 "image": "/file/stamp/x.png"
             }
         }
-    },
-    content: {
-        type$: "tabs/Stack",
-        view(data) {
-            this.super(view, data);
-            //let tree = this.add("Tree");
-            let draw = this.add({
-                title: "Draw",
-                icon: "/res/icons/photo.svg"
-            }, this.owner.create("/ui/pen/Canvas"));
-            this.add({
-                title: "Note",
-                icon: "/res/icons/book.svg"
-            }, this.owner.create("/ui/note/Note"));
-            this.add({
-                title: "Table",
-                icon: "/res/icons/work.svg"
-            }, this.owner.create({
-                type$: "/ui/grid/Table",
-                conf: {
-                    type$types: "/workbench/types",
-                    type$data: "/workbench/data"
-                }
-            }));
-            this.add({
-                title: "Tree",
-                icon: "/res/icons/folder-open.svg"
-            }, this.owner.create({
-                type$: "/ui/tree/Item",
-             }));            
-            this.activate(draw);
-        }
     }
+    // content: {
+    //     type$: "tabs/Stack",
+    //     view(data) {
+    //         this.super(view, data);
+    //         //let tree = this.add("Tree");
+    //         let draw = this.add({
+    //             title: "Draw",
+    //             icon: "/res/icons/photo.svg"
+    //         }, this.owner.create("/ui/pen/Canvas"));
+    //         this.add({
+    //             title: "Note",
+    //             icon: "/res/icons/book.svg"
+    //         }, this.owner.create("/ui/note/Note"));
+    //         this.add({
+    //             title: "Table",
+    //             icon: "/res/icons/work.svg"
+    //         }, this.owner.create({
+    //             type$: "/ui/grid/Table",
+    //             conf: {
+    //                 type$types: "/workbench/types",
+    //                 type$data: "/workbench/data"
+    //             }
+    //         }));
+    //         this.add({
+    //             title: "Tree",
+    //             icon: "/res/icons/folder-open.svg"
+    //         }, this.owner.create({
+    //             type$: "/ui/tree/Item",
+    //          }));            
+    //         this.activate(draw);
+    //     }
+    // }
 }
