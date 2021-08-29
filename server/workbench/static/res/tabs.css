@@ -55,9 +55,11 @@
 	/*border-bottom: 1px solid gainsboro; */
 }
 .activeTab {
-	color: seagreen;
 	background-color: white;
 	border-bottom-color: white;
+}
+.activeTab * {
+	color: steelblue;
 }
 .tab>IMG {
 	width: 20px;
@@ -81,16 +83,13 @@
 	overflow: hidden;
 }
 .workbenchTab {
-	max-width: 48px;
-	max-height: 48px;
-	min-width: 48px;
-	min-height: 48px;
-	flex: 1 1;
-	background: none;
-	color: white;
-	cursor: pointer;
-	border: 0;
+	border-right: 2px solid none;
+	background-color: none;
 	padding: 2px;
+}
+.workbenchTab.activeTab {
+	background-color: inherit;
+	border-right: 2px solid white;
 }
 .workbenchTab>IMG {
 	margin-top: 8px;

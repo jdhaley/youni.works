@@ -10,16 +10,14 @@ export default {
             views: {
                 test: {
                     title: "Test",
-                    icon: "/res/activity.svg",
+                    icon: "/res/icons/activity.svg",
                     body: {
                         type$: "/workbench/content"
                     }
                 },
                 dummy: {
                     title: "Dummy",
-                    icon: "/res/moon.svg",
-                    body: {
-                    }                   
+                    icon: "/res/icons/moon.svg"
                 }
             }
         }

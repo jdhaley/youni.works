@@ -51,7 +51,7 @@ export default {
         },
         view(views) {
             this.super(view);
-            if (views) for (let view in views) this.add(view);
+            if (views) for (let key in views) this.add(views[key]);
             this.activate();
         },
         extend$actions: {

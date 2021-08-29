@@ -1,7 +1,7 @@
 export default {
 	type$: "/ui/panel",
-    type$tree: "/ui/tree",
     type$tabs: "/ui/tabs",
+    type$tree: "/ui/tree",
     type$Shape: "/ui/shape/Shape",
     ArticleView: {
         type$: "Display",
@@ -42,53 +42,55 @@ export default {
             }
         },
 		members: {
-            type$header: "Display",
-			type$body: "workbenchBody",
-			type$footer: "workbenchFooter"
+            header: {
+                type$: "Display"
+            },
+			body: {
+                type$: "tabs/Stack",
+                extend$conf: {
+                    indexType: "/workbench/WorkbenchTab"
+                }        
+            },
+			footer: {
+                type$: "Display"
+            }
 		},
-        start(conf) {
-            this.super(start, conf);
-            console.log(conf);
-        },
-        modelof(part) {
+        modelFor(part) {
             if (part == this.parts.body) return this.conf.views;
         }
-    },
-    workbenchFooter: {
-        type$: "Display"
     },
     WorkbenchTab: {
         type$: "tabs/Tab"
     },
-	workbenchBody: {
-        type$: "tabs/Stack",
-        extend$conf: {
-            indexType: "/workbench/WorkbenchTab"
-        },
-        view(data) {
-            this.super(view, data);
-            let content = this.add({
-                title: "Test"
-            }, this.owner.create("/workbench/content"));
-            this.add({
-                title: "Test2",
-                icon: "/res/icons/moon.svg"
-            });
-            this.activate(content);
-        },
-    },
-    context: {
-        type$: "Display",
-        add(icon) {
-            let button = this.owner.create("/ui/pen/Image");
-            this.append(button);
-            return button;
-        },
-        display() {
-            this.super(display);
-            this.add("/res/icons/folder.svg");
-        }
-    },
+	// workbenchBody: {
+    //     type$: "tabs/Stack",
+    //     extend$conf: {
+    //         indexType: "/workbench/WorkbenchTab"
+    //     },
+    //     view(data) {
+    //         this.super(view, data);
+    //         let content = this.add({
+    //             title: "Test"
+    //         }, this.owner.create("/workbench/content"));
+    //         this.add({
+    //             title: "Test2",
+    //             icon: "/res/icons/moon.svg"
+    //         });
+    //         this.activate(content);
+    //     },
+    // },
+    // context: {
+    //     type$: "Display",
+    //     add(icon) {
+    //         let button = this.owner.create("/ui/pen/Image");
+    //         this.append(button);
+    //         return button;
+    //     },
+    //     display() {
+    //         this.super(display);
+    //         this.add("/res/icons/folder.svg");
+    //     }
+    // },
     sidebar: {
         type$: ["Display", "Shape"],
         members: {

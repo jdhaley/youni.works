@@ -35,16 +35,14 @@ const conf = {
 			"views": {
 				"test": {
 					"title": "Test",
-					"icon": "/res/activity.svg",
+					"icon": "/res/icons/activity.svg",
 					"body": {
 						"type$": "/workbench/content"
 					}
 				},
 				"dummy": {
 					"title": "Dummy",
-					"icon": "/res/moon.svg",
-					"body": {
-					}
+					"icon": "/res/icons/moon.svg"
 				}
 			}
 		}
@@ -120,8 +118,8 @@ return pkg;
 function workbench() {
 	const pkg = {
 	"type$": "/ui/panel",
-	"type$tree": "/ui/tree",
 	"type$tabs": "/ui/tabs",
+	"type$tree": "/ui/tree",
 	"type$Shape": "/ui/shape/Shape",
 	"ArticleView": {
 		"type$": "/workbench/Display"
@@ -155,52 +153,25 @@ function workbench() {
 			}
 		},
 		"members": {
-			"type$header": "/workbench/Display",
-			"type$body": "/workbench/workbenchBody",
-			"type$footer": "/workbench/workbenchFooter"
+			"header": {
+				"type$": "/workbench/Display"
+			},
+			"body": {
+				"type$": "/workbench/tabs/Stack",
+				"extend$conf": {
+					"indexType": "/workbench/WorkbenchTab"
+				}
+			},
+			"footer": {
+				"type$": "/workbench/Display"
+			}
 		},
-		"start": function start(conf) {
-            this.super(start, conf);
-            console.log(conf);
-        },
-		"modelof": function modelof(part) {
+		"modelFor": function modelFor(part) {
             if (part == this.parts.body) return this.conf.views;
         }
 	},
-	"workbenchFooter": {
-		"type$": "/workbench/Display"
-	},
 	"WorkbenchTab": {
 		"type$": "/workbench/tabs/Tab"
-	},
-	"workbenchBody": {
-		"type$": "/workbench/tabs/Stack",
-		"extend$conf": {
-			"indexType": "/workbench/WorkbenchTab"
-		},
-		"view": function view(data) {
-            this.super(view, data);
-            let content = this.add({
-                title: "Test"
-            }, this.owner.create("/workbench/content"));
-            this.add({
-                title: "Test2",
-                icon: "/res/icons/moon.svg"
-            });
-            this.activate(content);
-        }
-	},
-	"context": {
-		"type$": "/workbench/Display",
-		"add": function add(icon) {
-            let button = this.owner.create("/ui/pen/Image");
-            this.append(button);
-            return button;
-        },
-		"display": function display() {
-            this.super(display);
-            this.add("/res/icons/folder.svg");
-        }
 	},
 	"sidebar": {
 		"type$": ["/workbench/Display", "/workbench/Shape"],
