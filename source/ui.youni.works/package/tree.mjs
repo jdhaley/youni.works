@@ -37,6 +37,7 @@ export default {
             this.super(view, model);
             if (!model) {
                 console.log(this.of.key);
+                return;
             }
             let facet = this.facets[model.facet];
             let icon = facet ? facet.icon : "/res/icons/fullscreen.svg";

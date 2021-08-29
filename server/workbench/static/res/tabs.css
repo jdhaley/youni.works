@@ -52,7 +52,7 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	border-right: 1px solid gainsboro;
-	border-bottom: 1px solid gainsboro;
+	/*border-bottom: 1px solid gainsboro; */
 }
 .activeTab {
 	color: seagreen;

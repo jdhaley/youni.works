@@ -42,27 +42,6 @@ export default {
 		get$parts() {
 			return this.peer.$parts;
 		},
-		createContent(value, key) {
-			let type = this.typeFor(value, key);
-			let conf = this.configurationFor(value, key);
-			let control = this.owner.create(type, conf);
-			this.control(control, key);
-			this.append(control);
-			return control;
-		},
-		control(part, key) {
-			part.key = key;
-			this.parts[key] = part;
-		},
-		typeFor(value, key) {
-			if (this.members) {
-				return this.members[key] ? this.members[key] : "";
-			}
-			return this.contentType ||  "";
-		},
-		configurationFor(value, key) {
-			return this.conf;
-		},
 		view(model) {
 			this.model = model;
 			if (!this.parts) {
@@ -76,6 +55,27 @@ export default {
 			}
 
 			if (this.observe) this.observe(model);			
+		},
+		createContent(value, key) {
+			let type = this.typeFor(value, key);
+			let conf = this.configurationFor(value, key);
+			let control = this.owner.create(type, conf);
+			this.control(control, key);
+			this.append(control);
+			return control;
+		},
+		typeFor(value, key) {
+			if (this.members) {
+				return this.members[key] ? this.members[key] : "";
+			}
+			return this.contentType ||  "";
+		},
+		configurationFor(value, key) {
+			return this.conf;
+		},
+		control(part, key) {
+			part.key = key;
+			this.parts[key] = part;
 		},
 		modelFor(contentView) {
 			return this.members ? this.model : this.model && this.model[contentView.key];

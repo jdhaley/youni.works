@@ -462,27 +462,6 @@ function view() {
 		"get$parts": function get$parts() {
 			return this.peer.$parts;
 		},
-		"createContent": function createContent(value, key) {
-			let type = this.typeFor(value, key);
-			let conf = this.configurationFor(value, key);
-			let control = this.owner.create(type, conf);
-			this.control(control, key);
-			this.append(control);
-			return control;
-		},
-		"control": function control(part, key) {
-			part.key = key;
-			this.parts[key] = part;
-		},
-		"typeFor": function typeFor(value, key) {
-			if (this.members) {
-				return this.members[key] ? this.members[key] : "";
-			}
-			return this.contentType ||  "";
-		},
-		"configurationFor": function configurationFor(value, key) {
-			return this.conf;
-		},
 		"view": function view(model) {
 			this.model = model;
 			if (!this.parts) {
@@ -496,6 +475,27 @@ function view() {
 			}
 
 			if (this.observe) this.observe(model);			
+		},
+		"createContent": function createContent(value, key) {
+			let type = this.typeFor(value, key);
+			let conf = this.configurationFor(value, key);
+			let control = this.owner.create(type, conf);
+			this.control(control, key);
+			this.append(control);
+			return control;
+		},
+		"typeFor": function typeFor(value, key) {
+			if (this.members) {
+				return this.members[key] ? this.members[key] : "";
+			}
+			return this.contentType ||  "";
+		},
+		"configurationFor": function configurationFor(value, key) {
+			return this.conf;
+		},
+		"control": function control(part, key) {
+			part.key = key;
+			this.parts[key] = part;
 		},
 		"modelFor": function modelFor(contentView) {
 			return this.members ? this.model : this.model && this.model[contentView.key];
