@@ -102,8 +102,13 @@ function control() {
 			let subject = msg.subject;
 			while (subject) {
 				let action = this.actions[subject];
-				action && action.call(this, msg);
-				subject = (subject != msg.subject ? msg.subject : "");
+				try {
+					action && action.call(this, msg);
+					subject = (subject != msg.subject ? msg.subject : "");	
+				} catch (error) {
+					console.log(error);
+					subject = "";
+				}
 			}
 		},
 		"extend$actions": {

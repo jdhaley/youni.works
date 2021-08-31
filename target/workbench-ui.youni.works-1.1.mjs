@@ -214,7 +214,9 @@ const conf = {
 														"image": "/file/stamp/x.png"
 													}
 												}
-											}
+											},
+											"objectType": "Issue",
+											"dataset": "Issue"
 										}
 									}
 								},

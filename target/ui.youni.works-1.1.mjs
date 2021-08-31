@@ -753,8 +753,7 @@ function grid() {
 	},
 	"Key": {
 		"type$": ["/grid/Display", "/grid/Shape"],
-		"display": function display() {
-			this.super(display);
+		"view": function view() {
 			let key = this.of.key || "";
 			this.peer.textContent = key;
 		}
@@ -843,6 +842,14 @@ function grid() {
 		"start": function start(conf) {
 			this.super(start, conf);
 			this.peer.id = "I" + this.owner.createId();
+		},
+		"view": function view(model) {
+			if (model === undefined && this.conf.dataset) {
+				model = this.conf.data[this.conf.dataset];
+				this.conf.members = this.conf.types[this.conf.objectType].members;
+			}
+			console.log(model);
+			this.super(view, model);
 		}
 	}
 }

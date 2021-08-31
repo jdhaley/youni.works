@@ -24,7 +24,9 @@ export default {
 							type$: "/ui/grid/Table",
 							extend$conf: {
 								types: grid.types,
-								data: grid.data
+								data: grid.data,
+								objectType: "Issue",
+								dataset: "Issue"
 							}
 						}
 					},
