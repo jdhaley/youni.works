@@ -1,13 +1,11 @@
 export default {
     types: {
         "Design": {
-            "members": [
-                {
-                    "name": "id",
-                    "columnSize": 4
+            "members": {
+                "id": {
+                     "columnSize": 4
                 },
-                {
-                    "name": "shape",
+                "shape": {
                     "columnSize": 4,
                     "choice": {
                         "r": "Rectangle",
@@ -17,28 +15,24 @@ export default {
                         "x": "Irregular"
                     }
                 },
-                {
-                    "name": "width",
+                "width": {
                     "dataType": "number",
                     "columnSize": 4
                 },
-                {
-                    "name": "height",
+                "height": {
                     "dataType": "number",
                     "columnSize": 4
                 }
-            ]
+            }
         },
         "Issue": {
-            "members": [
-                {
-                    "name": "issued",
+            "members": {
+                "issued": {
                     "dataType": "date",
                     "columnSize": 4,
                     "flex": false
                 },
-                {
-                    "name": "design",
+                "design": {
                     "columnSize": 3,
                     "flex": false,
                     "dataType": "link",
@@ -46,28 +40,24 @@ export default {
                     "dataset": "Design",
                     "readOnly": false
                 },
-                {
-                    "name": "denom",
+                "denom": {
                     "caption": "Denomination",
                     "columnSize": 4
                 },
-                {
-                    "name": "colors",
+                "colors": {
                     "columnSize": 2,
                     "flex": false,
                     "inputType": "color"
                 },
-                {
-                    "name": "subject",
+                "subject": {
                     "columnSize": 6
                 },
-                {
-                    "name": "image",
+                "image": {
                     "dataType": "media",
                     "mediaType": "image",
                     "columnSize": 8
                 }
-            ]
+            }
         }
     },
     data: {

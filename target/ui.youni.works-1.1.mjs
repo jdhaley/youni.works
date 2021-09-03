@@ -840,13 +840,16 @@ function grid() {
 			return this.peer.id;
 		},
 		"start": function start(conf) {
-			this.super(start, conf);
 			this.peer.id = "I" + this.owner.createId();
+			this.super(start, conf);
+			if (this.conf.data) {
+
+			}
 		},
 		"view": function view(model) {
-			if (model === undefined && this.conf.dataset) {
-				model = this.conf.data[this.conf.dataset];
-				this.conf.members = this.conf.types[this.conf.objectType].members;
+			if (model === undefined && this.conf.data) {
+				model = this.conf.data.values[this.conf.dataset];
+			//	this.conf.members = this.conf.data.types[this.conf.objectType].members;
 			}
 			console.log(model);
 			this.super(view, model);
@@ -1515,7 +1518,8 @@ function record() {
 			"members": []
 		},
 		"once$members": function once$members() {
-			let members = this.conf.members;
+			let members = this.conf.data.types[this.conf.data.objectType].members;
+			console.log(members);
 			let keyProp = this.conf.memberKeyProperty || "name";
 			if (members && members[Symbol.iterator]) {
 				members = Object.create(null);

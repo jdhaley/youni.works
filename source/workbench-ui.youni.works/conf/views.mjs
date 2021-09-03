@@ -23,10 +23,12 @@ export default {
 						body: {
 							type$: "/ui/grid/Table",
 							extend$conf: {
-								types: grid.types,
-								data: grid.data,
-								objectType: "Issue",
-								dataset: "Issue"
+								data: {
+									types: grid.types,
+									values: grid.data,
+									objectType: "Issue",
+									dataset: "Issue"	
+								}
 							}
 						}
 					},

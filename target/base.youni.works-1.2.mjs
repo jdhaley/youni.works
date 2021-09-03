@@ -10,6 +10,7 @@ module.use = {
 module.package = {
 	command: command(),
 	control: control(),
+	data: data(),
 	dom: dom(),
 	origin: origin(),
 	util: util(),
@@ -106,8 +107,8 @@ function control() {
 					action && action.call(this, msg);
 					subject = (subject != msg.subject ? msg.subject : "");	
 				} catch (error) {
-					console.log(error);
-					subject = "";
+					console.error(error);
+//					subject = "";
 				}
 			}
 		},
@@ -218,6 +219,46 @@ function control() {
 				signal.source = on;
 				signal.model = model;
 				ctl.receive(signal);
+			}
+		}
+	}
+}
+return pkg;
+}
+
+function data() {
+	const pkg = {
+	"Dataset": {
+		"dataSource": null,
+		"dataType": null,
+		"create": function create(value) {
+		},
+		"retrieve": function retrieve(id) {
+		},
+		"update": function update(id, value) {
+		},
+		"del": function del(id) {
+		}
+	},
+	"DataSource": {
+		"types": {
+		},
+		"data": {
+		},
+		"views": {
+		},
+		"start": function start() {
+			this.let("views", Object.create(null));
+			for (let typeName in this.types) {
+				let type = this.types[typeName];
+				let members = Object.create(null);
+				for (let memberName in type.members) {
+					let member = type.members[memberName];
+					member.name = memberName;
+					let memberType = member.controlType || "/ui/record/Property";
+					members[memberName] = this.owner.create(memberType, member);
+				}
+				views[typeName] = members;
 			}
 		}
 	}

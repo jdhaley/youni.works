@@ -14,7 +14,8 @@ export default {
 		//TODO - work in logic with the extend$ facet (it can accept arrays containing element.name objects)
 		//TOOD - re above - more generally - thinking about converting arrays based on key/id value.
 		once$members() {
-			let members = this.conf.members;
+			let members = this.conf.data.types[this.conf.data.objectType].members;
+			console.log(members);
 			let keyProp = this.conf.memberKeyProperty || "name";
 			if (members && members[Symbol.iterator]) {
 				members = Object.create(null);
