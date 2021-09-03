@@ -1,21 +1,38 @@
 export default {
     type$: "/control",
 	Viewer: {
-		type$: ["Receiver", "Sender"],
+		type$: "Controller",
 		view(model) {
 		},
 		modelFor(part) {
 		},
 		extend$actions: {
 			view(event) {
-				for (let view of this.to) {
-					view.view(this.modelFor(view));
+				for (let part of this.to) {
+					part.view(this.modelFor(part));
 				}
 			}
 		}
 	},
-	View: {
-		type$: ["Viewer", "Sensor"],
+	Container: {
+		type$: "Viewer",
+		xxxxforEach(value, method, methodObject) {
+            if (!methodObject) methodObject = this;
+            if (value && value[Symbol.iterator]) {
+                let i = 0;
+                for (let datum of value) {
+                    method.call(methodObject, datum, i++, value);
+                }
+            } else if (typeof value == "object") {
+                for (let name in value) {
+                    method.call(methodObject, value[name], name, value);
+                }
+            }
+            // } else {
+            //     method.call(methodObject, value, "", value);
+            // }
+        },
+		type$forEach: "util/forEach",
 		var$model: undefined,
 		view(data) {
 			this.model = data;
@@ -23,17 +40,6 @@ export default {
 		modelFor(contentView) {
 			return this.model;
 		},
-		extend$actions: {
-			view(event) {
-				for (let view of this.to) {
-					view.view(this.modelFor(view));
-				}
-			}
-		}
-	},
-	Container: {
-		type$: "View",
-		type$forEach: "util/forEach",
 		part(key) {
 			for (let part of this.to) {
 				if (part.key == key) return part;

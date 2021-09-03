@@ -159,7 +159,7 @@ function control() {
 			}
 		}
 	},
-	"Control": {
+	"Controller": {
 		"type$": ["/control/Receiver", "/control/Sender", "/control/Sensor"]
 	},
 	"Publisher": {
@@ -557,47 +557,39 @@ function view() {
 	const pkg = {
 	"type$": "/control",
 	"Viewer": {
-		"type$": ["/view/Receiver", "/view/Sender"],
+		"type$": "/view/Controller",
 		"view": function view(model) {
 		},
 		"modelFor": function modelFor(part) {
 		},
 		"extend$actions": {
 			"view": function view(event) {
-				for (let view of this.to) {
-					view.view(this.modelFor(view));
-				}
-			}
-		}
-	},
-	"View": {
-		"type$": ["/view/Viewer", "/view/Sensor"],
-		"var$model": undefined,
-		"view": function view(data) {
-			this.model = data;
-		},
-		"modelFor": function modelFor(contentView) {
-			return this.model;
-		},
-		"extend$actions": {
-			"view": function view(event) {
-				for (let view of this.to) {
-					view.view(this.modelFor(view));
+				for (let part of this.to) {
+					part.view(this.modelFor(part));
 				}
 			}
 		}
 	},
 	"Container": {
-		"type$": "/view/View",
+		"type$": "/view/Viewer",
+		"xxxxforEach": function xxxxforEach(value, method, methodObject) {
+            if (!methodObject) methodObject = this;
+            if (value && value[Symbol.iterator]) {
+                let i = 0;
+                for (let datum of value) {
+                    method.call(methodObject, datum, i++, value);
+                }
+            } else if (typeof value == "object") {
+                for (let name in value) {
+                    method.call(methodObject, value[name], name, value);
+                }
+            }
+            // } else {
+            //     method.call(methodObject, value, "", value);
+            // }
+        },
 		"type$forEach": "/view/util/forEach",
-		"part": function part(key) {
-			for (let part of this.to) {
-				if (part.key == key) return part;
-			}
-		},
-		"get$parts": function get$parts() {
-			return this.peer.$parts;
-		},
+		"var$model": undefined,
 		"view": function view(model) {
 			this.model = model;
 			if (!this.parts) {
@@ -611,6 +603,17 @@ function view() {
 			}
 
 			if (this.observe) this.observe(model);			
+		},
+		"modelFor": function modelFor(contentView) {
+			return this.members ? this.model : this.model && this.model[contentView.key];
+		},
+		"part": function part(key) {
+			for (let part of this.to) {
+				if (part.key == key) return part;
+			}
+		},
+		"get$parts": function get$parts() {
+			return this.peer.$parts;
 		},
 		"createContent": function createContent(value, key) {
 			let type = this.typeFor(value, key);
@@ -632,9 +635,6 @@ function view() {
 		"control": function control(part, key) {
 			part.key = key;
 			this.parts[key] = part;
-		},
-		"modelFor": function modelFor(contentView) {
-			return this.members ? this.model : this.model && this.model[contentView.key];
 		}
 	}
 }

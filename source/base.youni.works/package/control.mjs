@@ -70,7 +70,7 @@ export default {
 			}
 		}
 	},
-	Control: {
+	Controller: {
 		type$: ["Receiver", "Sender", "Sensor"]
 	},
 	Publisher: {
