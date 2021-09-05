@@ -14,20 +14,10 @@ export default {
 		//TODO - work in logic with the extend$ facet (it can accept arrays containing element.name objects)
 		//TOOD - re above - more generally - thinking about converting arrays based on key/id value.
 		once$members() {
-			let members = this.conf.data.types[this.conf.data.objectType].members;
-			console.log(members);
-			let keyProp = this.conf.memberKeyProperty || "name";
-			if (members && members[Symbol.iterator]) {
-				members = Object.create(null);
-				for (let member of this.conf.members) {
-					let key = member[keyProp];
-					if (key) members[key] = member;
-				}
-			} else {
-				for (let key in members) {
-					let member = members[key];
-					if (!member[keyProp]) member[keyProp] = key;
-				}
+			let conf = this.conf.data.types[this.conf.data.objectType].members;
+			let members = Object.create(null);
+			for (let key in conf) {
+				members[key] = this.owner.create("/ui/record/Property", conf[key]);
 			}
 			return members;
 		},

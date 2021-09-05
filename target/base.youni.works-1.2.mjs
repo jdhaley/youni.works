@@ -592,13 +592,10 @@ function view() {
 		"var$model": undefined,
 		"view": function view(model) {
 			this.model = model;
-			if (!this.parts) {
-				this.peer.$parts = Object.create(null);
-				if (this.members) {
-					this.forEach(this.members, this.createContent);
-				}	
-			}
-			if (!this.members) {
+			if (this.members && !this.peer.$drawn) {
+				this.forEach(this.members, this.createContent);
+				this.peer.$drawn = true;
+			} else {
 				this.forEach(model, this.createContent);
 			}
 
@@ -607,13 +604,10 @@ function view() {
 		"modelFor": function modelFor(contentView) {
 			return this.members ? this.model : this.model && this.model[contentView.key];
 		},
-		"part": function part(key) {
+		"at": function at(key) {
 			for (let part of this.to) {
 				if (part.key == key) return part;
 			}
-		},
-		"get$parts": function get$parts() {
-			return this.peer.$parts;
 		},
 		"createContent": function createContent(value, key) {
 			let type = this.typeFor(value, key);
@@ -634,7 +628,6 @@ function view() {
 		},
 		"control": function control(part, key) {
 			part.key = key;
-			this.parts[key] = part;
 		}
 	}
 }

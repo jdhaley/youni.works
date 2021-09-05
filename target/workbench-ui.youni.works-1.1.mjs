@@ -428,7 +428,7 @@ function workbench() {
 			}
 		},
 		"modelFor": function modelFor(part) {
-            if (part == this.parts.body) return this.conf.views;
+            if (part == this.at("body")) return this.conf.views;
         }
 	},
 	"WorkbenchTab": {

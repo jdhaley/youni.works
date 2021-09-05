@@ -29,13 +29,13 @@ export default {
             let title = conf.title;
             tab.peer.innerHTML = `<img src=${icon}><span>${title}</span>`;
             tab.body = body;
-            this.parts.header.append(tab);
-            this.parts.body.append(body);
+            this.at("header").append(tab);
+            this.at("body").append(body);
             return tab;
         },
         activate(tab) {
             if (tab === undefined) {
-                for (let first of this.parts.header.to) {
+                for (let first of this.at("header").to) {
                     tab = first;
                     break;
                 }

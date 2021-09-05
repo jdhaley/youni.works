@@ -109,14 +109,15 @@ export default {
                 event.subject = "showValue";
             },
 			collapsed(event) {
-                this.parts.body.style.display = "none";
+                this.at("body").style.display = "none";
                 event.subject = "";
 			},
 			expanded(event) {
-                if (!this.parts.body.peer.childNodes.length) {
-                    this.parts.body.view(this.model);
+                const body = this.at("body");
+                if (!body.peer.childNodes.length) {
+                    body.view(this.model);
                 }
-                this.parts.body.style.removeProperty("display");
+                body.style.removeProperty("display");
                 event.subject = "";
 			}
 		}

@@ -9,29 +9,30 @@ export default {
 			type$footer: "Display"
 		},
 		size(x, y) {
+			const body = this.at("body");
 			for (let node of this.to) {
-				if (node != this.parts.body) y -= node.bounds.height;
+				if (node != body) y -= node.bounds.height;
 			}
 			this.style.minWidth = x + "px";
-			this.parts.body.style.minHeight = y + "px";
+			body.style.minHeight = y + "px";
 			this.style.maxWidth = x + "px";
-			this.parts.body.style.maxHeight = y + "px";
+			body.style.maxHeight = y + "px";
 		},
 		extend$actions: {
 			collapse(event) {
 				if (this.collapsed === "false") {
-					this.parts.body.style.display = "none";
+					this.at("body").style.display = "none";
 					this.collapsed = "true";
 				}
 			},
 			expand(event) {
 				if (this.collapsed === "true") {
-					this.parts.body.style.removeProperty("display");
+					this.at("body").style.removeProperty("display");
 					this.collapsed = "false";
 				}
 			},
 			click(event) {
-				if (event.target == this.parts.header.peer) {
+				if (event.target == this.at("header").peer) {
 					this.receive(this.collapsed === "true" ? "expand" : "collapse");
 				}
 			}
@@ -40,8 +41,8 @@ export default {
     Panel: {
 		type$: "Section",
 		view(data) {
-			this.parts.header.peer.textContent = "Header";
-			this.parts.body.peer.textContent = "Body";
+			this.at("header").peer.textContent = "Header";
+			this.at("body").peer.textContent = "Body";
 		}
 	}
 }

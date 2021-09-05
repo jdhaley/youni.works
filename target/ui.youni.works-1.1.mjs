@@ -1135,29 +1135,30 @@ function panel() {
 			"type$footer": "/panel/Display"
 		},
 		"size": function size(x, y) {
+			const body = this.at("body");
 			for (let node of this.to) {
-				if (node != this.parts.body) y -= node.bounds.height;
+				if (node != body) y -= node.bounds.height;
 			}
 			this.style.minWidth = x + "px";
-			this.parts.body.style.minHeight = y + "px";
+			body.style.minHeight = y + "px";
 			this.style.maxWidth = x + "px";
-			this.parts.body.style.maxHeight = y + "px";
+			body.style.maxHeight = y + "px";
 		},
 		"extend$actions": {
 			"collapse": function collapse(event) {
 				if (this.collapsed === "false") {
-					this.parts.body.style.display = "none";
+					this.at("body").style.display = "none";
 					this.collapsed = "true";
 				}
 			},
 			"expand": function expand(event) {
 				if (this.collapsed === "true") {
-					this.parts.body.style.removeProperty("display");
+					this.at("body").style.removeProperty("display");
 					this.collapsed = "false";
 				}
 			},
 			"click": function click(event) {
-				if (event.target == this.parts.header.peer) {
+				if (event.target == this.at("header").peer) {
 					this.receive(this.collapsed === "true" ? "expand" : "collapse");
 				}
 			}
@@ -1166,8 +1167,8 @@ function panel() {
 	"Panel": {
 		"type$": "/panel/Section",
 		"view": function view(data) {
-			this.parts.header.peer.textContent = "Header";
-			this.parts.body.peer.textContent = "Body";
+			this.at("header").peer.textContent = "Header";
+			this.at("body").peer.textContent = "Body";
 		}
 	}
 }
@@ -1518,20 +1519,10 @@ function record() {
 			"members": []
 		},
 		"once$members": function once$members() {
-			let members = this.conf.data.types[this.conf.data.objectType].members;
-			console.log(members);
-			let keyProp = this.conf.memberKeyProperty || "name";
-			if (members && members[Symbol.iterator]) {
-				members = Object.create(null);
-				for (let member of this.conf.members) {
-					let key = member[keyProp];
-					if (key) members[key] = member;
-				}
-			} else {
-				for (let key in members) {
-					let member = members[key];
-					if (!member[keyProp]) member[keyProp] = key;
-				}
+			let conf = this.conf.data.types[this.conf.data.objectType].members;
+			let members = Object.create(null);
+			for (let key in conf) {
+				members[key] = this.owner.create("/ui/record/Property", conf[key]);
 			}
 			return members;
 		},
@@ -1772,13 +1763,13 @@ function tabs() {
             let title = conf.title;
             tab.peer.innerHTML = `<img src=${icon}><span>${title}</span>`;
             tab.body = body;
-            this.parts.header.append(tab);
-            this.parts.body.append(body);
+            this.at("header").append(tab);
+            this.at("body").append(body);
             return tab;
         },
 		"activate": function activate(tab) {
             if (tab === undefined) {
-                for (let first of this.parts.header.to) {
+                for (let first of this.at("header").to) {
                     tab = first;
                     break;
                 }
@@ -1959,14 +1950,15 @@ function tree() {
                 event.subject = "showValue";
             },
 			"collapsed": function collapsed(event) {
-                this.parts.body.style.display = "none";
+                this.at("body").style.display = "none";
                 event.subject = "";
 			},
 			"expanded": function expanded(event) {
-                if (!this.parts.body.peer.childNodes.length) {
-                    this.parts.body.view(this.model);
+                const body = this.at("body");
+                if (!body.peer.childNodes.length) {
+                    body.view(this.model);
                 }
-                this.parts.body.style.removeProperty("display");
+                body.style.removeProperty("display");
                 event.subject = "";
 			}
 		}

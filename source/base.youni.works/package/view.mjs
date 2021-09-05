@@ -40,23 +40,17 @@ export default {
 		modelFor(contentView) {
 			return this.model;
 		},
-		part(key) {
+		at(key) {
 			for (let part of this.to) {
 				if (part.key == key) return part;
 			}
 		},
-		get$parts() {
-			return this.peer.$parts;
-		},
 		view(model) {
 			this.model = model;
-			if (!this.parts) {
-				this.peer.$parts = Object.create(null);
-				if (this.members) {
-					this.forEach(this.members, this.createContent);
-				}	
-			}
-			if (!this.members) {
+			if (this.members && !this.peer.$drawn) {
+				this.forEach(this.members, this.createContent);
+				this.peer.$drawn = true;
+			} else {
 				this.forEach(model, this.createContent);
 			}
 
@@ -81,7 +75,6 @@ export default {
 		},
 		control(part, key) {
 			part.key = key;
-			this.parts[key] = part;
 		},
 		modelFor(contentView) {
 			return this.members ? this.model : this.model && this.model[contentView.key];

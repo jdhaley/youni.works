@@ -3,7 +3,7 @@ export default {
         "Design": {
             "members": {
                 "id": {
-                     "columnSize": 4
+                    "columnSize": 4
                 },
                 "shape": {
                     "columnSize": 4,
