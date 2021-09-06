@@ -2,6 +2,13 @@
 //facet_name - public
 
 export default {
+			require: function(decl) {
+				decl.define = function(object) {
+					//Require is just documentation for now.
+					return true;
+				}
+				return decl;
+			},
 			const: function(decl) {
 				decl.configurable = true;
 				decl.enumerable = true;
