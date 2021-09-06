@@ -1,83 +1,87 @@
 export default {
-    type$: "/control",
 	Viewer: {
-		type$: "Controller",
 		view(model) {
+		}
+	},
+	Container: {
+		type$: "Viewer",
+		require$owner: null,
+		require$put(control) {
 		},
-		modelFor(part) {
+		type$contentType: "Viewer",
+		var$model: undefined,
+		view(model) {
+			this.model = model;
+			this.observe && this.observe(model);
 		},
+		modelFor(viewer) {
+			return this.model;
+		},
+		// at(key) {
+		// 	for (let part of this.to) {
+		// 		if (part.key == key) return part;
+		// 	}
+		// },
+		// put(content) {
+		// }
 		extend$actions: {
-			view(event) {
+			view() {
 				for (let part of this.to) {
 					part.view(this.modelFor(part));
 				}
 			}
 		}
 	},
-	Container: {
-		type$: "Viewer",
-		xxxxforEach(value, method, methodObject) {
-            if (!methodObject) methodObject = this;
-            if (value && value[Symbol.iterator]) {
-                let i = 0;
-                for (let datum of value) {
-                    method.call(methodObject, datum, i++, value);
-                }
-            } else if (typeof value == "object") {
-                for (let name in value) {
-                    method.call(methodObject, value[name], name, value);
-                }
-            }
-            // } else {
-            //     method.call(methodObject, value, "", value);
-            // }
-        },
-		type$forEach: "util/forEach",
-		var$model: undefined,
-		view(data) {
-			this.model = data;
+	Structure: {
+		type$: "Container",
+		extend$conf: {
+			memberType: "/ui/view/Viewer"
 		},
-		modelFor(contentView) {
-			return this.model;
-		},
-		at(key) {
-			for (let part of this.to) {
-				if (part.key == key) return part;
-			}
-		},
-		view(model) {
-			this.model = model;
-			if (this.members && !this.peer.$drawn) {
-				this.forEach(this.members, this.createContent);
-				this.peer.$drawn = true;
-			} else {
-				this.forEach(model, this.createContent);
-			}
+		once$members() {
+			let members = Object.create(null);
+			for (let name in this.conf.members) {
+				let conf = this.conf.members[name];
+				let type = conf.type || this.conf.memberType;
 
-			if (this.observe) this.observe(model);			
-		},
-		createContent(value, key) {
-			let type = this.typeFor(value, key);
-			let conf = this.configurationFor(value, key);
-			let control = this.owner.create(type, conf);
-			this.control(control, key);
-			this.append(control);
-			return control;
-		},
-		typeFor(value, key) {
-			if (this.members) {
-				return this.members[key] ? this.members[key] : "";
+				//TODO For now, keep the member types consistent & simple:
+				let member = this.conf.memberType.extend(conf);
+				member.let("key", name, "const");
+				members[name] = member;
 			}
-			return this.contentType ||  "";
+			return members;
 		},
-		configurationFor(value, key) {
-			return this.conf;
+		start(conf) {
+			this.super(start, conf);
+			for (let name in this.members) {
+				let control = this.owner.create(this.members[name]);
+				control.key = name;
+				this.put(control);
+			}
+		}
+	},
+	Collection: {
+		type$: "Viewer",
+		type$contentType: "Viewer",
+		view(model) {
+			this.super(view, model);
+			if (!model) {
+				return;
+			} else if (model[Symbol.iterator]) {
+                let key = 0;
+                for (let content of model) {
+					this.createContent(key++, content);
+                }
+            } else if (typeof model == "object") {
+                for (let key in model) {
+                    this.createContent(key, model[key]);
+                }
+            }			
 		},
-		control(part, key) {
-			part.key = key;
-		},
-		modelFor(contentView) {
-			return this.members ? this.model : this.model && this.model[contentView.key];
+		createContent(key, value) {
+			let type = value && value.type || this.contentType;
+			let content = this.owner.create(type);
+			content.key = key;
+			this.put(content);
 		}
 	}
 }

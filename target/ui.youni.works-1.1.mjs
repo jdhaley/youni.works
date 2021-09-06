@@ -339,21 +339,48 @@ return pkg;
 
 function display() {
 	const pkg = {
-	"type$": "/base/view",
-	"type$dom": "/base/dom",
-	"Display": {
-		"type$": ["/display/Container", "/display/dom/Element"],
+	"type$": "/base/dom",
+	"View": {
+		"type$": "/display/Element",
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
-		"extend$conf": {
-			"minWidth": 16,
-			"minHeight": 16
+		"var$model": undefined,
+		"view": function view(model) {
+			this.model = model;
+			this.observe && this.observe(model);
 		},
-		"start": function start(conf) {
-			if (conf) this.let("conf", conf, "extend");
+		"modelFor": function modelFor(viewer) {
+			return this.model;
 		},
 		"get$style": function get$style() {
 			return this.peer.style;
+		},
+		"start": function start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+			if (this.members) for (let name in this.members) {
+				let control = this.owner.create(this.members[name]);
+				control.key = name;
+				control.peer.classList.add(name);
+				this.put(control);
+			}
+		},
+		"extend$actions": {
+			"view": function view(event) {
+				for (let part of this.to) {
+					try {
+						part.view(this.modelFor(part));
+					} catch (err) {
+						console.error(err);
+					}
+				}
+			}
+		}
+	},
+	"Display": {
+		"type$": "/display/View",
+		"extend$conf": {
+			"minWidth": 16,
+			"minHeight": 16
 		},
 		"virtual$bounds": function virtual$bounds() {
 			if (arguments.length) {
@@ -398,7 +425,7 @@ function display() {
         }
 	},
 	"Frame": {
-		"type$": ["/display/Display", "/display/dom/Document"],
+		"type$": ["/display/Display", "/display/Document"],
 		"type$app": "/display/App",
 		"$window": null,
 		"get$owner": function get$owner() {

@@ -12,6 +12,13 @@ module.package = {
 }
 const conf = {
 	"facets": {
+		"require": function(decl) {
+				decl.define = function(object) {
+					//Require is just documentation for now.
+					return true;
+				}
+				return decl;
+			},
 		"const": function(decl) {
 				decl.configurable = true;
 				decl.enumerable = true;
@@ -279,7 +286,8 @@ function core() {
 		"super": function(method, ...args) {
 			if (method && typeof method == "function") {
 				if (method.$super) return method.$super.apply(this, args);
-				console.error(`super("${method.name}" ...) is not a method.`);
+                /*It no longer considered an error if there is no super... */
+				//console.error(`super("${method.name}" ...) is not a method.`);
 				return;
 			}
 			throw new TypeError("Invalid method argument.");

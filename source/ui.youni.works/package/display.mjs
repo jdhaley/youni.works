@@ -1,19 +1,46 @@
 const pkg = {
-	type$: "/base/view",
-	type$dom: "/base/dom",
-	Display: {
-		type$: ["Container", "dom/Element"],
+	type$: "/base/dom",
+	View: {
+		type$: "Element",
 		type$owner: "Frame",
 		nodeName: "div",
-		extend$conf: {
-			minWidth: 16,
-			minHeight: 16	
+		var$model: undefined,
+		view(model) {
+			this.model = model;
+			this.observe && this.observe(model);
 		},
-		start(conf) {
-			if (conf) this.let("conf", conf, "extend");
+		modelFor(viewer) {
+			return this.model;
 		},
 		get$style() {
 			return this.peer.style;
+		},
+		start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+			if (this.members) for (let name in this.members) {
+				let control = this.owner.create(this.members[name]);
+				control.key = name;
+				control.peer.classList.add(name);
+				this.put(control);
+			}
+		},
+		extend$actions: {
+			view(event) {
+				for (let part of this.to) {
+					try {
+						part.view(this.modelFor(part));
+					} catch (err) {
+						console.error(err);
+					}
+				}
+			}
+		}
+	},
+	Display: {
+		type$: "View",
+		extend$conf: {
+			minWidth: 16,
+			minHeight: 16	
 		},
 		virtual$bounds() {
 			if (arguments.length) {
@@ -58,7 +85,7 @@ const pkg = {
         },
 	},
 	Frame: {
-		type$: ["Display", "dom/Document"],
+		type$: ["Display", "Document"],
 		type$app: "App",
 		$window: null,
 		//

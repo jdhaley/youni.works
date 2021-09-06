@@ -1,4 +1,5 @@
 export default {
+	type$: "/control",
 	Document: {
 		document: null,
 		get$peer() {
@@ -7,10 +8,9 @@ export default {
 		get$location() {
 			return this.document.location;
 		},
-		createElement(name) {
-			if (name.indexOf("/") >= 0) {
-				let idx = name.lastIndexOf("/");
-				return this.document.createElementNS(name.substring(0, idx), name.substring(idx + 1));
+		createElement(name, namespace) {
+			if (namespace) {
+				return this.document.createElementNS(namespace, name);
 			} else {
 				return this.document.createElement(name);
 			}
@@ -29,58 +29,67 @@ export default {
 			return node;
 		},
 	},
-	Element: {
+	Node: {
+		type$: ["Receiver", "Sender", "Sensor"],
 		type$owner: "Document",
+		once$from() {
+			let of = this.peer.parentNode.$peer;
+			let from = Object.create(null);
+			from[Symbol.iterator] = function*() {
+				if (of) yield of;
+			}
+			return from;
+		},
+		once$to() {
+			const nodes = this.peer.childNodes;
+			let to = Object.create(null);
+			to[Symbol.iterator] = function*() {
+				for (let i = 0, len = nodes.length; i < len; i++) {
+					let node = nodes[i];
+					if (node.$peer) yield node.$peer;
+				}
+			}
+			return to;
+		},
+		once$peer() {
+			let peer = this.owner.createElement(this.nodeName, this.namespace);
+			peer.$peer = this;
+			return peer;
+		},
+		at(key) {
+			if (typeof key == "string" && key.charAt(0) == "@") {
+				return this.peer.getAttribute(key.substring(1));
+			}
+			for (let part of this.to) {
+				if (part.key == key) return part;
+			}
+		},
+		put(value, key) {
+			if (typeof key == "string" && key.charAt(0) == "@") {
+				this.peer.setAttribute(key.substring(1), value);
+				return;
+			}
+			this.peer.append(value.peer);
+		}
+	},
+	Element: {
+		type$: ["Instance", "Node"],
 		namespace: "",
+		nodeName: "",
+		once$className() {
+			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
+		},
+		/*
+			deprecated (get & set require a replacement api)
+		*/
 		get(name) {
 			return this.peer.getAttribute(name);
 		},
 		set(name, value) {
 			this.peer.setAttribute(name, value);
 		},
-		once$nodeName() {
-			return this.className;
-		},
-		once$className() {
-			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
-		},
-		get$to() {
-			const nodes = this.peer.childNodes;
-			if (!nodes.$to) nodes.$to = this[Symbol.for("owner")].create({
-				symbol$iterator: function*() {
-					for (let i = 0, len = nodes.length; i < len; i++) {
-						let node = nodes[i];
-						if (node.$peer) yield node.$peer;
-					}
-				}
-			});
-			return nodes.$to;
-		},
-		/**
-		 * Dom Nodes are rooted tree nodes, i.e. more-or-less equivalent to an undirected graph.
-		 * "of" is a generic whole-part relationship and for Dom Nodes the default is its parentNode.
-		 */
 		get$of() {
 			return this.peer.parentNode.$peer;
-		},
-		once$from() {
-			let of = this.of;
-			return this[Symbol.for("owner")].create({
-				symbol$iterator: function*() {
-					if (of) yield of;
-				}
-			});
-		},
-		once$peer() {
-			let name = (this.namespace ? this.namespace + "/" : "") + this.nodeName;
-			let peer = this.owner.createElement(name);
-			peer.$peer = this;
-			if (typeof this.at == "object") {
-				for (let name in this.at) {
-					peer.setAttribute(name, this.at[name]);
-				}
-			}
-			return peer;
 		},
 		append(control) {
 			this.peer.append(control.peer);

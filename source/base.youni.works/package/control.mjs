@@ -1,9 +1,6 @@
 export default {
 	type$: "/system/core",
 	Receiver: {
-		type$: "Instance",
-		start(conf) {
-		},
 		receive(signal) {
 			if (!signal) return;
 			let msg = signal;
@@ -19,7 +16,8 @@ export default {
 					subject = (subject != msg.subject ? msg.subject : "");	
 				} catch (error) {
 					console.error(error);
-//					subject = "";
+					//Stop all propagation - esp. important is the enclosing while loop
+					subject = "";
 				}
 			}
 		},
@@ -70,8 +68,25 @@ export default {
 			}
 		}
 	},
+	Viewer: {
+		type$: ["Receiver", "Sender"],
+		view(model) {
+		},
+		modelFor(part) {
+		},
+		extend$actions: {
+			view() {
+				for (let part of this.to) {
+					part.view(this.modelFor(part));
+				}
+			}
+		}
+	},
 	Controller: {
-		type$: ["Receiver", "Sender", "Sensor"]
+		type$: ["Instance", "Receiver", "Sender", "Sensor"],
+		start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+		}
 	},
 	Publisher: {
 		//io: socket.io.Server

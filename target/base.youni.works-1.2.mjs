@@ -90,9 +90,6 @@ function control() {
 	const pkg = {
 	"type$": "/system/core",
 	"Receiver": {
-		"type$": "/control/Instance",
-		"start": function start(conf) {
-		},
 		"receive": function receive(signal) {
 			if (!signal) return;
 			let msg = signal;
@@ -108,7 +105,8 @@ function control() {
 					subject = (subject != msg.subject ? msg.subject : "");	
 				} catch (error) {
 					console.error(error);
-//					subject = "";
+					//Stop all propagation - esp. important is the enclosing while loop
+					subject = "";
 				}
 			}
 		},
@@ -159,8 +157,25 @@ function control() {
 			}
 		}
 	},
+	"Viewer": {
+		"type$": ["/control/Receiver", "/control/Sender"],
+		"view": function view(model) {
+		},
+		"modelFor": function modelFor(part) {
+		},
+		"extend$actions": {
+			"view": function view() {
+				for (let part of this.to) {
+					part.view(this.modelFor(part));
+				}
+			}
+		}
+	},
 	"Controller": {
-		"type$": ["/control/Receiver", "/control/Sender", "/control/Sensor"]
+		"type$": ["/control/Instance", "/control/Receiver", "/control/Sender", "/control/Sensor"],
+		"start": function start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+		}
 	},
 	"Publisher": {
 		"publish": function publish(/* (subject [, data] | event) */) {
@@ -268,6 +283,7 @@ return pkg;
 
 function dom() {
 	const pkg = {
+	"type$": "/control",
 	"Document": {
 		"document": null,
 		"get$peer": function get$peer() {
@@ -276,10 +292,9 @@ function dom() {
 		"get$location": function get$location() {
 			return this.document.location;
 		},
-		"createElement": function createElement(name) {
-			if (name.indexOf("/") >= 0) {
-				let idx = name.lastIndexOf("/");
-				return this.document.createElementNS(name.substring(0, idx), name.substring(idx + 1));
+		"createElement": function createElement(name, namespace) {
+			if (namespace) {
+				return this.document.createElementNS(namespace, name);
 			} else {
 				return this.document.createElement(name);
 			}
@@ -298,54 +313,64 @@ function dom() {
 			return node;
 		}
 	},
-	"Element": {
+	"Node": {
+		"type$": ["/dom/Receiver", "/dom/Sender", "/dom/Sensor"],
 		"type$owner": "/dom/Document",
+		"once$from": function once$from() {
+			let of = this.peer.parentNode.$peer;
+			let from = Object.create(null);
+			from[Symbol.iterator] = function*() {
+				if (of) yield of;
+			}
+			return from;
+		},
+		"once$to": function once$to() {
+			const nodes = this.peer.childNodes;
+			let to = Object.create(null);
+			to[Symbol.iterator] = function*() {
+				for (let i = 0, len = nodes.length; i < len; i++) {
+					let node = nodes[i];
+					if (node.$peer) yield node.$peer;
+				}
+			}
+			return to;
+		},
+		"once$peer": function once$peer() {
+			let peer = this.owner.createElement(this.nodeName, this.namespace);
+			peer.$peer = this;
+			return peer;
+		},
+		"at": function at(key) {
+			if (typeof key == "string" && key.charAt(0) == "@") {
+				return this.peer.getAttribute(key.substring(1));
+			}
+			for (let part of this.to) {
+				if (part.key == key) return part;
+			}
+		},
+		"put": function put(value, key) {
+			if (typeof key == "string" && key.charAt(0) == "@") {
+				this.peer.setAttribute(key.substring(1), value);
+				return;
+			}
+			this.peer.append(value.peer);
+		}
+	},
+	"Element": {
+		"type$": ["/dom/Instance", "/dom/Node"],
 		"namespace": "",
+		"nodeName": "",
+		"once$className": function once$className() {
+			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
+		},
 		"get": function get(name) {
 			return this.peer.getAttribute(name);
 		},
 		"set": function set(name, value) {
 			this.peer.setAttribute(name, value);
 		},
-		"once$nodeName": function once$nodeName() {
-			return this.className;
-		},
-		"once$className": function once$className() {
-			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
-		},
-		"get$to": function get$to() {
-			const nodes = this.peer.childNodes;
-			if (!nodes.$to) nodes.$to = this[Symbol.for("owner")].create({
-				symbol$iterator: function*() {
-					for (let i = 0, len = nodes.length; i < len; i++) {
-						let node = nodes[i];
-						if (node.$peer) yield node.$peer;
-					}
-				}
-			});
-			return nodes.$to;
-		},
 		"get$of": function get$of() {
 			return this.peer.parentNode.$peer;
-		},
-		"once$from": function once$from() {
-			let of = this.of;
-			return this[Symbol.for("owner")].create({
-				symbol$iterator: function*() {
-					if (of) yield of;
-				}
-			});
-		},
-		"once$peer": function once$peer() {
-			let name = (this.namespace ? this.namespace + "/" : "") + this.nodeName;
-			let peer = this.owner.createElement(name);
-			peer.$peer = this;
-			if (typeof this.at == "object") {
-				for (let name in this.at) {
-					peer.setAttribute(name, this.at[name]);
-				}
-			}
-			return peer;
 		},
 		"append": function append(control) {
 			this.peer.append(control.peer);
@@ -555,79 +580,82 @@ return pkg;
 
 function view() {
 	const pkg = {
-	"type$": "/control",
 	"Viewer": {
-		"type$": "/view/Controller",
 		"view": function view(model) {
+		}
+	},
+	"Container": {
+		"type$": "/view/Viewer",
+		"require$owner": null,
+		"require$put": function require$put(control) {
 		},
-		"modelFor": function modelFor(part) {
+		"type$contentType": "/view/Viewer",
+		"var$model": undefined,
+		"view": function view(model) {
+			this.model = model;
+			this.observe && this.observe(model);
+		},
+		"modelFor": function modelFor(viewer) {
+			return this.model;
 		},
 		"extend$actions": {
-			"view": function view(event) {
+			"view": function view() {
 				for (let part of this.to) {
 					part.view(this.modelFor(part));
 				}
 			}
 		}
 	},
-	"Container": {
-		"type$": "/view/Viewer",
-		"xxxxforEach": function xxxxforEach(value, method, methodObject) {
-            if (!methodObject) methodObject = this;
-            if (value && value[Symbol.iterator]) {
-                let i = 0;
-                for (let datum of value) {
-                    method.call(methodObject, datum, i++, value);
-                }
-            } else if (typeof value == "object") {
-                for (let name in value) {
-                    method.call(methodObject, value[name], name, value);
-                }
-            }
-            // } else {
-            //     method.call(methodObject, value, "", value);
-            // }
-        },
-		"type$forEach": "/view/util/forEach",
-		"var$model": undefined,
-		"view": function view(model) {
-			this.model = model;
-			if (this.members && !this.peer.$drawn) {
-				this.forEach(this.members, this.createContent);
-				this.peer.$drawn = true;
-			} else {
-				this.forEach(model, this.createContent);
-			}
+	"Structure": {
+		"type$": "/view/Container",
+		"extend$conf": {
+			"memberType": "/ui/view/Viewer"
+		},
+		"once$members": function once$members() {
+			let members = Object.create(null);
+			for (let name in this.conf.members) {
+				let conf = this.conf.members[name];
+				let type = conf.type || this.conf.memberType;
 
-			if (this.observe) this.observe(model);			
-		},
-		"modelFor": function modelFor(contentView) {
-			return this.members ? this.model : this.model && this.model[contentView.key];
-		},
-		"at": function at(key) {
-			for (let part of this.to) {
-				if (part.key == key) return part;
+				//TODO For now, keep the member types consistent & simple:
+				let member = this.conf.memberType.extend(conf);
+				member.let("key", name, "const");
+				members[name] = member;
 			}
+			return members;
 		},
-		"createContent": function createContent(value, key) {
-			let type = this.typeFor(value, key);
-			let conf = this.configurationFor(value, key);
-			let control = this.owner.create(type, conf);
-			this.control(control, key);
-			this.append(control);
-			return control;
-		},
-		"typeFor": function typeFor(value, key) {
-			if (this.members) {
-				return this.members[key] ? this.members[key] : "";
+		"start": function start(conf) {
+			this.super(start, conf);
+			for (let name in this.members) {
+				let control = this.owner.create(this.members[name]);
+				control.key = name;
+				this.put(control);
 			}
-			return this.contentType ||  "";
+		}
+	},
+	"Collection": {
+		"type$": "/view/Viewer",
+		"type$contentType": "/view/Viewer",
+		"view": function view(model) {
+			this.super(view, model);
+			if (!model) {
+				return;
+			} else if (model[Symbol.iterator]) {
+                let key = 0;
+                for (let content of model) {
+					this.createContent(key++, content);
+                }
+            } else if (typeof model == "object") {
+                for (let key in model) {
+                    this.createContent(key, model[key]);
+                }
+            }			
 		},
-		"configurationFor": function configurationFor(value, key) {
-			return this.conf;
-		},
-		"control": function control(part, key) {
-			part.key = key;
+		"createContent": function createContent(key, value) {
+			let type = value && value.type || this.contentType;
+			let content = this.owner.create(type);
+			content.key = key;
+			this.put(content);
 		}
 	}
 }
