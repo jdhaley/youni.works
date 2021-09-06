@@ -63,7 +63,8 @@ const pkg = {
         super: function(method, ...args) {
 			if (method && typeof method == "function") {
 				if (method.$super) return method.$super.apply(this, args);
-				console.error(`super("${method.name}" ...) is not a method.`);
+                /*It no longer considered an error if there is no super... */
+				//console.error(`super("${method.name}" ...) is not a method.`);
 				return;
 			}
 			throw new TypeError("Invalid method argument.");
