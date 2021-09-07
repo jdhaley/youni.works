@@ -113,6 +113,27 @@ function control() {
 		"extend$actions": {
 		}
 	},
+	"Sender": {
+		"type$to": "/control/Iterable",
+		"send": function send(signal) {
+			if (!signal) return;
+			let message = signal;
+			if (typeof message != "object") {
+				message = Object.create(null);
+				message.subject = signal;
+			}
+			this.receive(message);
+			Promise.resolve(message).then(message => to(this, message));
+
+			function to(receiver, message) {
+				if (receiver.to) for (receiver of receiver.to) {
+					message.subject && receiver.receive(message);
+					message.subject && to(receiver, message);
+					if (!message.subject) return;
+				}
+			}
+		}
+	},
 	"Sensor": {
 		"type$from": "/control/Iterable",
 		"sense": function sense(signal) {
@@ -131,27 +152,6 @@ function control() {
 				if (receiver.from) for (receiver of receiver.from) {
 					message.subject && receiver.receive(message);
 					message.subject && from(receiver, message);
-					if (!message.subject) return;
-				}
-			}
-		}
-	},
-	"Sender": {
-		"type$to": "/control/Iterable",
-		"send": function send(signal) {
-			if (!signal) return;
-			let message = signal;
-			if (typeof message != "object") {
-				message = Object.create(null);
-				message.subject = signal;
-			}
-			this.receive(message);
-			Promise.resolve(message).then(message => to(this, message));
-
-			function to(receiver, message) {
-				if (receiver.to) for (receiver of receiver.to) {
-					message.subject && receiver.receive(message);
-					message.subject && to(receiver, message);
 					if (!message.subject) return;
 				}
 			}

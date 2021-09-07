@@ -1,6 +1,6 @@
 const pkg = {
 	type$: "/base/dom",
-	View: {
+	Display: {
 		type$: ["Element", "/base/view/View"],
 		type$owner: "Frame",
 		nodeName: "div",
@@ -15,33 +15,6 @@ const pkg = {
 		},
 		start(conf) {
 			if (conf) this.let("conf", conf, "extend");
-		}
-	},
-	Display: {
-		type$: "View",
-		extend$conf: {
-			minWidth: 16,
-			minHeight: 16	
-		},
-		virtual$bounds() {
-			if (arguments.length) {
-				let rect = arguments[0];
-				if (rect.width !== undefined) {
-					this.style.width = Math.max(rect.width, this.conf.minWidth) + "px";
-					this.style.minWidth = this.style.width;
-				}
-				if (rect.height !== undefined) {
-					this.style.height = Math.max(rect.height, this.conf.minHeight) + "px";
-					this.style.minHeight = this.style.height;
-				} 	
-				if (rect.left !== undefined || rect.top !== undefined) this.style.position = "absolute";
-				if (rect.left !== undefined) this.style.left = rect.left + "px";
-				if (rect.top !== undefined) this.style.top = rect.top + "px";
-			} else {
-				return this.peer.getBoundingClientRect();
-			}
-		},
-		size(w, y) {
 		}
 	},
     App: {
@@ -74,12 +47,12 @@ const pkg = {
 			}
 			return this.document.createRange();
 		},
-		create(controlType, conf) {
-			let control = this.app.create(controlType);
-			this.app.define(control, "owner", this, "const");
-			control.start(conf);
-			control.peer.classList.add(control.className);
-			return control;
+		create(type, conf) {
+			let display = this.app.create(type);
+			this.app.define(display, "owner", this, "const");
+			display.start(conf);
+			display.peer.classList.add(display.className);
+			return display;
 		},
 		createView(conf) {
 			let view = this.create(conf.type, conf);
