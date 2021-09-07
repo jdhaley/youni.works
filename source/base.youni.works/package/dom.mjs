@@ -79,6 +79,13 @@ export default {
 		once$className() {
 			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
 		},
+		virtual$markup() {
+			if (arguments.length) {
+				this.peer.innerHTML = arguments[0];
+			} else {
+				return this.peer.innerHTML;
+			}
+		},
 		/*
 			deprecated (get & set require a replacement api)
 		*/

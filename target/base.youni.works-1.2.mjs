@@ -343,6 +343,13 @@ function dom() {
 		"once$className": function once$className() {
 			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
 		},
+		"virtual$markup": function virtual$markup() {
+			if (arguments.length) {
+				this.peer.innerHTML = arguments[0];
+			} else {
+				return this.peer.innerHTML;
+			}
+		},
 		"get": function get(name) {
 			return this.peer.getAttribute(name);
 		},
