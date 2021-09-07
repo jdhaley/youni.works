@@ -6,12 +6,15 @@ const pkg = {
 		nodeName: "div",
 		createPart(key, type) {
 			let part = this.owner.create(type);
-			if (this.members) part.peer.classList.add(key);
 			this.put(key, part);
+			if (this.members) part.styles.add(key);
 			return part;
 		},
 		get$style() {
 			return this.peer.style;
+		},
+		get$styles() {
+			return this.peer.classList;
 		},
 		start(conf) {
 			if (conf) this.let("conf", conf, "extend");
@@ -51,7 +54,7 @@ const pkg = {
 			let display = this.app.create(type);
 			this.app.define(display, "owner", this, "const");
 			display.start(conf);
-			display.peer.classList.add(display.className);
+			display.styles.add(display.className);
 			return display;
 		},
 		createView(conf) {

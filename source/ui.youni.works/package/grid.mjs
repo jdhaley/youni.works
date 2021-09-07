@@ -19,7 +19,7 @@ export default {
 			this.super(view, model);
 			if (!this.rule) this.createRule();
 			this.peer.innerText = this.getCaption();
-			if (this.conf.dynamic) this.peer.classList.add("dynamic");
+			if (this.conf.dynamic) this.peer.styles.add("dynamic");
 		},
 		createRule() {
 			let flex = +(this.conf.columnSize);

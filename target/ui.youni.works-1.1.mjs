@@ -346,12 +346,15 @@ function display() {
 		"nodeName": "div",
 		"createPart": function createPart(key, type) {
 			let part = this.owner.create(type);
-			if (this.members) part.peer.classList.add(key);
 			this.put(key, part);
+			if (this.members) part.styles.add(key);
 			return part;
 		},
 		"get$style": function get$style() {
 			return this.peer.style;
+		},
+		"get$styles": function get$styles() {
+			return this.peer.classList;
 		},
 		"start": function start(conf) {
 			if (conf) this.let("conf", conf, "extend");
@@ -390,7 +393,7 @@ function display() {
 			let display = this.app.create(type);
 			this.app.define(display, "owner", this, "const");
 			display.start(conf);
-			display.peer.classList.add(display.className);
+			display.styles.add(display.className);
 			return display;
 		},
 		"createView": function createView(conf) {
@@ -704,7 +707,7 @@ function grid() {
 			this.super(view, model);
 			if (!this.rule) this.createRule();
 			this.peer.innerText = this.getCaption();
-			if (this.conf.dynamic) this.peer.classList.add("dynamic");
+			if (this.conf.dynamic) this.peer.styles.add("dynamic");
 		},
 		"createRule": function createRule() {
 			let flex = +(this.conf.columnSize);
@@ -1233,7 +1236,7 @@ function pen() {
 		}
 	},
 	"Shape": {
-		"type$": "/display/Display",
+		"type$": ["/display/Display", "/shape/Shape"],
 		"namespace": "http://www.w3.org/2000/svg",
 		"get$image": function get$image() {
 			for (let node = this.peer; node; node = node.parentNode) {
@@ -1774,11 +1777,11 @@ function tabs() {
             }
             if (!tab || tab == this.activeTab) return;
             if (this.activeTab) {
-                this.activeTab.peer.classList.remove("activeTab");
+                this.activeTab.styles.remove("activeTab");
                 this.activeTab.body.style.display = "none";
             }
             this.activeTab = tab;
-            this.activeTab.peer.classList.add("activeTab");
+            this.activeTab.styles.add("activeTab");
             this.activeTab.body.style.display = this.activeTab.body.peer.$display;
         },
 		"draw": function draw(tab) {

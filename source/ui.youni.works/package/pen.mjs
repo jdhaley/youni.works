@@ -78,7 +78,7 @@ export default {
 		},
 	},
 	Shape: {
-		type$: "/display/Display",
+		type$: ["/display/Display", "/shape/Shape"],
 		namespace: "http://www.w3.org/2000/svg",
 		get$image() {
 			for (let node = this.peer; node; node = node.parentNode) {
