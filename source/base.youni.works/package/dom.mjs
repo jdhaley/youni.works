@@ -1,37 +1,7 @@
 export default {
 	type$: "/control",
-	Document: {
-		document: null,
-		get$peer() {
-			return this.document.body;
-		},
-		get$location() {
-			return this.document.location;
-		},
-		createElement(name, namespace) {
-			if (namespace) {
-				return this.document.createElementNS(namespace, name);
-			} else {
-				return this.document.createElement(name);
-			}
-		},
-		createId() {
-			let id = this.document.$lastId || 0;
-			this.document.$lastId = ++id;
-			return id;
-		},
-		link(attrs) {
-			let node = this.createElement("link");
-			for (let attr in attrs) {
-				node.setAttribute(attr, attrs[attr]);
-			}
-			this.document.head.append(node);
-			return node;
-		},
-	},
 	Node: {
 		type$: ["Receiver", "Sender", "Sensor"],
-		type$owner: "Document",
 		peer: null,
 		once$from() {
 			let of = this.peer.parentNode.$peer;
@@ -71,6 +41,7 @@ export default {
 	},
 	Element: {
 		type$: ["Instance", "Node"],
+		type$owner: "Document",
 		namespace: "",
 		nodeName: "",
 		once$peer() {
@@ -102,6 +73,29 @@ export default {
 		},
 		append(control) {
 			this.peer.append(control.peer);
+		}
+	},
+	Document: {
+		type$: "Node",
+		document: null,
+		type$from: "Iterable",
+		get$peer() {
+			return this.document.body;
+		},
+		get$location() {
+			return this.document.location;
+		},
+		createElement(name, namespace) {
+			if (namespace) {
+				return this.document.createElementNS(namespace, name);
+			} else {
+				return this.document.createElement(name);
+			}
+		},
+		createId() {
+			let id = this.document.$lastId || 0;
+			this.document.$lastId = ++id;
+			return id;
 		}
 	}
 }

@@ -526,6 +526,14 @@ function display() {
 		"viewAt": function viewAt(x, y) {
 			let target = this.$window.document.elementFromPoint(x, y);
 			return this.viewOf(target);
+		},
+		"link": function link(attrs) {
+			let node = this.createElement("link");
+			for (let attr in attrs) {
+				node.setAttribute(attr, attrs[attr]);
+			}
+			this.document.head.append(node);
+			return node;
 		}
 	},
 	"$public": {

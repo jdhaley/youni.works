@@ -264,38 +264,8 @@ return pkg;
 function dom() {
 	const pkg = {
 	"type$": "/control",
-	"Document": {
-		"document": null,
-		"get$peer": function get$peer() {
-			return this.document.body;
-		},
-		"get$location": function get$location() {
-			return this.document.location;
-		},
-		"createElement": function createElement(name, namespace) {
-			if (namespace) {
-				return this.document.createElementNS(namespace, name);
-			} else {
-				return this.document.createElement(name);
-			}
-		},
-		"createId": function createId() {
-			let id = this.document.$lastId || 0;
-			this.document.$lastId = ++id;
-			return id;
-		},
-		"link": function link(attrs) {
-			let node = this.createElement("link");
-			for (let attr in attrs) {
-				node.setAttribute(attr, attrs[attr]);
-			}
-			this.document.head.append(node);
-			return node;
-		}
-	},
 	"Node": {
 		"type$": ["/dom/Receiver", "/dom/Sender", "/dom/Sensor"],
-		"type$owner": "/dom/Document",
 		"peer": null,
 		"once$from": function once$from() {
 			let of = this.peer.parentNode.$peer;
@@ -335,6 +305,7 @@ function dom() {
 	},
 	"Element": {
 		"type$": ["/dom/Instance", "/dom/Node"],
+		"type$owner": "/dom/Document",
 		"namespace": "",
 		"nodeName": "",
 		"once$peer": function once$peer() {
@@ -363,6 +334,29 @@ function dom() {
 		},
 		"append": function append(control) {
 			this.peer.append(control.peer);
+		}
+	},
+	"Document": {
+		"type$": "/dom/Node",
+		"document": null,
+		"type$from": "/dom/Iterable",
+		"get$peer": function get$peer() {
+			return this.document.body;
+		},
+		"get$location": function get$location() {
+			return this.document.location;
+		},
+		"createElement": function createElement(name, namespace) {
+			if (namespace) {
+				return this.document.createElementNS(namespace, name);
+			} else {
+				return this.document.createElement(name);
+			}
+		},
+		"createId": function createId() {
+			let id = this.document.$lastId || 0;
+			this.document.$lastId = ++id;
+			return id;
 		}
 	}
 }
