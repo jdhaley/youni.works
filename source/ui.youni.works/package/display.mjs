@@ -6,8 +6,36 @@ const pkg = {
 		nodeName: "div",
 		var$model: undefined,
 		view(model) {
+			if (this.members && !this.markup) {
+				for (let name in this.members) {
+					let part = this.viewPart(name, this.members[name]);
+					part.peer.classList.add(name);
+				}
+			} else if (this.contentType) {
+				this.markup = "";
+				if (!model) {
+					return;
+				} else if (model[Symbol.iterator]) {
+					let key = 0;
+					for (let content of model) {
+						let type = content && content.type || this.contentType;
+						this.viewPart(key++, type);
+					}
+				} else if (typeof model == "object") {
+					for (let key in model) {
+						let type = model[key] && model[key].type || this.contentType
+						this.viewPart(key, type);
+					}
+				}
+			}
 			this.model = model;
 			this.observe && this.observe(model);
+			this.peer.classList.add(this.className);
+		},
+		viewPart(key, type) {
+			let part = this.owner.create(type);
+			this.put(key, part);
+			return part;
 		},
 		modelFor(viewer) {
 			return this.model;
@@ -17,18 +45,18 @@ const pkg = {
 		},
 		start(conf) {
 			if (conf) this.let("conf", conf, "extend");
-			if (this.members) for (let name in this.members) {
-				let control = this.owner.create(this.members[name]);
-				control.key = name;
-				control.peer.classList.add(name);
-				this.put(control);
-			}
+			// if (this.members) for (let name in this.members) {
+			// 	let control = this.owner.create(this.members[name]);
+			// 	control.key = name;
+			// 	control.peer.classList.add(name);
+			// 	this.put(control);
+			// }
 		},
 		extend$actions: {
 			view(event) {
-				for (let part of this.to) {
+				for (let content of this.to) {
 					try {
-						part.view(this.modelFor(part));
+						content.view(this.modelFor(content));
 					} catch (err) {
 						console.error(err);
 					}

@@ -32,6 +32,7 @@ export default {
 	Node: {
 		type$: ["Receiver", "Sender", "Sensor"],
 		type$owner: "Document",
+		peer: null,
 		once$from() {
 			let of = this.peer.parentNode.$peer;
 			let from = Object.create(null);
@@ -51,11 +52,6 @@ export default {
 			}
 			return to;
 		},
-		once$peer() {
-			let peer = this.owner.createElement(this.nodeName, this.namespace);
-			peer.$peer = this;
-			return peer;
-		},
 		at(key) {
 			if (typeof key == "string" && key.charAt(0) == "@") {
 				return this.peer.getAttribute(key.substring(1));
@@ -64,11 +60,12 @@ export default {
 				if (part.key == key) return part;
 			}
 		},
-		put(value, key) {
+		put(key, value) {
 			if (typeof key == "string" && key.charAt(0) == "@") {
 				this.peer.setAttribute(key.substring(1), value);
 				return;
 			}
+			value.key = key;
 			this.peer.append(value.peer);
 		}
 	},
@@ -76,6 +73,11 @@ export default {
 		type$: ["Instance", "Node"],
 		namespace: "",
 		nodeName: "",
+		once$peer() {
+			let peer = this.owner.createElement(this.nodeName, this.namespace);
+			peer.$peer = this;
+			return peer;
+		},
 		once$className() {
 			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
 		},
