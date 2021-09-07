@@ -14,7 +14,10 @@ const conf = {
 	"facets": {
 		"require": function(decl) {
 				decl.define = function(object) {
-					//Require is just documentation for now.
+					//implement something like this:
+					// if (!object[decl.name]) {
+					// 	console.warn("Require missing " + decl.name);
+					// }
 					return true;
 				}
 				return decl;
