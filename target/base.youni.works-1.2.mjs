@@ -157,26 +157,6 @@ function control() {
 			}
 		}
 	},
-	"Viewer": {
-		"type$": ["/control/Receiver", "/control/Sender"],
-		"view": function view(model) {
-		},
-		"modelFor": function modelFor(part) {
-		},
-		"extend$actions": {
-			"view": function view() {
-				for (let part of this.to) {
-					part.view(this.modelFor(part));
-				}
-			}
-		}
-	},
-	"Controller": {
-		"type$": ["/control/Instance", "/control/Receiver", "/control/Sender", "/control/Sensor"],
-		"start": function start(conf) {
-			if (conf) this.let("conf", conf, "extend");
-		}
-	},
 	"Publisher": {
 		"publish": function publish(/* (subject [, data] | event) */) {
             if (!this.io) {

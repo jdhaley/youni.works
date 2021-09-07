@@ -1,3 +1,24 @@
+// Viewer: {
+// 	type$: ["Receiver", "Sender"],
+// 	view(model) {
+// 	},
+// 	modelFor(part) {
+// 	},
+// 	extend$actions: {
+// 		view() {
+// 			for (let part of this.to) {
+// 				part.view(this.modelFor(part));
+// 			}
+// 		}
+// 	}
+// },
+// Controller: {
+// 	type$: ["Instance", "Receiver", "Sender", "Sensor"],
+// 	start(conf) {
+// 		if (conf) this.let("conf", conf, "extend");
+// 	}
+// },
+
 export default {
 	Viewer: {
 		view(model) {
