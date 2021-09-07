@@ -24,8 +24,8 @@ export default {
                 type$: "Display"
             }
 		},
-        modelFor(part) {
-            if (part == this.at("body")) return this.conf.views;
+        modelFor(key) {
+            if (key == "body") return this.conf.views;
         }
     },
     WorkbenchTab: {

@@ -1,67 +1,20 @@
 const pkg = {
 	type$: "/base/dom",
 	View: {
-		type$: "Element",
+		type$: ["Element", "/base/view/View"],
 		type$owner: "Frame",
 		nodeName: "div",
-		var$model: undefined,
-		view(model) {
-			if (this.members && !this.markup) {
-				for (let name in this.members) {
-					let part = this.viewPart(name, this.members[name]);
-					part.peer.classList.add(name);
-				}
-			} else if (this.contentType) {
-				this.markup = "";
-				if (!model) {
-					return;
-				} else if (model[Symbol.iterator]) {
-					let key = 0;
-					for (let content of model) {
-						let type = content && content.type || this.contentType;
-						this.viewPart(key++, type);
-					}
-				} else if (typeof model == "object") {
-					for (let key in model) {
-						let type = model[key] && model[key].type || this.contentType
-						this.viewPart(key, type);
-					}
-				}
-			}
-			this.model = model;
-			this.observe && this.observe(model);
-			this.peer.classList.add(this.className);
-		},
-		viewPart(key, type) {
+		createPart(key, type) {
 			let part = this.owner.create(type);
+			if (this.members) part.peer.classList.add(key);
 			this.put(key, part);
 			return part;
-		},
-		modelFor(viewer) {
-			return this.model;
 		},
 		get$style() {
 			return this.peer.style;
 		},
 		start(conf) {
 			if (conf) this.let("conf", conf, "extend");
-			// if (this.members) for (let name in this.members) {
-			// 	let control = this.owner.create(this.members[name]);
-			// 	control.key = name;
-			// 	control.peer.classList.add(name);
-			// 	this.put(control);
-			// }
-		},
-		extend$actions: {
-			view(event) {
-				for (let content of this.to) {
-					try {
-						content.view(this.modelFor(content));
-					} catch (err) {
-						console.error(err);
-					}
-				}
-			}
 		}
 	},
 	Display: {
@@ -89,18 +42,6 @@ const pkg = {
 			}
 		},
 		size(w, y) {
-		},
-		display() {
-			this.textContent = "";
-			this.peer.classList.add(this.className);
-		},
-		control(part, key) {
-			this.super(control, part, key);
-			part.peer.classList.add(key);
-		},
-		view(data) {
-			this.display();
-			this.super(view, data);
 		}
 	},
     App: {
@@ -137,6 +78,7 @@ const pkg = {
 			let control = this.app.create(controlType);
 			this.app.define(control, "owner", this, "const");
 			control.start(conf);
+			control.peer.classList.add(control.className);
 			return control;
 		},
 		createView(conf) {

@@ -427,8 +427,8 @@ function workbench() {
 				"type$": "/workbench/Display"
 			}
 		},
-		"modelFor": function modelFor(part) {
-            if (part == this.at("body")) return this.conf.views;
+		"modelFor": function modelFor(key) {
+            if (key == "body") return this.conf.views;
         }
 	},
 	"WorkbenchTab": {

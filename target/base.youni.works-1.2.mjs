@@ -563,95 +563,35 @@ return pkg;
 
 function view() {
 	const pkg = {
+	"type$": "/control",
 	"Viewer": {
+		"require$to": "Iterable",
 		"view": function view(model) {
-		}
-	},
-	"Container": {
-		"type$": "/view/Viewer",
-		"require$owner": null,
-		"require$put": function require$put(control) {
 		},
-		"type$contentType": "/view/Viewer",
-		"var$model": undefined,
-		"view": function view(model) {
-			this.model = model;
-			this.observe && this.observe(model);
-		},
-		"modelFor": function modelFor(viewer) {
-			return this.model;
+		"modelFor": function modelFor(key) {
 		},
 		"extend$actions": {
-			"view": function view() {
+			"view": function view(event) {
 				for (let part of this.to) {
-					part.view(this.modelFor(part));
+					try {
+						part.view(this.modelFor(part.key));
+					} catch (err) {
+						console.error(err);
+					}
 				}
 			}
 		}
 	},
-	"Structure": {
-		"type$": "/view/Container",
-		"extend$conf": {
-			"memberType": "/ui/view/Viewer"
-		},
-		"once$members": function once$members() {
-			let members = Object.create(null);
-			for (let name in this.conf.members) {
-				let conf = this.conf.members[name];
-				let type = conf.type || this.conf.memberType;
-
-				//TODO For now, keep the member types consistent & simple:
-				let member = this.conf.memberType.extend(conf);
-				member.let("key", name, "const");
-				members[name] = member;
-			}
-			return members;
-		},
-		"start": function start(conf) {
-			this.super(start, conf);
-			for (let name in this.members) {
-				let control = this.owner.create(this.members[name]);
-				control.key = name;
-				this.put(control);
-			}
-		}
-	},
-	"Collection": {
-		"type$": "/view/Viewer",
-		"type$contentType": "/view/Viewer",
-		"view": function view(model) {
-			this.super(view, model);
-			if (!model) {
-				return;
-			} else if (model[Symbol.iterator]) {
-                let key = 0;
-                for (let content of model) {
-					this.createContent(key++, content);
-                }
-            } else if (typeof model == "object") {
-                for (let key in model) {
-                    this.createContent(key, model[key]);
-                }
-            }			
-		},
-		"createContent": function createContent(key, value) {
-			let type = value && value.type || this.contentType;
-			let content = this.owner.create(type);
-			content.key = key;
-			this.put(content);
-		}
-	},
-	"Owner": {
-	},
 	"View": {
-		"type$owner": "/view/Owner",
+		"type$": "/view/Viewer",
+		"require$markup": "",
+		"require$createPart": function require$createPart(key, type) {
+		},
 		"var$model": undefined,
 		"view": function view(model) {
-			if (this.members && this.model === undefined) {
-				this.model = model || null;
+			if (this.members && !this.markup) {
 				for (let name in this.members) {
-					let part = this.viewPart(name, this.members[name]);
-					part.peer.classList.add(name);
+					this.createPart(name, this.members[name]);
 				}
 			} else if (this.contentType) {
 				this.markup = "";
@@ -661,48 +601,20 @@ function view() {
 					let key = 0;
 					for (let content of model) {
 						let type = content && content.type || this.contentType;
-						this.viewPart(key++, type);
+						this.createPart(key++, type);
 					}
 				} else if (typeof model == "object") {
 					for (let key in model) {
 						let type = model[key] && model[key].type || this.contentType
-						this.viewPart(key, type);
+						this.createPart(key, type);
 					}
 				}
 			}
-			this.observe && this.observe(this.model);
-			this.peer.classList.add(this.className);
+			this.model = model;
+			this.observe && this.observe(model);
 		},
-		"viewPart": function viewPart(key, type) {
-			let part = this.owner.create(type);
-			this.put(key, part);
-			return part;
-		},
-		"modelFor": function modelFor(viewer) {
-			return this.model;
-		},
-		"get$style": function get$style() {
-			return this.peer.style;
-		},
-		"start": function start(conf) {
-			if (conf) this.let("conf", conf, "extend");
-			// if (this.members) for (let name in this.members) {
-			// 	let control = this.owner.create(this.members[name]);
-			// 	control.key = name;
-			// 	control.peer.classList.add(name);
-			// 	this.put(control);
-			// }
-		},
-		"extend$actions": {
-			"view": function view(event) {
-				for (let content of this.to) {
-					try {
-						content.view(this.modelFor(content));
-					} catch (err) {
-						console.error(err);
-					}
-				}
-			}
+		"modelFor": function modelFor(key) {
+			return this.contentType && this.model ? this.model[key] : this.model;
 		}
 	}
 }

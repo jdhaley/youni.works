@@ -60,16 +60,12 @@ export default {
 		get$contentType() {
 			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
 		},
-		display() {
-			this.super(display);
+		view(model) {
+			this.super(view, model);
 			let editor = this.owner.create(this.contentType, this.conf);
 			this.append(editor);
 		},
-		view(model) {
-			this.display();
-			this.model = model;
-		},
-		modelFor(editor) {
+		modelFor(key) {
 			return this.model && this.model[this.conf.name] || "";
 		}
 	},

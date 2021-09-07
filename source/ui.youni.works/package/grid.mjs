@@ -15,8 +15,8 @@ export default {
 				"CR": "size",
 			}
 		},
-		display() {
-			this.super(display);
+		view(model) {
+			this.super(view, model);
 			if (!this.rule) this.createRule();
 			this.peer.innerText = this.getCaption();
 			if (this.conf.dynamic) this.peer.classList.add("dynamic");

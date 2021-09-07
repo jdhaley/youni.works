@@ -131,14 +131,14 @@ export default {
 				let b = this.image.bounds;
 				this.x = (event.x - b.left) / b.width * 320;
 				this.y = (event.y - b.top) / b.height * 320;
-				this.vector.display();
+				this.vector.view();
 			},
 			release(event) {
 				if (event.ctrlKey) return;
 				let b = this.image.bounds;
 				this.x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				this.y = Math.round((event.y - b.top) / b.height * 32) * 10;
-				this.vector.display();
+				this.vector.view();
 			},
 			dblclick(event) {
 				event.subject = "";
@@ -157,7 +157,7 @@ export default {
 					this.cmd = "L";
 					next.cmd = "L";
 				}
-				this.vector.display();
+				this.vector.view();
 			}
 		}
 	},
@@ -165,8 +165,8 @@ export default {
 		type$: "Shape",
 		nodeName: "path",
 		var$points: null,
-		display() {
-			this.super(display);
+		view() {
+			this.super(view);
 			let path = "";
 			if (this.points) for (let point of this.points) {
 				path += point.toString();
@@ -187,8 +187,8 @@ export default {
 			}
 			point.x = x;
 			point.y = y;
-			point.display();
-			this.display();
+			point.view();
+			this.view();
 			return point;
 		},
 		extend$actions: {
@@ -204,7 +204,7 @@ export default {
 			viewBox: "0 0 320 320"
 		},
 		type$grid: "Grid",
-		display() {
+		view() {
 			let grid = this[Symbol.for("owner")].create(this.grid);
 			this.peer.innerHTML = grid.markup;
 			this.vector = this.owner.create("/ui/pen/Vector");
@@ -252,8 +252,8 @@ export default {
 	Canvas: {
 		type$: "/display/Display",
 		var$shape: null,
-		display() {
-			this.super(display);
+		view(model) {
+			this.super(view, model);
 			this.shape = this.owner.create("/ui/pen/Image");
 			this.append(this.shape);
 		},

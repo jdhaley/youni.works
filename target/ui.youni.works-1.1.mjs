@@ -341,67 +341,20 @@ function display() {
 	const pkg = {
 	"type$": "/base/dom",
 	"View": {
-		"type$": "/display/Element",
+		"type$": ["/display/Element", "/base/view/View"],
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
-		"var$model": undefined,
-		"view": function view(model) {
-			if (this.members && !this.markup) {
-				for (let name in this.members) {
-					let part = this.viewPart(name, this.members[name]);
-					part.peer.classList.add(name);
-				}
-			} else if (this.contentType) {
-				this.markup = "";
-				if (!model) {
-					return;
-				} else if (model[Symbol.iterator]) {
-					let key = 0;
-					for (let content of model) {
-						let type = content && content.type || this.contentType;
-						this.viewPart(key++, type);
-					}
-				} else if (typeof model == "object") {
-					for (let key in model) {
-						let type = model[key] && model[key].type || this.contentType
-						this.viewPart(key, type);
-					}
-				}
-			}
-			this.model = model;
-			this.observe && this.observe(model);
-			this.peer.classList.add(this.className);
-		},
-		"viewPart": function viewPart(key, type) {
+		"createPart": function createPart(key, type) {
 			let part = this.owner.create(type);
+			if (this.members) part.peer.classList.add(key);
 			this.put(key, part);
 			return part;
-		},
-		"modelFor": function modelFor(viewer) {
-			return this.model;
 		},
 		"get$style": function get$style() {
 			return this.peer.style;
 		},
 		"start": function start(conf) {
 			if (conf) this.let("conf", conf, "extend");
-			// if (this.members) for (let name in this.members) {
-			// 	let control = this.owner.create(this.members[name]);
-			// 	control.key = name;
-			// 	control.peer.classList.add(name);
-			// 	this.put(control);
-			// }
-		},
-		"extend$actions": {
-			"view": function view(event) {
-				for (let content of this.to) {
-					try {
-						content.view(this.modelFor(content));
-					} catch (err) {
-						console.error(err);
-					}
-				}
-			}
 		}
 	},
 	"Display": {
@@ -429,18 +382,6 @@ function display() {
 			}
 		},
 		"size": function size(w, y) {
-		},
-		"display": function display() {
-			this.textContent = "";
-			this.peer.classList.add(this.className);
-		},
-		"control": function control(part, key) {
-			this.super(control, part, key);
-			part.peer.classList.add(key);
-		},
-		"view": function view(data) {
-			this.display();
-			this.super(view, data);
 		}
 	},
 	"App": {
@@ -476,6 +417,7 @@ function display() {
 			let control = this.app.create(controlType);
 			this.app.define(control, "owner", this, "const");
 			control.start(conf);
+			control.peer.classList.add(control.className);
 			return control;
 		},
 		"createView": function createView(conf) {
@@ -785,8 +727,8 @@ function grid() {
 				"CR": "size"
 			}
 		},
-		"display": function display() {
-			this.super(display);
+		"view": function view(model) {
+			this.super(view, model);
 			if (!this.rule) this.createRule();
 			this.peer.innerText = this.getCaption();
 			if (this.conf.dynamic) this.peer.classList.add("dynamic");
@@ -1371,14 +1313,14 @@ function pen() {
 				let b = this.image.bounds;
 				this.x = (event.x - b.left) / b.width * 320;
 				this.y = (event.y - b.top) / b.height * 320;
-				this.vector.display();
+				this.vector.view();
 			},
 			"release": function release(event) {
 				if (event.ctrlKey) return;
 				let b = this.image.bounds;
 				this.x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				this.y = Math.round((event.y - b.top) / b.height * 32) * 10;
-				this.vector.display();
+				this.vector.view();
 			},
 			"dblclick": function dblclick(event) {
 				event.subject = "";
@@ -1397,7 +1339,7 @@ function pen() {
 					this.cmd = "L";
 					next.cmd = "L";
 				}
-				this.vector.display();
+				this.vector.view();
 			}
 		}
 	},
@@ -1405,8 +1347,8 @@ function pen() {
 		"type$": "/pen/Shape",
 		"nodeName": "path",
 		"var$points": null,
-		"display": function display() {
-			this.super(display);
+		"view": function view() {
+			this.super(view);
 			let path = "";
 			if (this.points) for (let point of this.points) {
 				path += point.toString();
@@ -1427,8 +1369,8 @@ function pen() {
 			}
 			point.x = x;
 			point.y = y;
-			point.display();
-			this.display();
+			point.view();
+			this.view();
 			return point;
 		},
 		"extend$actions": {
@@ -1444,7 +1386,7 @@ function pen() {
 			"viewBox": "0 0 320 320"
 		},
 		"type$grid": "/pen/Grid",
-		"display": function display() {
+		"view": function view() {
 			let grid = this[Symbol.for("owner")].create(this.grid);
 			this.peer.innerHTML = grid.markup;
 			this.vector = this.owner.create("/ui/pen/Vector");
@@ -1486,8 +1428,8 @@ function pen() {
 	"Canvas": {
 		"type$": "/display/Display",
 		"var$shape": null,
-		"display": function display() {
-			this.super(display);
+		"view": function view(model) {
+			this.super(view, model);
 			this.shape = this.owner.create("/ui/pen/Image");
 			this.append(this.shape);
 		}
@@ -1623,16 +1565,12 @@ function record() {
 		"get$contentType": function get$contentType() {
 			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
 		},
-		"display": function display() {
-			this.super(display);
+		"view": function view(model) {
+			this.super(view, model);
 			let editor = this.owner.create(this.contentType, this.conf);
 			this.append(editor);
 		},
-		"view": function view(model) {
-			this.display();
-			this.model = model;
-		},
-		"modelFor": function modelFor(editor) {
+		"modelFor": function modelFor(key) {
 			return this.model && this.model[this.conf.name] || "";
 		}
 	}
