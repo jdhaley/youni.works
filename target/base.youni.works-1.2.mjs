@@ -240,21 +240,21 @@ function data() {
 		},
 		"data": {
 		},
-		"views": {
-		},
-		"start": function start() {
-			this.let("views", Object.create(null));
+		"once$views": function once$views() {
+			let views = Object.create(null);
 			for (let typeName in this.types) {
 				let type = this.types[typeName];
 				let members = Object.create(null);
 				for (let memberName in type.members) {
 					let member = type.members[memberName];
 					member.name = memberName;
-					let memberType = member.controlType || "/ui/record/Property";
+					let memberType = member.viewType || "/ui/record/Property";
 					members[memberName] = this.owner.create(memberType, member);
 				}
 				views[typeName] = members;
 			}
+		},
+		"start": function start() {
 		}
 	}
 }

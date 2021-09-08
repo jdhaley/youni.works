@@ -1,4 +1,4 @@
-const pkg = {
+export default {
 	type$: "/base/dom",
 	Display: {
 		type$: ["Element", "/base/view/View"],
@@ -114,13 +114,8 @@ const pkg = {
 			this.document.head.append(node);
 			return node;
 		}
-	},
-	$public: {
-		type$Display: "Display",
-		type$Frame: "Frame"
 	}
 }
-export default pkg;
 
 	// setAttributes(ele, at) {
 	// 	//TODO if attribute is an object, prefix the path iterator over it.

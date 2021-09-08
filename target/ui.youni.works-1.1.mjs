@@ -453,10 +453,6 @@ function display() {
 			this.document.head.append(node);
 			return node;
 		}
-	},
-	"$public": {
-		"type$Display": "/display/Display",
-		"type$Frame": "/display/Frame"
 	}
 }
 return pkg;
