@@ -10,14 +10,15 @@
 	display: flex;
 	flex: 0 0;
 	min-height: 36px;
-	/* color: darkgray; */
 	background-color: ghostwhite;
 	overflow: scroll;
+	user-select: none;
 }
 .stack>.body {
 	flex: 1 1;
+	background: ghostwhite;
 	align-content: stretch;
-	overflow: hidden;
+	overflow: auto;
 /*
 	display: flex;
 	flex-direction: column;
@@ -26,8 +27,8 @@
 } 
 
 .stack>.header::-webkit-scrollbar {
-	width: 2px;
-	height: 2px;
+	width: 0px;
+	height: 4px;
 }
 .stack>.header::-webkit-scrollbar-track {
 	background: white;
@@ -47,19 +48,17 @@
 	cursor: pointer;
 	max-width: 150px;
 	min-width: 100px;
-	color: gray;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	border-right: 1px solid gainsboro;
-	/*border-bottom: 1px solid gainsboro; */
+	color: slategrey;
+	background: #eaeaea;
 }
 .activeTab {
 	background-color: white;
-	border-bottom-color: white;
 }
 .activeTab * {
-	color: steelblue;
 }
 .tab>IMG {
 	width: 20px;
@@ -70,7 +69,9 @@
 	flex-direction: row;
 	overflow: hidden;
 }
-
+.workbench>.stack>.body {
+	overflow: hidden;
+}
 .workbench>.stack>.header {
 	display: flex;
 	flex-direction: column;
@@ -78,21 +79,20 @@
 	flex: 0 0;
 	min-width: 48px;
 	max-width: 48px;
-	color: darkgray;
-	background-color: #323232;
+	background-color: gray;
+	border-right: 4px solid ghostwhite;
 	overflow: hidden;
 }
 .workbenchTab {
-	border-right: 2px solid none;
 	background-color: none;
-	padding: 2px;
+	margin: 4px;
+	padding: 4px;
+	border-radius: 4px;
 }
 .workbenchTab.activeTab {
-	background-color: inherit;
-	border-right: 2px solid white;
+	background-color: ghostwhite;
 }
 .workbenchTab>IMG {
-	margin-top: 8px;
 	width: 100%;
 }
 .workbenchTab>SPAN {
