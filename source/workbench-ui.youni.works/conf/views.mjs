@@ -1,4 +1,3 @@
-import grid from "./grid.mjs";
 export default {
 	test: {
 		title: "Test",
@@ -24,10 +23,9 @@ export default {
 							type$: "/ui/grid/Table",
 							extend$conf: {
 								data: {
-									types: grid.types,
-									values: grid.data,
-									objectType: "Issue",
-									dataset: "Issue"	
+									source: "test",
+									view: "Issue",
+									set: "issues"	
 								}
 							}
 						}

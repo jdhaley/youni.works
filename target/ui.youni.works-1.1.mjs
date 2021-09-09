@@ -344,6 +344,7 @@ function display() {
 		"type$": ["/display/Element", "/base/view/View"],
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
+		"display": "vertical",
 		"createPart": function createPart(key, type) {
 			let part = this.owner.create(type);
 			this.put(key, part);
@@ -686,6 +687,9 @@ function grid() {
 	"type$": "/record",
 	"type$Section": "/panel/Section",
 	"type$Shape": "/shape/Shape",
+	"Panel": {
+		"type$": "/grid/Display"
+	},
 	"Caption": {
 		"type$": ["/grid/Member", "/grid/Shape"],
 		"zones": {
@@ -820,7 +824,10 @@ function grid() {
 			this.peer.id = "I" + this.owner.createId();
 			this.super(start, conf);
 			if (this.conf.data) {
-
+				let data = this.conf.data;
+				let source = this.owner.app.data[data.source];
+				let members = source.views[data.view];
+				console.log(members);
 			}
 		},
 		"view": function view(model) {

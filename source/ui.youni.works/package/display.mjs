@@ -4,6 +4,7 @@ export default {
 		type$: ["Element", "/base/view/View"],
 		type$owner: "Frame",
 		nodeName: "div",
+		display: "vertical",
 		createPart(key, type) {
 			let part = this.owner.create(type);
 			this.put(key, part);

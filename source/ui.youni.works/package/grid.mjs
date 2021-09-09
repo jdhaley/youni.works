@@ -2,6 +2,10 @@ export default {
 	type$: "/record",
 	type$Section: "/panel/Section",
 	type$Shape: "/shape/Shape",
+	Panel: {
+		type$: "Display",
+
+	},
 	Caption: {
 		type$: ["Member", "Shape"],
 		zones: {
@@ -136,7 +140,10 @@ export default {
 			this.peer.id = "I" + this.owner.createId();
 			this.super(start, conf);
 			if (this.conf.data) {
-
+				let data = this.conf.data;
+				let source = this.owner.app.data[data.source];
+				let members = source.views[data.view];
+				console.log(members);
 			}
 		},
 		view(model) {
