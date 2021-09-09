@@ -63,7 +63,7 @@ export default {
         }
     },
     data: {
-        "Design": {
+        "designs": {
             "GB1A": {
                 "id": "GB1A",
                 "shape": "r",
@@ -79,7 +79,7 @@ export default {
                 "image": ""
             }
         },
-        "Issue": {
+        "issues": {
             "GB21": {
                 "issued": "1960-03-01",
                 "design": "GB1A",

@@ -137,18 +137,16 @@ export default {
 			return this.peer.id;
 		},
 		start(conf) {
-			this.peer.id = "I" + this.owner.createId();
 			this.super(start, conf);
 			if (this.conf.data) {
-				let data = this.conf.data;
-				let source = this.owner.app.data[data.source];
-				let members = source.views[data.view];
-				console.log(members);
+				this.dataSource = this.owner.app.data[this.conf.data.source];
+				this.conf.members = this.dataSource.views[this.conf.data.view];
 			}
+			this.peer.id = "I" + this.owner.createId();
 		},
 		view(model) {
-			if (model === undefined && this.conf.data) {
-				model = this.conf.data.values[this.conf.dataset];
+			if (model === undefined && this.dataSource) {
+				model = this.dataSource.data[this.conf.data.set];
 			//	this.conf.members = this.conf.data.types[this.conf.objectType].members;
 			}
 			console.log(model);

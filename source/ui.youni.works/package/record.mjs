@@ -4,23 +4,10 @@ export default {
 	 * A Record supports an object model view.
 	 */
 	Record: {
-		type$: ["Display", "Observer"],
+//		type$: ["Display", "Observer"],
+		type$: "Display",
 		type$typing: "/util/Typing",
 		isDynamic: false,
-		extend$conf: {
-			memberKeyProperty: "name",
-			members: []
-		},
-		//TODO - work in logic with the extend$ facet (it can accept arrays containing element.name objects)
-		//TOOD - re above - more generally - thinking about converting arrays based on key/id value.
-		once$members() {
-			let conf = this.conf.data.types[this.conf.data.objectType].members;
-			let members = Object.create(null);
-			for (let key in conf) {
-				members[key] = this.owner.create("/ui/record/Property", conf[key]);
-			}
-			return members;
-		},
 		view(model) {
 			this.super(view, model);
 			if (this.isDynamic) this.bindDynamic();
@@ -34,6 +21,12 @@ export default {
 			}
 			this.properties = props;
 			this.forEach(props, this.createContent);
+		},
+		start(conf) {
+			if (!this.members && conf.members) {
+				this.let("members", conf.members);
+			}
+			this.super(start, conf);
 		}
 	},
 	/**

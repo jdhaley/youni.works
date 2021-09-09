@@ -152,7 +152,7 @@ const conf = {
 				}
 			},
 			"data": {
-				"Design": {
+				"designs": {
 					"GB1A": {
 						"id": "GB1A",
 						"shape": "r",
@@ -168,7 +168,7 @@ const conf = {
 						"image": ""
 					}
 				},
-				"Issue": {
+				"issues": {
 					"GB21": {
 						"issued": "1960-03-01",
 						"design": "GB1A",

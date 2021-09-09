@@ -2,11 +2,13 @@ export default {
 	type$: "/base/dom",
 	Display: {
 		type$: ["Element", "/base/view/View"],
+		extend$conf: {
+		},
 		type$owner: "Frame",
 		nodeName: "div",
 		display: "vertical",
 		createPart(key, type) {
-			let part = this.owner.create(type);
+			let part = this.owner.create(type, this.conf);
 			this.put(key, part);
 			if (this.members) part.styles.add(key);
 			return part;

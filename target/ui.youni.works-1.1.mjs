@@ -342,11 +342,13 @@ function display() {
 	"type$": "/base/dom",
 	"Display": {
 		"type$": ["/display/Element", "/base/view/View"],
+		"extend$conf": {
+		},
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
 		"display": "vertical",
 		"createPart": function createPart(key, type) {
-			let part = this.owner.create(type);
+			let part = this.owner.create(type, this.conf);
 			this.put(key, part);
 			if (this.members) part.styles.add(key);
 			return part;
@@ -821,18 +823,16 @@ function grid() {
 			return this.peer.id;
 		},
 		"start": function start(conf) {
-			this.peer.id = "I" + this.owner.createId();
 			this.super(start, conf);
 			if (this.conf.data) {
-				let data = this.conf.data;
-				let source = this.owner.app.data[data.source];
-				let members = source.views[data.view];
-				console.log(members);
+				this.dataSource = this.owner.app.data[this.conf.data.source];
+				this.conf.members = this.dataSource.views[this.conf.data.view];
 			}
+			this.peer.id = "I" + this.owner.createId();
 		},
 		"view": function view(model) {
-			if (model === undefined && this.conf.data) {
-				model = this.conf.data.values[this.conf.dataset];
+			if (model === undefined && this.dataSource) {
+				model = this.dataSource.data[this.conf.data.set];
 			//	this.conf.members = this.conf.data.types[this.conf.objectType].members;
 			}
 			console.log(model);
@@ -1495,21 +1495,9 @@ function record() {
 	const pkg = {
 	"type$": "/display",
 	"Record": {
-		"type$": ["/record/Display", "/record/Observer"],
+		"type$": "/record/Display",
 		"type$typing": "/util/Typing",
 		"isDynamic": false,
-		"extend$conf": {
-			"memberKeyProperty": "name",
-			"members": []
-		},
-		"once$members": function once$members() {
-			let conf = this.conf.data.types[this.conf.data.objectType].members;
-			let members = Object.create(null);
-			for (let key in conf) {
-				members[key] = this.owner.create("/ui/record/Property", conf[key]);
-			}
-			return members;
-		},
 		"view": function view(model) {
 			this.super(view, model);
 			if (this.isDynamic) this.bindDynamic();
@@ -1523,6 +1511,12 @@ function record() {
 			}
 			this.properties = props;
 			this.forEach(props, this.createContent);
+		},
+		"start": function start(conf) {
+			if (!this.members && conf.members) {
+				this.let("members", conf.members);
+			}
+			this.super(start, conf);
 		}
 	},
 	"Member": {
