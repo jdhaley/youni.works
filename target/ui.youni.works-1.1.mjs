@@ -689,6 +689,30 @@ function grid() {
 	"type$": "/record",
 	"type$Section": "/panel/Section",
 	"type$Shape": "/shape/Shape",
+	"Record": {
+		"type$": "/grid/Display",
+		"start": function start(conf) {
+			this.super(start, conf);
+			if (!this.members && conf.members) {
+				this.let("members", conf.members);
+			}
+		}
+	},
+	"Property": {
+		"type$": "/grid/Display",
+		"get$editor": function get$editor() {
+			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
+		},
+		"view": function view(model) {
+			if (this.viewCaption) {
+				this.peer.append(this.conf.caption);
+			}
+			this.createPart("editor", this.editor);
+		},
+		"modelFor": function modelFor(key) {
+			return this.model && this.model[this.key] || "";
+		}
+	},
 	"Panel": {
 		"type$": "/grid/Display"
 	},
@@ -781,13 +805,10 @@ function grid() {
 		"type$": "/grid/Section",
 		"members": {
 			"header": {
-				"type$": "/grid/Row",
+				"type$": "/grid/Display",
 				"members": {
 					"type$key": "/grid/Key",
-					"value": {
-						"type$": "/grid/Record",
-						"type$contentType": "/grid/Caption"
-					}
+					"type$value": "/grid/Record"
 				}
 			},
 			"body": {
@@ -797,8 +818,7 @@ function grid() {
 					"members": {
 						"type$key": "/grid/Key",
 						"value": {
-							"type$": "/grid/Record",
-							"type$contentType": "/grid/Property"
+							"type$": "/grid/Record"
 						}
 					}
 				}

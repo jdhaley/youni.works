@@ -2,6 +2,30 @@ export default {
 	type$: "/record",
 	type$Section: "/panel/Section",
 	type$Shape: "/shape/Shape",
+	Record: {
+		type$: "Display",
+		start(conf) {
+			this.super(start, conf);
+			if (!this.members && conf.members) {
+				this.let("members", conf.members);
+			}
+		}
+	},
+	Property: {
+		type$: "Display",
+		get$editor() {
+			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
+		},
+		view(model) {
+			if (this.viewCaption) {
+				this.peer.append(this.conf.caption);
+			}
+			this.createPart("editor", this.editor);
+		},
+		modelFor(key) {
+			return this.model && this.model[this.key] || "";
+		}
+	},	
 	Panel: {
 		type$: "Display",
 
@@ -95,13 +119,10 @@ export default {
 		type$: "Section",
 		members: {
 			header: {
-				type$: "Row",
+				type$: "Display",
 				members: {
 					type$key: "Key",
-					value: {
-						type$: "Record",
-						type$contentType: "Caption"
-					}
+					type$value: "Record",
 				}
 			},
 			body: {
@@ -111,8 +132,7 @@ export default {
 					members: {
 						type$key: "Key",
 						value: {
-							type$: "Record",
-							type$contentType: "Property"
+							type$: "Record"
 						}
 					}
 				}
