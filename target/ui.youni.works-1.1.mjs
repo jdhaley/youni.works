@@ -16,13 +16,13 @@ module.package = {
 	display: display(),
 	editors: editors(),
 	gdr: gdr(),
-	grid: grid(),
 	note: note(),
 	panel: panel(),
 	pen: pen(),
 	range: range(),
 	record: record(),
 	shape: shape(),
+	table: table(),
 	tabs: tabs(),
 	tree: tree()
 }
@@ -679,185 +679,6 @@ function gdr() {
             ctl.sense(event);
             if (!event.subject) event.preventDefault();    
         }
-	}
-}
-return pkg;
-}
-
-function grid() {
-	const pkg = {
-	"type$": "/record",
-	"type$Section": "/panel/Section",
-	"type$Shape": "/shape/Shape",
-	"Record": {
-		"type$": "/grid/Display",
-		"start": function start(conf) {
-			this.super(start, conf);
-			if (!this.members && conf.members) {
-				this.let("members", conf.members);
-			}
-		}
-	},
-	"Property": {
-		"type$": "/grid/Display",
-		"get$editor": function get$editor() {
-			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
-		},
-		"view": function view(model) {
-			if (this.viewCaption) {
-				this.peer.append(this.conf.caption);
-			}
-			this.createPart("editor", this.editor);
-		},
-		"modelFor": function modelFor(key) {
-			return this.model && this.model[this.key] || "";
-		}
-	},
-	"Panel": {
-		"type$": "/grid/Display"
-	},
-	"Caption": {
-		"type$": ["/grid/Member", "/grid/Shape"],
-		"zones": {
-			"border": {
-				"right": 6
-			},
-			"cursor": {
-				"CR": "ew-resize"
-			},
-			"subject": {
-				"CR": "size"
-			}
-		},
-		"view": function view(model) {
-			this.super(view, model);
-			if (!this.rule) this.createRule();
-			this.peer.innerText = this.getCaption();
-			if (this.conf.dynamic) this.peer.styles.add("dynamic");
-		},
-		"createRule": function createRule() {
-			let flex = +(this.conf.columnSize);
-			let selector = "#" + getParentId(this.peer) + " ." + this.conf.name;
-			this.rule = this.owner.createStyle(selector, {
-				"flex": (this.conf.flex === false ? "0 0 " : "1 1 ") + flex + "cm",
-				"min-width": flex / 4 + "cm"
-			});
-			console.log(this.rule);
-			function getParentId(node) {
-				for (; node; node = node.parentNode) {
-					if (node.id) return node.id;
-				}
-			}
-		},
-		"extend$actions": {
-			"size": function size(event) {
-				if (event.track == this) {
-					let r = this.bounds;
-					this.rule.style.minWidth = (event.clientX - r.left) + "px";
-				}
-			}
-		}
-	},
-	"Key": {
-		"type$": ["/grid/Display", "/grid/Shape"],
-		"view": function view() {
-			let key = this.of.key || "";
-			this.peer.textContent = key;
-		}
-	},
-	"Row": {
-		"type$": "/grid/Display",
-		"direction": "horizontal",
-		"members": {
-			"type$key": "/grid/Key",
-			"type$value": "/grid/Display"
-		}
-	},
-	"Sheet": {
-		"type$": "/grid/Section",
-		"members": {
-			"type$header": "/grid/Display",
-			"type$body": "/grid/Rows",
-			"type$footer": "/grid/Display"
-		}
-	},
-	"Rows": {
-		"type$": "/grid/Display",
-		"type$contentType": "/grid/Row",
-		"direction": "vertical"
-	},
-	"PropertySheet": {
-		"type$": "/grid/Sheet",
-		"members": {
-			"body": {
-				"type$": "/grid/Record",
-				"contentType": {
-					"type$": "/grid/Row",
-					"members": {
-						"type$key": "/grid/Caption",
-						"type$value": "/grid/Property"
-					}
-				}
-			}
-		}
-	},
-	"Table": {
-		"type$": "/grid/Section",
-		"members": {
-			"header": {
-				"type$": "/grid/Display",
-				"members": {
-					"type$key": "/grid/Key",
-					"type$value": "/grid/Record"
-				}
-			},
-			"body": {
-				"type$": "/grid/Rows",
-				"contentType": {
-					"type$": "/grid/Row",
-					"members": {
-						"type$key": "/grid/Key",
-						"value": {
-							"type$": "/grid/Record"
-						}
-					}
-				}
-			},
-			"footer": {
-				"type$": "/grid/Row",
-				"members": {
-					"type$key": "/grid/Key",
-					"value": {
-						"type$": "/grid/Record",
-						"contentType": {
-							"type$": "/grid/Caption",
-							"getCaption": function getCaption() {
-								return "";
-							}
-						}
-					}
-				}
-			}
-		},
-		"get$id": function get$id() {
-			return this.peer.id;
-		},
-		"start": function start(conf) {
-			this.super(start, conf);
-			if (this.conf.data) {
-				this.dataSource = this.owner.app.data[this.conf.data.source];
-				this.conf.members = this.dataSource.views[this.conf.data.view];
-			}
-			this.peer.id = "I" + this.owner.createId();
-		},
-		"view": function view(model) {
-			if (model === undefined && this.dataSource) {
-				model = this.dataSource.data[this.conf.data.set];
-			//	this.conf.members = this.conf.data.types[this.conf.objectType].members;
-			}
-			console.log(model);
-			this.super(view, model);
-		}
 	}
 }
 return pkg;
@@ -1743,6 +1564,98 @@ function shape() {
 			let conf = this.elementConf;
 			this.shape = this.owner.create(type, conf);
 			this.append(this.shape);
+		}
+	}
+}
+return pkg;
+}
+
+function table() {
+	const pkg = {
+	"type$": "/display",
+	"Cell": {
+		"type$": "/table/Display",
+		"get$editor": function get$editor() {
+			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
+		},
+		"view": function view(model) {
+			this.super(view, model);
+			this.style.flex = `1 1 ${this.conf.columnSize || 10}cm`; 
+			if (this.viewCaption) {
+				this.peer.append(this.conf.caption);
+			}
+			this.createPart("editor", this.editor);
+		},
+		"modelFor": function modelFor(key) {
+			return this.model && this.model[this.key] || "";
+		}
+	},
+	"Record": {
+		"type$": "/table/Display",
+		"start": function start(conf) {
+			this.super(start, conf);
+			if (!this.members && conf.members) {
+				this.let("members", conf.members);
+			}
+		},
+		"view": function view(model) {
+			this.super(view, model);
+		}
+	},
+	"Key": {
+		"type$": "/table/Display",
+		"view": function view() {
+			let key = this.of.key || "";
+			this.peer.textContent = key;
+		}
+	},
+	"Row": {
+		"type$": "/table/Display",
+		"members": {
+			"type$key": "/table/Key",
+			"type$value": "/table/Record"
+		},
+		"view": function view(model) {
+			this.super(view, model);
+		}
+	},
+	"Rows": {
+		"type$": "/table/Display",
+		"type$contentType": "/table/Row",
+		"view": function view(model) {
+			this.super(view, model);
+		}
+	},
+	"Table": {
+		"type$": "/table/Display",
+		"members": {
+			"header": {
+				"type$": "/table/Row"
+			},
+			"body": {
+				"type$": "/table/Rows",
+				"type$contentType": "/table/Row"
+			},
+			"footer": {
+				"type$": "/table/Row"
+			}
+		},
+		"get$id": function get$id() {
+			return this.peer.id;
+		},
+		"start": function start(conf) {
+			this.super(start, conf);
+			if (this.conf.data) {
+				this.dataSource = this.owner.app.data[this.conf.data.source];
+				this.conf.members = this.dataSource.views[this.conf.data.view];
+			}
+			this.peer.id = "I" + this.owner.createId();
+		},
+		"view": function view(model) {
+			if (model === undefined && this.dataSource) {
+				model = this.dataSource.data[this.conf.data.set];
+			}
+			this.super(view, model);
 		}
 	}
 }

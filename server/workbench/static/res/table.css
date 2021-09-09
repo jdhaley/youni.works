@@ -9,7 +9,7 @@ INPUT {
 }
 .row, .record {
 	display: flex;
-	flex: 1 1;
+	flex: 1;
 }
 .rows {
 	display: flex;
@@ -23,18 +23,18 @@ INPUT {
 	border-style: solid;
 	border-color: silver;
 }
-.key, .caption, .property {
+.key, .cell {
 	display: flex;
 	border-bottom-width: 1px;
 	overflow: hidden;
 	min-width: 0;
 	min-height: 0;
 }
-.caption, .property {
+.cell {
 	border-left-width: 1px;
 }
 
-.property *:focus {
+.cell *:focus {
 	background: aliceblue;
 	outline: 0;
 }

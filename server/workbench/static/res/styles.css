@@ -4,7 +4,7 @@
 @import url('/res/workbench.css');
 @import url('/res/draw.css');
 @import url('/res/note.css');
-@import url('/res/grid.css');
+@import url('/res/table.css');
 
 *[id='i-*'] {
 	stroke: red;

@@ -20,7 +20,7 @@ export default {
 						title: "Table",
 						icon: "/res/icons/work.svg",
 						body: {
-							type$: "/ui/grid/Table",
+							type$: "/ui/table/Table",
 							extend$conf: {
 								data: {
 									source: "test",

@@ -50,7 +50,10 @@ export default {
 			this.observe && this.observe(model);
 		},
 		modelFor(key) {
-			return this.contentType && this.model ? this.model[key] : this.model;
+			if (this.contentType) {
+				if (this.model) return this.model[key];
+			}
+			return this.model;
 		}
 	}
 }

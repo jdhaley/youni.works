@@ -54,7 +54,7 @@ const conf = {
 									"title": "Table",
 									"icon": "/res/icons/work.svg",
 									"body": {
-										"type$": "/ui/grid/Table",
+										"type$": "/ui/table/Table",
 										"extend$conf": {
 											"data": {
 												"source": "test",
@@ -89,7 +89,7 @@ const conf = {
 	"data": {
 		"test": {
 			"type$": "/base/data/DataSource",
-			"type$viewType": "/ui/grid/Property",
+			"type$viewType": "/ui/table/Cell",
 			"types": {
 				"Design": {
 					"members": {

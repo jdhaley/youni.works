@@ -1,6 +1,6 @@
 export default {
     type$: "/base/data/DataSource",
-    type$viewType: "/ui/grid/Property",
+    type$viewType: "/ui/table/Cell",
     types: {
         "Design": {
             "members": {
