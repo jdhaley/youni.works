@@ -362,6 +362,19 @@ function display() {
 			this.styles.add(this.className);
 		}
 	},
+	"Caption": {
+		"type$": "/display/Display",
+		"view": function view(model) {
+			this.markup = this.conf.caption;
+		}
+	},
+	"Pane": {
+		"type$": "/display/Display",
+		"members": {
+			"type$header": "/display/Caption",
+			"type$body": "/display/Display"
+		}
+	},
 	"App": {
 		"type$": ["/display/Component", "/display/Receiver", "/base/origin/Origin"],
 		"start": function start() {
@@ -1572,20 +1585,20 @@ return pkg;
 function table() {
 	const pkg = {
 	"type$": "/display",
-	"Caption": {
+	"Key": {
 		"type$": "/table/Display",
-		"view": function view(model) {
-			this.markup = this.conf.caption;
+		"view": function view() {
+			this.peer.title = this.of.key || "";
 		}
 	},
 	"Value": {
 		"type$": "/table/Display",
 		"view": function view(model) {
-			this.peer.markup = model;
+			this.markup = model;
 		}
 	},
 	"Cell": {
-		"type$": "/table/Display",
+		"type$": "/table/Pane",
 		"extend$conf": {
 			"type$cellHeader": "/table/Caption",
 			"type$cellBody": "/table/Value"
@@ -1596,8 +1609,8 @@ function table() {
 		"start": function start(conf) {
 			this.super(start, conf);
 			conf = this.conf;
-			this.style.flex = `1 1 ${conf.columnSize || 5}cm`; 
-			this.members = Object.create(null);
+	//		this.style.flex = `1 1 ${conf.columnSize || 5}cm`; 
+			this.let("members", Object.create(null));
 			if (conf.cellHeader) {
 				this.members["header"] = conf.cellHeader;
 			}
@@ -1613,22 +1626,13 @@ function table() {
 		"display": "h",
 		"start": function start(conf) {
 			this.super(start, conf);
-			if (!this.members && conf.members) {
-				this.let("members", conf.members);
+			if (!this.members && conf.record) {
+				this.let("members", conf.record);
 			}
-		},
-		"view": function view(model) {
-			this.super(view, model);
-		}
-	},
-	"Key": {
-		"type$": "/table/Display",
-		"view": function view() {
-			this.peer.title = this.of.key || "";
 		}
 	},
 	"Row": {
-		"type$": "/table/Display",
+		"type$": "/table/Pane",
 		"display": "h",
 		"members": {
 			"type$header": "/table/Display",
@@ -1650,7 +1654,7 @@ function table() {
 		}
 	},
 	"Table": {
-		"type$": "/table/Display",
+		"type$": "/table/Pane",
 		"display": "v",
 		"members": {
 			"header": {
@@ -1677,9 +1681,26 @@ function table() {
 			this.super(start, conf);
 			if (this.conf.data) {
 				this.dataSource = this.owner.app.data[this.conf.data.source];
-				this.conf.members = this.dataSource.views[this.conf.data.view];
+				this.createRecord(this.dataSource.views[this.conf.data.view]);
 			}
-			this.peer.id = "I" + this.owner.createId();
+		},
+		"createRecord": function createRecord(record) {
+			let owner = this.owner;
+			let tableId = "I" + owner.createId();
+			for (let name in record) {
+				let member = record[name];
+				member.rule = createRule(name, member.conf);
+			}
+			this.peer.id = tableId;
+			this.conf.record = record;
+
+			function createRule(name, conf) {
+				let width = conf.columnSize * 1 || 4;
+				return owner.createStyle(`#${tableId} .${name}`, {
+					"flex": (conf.flex === false ? "0 0 " : "1 1 ") + width + "cm",
+					"min-width": width / 4 + "cm"
+				});
+			}	
 		},
 		"view": function view(model) {
 			if (model === undefined && this.dataSource) {

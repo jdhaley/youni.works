@@ -22,6 +22,20 @@ export default {
 			this.styles.add(this.className);
 		}
 	},
+	Caption: {
+		type$: "Display",
+		view(model) {
+			this.markup = this.conf.caption;
+		}
+	},
+	Pane: {
+		type$: "Display",
+		members: {
+			type$header: "Caption",
+			type$body: "Display",
+			//footer is optional.
+		}
+	},
     App: {
         type$: ["Component", "Receiver", "/base/origin/Origin"],
 		start() {
