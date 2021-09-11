@@ -1,20 +1,42 @@
 export default {
 	type$: "/display",
+	Caption: {
+		type$: "Display",
+		view(model) {
+			this.markup = this.conf.caption;
+		}
+	},
+	Value: {
+		type$: "Display",
+		view(model) {
+			this.peer.markup = model;
+		}		
+	},
 	Cell: {
 		type$: "Display",
+		extend$conf: {
+			type$cellHeader: "Caption",
+			type$cellBody: "Value"
+		},
 		get$editor() {
 			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
 		},
 		view(model) {
 			this.super(view, model);
 			this.style.flex = `1 1 ${this.conf.columnSize || 10}cm`; 
-			if (this.viewCaption) {
-				this.peer.append(this.conf.caption);
-			}
-			this.createPart("editor", this.editor);
 		},
 		modelFor(key) {
 			return this.model && this.model[this.key] || "";
+		},
+		start(conf) {
+			this.super(start, conf);
+			this.members = Object.create(null);
+			if (this.conf.cellHeader) {
+				this.members["header"] = this.conf.cellHeader;
+			}
+			if (this.conf.cellBody) {
+				this.members["body"] = this.editor;
+			}
 		}
 	},	
 	Record: {
@@ -39,18 +61,17 @@ export default {
 	Row: {
 		type$: "Display",
 		members: {
-			type$key: "Key",
-			type$value: "Record"
-		},
-		view(model) {
-			this.super(view, model);
+			type$header: "Key",
+			type$body: "Record"
 		}
 	},
-	Rows: {
+	Collection: {
 		type$: "Display",
-		type$contentType: "Row",
-		view(model) {
-			this.super(view, model);
+		contentType: {
+			type$: "Row",
+			extend$conf: {
+				cellHeader: false
+			}	
 		}
 	},
 	Table: {
@@ -58,13 +79,19 @@ export default {
 		members: {
 			header: {
 				type$: "Row",
+				extend$conf: {
+					cellBody: false
+				}	
 			},
 			body: {
-				type$: "Rows",
-				type$contentType: "Row"
+				type$: "Collection",
 			},
 			footer: {
 				type$: "Row",
+				extend$conf: {
+					cellHeader: false,
+					cellBody: false
+				}	
 			}
 		},
 		get$id() {

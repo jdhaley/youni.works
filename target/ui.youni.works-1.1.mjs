@@ -1573,21 +1573,43 @@ return pkg;
 function table() {
 	const pkg = {
 	"type$": "/display",
+	"Caption": {
+		"type$": "/table/Display",
+		"view": function view(model) {
+			this.markup = this.conf.caption;
+		}
+	},
+	"Value": {
+		"type$": "/table/Display",
+		"view": function view(model) {
+			this.peer.markup = model;
+		}
+	},
 	"Cell": {
 		"type$": "/table/Display",
+		"extend$conf": {
+			"type$cellHeader": "/table/Caption",
+			"type$cellBody": "/table/Value"
+		},
 		"get$editor": function get$editor() {
 			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
 		},
 		"view": function view(model) {
 			this.super(view, model);
 			this.style.flex = `1 1 ${this.conf.columnSize || 10}cm`; 
-			if (this.viewCaption) {
-				this.peer.append(this.conf.caption);
-			}
-			this.createPart("editor", this.editor);
 		},
 		"modelFor": function modelFor(key) {
 			return this.model && this.model[this.key] || "";
+		},
+		"start": function start(conf) {
+			this.super(start, conf);
+			this.members = Object.create(null);
+			if (this.conf.cellHeader) {
+				this.members["header"] = this.conf.cellHeader;
+			}
+			if (this.conf.cellBody) {
+				this.members["body"] = this.editor;
+			}
 		}
 	},
 	"Record": {
@@ -1612,32 +1634,37 @@ function table() {
 	"Row": {
 		"type$": "/table/Display",
 		"members": {
-			"type$key": "/table/Key",
-			"type$value": "/table/Record"
-		},
-		"view": function view(model) {
-			this.super(view, model);
+			"type$header": "/table/Key",
+			"type$body": "/table/Record"
 		}
 	},
-	"Rows": {
+	"Collection": {
 		"type$": "/table/Display",
-		"type$contentType": "/table/Row",
-		"view": function view(model) {
-			this.super(view, model);
+		"contentType": {
+			"type$": "/table/Row",
+			"extend$conf": {
+				"cellHeader": false
+			}
 		}
 	},
 	"Table": {
 		"type$": "/table/Display",
 		"members": {
 			"header": {
-				"type$": "/table/Row"
+				"type$": "/table/Row",
+				"extend$conf": {
+					"cellBody": false
+				}
 			},
 			"body": {
-				"type$": "/table/Rows",
-				"type$contentType": "/table/Row"
+				"type$": "/table/Collection"
 			},
 			"footer": {
-				"type$": "/table/Row"
+				"type$": "/table/Row",
+				"extend$conf": {
+					"cellHeader": false,
+					"cellBody": false
+				}
 			}
 		},
 		"get$id": function get$id() {

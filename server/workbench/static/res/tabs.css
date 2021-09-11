@@ -10,7 +10,7 @@
 	display: flex;
 	flex: 0 0;
 	min-height: 36px;
-	background-color: ghostwhite;
+	background-color: gainsboro;
 	overflow: scroll;
 	user-select: none;
 }
@@ -51,14 +51,15 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	border-right: 1px solid gainsboro;
 	color: slategrey;
-	background: #eaeaea;
+	background: ghostwhite;
+	border-right: 1px solid gainsboro;
+	border-bottom: 1px solid gainsboro;
+	/* background: #eaeaea; */
 }
 .activeTab {
 	background-color: white;
-}
-.activeTab * {
+	border-bottom: 1px solid white;
 }
 .tab>IMG {
 	width: 20px;
