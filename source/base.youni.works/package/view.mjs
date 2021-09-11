@@ -27,7 +27,8 @@ export default {
 		view(model) {
 			if (this.members && !this.markup) {
 				for (let name in this.members) {
-					this.createPart(name, this.members[name]);
+					let member = this.members[name];
+					member && this.createPart(name, member);
 				}
 			} else if (this.contentType) {
 				this.markup = "";
