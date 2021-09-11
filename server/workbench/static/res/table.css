@@ -1,59 +1,50 @@
 
 INPUT {
-	align-items: flex-start;
-	padding: 3px;
+	font: inherit;
+	margin: 3px;
 }
 .table {
-	display: flex;
-	flex-direction: column;
+	flex: 1 1 100%;
+/*	min-width: 10cm; */
 	border-top: 1px solid gainsboro;
 	background: white;
 }
-.table>.header, .table>.footer, .key {
+.table>.header, .table>.footer, .row>.header {
 	background: ghostwhite;
 	color: slategrey;
-}
-.table * {
-	border-width: 0;
-	border-style: solid;
-	border-color: gainsboro;
+	cursor: default;
 }
 .row, .record {
-	display: flex;
-	flex-direction: row;
 	flex: 1;
 }
-.collection {
+/* .collection {
 	display: flex;
 	flex-direction: column;
-}
-.row>.header, .cell {
-	display: flex;
-	align-content: stretch;
-	justify-content: stretch;
-	border-bottom-width: 1px;
+} */
+.row>.header {
+	border-bottom: 1px solid gainsboro;
 	overflow: hidden;
-	min-width: 0;
-	min-height: 0;
-	padding: 3px;
+	min-width: 24px;
+	max-width: 24px;
+	padding: 4px;
 }
 .cell {
-	border-left-width: 1px;
+	border-bottom: 1px solid gainsboro;
+	border-left: 1px solid gainsboro;
+	padding: 0;
+	overflow: hidden;
+	align-items: stretch;
 }
-.cell:focus {
-	background: aliceblue;
+.cell>.body:focus {
+	background: lightsteelblue;
 	outline: 0;
 }
 .cell>*, .cell>.link>* {
+	flex: 1 1;
 	padding: 3px;
 }
 .cell>.link {
 	padding: 0;
-}
-
-.key {
-	background-color: ghostwhite;
-	cursor: default;
 }
 .key {
 	border-left-width: 0;

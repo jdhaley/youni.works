@@ -21,7 +21,7 @@
 	/* background: ghostwhite; */
 	background: none;
 }
-* {
+*, INPUT {
 	box-sizing: border-box;
 	outline: 0;
 	margin: 0;

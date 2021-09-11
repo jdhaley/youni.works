@@ -120,6 +120,7 @@ const conf = {
 					"members": {
 						"issued": {
 							"dataType": "date",
+							"inputType": "string",
 							"columnSize": 4,
 							"flex": false
 						},
