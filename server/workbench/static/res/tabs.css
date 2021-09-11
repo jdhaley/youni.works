@@ -16,7 +16,6 @@
 }
 .stack>.body {
 	flex: 1 1;
-	background: ghostwhite;
 	align-content: stretch;
 	overflow: auto;
 /*
@@ -53,9 +52,10 @@
 	white-space: nowrap;
 	color: slategrey;
 	background: ghostwhite;
-	border-right: 1px solid gainsboro;
+	margin-top: 1px;
+	margin-left: 2px;
 	border-bottom: 1px solid gainsboro;
-	/* background: #eaeaea; */
+	border-radius: 4px 4px 0 0;
 }
 .activeTab {
 	background-color: white;
@@ -80,8 +80,9 @@
 	flex: 0 0;
 	min-width: 48px;
 	max-width: 48px;
-	background-color: gray;
-	border-right: 4px solid ghostwhite;
+	padding: 2px;
+	background-color: gainsboro;
+	border-right: 4px solid white;
 	overflow: hidden;
 }
 .workbenchTab {

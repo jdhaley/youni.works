@@ -29,6 +29,9 @@ export default {
         },
         "Issue": {
             "members": {
+                "id": {
+                    "columnSize": 3
+                },
                 "issued": {
                     "dataType": "date",
                     "inputType": "string",
@@ -80,8 +83,9 @@ export default {
                 "image": ""
             }
         },
-        "issues": {
-            "GB21": {
+        "issues": [
+            {
+                "id": "GB21",
                 "issued": "1960-03-01",
                 "design": "GB1A",
                 "denom": "1d",
@@ -89,7 +93,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/GB1As.png"
             },
-            "GB22":	{
+            {
+                "id": "GB22",
                 "issued": "1960-03-01",
                 "design": "GB1D",
                 "denom": "2d",
@@ -97,7 +102,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/GB1Ds.png"
             },
-            "GB23":	{
+            {
+                "id": "GB23",
                 "issued": "1960-03-01",
                 "design": "GB1A",
                 "denom": "3d",
@@ -105,7 +111,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/x.png"
             },
-            "GB24":{
+            {
+                "id": "GB24",
                 "issued": "1960-03-01",
                 "design": "GB1A",
                 "denom": "1d",
@@ -113,7 +120,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/GB1As.png"
             },
-            "GB25":{
+            {
+                "id": "GB25",
                 "issued": "1960-03-01",
                 "design": "GB1D",
                 "denom": "2d",
@@ -121,7 +129,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/GB1Ds.png"
             },
-            "GB26":{
+            {
+                "id": "GB26",
                 "issued": "1960-03-01",
                 "design": "GB1A",
                 "denom": "3d",
@@ -129,7 +138,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/x.png"
             },
-            "GB27":{
+            {
+                "id": "GB27",
                 "issued": "1960-03-01",
                 "design": "GB1A",
                 "denom": "1d",
@@ -137,7 +147,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/GB1As.png"
             },
-            "GB28":{
+            {
+                "id": "GB28",
                 "issued": "1960-03-01",
                 "design": "GB1D",
                 "denom": "2d",
@@ -145,7 +156,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/GB1Ds.png"
             },
-            "GB29":{
+            {
+                "id": "GB29",
                 "issued": "1960-03-01",
                 "design": "GB1A",
                 "denom": "3d",
@@ -153,7 +165,8 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/x.png"
             },
-            "GB210":{
+            {
+                "id": "GB210",
                 "issued": "1960-03-01",
                 "design": "GB1A",
                 "denom": "3d",
@@ -161,6 +174,6 @@ export default {
                 "subject": "",
                 "image": "/file/stamp/x.png"
             }
-        }
+        ]
     }
 }

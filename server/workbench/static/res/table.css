@@ -5,7 +5,8 @@ INPUT {
 }
 .table {
 	flex: 1 1 100%;
-/*	min-width: 10cm; */
+	min-width: 10cm;
+	border-left: 1px solid gainsboro;
 	border-top: 1px solid gainsboro;
 	background: white;
 }
@@ -34,10 +35,6 @@ INPUT {
 	padding: 0;
 	overflow: hidden;
 	align-items: stretch;
-}
-.cell>.body:focus {
-	background: lightsteelblue;
-	outline: 0;
 }
 .cell>*, .cell>.link>* {
 	flex: 1 1;
