@@ -312,10 +312,12 @@ function dom() {
 		}
 	},
 	"Element": {
-		"type$": ["/dom/Instance", "/dom/Node"],
+		"type$": ["/dom/Instance", "/dom/Node", "/view/View"],
 		"type$owner": "/dom/Document",
 		"namespace": "",
-		"nodeName": "",
+		"once$nodeName": function once$nodeName() {
+			return this.className;
+		},
 		"once$peer": function once$peer() {
 			let peer = this.owner.createElement(this.nodeName, this.namespace);
 			peer.$peer = this;
@@ -330,6 +332,17 @@ function dom() {
 			} else {
 				return this.peer.innerHTML;
 			}
+		},
+		"extend$conf": {
+		},
+		"start": function start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+		},
+		"createPart": function createPart(key, type) {
+			let part = this.owner.create(type, this.conf);
+			part.let("key", key);
+			this.peer.append(part.peer);
+			return part;
 		},
 		"get": function get(name) {
 			return this.peer.getAttribute(name);

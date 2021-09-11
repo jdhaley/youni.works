@@ -1,26 +1,25 @@
 export default {
 	type$: "/base/dom",
 	Display: {
-		type$: ["Element", "/base/view/View"],
-		extend$conf: {
-		},
+		type$: "Element",
 		type$owner: "Frame",
 		nodeName: "div",
-		display: "vertical",
-		createPart(key, type) {
-			let part = this.owner.create(type, this.conf);
-			this.put(key, part);
-			if (this.members) part.styles.add(key);
-			return part;
-		},
+		display: "",
 		get$style() {
 			return this.peer.style;
 		},
 		get$styles() {
 			return this.peer.classList;
 		},
+		createPart(key, type) {
+			let part = this.super(createPart, key, type);
+			if (this.members) part.styles.add(key);
+			return part;
+		},
 		start(conf) {
-			if (conf) this.let("conf", conf, "extend");
+			this.super(start, conf);
+			if (this.display) this.styles.add(this.display);
+			this.styles.add(this.className);
 		}
 	},
     App: {

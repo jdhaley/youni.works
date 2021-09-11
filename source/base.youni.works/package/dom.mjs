@@ -40,10 +40,12 @@ export default {
 		}
 	},
 	Element: {
-		type$: ["Instance", "Node"],
+		type$: ["Instance", "Node", "/view/View"],
 		type$owner: "Document",
 		namespace: "",
-		nodeName: "",
+		once$nodeName() {
+			return this.className;
+		},
 		once$peer() {
 			let peer = this.owner.createElement(this.nodeName, this.namespace);
 			peer.$peer = this;
@@ -58,6 +60,17 @@ export default {
 			} else {
 				return this.peer.innerHTML;
 			}
+		},
+		extend$conf: {
+		},
+		start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+		},
+		createPart(key, type) {
+			let part = this.owner.create(type, this.conf);
+			part.let("key", key);
+			this.peer.append(part.peer);
+			return part;
 		},
 		/*
 			deprecated (get & set require a replacement api)
