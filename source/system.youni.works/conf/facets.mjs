@@ -124,18 +124,22 @@ export default {
 				let  sys = this;
 				decl.define = function(object) {
 					let ext = Object.create(object[decl.name] || null);
-					if (decl.expr[Symbol.iterator]) {
-						for (let value of decl.expr) {
-							if (value && value.name) {
-								ext[value.name] = value;
-							}
-							else {
-								console.warn("Array extend element does not contain a name property. Igonoring.");
-							}
-						}
-					}
+					// if (decl.expr[Symbol.iterator]) {
+					// 	for (let value of decl.expr) {
+					// 		if (value && value.name) {
+					// 			ext[value.name] = value;
+					// 		}
+					// 		else {
+					// 			console.warn("Array extend element does not contain a name property. Igonoring.");
+					// 		}
+					// 	}
+					// }
 					for (let name in decl.expr) {
-						ext[name] = decl.expr[name];
+						let expr = decl.expr[name];
+						if (typeof expr == "function" && !expr.$super && typeof ext[name] == "function") {
+							expr.$super = ext[name];
+						}
+						ext[name] = expr;
 					}
 					return sys.define(object, decl.name, ext, "const");
 				}

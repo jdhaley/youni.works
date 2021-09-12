@@ -62,6 +62,14 @@ const pkg = {
 		},
         super: function(method, ...args) {
 			if (method && typeof method == "function") {
+                // if (!method.$super) {
+                //     for (let object = this; object ; object = Object.getPrototypeOf(object)) {
+                //         if (object[method.name] != method) {
+                //             console.log(object[Symbol.toStringTag], method.name);
+                //             break;
+                //         }
+                //     }
+                // }
 				if (method.$super) return method.$super.apply(this, args);
                 /*It no longer considered an error if there is no super... */
 				//console.error(`super("${method.name}" ...) is not a method.`);
