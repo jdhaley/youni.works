@@ -245,6 +245,9 @@ function editors() {
 			this.peer.src = "/res/link.svg";
 			this.peer.tabIndex = 1;
 		},
+		"get$link": function get$link() {
+			return this.conf.dataSource.data[this.conf.dataset][this.model];
+		},
 		"extend$actions": {
 			"click": function click(event) {
 				this.receive("navigate");
@@ -255,10 +258,11 @@ function editors() {
 			"navigate": function navigate(event) {
 				if (!this.pane) {
 					let members = this.conf.dataSource.views[this.conf.objectType];
-					debugger;
-					let model = this.owner.origin.data[this.conf.dataset][this.of.model];
+					let model = this.link;
 
-					this.pane = this.owner.create(this.conf.linkControl, type);	
+					this.pane = this.owner.create(this.conf.linkControl, {
+						members: members
+					});	
 					this.pane.view(model);
 					this.owner.send(this.pane, "view");
 				}
@@ -343,6 +347,10 @@ function gdr() {
                 event.subject = "moveover";
                 pkg.sense(event);
             }
+        },
+		"mouseout": function mouseout(event) {
+            event.subject = "moveout";
+            pkg.sense(event);
         },
 		"mouseup": function mouseup(event) {
             let priorEvent = pkg.TRACK;
@@ -1225,11 +1233,10 @@ function shape() {
 				}
 			},
 			"moveover": function moveover(event) {
-				let zone = this.getZone(event.clientX, event.clientY);
-				let cursor = this.zones.cursor[zone];
+				event.zone = this.getZone(event.clientX, event.clientY);
+				let cursor = this.zones.cursor[event.zone];
 				if (cursor) {
 					this.style.cursor = cursor;
-					event.subject = "";
 				} else {
 					this.style.removeProperty("cursor");
 				}
@@ -1293,9 +1300,13 @@ function table() {
 	},
 	"Cell": {
 		"type$": "/table/Pane",
+		"members": {
+			"type$header": "/table/Caption",
+			"type$body": "/table/Value"
+		},
 		"extend$conf": {
-			"type$cellHeader": "/table/Caption",
-			"type$cellBody": "/table/Value"
+			"cellHeader": true,
+			"cellBody": true
 		},
 		"modelFor": function modelFor(key) {
 			return this.model && this.model[this.key] || "";
@@ -1303,14 +1314,15 @@ function table() {
 		"start": function start(conf) {
 			this.super(start, conf);
 			conf = this.conf;
+			let members = this.members;
 			this.let("members", Object.create(null));
 			if (conf.cellHeader) {
-				this.members["header"] = conf.cellHeader;
+				this.members.header = members.header;
 			}
 			if (conf.cellBody) {
 				let editors = this.owner.editors;
 				let editor = editors[conf.inputType || conf.dataType] || editors.string
-				this.members["body"] = editor;
+				this.members.body = editor;
 			}
 		}
 	},
@@ -1502,6 +1514,20 @@ function tabs() {
                     this.bounds = {
                         width: event.clientX - r.left
                     }
+                }
+            },
+			"moveover": function moveover(event) {
+                this.super(moveover, event);
+                if (this.style.backgroundColor) {
+                    this.style.removeProperty("background-color");
+                }
+                if (event.zone == "CR") {
+                    this.style.backgroundColor = "gainsboro";
+                }
+            },
+			"moveout": function moveout(event) {
+                if (this.style.backgroundColor) {
+                    this.style.removeProperty("background-color");
                 }
             }
 		}
