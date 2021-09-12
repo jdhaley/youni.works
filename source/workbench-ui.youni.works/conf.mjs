@@ -1,6 +1,6 @@
 import editors from "./conf/editors.mjs";
 import views from "./conf/views.mjs";
-import testData from "./conf/testData.mjs";
+import test from "./conf/testDataSource.mjs";
 
 export default {
     type$: "/workbench/App",
@@ -14,7 +14,7 @@ export default {
         }
     },
     data: {
-        test: testData
+        test: test
     },
     conf: {
         type$events: "/ui/gdr",

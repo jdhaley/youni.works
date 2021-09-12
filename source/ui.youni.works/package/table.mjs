@@ -24,7 +24,6 @@ export default {
 		start(conf) {
 			this.super(start, conf);
 			conf = this.conf;
-	//		this.style.flex = `1 1 ${conf.columnSize || 5}cm`; 
 			this.let("members", Object.create(null));
 			if (conf.cellHeader) {
 				this.members["header"] = conf.cellHeader;
@@ -89,8 +88,11 @@ export default {
 				}	
 			}
 		},
-		get$id() {
-			return this.peer.id;
+		view(model) {
+			if (model === undefined && this.dataSource) {
+				model = this.dataSource.data[this.conf.data.set];
+			}
+			this.super(view, model);
 		},
 		start(conf) {
 			this.super(start, conf);
@@ -116,12 +118,6 @@ export default {
 					"min-width": width / 4 + "cm"
 				});
 			}	
-		},
-		view(model) {
-			if (model === undefined && this.dataSource) {
-				model = this.dataSource.data[this.conf.data.set];
-			}
-			this.super(view, model);
-		},
+		}
 	},
 }

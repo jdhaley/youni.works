@@ -1609,7 +1609,6 @@ function table() {
 		"start": function start(conf) {
 			this.super(start, conf);
 			conf = this.conf;
-	//		this.style.flex = `1 1 ${conf.columnSize || 5}cm`; 
 			this.let("members", Object.create(null));
 			if (conf.cellHeader) {
 				this.members["header"] = conf.cellHeader;
@@ -1674,8 +1673,11 @@ function table() {
 				}
 			}
 		},
-		"get$id": function get$id() {
-			return this.peer.id;
+		"view": function view(model) {
+			if (model === undefined && this.dataSource) {
+				model = this.dataSource.data[this.conf.data.set];
+			}
+			this.super(view, model);
 		},
 		"start": function start(conf) {
 			this.super(start, conf);
@@ -1701,12 +1703,6 @@ function table() {
 					"min-width": width / 4 + "cm"
 				});
 			}	
-		},
-		"view": function view(model) {
-			if (model === undefined && this.dataSource) {
-				model = this.dataSource.data[this.conf.data.set];
-			}
-			this.super(view, model);
 		}
 	}
 }
