@@ -40,7 +40,7 @@ export default {
                 "flex": false,
                 "dataType": "link",
                 "objectType": "Design",
-                "dataset": "Design",
+                "dataset": "designs",
                 "readOnly": false
             },
             "denom": {
