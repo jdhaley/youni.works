@@ -223,7 +223,7 @@ return pkg;
 
 function data() {
 	const pkg = {
-	"Member": {
+	"DevtMember": {
 		"type$": "/view/View",
 		"extend$conf": {
 			"caption": "",
@@ -264,6 +264,9 @@ function data() {
 		"once$owner": function once$owner() {
 			return this[Symbol.for("owner")];
 		}
+	},
+	"DataSet": {
+		"objectType": null
 	}
 }
 return pkg;

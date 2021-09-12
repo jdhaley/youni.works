@@ -1,5 +1,10 @@
 export default {
-	 Member: {
+	// String:
+	// Number:
+	// Date:
+	// Boolean:
+
+	 DevtMember: {
 		type$: "/view/View",
 		extend$conf: {
 			caption: "",
@@ -8,6 +13,17 @@ export default {
 		key: "",
 		title: "",
 		icon: "",
+	},
+	DataSource: {
+		getMetadata(name) {
+		},
+		getData(filter) {
+			return this.data[filter];
+		}
+	},
+	DataSet: {
+		objectType: null,
+
 	},
 	DataSource: {
 		type$textUtil: "/util/Text",

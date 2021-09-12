@@ -10,7 +10,7 @@ export default {
 		type$: "Display",
 		view(model) {
 			this.markup = model;
-		}		
+		}
 	},
 	Cell: {
 		type$: "Pane",
@@ -89,16 +89,16 @@ export default {
 			}
 		},
 		view(model) {
-			if (model === undefined && this.dataSource) {
-				model = this.dataSource.data[this.conf.data.set];
+			if (model === undefined && this.conf.dataSource) {
+				model = this.conf.dataSource.data[this.conf.data.set];
 			}
 			this.super(view, model);
 		},
 		start(conf) {
 			this.super(start, conf);
-			if (this.conf.data) {
-				this.dataSource = this.owner.app.data[this.conf.data.source];
-				this.createRecord(this.dataSource.views[this.conf.data.view]);
+			if (!this.conf.dataSource && this.conf.data) {
+				this.conf.dataSource = this.owner.app.data[this.conf.data.source];
+				this.createRecord(this.conf.dataSource.views[this.conf.data.view]);
 			}
 		},
 		createRecord(record) {

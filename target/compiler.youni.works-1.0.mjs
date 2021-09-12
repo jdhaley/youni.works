@@ -8,7 +8,6 @@ module.use = {
 	system: system
 }
 module.package = {
-	_devt: _devt(),
 	compiler: compiler(),
 	converter: converter(),
 	loader: loader(),
@@ -19,46 +18,6 @@ const main = function main_loadModule(module) {
 			return module.use.system.load(module);
 		};
 export default main(module, conf);
-function _devt() {
-	const pkg = {
-	"Member": {
-		"facet": "",
-		"name": "",
-		"type": "",
-		"expr": null,
-		"configurable": true,
-		"enumerable": true
-	},
-	"FileNode": {
-		"name": "",
-		"created": 0,
-		"modified": 0,
-		"size": 0,
-		"contentType": "",
-		"var$content": undefined,
-		"once$to": function once$to() {
-			if (typeof this.content == "object") {
-				return this[Symbol.for("owner")].create({
-					symbol$iterator: function*() {
-						for (let name in this.content) {
-							return this.content[name];
-						}
-					}
-				});
-			}
-		},
-		"loadContent": function loadContent() {
-		},
-		"extend$actions": {
-			"contentLoaded": function contentLoaded(event) {
-				this.content = event.content;
-			}
-		}
-	}
-}
-return pkg;
-}
-
 function compiler() {
 	const pkg = {
 	"type$": "/loader",

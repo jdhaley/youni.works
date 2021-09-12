@@ -1,5 +1,5 @@
 const pkg = {
-	type$: "/record",
+	type$: "/display",
 	Editor: {
 		type$: "Display",
 		dataType: "",
@@ -48,7 +48,7 @@ const pkg = {
 		dataType: "string",
 		view(value) {
 			this.super(view, value);
-			this.peer.textContent = value;
+			this.markup = value;
 			this.peer.contentEditable = this.conf.readOnly ? false : true;
 		}
 	},
@@ -86,7 +86,8 @@ const pkg = {
 			},
 			navigate(event) {
 				if (!this.pane) {
-					let type = this.owner.origin.types[this.conf.objectType];
+					let members = this.conf.dataSource.views[this.conf.objectType];
+					debugger;
 					let model = this.owner.origin.data[this.conf.dataset][this.of.model];
 
 					this.pane = this.owner.create(this.conf.linkControl, type);	
