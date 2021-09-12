@@ -77,6 +77,9 @@ const pkg = {
 			this.peer.src = "/res/link.svg";
 			this.peer.tabIndex = 1;
 		},
+		get$link() {
+			return this.conf.dataSource.data[this.conf.dataset][this.model];
+		},
 		extend$actions: {
 			click(event) {
 				this.receive("navigate");
@@ -87,10 +90,11 @@ const pkg = {
 			navigate(event) {
 				if (!this.pane) {
 					let members = this.conf.dataSource.views[this.conf.objectType];
-					debugger;
-					let model = this.owner.origin.data[this.conf.dataset][this.of.model];
+					let model = this.link;
 
-					this.pane = this.owner.create(this.conf.linkControl, type);	
+					this.pane = this.owner.create(this.conf.linkControl, {
+						members: members
+					});	
 					this.pane.view(model);
 					this.owner.send(this.pane, "view");
 				}
