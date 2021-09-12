@@ -57,6 +57,10 @@ const pkg = {
                 pkg.sense(event);
             }
         },
+        mouseout(event) {
+            event.subject = "moveout";
+            pkg.sense(event);
+        },
         mouseup(event) {
             let priorEvent = pkg.TRACK;
             if (priorEvent) {
