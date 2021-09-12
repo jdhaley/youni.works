@@ -430,7 +430,7 @@ function workbench() {
 			"body": {
 				"type$": "/ui/tabs/Tabs",
 				"extend$conf": {
-					"indexType": "/workbench/WorkbenchTab"
+					"tabType": "/workbench/WorkbenchTab"
 				}
 			},
 			"footer": {

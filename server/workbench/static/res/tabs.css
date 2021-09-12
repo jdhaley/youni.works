@@ -77,25 +77,28 @@
 	display: flex;
 	flex-direction: column;
 /*	align-items: center; */
-	flex: 0 0 38px;
+	flex: 0 0 48px;
 	/*
 	min-width: 48px;
 	max-width: 48px;
 	*/
 	background-color: gainsboro;
 	border-left: 1px solid gainsboro;
-	border-right: 4px solid white;
+	border-right: 5px solid white;
 	overflow: hidden;
 }
 .workbenchTab {
-	background-color: ghostWhite;
+	background-color: gainsboro;
 	padding: 2px;
 	border-radius: 4px 0 0 4px;
+	min-width: 38px;
+	min-height: 38px;
 }
 .workbenchTab.activeTab {
 	background-color: white;
 }
 .workbenchTab>IMG {
+
 }
 .workbenchTab>SPAN {
 	display: none;
