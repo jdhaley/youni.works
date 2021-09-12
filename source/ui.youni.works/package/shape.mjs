@@ -124,11 +124,10 @@ export default {
 				}
 			},
 			moveover(event) {
-				let zone = this.getZone(event.clientX, event.clientY);
-				let cursor = this.zones.cursor[zone];
+				event.zone = this.getZone(event.clientX, event.clientY);
+				let cursor = this.zones.cursor[event.zone];
 				if (cursor) {
 					this.style.cursor = cursor;
-					event.subject = "";
 				} else {
 					this.style.removeProperty("cursor");
 				}
