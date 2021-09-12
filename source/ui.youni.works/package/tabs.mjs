@@ -1,6 +1,6 @@
 export default {
     type$: "/panel",
-    Stack: {
+    Tabs: {
         type$: "Section",
         extend$conf: {
             indexType: "/ui/tabs/Tab",

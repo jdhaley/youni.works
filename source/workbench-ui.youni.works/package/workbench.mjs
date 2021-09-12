@@ -15,7 +15,7 @@ export default {
                 type$: "Display"
             },
 			body: {
-                type$: "/ui/tabs/Stack",
+                type$: "/ui/tabs/Tabs",
                 extend$conf: {
                     indexType: "/workbench/WorkbenchTab"
                 }        

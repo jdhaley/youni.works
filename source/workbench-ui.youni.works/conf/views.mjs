@@ -3,7 +3,7 @@ export default {
 		title: "Test",
 		icon: "/res/icons/activity.svg",
 		body: {
-			type$: "/ui/tabs/Stack",
+			type$: "/ui/tabs/Tabs",
 			extend$conf: {
 				views: {
 					draw: {

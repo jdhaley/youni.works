@@ -1712,7 +1712,7 @@ return pkg;
 function tabs() {
 	const pkg = {
 	"type$": "/panel",
-	"Stack": {
+	"Tabs": {
 		"type$": "/tabs/Section",
 		"extend$conf": {
 			"indexType": "/ui/tabs/Tab",

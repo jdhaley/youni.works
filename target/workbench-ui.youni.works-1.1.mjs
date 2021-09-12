@@ -37,7 +37,7 @@ const conf = {
 					"title": "Test",
 					"icon": "/res/icons/activity.svg",
 					"body": {
-						"type$": "/ui/tabs/Stack",
+						"type$": "/ui/tabs/Tabs",
 						"extend$conf": {
 							"views": {
 								"draw": {
@@ -428,7 +428,7 @@ function workbench() {
 				"type$": "/workbench/Display"
 			},
 			"body": {
-				"type$": "/ui/tabs/Stack",
+				"type$": "/ui/tabs/Tabs",
 				"extend$conf": {
 					"indexType": "/workbench/WorkbenchTab"
 				}

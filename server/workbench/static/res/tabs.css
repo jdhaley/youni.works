@@ -1,12 +1,12 @@
 
-.stack {
+.tabs {
 	display: flex;
 	flex-direction: column;
 	flex: 1 1;
 	align-content: stretch;
 	overflow: hidden;
 }
-.stack>.header {
+.tabs>.header {
 	display: flex;
 	flex: 0 0;
 	min-height: 36px;
@@ -14,7 +14,7 @@
 	overflow: scroll;
 	user-select: none;
 }
-.stack>.body {
+.tabs>.body {
 	flex: 1 1;
 	align-content: stretch;
 	overflow: auto;
@@ -25,17 +25,17 @@
 	border-bottom: 1px solid gainsboro; */
 } 
 
-.stack>.header::-webkit-scrollbar {
+.tabs>.header::-webkit-scrollbar {
 	width: 0px;
 	height: 4px;
 }
-.stack>.header::-webkit-scrollbar-track {
+.tabs>.header::-webkit-scrollbar-track {
 	background: white;
 }
-.stack>.header::-webkit-scrollbar-thumb {
+.tabs>.header::-webkit-scrollbar-thumb {
     background: none;
 }
-.stack>.header:hover::-webkit-scrollbar-thumb {
+.tabs>.header:hover::-webkit-scrollbar-thumb {
     background: lightsteelblue;
 }
 
@@ -62,17 +62,18 @@
 }
 .tab>IMG {
 	width: 20px;
+	height: 20px;
 	margin: 0 4px 0 4px;
 }
 
-.workbench>.stack {
+.workbench>.tabs {
 	flex-direction: row;
 	overflow: hidden;
 }
-.workbench>.stack>.body {
+.workbench>.tabs>.body {
 	overflow: hidden;
 }
-.workbench>.stack>.header {
+.workbench>.tabs>.header {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
