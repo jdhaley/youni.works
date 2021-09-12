@@ -33,6 +33,10 @@ const conf = {
 		"main": {
 			"type": "/workbench/Workbench",
 			"views": {
+				"dummy": {
+					"title": "Dummy",
+					"icon": "/res/icons/moon.svg"
+				},
 				"test": {
 					"title": "Test",
 					"icon": "/res/icons/activity.svg",
@@ -40,16 +44,6 @@ const conf = {
 						"type$": "/ui/tabs/Tabs",
 						"extend$conf": {
 							"views": {
-								"draw": {
-									"title": "Draw",
-									"icon": "/res/icons/photo.svg",
-									"type$body": "/ui/pen/Canvas"
-								},
-								"note": {
-									"title": "Note",
-									"icon": "/res/icons/book.svg",
-									"type$body": "/ui/note/Note"
-								},
 								"table": {
 									"title": "Table",
 									"icon": "/res/icons/work.svg",
@@ -63,6 +57,16 @@ const conf = {
 											}
 										}
 									}
+								},
+								"note": {
+									"title": "Note",
+									"icon": "/res/icons/book.svg",
+									"type$body": "/ui/note/Note"
+								},
+								"draw": {
+									"title": "Draw",
+									"icon": "/res/icons/photo.svg",
+									"type$body": "/ui/pen/Canvas"
 								},
 								"tree": {
 									"title": "Tree",
@@ -78,10 +82,6 @@ const conf = {
 				this.activate();
 			}
 					}
-				},
-				"dummy": {
-					"title": "Dummy",
-					"icon": "/res/icons/moon.svg"
 				}
 			}
 		}

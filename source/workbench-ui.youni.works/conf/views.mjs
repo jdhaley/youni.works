@@ -1,4 +1,8 @@
 export default {
+	dummy: {
+		title: "Dummy",
+		icon: "/res/icons/moon.svg"
+	},
 	test: {
 		title: "Test",
 		icon: "/res/icons/activity.svg",
@@ -6,16 +10,6 @@ export default {
 			type$: "/ui/tabs/Tabs",
 			extend$conf: {
 				views: {
-					draw: {
-						title: "Draw",
-						icon: "/res/icons/photo.svg",
-						type$body: "/ui/pen/Canvas"
-					},
-					note: {
-						title: "Note",
-						icon: "/res/icons/book.svg",
-						type$body: "/ui/note/Note"
-					},
 					table: {
 						title: "Table",
 						icon: "/res/icons/work.svg",
@@ -29,6 +23,16 @@ export default {
 								}
 							}
 						}
+					},
+					note: {
+						title: "Note",
+						icon: "/res/icons/book.svg",
+						type$body: "/ui/note/Note"
+					},
+					draw: {
+						title: "Draw",
+						icon: "/res/icons/photo.svg",
+						type$body: "/ui/pen/Canvas"
 					},
 					tree: {
 						title: "Tree",
@@ -44,9 +48,5 @@ export default {
 				this.activate();
 			}
 		}	
-	},
-	dummy: {
-		title: "Dummy",
-		icon: "/res/icons/moon.svg"
 	}
 }

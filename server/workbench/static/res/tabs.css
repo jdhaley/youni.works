@@ -11,6 +11,7 @@
 	flex: 0 0;
 	min-height: 36px;
 	background-color: gainsboro;
+	padding-top: 1px;
 	overflow: scroll;
 	user-select: none;
 }
@@ -54,7 +55,7 @@
 	background: ghostwhite;
 	margin-left: 1px;
 	border-bottom: 1px solid gainsboro;
-	border-radius: 4px 4px 0 0;
+	border-radius: 5px 5px 0 0;
 }
 .activeTab {
 	background-color: white;
@@ -76,29 +77,27 @@
 .workbench>.tabs>.header {
 	display: flex;
 	flex-direction: column;
-/*	align-items: center; */
+	align-items: flex-end;
 	flex: 0 0 48px;
 	/*
 	min-width: 48px;
 	max-width: 48px;
 	*/
 	background-color: gainsboro;
-	border-left: 1px solid gainsboro;
 	border-right: 5px solid white;
 	overflow: hidden;
 }
 .workbenchTab {
 	background-color: gainsboro;
-	padding: 2px;
-	border-radius: 4px 0 0 4px;
+	padding: 4px;
 	min-width: 38px;
 	min-height: 38px;
 }
 .workbenchTab.activeTab {
 	background-color: white;
 }
-.workbenchTab>IMG {
-
+.workbenchTab:hover {
+	background-color: ghostwhite;
 }
 .workbenchTab>SPAN {
 	display: none;
