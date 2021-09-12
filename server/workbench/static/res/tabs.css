@@ -58,7 +58,7 @@
 }
 .activeTab {
 	background-color: white;
-	border-bottom: 1px solid white;
+	border-bottom-color: white;
 }
 .tab>IMG {
 	width: 20px;
@@ -76,26 +76,26 @@
 .workbench>.tabs>.header {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	flex: 0 0;
+/*	align-items: center; */
+	flex: 0 0 38px;
+	/*
 	min-width: 48px;
 	max-width: 48px;
-	padding: 2px;
+	*/
 	background-color: gainsboro;
+	border-left: 1px solid gainsboro;
 	border-right: 4px solid white;
 	overflow: hidden;
 }
 .workbenchTab {
-	background-color: none;
-	margin: 4px;
-	padding: 4px;
-	border-radius: 4px;
+	background-color: ghostWhite;
+	padding: 2px;
+	border-radius: 4px 0 0 4px;
 }
 .workbenchTab.activeTab {
-	background-color: ghostwhite;
+	background-color: white;
 }
 .workbenchTab>IMG {
-	width: 100%;
 }
 .workbenchTab>SPAN {
 	display: none;
