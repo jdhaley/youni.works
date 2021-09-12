@@ -97,6 +97,20 @@ export default {
                         width: event.clientX - r.left
                     }
                 }
+            },
+            moveover(event) {
+                this.super(moveover, event);
+                if (this.style.backgroundColor) {
+                    this.style.removeProperty("background-color");
+                }
+                if (event.zone == "CR") {
+                    this.style.backgroundColor = "gainsboro";
+                }
+            },
+            moveout(event) {
+                if (this.style.backgroundColor) {
+                    this.style.removeProperty("background-color");
+                }
             }
         }
     }
