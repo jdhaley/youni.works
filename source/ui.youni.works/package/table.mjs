@@ -14,9 +14,13 @@ export default {
 	},
 	Cell: {
 		type$: "Pane",
+		members: {
+			type$header: "Caption",
+			type$body: "Value",
+		},
 		extend$conf: {
-			type$cellHeader: "Caption",
-			type$cellBody: "Value"
+			cellHeader: true,
+			cellBody: true
 		},
 		modelFor(key) {
 			return this.model && this.model[this.key] || "";
@@ -24,14 +28,15 @@ export default {
 		start(conf) {
 			this.super(start, conf);
 			conf = this.conf;
+			let members = this.members;
 			this.let("members", Object.create(null));
 			if (conf.cellHeader) {
-				this.members["header"] = conf.cellHeader;
+				this.members.header = members.header;
 			}
 			if (conf.cellBody) {
 				let editors = this.owner.editors;
 				let editor = editors[conf.inputType || conf.dataType] || editors.string
-				this.members["body"] = editor;
+				this.members.body = editor;
 			}
 		}
 	},	
