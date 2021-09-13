@@ -9,7 +9,6 @@ export default {
 	},
 	Viewer: {
 		type$: "Startable",
-		require$to: "Iterable",
 		view(model) {
 		},
 		modelFor(key) {
@@ -17,13 +16,7 @@ export default {
 		extend$actions: {
 			view(event) {
 				let model = event.from.modelFor(this.key);
-				for (let part of this.to) {
-					try {
-						part.view(this.modelFor(part.key));
-					} catch (err) {
-						console.error(err);
-					}
-				}
+				this.view(model);
 			}
 		}
 	},

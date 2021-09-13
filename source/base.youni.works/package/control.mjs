@@ -33,17 +33,18 @@ export default {
 				message = Object.create(null);
 				message.subject = signal;
 			}
-			this.receive(message);
-			if (message.subject) {
-				Promise.resolve(message).then(message => to(this, message));
-			}
 
-			function to(from, message) {
-				if (from.to) for (let receiver of from.to) {
-					message.from = from;
+			this.receive(message);
+			if (!message.subject) return;
+
+			Promise.resolve(message).then(message => to(this, message));
+
+			function to(sender, message) {
+				if (sender.to) for (let receiver of sender.to) {
+					message.from = sender;
 					receiver.receive(message);
-					to(receiver, message);
 					if (!message.subject) return;
+					to(receiver, message);
 				}
 			}
 		}
@@ -52,21 +53,23 @@ export default {
 		type$from: "Iterable",
 		sense(signal) {
 			if (!signal) return;
-			let message = signal;
-			if (typeof message != "object") {
-				message = Object.create(null);
-				message.subject = signal;
+			let event = signal;
+			if (typeof event != "object") {
+				event = Object.create(null);
+				event.subject = signal;
 			}
-			
-			this.receive(message);
-			//Promise.resolve(message).then(message => from(this, message));
-			from(this, message);
 
-			function from(receiver, message) {
-				if (receiver.from) for (receiver of receiver.from) {
-					message.subject && receiver.receive(message);
-					message.subject && from(receiver, message);
+			this.receive(event);
+			if (event.subject) {
+				from(this, event);
+			}
+
+			function from(sensor, message) {
+				if (sensor.from) for (let receiver of sensor.from) {
 					if (!message.subject) return;
+					message.sensor = sensor;
+					receiver.receive(message);
+					from(receiver, message);
 				}
 			}
 		},
