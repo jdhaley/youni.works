@@ -11,6 +11,9 @@ export default {
 		get$styles() {
 			return this.peer.classList;
 		},
+		get$box() {
+			return this.peer.getBoundingClientRect();;
+		},
 		createPart(key, type) {
 			let part = this.super(createPart, key, type);
 			if (this.members) part.styles.add(key);

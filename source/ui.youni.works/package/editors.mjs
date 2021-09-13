@@ -77,16 +77,32 @@ const pkg = {
 			this.peer.src = "/res/link.svg";
 			this.peer.tabIndex = 1;
 		},
+		extend$actions: {
+			click(event) {
+				event.subject = "navigate";
+			},
+			keydown(event) {
+				if (event.key == "Enter" || event.key == " ") event.subject = "navigate";
+			}
+		}
+	},
+	Link: {
+		type$: "Editor",
+		members: {
+			type$editor: "String",
+			type$button: "LinkNav",			
+		},
+		extend$conf: {
+			linkControl: {
+				type$: ["Pane", "/shape/Shape"]
+			//	contentType: "/grid/PropertySheet"
+			//	contentType: "/panel/Panel"
+			}
+		},
 		get$link() {
 			return this.conf.dataSource.data[this.conf.dataset][this.model];
 		},
 		extend$actions: {
-			click(event) {
-				this.receive("navigate");
-			},
-			keydown(event) {
-				if (event.key == "Enter" || event.key == " ") this.receive("navigate");
-			},
 			navigate(event) {
 				if (!this.pane) {
 					let members = this.conf.dataSource.views[this.conf.objectType];
@@ -101,33 +117,15 @@ const pkg = {
 				if (!this.pane.peer.parentNode) {
 					this.owner.append(this.pane);
 				}
-				let b = this.bounds;
+				let b = this.box;
 				this.pane.bounds = {
 					left: b.left,
-					top: b.bottom
+					top: b.bottom,
+					width: 100,
+					height: 150
 				};
 			}
 		}
-	},
-	Link: {
-		type$: "Editor",
-		extend$conf: {
-			type$linkNavControl: "LinkNav",
-			linkControl: {
-				type$: "/shape/Pane",
-			//	contentType: "/grid/PropertySheet"
-				contentType: "/panel/Panel"
-			},
-			type$editorControl: "String"
-		},
-		view(data) {
-			this.super(view, data);
-			this.value = this.owner.create(this.conf.editorControl, this.conf);
-			this.peer.tabIndex = 1;
-			this.append(this.value);
-			this.icon = this.owner.create(this.conf.linkNavControl, this.conf);
-			this.append(this.icon);
-		},
 	}
 }
 export default pkg;

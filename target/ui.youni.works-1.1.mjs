@@ -44,6 +44,9 @@ function display() {
 		"get$styles": function get$styles() {
 			return this.peer.classList;
 		},
+		"get$box": function get$box() {
+			return this.peer.getBoundingClientRect();;
+		},
 		"createPart": function createPart(key, type) {
 			let part = this.super(createPart, key, type);
 			if (this.members) part.styles.add(key);
@@ -245,16 +248,30 @@ function editors() {
 			this.peer.src = "/res/link.svg";
 			this.peer.tabIndex = 1;
 		},
+		"extend$actions": {
+			"click": function click(event) {
+				event.subject = "navigate";
+			},
+			"keydown": function keydown(event) {
+				if (event.key == "Enter" || event.key == " ") event.subject = "navigate";
+			}
+		}
+	},
+	"Link": {
+		"type$": "/editors/Editor",
+		"members": {
+			"type$editor": "/editors/String",
+			"type$button": "/editors/LinkNav"
+		},
+		"extend$conf": {
+			"linkControl": {
+				"type$": ["/editors/Pane", "/shape/Shape"]
+			}
+		},
 		"get$link": function get$link() {
 			return this.conf.dataSource.data[this.conf.dataset][this.model];
 		},
 		"extend$actions": {
-			"click": function click(event) {
-				this.receive("navigate");
-			},
-			"keydown": function keydown(event) {
-				if (event.key == "Enter" || event.key == " ") this.receive("navigate");
-			},
 			"navigate": function navigate(event) {
 				if (!this.pane) {
 					let members = this.conf.dataSource.views[this.conf.objectType];
@@ -269,31 +286,14 @@ function editors() {
 				if (!this.pane.peer.parentNode) {
 					this.owner.append(this.pane);
 				}
-				let b = this.bounds;
+				let b = this.box;
 				this.pane.bounds = {
 					left: b.left,
-					top: b.bottom
+					top: b.bottom,
+					width: 100,
+					height: 150
 				};
 			}
-		}
-	},
-	"Link": {
-		"type$": "/editors/Editor",
-		"extend$conf": {
-			"type$linkNavControl": "/editors/LinkNav",
-			"linkControl": {
-				"type$": "/shape/Pane",
-				"contentType": "/panel/Panel"
-			},
-			"type$editorControl": "/editors/String"
-		},
-		"view": function view(data) {
-			this.super(view, data);
-			this.value = this.owner.create(this.conf.editorControl, this.conf);
-			this.peer.tabIndex = 1;
-			this.append(this.value);
-			this.icon = this.owner.create(this.conf.linkNavControl, this.conf);
-			this.append(this.icon);
 		}
 	}
 }
