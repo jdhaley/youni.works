@@ -89,6 +89,13 @@ return pkg;
 function control() {
 	const pkg = {
 	"type$": "/system/core",
+	"Startable": {
+		"extend$conf": {
+		},
+		"start": function start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+		}
+	},
 	"Receiver": {
 		"receive": function receive(signal) {
 			if (!signal) return;
@@ -122,7 +129,6 @@ function control() {
 				message = Object.create(null);
 				message.subject = signal;
 			}
-			message.channel = "to";
 
 			this.receive(message);
 			if (!message.subject) return;
@@ -148,7 +154,6 @@ function control() {
 				event = Object.create(null);
 				event.subject = signal;
 			}
-			event.channel = "from";
 
 			this.receive(event);
 			if (event.subject) {
@@ -162,6 +167,18 @@ function control() {
 					receiver.receive(message);
 					from(receiver, message);
 				}
+			}
+		}
+	},
+	"Viewer": {
+		"view": function view(model, response) {
+		},
+		"modelFor": function modelFor(key) {
+		},
+		"extend$actions": {
+			"view": function view(message) {
+				let model = message.from.modelFor(this.key);
+				this.view(model, message.response);
 			}
 		}
 	},
@@ -591,33 +608,15 @@ return pkg;
 function view() {
 	const pkg = {
 	"type$": "/control",
-	"Startable": {
-		"extend$conf": {
-		},
-		"start": function start(conf) {
-			if (conf) this.let("conf", conf, "extend");
-		}
-	},
-	"Viewer": {
-		"type$": "/view/Startable",
-		"view": function view(model) {
-		},
-		"modelFor": function modelFor(key) {
-		},
-		"extend$actions": {
-			"view": function view(event) {
-				let model = event.from.modelFor(this.key);
-				this.view(model);
-			}
-		}
-	},
 	"View": {
-		"type$": "/view/Viewer",
+		"type$": ["/view/Startable", "/view/Viewer"],
 		"require$markup": "",
 		"require$createPart": function require$createPart(key, type) {
 		},
 		"var$model": undefined,
 		"view": function view(model) {
+			this.model = model;
+			this.observe && this.observe(model);
 			if (this.members && !this.markup) {
 				for (let name in this.members) {
 					let member = this.members[name];
@@ -640,8 +639,6 @@ function view() {
 					}
 				}
 			}
-			this.model = model;
-			this.observe && this.observe(model);
 		},
 		"modelFor": function modelFor(key) {
 			if (this.contentType) {

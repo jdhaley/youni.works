@@ -1,32 +1,14 @@
 export default {
 	type$: "/control",
-	Startable: {
-		extend$conf: {
-		},
-		start(conf) {
-			if (conf) this.let("conf", conf, "extend");
-		},
-	},
-	Viewer: {
-		type$: "Startable",
-		view(model) {
-		},
-		modelFor(key) {
-		},
-		extend$actions: {
-			view(event) {
-				let model = event.from.modelFor(this.key);
-				this.view(model);
-			}
-		}
-	},
 	View: {
-		type$: "Viewer",
+		type$: ["Startable", "Viewer"],
 		require$markup: "",
 		require$createPart(key, type) {
 		},
 		var$model: undefined,
 		view(model) {
+			this.model = model;
+			this.observe && this.observe(model);
 			if (this.members && !this.markup) {
 				for (let name in this.members) {
 					let member = this.members[name];
@@ -49,8 +31,6 @@ export default {
 					}
 				}
 			}
-			this.model = model;
-			this.observe && this.observe(model);
 		},
 		modelFor(key) {
 			if (this.contentType) {
