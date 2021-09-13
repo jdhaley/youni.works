@@ -61,11 +61,6 @@ export default {
 				return this.peer.innerHTML;
 			}
 		},
-		extend$conf: {
-		},
-		start(conf) {
-			if (conf) this.let("conf", conf, "extend");
-		},
 		createPart(key, type) {
 			let part = this.owner.create(type, this.conf);
 			part.let("key", key);

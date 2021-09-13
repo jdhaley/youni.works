@@ -1,6 +1,14 @@
 export default {
 	type$: "/control",
+	Startable: {
+		extend$conf: {
+		},
+		start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+		},
+	},
 	Viewer: {
+		type$: "Startable",
 		require$to: "Iterable",
 		view(model) {
 		},
@@ -8,6 +16,7 @@ export default {
 		},
 		extend$actions: {
 			view(event) {
+				let model = event.from.modelFor(this.key);
 				for (let part of this.to) {
 					try {
 						part.view(this.modelFor(part.key));

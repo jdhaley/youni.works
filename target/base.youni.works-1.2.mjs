@@ -123,12 +123,15 @@ function control() {
 				message.subject = signal;
 			}
 			this.receive(message);
-			Promise.resolve(message).then(message => to(this, message));
+			if (message.subject) {
+				Promise.resolve(message).then(message => to(this, message));
+			}
 
-			function to(receiver, message) {
-				if (receiver.to) for (receiver of receiver.to) {
-					message.subject && receiver.receive(message);
-					message.subject && to(receiver, message);
+			function to(from, message) {
+				if (from.to) for (let receiver of from.to) {
+					message.from = from;
+					receiver.receive(message);
+					to(receiver, message);
 					if (!message.subject) return;
 				}
 			}
@@ -335,11 +338,6 @@ function dom() {
 			} else {
 				return this.peer.innerHTML;
 			}
-		},
-		"extend$conf": {
-		},
-		"start": function start(conf) {
-			if (conf) this.let("conf", conf, "extend");
 		},
 		"createPart": function createPart(key, type) {
 			let part = this.owner.create(type, this.conf);
@@ -588,7 +586,15 @@ return pkg;
 function view() {
 	const pkg = {
 	"type$": "/control",
+	"Startable": {
+		"extend$conf": {
+		},
+		"start": function start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+		}
+	},
 	"Viewer": {
+		"type$": "/view/Startable",
 		"require$to": "Iterable",
 		"view": function view(model) {
 		},
@@ -596,6 +602,7 @@ function view() {
 		},
 		"extend$actions": {
 			"view": function view(event) {
+				let model = event.from.modelFor(this.key);
 				for (let part of this.to) {
 					try {
 						part.view(this.modelFor(part.key));

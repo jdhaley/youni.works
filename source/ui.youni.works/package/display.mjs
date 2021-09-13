@@ -14,6 +14,17 @@ export default {
 		get$box() {
 			return this.peer.getBoundingClientRect();;
 		},
+		size(width, height) {
+			this.style.width = Math.max(width, 16) + "px";
+			this.style.minWidth = this.style.width;
+			this.style.height = Math.max(height, 16) + "px";
+			this.style.minHeight = this.style.height;
+		},
+		moveTo(x, y) {
+			this.style.position = "absolute";			
+			this.style.left = x + "px";
+			this.style.top = y + "px";
+		},
 		createPart(key, type) {
 			let part = this.super(createPart, key, type);
 			if (this.members) part.styles.add(key);

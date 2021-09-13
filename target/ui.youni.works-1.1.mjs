@@ -47,6 +47,17 @@ function display() {
 		"get$box": function get$box() {
 			return this.peer.getBoundingClientRect();;
 		},
+		"size": function size(width, height) {
+			this.style.width = Math.max(width, 16) + "px";
+			this.style.minWidth = this.style.width;
+			this.style.height = Math.max(height, 16) + "px";
+			this.style.minHeight = this.style.height;
+		},
+		"moveTo": function moveTo(x, y) {
+			this.style.position = "absolute";			
+			this.style.left = x + "px";
+			this.style.top = y + "px";
+		},
 		"createPart": function createPart(key, type) {
 			let part = this.super(createPart, key, type);
 			if (this.members) part.styles.add(key);

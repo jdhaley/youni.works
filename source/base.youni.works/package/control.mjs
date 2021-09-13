@@ -34,12 +34,15 @@ export default {
 				message.subject = signal;
 			}
 			this.receive(message);
-			Promise.resolve(message).then(message => to(this, message));
+			if (message.subject) {
+				Promise.resolve(message).then(message => to(this, message));
+			}
 
-			function to(receiver, message) {
-				if (receiver.to) for (receiver of receiver.to) {
-					message.subject && receiver.receive(message);
-					message.subject && to(receiver, message);
+			function to(from, message) {
+				if (from.to) for (let receiver of from.to) {
+					message.from = from;
+					receiver.receive(message);
+					to(receiver, message);
 					if (!message.subject) return;
 				}
 			}
