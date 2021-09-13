@@ -8,6 +8,7 @@
 	color: darkslategray;
 }
 .workbench>.header {
+	display: none;
 	flex: 0 0 24px;
 	min-height: 24px;
 	background: ghostwhite;
