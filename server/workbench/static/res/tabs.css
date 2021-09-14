@@ -56,6 +56,10 @@
 	border-bottom: 4px solid ghostwhite;
 	border-bottom-color: inherit;
 	border-radius: 4px 4px 0 0;
+
+	transition-property: background-color;
+	transition-duration: 200ms;
+	transition-delay: 50ms;  
 }
 .tab:hover {
 	border-bottom-color: gainsboro;
