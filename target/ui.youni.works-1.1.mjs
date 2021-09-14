@@ -1119,6 +1119,7 @@ return pkg;
 
 function shape() {
 	const pkg = {
+	"type$Display": "/display/Display",
 	"Zoned": {
 		"zones": {
 			"border": {
@@ -1199,27 +1200,26 @@ function shape() {
 				return this.peer.getBoundingClientRect();
 			}
 		},
-		"size": function size(w, y) {
-		},
 		"get$shape": function get$shape(){
 			return this;
 		},
 		"extend$actions": {
 			"grab": function grab(event) {
 				if (event.track && event.track != this) return;
-				let zone = this.getZone(event.clientX, event.clientY);
+				let zone = this.getZone(event.x, event.y);
 				let subject = this.zones.subject[zone] || "";
 				if (!subject) return;
+
 				this.style.cursor = this.zones.cursor[zone];
-				let b = this.bounds;
+				let box = this.box;
 				this.peer.$tracking = {
 					subject: subject,
 					cursor: this.style.cursor,
-					insideX: event.x - b.left,
-					insideY: event.y - b.top
+					insideX: event.x - box.left,
+					insideY: event.y - box.top
 				}
 				event.track = this;
-			//	event.subject = "";
+				event.subject = "";
 			},
 			"drag": function drag(event) {
 				event.subject = this.peer.$tracking.subject;
@@ -1231,20 +1231,24 @@ function shape() {
 			},
 			"position": function position(event) {
 				if (event.track == this) {
-					this.bounds = {
-						left: event.x - this.peer.$tracking.insideX,
-						top: event.y - this.peer.$tracking.insideY
-					}
+					this.moveTo(
+						event.x - this.peer.$tracking.insideX,
+						event.y - this.peer.$tracking.insideY
+					);
 				}
 			},
 			"size": function size(event) {
-				if (event.track == this) {
-					let r = this.shape.peer.getBoundingClientRect();
-					this.shape.size(event.clientX - r.left, event.clientY - r.top);
-				}
+				let box = this.shape.box;
+                if (!this.peer.$tracking.fromRight) {
+                    this.peer.$tracking.fromRight = this.box.width - this.peer.$tracking.insideX;
+                }
+                this.shape.size(
+                    event.x - box.left + this.peer.$tracking.fromRight,
+                    box.height
+                );
 			},
 			"moveover": function moveover(event) {
-				event.zone = this.getZone(event.clientX, event.clientY);
+				event.zone = this.getZone(event.x, event.y);
 				let cursor = this.zones.cursor[event.zone];
 				if (cursor) {
 					this.style.cursor = cursor;
@@ -1254,7 +1258,51 @@ function shape() {
 			}
 		}
 	},
-	"type$Display": "/display/Display",
+	"Columnar": {
+		"type$": ["/shape/Display", "/shape/Shape"],
+		"zones": {
+			"border": {
+				"right": 4
+			},
+			"cursor": {
+				"CR": "ew-resize"
+			},
+			"subject": {
+				"CR": "size"
+			}
+		},
+		"size": function size(width) {
+			this.style.flex = "0 0 " + width + "px",
+			this.style.minWidth = width + "px";
+		},
+		"extend$actions": {
+			"size": function size(event) {
+                let box = this.box;
+                if (!this.peer.$tracking.fromRight) {
+                    this.peer.$tracking.fromRight = this.box.width - this.peer.$tracking.insideX;
+                }
+                this.size(
+                    event.x - box.left + this.peer.$tracking.fromRight,
+                    box.height
+                );
+                event.subject = "moveover";
+			},
+			"moveover": function moveover(event) {
+                this.super(moveover, event);
+                if (this.style.backgroundColor) {
+                    this.style.removeProperty("background-color");
+                }
+                if (event.zone == "CR") {
+                    this.style.backgroundColor = "gainsboro";
+                }
+            },
+			"moveout": function moveout(event) {
+                if (this.style.backgroundColor) {
+                    this.style.removeProperty("background-color");
+                }
+            }
+		}
+	},
 	"Pane": {
 		"type$": ["/shape/Display", "/shape/Shape"],
 		"var$shape": null,
@@ -1310,7 +1358,8 @@ function table() {
 		}
 	},
 	"Cell": {
-		"type$": "/table/Pane",
+		"type$": ["/shape/Columnar", "/table/Pane"],
+		"require$rule": "CSS-RULE",
 		"members": {
 			"type$header": "/table/Caption",
 			"type$body": "/table/Value"
@@ -1321,6 +1370,10 @@ function table() {
 		},
 		"modelFor": function modelFor(key) {
 			return this.model && this.model[this.key] || "";
+		},
+		"size": function size(width) {
+			this.rule.style.flex = "0 0 " + width + "px",
+			this.rule.style.minWidth = width + "px";
 		},
 		"start": function start(conf) {
 			this.super(start, conf);
@@ -1497,49 +1550,12 @@ function tabs() {
 		}
 	},
 	"Tab": {
-		"type$": ["/tabs/Display", "/shape/Shape"],
-		"zones": {
-			"border": {
-				"right": 4
-			},
-			"cursor": {
-				"TR": "ew-resize",
-				"CR": "ew-resize",
-				"BR": "ew-resize"
-			},
-			"subject": {
-				"TR": "size",
-				"CR": "size",
-				"BR": "size"
-			}
-		},
+		"type$": "/shape/Columnar",
 		"var$body": null,
 		"extend$actions": {
 			"click": function click(event) {
                 event.subject = "activateTab";
                 event.tab = this;
-            },
-			"size": function size(event) {
-                if (event.track == this) {
-                    let r = this.bounds;
-                    this.bounds = {
-                        width: event.clientX - r.left
-                    }
-                }
-            },
-			"moveover": function moveover(event) {
-                this.super(moveover, event);
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
-                if (event.zone == "CR") {
-                    this.style.backgroundColor = "gainsboro";
-                }
-            },
-			"moveout": function moveout(event) {
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
             }
 		}
 	}

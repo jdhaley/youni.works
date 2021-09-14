@@ -13,7 +13,8 @@ export default {
 		}
 	},
 	Cell: {
-		type$: "Pane",
+		type$: ["/shape/Columnar", "Pane"],
+		require$rule: "CSS-RULE",
 		members: {
 			type$header: "Caption",
 			type$body: "Value",
@@ -24,6 +25,10 @@ export default {
 		},
 		modelFor(key) {
 			return this.model && this.model[this.key] || "";
+		},
+		size(width) {
+			this.rule.style.flex = "0 0 " + width + "px",
+			this.rule.style.minWidth = width + "px";
 		},
 		start(conf) {
 			this.super(start, conf);

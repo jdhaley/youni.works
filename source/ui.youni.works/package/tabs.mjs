@@ -68,49 +68,12 @@ export default {
         }
     },
     Tab: {
-        type$: ["Display", "/shape/Shape"],
-        zones: {
-            border: {
-                right: 4
-            },
-            cursor: {
-                "TR": "ew-resize",
-                "CR": "ew-resize",
-                "BR": "ew-resize",
-            },
-            subject: {
-                "TR": "size",
-                "CR": "size",
-                "BR": "size",
-            }
-        },	
+        type$: "/shape/Columnar",
         var$body: null,
         extend$actions: {
             click(event) {
                 event.subject = "activateTab";
                 event.tab = this;
-            },
-            size(event) {
-                if (event.track == this) {
-                    let r = this.bounds;
-                    this.bounds = {
-                        width: event.clientX - r.left
-                    }
-                }
-            },
-            moveover(event) {
-                this.super(moveover, event);
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
-                if (event.zone == "CR") {
-                    this.style.backgroundColor = "gainsboro";
-                }
-            },
-            moveout(event) {
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
             }
         }
     }

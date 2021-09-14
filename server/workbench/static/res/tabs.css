@@ -9,7 +9,7 @@
 .tabs>.header {
 	display: flex;
 	flex: 0 0;
-/*	min-height: 36px; */
+	min-height: 40px;
 	overflow: scroll;
 	user-select: none;
 	background-color: #1a213f;
@@ -46,7 +46,7 @@
 	align-content: center;
 	align-items: center;
 	flex: 0 0 3cm;
-	cursor: pointer;
+	cursor: default;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
