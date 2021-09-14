@@ -95,8 +95,7 @@ const pkg = {
 		extend$conf: {
 			linkControl: {
 				type$: ["Pane", "/shape/Shape"]
-			//	contentType: "/grid/PropertySheet"
-			//	contentType: "/panel/Panel"
+			//	contentType: "Pane"
 			}
 		},
 		get$link() {

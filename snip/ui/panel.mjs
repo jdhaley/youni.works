@@ -45,4 +45,40 @@ export default {
 			this.at("body").peer.textContent = "Body";
 		}
 	}
+	// Pane: {
+	// 	type$: ["Display", "Shape"],
+	// 	border: {
+	// 		top: 0,
+	// 		right: 8,
+	// 		bottom: 12,
+	// 		left: 0
+	// 	},
+	// 	var$shape: null,
+	// 	extend$conf: {
+	// 		zone: {
+	// 			cursor: {
+	// 				"BC": "move",
+	// 				"BR": "nwse-resize",
+	// 			},
+	// 			subject: {
+	// 				"BC": "position",
+	// 				"BR": "size",
+	// 			}
+	// 		},	
+	// 	},
+	// 	get$contentType() {
+	// 		return this.conf.contentType;
+	// 	},
+	// 	get$elementConf() {
+	// 		return this.conf;
+	// 	},
+	// 	view(data) {
+	// 		this.super(view, data);
+	// 		let type = this.contentType;
+	// 		let conf = this.elementConf;
+	// 		this.shape = this.owner.create(type, conf);
+	// 		this.append(this.shape);
+	// 	}
+	// }
+
 }

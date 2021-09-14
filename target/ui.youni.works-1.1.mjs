@@ -16,10 +16,8 @@ module.package = {
 	editors: editors(),
 	events: events(),
 	note: note(),
-	panel: panel(),
 	pen: pen(),
 	range: range(),
-	record: record(),
 	shape: shape(),
 	table: table(),
 	tabs: tabs(),
@@ -71,8 +69,11 @@ function display() {
 	},
 	"Caption": {
 		"type$": "/display/Display",
+		"get$caption": function get$caption() {
+			return this.conf.caption;
+		},
 		"view": function view(model) {
-			this.markup = this.conf.caption;
+			this.markup = this.caption;
 		}
 	},
 	"Pane": {
@@ -673,58 +674,6 @@ function note() {
 return pkg;
 }
 
-function panel() {
-	const pkg = {
-	"type$": "/display",
-	"Section": {
-		"type$": "/panel/Display",
-		"var$collapsed": "false",
-		"members": {
-			"type$header": "/panel/Display",
-			"type$body": "/panel/Display",
-			"type$footer": "/panel/Display"
-		},
-		"size": function size(x, y) {
-			const body = this.at("body");
-			for (let node of this.to) {
-				if (node != body) y -= node.bounds.height;
-			}
-			this.style.minWidth = x + "px";
-			body.style.minHeight = y + "px";
-			this.style.maxWidth = x + "px";
-			body.style.maxHeight = y + "px";
-		},
-		"extend$actions": {
-			"collapse": function collapse(event) {
-				if (this.collapsed === "false") {
-					this.at("body").style.display = "none";
-					this.collapsed = "true";
-				}
-			},
-			"expand": function expand(event) {
-				if (this.collapsed === "true") {
-					this.at("body").style.removeProperty("display");
-					this.collapsed = "false";
-				}
-			},
-			"click": function click(event) {
-				if (event.target == this.at("header").peer) {
-					this.receive(this.collapsed === "true" ? "expand" : "collapse");
-				}
-			}
-		}
-	},
-	"Panel": {
-		"type$": "/panel/Section",
-		"view": function view(data) {
-			this.at("header").peer.textContent = "Header";
-			this.at("body").peer.textContent = "Body";
-		}
-	}
-}
-return pkg;
-}
-
 function pen() {
 	const pkg = {
 	"Box": {
@@ -1057,77 +1006,17 @@ function range() {
 return pkg;
 }
 
-function record() {
-	const pkg = {
-	"type$": "/display",
-	"Record": {
-		"type$": "/record/Display",
-		"type$typing": "/util/Typing",
-		"isDynamic": false,
-		"view": function view(model) {
-			this.super(view, model);
-			if (this.isDynamic) this.bindDynamic();
-		},
-		"bindDynamic": function bindDynamic() {
-			let props = Object.create(null);
-			for (let name in this.model) {
-				if (!this.members[name]) {
-					props[name] = this.typing.propertyOf(name, this.model[name]);
-				}
-			}
-			this.properties = props;
-			this.forEach(props, this.createContent);
-		},
-		"start": function start(conf) {
-			if (!this.members && conf.members) {
-				this.let("members", conf.members);
-			}
-			this.super(start, conf);
-		}
-	},
-	"Member": {
-		"type$": "/record/Display",
-		"type$textUtil": "/base/util/Text",
-		"get$name": function get$name() {
-			return this.conf.name;
-		},
-		"getCaption": function getCaption() {
-			return this.conf.caption || this.textUtil.captionize(this.conf.name || "");
-		}
-	},
-	"Property": {
-		"type$": "/record/Member",
-		"type$textUtil": "/base/util/Text",
-		"getCaption": function getCaption() {
-			return this.conf.caption || this.textUtil.captionize(this.conf.name || "");
-		},
-		"get$contentType": function get$contentType() {
-			return this.owner.editors[this.conf.inputType || this.conf.dataType] || this.owner.editors.string;
-		},
-		"view": function view(model) {
-			this.super(view, model);
-			let editor = this.owner.create(this.contentType, this.conf);
-			this.append(editor);
-		},
-		"modelFor": function modelFor(key) {
-			return this.model && this.model[this.conf.name] || "";
-		}
-	}
-}
-return pkg;
-}
-
 function shape() {
 	const pkg = {
 	"type$Display": "/display/Display",
 	"Zoned": {
+		"border": {
+			"top": 0,
+			"right": 0,
+			"bottom": 0,
+			"left": 0
+		},
 		"zones": {
-			"border": {
-				"top": 0,
-				"right": 0,
-				"bottom": 0,
-				"left": 0
-			},
 			"cursor": {
 				"TL": "",
 				"TC": "",
@@ -1156,7 +1045,7 @@ function shape() {
 			x -= rect.x;
 			y -= rect.y;
 
-			let border = this.zones.border;
+			let border = this.border;
 			let zone;
 
 			if (y <= border.top) {
@@ -1260,10 +1149,10 @@ function shape() {
 	},
 	"Columnar": {
 		"type$": ["/shape/Display", "/shape/Shape"],
+		"border": {
+			"right": 6
+		},
 		"zones": {
-			"border": {
-				"right": 4
-			},
 			"cursor": {
 				"CR": "ew-resize"
 			},
@@ -1301,41 +1190,6 @@ function shape() {
                     this.style.removeProperty("background-color");
                 }
             }
-		}
-	},
-	"Pane": {
-		"type$": ["/shape/Display", "/shape/Shape"],
-		"var$shape": null,
-		"extend$conf": {
-			"zone": {
-				"border": {
-					"top": 0,
-					"right": 8,
-					"bottom": 12,
-					"left": 0
-				},
-				"cursor": {
-					"BC": "move",
-					"BR": "nwse-resize"
-				},
-				"subject": {
-					"BC": "position",
-					"BR": "size"
-				}
-			}
-		},
-		"get$contentType": function get$contentType() {
-			return this.conf.contentType;
-		},
-		"get$elementConf": function get$elementConf() {
-			return this.conf;
-		},
-		"view": function view(data) {
-			this.super(view, data);
-			let type = this.contentType;
-			let conf = this.elementConf;
-			this.shape = this.owner.create(type, conf);
-			this.append(this.shape);
 		}
 	}
 }
@@ -1481,9 +1335,9 @@ return pkg;
 
 function tabs() {
 	const pkg = {
-	"type$": "/panel",
+	"type$": "/display",
 	"Tabs": {
-		"type$": "/tabs/Section",
+		"type$": "/tabs/Pane",
 		"extend$conf": {
 			"tabType": "/ui/tabs/Tab",
 			"viewType": "/ui/display/Display",

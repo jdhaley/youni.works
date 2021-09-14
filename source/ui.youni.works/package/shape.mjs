@@ -1,13 +1,13 @@
 export default {
 	type$Display: "/display/Display",
     Zoned: {
+		border: {
+			top: 0,
+			right: 0,
+			bottom: 0,
+			left: 0
+		},
 		zones: {
-			border: {
-				top: 0,
-				right: 0,
-				bottom: 0,
-				left: 0
-			},
 			cursor: {
 				"TL": "",
 				"TC": "",
@@ -36,7 +36,7 @@ export default {
 			x -= rect.x;
 			y -= rect.y;
 
-			let border = this.zones.border;
+			let border = this.border;
 			let zone;
 
 			if (y <= border.top) {
@@ -143,10 +143,10 @@ export default {
 	 */
 	Columnar: {
         type$: ["Display", "Shape"],
+		border: {
+			right: 6,
+		},
         zones: {
-            border: {
-                right: 4,
-            },
             cursor: {
                 "CR": "ew-resize",
             },
@@ -185,40 +185,5 @@ export default {
                 }
             }
         }
-    },
-	Pane: {
-		type$: ["Display", "Shape"],
-		var$shape: null,
-		extend$conf: {
-			zone: {
-				border: {
-					top: 0,
-					right: 8,
-					bottom: 12,
-					left: 0
-				},
-				cursor: {
-					"BC": "move",
-					"BR": "nwse-resize",
-				},
-				subject: {
-					"BC": "position",
-					"BR": "size",
-				}
-			},	
-		},
-		get$contentType() {
-			return this.conf.contentType;
-		},
-		get$elementConf() {
-			return this.conf;
-		},
-		view(data) {
-			this.super(view, data);
-			let type = this.contentType;
-			let conf = this.elementConf;
-			this.shape = this.owner.create(type, conf);
-			this.append(this.shape);
-		}
-	}
+    }
 }
