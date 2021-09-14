@@ -123,7 +123,7 @@ export default {
 			this.set("cy", arguments[0]);
 		},
 		extend$actions: {
-			grab(event) {
+			touch(event) {
 				event.track = this;
 				event.preventDefault();
 			},

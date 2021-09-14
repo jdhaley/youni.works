@@ -84,7 +84,7 @@ export default {
 			return this;
 		},
 		extend$actions: {
-			grab(event) {
+			touch(event) {
 				if (event.track && event.track != this) return;
 				let zone = this.getZone(event.x, event.y);
 				let subject = this.zones.subject[zone] || "";

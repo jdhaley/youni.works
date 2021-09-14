@@ -334,7 +334,7 @@ function events() {
             pkg.sense(event);
         },
 		"mousedown": function mousedown(event) {
-            event.subject = "grab";
+            event.subject = "touch";
             pkg.sense(event);
             if (event.track) {
 //                event.preventDefault();
@@ -850,7 +850,7 @@ function pen() {
 			this.set("cy", arguments[0]);
 		},
 		"extend$actions": {
-			"grab": function grab(event) {
+			"touch": function touch(event) {
 				event.track = this;
 				event.preventDefault();
 			},
@@ -1204,7 +1204,7 @@ function shape() {
 			return this;
 		},
 		"extend$actions": {
-			"grab": function grab(event) {
+			"touch": function touch(event) {
 				if (event.track && event.track != this) return;
 				let zone = this.getZone(event.x, event.y);
 				let subject = this.zones.subject[zone] || "";

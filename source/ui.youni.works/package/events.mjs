@@ -32,7 +32,7 @@ const pkg = {
             pkg.sense(event);
         },
         mousedown(event) {
-            event.subject = "grab";
+            event.subject = "touch";
             pkg.sense(event);
             if (event.track) {
 //                event.preventDefault();
