@@ -1,12 +1,5 @@
 export default {
 	type$: "/system/core",
-	Startable: {
-		extend$conf: {
-		},
-		start(conf) {
-			if (conf) this.let("conf", conf, "extend");
-		},
-	},
 	Receiver: {
 		receive(signal) {
 			if (!signal) return;
@@ -79,6 +72,13 @@ export default {
 					from(receiver, message);
 				}
 			}
+		},
+	},
+	Startable: {
+		extend$conf: {
+		},
+		start(conf) {
+			if (conf) this.let("conf", conf, "extend");
 		},
 	},
 	Viewer: {

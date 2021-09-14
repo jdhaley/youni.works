@@ -89,13 +89,6 @@ return pkg;
 function control() {
 	const pkg = {
 	"type$": "/system/core",
-	"Startable": {
-		"extend$conf": {
-		},
-		"start": function start(conf) {
-			if (conf) this.let("conf", conf, "extend");
-		}
-	},
 	"Receiver": {
 		"receive": function receive(signal) {
 			if (!signal) return;
@@ -168,6 +161,13 @@ function control() {
 					from(receiver, message);
 				}
 			}
+		}
+	},
+	"Startable": {
+		"extend$conf": {
+		},
+		"start": function start(conf) {
+			if (conf) this.let("conf", conf, "extend");
 		}
 	},
 	"Viewer": {
@@ -339,47 +339,6 @@ function dom() {
 			this.peer.append(value.peer);
 		}
 	},
-	"Element": {
-		"type$": ["/dom/Instance", "/dom/Node", "/view/View"],
-		"type$owner": "/dom/Document",
-		"namespace": "",
-		"once$nodeName": function once$nodeName() {
-			return this.className;
-		},
-		"once$peer": function once$peer() {
-			let peer = this.owner.createElement(this.nodeName, this.namespace);
-			peer.$peer = this;
-			return peer;
-		},
-		"once$className": function once$className() {
-			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
-		},
-		"virtual$markup": function virtual$markup() {
-			if (arguments.length) {
-				this.peer.innerHTML = arguments[0];
-			} else {
-				return this.peer.innerHTML;
-			}
-		},
-		"createPart": function createPart(key, type) {
-			let part = this.owner.create(type, this.conf);
-			part.let("key", key);
-			this.peer.append(part.peer);
-			return part;
-		},
-		"get": function get(name) {
-			return this.peer.getAttribute(name);
-		},
-		"set": function set(name, value) {
-			this.peer.setAttribute(name, value);
-		},
-		"get$of": function get$of() {
-			return this.peer.parentNode.$peer;
-		},
-		"append": function append(control) {
-			this.peer.append(control.peer);
-		}
-	},
 	"Document": {
 		"type$": "/dom/Node",
 		"document": null,
@@ -401,6 +360,64 @@ function dom() {
 			let id = this.document.$lastId || 0;
 			this.document.$lastId = ++id;
 			return id;
+		}
+	},
+	"Element": {
+		"type$": "/dom/Node",
+		"type$owner": "/dom/Document",
+		"namespace": "",
+		"once$nodeName": function once$nodeName() {
+			return this.className;
+		},
+		"once$peer": function once$peer() {
+			let peer = this.owner.createElement(this.nodeName, this.namespace);
+			peer.$peer = this;
+			return peer;
+		},
+		"once$className": function once$className() {
+			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
+		},
+		"virtual$markup": function virtual$markup() {
+			if (arguments.length) {
+				this.peer.innerHTML = arguments[0];
+			} else {
+				return this.peer.innerHTML;
+			}
+		},
+		"get": function get(name) {
+			return this.peer.getAttribute(name);
+		},
+		"set": function set(name, value) {
+			this.peer.setAttribute(name, value);
+		},
+		"get$of": function get$of() {
+			return this.peer.parentNode.$peer;
+		},
+		"append": function append(control) {
+			this.peer.append(control.peer);
+		}
+	},
+	"View": {
+		"type$": ["/dom/Element", "/view/View"],
+		"extend$conf": {
+		},
+		"display": "",
+		"get$style": function get$style() {
+			return this.peer.style;
+		},
+		"get$styles": function get$styles() {
+			return this.peer.classList;
+		},
+		"createPart": function createPart(key, type) {
+			let part = this.owner.create(type, this.conf);
+			this.put(key, part);
+			if (this.members) part.styles.add(key);
+			return part;
+		},
+		"start": function start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+			if (this.display) this.styles.add(this.display);
+			this.styles.add(this.className);
 		}
 	}
 }
@@ -609,8 +626,7 @@ function view() {
 	const pkg = {
 	"type$": "/control",
 	"View": {
-		"type$": ["/view/Startable", "/view/Viewer"],
-		"require$markup": "",
+		"type$": "/view/Viewer",
 		"require$createPart": function require$createPart(key, type) {
 		},
 		"var$model": undefined,

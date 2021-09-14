@@ -32,16 +32,9 @@ function display() {
 	const pkg = {
 	"type$": "/base/dom",
 	"Display": {
-		"type$": "/display/Element",
+		"type$": ["/display/Instance", "/display/View"],
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
-		"display": "",
-		"get$style": function get$style() {
-			return this.peer.style;
-		},
-		"get$styles": function get$styles() {
-			return this.peer.classList;
-		},
 		"get$box": function get$box() {
 			return this.peer.getBoundingClientRect();;
 		},
@@ -55,16 +48,6 @@ function display() {
 			this.style.position = "absolute";			
 			this.style.left = x + "px";
 			this.style.top = y + "px";
-		},
-		"createPart": function createPart(key, type) {
-			let part = this.super(createPart, key, type);
-			if (this.members) part.styles.add(key);
-			return part;
-		},
-		"start": function start(conf) {
-			this.super(start, conf);
-			if (this.display) this.styles.add(this.display);
-			this.styles.add(this.className);
 		}
 	},
 	"Caption": {

@@ -39,50 +39,6 @@ export default {
 			this.peer.append(value.peer);
 		}
 	},
-	Element: {
-		type$: ["Instance", "Node", "/view/View"],
-		type$owner: "Document",
-		namespace: "",
-		once$nodeName() {
-			return this.className;
-		},
-		once$peer() {
-			let peer = this.owner.createElement(this.nodeName, this.namespace);
-			peer.$peer = this;
-			return peer;
-		},
-		once$className() {
-			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
-		},
-		virtual$markup() {
-			if (arguments.length) {
-				this.peer.innerHTML = arguments[0];
-			} else {
-				return this.peer.innerHTML;
-			}
-		},
-		createPart(key, type) {
-			let part = this.owner.create(type, this.conf);
-			part.let("key", key);
-			this.peer.append(part.peer);
-			return part;
-		},
-		/*
-			deprecated (get & set require a replacement api)
-		*/
-		get(name) {
-			return this.peer.getAttribute(name);
-		},
-		set(name, value) {
-			this.peer.setAttribute(name, value);
-		},
-		get$of() {
-			return this.peer.parentNode.$peer;
-		},
-		append(control) {
-			this.peer.append(control.peer);
-		}
-	},
 	Document: {
 		type$: "Node",
 		document: null,
@@ -104,6 +60,67 @@ export default {
 			let id = this.document.$lastId || 0;
 			this.document.$lastId = ++id;
 			return id;
+		}
+	},
+	Element: {
+		type$: "Node",
+		type$owner: "Document",
+		namespace: "",
+		once$nodeName() {
+			return this.className;
+		},
+		once$peer() {
+			let peer = this.owner.createElement(this.nodeName, this.namespace);
+			peer.$peer = this;
+			return peer;
+		},
+		once$className() {
+			return this[Symbol.toStringTag].charAt(0).toLowerCase() + this[Symbol.toStringTag].substring(1);
+		},
+		virtual$markup() {
+			if (arguments.length) {
+				this.peer.innerHTML = arguments[0];
+			} else {
+				return this.peer.innerHTML;
+			}
+		},
+		/*
+			deprecated (get & set require a replacement api)
+		*/
+		get(name) {
+			return this.peer.getAttribute(name);
+		},
+		set(name, value) {
+			this.peer.setAttribute(name, value);
+		},
+		get$of() {
+			return this.peer.parentNode.$peer;
+		},
+		append(control) {
+			this.peer.append(control.peer);
+		}
+	},
+	View: {
+		type$: ["Element", "/view/View"],
+		extend$conf: {
+		},
+		display: "",
+		get$style() {
+			return this.peer.style;
+		},
+		get$styles() {
+			return this.peer.classList;
+		},
+		createPart(key, type) {
+			let part = this.owner.create(type, this.conf);
+			this.put(key, part);
+			if (this.members) part.styles.add(key);
+			return part;
+		},
+		start(conf) {
+			if (conf) this.let("conf", conf, "extend");
+			if (this.display) this.styles.add(this.display);
+			this.styles.add(this.className);
 		}
 	}
 }

@@ -1,8 +1,9 @@
 export default {
 	type$: "/control",
 	View: {
-		type$: ["Startable", "Viewer"],
-		require$markup: "",
+		type$: "Viewer",
+		//there is an issue with the require$markup seeming to replace Element.markup
+		//	require$markup: "",
 		require$createPart(key, type) {
 		},
 		var$model: undefined,
