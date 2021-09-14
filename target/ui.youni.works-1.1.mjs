@@ -14,7 +14,7 @@ module.use = {
 module.package = {
 	display: display(),
 	editors: editors(),
-	gdr: gdr(),
+	events: events(),
 	note: note(),
 	panel: panel(),
 	pen: pen(),
@@ -311,7 +311,7 @@ function editors() {
 return pkg;
 }
 
-function gdr() {
+function events() {
 	const pkg = {
 	"$public": {
 		"click": function click(event) {

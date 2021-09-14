@@ -5,6 +5,9 @@ import test from "./conf/testDataSource.mjs";
 export default {
     type$: "/workbench/App",
     title: "Workbench",
+    data: {
+        test: test
+    },
     frame: {
         type$: "/ui/display/Frame",
         editors: editors,
@@ -13,11 +16,8 @@ export default {
             views: views
         }
     },
-    data: {
-        test: test
-    },
     conf: {
-        type$events: "/ui/gdr",
+        type$events: "/ui/events",
         dataConverter: "/compiler/converter/Converter",
         "objectType": "Module",
         "dataset": "source",

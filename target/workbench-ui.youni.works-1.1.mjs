@@ -19,72 +19,6 @@ module.package = {
 const conf = {
 	"type$": "/workbench/App",
 	"title": "Workbench",
-	"frame": {
-		"type$": "/ui/display/Frame",
-		"editors": {
-			"type$string": "/ui/editors/String",
-			"type$number": "/ui/editors/Number",
-			"type$date": "/ui/editors/Date",
-			"type$boolean": "/ui/editors/Boolean",
-			"type$link": "/ui/editors/Link",
-			"type$color": "/ui/editors/Color"
-		},
-		"main": {
-			"type": "/workbench/Workbench",
-			"views": {
-				"dummy": {
-					"title": "Dummy",
-					"icon": "/res/icons/moon.svg"
-				},
-				"test": {
-					"title": "Test",
-					"icon": "/res/icons/activity.svg",
-					"body": {
-						"type$": "/ui/tabs/Tabs",
-						"extend$conf": {
-							"views": {
-								"table": {
-									"title": "Table",
-									"icon": "/res/icons/work.svg",
-									"body": {
-										"type$": "/ui/table/Table",
-										"extend$conf": {
-											"data": {
-												"source": "test",
-												"view": "Issue",
-												"set": "issues"
-											}
-										}
-									}
-								},
-								"note": {
-									"title": "Note",
-									"icon": "/res/icons/book.svg",
-									"type$body": "/ui/note/Note"
-								},
-								"draw": {
-									"title": "Draw",
-									"icon": "/res/icons/photo.svg",
-									"type$body": "/ui/pen/Canvas"
-								},
-								"tree": {
-									"title": "Tree",
-									"icon": "/res/icons/folder-open.svg",
-									"body": {
-										"type$": "/ui/tree/Item"
-									}
-								}
-							}
-						},
-						"view": function view() {
-				this.super(view, this.conf.views);
-				this.activate();
-			}
-					}
-				}
-			}
-		}
-	},
 	"data": {
 		"test": {
 			"type$": "/base/data/DataSource",
@@ -255,8 +189,74 @@ const conf = {
 			}
 		}
 	},
+	"frame": {
+		"type$": "/ui/display/Frame",
+		"editors": {
+			"type$string": "/ui/editors/String",
+			"type$number": "/ui/editors/Number",
+			"type$date": "/ui/editors/Date",
+			"type$boolean": "/ui/editors/Boolean",
+			"type$link": "/ui/editors/Link",
+			"type$color": "/ui/editors/Color"
+		},
+		"main": {
+			"type": "/workbench/Workbench",
+			"views": {
+				"dummy": {
+					"title": "Dummy",
+					"icon": "/res/icons/moon.svg"
+				},
+				"test": {
+					"title": "Test",
+					"icon": "/res/icons/activity.svg",
+					"body": {
+						"type$": "/ui/tabs/Tabs",
+						"extend$conf": {
+							"views": {
+								"table": {
+									"title": "Table",
+									"icon": "/res/icons/work.svg",
+									"body": {
+										"type$": "/ui/table/Table",
+										"extend$conf": {
+											"data": {
+												"source": "test",
+												"view": "Issue",
+												"set": "issues"
+											}
+										}
+									}
+								},
+								"note": {
+									"title": "Note",
+									"icon": "/res/icons/book.svg",
+									"type$body": "/ui/note/Note"
+								},
+								"draw": {
+									"title": "Draw",
+									"icon": "/res/icons/photo.svg",
+									"type$body": "/ui/pen/Canvas"
+								},
+								"tree": {
+									"title": "Tree",
+									"icon": "/res/icons/folder-open.svg",
+									"body": {
+										"type$": "/ui/tree/Item"
+									}
+								}
+							}
+						},
+						"view": function view() {
+				this.super(view, this.conf.views);
+				this.activate();
+			}
+					}
+				}
+			}
+		}
+	},
 	"conf": {
-		"type$events": "/ui/gdr",
+		"type$events": "/ui/events",
 		"dataConverter": "/compiler/converter/Converter",
 		"objectType": "Module",
 		"dataset": "source",
