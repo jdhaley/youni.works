@@ -101,7 +101,7 @@ export default {
 		}
 	},
 	View: {
-		type$: ["Element", "/view/View"],
+		type$: ["Element", "/view/View", "/util/Bounded"],
 		extend$conf: {
 		},
 		display: "",
@@ -110,6 +110,26 @@ export default {
 		},
 		get$styles() {
 			return this.peer.classList;
+		},
+		virtual$box() {
+			if (arguments.length) {
+				let r = arguments[0];
+				this.moveTo(r.left, r.top);
+				this.size(r.width, r.height);
+				return;
+			}
+			return this.peer.getBoundingClientRect();
+		},
+		size(width, height) {
+			this.style.width = Math.max(width, 16) + "px";
+			this.style.minWidth = this.style.width;
+			this.style.height = Math.max(height, 16) + "px";
+			this.style.minHeight = this.style.height;
+		},
+		moveTo(x, y) {
+			this.style.position = "absolute";			
+			this.style.left = x + "px";
+			this.style.top = y + "px";
 		},
 		createPart(key, type) {
 			let part = this.owner.create(type, this.conf);
@@ -123,5 +143,5 @@ export default {
 			this.styles.add(this.className);
 		}
 	},
-	type$Pane: "/view/Pane"
+	type$Pane: "/view/Pane",
 }

@@ -1,61 +1,9 @@
 export default {
 	type$: "/base/dom",
-	Zoned: {
-		border: {
-			top: 0,
-			right: 0,
-			bottom: 0,
-			left: 0
-		},
-        getEdge(x, y) {
-			let rect = this.peer.getBoundingClientRect();
-			x -= rect.x;
-			y -= rect.y;
-
-			let border = this.border;
-			let edge;
-
-			if (y <= border.top) {
-				edge = "T";
-			} else if (y >= rect.height - border.bottom) {
-				edge = "B";
-			} else {
-				edge = "C";
-			}
-			if (x <= border.left) {
-				edge += "L";
-			} else if (x >= rect.width - border.right) {
-				edge += "R";
-			} else {
-				edge += "C";
-			}
-			return edge;
-		}
-    },
 	Display: {
-		type$: ["Instance", "View", "Zoned"],
+		type$: ["Instance", "View"],
 		type$owner: "Frame",
 		nodeName: "div",
-		virtual$box() {
-			if (arguments.length) {
-				let r = arguments[0];
-				this.moveTo(r.left, r.top);
-				this.size(r.width, r.height);
-				return;
-			}
-			return this.peer.getBoundingClientRect();
-		},
-		size(width, height) {
-			this.style.width = Math.max(width, 16) + "px";
-			this.style.minWidth = this.style.width;
-			this.style.height = Math.max(height, 16) + "px";
-			this.style.minHeight = this.style.height;
-		},
-		moveTo(x, y) {
-			this.style.position = "absolute";			
-			this.style.left = x + "px";
-			this.style.top = y + "px";
-		},
 	},
 	Caption: {
 		type$: "Display",
@@ -64,6 +12,12 @@ export default {
 		},
 		view(model) {
 			this.markup = this.caption;
+		}
+	},
+	Pane: {
+		members: {
+			type$header: "Caption",
+			type$body: "Display"
 		}
 	},
     App: {

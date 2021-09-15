@@ -31,62 +31,10 @@ export default main(module, conf);
 function display() {
 	const pkg = {
 	"type$": "/base/dom",
-	"Zoned": {
-		"border": {
-			"top": 0,
-			"right": 0,
-			"bottom": 0,
-			"left": 0
-		},
-		"getEdge": function getEdge(x, y) {
-			let rect = this.peer.getBoundingClientRect();
-			x -= rect.x;
-			y -= rect.y;
-
-			let border = this.border;
-			let edge;
-
-			if (y <= border.top) {
-				edge = "T";
-			} else if (y >= rect.height - border.bottom) {
-				edge = "B";
-			} else {
-				edge = "C";
-			}
-			if (x <= border.left) {
-				edge += "L";
-			} else if (x >= rect.width - border.right) {
-				edge += "R";
-			} else {
-				edge += "C";
-			}
-			return edge;
-		}
-	},
 	"Display": {
-		"type$": ["/display/Instance", "/display/View", "/display/Zoned"],
+		"type$": ["/display/Instance", "/display/View"],
 		"type$owner": "/display/Frame",
-		"nodeName": "div",
-		"virtual$box": function virtual$box() {
-			if (arguments.length) {
-				let r = arguments[0];
-				this.moveTo(r.left, r.top);
-				this.size(r.width, r.height);
-				return;
-			}
-			return this.peer.getBoundingClientRect();
-		},
-		"size": function size(width, height) {
-			this.style.width = Math.max(width, 16) + "px";
-			this.style.minWidth = this.style.width;
-			this.style.height = Math.max(height, 16) + "px";
-			this.style.minHeight = this.style.height;
-		},
-		"moveTo": function moveTo(x, y) {
-			this.style.position = "absolute";			
-			this.style.left = x + "px";
-			this.style.top = y + "px";
-		}
+		"nodeName": "div"
 	},
 	"Caption": {
 		"type$": "/display/Display",
@@ -95,6 +43,12 @@ function display() {
 		},
 		"view": function view(model) {
 			this.markup = this.caption;
+		}
+	},
+	"Pane": {
+		"members": {
+			"type$header": "/display/Caption",
+			"type$body": "/display/Display"
 		}
 	},
 	"App": {

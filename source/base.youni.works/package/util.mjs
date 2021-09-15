@@ -5,6 +5,48 @@ export default {
             return this[Symbol.for("owner")].create(from);
         }
     },
+	Bounded: {
+		box: {
+			x: 0,
+			y: 0,
+			width: 0,
+			height: 0
+		},
+		border: {
+			top: 0,
+			//top-right
+			right: 0,
+			//bottom-right
+			bottom: 0,
+			//bottom-left
+			left: 0
+			//top-left
+		},
+        getEdge(x, y) {
+			let box = this.box;
+			x -= box.x;
+			y -= box.y;
+
+			let border = this.border;
+			let edge;
+
+			if (y <= border.top) {
+				edge = "T";
+			} else if (y >= box.height - border.bottom) {
+				edge = "B";
+			} else {
+				edge = "C";
+			}
+			if (x <= border.left) {
+				edge += "L";
+			} else if (x >= box.width - border.right) {
+				edge += "R";
+			} else {
+				edge += "C";
+			}
+			return edge;
+		}
+    },
 	Text: {
 		isUpperCase(str) {
 			return str == str.toUpperCase() && str != str.toLowerCase();

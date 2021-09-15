@@ -398,7 +398,7 @@ function dom() {
 		}
 	},
 	"View": {
-		"type$": ["/dom/Element", "/view/View"],
+		"type$": ["/dom/Element", "/view/View", "/util/Bounded"],
 		"extend$conf": {
 		},
 		"display": "",
@@ -407,6 +407,26 @@ function dom() {
 		},
 		"get$styles": function get$styles() {
 			return this.peer.classList;
+		},
+		"virtual$box": function virtual$box() {
+			if (arguments.length) {
+				let r = arguments[0];
+				this.moveTo(r.left, r.top);
+				this.size(r.width, r.height);
+				return;
+			}
+			return this.peer.getBoundingClientRect();
+		},
+		"size": function size(width, height) {
+			this.style.width = Math.max(width, 16) + "px";
+			this.style.minWidth = this.style.width;
+			this.style.height = Math.max(height, 16) + "px";
+			this.style.minHeight = this.style.height;
+		},
+		"moveTo": function moveTo(x, y) {
+			this.style.position = "absolute";			
+			this.style.left = x + "px";
+			this.style.top = y + "px";
 		},
 		"createPart": function createPart(key, type) {
 			let part = this.owner.create(type, this.conf);
@@ -509,6 +529,44 @@ function util() {
 		"create": function create(from) {
             return this[Symbol.for("owner")].create(from);
         }
+	},
+	"Bounded": {
+		"box": {
+			"x": 0,
+			"y": 0,
+			"width": 0,
+			"height": 0
+		},
+		"border": {
+			"top": 0,
+			"right": 0,
+			"bottom": 0,
+			"left": 0
+		},
+		"getEdge": function getEdge(x, y) {
+			let box = this.box;
+			x -= box.x;
+			y -= box.y;
+
+			let border = this.border;
+			let edge;
+
+			if (y <= border.top) {
+				edge = "T";
+			} else if (y >= box.height - border.bottom) {
+				edge = "B";
+			} else {
+				edge = "C";
+			}
+			if (x <= border.left) {
+				edge += "L";
+			} else if (x >= box.width - border.right) {
+				edge += "R";
+			} else {
+				edge += "C";
+			}
+			return edge;
+		}
 	},
 	"Text": {
 		"isUpperCase": function isUpperCase(str) {
@@ -662,12 +720,6 @@ function view() {
 				if (this.model) return this.model[key];
 			}
 			return this.model;
-		}
-	},
-	"Pane": {
-		"members": {
-			"type$header": "/view/Caption",
-			"type$body": "/view/Display"
 		}
 	}
 }
