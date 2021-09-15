@@ -106,11 +106,14 @@ export default {
             }
             if (this.isType(source)) {
                 implementType.call(this, source[Symbol.for("type")]);
-            } else if (source && Object.getPrototypeOf(source) == Object.prototype) {
-                implementSource.call(this, source);
+            // } else if (this.isDeclarations(source)) {
+            //     implementDeclarations.call(this, source);
+            // } else {
+            //     throw new TypeError(`Can't extend object: Source "${source}" is not a Type, Parcel, or Source object`);
+            // }
             } else {
-                throw new TypeError("Declarations must be a source or type object.");
-            }    
+                implementDeclarations.call(this, source);
+            }
             function implementType(type) {
                 for (let name in type) {
                     if (objectType) {
@@ -121,7 +124,7 @@ export default {
                     }
                 }
             }
-            function implementSource(source) {
+            function implementDeclarations(source) {
                 for (let decl in source) {
                     if (decl != this.conf.typeProperty) {
                         decl = this.declare(object, this.nameOf(decl), source[decl], this.facetOf(decl));
@@ -184,6 +187,12 @@ export default {
 			decl = "" + decl;
 			let index = decl.indexOf("$");
 			return index < 0 ? decl : decl.substring(index + 1);
+		},
+        isDeclarations(value) {
+			return value && typeof value == "object" && (
+                Object.getPrototypeOf(value) == Object.prototype ||
+                Object.getPrototypeOf(value) === null
+            );
 		},
         isSource(value) {
 			return value && typeof value == "object" && (
