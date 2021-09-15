@@ -122,5 +122,6 @@ export default {
 			if (this.display) this.styles.add(this.display);
 			this.styles.add(this.className);
 		}
-	}
+	},
+	type$Pane: "/view/Pane"
 }

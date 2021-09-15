@@ -419,7 +419,8 @@ function dom() {
 			if (this.display) this.styles.add(this.display);
 			this.styles.add(this.className);
 		}
-	}
+	},
+	"type$Pane": "/view/Pane"
 }
 return pkg;
 }
@@ -661,6 +662,12 @@ function view() {
 				if (this.model) return this.model[key];
 			}
 			return this.model;
+		}
+	},
+	"Pane": {
+		"members": {
+			"type$header": "/view/Caption",
+			"type$body": "/view/Display"
 		}
 	}
 }

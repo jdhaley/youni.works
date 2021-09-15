@@ -1,7 +1,7 @@
 export default {
     type$: "/display",
     Tabs: {
-        type$: "Pane",
+        type$: ["Display", "Pane"],
         extend$conf: {
             tabType: "/ui/tabs/Tab",
             viewType: "/ui/display/Display",

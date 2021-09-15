@@ -56,7 +56,7 @@ export default {
 		},
 	},
 	Row: {
-		type$: "Pane",
+		type$: ["Display", "Pane"],
 		display: "h",
 		members: {
 			type$header: "Display",
@@ -78,7 +78,7 @@ export default {
 		}
 	},
 	Table: {
-		type$: "Pane",
+		type$: ["Display", "Pane"],
 		display: "v",
 		members: {
 			header: {

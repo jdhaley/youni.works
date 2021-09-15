@@ -31,8 +31,40 @@ export default main(module, conf);
 function display() {
 	const pkg = {
 	"type$": "/base/dom",
+	"Zoned": {
+		"border": {
+			"top": 0,
+			"right": 0,
+			"bottom": 0,
+			"left": 0
+		},
+		"getEdge": function getEdge(x, y) {
+			let rect = this.peer.getBoundingClientRect();
+			x -= rect.x;
+			y -= rect.y;
+
+			let border = this.border;
+			let edge;
+
+			if (y <= border.top) {
+				edge = "T";
+			} else if (y >= rect.height - border.bottom) {
+				edge = "B";
+			} else {
+				edge = "C";
+			}
+			if (x <= border.left) {
+				edge += "L";
+			} else if (x >= rect.width - border.right) {
+				edge += "R";
+			} else {
+				edge += "C";
+			}
+			return edge;
+		}
+	},
 	"Display": {
-		"type$": ["/display/Instance", "/display/View"],
+		"type$": ["/display/Instance", "/display/View", "/display/Zoned"],
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
 		"virtual$box": function virtual$box() {
@@ -63,13 +95,6 @@ function display() {
 		},
 		"view": function view(model) {
 			this.markup = this.caption;
-		}
-	},
-	"Pane": {
-		"type$": "/display/Display",
-		"members": {
-			"type$header": "/display/Caption",
-			"type$body": "/display/Display"
 		}
 	},
 	"App": {
@@ -266,7 +291,7 @@ function editors() {
 		},
 		"extend$conf": {
 			"linkControl": {
-				"type$": ["/editors/Pane", "/shape/Shape"]
+				"type$": ["/shape/Shape", "/editors/Pane"]
 			}
 		},
 		"get$link": function get$link() {
@@ -743,7 +768,7 @@ function pen() {
 		}
 	},
 	"Shape": {
-		"type$": ["/display/Display", "/shape/Shape"],
+		"type$": "/shape/Shape",
 		"namespace": "http://www.w3.org/2000/svg",
 		"get$image": function get$image() {
 			for (let node = this.peer; node; node = node.parentNode) {
@@ -1000,46 +1025,14 @@ return pkg;
 
 function shape() {
 	const pkg = {
-	"type$Display": "/display/Display",
-	"Zoned": {
-		"border": {
-			"top": 0,
-			"right": 0,
-			"bottom": 0,
-			"left": 0
-		},
-		"edges": {
-		},
-		"getEdge": function getEdge(x, y) {
-			let rect = this.peer.getBoundingClientRect();
-			x -= rect.x;
-			y -= rect.y;
-
-			let border = this.border;
-			let edge;
-
-			if (y <= border.top) {
-				edge = "T";
-			} else if (y >= rect.height - border.bottom) {
-				edge = "B";
-			} else {
-				edge = "C";
-			}
-			if (x <= border.left) {
-				edge += "L";
-			} else if (x >= rect.width - border.right) {
-				edge += "R";
-			} else {
-				edge += "C";
-			}
-			return edge;
-		}
-	},
+	"type$": "/display",
 	"Shape": {
-		"type$": "/shape/Zoned",
+		"type$": "/shape/Display",
 		"extend$conf": {
 			"minWidth": 16,
 			"minHeight": 16
+		},
+		"edges": {
 		},
 		"extend$actions": {
 			"touch": function touch(event) {
@@ -1093,7 +1086,7 @@ function shape() {
 		}
 	},
 	"Columnar": {
-		"type$": ["/shape/Display", "/shape/Shape"],
+		"type$": "/shape/Shape",
 		"border": {
 			"right": 6
 		},
@@ -1199,7 +1192,7 @@ function table() {
 		}
 	},
 	"Row": {
-		"type$": "/table/Pane",
+		"type$": ["/table/Display", "/table/Pane"],
 		"display": "h",
 		"members": {
 			"type$header": "/table/Display",
@@ -1221,7 +1214,7 @@ function table() {
 		}
 	},
 	"Table": {
-		"type$": "/table/Pane",
+		"type$": ["/table/Display", "/table/Pane"],
 		"display": "v",
 		"members": {
 			"header": {
@@ -1281,7 +1274,7 @@ function tabs() {
 	const pkg = {
 	"type$": "/display",
 	"Tabs": {
-		"type$": "/tabs/Pane",
+		"type$": ["/tabs/Display", "/tabs/Pane"],
 		"extend$conf": {
 			"tabType": "/ui/tabs/Tab",
 			"viewType": "/ui/display/Display",

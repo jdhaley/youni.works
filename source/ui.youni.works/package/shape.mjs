@@ -1,44 +1,12 @@
 export default {
-	type$Display: "/display/Display",
-    Zoned: {
-		border: {
-			top: 0,
-			right: 0,
-			bottom: 0,
-			left: 0
-		},
-		edges: {
-		},
-        getEdge(x, y) {
-			let rect = this.peer.getBoundingClientRect();
-			x -= rect.x;
-			y -= rect.y;
-
-			let border = this.border;
-			let edge;
-
-			if (y <= border.top) {
-				edge = "T";
-			} else if (y >= rect.height - border.bottom) {
-				edge = "B";
-			} else {
-				edge = "C";
-			}
-			if (x <= border.left) {
-				edge += "L";
-			} else if (x >= rect.width - border.right) {
-				edge += "R";
-			} else {
-				edge += "C";
-			}
-			return edge;
-		}
-    },
+	type$: "/display",
 	Shape: {
-		type$: "Zoned",
+		type$: "Display",
 		extend$conf: {
 			minWidth: 16,
 			minHeight: 16	
+		},
+		edges: {
 		},
 		extend$actions: {
 			touch(event) {
@@ -95,7 +63,7 @@ export default {
 	 * Supports sizing the width from the right side of the shape.
 	 */
 	Columnar: {
-        type$: ["Display", "Shape"],
+        type$: "Shape",
 		border: {
 			right: 6,
 		},
