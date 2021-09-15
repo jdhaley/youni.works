@@ -1,5 +1,5 @@
 export default {
-	type$: "/display",
+	type$: "/agent",
 	Commandable: {
 		shortcuts: {
 		},

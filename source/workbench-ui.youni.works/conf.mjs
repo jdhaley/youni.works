@@ -9,7 +9,7 @@ export default {
         test: test
     },
     frame: {
-        type$: "/ui/display/Frame",
+        type$: "/ui/agent/Frame",
         editors: editors,
         main: {
             type: "/workbench/Workbench",

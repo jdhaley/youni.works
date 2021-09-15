@@ -1,5 +1,5 @@
 export default {
-	type$: "/display",
+	type$: "/agent",
 	Caption: {
 		type$: "Display",
 		get$caption() {

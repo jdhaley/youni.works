@@ -1,5 +1,6 @@
 import system from "./system.youni.works-2.1.mjs";
 import base from "./base.youni.works-1.2.mjs";
+import display from "./display.youni.works-1.0.mjs";
 import compiler from "./compiler.youni.works-1.0.mjs";
 const module = {
 	"name": "ui.youni.works",
@@ -9,10 +10,11 @@ const module = {
 module.use = {
 	system: system,
 	base: base,
+	display: display,
 	compiler: compiler
 }
 module.package = {
-	display: display(),
+	agent: agent(),
 	editors: editors(),
 	events: events(),
 	note: note(),
@@ -28,12 +30,12 @@ const main = function main_loadModule(module) {
 			return module.use.system.load(module);
 		};
 export default main(module, conf);
-function display() {
+function agent() {
 	const pkg = {
 	"type$": "/base/dom",
 	"Frame": {
-		"type$": ["/display/Display", "/display/Document"],
-		"type$app": "/display/Component",
+		"type$": ["/agent/Display", "/agent/Document"],
+		"type$app": "/agent/Component",
 		"$window": null,
 		"get$owner": function get$owner() {
 			return this;
@@ -122,7 +124,7 @@ return pkg;
 
 function editors() {
 	const pkg = {
-	"type$": "/display",
+	"type$": "/agent",
 	"Editor": {
 		"type$": "/editors/Display",
 		"dataType": ""
@@ -351,7 +353,7 @@ return pkg;
 
 function note() {
 	const pkg = {
-	"type$": "/display",
+	"type$": "/agent",
 	"Commandable": {
 		"shortcuts": {
 		},
@@ -859,7 +861,7 @@ function pen() {
 		}
 	},
 	"Canvas": {
-		"type$": "/display/Display",
+		"type$": "/agent/Display",
 		"var$shape": null,
 		"size": function size(x, y) {
 			this.shape.size(x, y);
@@ -950,7 +952,7 @@ return pkg;
 
 function shape() {
 	const pkg = {
-	"type$": "/display",
+	"type$": "/agent",
 	"Shape": {
 		"type$": "/shape/Display",
 		"extend$conf": {
@@ -1060,12 +1062,12 @@ return pkg;
 
 function tabs() {
 	const pkg = {
-	"type$": "/display",
+	"type$": "/agent",
 	"Tabs": {
 		"type$": "/tabs/Display",
 		"extend$conf": {
 			"tabType": "/ui/tabs/Tab",
-			"viewType": "/ui/display/Display",
+			"viewType": "/ui/agent/Display",
 			"icon": "/res/icons/bag.svg"
 		},
 		"var$activeTab": null,
@@ -1140,7 +1142,7 @@ return pkg;
 
 function tree() {
 	const pkg = {
-	"type$": "/display",
+	"type$": "/agent",
 	"ItemHeader": {
 		"type$": "/tree/Display",
 		"facets": {
@@ -1269,7 +1271,7 @@ return pkg;
 
 function views() {
 	const pkg = {
-	"type$": "/display",
+	"type$": "/agent",
 	"Caption": {
 		"type$": "/views/Display",
 		"get$caption": function get$caption() {

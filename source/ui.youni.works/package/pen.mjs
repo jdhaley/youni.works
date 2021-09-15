@@ -245,7 +245,7 @@ export default {
 		},
 	},
 	Canvas: {
-		type$: "/display/Display",
+		type$: "/agent/Display",
 		var$shape: null,
 		size(x, y) {
 			this.shape.size(x, y);

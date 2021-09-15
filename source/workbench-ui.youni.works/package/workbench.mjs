@@ -1,5 +1,5 @@
 export default {
-	type$: "/ui/display",
+	type$: "/ui/agent",
     App: {
         type$: ["Component", "Receiver", "/base/origin/Origin"],
 		start() {

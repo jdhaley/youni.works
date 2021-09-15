@@ -190,7 +190,7 @@ const conf = {
 		}
 	},
 	"frame": {
-		"type$": "/ui/display/Frame",
+		"type$": "/ui/agent/Frame",
 		"editors": {
 			"type$string": "/ui/editors/String",
 			"type$number": "/ui/editors/Number",
@@ -274,7 +274,7 @@ const main = function main(module, conf) {
 export default main(module, conf);
 function workbench() {
 	const pkg = {
-	"type$": "/ui/display",
+	"type$": "/ui/agent",
 	"App": {
 		"type$": ["/workbench/Component", "/workbench/Receiver", "/base/origin/Origin"],
 		"start": function start() {

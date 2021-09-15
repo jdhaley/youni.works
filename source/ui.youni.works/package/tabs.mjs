@@ -1,10 +1,10 @@
 export default {
-    type$: "/display",
+    type$: "/agent",
     Tabs: {
         type$: "Display",
         extend$conf: {
             tabType: "/ui/tabs/Tab",
-            viewType: "/ui/display/Display",
+            viewType: "/ui/agent/Display",
             icon: "/res/icons/bag.svg"
         },
         var$activeTab: null,

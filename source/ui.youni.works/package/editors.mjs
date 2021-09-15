@@ -1,5 +1,5 @@
 const pkg = {
-	type$: "/display",
+	type$: "/agent",
 	Editor: {
 		type$: "Display",
 		dataType: "",
