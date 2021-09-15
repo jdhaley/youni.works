@@ -115,7 +115,7 @@ export default {
 		virtual$box() {
 			if (arguments.length) {
 				let r = arguments[0];
-				this.moveTo(r.left, r.top);
+				this.position(r.left, r.top);
 				this.size(r.width, r.height);
 				return;
 			}
@@ -127,7 +127,7 @@ export default {
 			this.style.height = Math.max(height, 16) + "px";
 			this.style.minHeight = this.style.height;
 		},
-		moveTo(x, y) {
+		position(x, y) {
 			this.style.position = "absolute";			
 			this.style.left = x + "px";
 			this.style.top = y + "px";

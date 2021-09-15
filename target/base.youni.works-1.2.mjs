@@ -412,7 +412,7 @@ function dom() {
 		"virtual$box": function virtual$box() {
 			if (arguments.length) {
 				let r = arguments[0];
-				this.moveTo(r.left, r.top);
+				this.position(r.left, r.top);
 				this.size(r.width, r.height);
 				return;
 			}
@@ -424,7 +424,7 @@ function dom() {
 			this.style.height = Math.max(height, 16) + "px";
 			this.style.minHeight = this.style.height;
 		},
-		"moveTo": function moveTo(x, y) {
+		"position": function position(x, y) {
 			this.style.position = "absolute";			
 			this.style.left = x + "px";
 			this.style.top = y + "px";

@@ -992,7 +992,7 @@ function shape() {
 			},
 			"position": function position(event) {
 				if (event.track == this) {
-					this.moveTo(
+					this.position(
 						event.x - this.peer.$tracking.insideX,
 						event.y - this.peer.$tracking.insideY
 					);
