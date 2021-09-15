@@ -399,6 +399,7 @@ function dom() {
 	},
 	"View": {
 		"type$": ["/dom/Element", "/view/View", "/util/Bounded"],
+		"nodeName": "div",
 		"extend$conf": {
 		},
 		"display": "",
@@ -439,8 +440,7 @@ function dom() {
 			if (this.display) this.styles.add(this.display);
 			this.styles.add(this.className);
 		}
-	},
-	"type$Pane": "/view/Pane"
+	}
 }
 return pkg;
 }

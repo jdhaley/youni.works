@@ -276,7 +276,13 @@ function workbench() {
 	const pkg = {
 	"type$": "/ui/display",
 	"App": {
-		"type$": "/workbench/App"
+		"type$": ["/workbench/Component", "/workbench/Receiver", "/base/origin/Origin"],
+		"start": function start() {
+            console.log("Starting application", this[Symbol.for("owner")]);
+            let conf = this.conf;
+            this.define(this.frame, "app", this);
+            this.frame.start(this.conf);
+        }
 	},
 	"Workbench": {
 		"type$": "/workbench/Display",

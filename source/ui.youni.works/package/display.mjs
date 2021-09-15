@@ -3,35 +3,10 @@ export default {
 	Display: {
 		type$: ["Instance", "View"],
 		type$owner: "Frame",
-		nodeName: "div",
-	},
-	Caption: {
-		type$: "Display",
-		get$caption() {
-			return this.conf.caption;
-		},
-		view(model) {
-			this.markup = this.caption;
-		}
-	},
-	Pane: {
-		members: {
-			type$header: "Caption",
-			type$body: "Display"
-		}
-	},
-    App: {
-        type$: ["Component", "Receiver", "/base/origin/Origin"],
-		start() {
-            console.log("Starting application", this[Symbol.for("owner")]);
-            let conf = this.conf;
-            this.define(this.frame, "app", this);
-            this.frame.start(this.conf);
-        },
 	},
 	Frame: {
 		type$: ["Display", "Document"],
-		type$app: "App",
+		type$app: "Component",
 		$window: null,
 		//
 		get$owner() {

@@ -33,36 +33,11 @@ function display() {
 	"type$": "/base/dom",
 	"Display": {
 		"type$": ["/display/Instance", "/display/View"],
-		"type$owner": "/display/Frame",
-		"nodeName": "div"
-	},
-	"Caption": {
-		"type$": "/display/Display",
-		"get$caption": function get$caption() {
-			return this.conf.caption;
-		},
-		"view": function view(model) {
-			this.markup = this.caption;
-		}
-	},
-	"Pane": {
-		"members": {
-			"type$header": "/display/Caption",
-			"type$body": "/display/Display"
-		}
-	},
-	"App": {
-		"type$": ["/display/Component", "/display/Receiver", "/base/origin/Origin"],
-		"start": function start() {
-            console.log("Starting application", this[Symbol.for("owner")]);
-            let conf = this.conf;
-            this.define(this.frame, "app", this);
-            this.frame.start(this.conf);
-        }
+		"type$owner": "/display/Frame"
 	},
 	"Frame": {
 		"type$": ["/display/Display", "/display/Document"],
-		"type$app": "/display/App",
+		"type$app": "/display/Component",
 		"$window": null,
 		"get$owner": function get$owner() {
 			return this;
@@ -245,7 +220,7 @@ function editors() {
 		},
 		"extend$conf": {
 			"linkControl": {
-				"type$": ["/shape/Shape", "/editors/Pane"]
+				"type$": "/shape/Shape"
 			}
 		},
 		"get$link": function get$link() {
@@ -1090,6 +1065,21 @@ return pkg;
 function table() {
 	const pkg = {
 	"type$": "/display",
+	"Caption": {
+		"type$": "/table/Display",
+		"get$caption": function get$caption() {
+			return this.conf.caption;
+		},
+		"view": function view(model) {
+			this.markup = this.caption;
+		}
+	},
+	"Pane": {
+		"members": {
+			"type$header": "/table/Caption",
+			"type$body": "/table/Display"
+		}
+	},
 	"Key": {
 		"type$": "/table/Display",
 		"view": function view() {
@@ -1228,7 +1218,7 @@ function tabs() {
 	const pkg = {
 	"type$": "/display",
 	"Tabs": {
-		"type$": ["/tabs/Display", "/tabs/Pane"],
+		"type$": "/tabs/Display",
 		"extend$conf": {
 			"tabType": "/ui/tabs/Tab",
 			"viewType": "/ui/display/Display",
@@ -1236,12 +1226,8 @@ function tabs() {
 		},
 		"var$activeTab": null,
 		"members": {
-			"header": {
-				"type$": "/tabs/Display"
-			},
-			"body": {
-				"type$": "/tabs/Display"
-			}
+			"type$header": "/tabs/Display",
+			"type$body": "/tabs/Display"
 		},
 		"add": function add(conf, body) {
             if (!body) {

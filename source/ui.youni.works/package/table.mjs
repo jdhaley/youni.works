@@ -1,5 +1,20 @@
 export default {
 	type$: "/display",
+	Caption: {
+		type$: "Display",
+		get$caption() {
+			return this.conf.caption;
+		},
+		view(model) {
+			this.markup = this.caption;
+		}
+	},
+	Pane: {
+		members: {
+			type$header: "Caption",
+			type$body: "Display"
+		}
+	},
 	Key: {
 		type$: "Display",
 		view() {

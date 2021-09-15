@@ -1,8 +1,14 @@
 export default {
 	type$: "/ui/display",
     App: {
-        type$: "App"
-    },
+        type$: ["Component", "Receiver", "/base/origin/Origin"],
+		start() {
+            console.log("Starting application", this[Symbol.for("owner")]);
+            let conf = this.conf;
+            this.define(this.frame, "app", this);
+            this.frame.start(this.conf);
+        },
+	},
     Workbench: {
         type$: "Display",
         nodeName: "main",

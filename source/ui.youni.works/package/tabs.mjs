@@ -1,7 +1,7 @@
 export default {
     type$: "/display",
     Tabs: {
-        type$: ["Display", "Pane"],
+        type$: "Display",
         extend$conf: {
             tabType: "/ui/tabs/Tab",
             viewType: "/ui/display/Display",
@@ -9,12 +9,8 @@ export default {
         },
         var$activeTab: null,
         members: {
-            header: {
-                type$: "Display"
-            },
-            body: {
-                type$: "Display"
-            }
+            type$header: "Display",
+            type$body: "Display"
         },
         add(conf, body) {
             if (!body) {
