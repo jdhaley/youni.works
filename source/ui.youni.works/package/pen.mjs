@@ -128,14 +128,14 @@ export default {
 				event.preventDefault();
 			},
 			drag(event) {
-				let b = this.image.bounds;
+				let b = this.image.box;
 				this.x = (event.x - b.left) / b.width * 320;
 				this.y = (event.y - b.top) / b.height * 320;
 				this.vector.view();
 			},
 			release(event) {
 				if (event.ctrlKey) return;
-				let b = this.image.bounds;
+				let b = this.image.box;
 				this.x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				this.y = Math.round((event.y - b.top) / b.height * 32) * 10;
 				this.vector.view();
@@ -215,14 +215,9 @@ export default {
 		var$points: null,
 		var$vector: "",
 		extend$actions: {
-			// moveover(event) {
-			// 	let r = this.bounds;
-			// 	let x = Math.round((event.x - r.left) / r.width * 320);
-			// 	let y = Math.round((event.y - r.top) / r.height * 320);
-			// },
 			dblclick(event) {
 				this.peer.focus();
-				let b = this.bounds;
+				let b = this.box;
 				let x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				let y = Math.round((event.y - b.top) / b.height * 32) * 10;
 				this.vector.add(x, y, event.shiftKey ? "Q" : undefined);
@@ -252,6 +247,9 @@ export default {
 	Canvas: {
 		type$: "/display/Display",
 		var$shape: null,
+		size(x, y) {
+			this.shape.size(x, y);
+		},
 		view(model) {
 			this.super(view, model);
 			this.shape = this.owner.create("/ui/pen/Image");

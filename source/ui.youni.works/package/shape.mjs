@@ -15,23 +15,23 @@ export default {
 			y -= rect.y;
 
 			let border = this.border;
-			let zone;
+			let edge;
 
 			if (y <= border.top) {
-				zone = "T";
+				edge = "T";
 			} else if (y >= rect.height - border.bottom) {
-				zone = "B";
+				edge = "B";
 			} else {
-				zone = "C";
+				edge = "C";
 			}
 			if (x <= border.left) {
-				zone += "L";
+				edge += "L";
 			} else if (x >= rect.width - border.right) {
-				zone += "R";
+				edge += "R";
 			} else {
-				zone += "C";
+				edge += "C";
 			}
-			return zone;
+			return edge;
 		}
     },
 	Shape: {
@@ -40,36 +40,15 @@ export default {
 			minWidth: 16,
 			minHeight: 16	
 		},
-		virtual$bounds() {
-			if (arguments.length) {
-				let rect = arguments[0];
-				if (rect.width !== undefined) {
-					this.style.width = Math.max(rect.width, this.conf.minWidth) + "px";
-					this.style.minWidth = this.style.width;
-				}
-				if (rect.height !== undefined) {
-					this.style.height = Math.max(rect.height, this.conf.minHeight) + "px";
-					this.style.minHeight = this.style.height;
-				} 	
-				if (rect.left !== undefined || rect.top !== undefined) this.style.position = "absolute";
-				if (rect.left !== undefined) this.style.left = rect.left + "px";
-				if (rect.top !== undefined) this.style.top = rect.top + "px";
-			} else {
-				return this.peer.getBoundingClientRect();
-			}
-		},
-		get$shape(){
-			return this;
-		},
 		extend$actions: {
 			touch(event) {
 				if (event.track && event.track != this) return;
 				let edge = this.getEdge(event.x, event.y);
-				let zone = this.edges[edge];
-				let subject = zone && zone.subject;
+				edge = this.edges[edge];
+				let subject = edge && edge.subject;
 				if (!subject) return;
 
-				if (zone.cursor) this.style.cursor = zone.cursor;
+				if (edge.cursor) this.style.cursor = edge.cursor;
 				let box = this.box;
 				this.peer.$tracking = {
 					subject: subject,
@@ -97,20 +76,14 @@ export default {
 				}
 			},
 			size(event) {
-				let box = this.shape.box;
-                if (!this.peer.$tracking.fromRight) {
-                    this.peer.$tracking.fromRight = this.box.width - this.peer.$tracking.insideX;
-                }
-                this.shape.size(
-                    event.x - box.left + this.peer.$tracking.fromRight,
-                    box.height
-                );
+				let box = this.box;
+				this.size(event.x - box.left, event.y - box.top);
 			},
 			moveover(event) {
-				event.zone = this.getEdge(event.x, event.y);
-				let zone = this.edges[event.zone];
-				if (zone && zone.cursor != this.style.cursor) {
-					this.style.cursor = zone.cursor;
+				event.edge = this.getEdge(event.x, event.y);
+				let edge = this.edges[event.edge];
+				if (edge && edge.cursor != this.style.cursor) {
+					this.style.cursor = edge.cursor;
 				}
 			},
 			moveout(event) {
@@ -153,11 +126,12 @@ export default {
                 if (this.style.backgroundColor) {
                     this.style.removeProperty("background-color");
                 }
-                if (event.zone == "CR") {
+                if (event.edge == "CR") {
                     this.style.backgroundColor = "gainsboro";
                 }
             },
             moveout(event) {
+				this.super(moveout, event);
                 if (this.style.backgroundColor) {
                     this.style.removeProperty("background-color");
                 }

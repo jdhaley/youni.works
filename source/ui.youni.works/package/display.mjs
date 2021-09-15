@@ -4,8 +4,14 @@ export default {
 		type$: ["Instance", "View"],
 		type$owner: "Frame",
 		nodeName: "div",
-		get$box() {
-			return this.peer.getBoundingClientRect();;
+		virtual$box() {
+			if (arguments.length) {
+				let r = arguments[0];
+				this.moveTo(r.left, r.top);
+				this.size(r.width, r.height);
+				return;
+			}
+			return this.peer.getBoundingClientRect();
 		},
 		size(width, height) {
 			this.style.width = Math.max(width, 16) + "px";

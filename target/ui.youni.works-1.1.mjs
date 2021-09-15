@@ -35,8 +35,14 @@ function display() {
 		"type$": ["/display/Instance", "/display/View"],
 		"type$owner": "/display/Frame",
 		"nodeName": "div",
-		"get$box": function get$box() {
-			return this.peer.getBoundingClientRect();;
+		"virtual$box": function virtual$box() {
+			if (arguments.length) {
+				let r = arguments[0];
+				this.moveTo(r.left, r.top);
+				this.size(r.width, r.height);
+				return;
+			}
+			return this.peer.getBoundingClientRect();
 		},
 		"size": function size(width, height) {
 			this.style.width = Math.max(width, 16) + "px";
@@ -282,7 +288,7 @@ function editors() {
 					this.owner.append(this.pane);
 				}
 				let b = this.box;
-				this.pane.bounds = {
+				this.pane.box = {
 					left: b.left,
 					top: b.bottom,
 					width: 100,
@@ -787,14 +793,14 @@ function pen() {
 				event.preventDefault();
 			},
 			"drag": function drag(event) {
-				let b = this.image.bounds;
+				let b = this.image.box;
 				this.x = (event.x - b.left) / b.width * 320;
 				this.y = (event.y - b.top) / b.height * 320;
 				this.vector.view();
 			},
 			"release": function release(event) {
 				if (event.ctrlKey) return;
-				let b = this.image.bounds;
+				let b = this.image.box;
 				this.x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				this.y = Math.round((event.y - b.top) / b.height * 32) * 10;
 				this.vector.view();
@@ -876,7 +882,7 @@ function pen() {
 		"extend$actions": {
 			"dblclick": function dblclick(event) {
 				this.peer.focus();
-				let b = this.bounds;
+				let b = this.box;
 				let x = Math.round((event.x - b.left) / b.width * 32) * 10;
 				let y = Math.round((event.y - b.top) / b.height * 32) * 10;
 				this.vector.add(x, y, event.shiftKey ? "Q" : undefined);
@@ -905,6 +911,9 @@ function pen() {
 	"Canvas": {
 		"type$": "/display/Display",
 		"var$shape": null,
+		"size": function size(x, y) {
+			this.shape.size(x, y);
+		},
 		"view": function view(model) {
 			this.super(view, model);
 			this.shape = this.owner.create("/ui/pen/Image");
@@ -1007,23 +1016,23 @@ function shape() {
 			y -= rect.y;
 
 			let border = this.border;
-			let zone;
+			let edge;
 
 			if (y <= border.top) {
-				zone = "T";
+				edge = "T";
 			} else if (y >= rect.height - border.bottom) {
-				zone = "B";
+				edge = "B";
 			} else {
-				zone = "C";
+				edge = "C";
 			}
 			if (x <= border.left) {
-				zone += "L";
+				edge += "L";
 			} else if (x >= rect.width - border.right) {
-				zone += "R";
+				edge += "R";
 			} else {
-				zone += "C";
+				edge += "C";
 			}
-			return zone;
+			return edge;
 		}
 	},
 	"Shape": {
@@ -1032,36 +1041,15 @@ function shape() {
 			"minWidth": 16,
 			"minHeight": 16
 		},
-		"virtual$bounds": function virtual$bounds() {
-			if (arguments.length) {
-				let rect = arguments[0];
-				if (rect.width !== undefined) {
-					this.style.width = Math.max(rect.width, this.conf.minWidth) + "px";
-					this.style.minWidth = this.style.width;
-				}
-				if (rect.height !== undefined) {
-					this.style.height = Math.max(rect.height, this.conf.minHeight) + "px";
-					this.style.minHeight = this.style.height;
-				} 	
-				if (rect.left !== undefined || rect.top !== undefined) this.style.position = "absolute";
-				if (rect.left !== undefined) this.style.left = rect.left + "px";
-				if (rect.top !== undefined) this.style.top = rect.top + "px";
-			} else {
-				return this.peer.getBoundingClientRect();
-			}
-		},
-		"get$shape": function get$shape(){
-			return this;
-		},
 		"extend$actions": {
 			"touch": function touch(event) {
 				if (event.track && event.track != this) return;
 				let edge = this.getEdge(event.x, event.y);
-				let zone = this.edges[edge];
-				let subject = zone && zone.subject;
+				edge = this.edges[edge];
+				let subject = edge && edge.subject;
 				if (!subject) return;
 
-				if (zone.cursor) this.style.cursor = zone.cursor;
+				if (edge.cursor) this.style.cursor = edge.cursor;
 				let box = this.box;
 				this.peer.$tracking = {
 					subject: subject,
@@ -1089,20 +1077,14 @@ function shape() {
 				}
 			},
 			"size": function size(event) {
-				let box = this.shape.box;
-                if (!this.peer.$tracking.fromRight) {
-                    this.peer.$tracking.fromRight = this.box.width - this.peer.$tracking.insideX;
-                }
-                this.shape.size(
-                    event.x - box.left + this.peer.$tracking.fromRight,
-                    box.height
-                );
+				let box = this.box;
+				this.size(event.x - box.left, event.y - box.top);
 			},
 			"moveover": function moveover(event) {
-				event.zone = this.getEdge(event.x, event.y);
-				let zone = this.edges[event.zone];
-				if (zone && zone.cursor != this.style.cursor) {
-					this.style.cursor = zone.cursor;
+				event.edge = this.getEdge(event.x, event.y);
+				let edge = this.edges[event.edge];
+				if (edge && edge.cursor != this.style.cursor) {
+					this.style.cursor = edge.cursor;
 				}
 			},
 			"moveout": function moveout(event) {
@@ -1142,11 +1124,12 @@ function shape() {
                 if (this.style.backgroundColor) {
                     this.style.removeProperty("background-color");
                 }
-                if (event.zone == "CR") {
+                if (event.edge == "CR") {
                     this.style.backgroundColor = "gainsboro";
                 }
             },
 			"moveout": function moveout(event) {
+				this.super(moveout, event);
                 if (this.style.backgroundColor) {
                     this.style.removeProperty("background-color");
                 }

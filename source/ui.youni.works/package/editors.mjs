@@ -117,7 +117,7 @@ const pkg = {
 					this.owner.append(this.pane);
 				}
 				let b = this.box;
-				this.pane.bounds = {
+				this.pane.box = {
 					left: b.left,
 					top: b.bottom,
 					width: 100,
