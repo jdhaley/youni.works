@@ -999,31 +999,9 @@ function shape() {
 			"bottom": 0,
 			"left": 0
 		},
-		"zones": {
-			"cursor": {
-				"TL": "",
-				"TC": "",
-				"TR": "",
-				"CL": "",
-				"CC": "",
-				"CR": "",
-				"BL": "",
-				"BC": "",
-				"BR": ""
-			},
-			"subject": {
-				"TL": "",
-				"TC": "",
-				"TR": "",
-				"CL": "",
-				"CC": "",
-				"CR": "",
-				"BL": "",
-				"BC": "",
-				"BR": ""
-			}
+		"edges": {
 		},
-		"getZone": function getZone(x, y) {
+		"getEdge": function getEdge(x, y) {
 			let rect = this.peer.getBoundingClientRect();
 			x -= rect.x;
 			y -= rect.y;
@@ -1078,11 +1056,12 @@ function shape() {
 		"extend$actions": {
 			"touch": function touch(event) {
 				if (event.track && event.track != this) return;
-				let zone = this.getZone(event.x, event.y);
-				let subject = this.zones.subject[zone] || "";
+				let edge = this.getEdge(event.x, event.y);
+				let zone = this.edges[edge];
+				let subject = zone && zone.subject;
 				if (!subject) return;
 
-				this.style.cursor = this.zones.cursor[zone];
+				if (zone.cursor) this.style.cursor = zone.cursor;
 				let box = this.box;
 				this.peer.$tracking = {
 					subject: subject,
@@ -1120,13 +1099,14 @@ function shape() {
                 );
 			},
 			"moveover": function moveover(event) {
-				event.zone = this.getZone(event.x, event.y);
-				let cursor = this.zones.cursor[event.zone];
-				if (cursor) {
-					this.style.cursor = cursor;
-				} else {
-					this.style.removeProperty("cursor");
+				event.zone = this.getEdge(event.x, event.y);
+				let zone = this.edges[event.zone];
+				if (zone && zone.cursor != this.style.cursor) {
+					this.style.cursor = zone.cursor;
 				}
+			},
+			"moveout": function moveout(event) {
+				this.style.removeProperty("cursor");
 			}
 		}
 	},
@@ -1135,12 +1115,10 @@ function shape() {
 		"border": {
 			"right": 6
 		},
-		"zones": {
-			"cursor": {
-				"CR": "ew-resize"
-			},
-			"subject": {
-				"CR": "size"
+		"edges": {
+			"CR": {
+				"subject": "size",
+				"cursor": "ew-resize"
 			}
 		},
 		"size": function size(width) {

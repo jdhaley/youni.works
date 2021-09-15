@@ -7,31 +7,9 @@ export default {
 			bottom: 0,
 			left: 0
 		},
-		zones: {
-			cursor: {
-				"TL": "",
-				"TC": "",
-				"TR": "",
-				"CL": "",
-				"CC": "",
-				"CR": "",
-				"BL": "",
-				"BC": "",
-				"BR": "",
-			},
-			subject: {
-				"TL": "",
-				"TC": "",
-				"TR": "",
-				"CL": "",
-				"CC": "",
-				"CR": "",
-				"BL": "",
-				"BC": "",
-				"BR": "",
-			}
+		edges: {
 		},
-        getZone(x, y) {
+        getEdge(x, y) {
 			let rect = this.peer.getBoundingClientRect();
 			x -= rect.x;
 			y -= rect.y;
@@ -86,11 +64,12 @@ export default {
 		extend$actions: {
 			touch(event) {
 				if (event.track && event.track != this) return;
-				let zone = this.getZone(event.x, event.y);
-				let subject = this.zones.subject[zone] || "";
+				let edge = this.getEdge(event.x, event.y);
+				let zone = this.edges[edge];
+				let subject = zone && zone.subject;
 				if (!subject) return;
 
-				this.style.cursor = this.zones.cursor[zone];
+				if (zone.cursor) this.style.cursor = zone.cursor;
 				let box = this.box;
 				this.peer.$tracking = {
 					subject: subject,
@@ -128,13 +107,14 @@ export default {
                 );
 			},
 			moveover(event) {
-				event.zone = this.getZone(event.x, event.y);
-				let cursor = this.zones.cursor[event.zone];
-				if (cursor) {
-					this.style.cursor = cursor;
-				} else {
-					this.style.removeProperty("cursor");
+				event.zone = this.getEdge(event.x, event.y);
+				let zone = this.edges[event.zone];
+				if (zone && zone.cursor != this.style.cursor) {
+					this.style.cursor = zone.cursor;
 				}
+			},
+			moveout(event) {
+				this.style.removeProperty("cursor");
 			}
 		}
 	},
@@ -146,13 +126,11 @@ export default {
 		border: {
 			right: 6,
 		},
-        zones: {
-            cursor: {
-                "CR": "ew-resize",
-            },
-            subject: {
-                "CR": "size",
-            }
+        edges: {
+			CR: {
+				subject: "size",
+				cursor: "ew-resize"
+			}
         },
 		size(width) {
 			this.style.flex = "0 0 " + width + "px",
