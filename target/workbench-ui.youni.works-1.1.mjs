@@ -22,7 +22,7 @@ const conf = {
 	"data": {
 		"test": {
 			"type$": "/base/data/DataSource",
-			"type$viewType": "/ui/table/Cell",
+			"type$viewType": "/ui/views/Cell",
 			"types": {
 				"Design": {
 					"members": {
@@ -217,7 +217,7 @@ const conf = {
 									"title": "Table",
 									"icon": "/res/icons/work.svg",
 									"body": {
-										"type$": "/ui/table/Table",
+										"type$": "/ui/views/Table",
 										"extend$conf": {
 											"data": {
 												"source": "test",

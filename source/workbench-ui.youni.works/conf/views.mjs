@@ -14,7 +14,7 @@ export default {
 						title: "Table",
 						icon: "/res/icons/work.svg",
 						body: {
-							type$: "/ui/table/Table",
+							type$: "/ui/views/Table",
 							extend$conf: {
 								data: {
 									source: "test",
