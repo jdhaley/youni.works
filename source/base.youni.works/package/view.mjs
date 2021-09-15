@@ -5,6 +5,8 @@ export default {
 		//there is an issue with the require$markup seeming to replace Element.markup
 		//	require$markup: "",
 		require$createPart(key, type) {
+			let part = this.super(createPart, key, type);
+			part.view(this.modelFor(key));
 		},
 		var$model: undefined,
 		view(model) {

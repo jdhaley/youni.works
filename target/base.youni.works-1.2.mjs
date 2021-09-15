@@ -687,6 +687,8 @@ function view() {
 	"View": {
 		"type$": "/view/Viewer",
 		"require$createPart": function require$createPart(key, type) {
+			let part = this.super(createPart, key, type);
+			part.view(this.modelFor(key));
 		},
 		"var$model": undefined,
 		"view": function view(model) {
