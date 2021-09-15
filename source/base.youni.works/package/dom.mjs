@@ -102,6 +102,7 @@ export default {
 	},
 	View: {
 		type$: ["Element", "/view/View", "/util/Bounded"],
+		nodeName: "div",
 		extend$conf: {
 		},
 		display: "",
@@ -142,6 +143,5 @@ export default {
 			if (this.display) this.styles.add(this.display);
 			this.styles.add(this.className);
 		}
-	},
-	type$Pane: "/view/Pane",
+	}
 }
