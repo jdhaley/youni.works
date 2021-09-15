@@ -396,50 +396,6 @@ function dom() {
 		"append": function append(control) {
 			this.peer.append(control.peer);
 		}
-	},
-	"Display": {
-		"type$": ["/dom/Instance", "/dom/Element", "/view/View", "/util/Bounded"],
-		"nodeName": "div",
-		"extend$conf": {
-		},
-		"display": "",
-		"get$style": function get$style() {
-			return this.peer.style;
-		},
-		"get$styles": function get$styles() {
-			return this.peer.classList;
-		},
-		"virtual$box": function virtual$box() {
-			if (arguments.length) {
-				let r = arguments[0];
-				this.position(r.left, r.top);
-				this.size(r.width, r.height);
-				return;
-			}
-			return this.peer.getBoundingClientRect();
-		},
-		"size": function size(width, height) {
-			this.style.width = Math.max(width, 16) + "px";
-			this.style.minWidth = this.style.width;
-			this.style.height = Math.max(height, 16) + "px";
-			this.style.minHeight = this.style.height;
-		},
-		"position": function position(x, y) {
-			this.style.position = "absolute";			
-			this.style.left = x + "px";
-			this.style.top = y + "px";
-		},
-		"createPart": function createPart(key, type) {
-			let part = this.owner.create(type, this.conf);
-			this.put(key, part);
-			if (this.members) part.styles.add(key);
-			return part;
-		},
-		"start": function start(conf) {
-			if (conf) this.let("conf", conf, "extend");
-			if (this.display) this.styles.add(this.display);
-			this.styles.add(this.className);
-		}
 	}
 }
 return pkg;

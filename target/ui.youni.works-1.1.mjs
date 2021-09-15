@@ -32,7 +32,7 @@ const main = function main_loadModule(module) {
 export default main(module, conf);
 function agent() {
 	const pkg = {
-	"type$": "/base/dom",
+	"type$": "/display/display",
 	"Frame": {
 		"type$": ["/agent/Display", "/agent/Document"],
 		"type$app": "/agent/Component",

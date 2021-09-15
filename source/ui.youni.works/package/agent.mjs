@@ -1,5 +1,5 @@
 export default {
-	type$: "/base/dom",
+	type$: "/display/display",
 	Frame: {
 		type$: ["Display", "Document"],
 		type$app: "Component",
