@@ -397,8 +397,8 @@ function dom() {
 			this.peer.append(control.peer);
 		}
 	},
-	"View": {
-		"type$": ["/dom/Element", "/view/View", "/util/Bounded"],
+	"Display": {
+		"type$": ["/dom/Instance", "/dom/Element", "/view/View", "/util/Bounded"],
 		"nodeName": "div",
 		"extend$conf": {
 		},

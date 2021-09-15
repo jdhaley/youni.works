@@ -100,8 +100,8 @@ export default {
 			this.peer.append(control.peer);
 		}
 	},
-	View: {
-		type$: ["Element", "/view/View", "/util/Bounded"],
+	Display: {
+		type$: ["Instance", "Element", "/view/View", "/util/Bounded"],
 		nodeName: "div",
 		extend$conf: {
 		},

@@ -31,10 +31,6 @@ export default main(module, conf);
 function display() {
 	const pkg = {
 	"type$": "/base/dom",
-	"Display": {
-		"type$": ["/display/Instance", "/display/View"],
-		"type$owner": "/display/Frame"
-	},
 	"Frame": {
 		"type$": ["/display/Display", "/display/Document"],
 		"type$app": "/display/Component",
