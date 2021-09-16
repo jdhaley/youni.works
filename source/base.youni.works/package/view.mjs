@@ -1,5 +1,17 @@
 export default {
 	type$: "/control",
+	Viewer: {
+		require$view(model, response) {
+		},
+		require$modelFor(key) {
+		},
+		extend$actions: {
+			view(message) {
+				let model = message.from && message.from.modelFor(this.key);
+				this.view(model, message.response);
+			}
+		}
+	},
 	View: {
 		type$: "Viewer",
 		//there is an issue with the require$markup seeming to replace Element.markup

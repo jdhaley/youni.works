@@ -90,9 +90,6 @@ function control() {
 	"type$": "/system/core",
 	"Receiver": {
 		"receive": function receive(signal) {
-			if (signal.subject == "touch") {
-				console.log(arguments);
-			}
 			if (!signal) return;
 			let msg = signal;
 			if (typeof msg != "object") {
@@ -170,18 +167,6 @@ function control() {
 		},
 		"start": function start(conf) {
 			if (conf) this.let("conf", conf, "extend");
-		}
-	},
-	"Viewer": {
-		"view": function view(model, response) {
-		},
-		"modelFor": function modelFor(key) {
-		},
-		"extend$actions": {
-			"view": function view(message) {
-				let model = message.from.modelFor(this.key);
-				this.view(model, message.response);
-			}
 		}
 	},
 	"Publisher": {
@@ -512,6 +497,18 @@ return pkg;
 function view() {
 	const pkg = {
 	"type$": "/control",
+	"Viewer": {
+		"require$view": function require$view(model, response) {
+		},
+		"require$modelFor": function require$modelFor(key) {
+		},
+		"extend$actions": {
+			"view": function view(message) {
+				let model = message.from && message.from.modelFor(this.key);
+				this.view(model, message.response);
+			}
+		}
+	},
 	"View": {
 		"type$": "/view/Viewer",
 		"require$createPart": function require$createPart(key, type) {

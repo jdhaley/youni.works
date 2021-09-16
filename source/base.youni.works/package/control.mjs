@@ -81,18 +81,6 @@ export default {
 			if (conf) this.let("conf", conf, "extend");
 		},
 	},
-	Viewer: {
-		view(model, response) {
-		},
-		modelFor(key) {
-		},
-		extend$actions: {
-			view(message) {
-				let model = message.from.modelFor(this.key);
-				this.view(model, message.response);
-			}
-		}
-	},
 	Publisher: {
 		//io: socket.io.Server
         publish(/* (subject [, data] | event) */) {
