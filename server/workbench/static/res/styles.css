@@ -58,3 +58,14 @@ IFRAME {
 	display: flex;
 	flex-direction: row;
 }
+
+.column-move-sizing {
+	border-bottom-color: orange !important;
+	cursor: ew-resize;
+	transition-property: border-bottom-color;
+	transition-duration: 200ms;
+	transition-delay: 50ms;  
+}
+.column-move {
+	border-bottom-color: gainsboro;
+}

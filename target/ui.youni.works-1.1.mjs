@@ -132,6 +132,23 @@ function agent() {
 		"edges": {
 		},
 		"extend$actions": {
+			"moveover": function moveover(event) {
+				let edge = this.edges[this.peer.$edge];
+				if (edge && edge.style) {
+					this.styles.remove(edge.style);
+				}
+				this.peer.$edge = this.getEdge(event.x, event.y);
+				edge = this.edges[this.peer.$edge];
+				if (edge && edge.style) {
+					this.styles.add(edge.style);
+				}
+			},
+			"moveout": function moveout(event) {
+				let edge = this.edges[this.peer.$edge];
+				if (edge && edge.style) {
+					this.styles.remove(edge.style);
+				}
+			},
 			"touch": function touch(event) {
 				if (event.track && event.track != this) return;
 				let edge = this.getEdge(event.x, event.y);
@@ -169,16 +186,6 @@ function agent() {
 			"size": function size(event) {
 				let box = this.box;
 				this.size(event.x - box.left, event.y - box.top);
-			},
-			"moveover": function moveover(event) {
-				event.edge = this.getEdge(event.x, event.y);
-				let edge = this.edges[event.edge];
-				if (edge && edge.cursor != this.style.cursor) {
-					this.style.cursor = edge.cursor;
-				}
-			},
-			"moveout": function moveout(event) {
-				this.style.removeProperty("cursor");
 			}
 		}
 	},
@@ -190,7 +197,10 @@ function agent() {
 		"edges": {
 			"CR": {
 				"subject": "size",
-				"cursor": "ew-resize"
+				"style": "column-move-sizing"
+			},
+			"CC": {
+				"style": "column-move"
 			}
 		},
 		"size": function size(width) {
@@ -208,22 +218,7 @@ function agent() {
                     box.height
                 );
                 event.subject = "moveover";
-			},
-			"moveover": function moveover(event) {
-                this.super(moveover, event);
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
-                if (event.edge == "CR") {
-                    this.style.backgroundColor = "gainsboro";
-                }
-            },
-			"moveout": function moveout(event) {
-				this.super(moveout, event);
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
-            }
+			}
 		}
 	},
 	"Cell": {

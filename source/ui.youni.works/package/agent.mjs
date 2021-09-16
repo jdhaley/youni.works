@@ -106,6 +106,23 @@ export default {
 		edges: {
 		},
 		extend$actions: {
+			moveover(event) {
+				let edge = this.edges[this.peer.$edge];
+				if (edge && edge.style) {
+					this.styles.remove(edge.style);
+				}
+				this.peer.$edge = this.getEdge(event.x, event.y);
+				edge = this.edges[this.peer.$edge];
+				if (edge && edge.style) {
+					this.styles.add(edge.style);
+				}
+			},
+			moveout(event) {
+				let edge = this.edges[this.peer.$edge];
+				if (edge && edge.style) {
+					this.styles.remove(edge.style);
+				}
+			},
 			touch(event) {
 				if (event.track && event.track != this) return;
 				let edge = this.getEdge(event.x, event.y);
@@ -143,16 +160,6 @@ export default {
 			size(event) {
 				let box = this.box;
 				this.size(event.x - box.left, event.y - box.top);
-			},
-			moveover(event) {
-				event.edge = this.getEdge(event.x, event.y);
-				let edge = this.edges[event.edge];
-				if (edge && edge.cursor != this.style.cursor) {
-					this.style.cursor = edge.cursor;
-				}
-			},
-			moveout(event) {
-				this.style.removeProperty("cursor");
 			}
 		}
 	},
@@ -167,7 +174,10 @@ export default {
         edges: {
 			CR: {
 				subject: "size",
-				cursor: "ew-resize"
+				style: "column-move-sizing"
+			},
+			CC: {
+				style: "column-move"
 			}
         },
 		size(width) {
@@ -186,21 +196,6 @@ export default {
                 );
                 event.subject = "moveover";
 			},
-            moveover(event) {
-                this.super(moveover, event);
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
-                if (event.edge == "CR") {
-                    this.style.backgroundColor = "gainsboro";
-                }
-            },
-            moveout(event) {
-				this.super(moveout, event);
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
-            }
         }
     },
 	Cell: {
