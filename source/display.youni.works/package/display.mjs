@@ -1,5 +1,5 @@
 export default {
-	type$: ["/base/dom", "/base/view", "/base/util"],
+	type$: ["/dom", "/base/view", "/base/util"],
 	Display: {
 		type$: ["Instance", "Element", "View", "Bounded"],
 		nodeName: "div",

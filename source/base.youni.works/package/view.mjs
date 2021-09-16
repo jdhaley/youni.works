@@ -36,10 +36,7 @@ export default {
 			}
 		},
 		modelFor(key) {
-			if (this.contentType) {
-				if (this.model) return this.model[key];
-			}
-			return this.model;
+			return this.model && this.contentType ? this.model[key] : this.model;
 		}
 	}
 }

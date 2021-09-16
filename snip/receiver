@@ -1,0 +1,22 @@
+	selfReceiver: {
+		xapply(signal) {
+			if (!signal) return;
+			let msg = signal;
+			if (typeof msg != "object") {
+				msg = Object.create(null);
+				msg.subject = signal;
+			}
+			let subject = msg.subject;
+			while (subject) {
+				let method = this[subject];
+				try {
+					method && method.apply(this, msg);
+					subject = (subject != msg.subject ? msg.subject : "");	
+				} catch (error) {
+					console.error(error);
+					//Stop all propagation - esp. important is the enclosing while loop
+					subject = "";
+				}
+			}
+		}
+	},

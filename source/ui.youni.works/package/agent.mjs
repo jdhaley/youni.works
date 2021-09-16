@@ -86,12 +86,23 @@ export default {
 			return node;
 		}
 	},
-	Shape: {
+	Commandable: {
 		require$: "Display",
-		extend$conf: {
-			minWidth: 16,
-			minHeight: 16	
+		shortcuts: {
 		},
+		extend$actions: {
+			command(event) {
+				let cmd = this.shortcuts[event.shortcut];
+				if (cmd) event.subject = cmd;
+			}
+		}
+	},
+	Shape: {
+		type$: "Commandable",
+		// extend$conf: {
+		// 	minWidth: 16,
+		// 	minHeight: 16	
+		// },
 		edges: {
 		},
 		extend$actions: {

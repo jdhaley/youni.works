@@ -116,12 +116,19 @@ function agent() {
 			return node;
 		}
 	},
-	"Shape": {
+	"Commandable": {
 		"require$": "Display",
-		"extend$conf": {
-			"minWidth": 16,
-			"minHeight": 16
+		"shortcuts": {
 		},
+		"extend$actions": {
+			"command": function command(event) {
+				let cmd = this.shortcuts[event.shortcut];
+				if (cmd) event.subject = cmd;
+			}
+		}
+	},
+	"Shape": {
+		"type$": "/agent/Commandable",
 		"edges": {
 		},
 		"extend$actions": {
@@ -462,19 +469,6 @@ return pkg;
 function note() {
 	const pkg = {
 	"type$": "/agent",
-	"Commandable": {
-		"shortcuts": {
-		},
-		"extend$actions": {
-			"command": function command(event) {
-				let cmd = this.shortcuts[event.shortcut];
-				if (cmd) {
-					event.subject = cmd;
-					event.target.$peer.sense(event);
-				}
-			}
-		}
-	},
 	"Note": {
 		"type$": ["/note/Display", "/note/Commandable"],
 		"shortcuts": {
@@ -497,7 +491,7 @@ function note() {
 					"Sally": "Grape"
 				}
 			});
-			console.log(markup);
+			//console.log(markup);
 			this.peer.innerHTML = markup;
 			this.peer.contentEditable = this.conf.readOnly ? false : true;
 		},
@@ -602,14 +596,6 @@ function note() {
 			view.dataset.level = level;
 		},
 		"extend$actions": {
-			"command": function command(event) {
-				let cmd = this.shortcuts[event.shortcut];
-				if (cmd) {
-					console.log(cmd);
-					event.subject = cmd;
-					event.target.$peer.sense(event);
-				}
-			},
 			"copy": function copy(event) {
 				console.log("copy", event);
 			},

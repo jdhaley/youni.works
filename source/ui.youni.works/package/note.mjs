@@ -1,18 +1,5 @@
 export default {
 	type$: "/agent",
-	Commandable: {
-		shortcuts: {
-		},
-		extend$actions: {
-			command(event) {
-				let cmd = this.shortcuts[event.shortcut];
-				if (cmd) {
-					event.subject = cmd;
-					event.target.$peer.sense(event);
-				}
-			}
-		}
-	},
 	Note: {
 		type$: ["Display", "Commandable"],
 		shortcuts: {
@@ -35,7 +22,7 @@ export default {
 					"Sally": "Grape"
 				}
 			});
-			console.log(markup);
+			//console.log(markup);
 			this.peer.innerHTML = markup;
 			this.peer.contentEditable = this.conf.readOnly ? false : true;
 		},
@@ -148,14 +135,6 @@ export default {
 		// 	}
 		// },
 		extend$actions: {
-			command(event) {
-				let cmd = this.shortcuts[event.shortcut];
-				if (cmd) {
-					console.log(cmd);
-					event.subject = cmd;
-					event.target.$peer.sense(event);
-				}
-			},
 			copy(event) {
 				console.log("copy", event);
 			},

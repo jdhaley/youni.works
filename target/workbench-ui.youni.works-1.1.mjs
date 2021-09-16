@@ -21,7 +21,7 @@ const conf = {
 	"title": "Workbench",
 	"data": {
 		"test": {
-			"type$": "/base/data/DataSource",
+			"type$": "/ui/display/data/DataSource",
 			"type$viewType": "/ui/agent/Cell",
 			"types": {
 				"Design": {

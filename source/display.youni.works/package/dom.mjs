@@ -1,5 +1,5 @@
 export default {
-	type$: "/control",
+	type$: "/base/control",
 	Node: {
 		type$: ["Receiver", "Sender", "Sensor"],
 		peer: null,
