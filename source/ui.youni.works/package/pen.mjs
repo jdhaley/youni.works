@@ -1,4 +1,5 @@
 export default {
+	type$: "/agent",
 	Box: {
 		top: 0,
 		right: 0,
@@ -78,7 +79,7 @@ export default {
 		},
 	},
 	Shape: {
-		type$: "/shape/Shape",
+		type$: ["Display", "Shape"],
 		namespace: "http://www.w3.org/2000/svg",
 		get$image() {
 			for (let node = this.peer; node; node = node.parentNode) {

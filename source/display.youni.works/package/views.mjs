@@ -1,5 +1,5 @@
 export default {
-	type$: "/agent",
+	type$: "/display",
 	Caption: {
 		type$: "Display",
 		get$caption() {
@@ -28,7 +28,7 @@ export default {
 		}
 	},
 	Cell: {
-		type$: ["/shape/Columnar", "Pane"],
+		type$: ["Display", "Pane"],
 		require$rule: "CSS-RULE",
 		members: {
 			type$header: "Caption",
@@ -123,10 +123,10 @@ export default {
 			this.super(start, conf);
 			if (!this.conf.dataSource && this.conf.data) {
 				this.conf.dataSource = this.owner.app.data[this.conf.data.source];
-				this.createRecord(this.conf.dataSource.views[this.conf.data.view]);
+				this.processRecord(this.conf.dataSource.views[this.conf.data.view]);
 			}
 		},
-		createRecord(record) {
+		processRecord(record) {
 			let owner = this.owner;
 			let tableId = "I" + owner.createId();
 			for (let name in record) {

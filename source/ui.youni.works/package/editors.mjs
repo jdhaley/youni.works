@@ -94,7 +94,7 @@ const pkg = {
 		},
 		extend$conf: {
 			linkControl: {
-				type$: "/shape/Shape"
+				type$: ["Display", "Shape"]
 			}
 		},
 		get$link() {

@@ -20,10 +20,8 @@ module.package = {
 	note: note(),
 	pen: pen(),
 	range: range(),
-	shape: shape(),
 	tabs: tabs(),
-	tree: tree(),
-	views: views()
+	tree: tree()
 }
 const conf = undefined;
 const main = function main_loadModule(module) {
@@ -32,7 +30,7 @@ const main = function main_loadModule(module) {
 export default main(module, conf);
 function agent() {
 	const pkg = {
-	"type$": "/display/display",
+	"type$": "/display/views",
 	"Frame": {
 		"type$": ["/agent/Display", "/agent/Document"],
 		"type$app": "/agent/Component",
@@ -116,6 +114,116 @@ function agent() {
 			}
 			this.document.head.append(node);
 			return node;
+		}
+	},
+	"Shape": {
+		"require$": "Display",
+		"extend$conf": {
+			"minWidth": 16,
+			"minHeight": 16
+		},
+		"edges": {
+		},
+		"extend$actions": {
+			"touch": function touch(event) {
+				if (event.track && event.track != this) return;
+				let edge = this.getEdge(event.x, event.y);
+				edge = this.edges[edge];
+				let subject = edge && edge.subject;
+				if (!subject) return;
+
+				if (edge.cursor) this.style.cursor = edge.cursor;
+				let box = this.box;
+				this.peer.$tracking = {
+					subject: subject,
+					cursor: this.style.cursor,
+					insideX: event.x - box.left,
+					insideY: event.y - box.top
+				}
+				event.track = this;
+				event.subject = "";
+			},
+			"drag": function drag(event) {
+				event.subject = this.peer.$tracking.subject;
+				this.receive(event)
+			},
+			"release": function release(event) {
+				delete this.peer.$tracking;
+                this.owner.style.removeProperty("cursor");
+			},
+			"position": function position(event) {
+				if (event.track == this) {
+					this.position(
+						event.x - this.peer.$tracking.insideX,
+						event.y - this.peer.$tracking.insideY
+					);
+				}
+			},
+			"size": function size(event) {
+				let box = this.box;
+				this.size(event.x - box.left, event.y - box.top);
+			},
+			"moveover": function moveover(event) {
+				event.edge = this.getEdge(event.x, event.y);
+				let edge = this.edges[event.edge];
+				if (edge && edge.cursor != this.style.cursor) {
+					this.style.cursor = edge.cursor;
+				}
+			},
+			"moveout": function moveout(event) {
+				this.style.removeProperty("cursor");
+			}
+		}
+	},
+	"Columnar": {
+		"type$": "/agent/Shape",
+		"border": {
+			"right": 6
+		},
+		"edges": {
+			"CR": {
+				"subject": "size",
+				"cursor": "ew-resize"
+			}
+		},
+		"size": function size(width) {
+			this.style.flex = "0 0 " + width + "px",
+			this.style.minWidth = width + "px";
+		},
+		"extend$actions": {
+			"size": function size(event) {
+                let box = this.box;
+                if (!this.peer.$tracking.fromRight) {
+                    this.peer.$tracking.fromRight = this.box.width - this.peer.$tracking.insideX;
+                }
+                this.size(
+                    event.x - box.left + this.peer.$tracking.fromRight,
+                    box.height
+                );
+                event.subject = "moveover";
+			},
+			"moveover": function moveover(event) {
+                this.super(moveover, event);
+                if (this.style.backgroundColor) {
+                    this.style.removeProperty("background-color");
+                }
+                if (event.edge == "CR") {
+                    this.style.backgroundColor = "gainsboro";
+                }
+            },
+			"moveout": function moveout(event) {
+				this.super(moveout, event);
+                if (this.style.backgroundColor) {
+                    this.style.removeProperty("background-color");
+                }
+            }
+		}
+	},
+	"Cell": {
+		"type$": ["/agent/Cell", "/agent/Shape", "/agent/Columnar"],
+		"size": function size(width) {
+			this.rule.style.flex = "0 0 " + width + "px",
+			this.rule.style.minWidth = width + "px";
 		}
 	}
 }
@@ -218,7 +326,7 @@ function editors() {
 		},
 		"extend$conf": {
 			"linkControl": {
-				"type$": "/shape/Shape"
+				"type$": ["/editors/Display", "/editors/Shape"]
 			}
 		},
 		"get$link": function get$link() {
@@ -617,6 +725,7 @@ return pkg;
 
 function pen() {
 	const pkg = {
+	"type$": "/agent",
 	"Box": {
 		"top": 0,
 		"right": 0,
@@ -695,7 +804,7 @@ function pen() {
 		}
 	},
 	"Shape": {
-		"type$": "/shape/Shape",
+		"type$": ["/pen/Display", "/pen/Shape"],
 		"namespace": "http://www.w3.org/2000/svg",
 		"get$image": function get$image() {
 			for (let node = this.peer; node; node = node.parentNode) {
@@ -950,116 +1059,6 @@ function range() {
 return pkg;
 }
 
-function shape() {
-	const pkg = {
-	"type$": "/agent",
-	"Shape": {
-		"type$": "/shape/Display",
-		"extend$conf": {
-			"minWidth": 16,
-			"minHeight": 16
-		},
-		"edges": {
-		},
-		"extend$actions": {
-			"touch": function touch(event) {
-				if (event.track && event.track != this) return;
-				let edge = this.getEdge(event.x, event.y);
-				edge = this.edges[edge];
-				let subject = edge && edge.subject;
-				if (!subject) return;
-
-				if (edge.cursor) this.style.cursor = edge.cursor;
-				let box = this.box;
-				this.peer.$tracking = {
-					subject: subject,
-					cursor: this.style.cursor,
-					insideX: event.x - box.left,
-					insideY: event.y - box.top
-				}
-				event.track = this;
-				event.subject = "";
-			},
-			"drag": function drag(event) {
-				event.subject = this.peer.$tracking.subject;
-				this.receive(event)
-			},
-			"release": function release(event) {
-				delete this.peer.$tracking;
-                this.owner.style.removeProperty("cursor");
-			},
-			"position": function position(event) {
-				if (event.track == this) {
-					this.position(
-						event.x - this.peer.$tracking.insideX,
-						event.y - this.peer.$tracking.insideY
-					);
-				}
-			},
-			"size": function size(event) {
-				let box = this.box;
-				this.size(event.x - box.left, event.y - box.top);
-			},
-			"moveover": function moveover(event) {
-				event.edge = this.getEdge(event.x, event.y);
-				let edge = this.edges[event.edge];
-				if (edge && edge.cursor != this.style.cursor) {
-					this.style.cursor = edge.cursor;
-				}
-			},
-			"moveout": function moveout(event) {
-				this.style.removeProperty("cursor");
-			}
-		}
-	},
-	"Columnar": {
-		"type$": "/shape/Shape",
-		"border": {
-			"right": 6
-		},
-		"edges": {
-			"CR": {
-				"subject": "size",
-				"cursor": "ew-resize"
-			}
-		},
-		"size": function size(width) {
-			this.style.flex = "0 0 " + width + "px",
-			this.style.minWidth = width + "px";
-		},
-		"extend$actions": {
-			"size": function size(event) {
-                let box = this.box;
-                if (!this.peer.$tracking.fromRight) {
-                    this.peer.$tracking.fromRight = this.box.width - this.peer.$tracking.insideX;
-                }
-                this.size(
-                    event.x - box.left + this.peer.$tracking.fromRight,
-                    box.height
-                );
-                event.subject = "moveover";
-			},
-			"moveover": function moveover(event) {
-                this.super(moveover, event);
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
-                if (event.edge == "CR") {
-                    this.style.backgroundColor = "gainsboro";
-                }
-            },
-			"moveout": function moveout(event) {
-				this.super(moveout, event);
-                if (this.style.backgroundColor) {
-                    this.style.removeProperty("background-color");
-                }
-            }
-		}
-	}
-}
-return pkg;
-}
-
 function tabs() {
 	const pkg = {
 	"type$": "/agent",
@@ -1127,7 +1126,7 @@ function tabs() {
 		}
 	},
 	"Tab": {
-		"type$": "/shape/Columnar",
+		"type$": ["/tabs/Display", "/tabs/Shape", "/tabs/Columnar"],
 		"var$body": null,
 		"extend$actions": {
 			"click": function click(event) {
@@ -1263,158 +1262,6 @@ function tree() {
                 body.style.removeProperty("display");
                 event.subject = "";
 			}
-		}
-	}
-}
-return pkg;
-}
-
-function views() {
-	const pkg = {
-	"type$": "/agent",
-	"Caption": {
-		"type$": "/views/Display",
-		"get$caption": function get$caption() {
-			return this.conf.caption;
-		},
-		"view": function view(model) {
-			this.markup = this.caption;
-		}
-	},
-	"Pane": {
-		"members": {
-			"type$header": "/views/Caption",
-			"type$body": "/views/Display"
-		}
-	},
-	"Key": {
-		"type$": "/views/Display",
-		"view": function view() {
-			this.peer.title = this.of.key || "";
-		}
-	},
-	"Value": {
-		"type$": "/views/Display",
-		"view": function view(model) {
-			this.markup = model;
-		}
-	},
-	"Cell": {
-		"type$": ["/shape/Columnar", "/views/Pane"],
-		"require$rule": "CSS-RULE",
-		"members": {
-			"type$header": "/views/Caption",
-			"type$body": "/views/Value"
-		},
-		"extend$conf": {
-			"cellHeader": true,
-			"cellBody": true
-		},
-		"modelFor": function modelFor(key) {
-			return this.model && this.model[this.key] || "";
-		},
-		"size": function size(width) {
-			this.rule.style.flex = "0 0 " + width + "px",
-			this.rule.style.minWidth = width + "px";
-		},
-		"start": function start(conf) {
-			this.super(start, conf);
-			conf = this.conf;
-			let members = this.members;
-			this.let("members", Object.create(null));
-			if (conf.cellHeader) {
-				this.members.header = members.header;
-			}
-			if (conf.cellBody) {
-				let editors = this.owner.editors;
-				let editor = editors[conf.inputType || conf.dataType] || editors.string
-				this.members.body = editor;
-			}
-		}
-	},
-	"Record": {
-		"type$": "/views/Display",
-		"display": "h",
-		"start": function start(conf) {
-			this.super(start, conf);
-			if (!this.members && conf.record) {
-				this.let("members", conf.record);
-			}
-		}
-	},
-	"Row": {
-		"type$": ["/views/Display", "/views/Pane"],
-		"display": "h",
-		"members": {
-			"type$header": "/views/Display",
-			"type$body": "/views/Record"
-		}
-	},
-	"Collection": {
-		"type$": "/views/Display",
-		"display": "v",
-		"contentType": {
-			"type$": "/views/Row",
-			"members": {
-				"type$header": "/views/Key",
-				"type$body": "/views/Record"
-			},
-			"extend$conf": {
-				"cellHeader": false
-			}
-		}
-	},
-	"Table": {
-		"type$": ["/views/Display", "/views/Pane"],
-		"display": "v",
-		"members": {
-			"header": {
-				"type$": "/views/Row",
-				"extend$conf": {
-					"cellBody": false
-				}
-			},
-			"body": {
-				"type$": "/views/Collection"
-			},
-			"footer": {
-				"type$": "/views/Row",
-				"extend$conf": {
-					"cellHeader": false,
-					"cellBody": false
-				}
-			}
-		},
-		"view": function view(model) {
-			if (model === undefined && this.conf.dataSource) {
-				model = this.conf.dataSource.data[this.conf.data.set];
-			}
-			this.super(view, model);
-		},
-		"start": function start(conf) {
-			this.super(start, conf);
-			if (!this.conf.dataSource && this.conf.data) {
-				this.conf.dataSource = this.owner.app.data[this.conf.data.source];
-				this.createRecord(this.conf.dataSource.views[this.conf.data.view]);
-			}
-		},
-		"createRecord": function createRecord(record) {
-			let owner = this.owner;
-			let tableId = "I" + owner.createId();
-			for (let name in record) {
-				let member = record[name];
-				member.rule = createRule(name, member.conf);
-			}
-			this.peer.id = tableId;
-			this.conf.record = record;
-
-			function createRule(name, conf) {
-				let width = conf.columnSize * 1 || 4;
-				return owner.createStyle(`#${tableId} .${name}`, {
-					"flex": (conf.flex === false ? "0 0 " : "1 1 ") + width + "cm",
-					"min-width": width / 4 + "cm"
-				});
-			}	
 		}
 	}
 }

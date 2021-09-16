@@ -64,7 +64,7 @@ export default {
         }
     },
     Tab: {
-        type$: "/shape/Columnar",
+        type$: ["Display", "Shape", "Columnar"],
         var$body: null,
         extend$actions: {
             click(event) {
