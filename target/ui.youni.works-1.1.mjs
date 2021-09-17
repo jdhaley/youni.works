@@ -118,9 +118,10 @@ function agent() {
 	},
 	"Commandable": {
 		"require$": "Display",
-		"shortcuts": {
+		"extend$shortcuts": {
 		},
 		"extend$controller": {
+			"type$": "/agent/Display/controller",
 			"command": function command(event) {
 				let cmd = this.shortcuts[event.shortcut];
 				if (cmd) event.subject = cmd;
@@ -129,9 +130,10 @@ function agent() {
 	},
 	"Shape": {
 		"type$": "/agent/Commandable",
-		"edges": {
+		"extend$edges": {
 		},
 		"extend$controller": {
+			"type$": "/agent/Commandable/controller",
 			"moveover": function moveover(event) {
 				let edge = this.edges[this.peer.$edge];
 				if (edge && edge.style) {
@@ -208,6 +210,7 @@ function agent() {
 			this.style.minWidth = width + "px";
 		},
 		"extend$controller": {
+			"type$": "/agent/Shape/controller",
 			"size": function size(event) {
                 let box = this.box;
                 if (!this.peer.$tracking.fromRight) {
@@ -222,7 +225,7 @@ function agent() {
 		}
 	},
 	"Cell": {
-		"type$": ["/agent/Cell", "/agent/Shape", "/agent/Columnar"],
+		"type$": ["/display/views/Cell", "/agent/Columnar"],
 		"size": function size(width) {
 			this.rule.style.flex = "0 0 " + width + "px",
 			this.rule.style.minWidth = width + "px";

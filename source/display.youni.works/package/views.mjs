@@ -9,12 +9,6 @@ export default {
 			this.markup = this.caption;
 		}
 	},
-	Pane: {
-		members: {
-			type$header: "Caption",
-			type$body: "Display"
-		}
-	},
 	Key: {
 		type$: "Display",
 		view() {
@@ -25,6 +19,12 @@ export default {
 		type$: "Display",
 		view(model) {
 			this.markup = model;
+		}
+	},
+	Pane: {
+		members: {
+			type$header: "Caption",
+			type$body: "Display"
 		}
 	},
 	Cell: {

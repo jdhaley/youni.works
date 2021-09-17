@@ -222,12 +222,6 @@ function views() {
 			this.markup = this.caption;
 		}
 	},
-	"Pane": {
-		"members": {
-			"type$header": "/views/Caption",
-			"type$body": "/views/Display"
-		}
-	},
 	"Key": {
 		"type$": "/views/Display",
 		"view": function view() {
@@ -238,6 +232,12 @@ function views() {
 		"type$": "/views/Display",
 		"view": function view(model) {
 			this.markup = model;
+		}
+	},
+	"Pane": {
+		"members": {
+			"type$header": "/views/Caption",
+			"type$body": "/views/Display"
 		}
 	},
 	"Cell": {

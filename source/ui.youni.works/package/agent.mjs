@@ -88,9 +88,10 @@ export default {
 	},
 	Commandable: {
 		require$: "Display",
-		shortcuts: {
+		extend$shortcuts: {
 		},
 		extend$controller: {
+			type$: "Display/controller",
 			command(event) {
 				let cmd = this.shortcuts[event.shortcut];
 				if (cmd) event.subject = cmd;
@@ -99,13 +100,10 @@ export default {
 	},
 	Shape: {
 		type$: "Commandable",
-		// extend$conf: {
-		// 	minWidth: 16,
-		// 	minHeight: 16	
-		// },
-		edges: {
+		extend$edges: {
 		},
 		extend$controller: {
+			type$: "Commandable/controller",
 			moveover(event) {
 				let edge = this.edges[this.peer.$edge];
 				if (edge && edge.style) {
@@ -185,6 +183,7 @@ export default {
 			this.style.minWidth = width + "px";
 		},
         extend$controller: {
+			type$: "Shape/controller",
             size(event) {
                 let box = this.box;
                 if (!this.peer.$tracking.fromRight) {
@@ -199,7 +198,7 @@ export default {
         }
     },
 	Cell: {
-		type$: ["Cell", "Shape", "Columnar"],
+		type$: ["/display/views/Cell", "Columnar"],
 		size(width) {
 			this.rule.style.flex = "0 0 " + width + "px",
 			this.rule.style.minWidth = width + "px";
