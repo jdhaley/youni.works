@@ -110,7 +110,7 @@ function control() {
 			}
 		},
 		"getReaction": function getReaction(message) {
-			let actions = this.actions || (this.controller && this.controller.actions);
+			let actions = this.actions || this.controller;
 			return actions && actions[message.subject];
 		}
 	},
@@ -499,13 +499,13 @@ return pkg;
 function view() {
 	const pkg = {
 	"type$": "/control",
-	"Viewer": {
+	"Viewable": {
 		"require$key": "",
-		"require$view": function require$view(model, response) {
-		},
 		"require$modelFor": function require$modelFor(key) {
 		},
-		"extend$actions": {
+		"require$view": function require$view(model, response) {
+		},
+		"extend$controller": {
 			"view": function view(message) {
 				let model = message.from && message.from.modelFor(this.key);
 				this.view(model, message.response);
@@ -513,7 +513,7 @@ function view() {
 		}
 	},
 	"View": {
-		"type$": "/view/Viewer",
+		"type$": "/view/Viewable",
 		"require$createPart": function require$createPart(key, type) {
 			let part = this.super(createPart, key, type);
 			part.view(this.modelFor(key));

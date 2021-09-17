@@ -458,11 +458,14 @@ function factory() {
             }
             function implementType(type) {
                 for (let name in type) {
+                    let decl = type[name];
                     if (objectType) {
-                        this.define(objectType, name, type[name]);
+                        if (!(decl.facet == "require" && objectType[name])) {
+                            this.define(objectType, name, decl);
+                        }
                     }
-                    if (!type[name].define(object)) {
-                        console.warn("Unable to define declaration: ", decl);
+                    if (!decl.define(object)) {
+                      //  console.warn("Unable to define declaration: ", decl);
                     }
                 }
             }

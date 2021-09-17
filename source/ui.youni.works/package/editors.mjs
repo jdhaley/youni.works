@@ -77,7 +77,7 @@ const pkg = {
 			this.peer.src = "/res/link.svg";
 			this.peer.tabIndex = 1;
 		},
-		extend$actions: {
+		extend$controller: {
 			click(event) {
 				event.subject = "navigate";
 			},
@@ -100,7 +100,7 @@ const pkg = {
 		get$link() {
 			return this.conf.dataSource.data[this.conf.dataset][this.model];
 		},
-		extend$actions: {
+		extend$controller: {
 			navigate(event) {
 				if (!this.pane) {
 					let members = this.conf.dataSource.views[this.conf.objectType];

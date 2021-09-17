@@ -72,7 +72,7 @@ export default {
                 this.state = "empty";
             }
         },
-        extend$actions: {
+        extend$controller: {
             click(event) {
                 event.value = this.model.expr;
                 if (this.state === "collapsed") {
@@ -104,7 +104,7 @@ export default {
             type$header: "ItemHeader",
             type$body: "ItemBody"
         },
-		extend$actions: {
+		extend$controller: {
             empty(event) {
                 event.subject = "showValue";
             },

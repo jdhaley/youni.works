@@ -53,7 +53,7 @@ export default {
             if (views) for (let key in views) this.add(views[key]);
             this.activate();
         },
-        extend$actions: {
+        extend$controller: {
             activateTab(event) {
                 this.activate(event.tab);
                 event.subject = "";
@@ -66,7 +66,7 @@ export default {
     Tab: {
         type$: ["Display", "Shape", "Columnar"],
         var$body: null,
-        extend$actions: {
+        extend$controller: {
             click(event) {
                 event.subject = "activateTab";
                 event.tab = this;

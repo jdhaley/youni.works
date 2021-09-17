@@ -1,12 +1,12 @@
 export default {
 	type$: "/control",
-	Viewer: {
+	Viewable: {
 		require$key: "",
-		require$view(model, response) {
-		},
 		require$modelFor(key) {
 		},
-		extend$actions: {
+		require$view(model, response) {
+		},
+		extend$controller: {
 			view(message) {
 				let model = message.from && message.from.modelFor(this.key);
 				this.view(model, message.response);
@@ -14,7 +14,7 @@ export default {
 		}
 	},
 	View: {
-		type$: "Viewer",
+		type$: "Viewable",
 		//there is an issue with the require$markup seeming to replace Element.markup
 		//	require$markup: "",
 		require$createPart(key, type) {

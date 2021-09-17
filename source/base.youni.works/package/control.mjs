@@ -22,7 +22,7 @@ export default {
 			}
 		},
 		getReaction(message) {
-			let actions = this.actions || (this.controller && this.controller.actions);
+			let actions = this.actions || this.controller;
 			return actions && actions[message.subject];
 		}
 	},

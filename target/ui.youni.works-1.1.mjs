@@ -120,7 +120,7 @@ function agent() {
 		"require$": "Display",
 		"shortcuts": {
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"command": function command(event) {
 				let cmd = this.shortcuts[event.shortcut];
 				if (cmd) event.subject = cmd;
@@ -131,7 +131,7 @@ function agent() {
 		"type$": "/agent/Commandable",
 		"edges": {
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"moveover": function moveover(event) {
 				let edge = this.edges[this.peer.$edge];
 				if (edge && edge.style) {
@@ -207,7 +207,7 @@ function agent() {
 			this.style.flex = "0 0 " + width + "px",
 			this.style.minWidth = width + "px";
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"size": function size(event) {
                 let box = this.box;
                 if (!this.peer.$tracking.fromRight) {
@@ -311,7 +311,7 @@ function editors() {
 			this.peer.src = "/res/link.svg";
 			this.peer.tabIndex = 1;
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"click": function click(event) {
 				event.subject = "navigate";
 			},
@@ -334,7 +334,7 @@ function editors() {
 		"get$link": function get$link() {
 			return this.conf.dataSource.data[this.conf.dataset][this.model];
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"navigate": function navigate(event) {
 				if (!this.pane) {
 					let members = this.conf.dataSource.views[this.conf.objectType];
@@ -590,7 +590,7 @@ function note() {
 			if (view.nodeType == Node.TEXT_NODE) view = view.parentNode;
 			view.dataset.level = level;
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"copy": function copy(event) {
 				console.log("copy", event);
 			},
@@ -829,7 +829,7 @@ function pen() {
 			if (!arguments.length) return this.get("cy");
 			this.set("cy", arguments[0]);
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"touch": function touch(event) {
 				event.track = this;
 				event.preventDefault();
@@ -898,7 +898,7 @@ function pen() {
 			this.view();
 			return point;
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"moveover": function moveover(event) {
 			}
 		}
@@ -921,7 +921,7 @@ function pen() {
 		},
 		"var$points": null,
 		"var$vector": "",
-		"extend$actions": {
+		"extend$controller": {
 			"dblclick": function dblclick(event) {
 				this.peer.focus();
 				let b = this.box;
@@ -1096,7 +1096,7 @@ function tabs() {
             if (views) for (let key in views) this.add(views[key]);
             this.activate();
         },
-		"extend$actions": {
+		"extend$controller": {
 			"activateTab": function activateTab(event) {
                 this.activate(event.tab);
                 event.subject = "";
@@ -1109,7 +1109,7 @@ function tabs() {
 	"Tab": {
 		"type$": ["/tabs/Display", "/tabs/Shape", "/tabs/Columnar"],
 		"var$body": null,
-		"extend$actions": {
+		"extend$controller": {
 			"click": function click(event) {
                 event.subject = "activateTab";
                 event.tab = this;
@@ -1195,7 +1195,7 @@ function tree() {
                 this.state = "empty";
             }
         },
-		"extend$actions": {
+		"extend$controller": {
 			"click": function click(event) {
                 event.value = this.model.expr;
                 if (this.state === "collapsed") {
@@ -1227,7 +1227,7 @@ function tree() {
 			"type$header": "/tree/ItemHeader",
 			"type$body": "/tree/ItemBody"
 		},
-		"extend$actions": {
+		"extend$controller": {
 			"empty": function empty(event) {
                 event.subject = "showValue";
             },

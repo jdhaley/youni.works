@@ -123,7 +123,7 @@ export default {
 			if (!arguments.length) return this.get("cy");
 			this.set("cy", arguments[0]);
 		},
-		extend$actions: {
+		extend$controller: {
 			touch(event) {
 				event.track = this;
 				event.preventDefault();
@@ -192,7 +192,7 @@ export default {
 			this.view();
 			return point;
 		},
-		extend$actions: {
+		extend$controller: {
 			moveover(event) {
 			}
 		}
@@ -215,7 +215,7 @@ export default {
 		},
 		var$points: null,
 		var$vector: "",
-		extend$actions: {
+		extend$controller: {
 			dblclick(event) {
 				this.peer.focus();
 				let b = this.box;

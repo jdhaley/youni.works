@@ -58,7 +58,7 @@ function service() {
 	},
 	"Test": {
 		"type$": "/service/Endpoint",
-		"extend$actions": {
+		"extend$controller": {
 			"service": function service(msg) {
                 this.owner.publish("test1", this.value);
                 msg.response.send(this.value);

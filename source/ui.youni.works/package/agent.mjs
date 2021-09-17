@@ -90,7 +90,7 @@ export default {
 		require$: "Display",
 		shortcuts: {
 		},
-		extend$actions: {
+		extend$controller: {
 			command(event) {
 				let cmd = this.shortcuts[event.shortcut];
 				if (cmd) event.subject = cmd;
@@ -105,7 +105,7 @@ export default {
 		// },
 		edges: {
 		},
-		extend$actions: {
+		extend$controller: {
 			moveover(event) {
 				let edge = this.edges[this.peer.$edge];
 				if (edge && edge.style) {
@@ -184,7 +184,7 @@ export default {
 			this.style.flex = "0 0 " + width + "px",
 			this.style.minWidth = width + "px";
 		},
-        extend$actions: {
+        extend$controller: {
             size(event) {
                 let box = this.box;
                 if (!this.peer.$tracking.fromRight) {

@@ -134,7 +134,7 @@ export default {
 		// 		}
 		// 	}
 		// },
-		extend$actions: {
+		extend$controller: {
 			copy(event) {
 				console.log("copy", event);
 			},

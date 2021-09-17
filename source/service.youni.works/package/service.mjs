@@ -38,7 +38,7 @@ export default {
     },
     Test: {
         type$: "Endpoint",
-        extend$actions: {
+        extend$controller: {
             service(msg) {
                 this.owner.publish("test1", this.value);
                 msg.response.send(this.value);
