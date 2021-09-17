@@ -1,6 +1,7 @@
 export default {
 	type$: "/control",
 	Viewer: {
+		require$key: "",
 		require$view(model, response) {
 		},
 		require$modelFor(key) {

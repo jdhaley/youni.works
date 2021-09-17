@@ -2,6 +2,7 @@ export default {
 	type$: ["/dom", "/base/view", "/base/util"],
 	Display: {
 		type$: ["Instance", "Element", "View", "Bounded"],
+//		type$controller: "Viewer",
 		nodeName: "div",
 		extend$conf: {
 		},

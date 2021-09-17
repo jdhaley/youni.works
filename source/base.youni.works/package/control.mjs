@@ -10,8 +10,8 @@ export default {
 			}
 			let subject = msg.subject;
 			while (subject) {
-				let action = this.actions[subject];
 				try {
+					let action = this.getReaction(msg);
 					action && action.call(this, msg);
 					subject = (subject != msg.subject ? msg.subject : "");	
 				} catch (error) {
@@ -21,7 +21,9 @@ export default {
 				}
 			}
 		},
-		extend$actions: {
+		getReaction(message) {
+			let actions = this.actions || (this.controller && this.controller.actions);
+			return actions && actions[message.subject];
 		}
 	},
 	Sender: {
