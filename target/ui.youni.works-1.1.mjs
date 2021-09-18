@@ -124,6 +124,7 @@ function agent() {
 			"type$": "/agent/Display/controller",
 			"command": function command(event) {
 				let cmd = this.shortcuts[event.shortcut];
+				console.log(shortcut, cmd);
 				if (cmd) event.subject = cmd;
 			}
 		}
@@ -369,22 +370,14 @@ return pkg;
 function events() {
 	const pkg = {
 	"$public": {
-		"click": function click(event) {
-            pkg.sense(event);
-        },
-		"dblclick": function dblclick(event) {
-            pkg.sense(event);
-        },
 		"keydown": function keydown(event) {
             let shortcut = pkg.getShortcut(event);
             if (shortcut) {
-                console.log(shortcut);
-                event.subject = "command";
                 event.shortcut = shortcut;
+                event.subject = "command";
             } else {
-                console.log(event.key);
-                event.subject = "charpress";
                 event.character = event.key;
+                event.subject = "charpress";
             }
             pkg.sense(event);
         },
@@ -414,8 +407,10 @@ function events() {
                 pkg.sense(event);
             }
         },
-		"mouseout": function mouseout(event) {
-            event.subject = "moveout";
+		"click": function click(event) {
+            pkg.sense(event);
+        },
+		"dblclick": function dblclick(event) {
             pkg.sense(event);
         },
 		"mouseup": function mouseup(event) {
@@ -430,6 +425,10 @@ function events() {
                 pkg.TRACK = null;
                 return;
             }
+        },
+		"mouseout": function mouseout(event) {
+            event.subject = "moveout";
+            pkg.sense(event);
         }
 	},
 	"TRACK": null,

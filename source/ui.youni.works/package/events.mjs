@@ -9,25 +9,14 @@ const pkg = {
         // type$focusout: "sense",
         // type$focus: "sense",
         // type$blur: "sense",
-
-        // type$click: "sense",
-        // type$dblclick: "sense",
-        click(event) {
-            pkg.sense(event);
-        },
-        dblclick(event) {
-            pkg.sense(event);
-        },
         keydown(event) {
             let shortcut = pkg.getShortcut(event);
             if (shortcut) {
-                console.log(shortcut);
-                event.subject = "command";
                 event.shortcut = shortcut;
+                event.subject = "command";
             } else {
-                console.log(event.key);
-                event.subject = "charpress";
                 event.character = event.key;
+                event.subject = "charpress";
             }
             pkg.sense(event);
         },
@@ -57,8 +46,10 @@ const pkg = {
                 pkg.sense(event);
             }
         },
-        mouseout(event) {
-            event.subject = "moveout";
+        click(event) {
+            pkg.sense(event);
+        },
+        dblclick(event) {
             pkg.sense(event);
         },
         mouseup(event) {
@@ -73,6 +64,10 @@ const pkg = {
                 pkg.TRACK = null;
                 return;
             }
+        },
+        mouseout(event) {
+            event.subject = "moveout";
+            pkg.sense(event);
         }
     },
     TRACK: null,

@@ -92,8 +92,11 @@ export default {
 		},
 		extend$controller: {
 			type$: "Display/controller",
+			// charpress(event) {
+			// },
 			command(event) {
 				let cmd = this.shortcuts[event.shortcut];
+				console.log(shortcut, cmd);
 				if (cmd) event.subject = cmd;
 			}
 		}
