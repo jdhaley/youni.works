@@ -114,17 +114,32 @@ function agent() {
 			}
 			this.document.head.append(node);
 			return node;
+		},
+		"removeStyle": function removeStyle(name) {
+			let nodes = this.document.getElementsByClassName(name);
+			if (!nodes.length) return;
+			nodes = Array.prototype.slice.call(nodes);
+			for (let i = 0, len = nodes.length; i < len; i++) {
+				let node = nodes[i];
+				node && node.classList.remove(name);
+			}
 		}
 	},
 	"Commandable": {
 		"require$": "Display",
+		"selectable": true,
 		"extend$shortcuts": {
 		},
 		"extend$controller": {
 			"type$": "/agent/Display/controller",
+			"select": function select(event) {
+				if (this.selectable) {
+					this.styles.toggle("selected");
+				}
+			},
 			"command": function command(event) {
 				let cmd = this.shortcuts[event.shortcut];
-				console.log(shortcut, cmd);
+				console.log(event.shortcut, cmd);
 				if (cmd) event.subject = cmd;
 			}
 		}
@@ -136,6 +151,12 @@ function agent() {
 		"extend$controller": {
 			"type$": "/agent/Commandable/controller",
 			"moveover": function moveover(event) {
+				if (event.ctrlKey) {
+					if (this.style.cursor != "cell") this.style.cursor = "cell";
+					return;
+				} else {
+					if (this.style.cursor == "cell") this.style.removeProperty("cursor");
+				}
 				let edge = this.edges[this.peer.$edge];
 				if (edge && edge.style) {
 					this.styles.remove(edge.style);
@@ -153,6 +174,7 @@ function agent() {
 				}
 			},
 			"touch": function touch(event) {
+
 				if (event.track && event.track != this) return;
 				let edge = this.getEdge(event.x, event.y);
 				edge = this.edges[edge];
@@ -382,6 +404,12 @@ function events() {
             pkg.sense(event);
         },
 		"mousedown": function mousedown(event) {
+            if (event.ctrlKey) {
+                event.subject = "select";
+                pkg.sense(event);
+                return;
+            }
+            pkg.getControl(event.target).owner.removeStyle("selected");
             event.subject = "touch";
             pkg.sense(event);
             if (event.track) {
@@ -412,6 +440,9 @@ function events() {
         },
 		"dblclick": function dblclick(event) {
             pkg.sense(event);
+        },
+		"contextmenu": function contextmenu(event) {
+            if (event.ctrlKey) event.preventDefault();
         },
 		"mouseup": function mouseup(event) {
             let priorEvent = pkg.TRACK;

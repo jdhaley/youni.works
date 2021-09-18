@@ -21,6 +21,12 @@ const pkg = {
             pkg.sense(event);
         },
         mousedown(event) {
+            if (event.ctrlKey) {
+                event.subject = "select";
+                pkg.sense(event);
+                return;
+            }
+            pkg.getControl(event.target).owner.removeStyle("selected");
             event.subject = "touch";
             pkg.sense(event);
             if (event.track) {
@@ -51,6 +57,9 @@ const pkg = {
         },
         dblclick(event) {
             pkg.sense(event);
+        },
+        contextmenu(event) {
+            if (event.ctrlKey) event.preventDefault();
         },
         mouseup(event) {
             let priorEvent = pkg.TRACK;

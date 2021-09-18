@@ -84,19 +84,34 @@ export default {
 			}
 			this.document.head.append(node);
 			return node;
+		},
+		removeStyle(name) {
+			let nodes = this.document.getElementsByClassName(name);
+			if (!nodes.length) return;
+			nodes = Array.prototype.slice.call(nodes);
+			for (let i = 0, len = nodes.length; i < len; i++) {
+				let node = nodes[i];
+				node && node.classList.remove(name);
+			}
 		}
 	},
 	Commandable: {
 		require$: "Display",
+		selectable: true,
 		extend$shortcuts: {
 		},
 		extend$controller: {
 			type$: "Display/controller",
 			// charpress(event) {
 			// },
+			select(event) {
+				if (this.selectable) {
+					this.styles.toggle("selected");
+				}
+			},
 			command(event) {
 				let cmd = this.shortcuts[event.shortcut];
-				console.log(shortcut, cmd);
+				console.log(event.shortcut, cmd);
 				if (cmd) event.subject = cmd;
 			}
 		}
@@ -108,6 +123,12 @@ export default {
 		extend$controller: {
 			type$: "Commandable/controller",
 			moveover(event) {
+				if (event.ctrlKey) {
+					if (this.style.cursor != "cell") this.style.cursor = "cell";
+					return;
+				} else {
+					if (this.style.cursor == "cell") this.style.removeProperty("cursor");
+				}
 				let edge = this.edges[this.peer.$edge];
 				if (edge && edge.style) {
 					this.styles.remove(edge.style);
@@ -125,6 +146,7 @@ export default {
 				}
 			},
 			touch(event) {
+
 				if (event.track && event.track != this) return;
 				let edge = this.getEdge(event.x, event.y);
 				edge = this.edges[edge];

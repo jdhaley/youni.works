@@ -69,3 +69,7 @@ IFRAME {
 .column-move {
 	border-bottom-color: gainsboro;
 }
+
+.selected {
+	background-color: lightsteelblue;
+}
