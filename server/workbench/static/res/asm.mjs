@@ -1,3 +1,140 @@
+export default function assemble(source) {
+	let tokens = tokenize(source);
+	let model = parse(tokens);
+	return model;
+}
+
+const reg = {
+	r0: "0",
+	r1: "1",
+	r2: "2",
+	r3: "3",
+	r4: "4",
+	r5: "5",
+	r6: "6",
+	r7: "7"
+}
+
+const ops = {
+	hlt: {
+		opcode: 0,
+	},
+	not: {
+		opcode: 1,
+		a: 1
+	},
+    set: {
+		opcode: 4,
+		a: 1,
+		b: 3
+	},
+    get: {
+		opcode: 8,
+		a: 1,
+		b: 3
+	},
+    put: {
+		opcode: 12,
+		a: 1,
+		b: 3
+	},
+    add: {
+		opcode: 16,
+		a: 1,
+		b: 3
+	},
+    and: {
+		opcode: 20,
+		a: 1,
+		b: 3
+	},
+	br: {
+		opcode: 24,
+		a: 1,
+		b: 1,
+		// I_BE,   // b == 0
+		// I_BN,   // b != 0
+		// I_BL,   // b <  0
+		// I_BG,   // b >  0
+		// I_BLE,  // b <= 0
+		// I_BGE,  // b >= 0		
+	}
+}
+
+function parse(tokens) {
+	let model = Object.create(null);
+	model.code = [];
+	model.labels = Object.create(null);
+
+	let pc = 0;
+	let cursor = 0;
+	while (cursor < tokens.length) {
+		let token = tokens[cursor++];
+		//1. check label. It is optional.
+		if (token.name == "LABEL") {
+			token.pc = pc;
+			if (model.labels[token.value]) {
+				console.info("Label is already defined:", token);
+			}
+			token.name = token.value;
+			delete token.value;
+			model.labels[token.name] = token;
+			token = tokens[cursor++];
+			if (token.name == "BR") {
+				//a label can appear on its own line
+				token = tokens[cursor++];
+			}
+		}
+		//2. check for an op. It is mandatory.
+		let op = token.name == "SYMBOL" && ops[token.value];
+		if (op) {
+			token.name = token.value;
+			token.value = op.opcode;
+			token.pc = pc;
+			model.code.push(token);
+		} else {
+			token.name = "BAD_INSTRUCTION";
+			console.info("Invalid instruction:", token);
+		}
+
+		//3. read the arguments / rest of the line.  This recovers parsing when there is an unknown op.
+		let args = [];
+		for (let arg = tokens[cursor++]; arg.name != "BR"; arg = tokens[cursor++]) {
+			args.push(arg);
+		}
+		
+		//4. parse the instruction token. Critical thing for now is increment the pc correctly.
+		pc += parseInstruction(token, args)
+	}
+	return model;
+}
+
+function parseInstruction(instr, args) {
+	let argCount = 0;
+	let arg = args[0];
+	if (arg && arg.name == "SYMBOL" && reg[arg.value]) {
+		instr.a = reg[arg.value];
+		arg = args[++argCount];
+		if (arg && arg.name == "SYMBOL" && reg[arg.value]) {
+			instr.b = reg[arg.value];
+			arg = args[++argCount];
+		}
+	}
+	if (arg) {
+		++argCount;
+		switch (arg.name) {
+			case "SYMBOL":
+			case "NUMBER":
+				instr.imm = arg.value;
+		}
+	}
+	if (args.length > argCount) {
+		console.info("Too many arguments starting at:", args[argCount]);
+	}
+
+	return instr.imm ? 2 : 1;
+}
+
 const CHAR_TYPES = {
 	WS: " \t",
 	BR: "\n",
@@ -9,18 +146,6 @@ const CHAR_TYPES = {
 	DOT: "."
 }
 
-function charType(ch) {
-	for (let type in CHAR_TYPES) {
-		if (CHAR_TYPES[type].indexOf(ch) >=  0) return type;
-	}
-	return "";
-}
-const Token = {
-	name: "",
-	value: "",
-	line: 0,
-	column: 0
-}
 const NEUTRAL = Object.freeze({
 	name: "NEUTRAL"
 });
@@ -31,7 +156,7 @@ const BR = Object.freeze({
 	name: "BR"
 });
 
-function parse(source) {
+function tokenize(source) {
 	const tokens = [];
 
 	let line = 1;
@@ -132,7 +257,7 @@ function parse(source) {
 	}
 
 	function newToken(name, value) {
-		let token = Object.create(Token);
+		let token = Object.create(null);
 		token.name = name;
 		token.value = value || "";
 		token.line = line;
@@ -143,124 +268,10 @@ function parse(source) {
 
 	return tokens;
 }
-const reg = {
-	r0: 0,
-	r1: 1,
-	r2: 2,
-	r3: 3,
-	r4: 4,
-	r5: 5,
-	r6: 6,
-	r7: 7
-}
-const ops = {
-	hlt: {
-		opcode: 0,
-	},
-	not: {
-		opcode: 1,
-		a: 1
-	},
-    set: {
-		opcode: 4,
-		a: 1,
-		b: 3
-	},
-    get: {
-		opcode: 8,
-		a: 1,
-		b: 3
-	},
-    put: {
-		opcode: 12,
-		a: 1,
-		b: 3
-	},
-    add: {
-		opcode: 16,
-		a: 1,
-		b: 3
-	},
-    and: {
-		opcode: 20,
-		a: 1,
-		b: 3
-	},
-	br: {
-		opcode: 24,
-		a: 1,
-		b: 1,
-		// I_BE,   // b == 0
-		// I_BN,   // b != 0
-		// I_BL,   // b <  0
-		// I_BG,   // b >  0
-		// I_BLE,  // b <= 0
-		// I_BGE,  // b >= 0		
-	}
-}
-/*
-	label? OP ARGUMENTS? BR
 
-	l
-*/
-export default function assemble(source) {
-	let pc = 0;
-	let model = {
-		code: [],
-		labels: Object.create(null)
+function charType(ch) {
+	for (let type in CHAR_TYPES) {
+		if (CHAR_TYPES[type].indexOf(ch) >=  0) return type;
 	}
-	let fwdrefs = [];
-	let tokens = parse(source);
-	let cursor = 0;
-	while (cursor < tokens.length) {
-		let token = tokens[cursor++];
-		//1. check label. It is optional.
-		if (token.name == "LABEL") {
-			token.pc = pc;
-			if (model.labels[token.value]) {
-				console.error("Label is already defined.");
-			}
-			model.labels[token.value] = token;
-			token = tokens[cursor++];
-			if (token.name == "BR") {
-				//a label can appear on its own line
-				token = tokens[cursor++];
-			}
-		}
-		//2. check for an op. It is mandatory.
-		let op = token.name == "SYMBOL" && ops[token.value];
-		if (!op) {
-			console.error("invalid op");
-			return;
-		}
-		let instr = token;
-		instr.op = op;
-		instr.pc = pc;
-		instr.args = [];
-		//3. read the arguments
-		for (let i = 0; token.name != "BR"; i++) {
-			token = tokens[cursor++];
-			instr.args[i] = token;
-		}
-		//4. parse the args.  Critical thing for now is increment the pc correctly..
-		pc += parseArgs(instr);
-		model.code.push(instr);
-	}
-	return model;
+	return "";
 }
-
-function parseArgs(instr) {
-	let arg = instr.args[0];
-	if (arg && arg.name == "SYMBOL") {
-		if (reg[arg.value]) instr.a = reg[arg.value];
-		arg = instr.args[1];
-		if (arg && arg.name == "SYMBOL") {
-			if (reg[arg.value]) instr.b = reg[arg.value];
-			arg = instr.args[2];
-		}
-	}
-	instr.imm = arg;
-
-	return instr.imm ? 2 : 1;
-}
-
