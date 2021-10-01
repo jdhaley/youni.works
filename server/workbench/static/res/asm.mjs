@@ -34,13 +34,14 @@ function get_ab(args) {
 }
 function checkArgs_a(instr) {
 	let args = instr.args;
-	if (args.length > 2) instr.warning = "Extraneous arguments will be ignored.";
-	if (args.length < 2) {
-		instr.error = "Missing argument.";
+	let op = ops[instr.name];
+	if (args.length > op.argMax) instr.warning = "Extraneous arguments will be ignored.";
+	if (args.length < op.argMin) {
+		instr.error = "Missing argument(s).";
 		return;
 	}
 	if (!reg[args[0].value]) {
-		instr.error = "Argument 'A' is not a Register name.";
+		instr.error = "Argument 'a' is not a Register name.";
 		return;
 	}
 }
@@ -95,36 +96,50 @@ function asm_a_bOrLabel(model, number) {
 const ops = {
 	hlt: {
 		opcode: 0,
+		argMin: 0,
+		argMax: 0,
 		count: instr => 1,
 		asm: asm
 	},
 	not: {
 		opcode: 1,
+		argMin: 1,
+		argMax: 1,
 		count: instr => 1,
 		asm: asm_a
 	},
 	get: {
 		opcode: 8,
+		argMin: 2,
+		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrLabel
 	},
     put: {
 		opcode: 12,
+		argMin: 2,
+		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrLabel
 	},
     set: {
 		opcode: 4,
+		argMin: 2,
+		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
     add: {
 		opcode: 16,
+		argMin: 2,
+		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
     and: {
 		opcode: 20,
+		argMin: 2,
+		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
