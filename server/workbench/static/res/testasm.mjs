@@ -8,7 +8,7 @@ let code = `
 loop:	
     add r3 12 x; do something
     br r3 loop
-    shunt
+    shunt r1 r2
 exit:
     hlt
 exit:

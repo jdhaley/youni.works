@@ -1,8 +1,103 @@
-export default function assemble(source) {
-	let tokens = tokenize(source);
-	let model = parse(tokens);
-	return model;
+const ops = {
+	hlt: {
+		opcode: 0,
+		count: instr => 1,
+		asm: (model, number) => {
+		}
+	},
+	not: {
+		opcode: 1,
+		count: instr => 1,
+		asm: (model, number) => {
+			instr = model.code[number];
+			if (!inst.a) console.info("Missing 'a' argument:", instr);
+			inst.value = [instr.value, inst.a];
+		}
+	},
+    set: {
+		opcode: 4,
+		count: rAndImm,
+		asm: (model, number) => {
+			instr = model.code[number];
+			if (!inst.a) console.info("Missing 'a' argument:", instr);
+			if (inst.imm) {
+
+				inst.value[0] += 2;
+			}
+			let a = inst.a * 1 || 0;
+			let b = inst.b * 1 || 0;
+			inst.value = [instr.value, a | (b << 3)];
+			if (inst.imm) {
+				inst.value.push(imm >> 8);
+				inst.value.push(imm | 0xFF);
+			}
+		}
+	},
+    get: {
+		opcode: 8,
+		count: rAndImm,
+		asm: (model, number) => {
+		}
+	},
+    put: {
+		opcode: 12,
+		count: rAndImm,
+		asm: (model, number) => {
+		}
+	},
+    add: {
+		opcode: 16,
+		count: rAndImm,
+		asm: (model, number) => {
+		}
+	},
+    and: {
+		opcode: 20,
+		count: rAndImm,
+		asm: (model, number) => {
+		}
+	},
+	br: {
+		opcode: 24,
+		count: instr => 2,
+		asm: (model, number) => {
+		}
+	}
 }
+
+function rAndImm(instr) {
+	for (let arg of instr.args) {
+		//If not a register symbol, assume it is a following argument.
+		if (!reg[arg.value]) return 2;
+	}
+	return 1;
+}
+
+// function parseInstruction(instr, args) {
+// 	let argCount = 0;
+// 	let arg = args[0];
+// 	if (arg && arg.name == "SYMBOL" && reg[arg.value]) {
+// 		instr.a = reg[arg.value];
+// 		arg = args[++argCount];
+// 		if (arg && arg.name == "SYMBOL" && reg[arg.value]) {
+// 			instr.b = reg[arg.value];
+// 			arg = args[++argCount];
+// 		}
+// 	}
+// 	if (arg) {
+// 		++argCount;
+// 		switch (arg.name) {
+// 			case "SYMBOL":
+// 			case "NUMBER":
+// 				instr.imm = arg.value;
+// 		}
+// 	}
+// 	if (args.length > argCount) {
+// 		console.info("Too many arguments starting at:", args[argCount]);
+// 	}
+
+// 	return instr.imm ? 2 : 1;
+// }
 
 const reg = {
 	r0: "0",
@@ -15,50 +110,20 @@ const reg = {
 	r7: "7"
 }
 
-const ops = {
-	hlt: {
-		opcode: 0,
-	},
-	not: {
-		opcode: 1,
-		a: 1
-	},
-    set: {
-		opcode: 4,
-		a: 1,
-		b: 3
-	},
-    get: {
-		opcode: 8,
-		a: 1,
-		b: 3
-	},
-    put: {
-		opcode: 12,
-		a: 1,
-		b: 3
-	},
-    add: {
-		opcode: 16,
-		a: 1,
-		b: 3
-	},
-    and: {
-		opcode: 20,
-		a: 1,
-		b: 3
-	},
-	br: {
-		opcode: 24,
-		a: 1,
-		b: 1,
-		// I_BE,   // b == 0
-		// I_BN,   // b != 0
-		// I_BL,   // b <  0
-		// I_BG,   // b >  0
-		// I_BLE,  // b <= 0
-		// I_BGE,  // b >= 0		
+const machineType = {
+	reg: reg,
+	ops: ops,
+	assemble: assemble,
+	parse: parse
+}
+
+export default function assemble(source) {
+	let tokens = tokenize(source);
+	let model = parse(tokens);
+	for (let i = 0; i < model.code.length; i++) {
+		ops[model.code[i].name].asm(model, i);
 	}
+	return model;
 }
 
 function parse(tokens) {
@@ -85,54 +150,28 @@ function parse(tokens) {
 				token = tokens[cursor++];
 			}
 		}
-		//2. check for an op. It is mandatory.
+
+		//2. read the arguments / rest of the line.  This recovers parsing when there is an unknown op.
+		token.args = [];
+		for (let arg = tokens[cursor++]; arg.name != "BR"; arg = tokens[cursor++]) {
+			token.args.push(arg);
+		}
+		
+		//3. check for an op. It is mandatory.
 		let op = token.name == "SYMBOL" && ops[token.value];
 		if (op) {
 			token.name = token.value;
 			token.value = op.opcode;
 			token.pc = pc;
+			//4. Ensure the pc is accurate based on the arguments to the instruction.
+			pc += op.count(token)
 			model.code.push(token);
 		} else {
 			token.name = "BAD_INSTRUCTION";
 			console.info("Invalid instruction:", token);
 		}
-
-		//3. read the arguments / rest of the line.  This recovers parsing when there is an unknown op.
-		let args = [];
-		for (let arg = tokens[cursor++]; arg.name != "BR"; arg = tokens[cursor++]) {
-			args.push(arg);
-		}
-		
-		//4. parse the instruction token. Critical thing for now is increment the pc correctly.
-		pc += parseInstruction(token, args)
 	}
 	return model;
-}
-
-function parseInstruction(instr, args) {
-	let argCount = 0;
-	let arg = args[0];
-	if (arg && arg.name == "SYMBOL" && reg[arg.value]) {
-		instr.a = reg[arg.value];
-		arg = args[++argCount];
-		if (arg && arg.name == "SYMBOL" && reg[arg.value]) {
-			instr.b = reg[arg.value];
-			arg = args[++argCount];
-		}
-	}
-	if (arg) {
-		++argCount;
-		switch (arg.name) {
-			case "SYMBOL":
-			case "NUMBER":
-				instr.imm = arg.value;
-		}
-	}
-	if (args.length > argCount) {
-		console.info("Too many arguments starting at:", args[argCount]);
-	}
-
-	return instr.imm ? 2 : 1;
 }
 
 const CHAR_TYPES = {
