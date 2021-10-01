@@ -1,6 +1,6 @@
 function asm(model, number) {
 	let instr = model.instrs[number];
-	instr.code = String.fromCharCode(this.opcode);
+	instr.code = String.fromCharCode(this.opcode | 1 << 14);
 }
 
 //op a
@@ -20,7 +20,7 @@ function asm_a(model, number) {
 		instr.warning = "Extraneous arguments will be ignored.";
 	}
 	let r = reg[a] * 1;
-	instr.code = String.fromCharCode(this.opcode | (r << 8));
+	instr.code = String.fromCharCode(this.opcode | (r << 8) | 1 << 14);
 }
 
 // a b?
@@ -55,10 +55,10 @@ function asm_a_bOrNumber(model, number) {
 
 	if (reg[args[1].value]) {
 		//op a b
-		instr.code = String.fromCharCode(this.opcode | (ab << 8));	
+		instr.code = String.fromCharCode(this.opcode | (ab << 8) | 1 << 14);	
 	} else if (args[1].name == "NUMBER") {
 		//op+1 a number
-		instr.code = String.fromCharCode(this.opcode + 1 | (ab << 8));
+		instr.code = String.fromCharCode(this.opcode + 1 | (ab << 8) | 1 << 14);
 		instr.code += String.fromCharCode(args[1].value * 1);	
 	} else {
 		instr.error = "Argument 'B' must be a Register name or numeric value";
@@ -77,7 +77,7 @@ function asm_a_bOrLabel(model, number) {
 
 	if (reg[args[1].value]) {
 		//op a b
-		instr.code = String.fromCharCode(this.opcode | (ab << 8));	
+		instr.code = String.fromCharCode(this.opcode | (ab << 8) | (1 << 14));	
 	} else if (args[1].name == "SYMBOL") {
 		//op+1 a number
 		label = model.labels[args[1].name];
@@ -85,7 +85,7 @@ function asm_a_bOrLabel(model, number) {
 			instr.error = "Argument 'B' Label not defined.";
 			return;
 		}
-		instr.code = String.fromCharCode(this.opcode + 1 | (r << 8));
+		instr.code = String.fromCharCode(this.opcode + 1 | (r << 8) | (1 << 14));
 		instr.code += String.fromCharCode(label.pc);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or Label name";
@@ -159,32 +159,6 @@ function rAndImm(instr) {
 	return 1;
 }
 
-// function parseInstruction(instr, args) {
-// 	let argCount = 0;
-// 	let arg = args[0];
-// 	if (arg && arg.name == "SYMBOL" && reg[arg.value]) {
-// 		instr.a = reg[arg.value];
-// 		arg = args[++argCount];
-// 		if (arg && arg.name == "SYMBOL" && reg[arg.value]) {
-// 			instr.b = reg[arg.value];
-// 			arg = args[++argCount];
-// 		}
-// 	}
-// 	if (arg) {
-// 		++argCount;
-// 		switch (arg.name) {
-// 			case "SYMBOL":
-// 			case "NUMBER":
-// 				instr.imm = arg.value;
-// 		}
-// 	}
-// 	if (args.length > argCount) {
-// 		console.info("Too many arguments starting at:", args[argCount]);
-// 	}
-
-// 	return instr.imm ? 2 : 1;
-// }
-
 const reg = {
 	r0: "0",
 	r1: "1",
@@ -209,6 +183,12 @@ export default function assemble(source) {
 	for (let i = 0; i < model.instrs.length; i++) {
 		ops[model.instrs[i].name].asm(model, i);
 	}
+	let code = "";
+	for (let instr of model.instrs) {
+		if (instr.error) return "";
+		if (instr.code) code += instr.code;
+	}
+	model.code = code;
 	return model;
 }
 
