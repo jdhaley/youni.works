@@ -7,6 +7,7 @@ let code = `
 ;Code
 loop:	
     add r3 12 x; do something
+    not r2
     br r3 loop
     shunt r1 r2
 exit:

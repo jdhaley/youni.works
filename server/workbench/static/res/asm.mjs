@@ -1,61 +1,132 @@
+function asm(model, number) {
+	let instr = model.instrs[number];
+	instr.code = String.fromCharCode(this.opcode);
+}
+
+//op a
+function asm_a(model, number) {
+	let instr = model.instrs[number];
+	let args = instr.args;
+	if (!args.length) {
+		instr.error = "Missing Register argument.";
+		return;
+	}
+	let a = args[0].value;
+	if (!reg[a]) {
+		instr.error = "Argument is not a Register name.";
+		return;
+	}
+	if (args.length > 1) {
+		instr.warning = "Extraneous arguments will be ignored.";
+	}
+	let r = reg[a] * 1;
+	instr.code = String.fromCharCode(this.opcode | (r << 8));
+}
+
+// a b?
+function get_ab(args) {
+	let a = reg[args[0].value] * 1;
+	let b = 0;
+	if (reg[args[1].value]) {
+		b = reg[args[1].value] * 1;
+	}
+	return a | (b << 3);
+}
+function checkArgs_a(instr) {
+	let args = instr.args;
+	if (args.length > 2) instr.warning = "Extraneous arguments will be ignored.";
+	if (args.length < 2) {
+		instr.error = "Missing argument.";
+		return;
+	}
+	if (!reg[args[0].value]) {
+		instr.error = "Argument 'A' is not a Register name.";
+		return;
+	}
+}
+//op	a b
+//op+1	a ;	number
+function asm_a_bOrNumber(model, number) {
+	let instr = model.instrs[number];
+	checkArgs_a(instr);
+	let args = instr.args;
+	let ab = get_ab(args);
+
+	if (reg[args[1].value]) {
+		//op a b
+		instr.code = String.fromCharCode(this.opcode | (ab << 8));	
+	} else if (args[1].name == "NUMBER") {
+		//op+1 a number
+		instr.code = String.fromCharCode(this.opcode + 1 | (ab << 8));
+		instr.code += String.fromCharCode(args[1].value * 1);	
+	} else {
+		instr.error = "Argument 'B' must be a Register name or numeric value";
+	}
+	return;
+}
+
+//TODO calculate label + offset
+//op	a b
+//op+1	a ,	label number?
+function asm_a_bOrLabel(model, number) {
+	let instr = model.instrs[number];
+	checkArgs_a(instr);
+	let args = instr.args;
+	let ab = get_ab(args);
+
+	if (reg[args[1].value]) {
+		//op a b
+		instr.code = String.fromCharCode(this.opcode | (ab << 8));	
+	} else if (args[1].name == "SYMBOL") {
+		//op+1 a number
+		label = model.labels[args[1].name];
+		if (!label) {
+			instr.error = "Argument 'B' Label not defined.";
+			return;
+		}
+		instr.code = String.fromCharCode(this.opcode + 1 | (r << 8));
+		instr.code += String.fromCharCode(label.pc);
+	} else {
+		instr.error = "Argument 'B' must be a Register name or Label name";
+	}
+	return;
+}
+
 const ops = {
 	hlt: {
 		opcode: 0,
 		count: instr => 1,
-		asm: (model, number) => {
-		}
+		asm: asm
 	},
 	not: {
 		opcode: 1,
 		count: instr => 1,
-		asm: (model, number) => {
-			instr = model.code[number];
-			if (!inst.a) console.info("Missing 'a' argument:", instr);
-			inst.value = [instr.value, inst.a];
-		}
+		asm: asm_a
 	},
-    set: {
-		opcode: 4,
-		count: rAndImm,
-		asm: (model, number) => {
-			instr = model.code[number];
-			if (!inst.a) console.info("Missing 'a' argument:", instr);
-			if (inst.imm) {
-
-				inst.value[0] += 2;
-			}
-			let a = inst.a * 1 || 0;
-			let b = inst.b * 1 || 0;
-			inst.value = [instr.value, a | (b << 3)];
-			if (inst.imm) {
-				inst.value.push(imm >> 8);
-				inst.value.push(imm | 0xFF);
-			}
-		}
-	},
-    get: {
+	get: {
 		opcode: 8,
 		count: rAndImm,
-		asm: (model, number) => {
-		}
+		asm: asm_a_bOrLabel
 	},
     put: {
 		opcode: 12,
 		count: rAndImm,
-		asm: (model, number) => {
-		}
+		asm: asm_a_bOrLabel
+	},
+    set: {
+		opcode: 4,
+		count: rAndImm,
+		asm: asm_a_bOrNumber
 	},
     add: {
 		opcode: 16,
 		count: rAndImm,
-		asm: (model, number) => {
-		}
+		asm: asm_a_bOrNumber
 	},
     and: {
 		opcode: 20,
 		count: rAndImm,
-		asm: (model, number) => {
-		}
+		asm: asm_a_bOrNumber
 	},
 	br: {
 		opcode: 24,
@@ -120,15 +191,15 @@ const machineType = {
 export default function assemble(source) {
 	let tokens = tokenize(source);
 	let model = parse(tokens);
-	for (let i = 0; i < model.code.length; i++) {
-		ops[model.code[i].name].asm(model, i);
+	for (let i = 0; i < model.instrs.length; i++) {
+		ops[model.instrs[i].name].asm(model, i);
 	}
 	return model;
 }
 
 function parse(tokens) {
 	let model = Object.create(null);
-	model.code = [];
+	model.instrs = [];
 	model.labels = Object.create(null);
 
 	let pc = 0;
@@ -165,7 +236,7 @@ function parse(tokens) {
 			token.pc = pc;
 			//4. Ensure the pc is accurate based on the arguments to the instruction.
 			pc += op.count(token)
-			model.code.push(token);
+			model.instrs.push(token);
 		} else {
 			token.name = "BAD_INSTRUCTION";
 			console.info("Invalid instruction:", token);
