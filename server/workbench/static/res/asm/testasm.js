@@ -1,4 +1,4 @@
-import asm from "/res/asm.mjs";
+import asm from "./asm.mjs";
 
 let code = `
 ; This is a simple test for parsing
