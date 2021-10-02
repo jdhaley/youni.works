@@ -8,7 +8,7 @@ let code = `
 loop:
     add r3 12 x; do something
     not r2
-    br r3 loop
+    jz r3 loop
     shunt r1 r2
 exit:
     hlt
@@ -28,10 +28,18 @@ loop:
     r1 sub r2   ;
     r5 bl r1    ; brach to loop if r1 < 99
     halt
+
+    get r2 arr + 18
+.DATA
+    arr: 0*30
+    x: 0
+    y: 0
+
 */
 `
 let output = "䌑䈁䀀";
 console.log(output.length, output);
+
 let model = asm(code);
 console.log(model);
 document.body.innerHTML = model.code || "Error or Empty Source";

@@ -79,8 +79,8 @@ function asm_a_bOrLabel(model, number) {
 		//op a b
 		instr.code = String.fromCharCode(this.opcode | (ab << 8) | (1 << 14));	
 	} else if (args[1].name == "SYMBOL") {
-		//op+1 a number
-		label = model.labels[args[1].name];
+		//op+1 a label
+		let label = model.labels[args[1].name];
 		if (!label) {
 			instr.error = "Argument 'B' Label not defined.";
 			return;
@@ -89,6 +89,26 @@ function asm_a_bOrLabel(model, number) {
 		instr.code += String.fromCharCode(label.pc);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or Label name";
+	}
+	return;
+}
+
+function asm_a_label(model, number) {
+	let instr = model.instrs[number];
+	checkArgs_a(instr);
+	let args = instr.args;
+	let ab = get_ab(args);
+
+	if (args[1].name == "SYMBOL") {
+		let label = model.labels[args[1].value];
+		if (!label) {
+			instr.error = "Argument 'B' Label is not defined.";
+			return;
+		}
+		instr.code = String.fromCharCode(this.opcode | (ab << 8) | (1 << 14));
+		instr.code += String.fromCharCode(label.pc);
+	} else {
+		instr.error = "Argument 'B' must be a Code Label name";
 	}
 	return;
 }
@@ -143,11 +163,61 @@ const ops = {
 		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
-	br: {
+	jmp: {
 		opcode: 24,
+		argMin: 2,
+		argMax: 2,
 		count: instr => 2,
-		asm: (model, number) => {
-		}
+		asm: asm_a_label
+	},
+	jsr: {
+		opcode: 25,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jz: {
+		opcode: 26,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jzn: {
+		opcode: 27,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jzp: {
+		opcode: 28,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jv: {
+		opcode: 29,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jvn: {
+		opcode: 30,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jvp: {
+		opcode: 31,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
 	}
 }
 
