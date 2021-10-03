@@ -1,5 +1,4 @@
-import asm from "./asm.mjs";
-
+import assembler from "./asm.mjs";
 let code = `
 ; This is a simple test for parsing
 ;Var
@@ -37,9 +36,4 @@ loop:
 
 */
 `
-let output = "䌑䈁䀀";
-console.log(output.length, output);
-
-let model = asm(code);
-console.log(model);
-document.body.innerHTML = model.code || "Error or Empty Source";
+document.body.innerHTML = assembler.assemble(code).code || "Error or Empty Source";
