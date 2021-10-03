@@ -9,8 +9,8 @@ export default asm;
 function assemble(source) {
 	let tokens = this.lex(source);
 	let seg = this.parse(tokens);
-	for (let i = 0; i < seg.instrs.length; i++) {
-		this.ops[seg.instrs[i].name].asm(seg, i);
+	for (let instr of seg.instrs) {
+		this.ops[instr.name].asm(instr);
 	}
 	let code = "";
 	for (let instr of seg.instrs) {
@@ -29,6 +29,7 @@ function assemble(source) {
 function parse(tokens) {
 	let seg = Object.create(null);
 	seg.instrs = [];
+	seg.errors = [];
 	seg.labels = Object.create(null);
 	seg.reg = this.reg;
 
@@ -71,6 +72,7 @@ function parse(tokens) {
 		} else {
 			token.name = "BAD_INSTRUCTION";
 			console.info("Invalid instruction:", token);
+			seg.errors.push(token);
 		}
 	}
 	return seg;

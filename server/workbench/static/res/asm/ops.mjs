@@ -114,14 +114,12 @@ function rAndImm(instr) {
 	return 1;
 }
 
-function asm(seg, number) {
-	let instr = seg.instrs[number];
+function asm(instr) {
 	instr.code = String.fromCharCode(this.opcode | 1 << 14);
 }
 
 //op a
-function asm_a(seg, number) {
-	let instr = seg.instrs[number];
+function asm_a(instr) {
 	let args = instr.args;
 	if (!args.length) {
 		instr.error = "Missing Register argument.";
@@ -158,7 +156,6 @@ function checkArgs_a(instr, op) {
 		instr.error = "Missing argument(s).";
 		return;
 	}
-	let reg = instr.seg.reg;
 	if (!instr.seg.reg[args[0].value]) {
 		instr.error = "Argument 'a' is not a Register name.";
 		return;
@@ -166,8 +163,7 @@ function checkArgs_a(instr, op) {
 }
 //op	a b
 //op+1	a ;	number
-function asm_a_bOrNumber(seg, number) {
-	let instr = seg.instrs[number];
+function asm_a_bOrNumber(instr) {
 	checkArgs_a(instr, this);
 	let ab = get_ab(instr);
 
@@ -190,8 +186,7 @@ function asm_a_bOrNumber(seg, number) {
 //TODO calculate label + offset
 //op	a b
 //op+1	a ,	label number?
-function asm_a_bOrLabel(seg, number) {
-	let instr = seg.instrs[number];
+function asm_a_bOrLabel(instr) {
 	checkArgs_a(instr, this);
 	let ab = get_ab(instr);
 
@@ -216,15 +211,14 @@ function asm_a_bOrLabel(seg, number) {
 	return;
 }
 
-function asm_a_label(seg, number) {
-	let instr = seg.instrs[number];
+function asm_a_label(instr) {
 	checkArgs_a(instr, this);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
 
 	if (args[1].name == "SYMBOL") {
-		let label = seg.labels[args[1].value];
+		let label = instr.seg.labels[args[1].value];
 		if (!label) {
 			instr.error = "Argument 'B' Label is not defined.";
 			return;
