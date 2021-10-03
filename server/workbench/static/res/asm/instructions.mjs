@@ -1,10 +1,4 @@
 export default {
-	Code: {
-		type: "directive"
-	},
-	Data: {
-		type: "directive"
-	},
 	hlt: {
 		opcode: 0,
 		argMin: 0,
@@ -179,7 +173,7 @@ function asm_a_bOrNumber(instr) {
 	if (reg[args[1].value]) {
 		//op a b
 		instr.code = String.fromCharCode(this.opcode | (ab << 8) | 1 << 14);	
-	} else if (args[1].name == "NUMBER") {
+	} else if (args[1].type == "NUMBER") {
 		//op+1 a number
 		instr.code = String.fromCharCode(this.opcode + 1 | (ab << 8) | 1 << 14);
 		instr.code += String.fromCharCode(args[1].value * 1);	
@@ -202,7 +196,7 @@ function asm_a_bOrLabel(instr) {
 	if (reg[args[1].value]) {
 		//op a b
 		instr.code = String.fromCharCode(this.opcode | (ab << 8) | (1 << 14));	
-	} else if (args[1].name == "SYMBOL") {
+	} else if (args[1].type == "SYMBOL") {
 		//op+1 a label
 		let label = seg.labels[args[1].name];
 		if (!label) {
@@ -223,7 +217,7 @@ function asm_a_label(instr) {
 
 	let args = instr.args;
 
-	if (args[1].name == "SYMBOL") {
+	if (args[1].type == "SYMBOL") {
 		let label = instr.seg.labels[args[1].value];
 		if (!label) {
 			instr.error = "Argument 'B' Label is not defined.";

@@ -13,13 +13,13 @@ const CHAR_TYPES = {
 }
 
 const NEUTRAL = Object.freeze({
-	name: "NEUTRAL"
+	type: "NEUTRAL"
 });
 const COMMENT = Object.freeze({
-	name: "COMMENT"
+	type: "COMMENT"
 });
 const BR = Object.freeze({
-	name: "BR"
+	type: "BR"
 });
 
 function lex(source) {
@@ -32,7 +32,7 @@ function lex(source) {
 	while (cursor < source.length) {
 		let ch = source[cursor++];
 		col++;
-		switch (token.name) {
+		switch (token.type) {
 			case "NEUTRAL":
 				switch (charType(ch)) {
 					case "WS":
@@ -60,7 +60,7 @@ function lex(source) {
 			case "SYMBOL":
 				switch (charType(ch)) {
 					case "LABEL":
-						token.name = "LABEL";
+						token.type = "LABEL";
 						token = NEUTRAL;
 						break;
 					case "CHAR":
@@ -122,9 +122,9 @@ function lex(source) {
 		col = 0;
 	}
 
-	function newToken(name, value) {
+	function newToken(type, value) {
 		let token = Object.create(null);
-		token.name = name;
+		token.type = type;
 		token.value = value || "";
 		token.line = line;
 		token.column = col;

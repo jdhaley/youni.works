@@ -1,5 +1,5 @@
-import assembler from "./asm.mjs";
-let code = `
+import assemble from "./asm.mjs";
+let source = `
 ; This is a simple test for parsing
 ;Var
 ;	sum: 
@@ -17,7 +17,7 @@ exit:
 let code1 = `
 var: 7
 max: 99
-CODE name:
+CODE name
     r5 set 6    ; loop starts at PC+6 (3 instructions * 2 halfwords)
     r2 set 99   ; the value must be less than 99.
 loop:
@@ -29,11 +29,11 @@ loop:
     halt
 
     get r2 arr + 18
-DATA name:
+DATA name
     arr: 0*30
     x: 0
     y: 0
 
 */
 `
-document.body.innerHTML = assembler.assemble(code);
+document.body.innerHTML = assemble(source).target;
