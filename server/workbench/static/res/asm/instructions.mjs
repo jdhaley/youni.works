@@ -1,4 +1,10 @@
 export default {
+	Code: {
+		type: "directive"
+	},
+	Data: {
+		type: "directive"
+	},
 	hlt: {
 		opcode: 0,
 		argMin: 0,

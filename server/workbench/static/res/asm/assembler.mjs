@@ -1,5 +1,5 @@
 const asm = Object.create(null);
-asm.ops = null;
+asm.instructions = null;
 asm.reg = null;
 asm.segment = segment;
 asm.lex = lex;
@@ -13,7 +13,7 @@ function assemble(source) {
 	for (let seg of segments) {
 		seg.code = "";
 		for (let instr of seg.stmts) {
-			this.ops[instr.name].asm(instr);
+			this.instructions[instr.name].asm(instr);
 			seg.code += instr.code || "";
 		}	
 	}
@@ -75,21 +75,21 @@ function parse(tokens) {
 			}
 		}
 
-		//2. read the arguments / rest of the line.  This recovers parsing when there is an unknown op.
+		//2. read the arguments / rest of the line.  This recovers parsing when there is an unknown instruction.
 		token.args = [];
 		for (let arg = tokens.read(); arg.name != "BR"; arg = tokens.read()) {
 			token.args.push(arg);
 		}
 		
-		//3. check for an op. It is mandatory.
-		let op = token.name == "SYMBOL" && this.ops[token.value];
-		if (op) {
+		//3. check for an instruction. It is mandatory.
+		let instr = token.name == "SYMBOL" && this.instructions[token.value];
+		if (instr) {
 			token.name = token.value;
-			token.value = op.opcode;
+			token.value = instr.opcode;
 			token.pc = seg.counter;
 			token.seg = seg;
 			//4. Ensure the pc is accurate based on the arguments to the instruction.
-			seg.counter += op.count(token)
+			seg.counter += instr.count(token)
 			seg.stmts.push(token);
 		} else {
 			token.name = "BAD_INSTRUCTION";
