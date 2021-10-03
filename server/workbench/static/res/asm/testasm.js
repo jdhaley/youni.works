@@ -17,7 +17,7 @@ exit:
 let code1 = `
 var: 7
 max: 99
-.CODE
+CODE name:
     r5 set 6    ; loop starts at PC+6 (3 instructions * 2 halfwords)
     r2 set 99   ; the value must be less than 99.
 loop:
@@ -29,11 +29,11 @@ loop:
     halt
 
     get r2 arr + 18
-.DATA
+DATA name:
     arr: 0*30
     x: 0
     y: 0
 
 */
 `
-document.body.innerHTML = assembler.assemble(code).code || "Error or Empty Source";
+document.body.innerHTML = assembler.assemble(code);
