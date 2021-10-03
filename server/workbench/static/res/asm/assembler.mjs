@@ -8,18 +8,18 @@ export default asm;
 
 function assemble(source) {
 	let tokens = this.lex(source);
-	let model = this.parse(tokens);
-	for (let i = 0; i < model.instrs.length; i++) {
-		this.ops[model.instrs[i].name].asm(model, i);
+	let seg = this.parse(tokens);
+	for (let i = 0; i < seg.instrs.length; i++) {
+		this.ops[seg.instrs[i].name].asm(seg, i);
 	}
 	let code = "";
-	for (let instr of model.instrs) {
+	for (let instr of seg.instrs) {
 		if (instr.error) return "";
 		if (instr.code) code += instr.code;
 	}
-	model.code = code;
-	console.info(model);
-	return model;
+	seg.code = code;
+	console.info(seg);
+	return seg;
 }
 // const seg = {
 // 	type: "",
@@ -27,10 +27,10 @@ function assemble(source) {
 // 	labels: null,
 // }
 function parse(tokens) {
-	let model = Object.create(null);
-	model.instrs = [];
-	model.labels = Object.create(null);
-	model.reg = this.reg;
+	let seg = Object.create(null);
+	seg.instrs = [];
+	seg.labels = Object.create(null);
+	seg.reg = this.reg;
 
 	let pc = 0;
 	let cursor = 0;
@@ -39,12 +39,12 @@ function parse(tokens) {
 		//1. check label. It is optional.
 		if (token.name == "LABEL") {
 			token.pc = pc;
-			if (model.labels[token.value]) {
+			if (seg.labels[token.value]) {
 				console.info("Label is already defined:", token);
 			}
 			token.name = token.value;
 			delete token.value;
-			model.labels[token.name] = token;
+			seg.labels[token.name] = token;
 			token = tokens[cursor++];
 			if (token.name == "BR") {
 				//a label can appear on its own line
@@ -64,16 +64,16 @@ function parse(tokens) {
 			token.name = token.value;
 			token.value = op.opcode;
 			token.pc = pc;
-			token.model = model;
+			token.seg = seg;
 			//4. Ensure the pc is accurate based on the arguments to the instruction.
 			pc += op.count(token)
-			model.instrs.push(token);
+			seg.instrs.push(token);
 		} else {
 			token.name = "BAD_INSTRUCTION";
 			console.info("Invalid instruction:", token);
 		}
 	}
-	return model;
+	return seg;
 }
 
 function lex() {

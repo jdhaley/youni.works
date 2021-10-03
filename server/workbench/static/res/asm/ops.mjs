@@ -109,25 +109,25 @@ export default {
 function rAndImm(instr) {
 	for (let arg of instr.args) {
 		//If not a register symbol, assume it is a following argument.
-		if (!instr.model.reg[arg.value]) return 2;
+		if (!instr.seg.reg[arg.value]) return 2;
 	}
 	return 1;
 }
 
-function asm(model, number) {
-	let instr = model.instrs[number];
+function asm(seg, number) {
+	let instr = seg.instrs[number];
 	instr.code = String.fromCharCode(this.opcode | 1 << 14);
 }
 
 //op a
-function asm_a(model, number) {
-	let instr = model.instrs[number];
+function asm_a(seg, number) {
+	let instr = seg.instrs[number];
 	let args = instr.args;
 	if (!args.length) {
 		instr.error = "Missing Register argument.";
 		return;
 	}
-	let reg = instr.model.reg;
+	let reg = instr.seg.reg;
 	let a = args[0].value;
 	if (!reg[a]) {
 		instr.error = "Argument is not a Register name.";
@@ -142,7 +142,7 @@ function asm_a(model, number) {
 
 // a b?
 function get_ab(instr) {
-	let reg = instr.model.reg;
+	let reg = instr.seg.reg;
 	let args = instr.args;
 	let a = reg[args[0].value] * 1;
 	let b = 0;
@@ -158,22 +158,22 @@ function checkArgs_a(instr, op) {
 		instr.error = "Missing argument(s).";
 		return;
 	}
-	let reg = instr.model.reg;
-	if (!instr.model.reg[args[0].value]) {
+	let reg = instr.seg.reg;
+	if (!instr.seg.reg[args[0].value]) {
 		instr.error = "Argument 'a' is not a Register name.";
 		return;
 	}
 }
 //op	a b
 //op+1	a ;	number
-function asm_a_bOrNumber(model, number) {
-	let instr = model.instrs[number];
+function asm_a_bOrNumber(seg, number) {
+	let instr = seg.instrs[number];
 	checkArgs_a(instr, this);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
 
-	let reg = instr.model.reg;
+	let reg = instr.seg.reg;
 	if (reg[args[1].value]) {
 		//op a b
 		instr.code = String.fromCharCode(this.opcode | (ab << 8) | 1 << 14);	
@@ -190,20 +190,20 @@ function asm_a_bOrNumber(model, number) {
 //TODO calculate label + offset
 //op	a b
 //op+1	a ,	label number?
-function asm_a_bOrLabel(model, number) {
-	let instr = model.instrs[number];
+function asm_a_bOrLabel(seg, number) {
+	let instr = seg.instrs[number];
 	checkArgs_a(instr, this);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
 
-	let reg = instr.model.reg;
+	let reg = instr.seg.reg;
 	if (reg[args[1].value]) {
 		//op a b
 		instr.code = String.fromCharCode(this.opcode | (ab << 8) | (1 << 14));	
 	} else if (args[1].name == "SYMBOL") {
 		//op+1 a label
-		let label = model.labels[args[1].name];
+		let label = seg.labels[args[1].name];
 		if (!label) {
 			instr.error = "Argument 'B' Label not defined.";
 			return;
@@ -216,15 +216,15 @@ function asm_a_bOrLabel(model, number) {
 	return;
 }
 
-function asm_a_label(model, number) {
-	let instr = model.instrs[number];
+function asm_a_label(seg, number) {
+	let instr = seg.instrs[number];
 	checkArgs_a(instr, this);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
 
 	if (args[1].name == "SYMBOL") {
-		let label = model.labels[args[1].value];
+		let label = seg.labels[args[1].value];
 		if (!label) {
 			instr.error = "Argument 'B' Label is not defined.";
 			return;
