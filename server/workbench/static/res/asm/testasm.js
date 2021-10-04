@@ -1,7 +1,7 @@
 import assemble from "./asm.mjs";
 let source = `
 Code
-set r2 -99       ; the value must be less than 99.
+set r2 -99      ; the value must be less than 99.
 loop:
     get r1 var  ; fetch the data into r1. It is externally set to 7.
     add r1 13   ; add 13 to the value in r1.
@@ -10,6 +10,9 @@ loop:
     jn  r1 loop ;   goto loop
 hlt
 Data
-var: 7
+    var: -32  60 61 62 63  ; comment test.
+    arr: *5
+    string: "Hello, world!!"
+    next: 13
 `
 document.body.innerHTML = assemble(source).target;

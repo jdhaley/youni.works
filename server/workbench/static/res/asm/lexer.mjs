@@ -6,8 +6,10 @@ const CHAR_TYPES = {
 	LETTER: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$",
 	DIGIT: "0123456789",
 
+	STRING: "\"",
 	LABEL: ":",
 	SIGN: "-",
+	COUNT: "*"
 }
 
 const NEUTRAL = Object.freeze({
@@ -39,6 +41,12 @@ function lex(source) {
 					case "LETTER":
 						token = newToken("SYMBOL", ch);
 						break;
+					case "STRING":
+						token = newToken("STRING"); //exclude delimiters from the value.
+						break;
+					case "COUNT":
+						token = newToken("COUNT");
+						break;
 					case "SIGN":
 					case "DIGIT":
 						token = newToken("NUMBER", ch);
@@ -66,6 +74,7 @@ function lex(source) {
 				}
 				break;
 			case "NUMBER":
+			case "COUNT":
 				switch (charType(ch)) {
 					case "DIGIT":
 						token.value += ch;
@@ -84,6 +93,16 @@ function lex(source) {
 					token = NEUTRAL;
 				}
 				break;
+			case "STRING": {
+				if (ch == "\"" && token.value[token.value.length - 1] != "\\") {
+					token = NEUTRAL;
+				} else {
+					token.value += ch;
+				}
+				break;
+			}
+			default:
+				throw new Error("Internal Error.");
 		}
 	}
 

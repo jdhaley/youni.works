@@ -1,9 +1,10 @@
 import lex from "./lexer.mjs";
 import Code from "./asmCode.mjs";
+import Data from "./asmData.mjs";
 
 const types = {
 	Code: Code,
-	Data: null
+	Data: Data
 }
 
 export default function assemble(source) {
