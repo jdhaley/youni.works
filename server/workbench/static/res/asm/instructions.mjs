@@ -1,4 +1,4 @@
-export default {
+const instrs = {
 	hlt: {
 		opcode: 0,
 		argMin: 0,
@@ -7,7 +7,7 @@ export default {
 		asm: asm
 	},
 	not: {
-		opcode: 1,
+		opcode: 4,
 		argMin: 1,
 		argMax: 1,
 		count: instr => 1,
@@ -18,31 +18,64 @@ export default {
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrLabel
+		asm: asm_a_bOrLabel,
+		modes: ["R", "L"]
 	},
     put: {
+		opcode: 10,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
+		asm: asm_a_bOrLabel,
+		modes: ["R", "L"]
+	},
+    set: {
 		opcode: 12,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrLabel
+		asm: asm_a_bOrNumber,
+		modes: ["R", "I"]
 	},
-    set: {
-		opcode: 4,
+    and: {
+		opcode: 14,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asm_a_bOrNumber,
+		modes: ["R", "I"]
 	},
-    add: {
+	add: {
 		opcode: 16,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
+		asm: asm_a_bOrNumber,
+		modes: ["R", "I"]
+	},
+	sub: {
+		opcode: 18,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
-    and: {
+	mul: {
+		opcode: 19,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
+		asm: asm_a_bOrNumber
+	},
+	div: {
 		opcode: 20,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
+		asm: asm_a_bOrNumber
+	},
+	mod: {
+		opcode: 21,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
@@ -70,41 +103,57 @@ export default {
 		asm: asm_a_label
 	},
 	jv: {
-		opcode: 29,
-		argMin: 2,
-		argMax: 2,
-		count: instr => 2,
-		asm: asm_a_label
-	},
-	jn: {
-		opcode: 30,
-		argMin: 2,
-		argMax: 2,
-		count: instr => 2,
-		asm: asm_a_label
-	},
-	jp: {
-		opcode: 31,
-		argMin: 2,
-		argMax: 2,
-		count: instr => 2,
-		asm: asm_a_label
-	},
-	jnz: {
 		opcode: 27,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
-	jpz: {
+	jn: {
 		opcode: 28,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jp: {
+		opcode: 29,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jnz: {
+		opcode: 30,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jpz: {
+		opcode: 31,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	}
 }
+let opcodes = "";
+for (let name in instrs) {
+	let instr = instrs[name];
+	if (instr.modes) {
+		let i = 0;
+		for (let mode of instr.modes) {
+			opcodes += `,\n\tOP_${name.toUpperCase()}_${mode.toUpperCase()} = ${instr.opcode + i++}`;
+		}
+	} else {
+		opcodes += `,\n\tOP_${name.toUpperCase()} = ${instr.opcode}`;
+	}
+}
+opcodes = opcodes.substring(2);
+console.log(opcodes);
+export default instrs;
+//////////////////////
 
 function rAndImm(instr) {
 	for (let arg of instr.args) {
