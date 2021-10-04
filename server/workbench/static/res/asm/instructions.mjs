@@ -69,20 +69,6 @@ export default {
 		count: instr => 2,
 		asm: asm_a_label
 	},
-	jzn: {
-		opcode: 27,
-		argMin: 2,
-		argMax: 2,
-		count: instr => 2,
-		asm: asm_a_label
-	},
-	jzp: {
-		opcode: 28,
-		argMin: 2,
-		argMax: 2,
-		count: instr => 2,
-		asm: asm_a_label
-	},
 	jv: {
 		opcode: 29,
 		argMin: 2,
@@ -90,15 +76,29 @@ export default {
 		count: instr => 2,
 		asm: asm_a_label
 	},
-	jvn: {
+	jn: {
 		opcode: 30,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
-	jvp: {
+	jp: {
 		opcode: 31,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jnz: {
+		opcode: 27,
+		argMin: 2,
+		argMax: 2,
+		count: instr => 2,
+		asm: asm_a_label
+	},
+	jpz: {
+		opcode: 28,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
@@ -198,12 +198,12 @@ function asm_a_bOrLabel(instr) {
 		instr.code = String.fromCharCode(this.opcode | (ab << 8) | (1 << 14));	
 	} else if (args[1].type == "SYMBOL") {
 		//op+1 a label
-		let label = seg.labels[args[1].name];
+		let label = instr.seg.labels[args[1].value];
 		if (!label) {
 			instr.error = "Argument 'B' Label not defined.";
 			return;
 		}
-		instr.code = String.fromCharCode(this.opcode + 1 | (r << 8) | (1 << 14));
+		instr.code = String.fromCharCode(this.opcode + 1 | (ab << 8) | (1 << 14));
 		instr.code += String.fromCharCode(label.pc);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or Label name";

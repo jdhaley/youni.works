@@ -1,15 +1,13 @@
 export default lex;
 
 const CHAR_TYPES = {
-	WS: " \t",
-	BR: "\n",
+	WS: " \t\n",
 	COMMENT: ";",
-	CHAR: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$",
+	LETTER: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$",
 	DIGIT: "0123456789",
 
 	LABEL: ":",
 	SIGN: "-",
-	DOT: "."
 }
 
 const NEUTRAL = Object.freeze({
@@ -17,9 +15,6 @@ const NEUTRAL = Object.freeze({
 });
 const COMMENT = Object.freeze({
 	type: "COMMENT"
-});
-const BR = Object.freeze({
-	type: "BR"
 });
 
 function lex(source) {
@@ -36,16 +31,12 @@ function lex(source) {
 			case "NEUTRAL":
 				switch (charType(ch)) {
 					case "WS":
-						break;
-					case "BR": 
-						//line breaks are WS when in neutral state.
-						lineBreak();
+						if (ch == "\n") lineBreak();
 						break;
 					case "COMMENT":
 						token = COMMENT;
 						break;
-					case "DOT":
-					case "CHAR":
+					case "LETTER":
 						token = newToken("SYMBOL", ch);
 						break;
 					case "SIGN":
@@ -53,29 +44,20 @@ function lex(source) {
 						token = newToken("NUMBER", ch);
 						break;
 					default:
-						token = newToken("BAD_CHAR", ch);
+						token = newToken("BAD_LETTER", ch);
 						break;
 				}
 				break;
 			case "SYMBOL":
 				switch (charType(ch)) {
-					case "LABEL":
-						token.type = "LABEL";
-						token = NEUTRAL;
-						break;
-					case "CHAR":
+					case "LETTER":
 					case "DIGIT":
 						token.value += ch;
 						break;
-					case "COMMENT":
-						newToken("BR");
-						token = COMMENT;
-						break;
-					case "BR":
-						lineBreak();
-						token = newToken("BR");
+					case "LABEL":
+						token.type = "LABEL";
 						token = NEUTRAL;
-						break;
+						break;	
 					default:
 						cursor--;
 						col--;
@@ -88,15 +70,6 @@ function lex(source) {
 					case "DIGIT":
 						token.value += ch;
 						break;
-					case "COMMENT":
-						newToken("BR");
-						token = COMMENT;
-						break;	
-					case "BR":
-						lineBreak();
-						token = newToken("BR");
-						token = NEUTRAL;
-						break;
 					default:
 						cursor--;
 						col--;
@@ -105,13 +78,10 @@ function lex(source) {
 				}
 				break;
 			case "COMMENT":
-				switch (charType(ch)) {
-					case "BR":
-						lineBreak();
-						token = NEUTRAL;
-						break;
-					default:
-						break;			
+				if (ch == "\n") {
+					cursor--;
+					col--;
+					token = NEUTRAL;
 				}
 				break;
 		}

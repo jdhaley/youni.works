@@ -18,13 +18,15 @@ function create(assembly) {
 	seg.reg = type.reg;
 	seg.counter = 0;
 
-	let token = assembly.tokens.peek();
+	let tokens = assembly.tokens;
+	let token = tokens.peek();
 	if (token.type == "SYMBOL" && assembly.types[token.value]) {
-		//Do a sanity check that this type matches the source's declared type.
-		if (assembly.types[token.value] != type) throw new Error();
-		assembly.tokens.read();
-		if (assembly.tokens.peek().type == "LABEL") {
-			seg.name = assembly.tokens.read().value;
+		let line = [];
+		for (let arg = tokens.peek(); arg && arg.line == token.line; arg = tokens.peek()) {
+			line.push(tokens.read());
+		}
+		if (line[1] && line[1].type == "SYMBOL") {
+			seg.name = line[1].value;
 		}
 	}
 	assembly.segments.push(seg);
@@ -43,7 +45,14 @@ function assemble(assembly) {
 
 function parse(seg) {
 	let tokens = seg.assembly.tokens;
-	for (let token = tokens.read(); token; token = tokens.read()) {
+	for (let token = tokens.peek(); token; token = tokens.peek()) {
+		//0. check if the token is a segment directive.
+		if (token.type == "SYMBOL" && seg.assembly.types[token.value]) {
+			seg.assembly.types[token.value].assemble(seg.assembly);
+			return;
+		}
+		token = tokens.read();
+
 		//1. check label. It is optional.
 		if (token.type == "LABEL") {
 			token.pc = seg.counter;
@@ -58,24 +67,20 @@ function parse(seg) {
 
 		//2. read the arguments / rest of the line.  This recovers parsing when there is an unknown instruction.
 		token.args = [];
-		for (let arg = tokens.read(); arg.type != "BR"; arg = tokens.read()) {
-			token.args.push(arg);
+		for (let arg = tokens.peek(); arg && arg.line == token.line; arg = tokens.peek()) {
+			token.args.push(tokens.read());
 		}
 		
 		//3. check for an instruction. It is mandatory.
 		let instr = token.type == "SYMBOL" && seg.type.instructions[token.value];
 		if (instr) {
-			if (instr.type == "directive") {
-
-			} else {
-				token.name = token.value;
-				token.value = instr.opcode;
-				token.pc = seg.counter;
-				token.seg = seg;
-				//4. Ensure the pc is accurate based on the arguments to the instruction.
-				seg.counter += instr.count(token)
-				seg.stmts.push(token);	
-			}
+			token.name = token.value;
+			token.value = instr.opcode;
+			token.pc = seg.counter;
+			token.seg = seg;
+			//4. Ensure the pc is accurate based on the arguments to the instruction.
+			seg.counter += instr.count(token)
+			seg.stmts.push(token);	
 		} else {
 			token.type = "BAD_INSTRUCTION";
 			console.info("Invalid instruction:", token);
