@@ -16,12 +16,13 @@ export default function assemble(source) {
 	asm.target = "";
 	asm.encode = encode;
 
-	let type = types.Code;
+	let type = asm.types.Code;
 	let token = asm.tokens.peek();
 	if (token.type == "SYMBOL" && asm.types[token.value]) {
 		type = asm.types[token.value];
 	}
 	type.assemble(asm);
+	asm.target = encode(asm.segments.length);
 	for (let seg of asm.segments) asm.target += seg.header + seg.code;
 	console.log(asm);
 	return asm;
