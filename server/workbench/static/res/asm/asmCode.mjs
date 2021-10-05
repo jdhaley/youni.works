@@ -41,8 +41,10 @@ function assemble(assembly) {
 		seg.type.instructions[instr.name].asm(instr);
 		seg.code += instr.code || "";
 	}
-	//The header is the segment type & number of 16-bit values.
-	seg.header = seg.assembly.encode("C", 0, seg.counter & 0xFF, seg.counter >> 8 & 0xFF);
+	//The header is the segment type & target length.
+	let count = seg.counter / 2;
+	if (seg.counter % 2) count++;
+	seg.header = "/c" + seg.assembly.encode(count);
 }
 
 function parse(seg) {

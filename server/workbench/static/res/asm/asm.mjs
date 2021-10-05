@@ -39,25 +39,37 @@ function tokenStream(source) {
 	return tokens;
 }
 
-const digit = "0123456789ABCDEF";
 function encode() {
 	let out = "";
 	for (let i = 0; i < arguments.length; i++) {
 		let v = arguments[i];
-		if (typeof v == "string") {
-			for (let ch of v) {
-				ch = ch.charCodeAt(0);
-				for (let n = 3; n >= 0; n--) {
-					out += digit[(ch >> (4 * n)) & 0xF];
-				}
-				out += ".";
-			}
+		if (typeof v == "number") {
+			out += encodeNumber(v);
 		} else {
-			for (let n = 3; n >= 0; n--) {
-				out += digit[(v >> (4 * n)) & 0xF];
+			for (i = 0; i < v.length; i += 2) {
+				let n = v.charCodeAt(i) << 16;
+				n |= (v.charCodeAt(i + 1) || 0);
+				out += encodeNumber(n);
 			}
-			out += ".";
 		}
 	}
 	return out;
+}
+const digit = "0123456789ABCDEF";
+function encodeNumber(v) {
+	if (v == 0) return "+0";
+	let sign = "+";
+	if (v < 0 ) {
+		sign = "-";
+		v *= -1;
+	}
+	let out = "";
+	for (let n = 7; n >= 0; n--) {
+		let nyb = (v >> (4 * n)) & 0xF;
+		out += digit[nyb];
+	}
+	for (let i = 0; i < out.length; i++) {
+		if (out[i] != "0") return sign + out.substr(i);
+	}
+	return "?";
 }

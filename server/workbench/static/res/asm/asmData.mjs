@@ -30,9 +30,7 @@ function create(assembly) {
 function assemble(assembly) {
 	let seg = create(assembly);
 	parse(seg);
-	//The header is the segment type & number of 16-bit values.
-	let count = seg.counter * 2;
-	seg.header = seg.assembly.encode("D", 0, count & 0xFF, count >> 8 & 0xFF);
+	seg.header = "/d" + seg.assembly.encode(seg.counter);
 }
 
 function parse(seg) {
@@ -56,26 +54,23 @@ function parse(seg) {
 				seg.labels[token.name] = token;	
 			}	break;
 			case "NUMBER": {
-				let v = token.value * 1;
-				seg.assembly.encode(v & 0xFFFF, v >> 16 & 0xFFFF);
+				seg.code += seg.assembly.encode(token.value * 1);
 				seg.counter++;
 			}	break;
 			case "COUNT": {
-				let len = token.value;
-				let zero = String.fromCharCode(0) + String.fromCharCode(0);
-				for (let i = 0; i < len; i++) {
-					seg.code += seg.assembly.encode(0, 0);
-				}
-				seg.counter += len;
+				let n = token.value * 1;
+				if (n < 0) throw new Error("Negative count.");
+				seg.code += "*" + seg.assembly.encode(n).substring(1);
+				seg.counter += n;
 			}	break;
 			case "STRING": {
-				let v = token.value;
-				seg.code += seg.assembly.encode(v, 0);
-				//Pad strings to an even word address.
-				let odd = (v.length + 1 ) % 2; //Account for the trailing NULL sentinel.
-				if (odd) seg.code += seg.assembly.encode(0);
-				//Number of 32-bit words 
-				seg.counter += (v.length + 1 + odd) / 2;
+				let v = token.value + "\0";
+				//Encoding converts each pair of UTF-16 characters into an encoded 32-bit value.
+				seg.code += seg.assembly.encode(v);
+				//Dive the string length by 2 to get the 32-bit word count.
+				seg.counter += v.length / 2;
+				//If the length is odd, make sure we stay aligned on 32-bits.
+				if (v.length % 2) seg.counter++;
 			}	break;
 			default: {
 				console.error("BAD TOKEN", token);
