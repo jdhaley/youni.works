@@ -164,7 +164,7 @@ function rAndImm(instr) {
 }
 
 function asm(instr) {
-	instr.code = String.fromCharCode(this.opcode | 1 << 14);
+	instr.code = instr.seg.assembly.encode(this.opcode, 0);
 }
 
 //op a
@@ -184,7 +184,7 @@ function asm_a(instr) {
 		instr.warning = "Extraneous arguments will be ignored.";
 	}
 	let r = reg[a] * 1;
-	instr.code = String.fromCharCode(this.opcode | (r << 8) | 1 << 14);
+	instr.code = instr.seg.assembly.encode(this.opcode, r);
 }
 
 // a b?
@@ -221,11 +221,11 @@ function asm_a_bOrNumber(instr) {
 	let reg = instr.seg.reg;
 	if (reg[args[1].value]) {
 		//op a b
-		instr.code = String.fromCharCode(this.opcode | (ab << 8) | 1 << 14);	
+		instr.code = instr.seg.assembly.encode(this.opcode, ab);	
 	} else if (args[1].type == "NUMBER") {
 		//op+1 a number
-		instr.code = String.fromCharCode(this.opcode + 1 | (ab << 8) | 1 << 14);
-		instr.code += String.fromCharCode(args[1].value * 1);	
+		let num = args[1].value * 1;
+		instr.code = instr.seg.assembly.encode(this.opcode + 1, ab, num & 0xFF, num >> 8);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or numeric value";
 	}
@@ -244,7 +244,7 @@ function asm_a_bOrLabel(instr) {
 	let reg = instr.seg.reg;
 	if (reg[args[1].value]) {
 		//op a b
-		instr.code = String.fromCharCode(this.opcode | (ab << 8) | (1 << 14));	
+		instr.code = instr.seg.assembly.encode(this.opcode, ab);	
 	} else if (args[1].type == "SYMBOL") {
 		//op+1 a label
 		let label = instr.seg.labels[args[1].value];
@@ -252,8 +252,7 @@ function asm_a_bOrLabel(instr) {
 			instr.error = "Argument 'B' Label not defined.";
 			return;
 		}
-		instr.code = String.fromCharCode(this.opcode + 1 | (ab << 8) | (1 << 14));
-		instr.code += String.fromCharCode(label.pc);
+		instr.code = instr.seg.assembly.encode(this.opcode + 1, ab, label.pc & 0xFF, label.pc >> 8);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or Label name";
 	}
@@ -272,8 +271,7 @@ function asm_a_label(instr) {
 			instr.error = "Argument 'B' Label is not defined.";
 			return;
 		}
-		instr.code = String.fromCharCode(this.opcode | (ab << 8) | (1 << 14));
-		instr.code += String.fromCharCode(label.pc);
+		instr.code = instr.seg.assembly.encode(this.opcode, ab, label.pc & 0xFF, label.pc >> 8);
 	} else {
 		instr.error = "Argument 'B' must be a Code Label name";
 	}

@@ -30,6 +30,9 @@ function create(assembly) {
 function assemble(assembly) {
 	let seg = create(assembly);
 	parse(seg);
+	//The header is the segment type & number of 16-bit values.
+	let count = seg.counter * 2;
+	seg.header = seg.assembly.encode("D", 0, count & 0xFF, count >> 8 & 0xFF);
 }
 
 function parse(seg) {
@@ -54,27 +57,23 @@ function parse(seg) {
 			}	break;
 			case "NUMBER": {
 				let v = token.value * 1;
-				seg.code += String.fromCharCode(v & 0xFFFF);
-				seg.code += String.fromCharCode((v >> 16) & 0xFFFF);
+				seg.assembly.encode(v & 0xFFFF, v >> 16 & 0xFFFF);
 				seg.counter++;
 			}	break;
 			case "COUNT": {
 				let len = token.value;
 				let zero = String.fromCharCode(0) + String.fromCharCode(0);
 				for (let i = 0; i < len; i++) {
-					seg.code += zero;
+					seg.code += seg.assembly.encode(0, 0);
 				}
 				seg.counter += len;
 			}	break;
 			case "STRING": {
 				let v = token.value;
-				for (let i = 0; i < v.length; i++) {
-					seg.code += v[i];
-				}
-				seg.code += String.fromCharCode(0);
+				seg.code += seg.assembly.encode(v, 0);
 				//Pad strings to an even word address.
 				let odd = (v.length + 1 ) % 2; //Account for the trailing NULL sentinel.
-				if (odd) seg.code += String.fromCharCode(0);
+				if (odd) seg.code += seg.assembly.encode(0);
 				//Number of 32-bit words 
 				seg.counter += (v.length + 1 + odd) / 2;
 			}	break;

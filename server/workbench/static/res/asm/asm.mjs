@@ -14,6 +14,7 @@ export default function assemble(source) {
 	asm.source = source;
 	asm.tokens = tokenStream(source);
 	asm.target = "";
+	asm.encode = encode;
 
 	let type = types.Code;
 	let token = asm.tokens.peek();
@@ -21,7 +22,7 @@ export default function assemble(source) {
 		type = asm.types[token.value];
 	}
 	type.assemble(asm);
-	for (let seg of asm.segments) asm.target += seg.code;
+	for (let seg of asm.segments) asm.target += seg.header + seg.code;
 	console.log(asm);
 	return asm;
 }
@@ -36,4 +37,27 @@ function tokenStream(source) {
 		return this[this.cursor];
 	}
 	return tokens;
+}
+
+const digit = "0123456789ABCDEF";
+function encode() {
+	let out = "";
+	for (let i = 0; i < arguments.length; i++) {
+		let v = arguments[i];
+		if (typeof v == "string") {
+			for (let ch of v) {
+				ch = ch.charCodeAt(0);
+				for (let n = 3; n >= 0; n--) {
+					out += digit[(ch >> (4 * n)) & 0xF];
+				}
+				out += ".";
+			}
+		} else {
+			for (let n = 3; n >= 0; n--) {
+				out += digit[(v >> (4 * n)) & 0xF];
+			}
+			out += ".";
+		}
+	}
+	return out;
 }
