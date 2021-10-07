@@ -83,22 +83,22 @@ export default function exec(vm) {
                 vm.r[a] = ~vm.r[a];
                 break;
             case OP_JZ:
-                if (vm.r[b] == 0) vm.pc = vm.r[a];
+				vm.pc = vm.r[a] == 0 ? vm.code[vm.pc] : vm.pc + 1;
                 break;
             case OP_JV:
-                if (vm.r[b] != 0) vm.pc = vm.r[a];
+				vm.pc = vm.r[a] != 0 ? vm.code[vm.pc] : vm.pc + 1;
                 break;
             case OP_JN:
-				vm.pc = vm.r[a] < 0 ? vm.code[vm.pc] : vm.pc + 1;
+				vm.pc = vm.r[a]  < 0 ? vm.code[vm.pc] : vm.pc + 1;
                 break;
             case OP_JP:
-                if (vm.r[b] > 0) vm.pc = vm.r[a];
+				vm.pc = vm.r[a]  > 0 ? vm.code[vm.pc] : vm.pc + 1;
                 break;
             case OP_JNZ:
-                if (vm.r[b] <= 0) vm.pc = vm.r[a];
+				vm.pc = vm.r[a] <= 0 ? vm.code[vm.pc] : vm.pc + 1;
                 break;
             case OP_JPZ:
-                if (vm.r[b] >= 0) vm.pc = vm.r[a];
+				vm.pc = vm.r[a] >= 0 ? vm.code[vm.pc] : vm.pc + 1;
                 break;
             default:
                 /* BAD OPCODE */
