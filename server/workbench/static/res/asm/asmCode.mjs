@@ -2,6 +2,7 @@ import reg from "./registers.mjs";
 import instrs from "./instructions.mjs";
 
 const type = Object.create(null);
+type.code = "c";
 type.instructions = instrs;
 type.reg = reg;
 type.assemble = assemble;
@@ -16,7 +17,7 @@ function create(assembly) {
 	seg.opcodes = [];
 
 	seg.errors = [];
-	seg.labels = Object.create(null);
+	// seg.labels = Object.create(null);
 	seg.reg = type.reg;
 	seg.counter = 0;
 
@@ -49,7 +50,7 @@ function assemble(assembly) {
 	//The header is the segment type & target length.
 	let count = seg.opcodes.length / 2;
 	if (seg.opcodes.length % 2) count++;
-	seg.header = "/c" + seg.assembly.encode(count);
+	seg.header = "/" + seg.type.code + seg.assembly.encode(count);
 }
 
 function parse(seg) {
@@ -64,13 +65,14 @@ function parse(seg) {
 
 		//1. check label. It is optional.
 		if (token.type == "LABEL") {
-			token.pc = seg.counter;
-			if (seg.labels[token.value]) {
+			token.offset = seg.counter;
+			if (seg.assembly.labels[token.value]) {
 				console.info("Label is already defined:", token);
 			}
 			token.name = token.value;
+			token.seg = seg;
 			delete token.value;
-			seg.labels[token.name] = token;
+			seg.assembly.labels[token.name] = token;
 			token = tokens.read();
 		}
 
@@ -85,7 +87,7 @@ function parse(seg) {
 		if (instr) {
 			token.name = token.value;
 			token.value = instr.opcode;
-			token.pc = seg.counter;
+			token.offset = seg.counter;
 			token.seg = seg;
 			//4. Ensure the pc is accurate based on the arguments to the instruction.
 			seg.counter += instr.count(token)

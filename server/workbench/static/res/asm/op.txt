@@ -1,0 +1,16 @@
+Arithmetic:
+and
+or
+shf
+add
+sub
+mul
+div
+mod
+
+00 000 aaa
+01 uop aaa
+10 bop aaa bbb
+10000 aop aaa 000 xx [16]
+11000 rel aaa bbb xx
+

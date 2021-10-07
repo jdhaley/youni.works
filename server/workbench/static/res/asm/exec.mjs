@@ -47,7 +47,7 @@ export default function exec(vm) {
                 vm.r[a] = vm.data[vm.r[b]];
                 break;
             case OP_GET_L:
-                vm.r[a] = vm.data[vm.pc++];
+                vm.r[a] = vm.data[vm.code[vm.pc++]];
                 break;
             case OP_SET_R:
                 vm.r[a] = vm.r[b];
@@ -89,7 +89,7 @@ export default function exec(vm) {
                 if (vm.r[b] != 0) vm.pc = vm.r[a];
                 break;
             case OP_JN:
-                if (vm.r[b] < 0) vm.pc = vm.r[a];
+				vm.pc = vm.r[a] < 0 ? vm.code[vm.pc] : vm.pc + 1;
                 break;
             case OP_JP:
                 if (vm.r[b] > 0) vm.pc = vm.r[a];

@@ -15,6 +15,8 @@ export default function assemble(source) {
 	asm.tokens = tokenStream(source);
 	asm.target = "";
 	asm.encode = encode;
+	asm.errors = [];
+	asm.labels = Object.create(null);
 
 	let type = asm.types.Code;
 	let token = asm.tokens.peek();

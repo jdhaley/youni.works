@@ -56,7 +56,7 @@ const instrs = {
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber,
+		asm: asm_set,
 		modes: ["R", "I"]
 	},
     and: {
@@ -220,10 +220,10 @@ function get_ab(instr) {
 	}
 	return a | (b << 3);
 }
-function checkArgs_a(instr, op) {
+function checkArgs_a(instr) {
 	let args = instr.args;
-	if (args.length > op.argMax) instr.warning = "Extraneous arguments will be ignored.";
-	if (args.length < op.argMin) {
+	if (args.length > this.argMax) instr.warning = "Extraneous arguments will be ignored.";
+	if (args.length < this.argMin) {
 		instr.error = "Missing argument(s).";
 		return;
 	}
@@ -232,10 +232,49 @@ function checkArgs_a(instr, op) {
 		return;
 	}
 }
+
+function asm_set(instr) {
+	checkArgs_a.call(this, instr);
+	let ab = get_ab(instr);
+
+	let args = instr.args;
+
+	let reg = instr.seg.reg;
+	if (reg[args[1].value]) {
+		//op a b
+		instr.seg.opcodes.push(this.opcode | ab << 8);
+		return;
+	}
+	let imm = 0;
+	if (args[1].type == "NUMBER") {
+		//op+1 a number
+		imm = args[1].value * 1;
+	} else if (args[1].type == "SYMBOL") {
+		//op+1 a label
+		let label = instr.seg.assembly.labels[args[1].value];
+		if (!label) {
+			instr.error = "Argument 'B' Label not defined.";
+			return;
+		}
+		imm = label.offset;
+		// if (label.seg.type.code != "d") {
+		// 	console.error("Not a data label.");
+		// }
+		
+	} else {
+		instr.error = "Argument 'B' must be a Register name, numeric value, or label.";
+		return;
+	}
+	instr.seg.opcodes.push(this.opcode + 1 | ab << 8);
+	instr.seg.opcodes.push(imm);
+
+	return;
+}
+
 //op	a b
 //op+1	a ;	number
 function asm_a_bOrNumber(instr) {
-	checkArgs_a(instr, this);
+	checkArgs_a.call(this, instr);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
@@ -259,7 +298,7 @@ function asm_a_bOrNumber(instr) {
 //op	a b
 //op+1	a ,	label number?
 function asm_a_bOrLabel(instr) {
-	checkArgs_a(instr, this);
+	checkArgs_a.call(this, instr);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
@@ -270,13 +309,16 @@ function asm_a_bOrLabel(instr) {
 		instr.seg.opcodes.push(this.opcode | ab << 8);
 	} else if (args[1].type == "SYMBOL") {
 		//op+1 a label
-		let label = instr.seg.labels[args[1].value];
+		let label = instr.seg.assembly.labels[args[1].value];
 		if (!label) {
 			instr.error = "Argument 'B' Label not defined.";
 			return;
 		}
+		if (label.seg.type.code != "d") {
+			console.error("Not a data label.");
+		}
 		instr.seg.opcodes.push(this.opcode + 1 | ab << 8);
-		instr.seg.opcodes.push(label.pc);
+		instr.seg.opcodes.push(label.offset);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or Label name";
 	}
@@ -284,19 +326,22 @@ function asm_a_bOrLabel(instr) {
 }
 
 function asm_a_label(instr) {
-	checkArgs_a(instr, this);
+	checkArgs_a.call(this, instr);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
 
 	if (args[1].type == "SYMBOL") {
-		let label = instr.seg.labels[args[1].value];
+		let label = instr.seg.assembly.labels[args[1].value];
 		if (!label) {
 			instr.error = "Argument 'B' Label is not defined.";
 			return;
 		}
+		if (label.seg.type.code != "c") {
+			console.error("Not a code label.");
+		}
 		instr.seg.opcodes.push(this.opcode | ab << 8);
-		instr.seg.opcodes.push(label.pc);
+		instr.seg.opcodes.push(label.offset);
 	} else {
 		instr.error = "Argument 'B' must be a Code Label name";
 	}

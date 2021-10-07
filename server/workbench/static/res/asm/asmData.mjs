@@ -1,4 +1,5 @@
 const type = Object.create(null);
+type.code = "d";
 type.assemble = assemble;
 export default type;
 
@@ -8,9 +9,9 @@ function create(assembly) {
 	seg.assembly = assembly;
 	seg.type = type;
 	seg.errors = [];
-	seg.labels = Object.create(null);
 	seg.code = "";
 	seg.counter = 0;
+	seg.data = [];
 
 	let tokens = assembly.tokens;
 	let token = tokens.peek();
@@ -30,7 +31,7 @@ function create(assembly) {
 function assemble(assembly) {
 	let seg = create(assembly);
 	parse(seg);
-	seg.header = "/d" + seg.assembly.encode(seg.counter);
+	seg.header = "/" + seg.type.code + seg.assembly.encode(seg.counter);
 }
 
 function parse(seg) {
@@ -45,25 +46,29 @@ function parse(seg) {
 
 		switch (token.type) {
 			case "LABEL": {
-				token.pc = seg.counter;
-				if (seg.labels[token.value]) {
+				token.offset = seg.counter;
+				if (seg.assembly.labels[token.value]) {
 					console.info("Label is already defined:", token);
 				}
 				token.name = token.value;
+				token.seg = seg;
 				delete token.value;
-				seg.labels[token.name] = token;	
+				seg.assembly.labels[token.name] = token;	
 			}	break;
 			case "NUMBER": {
 				seg.code += seg.assembly.encode(token.value * 1);
+				seg.data[seg.counter] = (token.value * 1);
 				seg.counter++;
 			}	break;
 			case "COUNT": {
 				let n = token.value * 1;
 				if (n < 0) throw new Error("Negative count.");
+				// TODO should these be added to the seg.data?
 				seg.code += "*" + seg.assembly.encode(n).substring(1);
 				seg.counter += n;
 			}	break;
 			case "STRING": {
+				// TODO add string data to the .data
 				let v = token.value + "\0";
 				//Encoding converts each pair of UTF-16 characters into an encoded 32-bit value.
 				seg.code += seg.assembly.encode(v);
