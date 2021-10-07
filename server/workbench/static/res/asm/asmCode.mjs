@@ -1,6 +1,17 @@
 import reg from "./registers.mjs";
 import instrs from "./instructions.mjs";
 
+let jsOps = "";
+let cOps = "";
+for (let name in instrs) {
+	let instr = instrs[name];
+	jsOps += `const OP_${name.toUpperCase()} = ${instr.opcode};\n`;
+	cOps += `\tOP_${name.toUpperCase()} = ${instr.opcode},\n`;
+}
+console.log(jsOps);
+console.log(cOps);
+
+
 const type = Object.create(null);
 type.code = "c";
 type.instructions = instrs;
@@ -40,7 +51,8 @@ function assemble(assembly) {
 	let seg = create(assembly);
 	parse(seg);
 	for (let instr of seg.stmts) {
-		seg.type.instructions[instr.name].asm(instr);
+		let op = seg.type.instructions[instr.name];
+		op.type.asm(instr, op);
 	}
 	seg.code = "";
 	for (let i = 0; i < seg.opcodes.length; i += 2) {
@@ -90,7 +102,7 @@ function parse(seg) {
 			token.offset = seg.counter;
 			token.seg = seg;
 			//4. Ensure the pc is accurate based on the arguments to the instruction.
-			seg.counter += instr.count(token)
+			seg.counter += instr.type.count(token)
 			seg.stmts.push(token);	
 		} else {
 			token.type = "BAD_INSTRUCTION";
