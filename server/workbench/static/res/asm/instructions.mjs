@@ -32,7 +32,14 @@ const instrs = {
 		argMin: 1,
 		argMax: 1,
 		count: instr => 1,
-		asm: asm_a
+		asm: asmUnary
+	},
+	neg: {
+		opcode: 5,
+		argMin: 1,
+		argMax: 1,
+		count: instr => 1,
+		asm: asmUnary
 	},
 	get: {
 		opcode: 8,
@@ -51,140 +58,139 @@ const instrs = {
 		modes: ["R", "L"],
 		vm: ["vm->data[A] = B;", "vm->data[I] = B;"]
 	},
+
     set: {
-		opcode: 12,
+		opcode: 15,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_set,
-		modes: ["R", "I"]
+		asm: asmBinary
 	},
-	
     and: {
 		opcode: 16,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
     or: {
 		opcode: 17,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
     xor: {
 		opcode: 18,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
 	add: {
 		opcode: 19,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
 	sub: {
 		opcode: 20,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
 	mul: {
 		opcode: 21,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
 	div: {
 		opcode: 22,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
 	mod: {
 		opcode: 23,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
 	shl: {
 		opcode: 24,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
 	shr: {
 		opcode: 25,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber
+		asm: asmBinary
 	},
 	jmp: {
 		opcode: 56,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asm_a_label
+		asm: asmJump
 	},
 	jsr: {
 		opcode: 57,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asm_a_label
+		asm: asmJump
 	},
 	jz: {
 		opcode: 58,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asm_a_label
+		asm: asmJump
 	},
 	jv: {
 		opcode: 59,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asm_a_label
+		asm: asmJump
 	},
 	jn: {
 		opcode: 60,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asm_a_label
+		asm: asmJump
 	},
 	jp: {
 		opcode: 61,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asm_a_label
+		asm: asmJump
 	},
 	jnz: {
 		opcode: 62,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asm_a_label
+		asm: asmJump
 	},
 	jpz: {
 		opcode: 63,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asm_a_label
+		asm: asmJump
 	}
 }
 //const OP_SET_I = 13;
@@ -206,20 +212,12 @@ console.log(opcodes);
 export default instrs;
 //////////////////////
 
-function rAndImm(instr) {
-	for (let arg of instr.args) {
-		//If not a register symbol, assume it is a following argument.
-		if (!instr.seg.reg[arg.value]) return 2;
-	}
-	return 1;
-}
-
 function asm(instr) {
 	instr.seg.opcodes.push(this.opcode);
 }
 
 //op a
-function asm_a(instr) {
+function asmUnary(instr) {
 	let args = instr.args;
 	if (!args.length) {
 		instr.error = "Missing Register argument.";
@@ -238,31 +236,7 @@ function asm_a(instr) {
 	instr.seg.opcodes.push(r << 8 | this.opcode);
 }
 
-// a b?
-function get_ab(instr) {
-	let reg = instr.seg.reg;
-	let args = instr.args;
-	let a = reg[args[0].value] * 1;
-	let b = 0;
-	if (reg[args[1].value]) {
-		b = reg[args[1].value] * 1;
-	}
-	return a | (b << 3);
-}
-function checkArgs_a(instr) {
-	let args = instr.args;
-	if (args.length > this.argMax) instr.warning = "Extraneous arguments will be ignored.";
-	if (args.length < this.argMin) {
-		instr.error = "Missing argument(s).";
-		return;
-	}
-	if (!instr.seg.reg[args[0].value]) {
-		instr.error = "Argument 'a' is not a Register name.";
-		return;
-	}
-}
-
-function asm_set(instr) {
+function asmBinary(instr) {
 	checkArgs_a.call(this, instr);
 	let ab = get_ab(instr);
 
@@ -276,7 +250,7 @@ function asm_set(instr) {
 	}
 	let imm = 0;
 	if (args[1].type == "NUMBER") {
-		//op+1 a number
+		//op a number
 		imm = args[1].value * 1;
 	} else if (args[1].type == "SYMBOL") {
 		//op+1 a label
@@ -294,38 +268,12 @@ function asm_set(instr) {
 		instr.error = "Argument 'B' must be a Register name, numeric value, or label.";
 		return;
 	}
-	instr.seg.opcodes.push(this.opcode + 1 | ab << 8);
+	instr.seg.opcodes.push(this.opcode | 1 << 6 | ab << 8);
 	instr.seg.opcodes.push(imm);
 
 	return;
 }
 
-//op	a b
-//op+1	a ;	number
-function asm_a_bOrNumber(instr) {
-	checkArgs_a.call(this, instr);
-	let ab = get_ab(instr);
-
-	let args = instr.args;
-
-	let reg = instr.seg.reg;
-	if (reg[args[1].value]) {
-		//op a b
-		instr.seg.opcodes.push(this.opcode | ab << 8);	
-	} else if (args[1].type == "NUMBER") {
-		//op+1 a number
-		let num = args[1].value * 1;
-		instr.seg.opcodes.push(this.opcode | 1 << 6 | ab << 8);
-		instr.seg.opcodes.push(num);
-	} else {
-		instr.error = "Argument 'B' must be a Register name or numeric value";
-	}
-	return;
-}
-
-//TODO calculate label + offset
-//op	a b
-//op+1	a ,	label number?
 function asm_a_bOrLabel(instr) {
 	checkArgs_a.call(this, instr);
 	let ab = get_ab(instr);
@@ -354,7 +302,7 @@ function asm_a_bOrLabel(instr) {
 	return;
 }
 
-function asm_a_label(instr) {
+function asmJump(instr) {
 	checkArgs_a.call(this, instr);
 	let ab = get_ab(instr);
 
@@ -375,4 +323,37 @@ function asm_a_label(instr) {
 		instr.error = "Argument 'B' must be a Code Label name";
 	}
 	return;
+}
+/////////
+function rAndImm(instr) {
+	for (let arg of instr.args) {
+		//If not a register symbol, assume it is a following argument.
+		if (!instr.seg.reg[arg.value]) return 2;
+	}
+	return 1;
+}
+
+// a b?
+function get_ab(instr) {
+	let reg = instr.seg.reg;
+	let args = instr.args;
+	let a = reg[args[0].value] * 1;
+	let b = 0;
+	if (reg[args[1].value]) {
+		b = reg[args[1].value] * 1;
+	}
+	return a | (b << 3);
+}
+
+function checkArgs_a(instr) {
+	let args = instr.args;
+	if (args.length > this.argMax) instr.warning = "Extraneous arguments will be ignored.";
+	if (args.length < this.argMin) {
+		instr.error = "Missing argument(s).";
+		return;
+	}
+	if (!instr.seg.reg[args[0].value]) {
+		instr.error = "Argument 'a' is not a Register name.";
+		return;
+	}
 }
