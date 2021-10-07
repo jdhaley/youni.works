@@ -1,30 +1,9 @@
-// case OP_GET_R: A = vm->data[B];
-// case OP_GET_L: A = vm->data[I];
-// case OP_SET_R: A = B;
-// case OP_SET_I: A = I;
-// case OP_ADD_R: A += B;
-// case OP_ADD_I: A += I;
-// case OP_SUB:   A -= B;
-// case OP_MUL:   A *= B;
-// case OP_DIV:   A /= B;
-// case OP_MOD:   A %= B;
-// case OP_AND_R: A &= B;      
-// case OP_AND_I: A &= I;
-// case OP_NOT:   A = ~A;
-// case OP_JZ:	  if (B == 0) vm->pc = A;
-// case OP_JV:    if (B != 0) vm->pc = A;
-// case OP_JN:	  if ((int32_t)  B < 0) vm->pc = A;
-// case OP_JP:    if (B > 0) vm->pc = A;
-// case OP_JNZ:   if (B <= 0) vm->pc = A;
-// case OP_JPZ:   if (B >= 0) vm->pc = A;
-
 const instrs = {
 	hlt: {
 		opcode: 0,
 		argMin: 0,
 		argMax: 0,
 		count: instr => 1,
-		vm: "running = 0;",
 		asm: asm
 	},
 	not: {
@@ -45,91 +24,91 @@ const instrs = {
 		opcode: 8,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
     put: {
 		opcode: 10,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
     set: {
 		opcode: 15,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
     and: {
 		opcode: 16,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
     or: {
 		opcode: 17,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
     xor: {
 		opcode: 18,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
 	add: {
 		opcode: 19,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
 	sub: {
 		opcode: 20,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
 	mul: {
 		opcode: 21,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
 	div: {
 		opcode: 22,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
 	mod: {
 		opcode: 23,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
 	shl: {
 		opcode: 24,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
 	shr: {
 		opcode: 25,
 		argMin: 2,
 		argMax: 2,
-		count: rAndImm,
+		count: checkImm,
 		asm: asmBinary
 	},
 	jmp: {
@@ -209,31 +188,24 @@ export default instrs;
 //////////////////////
 
 function asm(instr) {
+	checkArgs.call(this, instr);
 	instr.seg.opcodes.push(this.opcode);
 }
 
 //op a
 function asmUnary(instr) {
 	let args = instr.args;
-	if (!args.length) {
-		instr.error = "Missing Register argument.";
-		return;
-	}
+	checkArgs.call(this, instr);
+	checkA.call(this, instr);
 	let reg = instr.seg.reg;
 	let a = args[0].value;
-	if (!reg[a]) {
-		instr.error = "Argument is not a Register name.";
-		return;
-	}
-	if (args.length > 1) {
-		instr.warning = "Extraneous arguments will be ignored.";
-	}
 	let r = reg[a] * 1;
 	instr.seg.opcodes.push(r << 8 | this.opcode);
 }
 
 function asmBinary(instr) {
-	checkArgs_a.call(this, instr);
+	checkArgs.call(this, instr);
+	checkA.call(this, instr);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
@@ -271,7 +243,8 @@ function asmBinary(instr) {
 }
 
 function asm_a_bOrLabel(instr) {
-	checkArgs_a.call(this, instr);
+	checkArgs.call(this, instr);
+	checkA.call(this, instr);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
@@ -299,7 +272,8 @@ function asm_a_bOrLabel(instr) {
 }
 
 function asmJump(instr) {
-	checkArgs_a.call(this, instr);
+	checkArgs.call(this, instr);
+	checkA.call(this, instr);
 	let ab = get_ab(instr);
 
 	let args = instr.args;
@@ -307,21 +281,24 @@ function asmJump(instr) {
 	if (args[1].type == "SYMBOL") {
 		let label = instr.seg.assembly.labels[args[1].value];
 		if (!label) {
-			instr.error = "Argument 'B' Label is not defined.";
+			instr.error = "Jump target Label is not defined.";
 			return;
 		}
-		if (label.seg.type.code != "c") {
-			console.error("Not a code label.");
+		if (label.seg != instr.seg) {
+			instr.error = "Jump target must be a Label name in the current segment.";
+			return;
 		}
+		console.log("Relative jump", label.offset - instr.offset - 1);
 		instr.seg.opcodes.push(this.opcode | ab << 8);
-		instr.seg.opcodes.push(label.offset);
+		//subtract 1 from the instruction offset because the PC was just incremented for the instruction.
+		instr.seg.opcodes.push(label.offset - instr.offset - 1);
 	} else {
-		instr.error = "Argument 'B' must be a Code Label name";
+		instr.error = "Jump target must be a Label name in the current segment.";
 	}
 	return;
 }
 /////////
-function rAndImm(instr) {
+function checkImm(instr) {
 	for (let arg of instr.args) {
 		//If not a register symbol, assume it is a following argument.
 		if (!instr.seg.reg[arg.value]) return 2;
@@ -341,15 +318,14 @@ function get_ab(instr) {
 	return a | (b << 3);
 }
 
-function checkArgs_a(instr) {
+function checkArgs(instr) {
 	let args = instr.args;
 	if (args.length > this.argMax) instr.warning = "Extraneous arguments will be ignored.";
 	if (args.length < this.argMin) {
 		instr.error = "Missing argument(s).";
-		return;
 	}
-	if (!instr.seg.reg[args[0].value]) {
-		instr.error = "Argument 'a' is not a Register name.";
-		return;
-	}
+}
+function checkA(instr) {
+	if (instr.args[0] && instr.seg.reg[instr.args[0].value]) return;
+	instr.error = "First argument must be a Register name.";
 }
