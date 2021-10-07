@@ -15,7 +15,11 @@ export default {
 		argMin: 2,
 		argMax: 2,
 		count: checkImm,
-		asm: asmBinary
+		asm: asmBinary,
+		template: {
+			js: (a) => `vm.r[a] ${a.operator} mode ? vm.code[vm.pc++] : vm.r[b];`,
+			c: ""
+		}
 	},
 	jump: {
 		argMin: 2,
