@@ -59,117 +59,146 @@ const instrs = {
 		asm: asm_set,
 		modes: ["R", "I"]
 	},
+	
     and: {
-		opcode: 14,
-		argMin: 2,
-		argMax: 2,
-		count: rAndImm,
-		asm: asm_a_bOrNumber,
-		modes: ["R", "I"]
-	},
-	add: {
 		opcode: 16,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrNumber,
-		modes: ["R", "I"]
+		asm: asm_a_bOrNumber
 	},
-	sub: {
+    or: {
+		opcode: 17,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
+		asm: asm_a_bOrNumber
+	},
+    xor: {
 		opcode: 18,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
-	mul: {
+	add: {
 		opcode: 19,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
-	div: {
+	sub: {
 		opcode: 20,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
-	mod: {
+	mul: {
 		opcode: 21,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrNumber
 	},
-	jmp: {
+	div: {
+		opcode: 22,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
+		asm: asm_a_bOrNumber
+	},
+	mod: {
+		opcode: 23,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
+		asm: asm_a_bOrNumber
+	},
+	shl: {
 		opcode: 24,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
+		asm: asm_a_bOrNumber
+	},
+	shr: {
+		opcode: 25,
+		argMin: 2,
+		argMax: 2,
+		count: rAndImm,
+		asm: asm_a_bOrNumber
+	},
+	jmp: {
+		opcode: 56,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
 	jsr: {
-		opcode: 25,
+		opcode: 57,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
 	jz: {
-		opcode: 26,
+		opcode: 58,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
 	jv: {
-		opcode: 27,
+		opcode: 59,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
 	jn: {
-		opcode: 28,
+		opcode: 60,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
 	jp: {
-		opcode: 29,
+		opcode: 61,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
 	jnz: {
-		opcode: 30,
+		opcode: 62,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	},
 	jpz: {
-		opcode: 31,
+		opcode: 63,
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
 		asm: asm_a_label
 	}
 }
+//const OP_SET_I = 13;
+
 let opcodes = "";
 for (let name in instrs) {
 	let instr = instrs[name];
 	if (instr.modes) {
 		let i = 0;
 		for (let mode of instr.modes) {
-			opcodes += `,\n\tOP_${name.toUpperCase()}_${mode.toUpperCase()} = ${instr.opcode + i++}`;
+			opcodes += `;\n\tconst OP_${name.toUpperCase()}_${mode.toUpperCase()} = ${instr.opcode + i++}`;
 		}
 	} else {
-		opcodes += `,\n\tOP_${name.toUpperCase()} = ${instr.opcode}`;
+		opcodes += `;\n\tconst OP_${name.toUpperCase()} = ${instr.opcode}`;
 	}
 }
 opcodes = opcodes.substring(2);
@@ -286,7 +315,7 @@ function asm_a_bOrNumber(instr) {
 	} else if (args[1].type == "NUMBER") {
 		//op+1 a number
 		let num = args[1].value * 1;
-		instr.seg.opcodes.push(this.opcode + 1 | ab << 8);
+		instr.seg.opcodes.push(this.opcode | 1 << 6 | ab << 8);
 		instr.seg.opcodes.push(num);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or numeric value";
