@@ -56,6 +56,13 @@ function lex(source) {
 						break;
 				}
 				break;
+			case "COMMENT":
+				if (ch == "\n") {
+					cursor--;
+					col--;
+					token = NEUTRAL;
+				}
+				break;
 			case "SYMBOL":
 				switch (charType(ch)) {
 					case "LETTER":
@@ -84,13 +91,6 @@ function lex(source) {
 						col--;
 						token = NEUTRAL;
 						break;			
-				}
-				break;
-			case "COMMENT":
-				if (ch == "\n") {
-					cursor--;
-					col--;
-					token = NEUTRAL;
 				}
 				break;
 			case "STRING": {

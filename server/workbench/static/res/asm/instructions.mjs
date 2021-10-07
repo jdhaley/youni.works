@@ -1,9 +1,30 @@
+// case OP_GET_R: A = vm->data[B];
+// case OP_GET_L: A = vm->data[I];
+// case OP_SET_R: A = B;
+// case OP_SET_I: A = I;
+// case OP_ADD_R: A += B;
+// case OP_ADD_I: A += I;
+// case OP_SUB:   A -= B;
+// case OP_MUL:   A *= B;
+// case OP_DIV:   A /= B;
+// case OP_MOD:   A %= B;
+// case OP_AND_R: A &= B;      
+// case OP_AND_I: A &= I;
+// case OP_NOT:   A = ~A;
+// case OP_JZ:	  if (B == 0) vm->pc = A;
+// case OP_JV:    if (B != 0) vm->pc = A;
+// case OP_JN:	  if ((int32_t)  B < 0) vm->pc = A;
+// case OP_JP:    if (B > 0) vm->pc = A;
+// case OP_JNZ:   if (B <= 0) vm->pc = A;
+// case OP_JPZ:   if (B >= 0) vm->pc = A;
+
 const instrs = {
 	hlt: {
 		opcode: 0,
 		argMin: 0,
 		argMax: 0,
 		count: instr => 1,
+		vm: "running = 0;",
 		asm: asm
 	},
 	not: {
@@ -27,7 +48,8 @@ const instrs = {
 		argMax: 2,
 		count: rAndImm,
 		asm: asm_a_bOrLabel,
-		modes: ["R", "L"]
+		modes: ["R", "L"],
+		vm: ["vm->data[A] = B;", "vm->data[I] = B;"]
 	},
     set: {
 		opcode: 12,
@@ -164,7 +186,7 @@ function rAndImm(instr) {
 }
 
 function asm(instr) {
-	instr.code = instr.seg.assembly.encode(this.opcode);
+	instr.seg.opcodes.push(this.opcode);
 }
 
 //op a
@@ -184,7 +206,7 @@ function asm_a(instr) {
 		instr.warning = "Extraneous arguments will be ignored.";
 	}
 	let r = reg[a] * 1;
-	instr.code = instr.seg.assembly.encode(r << 8 | this.opcode);
+	instr.seg.opcodes.push(r << 8 | this.opcode);
 }
 
 // a b?
@@ -221,11 +243,12 @@ function asm_a_bOrNumber(instr) {
 	let reg = instr.seg.reg;
 	if (reg[args[1].value]) {
 		//op a b
-		instr.code = instr.seg.assembly.encode(this.opcode | ab << 8);	
+		instr.seg.opcodes.push(this.opcode | ab << 8);	
 	} else if (args[1].type == "NUMBER") {
 		//op+1 a number
 		let num = args[1].value * 1;
-		instr.code = instr.seg.assembly.encode(this.opcode + 1 | ab << 8 | num << 16);
+		instr.seg.opcodes.push(this.opcode + 1 | ab << 8);
+		instr.seg.opcodes.push(num);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or numeric value";
 	}
@@ -244,7 +267,7 @@ function asm_a_bOrLabel(instr) {
 	let reg = instr.seg.reg;
 	if (reg[args[1].value]) {
 		//op a b
-		instr.code = instr.seg.assembly.encode(this.opcode | ab << 8);	
+		instr.seg.opcodes.push(this.opcode | ab << 8);
 	} else if (args[1].type == "SYMBOL") {
 		//op+1 a label
 		let label = instr.seg.labels[args[1].value];
@@ -252,7 +275,8 @@ function asm_a_bOrLabel(instr) {
 			instr.error = "Argument 'B' Label not defined.";
 			return;
 		}
-		instr.code = instr.seg.assembly.encode(this.opcode + 1 | ab << 8 | label.pc << 16);
+		instr.seg.opcodes.push(this.opcode + 1 | ab << 8);
+		instr.seg.opcodes.push(label.pc);
 	} else {
 		instr.error = "Argument 'B' must be a Register name or Label name";
 	}
@@ -271,7 +295,8 @@ function asm_a_label(instr) {
 			instr.error = "Argument 'B' Label is not defined.";
 			return;
 		}
-		instr.code = instr.seg.assembly.encode(this.opcode | ab << 8 | label.pc << 16);
+		instr.seg.opcodes.push(this.opcode | ab << 8);
+		instr.seg.opcodes.push(label.pc);
 	} else {
 		instr.error = "Argument 'B' must be a Code Label name";
 	}

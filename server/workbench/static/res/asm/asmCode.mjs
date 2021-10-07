@@ -9,10 +9,12 @@ export default type;
 
 function create(assembly) {
 	let seg = Object.create(null);
-	seg.name = "";
 	seg.assembly = assembly;
+	seg.name = "";
 	seg.type = type;
 	seg.stmts = [];
+	seg.opcodes = [];
+
 	seg.errors = [];
 	seg.labels = Object.create(null);
 	seg.reg = type.reg;
@@ -36,14 +38,17 @@ function create(assembly) {
 function assemble(assembly) {
 	let seg = create(assembly);
 	parse(seg);
-	seg.code = "";
 	for (let instr of seg.stmts) {
 		seg.type.instructions[instr.name].asm(instr);
-		seg.code += instr.code || "";
+	}
+	seg.code = "";
+	for (let i = 0; i < seg.opcodes.length; i += 2) {
+//		console.log(seg.opcodes[i], seg.opcodes[i + 1]);
+		seg.code += seg.assembly.encode(seg.opcodes[i] | (seg.opcodes[i + 1] || 0) << 16);
 	}
 	//The header is the segment type & target length.
-	let count = seg.counter / 2;
-	if (seg.counter % 2) count++;
+	let count = seg.opcodes.length / 2;
+	if (seg.opcodes.length % 2) count++;
 	seg.header = "/c" + seg.assembly.encode(count);
 }
 
@@ -87,7 +92,7 @@ function parse(seg) {
 			seg.stmts.push(token);	
 		} else {
 			token.type = "BAD_INSTRUCTION";
-			console.info("Invalid instruction:", token);
+			console.error("Invalid instruction:", token);
 			seg.errors.push(token);
 		}
 	}
