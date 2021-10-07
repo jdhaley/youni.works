@@ -46,19 +46,15 @@ const instrs = {
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrLabel,
-		modes: ["R", "L"]
+		asm: asmBinary
 	},
     put: {
 		opcode: 10,
 		argMin: 2,
 		argMax: 2,
 		count: rAndImm,
-		asm: asm_a_bOrLabel,
-		modes: ["R", "L"],
-		vm: ["vm->data[A] = B;", "vm->data[I] = B;"]
+		asm: asmBinary
 	},
-
     set: {
 		opcode: 15,
 		argMin: 2,

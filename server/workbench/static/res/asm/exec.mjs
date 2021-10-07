@@ -1,29 +1,27 @@
-const OP_HLT = 0;
-const OP_NOT = 4;
-const OP_NEG = 5;
-const OP_GET_R = 8;
-const OP_GET_L = 9;
-const OP_PUT_R = 10;
-const OP_PUT_L = 11;
-const OP_SET = 15;
-const OP_AND = 16;
-const OP_OR = 17;
-const OP_XOR = 18;
-const OP_ADD = 19;
-const OP_SUB = 20;
-const OP_MUL = 21;
-const OP_DIV = 22;
-const OP_MOD = 23;
-const OP_SHL = 24;
-const OP_SHR = 25;
-const OP_JMP = 56;
-const OP_JSR = 57;
-const OP_JZ = 58;
-const OP_JV = 59;
-const OP_JN = 60;
-const OP_JP = 61;
-const OP_JNZ = 62;
-const OP_JPZ = 63;
+    const OP_HLT = 0;
+	const OP_NOT = 4;
+	const OP_NEG = 5;
+	const OP_GET = 8;
+	const OP_PUT = 10;
+	const OP_SET = 15;
+	const OP_AND = 16;
+	const OP_OR = 17;
+	const OP_XOR = 18;
+	const OP_ADD = 19;
+	const OP_SUB = 20;
+	const OP_MUL = 21;
+	const OP_DIV = 22;
+	const OP_MOD = 23;
+	const OP_SHL = 24;
+	const OP_SHR = 25;
+	const OP_JMP = 56;
+	const OP_JSR = 57;
+	const OP_JZ = 58;
+	const OP_JV = 59;
+	const OP_JN = 60;
+	const OP_JP = 61;
+	const OP_JNZ = 62;
+	const OP_JPZ = 63;
 
 export default function exec(vm) {
 	function I() {
@@ -39,17 +37,11 @@ export default function exec(vm) {
             case OP_HLT:
                 running = false;
                 break;
-            case OP_PUT_R:
-                vm.data[vm.r[b]] = vm.r[a];
+            case OP_PUT:
+                vm.data[mode ? vm.code[vm.pc++] : vm.r[b]] = vm.r[a];
                 break;
-            case OP_PUT_L:
-                vm.data[vm.code[vm.pc++]] = vm.r[a];
-                break;
-            case OP_GET_R:
-                vm.r[a] = vm.data[vm.r[b]];
-                break;
-            case OP_GET_L:
-                vm.r[a] = vm.data[vm.code[vm.pc++]];
+            case OP_GET:
+                vm.r[a] = vm.data[mode ? vm.code[vm.pc++] : vm.r[b]];
                 break;
             case OP_SET:
                 vm.r[a] = mode ? vm.code[vm.pc++] : vm.r[b];
