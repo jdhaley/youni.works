@@ -58,21 +58,20 @@ function encode() {
 	}
 	return out;
 }
-const digit = "0123456789ABCDEF";
 function encodeNumber(v) {
 	if (v == 0) return "+0";
-	let sign = "+";
-	if (v < 0 ) {
-		sign = "-";
-		v *= -1;
+
+	//Encode using a sign so that small negative numbers are kept short.
+	let out = v < 0 ? "-" : "+";
+	if (v < 0) v = -v;
+
+	// The value is encoded in little-endian 6-bit digits
+	let zero = 48 //ASCII value for zero.
+	while (v) {
+		//Convert the least significant 6 bits into a digit.
+		out += String.fromCharCode((v & 63) + zero);
+		//Move the next higher 6 bits into the least significant position for encoding.
+		v >>= 6;
 	}
-	let out = "";
-	for (let n = 7; n >= 0; n--) {
-		let nyb = (v >> (4 * n)) & 0xF;
-		out += digit[nyb];
-	}
-	for (let i = 0; i < out.length; i++) {
-		if (out[i] != "0") return sign + out.substr(i);
-	}
-	return "?";
+	return out;
 }
