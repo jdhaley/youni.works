@@ -23,9 +23,6 @@ const OP_JNZ = 30;
 const OP_JPZ = 31;
 
 export default function exec(vm) {
-	function I() {
-		return vm.code[vm.pc++];
-	}
 	let running = true;
     while (running) {
 		let i = vm.code[vm.pc++];
