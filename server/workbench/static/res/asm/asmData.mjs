@@ -9,7 +9,7 @@ function create(assembly) {
 	seg.assembly = assembly;
 	seg.type = type;
 	seg.errors = [];
-	seg.code = "";
+	seg.target = "";
 	seg.counter = 0;
 	seg.data = [];
 
@@ -31,7 +31,7 @@ function create(assembly) {
 function assemble(assembly) {
 	let seg = create(assembly);
 	parse(seg);
-	seg.header = "/" + seg.type.code + seg.assembly.encode(seg.counter);
+	seg.target = "/" + seg.type.code + seg.assembly.encode(seg.counter) + seg.target;
 }
 
 function parse(seg) {
@@ -56,7 +56,7 @@ function parse(seg) {
 				seg.assembly.labels[token.name] = token;	
 			}	break;
 			case "NUMBER": {
-				seg.code += seg.assembly.encode(token.value * 1);
+				seg.target += seg.assembly.encode(token.value * 1);
 				seg.data[seg.counter] = (token.value * 1);
 				seg.counter++;
 			}	break;
@@ -64,14 +64,14 @@ function parse(seg) {
 				let n = token.value * 1;
 				if (n < 0) throw new Error("Negative count.");
 				// TODO should these be added to the seg.data?
-				seg.code += "*" + seg.assembly.encode(n).substring(1);
+				seg.target += "*" + seg.assembly.encode(n).substring(1);
 				seg.counter += n;
 			}	break;
 			case "STRING": {
 				// TODO add string data to the .data
 				let v = token.value + "\0";
 				//Encoding converts each pair of UTF-16 characters into an encoded 32-bit value.
-				seg.code += seg.assembly.encode(v);
+				seg.target += seg.assembly.encode(v);
 				//Dive the string length by 2 to get the 32-bit word count.
 				seg.counter += v.length / 2;
 				//If the length is odd, make sure we stay aligned on 32-bits.

@@ -54,15 +54,10 @@ function assemble(assembly) {
 		let op = seg.type.instructions[instr.name];
 		op.type.asm(instr, op);
 	}
-	seg.code = "";
-	for (let i = 0; i < seg.opcodes.length; i += 2) {
-//		console.log(seg.opcodes[i], seg.opcodes[i + 1]);
-		seg.code += seg.assembly.encode(seg.opcodes[i] | (seg.opcodes[i + 1] || 0) << 16);
+	seg.target = "/" + seg.type.code + seg.assembly.encode(seg.opcodes.length);
+	for (let i = 0; i < seg.opcodes.length; i++) {
+		seg.target += seg.assembly.encode(seg.opcodes[i]);
 	}
-	//The header is the segment type & target length.
-	let count = seg.opcodes.length / 2;
-	if (seg.opcodes.length % 2) count++;
-	seg.header = "/" + seg.type.code + seg.assembly.encode(count);
 }
 
 function parse(seg) {
@@ -111,3 +106,10 @@ function parse(seg) {
 		}
 	}
 }
+
+//For now don't combine ops into a single 32-bit value...
+//
+// for (let i = 0; i < seg.opcodes.length; i += 2) {
+// 	seg.code += seg.assembly.encode(seg.opcodes[i] | (seg.opcodes[i + 1] || 0) << 16);
+// }
+	

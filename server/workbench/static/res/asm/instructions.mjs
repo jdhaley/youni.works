@@ -1,25 +1,43 @@
 import type from "./instrTypes.mjs";
+	// jmp: {
+	// 	opcode: 56,
+	// 	argMin: 2,
+	// 	argMax: 2,
+	// 	count: instr => 2,
+	// 	asm: asmJump
+	// },
+	// jsr: {
+	// 	opcode: 57,
+	// 	argMin: 2,
+	// 	argMax: 2,
+	// 	count: instr => 2,
+	// 	asm: asmJump
+	// },
 
 export default {
 	hlt: {
 		opcode: 0,
 		type: type.noarg
 	},
-	not: {
-		opcode: 4,
-		type: type.unary
-	},
-	neg: {
-		opcode: 5,
-		type: type.unary
+	nop: {
+		opcode: 1,
+		type: type.noarg
 	},
 	get: {
 		opcode: 8,
 		type: type.binary
 	},
     put: {
-		opcode: 10,
+		opcode: 9,
 		type: type.binary
+	},
+	not: {
+		opcode: 13,
+		type: type.unary
+	},
+	neg: {
+		opcode: 14,
+		type: type.unary
 	},
     set: {
 		opcode: 15,
@@ -65,42 +83,28 @@ export default {
 		opcode: 25,
 		type: type.binary
 	},
-	// jmp: {
-	// 	opcode: 56,
-	// 	argMin: 2,
-	// 	argMax: 2,
-	// 	count: instr => 2,
-	// 	asm: asmJump
-	// },
-	// jsr: {
-	// 	opcode: 57,
-	// 	argMin: 2,
-	// 	argMax: 2,
-	// 	count: instr => 2,
-	// 	asm: asmJump
-	// },
 	jz: {
-		opcode: 58,
+		opcode: 26,
 		type: type.jump
 	},
 	jv: {
-		opcode: 59,
+		opcode: 27,
 		type: type.jump
 	},
 	jn: {
-		opcode: 60,
+		opcode: 28,
 		type: type.jump
 	},
 	jp: {
-		opcode: 61,
+		opcode: 29,
 		type: type.jump
 	},
 	jnz: {
-		opcode: 62,
+		opcode: 30,
 		type: type.jump
 	},
 	jpz: {
-		opcode: 63,
+		opcode: 31,
 		type: type.jump
 	}
 }

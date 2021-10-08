@@ -25,7 +25,7 @@ export default function assemble(source) {
 	}
 	type.assemble(asm);
 	asm.target = encode(asm.segments.length);
-	for (let seg of asm.segments) asm.target += seg.header + seg.code;
+	for (let seg of asm.segments) asm.target += seg.target;
 	console.log(asm);
 	return asm;
 }
