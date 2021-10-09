@@ -3,7 +3,8 @@ import exec from "./exec.mjs";
 let source = `
 Code
 set r0 var
-set r2 -99      ; the value must be less than 99.
+set r2 limit      ; the value must be less than 99.
+get r2 r2
 loop:
     get r1 r0   ; fetch the data from the r0 pointer [Data.var] into r1.
     add r1 13   ; add 13 to the value in r1.
@@ -13,6 +14,7 @@ loop:
 hlt
 Data
             -32
+    limit: -1000000000
     var:  7 60 61 62 63  ; comment test.
     arr: *5
     string: "Hello, world!!"
@@ -28,4 +30,4 @@ let vm = {
     code: asm.segments[0].opcodes,
     data: asm.segments[1].data
 }
-exec(vm);
+//exec(vm);
