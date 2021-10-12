@@ -14,7 +14,7 @@ loop:
 hlt
 Data
             -32
-    limit: -99
+    limit: -1000000000
     var:  7 60 61 62 63  ; comment test.
     arr: *5
     string: "Hello, world!!"
@@ -30,4 +30,4 @@ let vm = {
     code: asm.segments[0].opcodes,
     data: asm.segments[1].data
 }
-exec(vm);
+//exec(vm);
