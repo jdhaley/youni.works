@@ -3,12 +3,32 @@ import instrs from "./instructions.mjs";
 
 let jsOps = "";
 let cOps = "";
+let jsCode = "";
+let ws = "";
 for (let name in instrs) {
 	let instr = instrs[name];
 	jsOps += `const OP_${name.toUpperCase()} = ${instr.opcode};\n`;
 	cOps += `\tOP_${name.toUpperCase()} = ${instr.opcode},\n`;
+	jsCode += `${ws}case OP_${name.toUpperCase()}: ${instr.tpl.js()}; break;`
+	ws = "\n\t\t\t";
 }
-console.log(jsOps);
+let exec = `
+${jsOps}
+export default function exec(vm) {
+	let running = true;
+    while (running) {
+		let i = vm.code[vm.pc++];
+		let mode = i >> 6 & 3;
+		let a = i >> 8 & 7;
+		let b = i >> 11 & 7;
+        switch (i & 63) {
+			${jsCode}
+			default: break;
+		}
+	}
+}
+`
+console.log(exec);
 console.log(cOps);
 
 

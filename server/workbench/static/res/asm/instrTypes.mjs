@@ -131,7 +131,6 @@ function asmJump(instr, op) {
 			instr.error = "Jump target must be a Label name in the current segment.";
 			return;
 		}
-		console.log("Relative jump", label.offset - instr.offset - 1);
 		instr.seg.opcodes.push(op.opcode | ab << 8);
 		//subtract 1 from the instruction offset because the PC was just incremented for the instruction.
 		instr.seg.opcodes.push(label.offset - instr.offset - 1);

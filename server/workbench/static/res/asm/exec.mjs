@@ -30,77 +30,30 @@ export default function exec(vm) {
 		let a = i >> 8 & 7;
 		let b = i >> 11 & 7;
         switch (i & 63) {
-            case OP_HLT:
-                running = false;
-                break;
-            case OP_NOP:
-                break;
-            case OP_PUT:
-                vm.data[mode ? vm.code[vm.pc++] : vm.r[b]] = vm.r[a];
-                break;
-            case OP_GET:
-                vm.r[a] = vm.data[mode ? vm.code[vm.pc++] : vm.r[b]];
-                break;
-            case OP_SET:
-                vm.r[a] = mode ? vm.code[vm.pc++] : vm.r[b];
-                break;
-            case OP_ADD:
-                vm.r[a] += mode ? vm.code[vm.pc++] : vm.r[b];
-                break;
-            case OP_SUB:
-                vm.r[a] -= mode ? vm.code[vm.pc++] : vm.r[b];
-                break;
-            case OP_MUL:
-                vm.r[a] *= mode ? vm.code[vm.pc++] : vm.r[b];
-                break;
-            case OP_DIV:
-                vm.r[a] /= mode ? vm.code[vm.pc++] : vm.r[b];
-                break;
-            case OP_MOD:
-                vm.r[a] %= mode ? vm.code[vm.pc++] : vm.r[b];
-                break;       
-            case OP_AND:
-                vm.r[a] &= mode ? vm.code[vm.pc++] : vm.r[b];
-                break;       
-            case OP_OR:
-                vm.r[a] |= mode ? vm.code[vm.pc++] : vm.r[b];
-                break;
-			case OP_XOR:
-				vm.r[a] ^= mode ? vm.code[vm.pc++] : vm.r[b];
-				break;
-			case OP_SHL:
-				vm.r[a] <<= mode ? vm.code[vm.pc++] : vm.r[b];
-				break;
-			case OP_SHR:
-				vm.r[a] >>= mode ? vm.code[vm.pc++] : vm.r[b];
-				break;
-			case OP_NOT:
-                vm.r[a] = ~vm.r[a];
-                break;
-            case OP_NEG:
-                vm.r[a] = -vm.r[a];
-                break;    
-            case OP_JZ:
-				vm.pc += vm.r[a] == 0 ? vm.code[vm.pc] : 1;
-                break;
-            case OP_JV:
-				vm.pc += vm.r[a] != 0 ? vm.code[vm.pc] : 1;
-                break;
-            case OP_JN:
-				vm.pc += vm.r[a]  < 0 ? vm.code[vm.pc] : 1;
-                break;
-            case OP_JP:
-				vm.pc += vm.r[a]  > 0 ? vm.code[vm.pc] : 1;
-                break;
-            case OP_JNZ:
-				vm.pc += vm.r[a] <= 0 ? vm.code[vm.pc] : 1;
-                break;
-            case OP_JPZ:
-				vm.pc += vm.r[a] >= 0 ? vm.code[vm.pc] : 1;
-                break;
-            default:
-                /* BAD OPCODE */
-                break;
-        }
-    }
+			case OP_HLT: running = false; break;
+			case OP_NOP: ; break;
+			case OP_GET: vm.r[a] = vm.data[mode ? vm.code[vm.pc++] : vm.r[b]]; break;
+			case OP_PUT: vm.data[mode ? vm.code[vm.pc++] : vm.r[b]] = vm.r[a]; break;
+			case OP_NOT: vm.r[a] = ~vm.r[a]; break;
+			case OP_NEG: vm.r[a] = -vm.r[a]; break;
+			case OP_SET: vm.r[a] = mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_AND: vm.r[a] &= mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_OR: vm.r[a] |= mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_XOR: vm.r[a] ^= mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_ADD: vm.r[a] += mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_SUB: vm.r[a] -= mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_MUL: vm.r[a] *= mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_DIV: vm.r[a] = vm.r[a] / (mode ? vm.code[vm.pc++] : vm.r[b]) & 0xFFFFFFFF; break;
+			case OP_MOD: vm.r[a] = vm.r[a] % (mode ? vm.code[vm.pc++] : vm.r[b]) & 0xFFFFFFFF; break;
+			case OP_SHL: vm.r[a] <<= mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_SHR: vm.r[a] >>= mode ? vm.code[vm.pc++] : vm.r[b]; break;
+			case OP_JZ: vm.pc += vm.r[a] == 0 ? vm.code[vm.pc] : 1; break;
+			case OP_JV: vm.pc += vm.r[a] != 0 ? vm.code[vm.pc] : 1; break;
+			case OP_JN: vm.pc += vm.r[a] < 0 ? vm.code[vm.pc] : 1; break;
+			case OP_JP: vm.pc += vm.r[a] > 0 ? vm.code[vm.pc] : 1; break;
+			case OP_JNZ: vm.pc += vm.r[a] <= 0 ? vm.code[vm.pc] : 1; break;
+			case OP_JPZ: vm.pc += vm.r[a] >= 0 ? vm.code[vm.pc] : 1; break;
+			default: break;
+		}
+	}
 }
