@@ -9,23 +9,28 @@ export default {
 		argMin: 1,
 		argMax: 1,
 		count: instr => 1,
-		asm: asmUnary
+		asm: asmUnary,
+		tpl: {
+			js: a => `vm.r[a] = ${a.oper}vm.r[a]`
+		}
 	},
 	binary: {
 		argMin: 2,
 		argMax: 2,
 		count: checkImm,
 		asm: asmBinary,
-		template: {
-			js: (a) => `vm.r[a] ${a.operator} mode ? vm.code[vm.pc++] : vm.r[b];`,
-			c: ""
+		tpl: {
+			js: a => `vm.r[a] ${a.oper} mode ? vm.code[vm.pc++] : vm.r[b]`
 		}
 	},
 	jump: {
 		argMin: 2,
 		argMax: 2,
 		count: instr => 2,
-		asm: asmJump
+		asm: asmJump,
+		tpl: {
+			js: a => `vm.pc += vm.r[a] ${a.oper} 0 ? vm.code[vm.pc] : 1`
+		}
 	}
 }
 //////////////////////

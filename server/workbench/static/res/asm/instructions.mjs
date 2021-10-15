@@ -51,153 +51,134 @@ export default {
 	not: {
 		opcode: 13,
 		type: type.unary,
+		oper: "~",
 		tpl: {
-			js: i => `vm.r[a] = ~vm.r[a]`,
-			c: i => ``
 		}
 	},
 	neg: {
 		opcode: 14,
 		type: type.unary,
+		oper: "-",
 		tpl: {
-			js: i => `vm.r[a] = -vm.r[a]`,
-			c: i => ``
 		}
 	},
     set: {
 		opcode: 15,
 		type: type.binary,
+		oper: "=",
 		tpl: {
-			js: i => `vm.r[a] = mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
     and: {
 		opcode: 16,
 		type: type.binary,
+		oper: "&=",
 		tpl: {
-			js: i => `vm.r[a] &= mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
     or: {
 		opcode: 17,
 		type: type.binary,
+		oper: "|=",
 		tpl: {
-			js: i => `vm.r[a] |= mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
     xor: {
 		opcode: 18,
 		type: type.binary,
+		oper: "^=",
 		tpl: {
-			js: i => `vm.r[a] ^= mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
 	add: {
 		opcode: 19,
 		type: type.binary,
+		oper: "+=",
 		tpl: {
-			js: i => `vm.r[a] += mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
 	sub: {
 		opcode: 20,
 		type: type.binary,
+		oper: "-=",
 		tpl: {
-			js: i => `vm.r[a] -= mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
 	mul: {
 		opcode: 21,
 		type: type.binary,
+		oper: "*=",
 		tpl: {
-			js: i => `vm.r[a] *= mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
 	div: {
 		opcode: 22,
 		type: type.binary,
 		tpl: {
-			js: i => `vm.r[a] = vm.r[a] / (mode ? vm.code[vm.pc++] : vm.r[b]) & 0xFFFFFFFF`,
-			c: i => ``
+			js: a => `vm.r[a] = vm.r[a] / (mode ? vm.code[vm.pc++] : vm.r[b]) & 0xFFFFFFFF`,
 		}
 	},
 	mod: {
 		opcode: 23,
 		type: type.binary,
 		tpl: {
-			js: i => `vm.r[a] = vm.r[a] % (mode ? vm.code[vm.pc++] : vm.r[b]) & 0xFFFFFFFF`,
-			c: i => ``
+			js: a => `vm.r[a] = vm.r[a] % (mode ? vm.code[vm.pc++] : vm.r[b]) & 0xFFFFFFFF`,
 		}
 	},
 	shl: {
 		opcode: 24,
 		type: type.binary,
+		oper: "<<=",
 		tpl: {
-			js: i => `vm.r[a] <<= mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
 	shr: {
 		opcode: 25,
 		type: type.binary,
+		oper: ">>=",
 		tpl: {
-			js: i => `vm.r[a] >>= mode ? vm.code[vm.pc++] : vm.r[b]`,
-			c: i => ``
 		}
 	},
 	jz: {
 		opcode: 26,
 		type: type.jump,
+		oper: "==",
 		tpl: {
-			js: i => `vm.pc += vm.r[a] == 0 ? vm.code[vm.pc] : 1`,
-			c: i => ``
 		}
 	},
 	jv: {
 		opcode: 27,
 		type: type.jump,
+		oper: "!=",
 		tpl: {
-			js: i => `vm.pc += vm.r[a] != 0 ? vm.code[vm.pc] : 1`,
-			c: i => ``
 		}
 	},
 	jn: {
 		opcode: 28,
 		type: type.jump,
+		oper: "<",
 		tpl: {
-			js: i => `vm.pc += vm.r[a] < 0 ? vm.code[vm.pc] : 1`,
-			c: i => ``
 		}
 	},
 	jp: {
 		opcode: 29,
 		type: type.jump,
+		oper: ">",
 		tpl: {
-			js: i => `vm.pc += vm.r[a] > 0 ? vm.code[vm.pc] : 1`,
-			c: i => ``
 		}
 	},
 	jnz: {
 		opcode: 30,
 		type: type.jump,
+		oper: "<=",
 		tpl: {
-			js: i => `vm.pc += vm.r[a] <= 0 ? vm.code[vm.pc] : 1`,
-			c: i => ``
 		}
 	},
 	jpz: {
 		opcode: 31,
 		type: type.jump,
+		oper: ">=",
 		tpl: {
-			js: i => `vm.pc += vm.r[a] >= 0 ? vm.code[vm.pc] : 1`,
-			c: i => ``
 		}
 	}
 }

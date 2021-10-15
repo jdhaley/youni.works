@@ -9,7 +9,9 @@ for (let name in instrs) {
 	let instr = instrs[name];
 	jsOps += `const OP_${name.toUpperCase()} = ${instr.opcode};\n`;
 	cOps += `\tOP_${name.toUpperCase()} = ${instr.opcode},\n`;
-	jsCode += `${ws}case OP_${name.toUpperCase()}: ${instr.tpl.js()}; break;`
+	instr.name = name;
+	let gen = instr.tpl.js ? instr.tpl.js(instr) : instr.type.tpl.js(instr);
+	jsCode += `${ws}case OP_${name.toUpperCase()}: ${gen}; break;`
 	ws = "\n\t\t\t";
 }
 let exec = `
