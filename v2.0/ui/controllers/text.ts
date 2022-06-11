@@ -1,0 +1,78 @@
+import { Display, UserEvent } from "../../display.js";
+import {extend} from "../../util.js";
+import view from "./view.js";
+
+export default extend(view, {
+	// copy(this: Article, event: UserEvent) {
+	// 	event.subject = "";
+	// 	let range = this.owner.selectionRange;
+	// 	range = adjustRange(range, getElement(range, "list"));
+	// 	event.clipboardData.setData("text/json", JSON.stringify(this.toModel(range)));
+	// },
+	// cut(this: Article, event: UserEvent) {
+	// 	event.subject = "";
+	// 	let range = this.owner.selectionRange;
+	// 	if (range.collapsed) return;
+	// 	range = adjustRange(range, getElement(range, "list"));
+	// 	event.clipboardData.setData("text/json", JSON.stringify(this.toModel(range)));
+	// 	range = this.edit("Cut", range, "");
+	// 	range.collapse();
+	// },
+	// paste(this: Article, event: UserEvent) {
+	// 	event.subject = "";
+	// 	let range = this.owner.selectionRange;
+	// 	let data = event.clipboardData.getData("text/json");
+	// 	console.log(data);
+	// 	let model = JSON.parse(data);
+	// 	let view = this.type.toView(model, this.view);
+	// 	range = this.edit("Paste", range, view.innerHTML);
+	// 	range.collapse();
+	// },
+	charpress(this: Display, event: UserEvent) {
+		console.log(event);
+		// event.subject = ""
+		// let range = this.owner.selectionRange;
+		// let node = range.commonAncestorContainer;
+		// if (node.nodeType != Node.TEXT_NODE) return;
+
+		// let offset = range.startOffset;
+		// let text = range.commonAncestorContainer.textContent;
+		// text = text.substring(0, offset) + event.key + text.substring(offset);
+		// this.textEdit("Enter-Text", range, text, offset + 1);
+	},
+	delete(this: Display, event: UserEvent) {
+		// event.subject = "";
+		// let range = this.owner.selectionRange;
+		// if (!range.collapsed) {
+		// 	range = adjustRange(range, getElement(range, "list"));
+		// 	range = this.edit("Delete", range, "");
+		// 	range.collapse();
+		// 	return;
+		// } 
+		// let node = range.commonAncestorContainer;
+		// if (node.nodeType != Node.TEXT_NODE) return;
+		// let offset = range.startOffset;
+		// let text = range.commonAncestorContainer.textContent;
+		// if (offset >= text.length) return;
+		// text = text.substring(0, offset) + text.substring(offset + 1);
+		// this.textEdit("Delete-Text", range, text, offset);
+	},
+	erase(this: Display, event: UserEvent) {
+		// event.subject = "";
+		// let range = this.owner.selectionRange;
+		// if (!range.collapsed) {
+		// 	this.edit("Delete", range, "");
+		// 	return;
+		// } 
+		// let node = range.commonAncestorContainer;
+		// if (node.nodeType != Node.TEXT_NODE) return;
+		// let offset = range.startOffset;
+		// let text = range.commonAncestorContainer.textContent;
+		// if (offset < 1) return;
+		// text = text.substring(0, offset - 1) + text.substring(offset);
+		// this.textEdit("Erase-Text", range, text, offset - 1);
+	},
+	enter(this: Display, event: UserEvent) {
+		// event.subject = "";
+	},
+});
