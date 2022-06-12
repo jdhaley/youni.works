@@ -1,32 +1,51 @@
-import {Signal, content} from "./model.js";
+import {Signal, content, ContentType, Type} from "./model.js";
 import {RemoteFileService} from "./remote.js";
-import {controller} from "./control.js";
-import {ListType, ViewContext, ViewType} from "./view.js";
-import { bundle } from "./util.js";
-
+import {Controller, controller} from "./control.js";
+import {ViewContext, ViewType} from "./view.js";
+import {bundle} from "./util.js";
+import {loadTypes} from "./loader.js";
 export interface View extends HTMLElement {
 	$control?: ViewType<View>;
 	$model?: content;
+	$shortcuts?: bundle<string>;
 }
 
-export class Article extends ListType<View> {
+export class Article extends Controller implements ContentType<View> {
 	constructor(frame: Frame, conf: bundle<any>) {
-		super();
+		super(conf);
 		this.owner = frame;
 		this.context = new DisplayContext(this);
-		for (let name in conf) {
-			this[name] = conf[name];
-		}
-		this.service = new RemoteFileService(this.owner.location.origin + conf["sources"]);
+		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
 		this.controller = conf.controllers.article;
 	}
-	readonly service: RemoteFileService;
-	readonly tag = "article";
 	readonly owner: Frame;
+	readonly service: RemoteFileService;
+	readonly context: DisplayContext;
+
+	types: bundle<ViewType<unknown>>;
+	type: ViewType<View>;
 	view: View;
-	
+
 	get model(): content {
 		return this.view.$model;
+	}
+	get name() {
+		return this.type.name;
+	}
+	
+	toModel(view: View): content {
+		return this.type.toModel(view);
+	}
+	toView(model: content): View {
+		return this.type.toView(model);
+	}
+	generalizes(type: Type): boolean {
+		return this.type.generalizes(type);
+	}
+	loadTypes(source: bundle<any>, base: bundle<ViewType<unknown>>) {
+		this.types = loadTypes(source, base);
+		this.type = this.types[this.conf.type] as ViewType<View>;
+		this.type.tag = "article";
 	}
 }
 

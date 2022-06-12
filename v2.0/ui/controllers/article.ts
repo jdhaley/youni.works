@@ -8,7 +8,7 @@ import view from "./view.js";
 export default extend(view, {
 	open(this: Article, res: Response<string>) {
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
-		this.view = this.toView(model);
+		this.view = this.type.toView(model);
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.owner.view.append(this.view);

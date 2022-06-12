@@ -1,14 +1,17 @@
 import {Receiver, Signal} from "./model.js";
 import {Message} from "./message.js";
+import {bundle, EMPTY} from "./util.js";
 
 export interface controller {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
-let EMPTY_CONTROLLER: controller = Object.freeze(Object.create(null));
-
 export class Controller implements Receiver {
-	controller: controller = EMPTY_CONTROLLER;
+	constructor(conf?: bundle<any>) {
+		if (conf) this.conf = conf;
+	}
+	controller: controller = EMPTY.object;
+	conf: bundle<any> = EMPTY.object;
 
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
