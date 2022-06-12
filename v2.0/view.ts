@@ -2,31 +2,33 @@ import {typeOf, content, List, Record, ContentType, Type} from "./model.js";
 import {Context, Control} from "./control.js";
 import {bundle} from "./util.js";
 
-export interface ViewContext<V> extends Context<V>{
+export interface ViewContext<V> extends Context<V> {
+	getReceiver(view: V): ViewType<V>;
+
 	createView(type: ViewType<V>): V;
 	appendTo(view: V, member: V): void;
-	getReceiver(view: V): ViewType<V>;
-	getValue(view: V): string;
-	setValue(view: V, value: string): void;
+	getText(view: V): string;
+	setText(view: V, value: string): void;
 }
 
-export abstract class ViewType<V> extends Control<V> implements ContentType<V> {
+export class ViewType<V> extends Control<V> implements ContentType<V> {
+	context: ViewContext<V>;
 	readonly modelName: string;
 	name?: string;
 	propertyName?: string;
 	tag?: string;
 	types?: bundle<ViewType<V>>;
-	context: ViewContext<V>;
 
-	abstract viewContent(view: V, model: content): void;
-	abstract toModel(view: V): content;
-
+	toModel(view: V): content {
+		return undefined;
+	}
 	toView(model: content): V {
 		let view = this.context.createView(this);
 		this.viewContent(view, model);
 		return view;
 	}
-
+	viewContent(view: V, model: content): void {
+	}
 	generalizes(type: Type): boolean {
 		return type == this;
 	}
@@ -35,10 +37,10 @@ export abstract class ViewType<V> extends Control<V> implements ContentType<V> {
 export class TextType<V> extends ViewType<V> {
 	readonly modelName = "text";
 	viewContent(view: V, model: string): void {
-		this.context.setValue(view, model);
+		this.context.setText(view, model);
 	}
 	toModel(view: V): string {
-		return this.context.getValue(view);
+		return this.context.getText(view);
 	}
 	
 }
@@ -49,7 +51,6 @@ export class RecordType<V> extends ViewType<V> {
 			let value = model ? model[name] : null;
 			let member = this.types[name].toView(value);
 			this.context.appendTo(view, member);
-		//	member.classList.add("member");
 		}
 	}
 	toModel(view: V): Record {
@@ -66,7 +67,7 @@ export class RecordType<V> extends ViewType<V> {
 	}
 }
 
-export class CollectionType<V> extends ViewType<V> {
+export class ListType<V> extends ViewType<V> {
 	readonly modelName = "list";
 	defaultType: ViewType<V>
 	toModel(view: V): content {
@@ -89,7 +90,7 @@ export class CollectionType<V> extends ViewType<V> {
 			let child = type.toView(value);
 			this.context.appendTo(view, child);
 		} else {
-			this.context.setValue(view, "");
+			this.context.setText(view, "");
 		}
 	}
 	contentType(value: content): ViewType<V> {

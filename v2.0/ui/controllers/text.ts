@@ -1,4 +1,4 @@
-import { Display, UserEvent } from "../../display.js";
+import { Article, UserEvent } from "../../display.js";
 import {extend} from "../../util.js";
 import view from "./view.js";
 
@@ -28,7 +28,7 @@ export default extend(view, {
 	// 	range = this.edit("Paste", range, view.innerHTML);
 	// 	range.collapse();
 	// },
-	charpress(this: Display, event: UserEvent) {
+	charpress(this: Article, event: UserEvent) {
 		console.log(event);
 		// event.subject = ""
 		// let range = this.owner.selectionRange;
@@ -40,7 +40,7 @@ export default extend(view, {
 		// text = text.substring(0, offset) + event.key + text.substring(offset);
 		// this.textEdit("Enter-Text", range, text, offset + 1);
 	},
-	delete(this: Display, event: UserEvent) {
+	delete(this: Article, event: UserEvent) {
 		// event.subject = "";
 		// let range = this.owner.selectionRange;
 		// if (!range.collapsed) {
@@ -57,7 +57,7 @@ export default extend(view, {
 		// text = text.substring(0, offset) + text.substring(offset + 1);
 		// this.textEdit("Delete-Text", range, text, offset);
 	},
-	erase(this: Display, event: UserEvent) {
+	erase(this: Article, event: UserEvent) {
 		// event.subject = "";
 		// let range = this.owner.selectionRange;
 		// if (!range.collapsed) {
@@ -72,7 +72,7 @@ export default extend(view, {
 		// text = text.substring(0, offset - 1) + text.substring(offset);
 		// this.textEdit("Erase-Text", range, text, offset - 1);
 	},
-	enter(this: Display, event: UserEvent) {
+	enter(this: Article, event: UserEvent) {
 		// event.subject = "";
 	},
 });

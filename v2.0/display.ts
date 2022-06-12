@@ -1,7 +1,7 @@
 import {Signal, content} from "./model.js";
 import {RemoteFileService} from "./remote.js";
 import {Controller} from "./control.js";
-import {CollectionType, ViewContext, ViewType} from "./view.js";
+import {ListType, ViewContext, ViewType} from "./view.js";
 import { bundle } from "./util.js";
 
 export interface View extends HTMLElement {
@@ -9,48 +9,7 @@ export interface View extends HTMLElement {
 	$model?: content;
 }
 
-let NEXT_ID = 1;
-let ZWSP = "\u200b";
-
-class DisplayContext implements ViewContext<View> {
-	constructor(display: Display) {
-		this.display = display;
-	}
-	readonly display: Display;
-
-	getPartsOf(view: View) {
-		return view.children as Iterable<View>
-	}
-	getPartOf(view: View): View {
-		return view.parentElement;
-	}
-	getReceiver(view: View): ViewType<View> {
-		return view.$control;
-	}
-	createView(type: ViewType<View>): View {
-		let view = this.display.owner.create(type.tag || "div") as View;
-		view.$control = type;
-		view.id = "" + NEXT_ID++;
-		view.dataset.model = type.modelName;
-		if (type.name) view.dataset.type = type.name;
-		if (type.propertyName) {
-			view.dataset.name = type.propertyName;
-			view.classList.add("member");
-		}
-		return view;
-	}
-	appendTo(view: View, member: View): void {
-		view.append(member);
-	}
-	getValue(view: View): string {
-		return view.textContent || ZWSP;
-	}
-	setValue(view: View, value: string): void {
-		view.textContent = value || ZWSP;
-	}
-}
-
-export class Display extends CollectionType<View> {
+export class Article extends ListType<View> {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.owner = frame;
@@ -71,6 +30,47 @@ export class Display extends CollectionType<View> {
 	}
 }
 
+let NEXT_ID = 1;
+let ZWSP = "\u200b";
+
+class DisplayContext implements ViewContext<View> {
+	constructor(display: Article) {
+		this.display = display;
+	}
+	readonly display: Article;
+
+	getReceiver(view: View): ViewType<View> {
+		return view.$control;
+	}
+	getPartsOf(view: View) {
+		return view.children as Iterable<View>
+	}
+	getPartOf(view: View): View {
+		return view.parentElement;
+	}
+	getText(view: View): string {
+		return view.textContent || ZWSP;
+	}
+	setText(view: View, value: string): void {
+		view.textContent = value || ZWSP;
+	}
+	appendTo(view: View, part: View): void {
+		view.append(part);
+	}
+	createView(type: ViewType<View>): View {
+		let view = this.display.owner.create(type.tag || "div") as View;
+		view.$control = type;
+		view.id = "" + NEXT_ID++;
+		view.dataset.model = type.modelName;
+		if (type.name) view.dataset.type = type.name;
+		if (type.propertyName) {
+			view.dataset.name = type.propertyName;
+			view.classList.add("member");
+		}
+		return view;
+	}
+}
+
 export function viewOf(node: Node | Range): View {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
@@ -78,6 +78,7 @@ export function viewOf(node: Node | Range): View {
 		node = node.parentNode;
 	}
 }
+
 export function ownerOf(node: Node | Range): Frame  {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	if (node instanceof Document) return node["$owner"];
@@ -95,8 +96,6 @@ export class Frame {
 		}
 	}
 	#window: Window;
-
-	readonly context: DisplayContext;
 
 	get view(): HTMLElement {
 		return this.#window.document.body;
