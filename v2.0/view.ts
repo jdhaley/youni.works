@@ -13,10 +13,9 @@ export interface ViewContext<V> extends Context<V> {
 
 export class ViewType<V> extends Control<V> implements ContentType<V> {
 	context: ViewContext<V>;
-	readonly modelName: string;
+	tag: string;
 	name?: string;
 	propertyName?: string;
-	tag?: string;
 	types?: bundle<ViewType<V>>;
 
 	toModel(view: V): content {
@@ -35,18 +34,17 @@ export class ViewType<V> extends Control<V> implements ContentType<V> {
 }
 
 export class TextType<V> extends ViewType<V> {
-	readonly modelName = "text";
+	tag = "ui-text";
 	viewContent(view: V, model: string): void {
 		this.context.setText(view, model);
 	}
 	toModel(view: V): string {
 		return this.context.getText(view);
 	}
-	
 }
 
 export class RecordType<V> extends ViewType<V> {
-	readonly modelName = "record";
+	tag = "ui-record";
 	viewContent(view: V, model: Record): void {
 		for (let name in this.types) {
 			let value = model ? model[name] : null;
@@ -69,7 +67,7 @@ export class RecordType<V> extends ViewType<V> {
 }
 
 export class ListType<V> extends ViewType<V> {
-	readonly modelName = "list";
+	tag = "ui-list";
 	defaultType: ViewType<V>
 	toModel(view: V): content {
 		let model = [];

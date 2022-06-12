@@ -53,7 +53,7 @@ function createType(name: string, value: bundle<source>, types: types, source: s
 		} else {
 			member = getType(part, types, source);
 		}
-		if (type.modelName == "record") {
+		if (type.tag == "ui-record") {
 			member = Object.create(member);
 			member.name = "";
 			member.propertyName = name;

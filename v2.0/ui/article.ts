@@ -1,7 +1,34 @@
-import {ViewType} from "../view.js";
+import {RecordType, ViewType} from "../view.js";
 import {Frame, Article, View} from "../display.js";
 import {bundle} from "../util.js";
 import {baseTypes} from "./views.js";
+
+class Display extends HTMLElement {
+	constructor() {
+		super();
+	}
+}
+
+class Record extends Display {
+	constructor() {
+		super();
+	}
+}
+customElements.define('ui-record', Record);
+
+class List extends Display {
+	constructor() {
+		super();
+	}
+}
+customElements.define('ui-list', List);
+
+class Text extends Display {
+	constructor() {
+		super();
+	}
+}
+customElements.define('ui-text', Text);
 
 export default function main(conf: bundle<any>) {
 	let frame = new Frame(window, conf.controllers.frame);

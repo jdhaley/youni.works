@@ -4,6 +4,7 @@ import {Controller, controller} from "./control.js";
 import {ViewContext, ViewType} from "./view.js";
 import {bundle} from "./util.js";
 import {loadTypes} from "./loader.js";
+
 export interface View extends HTMLElement {
 	$control?: ViewType<View>;
 	$model?: content;
@@ -45,7 +46,6 @@ export class Article extends Controller implements ContentType<View> {
 	loadTypes(source: bundle<any>, base: bundle<ViewType<unknown>>) {
 		this.types = loadTypes(source, base);
 		this.type = this.types[this.conf.type] as ViewType<View>;
-		this.type.tag = "article";
 	}
 }
 
@@ -80,11 +80,9 @@ class DisplayContext implements ViewContext<View> {
 		let view = this.display.owner.create(type.tag || "div") as View;
 		view.$control = type;
 		view.id = "" + NEXT_ID++;
-		view.dataset.model = type.modelName;
 		if (type.name) view.dataset.type = type.name;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
-			view.classList.add("member");
 		}
 		return view;
 	}
