@@ -1,13 +1,11 @@
 import {bundle} from "./util.js";
-import {Message, Response} from "./control.js";
-import { Receiver } from "./model.js";
+import {Receiver} from "./model.js";
+import {Message, Response} from "./message.js";
 
 class Request extends Message<any> {
 	constructor(subject: string, from: Receiver | Function, to: string, body?: any) {
 		/* "from" becomes the response receiver. */
-		super(subject, from);
-		this.to = to;
-		this.body = body;
+		super(subject, from, to, body);
 	}
 
 	//HTTP specific
@@ -143,4 +141,3 @@ export interface Location {
 	////* A URLSearchParams object which can be used to access the individual query parameters found in search. */
 	//readonly searchParams
 }
-

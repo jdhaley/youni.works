@@ -19,9 +19,9 @@ export interface ContentType<V> extends Type {
 
 export interface Signal {
 	readonly direction: "up" | "down"
-	subject?: string;
-	on?: any;
+	subject: string;
 	from?: any;
+	on?: any;
 }
 
 export interface Receiver {

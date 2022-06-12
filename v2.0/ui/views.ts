@@ -1,5 +1,5 @@
 import {bundle} from "../util.js";
-import {Controller} from "../control.js";
+import {controller} from "../control.js";
 
 import {ViewType, ViewContext, TextType, ListType, RecordType} from "../view.js";
 
@@ -13,7 +13,7 @@ let TYPES: bundle<typeof ViewType> = {
 	record: RecordType
 }
 
-export function baseTypes(controllers: bundle<Controller>, context: ViewContext<unknown>): bundle<Type> {
+export function baseTypes(controllers: bundle<controller>, context: ViewContext<unknown>): bundle<Type> {
 	let types = Object.create(null);
 	for (let name in TYPES) {
 		let type = new TYPES[name];

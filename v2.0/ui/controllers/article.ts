@@ -1,4 +1,4 @@
-import {Response} from "../../control.js";
+import {Response} from "../../message.js";
 import {extend} from "../../util.js";
 
 import {Article, UserEvent} from "../../display.js";

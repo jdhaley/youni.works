@@ -1,6 +1,6 @@
 import {Signal, content} from "./model.js";
 import {RemoteFileService} from "./remote.js";
-import {Controller} from "./control.js";
+import {controller} from "./control.js";
 import {ListType, ViewContext, ViewType} from "./view.js";
 import { bundle } from "./util.js";
 
@@ -54,7 +54,7 @@ class DisplayContext implements ViewContext<View> {
 	setText(view: View, value: string): void {
 		view.textContent = value || ZWSP;
 	}
-	appendTo(view: View, part: View): void {
+	appendPart(view: View, part: View): void {
 		view.append(part);
 	}
 	createView(type: ViewType<View>): View {
@@ -86,7 +86,7 @@ export function ownerOf(node: Node | Range): Frame  {
 }
 
 export class Frame {
-	constructor(window: Window, controller: Controller) {
+	constructor(window: Window, controller: controller) {
 		window.document["$owner"] = this;
 		this.#window = window;
 		for (let name in controller) {

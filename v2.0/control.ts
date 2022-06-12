@@ -1,21 +1,14 @@
 import {Receiver, Signal} from "./model.js";
+import {Message} from "./message.js";
 
-export interface Controller {
+export interface controller {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
-let EMPTY_CONTROLLER: Controller = Object.freeze(Object.create(null));
+let EMPTY_CONTROLLER: controller = Object.freeze(Object.create(null));
 
-export interface Context<V> {
-	getPartsOf(value: V): Iterable<V>;
-	getPartOf(value: V): V;
-	getReceiver(value: V): Receiver;
-}
-
-export abstract class Control<V> implements Receiver {
-	controller: Controller = EMPTY_CONTROLLER;
-
-	abstract get context(): Context<V>;
+export class Controller implements Receiver {
+	controller: controller = EMPTY_CONTROLLER;
 
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
@@ -29,6 +22,17 @@ export abstract class Control<V> implements Receiver {
 			subject = "";
 		}
 	}
+}
+
+export interface Context<V> {
+	getPartsOf(value: V): Iterable<V>;
+	getPartOf(value: V): V;
+	getReceiver(value: V): Receiver;
+}
+
+export abstract class Control<V> extends Controller {
+	abstract get context(): Context<V>;
+
 	send(signal: Signal | string, to: V) {
 		if (typeof signal == "string") signal = new Message(signal, this, to);
 		if (!signal.subject) return;
@@ -49,32 +53,6 @@ export abstract class Control<V> implements Receiver {
 			on = this.context.getPartOf(on);
 		}
 	}
-}
-
-export class Message<T> implements Signal {
-	constructor(subject: string, from: Receiver | Function, to?: any, body?: T) {
-		this.subject = subject;
-		this.from = from;
-		if (to) this.to = to;
-		if (body) this.body = body;
-	}
-	readonly direction = "down";
-	subject: string;
-	from: any;
-	on: any;
-	/** The path, control, etc. */
-	declare to?: any;
-	declare body?: T; // serial | Buffer	//naming compatibility with Express.js
-}
-
-export class Response<T> extends Message<T> {
-	constructor(request: Message<unknown>, from: any, status: number, body?: T) {
-		super(request.subject, from, null, body);
-		this.req = request;
-		this.statusCode = status;
-	}
-	readonly req: Message<unknown>;	//naming compatibility with Express.js
-	readonly statusCode: number;	//naming compatibility with Express.js
 }
 
 //DEVT only

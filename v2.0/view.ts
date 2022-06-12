@@ -6,7 +6,7 @@ export interface ViewContext<V> extends Context<V> {
 	getReceiver(view: V): ViewType<V>;
 
 	createView(type: ViewType<V>): V;
-	appendTo(view: V, member: V): void;
+	appendPart(view: V, part: V): void;
 	getText(view: V): string;
 	setText(view: V, value: string): void;
 }
@@ -44,13 +44,14 @@ export class TextType<V> extends ViewType<V> {
 	}
 	
 }
+
 export class RecordType<V> extends ViewType<V> {
 	readonly modelName = "record";
 	viewContent(view: V, model: Record): void {
 		for (let name in this.types) {
 			let value = model ? model[name] : null;
 			let member = this.types[name].toView(value);
-			this.context.appendTo(view, member);
+			this.context.appendPart(view, member);
 		}
 	}
 	toModel(view: V): Record {
@@ -86,14 +87,11 @@ export class ListType<V> extends ViewType<V> {
 		// let level = view.getAttribute("aria-level") as any * 1 || 0;
 		// level++;
 		if (model && model[Symbol.iterator]) for (let value of model) {
-			let type = this.contentType(value);
+			let type = this.types[typeOf(value)] || this.defaultType;
 			let child = type.toView(value);
-			this.context.appendTo(view, child);
+			this.context.appendPart(view, child);
 		} else {
 			this.context.setText(view, "");
 		}
-	}
-	contentType(value: content): ViewType<V> {
-		return this.types[typeOf(value)] || this.defaultType;
 	}
 }

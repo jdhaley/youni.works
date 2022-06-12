@@ -1,6 +1,5 @@
-import {Controller} from "../../control.js";
-import {ownerOf, UserEvent} from "../../display.js";
-import {viewOf} from "../../display.js";
+import {controller} from "../../control.js";
+import {viewOf, ownerOf, UserEvent} from "../../display.js";
 
 let TRACK: UserEvent = null;
 let SELECTION: UserEvent = null;
@@ -94,7 +93,7 @@ export default {
         event.subject = "moveout";
         sense(event);
     }
-} as Controller;
+} as controller;
 
 function  getShortcut(event: UserEvent) {
     let mod = getModifiers(event);

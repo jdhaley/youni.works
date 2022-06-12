@@ -1,6 +1,5 @@
-import { Article, UserEvent } from "../../display.js";
-import { Response } from "../../control.js";
-import { extend } from "../../util.js";
+import {UserEvent} from "../../display.js";
+import {extend} from "../../util.js";
 import article from "./article.js";
 
 let UNDONE = false;
