@@ -1,5 +1,5 @@
 import {bundle, extend} from "./util.js";
-import {ViewType} from "./view.js";
+import {ViewType} from "./viewTypes.js";
 
 type types = bundle<ViewType<unknown>>;
 type source = bundle<string | source> | string

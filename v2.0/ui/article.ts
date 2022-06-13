@@ -1,29 +1,9 @@
-import {RecordType, ViewType} from "../view.js";
+import {ViewType} from "../viewTypes.js";
 import {Frame, Article, View} from "../display.js";
 import {bundle} from "../util.js";
 import {baseTypes} from "./views.js";
 
 
-class Record extends View {
-	constructor() {
-		super();
-	}
-}
-customElements.define('ui-record', Record);
-
-class List extends View {
-	constructor() {
-		super();
-	}
-}
-customElements.define('ui-list', List);
-
-class Text extends View {
-	constructor() {
-		super();
-	}
-}
-customElements.define('ui-text', Text);
 
 export default function main(conf: bundle<any>) {
 	let frame = new Frame(window, conf.controllers.frame);

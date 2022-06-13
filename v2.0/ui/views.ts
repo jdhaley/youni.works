@@ -1,7 +1,7 @@
 import {bundle} from "../util.js";
 import {controller} from "../control.js";
 
-import {ViewType, ViewContext, TextType, ListType, RecordType} from "../view.js";
+import {ViewType, ViewContext, TextType, ListType, RecordType} from "../viewTypes.js";
 
 type Type = ViewType<unknown>;
 

@@ -1,7 +1,7 @@
 import {Signal, content, ContentType, Type} from "./model.js";
 import {RemoteFileService} from "./remote.js";
 import {Controller, controller} from "./control.js";
-import {ViewContext, ViewType} from "./view.js";
+import {ViewContext, ViewType} from "./viewTypes.js";
 import {bundle} from "./util.js";
 import {loadTypes} from "./loader.js";
 
@@ -13,6 +13,27 @@ export class View extends HTMLElement {
 	$model?: content;
 	$shortcuts?: bundle<string>;
 }
+
+class Record extends View {
+	constructor() {
+		super();
+	}
+}
+customElements.define('ui-record', Record);
+
+class List extends View {
+	constructor() {
+		super();
+	}
+}
+customElements.define('ui-list', List);
+
+class Text extends View {
+	constructor() {
+		super();
+	}
+}
+customElements.define('ui-text', Text);
 
 export class Article extends Controller implements ContentType<View> {
 	constructor(frame: Frame, conf: bundle<any>) {
