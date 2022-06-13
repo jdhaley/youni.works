@@ -3,27 +3,22 @@ import {Frame, Article, View} from "../display.js";
 import {bundle} from "../util.js";
 import {baseTypes} from "./views.js";
 
-class Display extends HTMLElement {
-	constructor() {
-		super();
-	}
-}
 
-class Record extends Display {
+class Record extends View {
 	constructor() {
 		super();
 	}
 }
 customElements.define('ui-record', Record);
 
-class List extends Display {
+class List extends View {
 	constructor() {
 		super();
 	}
 }
 customElements.define('ui-list', List);
 
-class Text extends Display {
+class Text extends View {
 	constructor() {
 		super();
 	}

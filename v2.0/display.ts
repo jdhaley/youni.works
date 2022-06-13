@@ -5,7 +5,10 @@ import {ViewContext, ViewType} from "./view.js";
 import {bundle} from "./util.js";
 import {loadTypes} from "./loader.js";
 
-export interface View extends HTMLElement {
+export class View extends HTMLElement {
+	constructor() {
+		super();
+	}
 	$control?: ViewType<View>;
 	$model?: content;
 	$shortcuts?: bundle<string>;
