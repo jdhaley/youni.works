@@ -22,9 +22,9 @@ export default {
         sense(event);
     },
     input: sense,
-    cut: sense,
-    copy: sense,
-    paste: sense,
+    cut: rangeEvent,
+    copy: rangeEvent,
+    paste: rangeEvent,
     keydown(event: UserEvent) {
         event.range = ownerOf(event.target as Node).selectionRange;
         event.source = viewOf(event.range.commonAncestorContainer);
@@ -126,9 +126,16 @@ function getModifiers(event: UserEvent) {
     return mod;
 }
 
+function rangeEvent(event: UserEvent) {
+    event.range = ownerOf(event.target as Node).selectionRange;
+    event.source = viewOf(event.range.commonAncestorContainer);
+    sense(event);
+}
+
 function sense(event: UserEvent) {
     let source = viewOf(event.source || event.target as Node);
     if (source?.$control) {
+        event.owner = ownerOf(source);
         event.source = source;
         event.from = ownerOf(event.target as Node);
         event.direction = "up";

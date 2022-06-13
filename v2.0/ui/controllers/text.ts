@@ -1,14 +1,8 @@
-import { Article, UserEvent } from "../../display.js";
+import { Article, UserEvent, Viewer} from "../../display.js";
 import {extend} from "../../util.js";
 import view from "./view.js";
 
 export default extend(view, {
-	// copy(this: Article, event: UserEvent) {
-	// 	event.subject = "";
-	// 	let range = this.owner.selectionRange;
-	// 	range = adjustRange(range, getElement(range, "list"));
-	// 	event.clipboardData.setData("text/json", JSON.stringify(this.toModel(range)));
-	// },
 	// cut(this: Article, event: UserEvent) {
 	// 	event.subject = "";
 	// 	let range = this.owner.selectionRange;

@@ -5,13 +5,23 @@ import {ViewContext, ViewType} from "./viewTypes.js";
 import {bundle} from "./util.js";
 import {loadTypes} from "./loader.js";
 
+export type Viewer = ViewType<View>;
+
 export class View extends HTMLElement {
 	constructor() {
 		super();
 	}
-	$control?: ViewType<View>;
+	$control?: Viewer;
 	$model?: content;
 	$shortcuts?: bundle<string>;
+	rangeContent(range: Range): content {
+		let frag = range.cloneContents();
+		let copy = this.$control.context.createView(this.$control);
+		while (frag.firstChild) copy.append(frag.firstChild);
+		let content = copy.$control.toModel(copy);
+		console.log(copy, content);
+		return content;
+	}
 }
 
 class Record extends View {
@@ -47,8 +57,8 @@ export class Article extends Controller implements ContentType<View> {
 	readonly service: RemoteFileService;
 	readonly context: DisplayContext;
 
-	types: bundle<ViewType<unknown>>;
-	type: ViewType<View>;
+	types: bundle<Viewer>;
+	type: Viewer;
 	view: View;
 
 	get model(): content {
@@ -67,9 +77,9 @@ export class Article extends Controller implements ContentType<View> {
 	generalizes(type: Type): boolean {
 		return this.type.generalizes(type);
 	}
-	loadTypes(source: bundle<any>, base: bundle<ViewType<unknown>>) {
-		this.types = loadTypes(source, base);
-		this.type = this.types[this.conf.type] as ViewType<View>;
+	loadTypes(source: bundle<any>, base: bundle<Viewer>) {
+		this.types = loadTypes(source, base) as bundle<Viewer>;
+		this.type = this.types[this.conf.type] as Viewer;
 		this.type.conf = {
 			shortcuts: this.conf.shortcuts
 		}
@@ -85,14 +95,14 @@ class DisplayContext implements ViewContext<View> {
 	}
 	readonly display: Article;
 
-	getReceiver(view: View): ViewType<View> {
+	getReceiver(view: View): Viewer {
 		return view.$control;
 	}
 	getPartsOf(view: View) {
 		return view.children as Iterable<View>
 	}
 	getPartOf(view: View): View {
-		return view.parentElement;
+		return view.parentElement as View;
 	}
 	getText(view: View): string {
 		return view.textContent || ZWSP;
@@ -103,7 +113,7 @@ class DisplayContext implements ViewContext<View> {
 	appendPart(view: View, part: View): void {
 		view.append(part);
 	}
-	createView(type: ViewType<View>): View {
+	createView(type: Viewer): View {
 		let view = this.display.owner.create(type.tag || "div") as View;
 		view.$control = type;
 		view.id = "" + NEXT_ID++;
@@ -177,7 +187,9 @@ export class Frame {
 }
 
 export interface UserEvent extends Signal, UIEvent {
+	owner: Frame;
 	source: View;
+	on: View;
 	//all user events
 	direction: "up";
 
