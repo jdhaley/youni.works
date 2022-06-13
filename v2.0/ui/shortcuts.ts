@@ -13,5 +13,5 @@ export default {
 	"Control+u": "tag",
 	"Control+q": "tag",
 	"Control+s": "save",
-	"Control+/": "parse"
+	"Control+/": "test"
 }

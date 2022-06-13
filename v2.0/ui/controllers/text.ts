@@ -29,7 +29,7 @@ export default extend(view, {
 	// 	range.collapse();
 	// },
 	charpress(this: Article, event: UserEvent) {
-		console.log(event);
+		event.subject = "user_edit";
 		// event.subject = ""
 		// let range = this.owner.selectionRange;
 		// let node = range.commonAncestorContainer;
@@ -41,6 +41,7 @@ export default extend(view, {
 		// this.textEdit("Enter-Text", range, text, offset + 1);
 	},
 	delete(this: Article, event: UserEvent) {
+		event.subject = "user_edit";
 		// event.subject = "";
 		// let range = this.owner.selectionRange;
 		// if (!range.collapsed) {
@@ -58,6 +59,7 @@ export default extend(view, {
 		// this.textEdit("Delete-Text", range, text, offset);
 	},
 	erase(this: Article, event: UserEvent) {
+		event.subject = "user_edit";
 		// event.subject = "";
 		// let range = this.owner.selectionRange;
 		// if (!range.collapsed) {

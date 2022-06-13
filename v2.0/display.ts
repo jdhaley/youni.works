@@ -70,6 +70,9 @@ export class Article extends Controller implements ContentType<View> {
 	loadTypes(source: bundle<any>, base: bundle<ViewType<unknown>>) {
 		this.types = loadTypes(source, base);
 		this.type = this.types[this.conf.type] as ViewType<View>;
+		this.type.conf = {
+			shortcuts: this.conf.shortcuts
+		}
 	}
 }
 
