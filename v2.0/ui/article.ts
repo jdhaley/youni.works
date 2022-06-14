@@ -1,13 +1,14 @@
-import {ViewType, ViewContext, TextType, ListType, RecordType} from "../viewTypes.js";
-import {Frame, Article, View, Viewer} from "../display.js";
+import {Frame} from "../ui.js";
 import {bundle} from "../util.js";
 import { controller } from "../control.js";
+import { Article } from "../article.js";
+import { ListType, RecordType, TextType, ViewType } from "../view.js";
 
 export default function main(conf: bundle<any>) {
 	let frame = new Frame(window, conf.controllers.frame);
 	let article = new Article(frame, conf);
 
-	let types = baseTypes(conf.controllers, article.context) as bundle<Viewer>;
+	let types = baseTypes(conf.controllers, article) as bundle<ViewType>;
 	article.loadTypes(conf.types, types);
 
 	let resource = "/" + window.location.search.substring(1);
@@ -24,7 +25,7 @@ let TYPES: bundle<typeof ViewType> = {
 	record: RecordType
 }
 
-export function baseTypes(controllers: bundle<controller>, context: ViewContext<unknown>): bundle<Viewer> {
+export function baseTypes(controllers: bundle<controller>, context: Article): bundle<ViewType> {
 	let types = Object.create(null);
 	for (let name in TYPES) {
 		let type = new TYPES[name];

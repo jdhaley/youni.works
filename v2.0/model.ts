@@ -1,3 +1,5 @@
+import { bundle } from "./util";
+
 export type content = string | number | boolean | Date | List | Record;
 
 export interface List extends Iterable<content> {
@@ -13,6 +15,8 @@ export interface Type {
 }
 
 export interface ContentType<V> extends Type {
+	types?: bundle<ContentType<V>>
+	propertyName?: string;
 	toModel(view: V): content;
 	toView(model: content): V;
 }

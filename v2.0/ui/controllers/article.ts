@@ -1,9 +1,10 @@
 import {Response} from "../../message.js";
 import {extend} from "../../util.js";
 
-import {Article, UserEvent} from "../../display.js";
+import {UserEvent} from "../../ui.js";
 
 import view from "./view.js";
+import { Article } from "../../article.js";
 
 export default extend(view, {
 	open(this: Article, res: Response<string>) {
@@ -11,7 +12,7 @@ export default extend(view, {
 		this.view = this.type.toView(model);
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
-		this.owner.view.append(this.view);
+		this.frame.view.append(this.view);
 	},
 	save(this: Article, signal: UserEvent | Response<string>) {
 		signal.subject = "";
@@ -19,13 +20,13 @@ export default extend(view, {
 			console.log("Saved: ", signal);
 			return;
 		}
-		let model = this.toModel(this.view);
+		let model = this.view.view_model;
 		console.log(model);
 		this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
 	},
 	selectAll(this: Article, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
+		let range = this.frame.selectionRange;
 		range.selectNodeContents(this.view)
 	}
 });

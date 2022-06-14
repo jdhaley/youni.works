@@ -1,4 +1,4 @@
-import {UserEvent} from "../../display.js";
+import {UserEvent} from "../../ui.js";
 import {extend} from "../../util.js";
 import article from "./article.js";
 

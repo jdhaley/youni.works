@@ -1,10 +1,11 @@
-import {extend} from "../../util.js";
-import {copyRange, ownerOf, UserEvent, View, Viewer} from "../../display.js";
-import {bundle} from "../../../../core/api/model.js";
-import { typeOf } from "../../model.js";
+import {extend, bundle} from "../../util.js";
+import {typeOf} from "../../model.js";
+import {View, ViewType} from "../../view.js";
+import {UiElement, UserEvent} from "../../ui.js";
+import {copyRange} from "../../article.js";
 
 export default extend(null, {
-	copy(this: Viewer, event: UserEvent) {
+	copy(this: ViewType, event: UserEvent) {
 		event.subject = "";
 		let range = event.owner.selectionRange;
 		let copy = copyRange(range, this);
@@ -38,16 +39,16 @@ export default extend(null, {
 	enter(event: UserEvent) {
 		event.subject = "";
 	},
-	test(this: Viewer, event: UserEvent) {
+	test(this: ViewType, event: UserEvent) {
 		event.subject = "";
-		let range = ownerOf(event.on).selectionRange;
+		let range = this.context.frame.selectionRange;
 		range.setStartBefore(event.on.parentElement);
 		range.collapse(true);
 		console.log(range.commonAncestorContainer.nodeName);
 	}
 });
 
-function getShortcuts(view: View): bundle<string> {
+function getShortcuts(view: UiElement): bundle<string> {
 	if (view.$shortcuts) return view.$shortcuts;
 	if (!view.$shortcuts) for (let node: Element = view; node; node = node.parentElement) {
 		if (node instanceof View) {
