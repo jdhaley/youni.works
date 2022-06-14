@@ -1,3 +1,7 @@
+export const CHAR = Object.freeze(extend(null, {
+	ZWSP: "\u200b"
+}));
+
 
 export interface bundle<T> {
 	[key: string]: T

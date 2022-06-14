@@ -1,6 +1,6 @@
-import {UserEvent} from "../../ui.js";
+import {UserEvent} from "../ui.js";
 import {extend} from "../../util.js";
-import {ViewType} from "../../view.js";
+import {ViewType} from "../views/view.js";
 import view from "./view.js";
 
 export default extend(view, {

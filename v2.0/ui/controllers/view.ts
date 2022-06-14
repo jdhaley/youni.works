@@ -1,8 +1,8 @@
-import {extend, bundle} from "../../util.js";
+import {extend} from "../../util.js";
 import {typeOf} from "../../model.js";
-import {View, ViewType} from "../../view.js";
-import {UiElement, UserEvent} from "../../ui.js";
-import {copyRange} from "../../article.js";
+import {ViewType} from "../views/view.js";
+import {UserEvent} from "../ui.js";
+import {copyRange} from "../article.js";
 
 export default extend(null, {
 	copy(this: ViewType, event: UserEvent) {
@@ -23,7 +23,7 @@ export default extend(null, {
 		event.clipboardData.setData("text/plain", data);
 	},
 	command(event: UserEvent) {
-		let shortcuts = event.on.$shortcuts || getShortcuts(event.on);
+		let shortcuts = event.on.$shortcuts;
 		let command = shortcuts && shortcuts[event.shortcut];
 		if (command) event.subject = command;
 	},
@@ -47,16 +47,3 @@ export default extend(null, {
 		console.log(range.commonAncestorContainer.nodeName);
 	}
 });
-
-function getShortcuts(view: UiElement): bundle<string> {
-	if (view.$shortcuts) return view.$shortcuts;
-	if (!view.$shortcuts) for (let node: Element = view; node; node = node.parentElement) {
-		if (node instanceof View) {
-			let shortcuts = node.$control.conf.shortcuts;
-			if (shortcuts) {
-				view.$shortcuts = shortcuts;
-				return shortcuts;
-			}
-		}
-	}
-}

@@ -1,6 +1,6 @@
-import {ownerOf, viewOf} from "../../article.js";
+import {ownerOf, viewOf} from "../article.js";
 import {controller} from "../../control.js";
-import {UserEvent} from "../../ui.js";
+import {UserEvent} from "../ui.js";
 
 let TRACK: UserEvent = null;
 let SELECTION: UserEvent = null;

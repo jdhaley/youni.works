@@ -1,6 +1,6 @@
-import {Control, controller} from "./control";
-import {Signal} from "./model";
-import {bundle} from "./util";
+import {Control, controller} from "../control";
+import {Signal} from "../model";
+import {bundle} from "../util";
 
 export interface UiElement extends HTMLElement {
 	$control?: Control<UiElement>;
