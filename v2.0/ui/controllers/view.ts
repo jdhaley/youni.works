@@ -1,17 +1,25 @@
 import {extend} from "../../util.js";
 import {copyRange, ownerOf, UserEvent, View, Viewer} from "../../display.js";
 import {bundle} from "../../../../core/api/model.js";
+import { typeOf } from "../../model.js";
 
 export default extend(null, {
 	copy(this: Viewer, event: UserEvent) {
 		event.subject = "";
 		let range = event.owner.selectionRange;
 		let copy = copyRange(range, this);
-		event.clipboardData.setData("text/xml", copy.outerHTML);
 		let content = this.toModel(copy);
-		let data = JSON.stringify(content, null, 2);
-		event.clipboardData.setData("application/json", data);
-		event.clipboardData.setData("text/plain", typeof content == "string" ? content : data);
+		event.clipboardData.setData("application/json", JSON.stringify(content));
+		//TODO transform content into simple HTML markup.
+		//event.clipboardData.setData("text/xml", copy.outerHTML);
+		let data = "";
+		if (typeOf(content) == "text") {
+			data = "" + content;
+		} else {
+			//pretty-print when copying to text.
+			data = JSON.stringify(content, null, 2);
+		}
+		event.clipboardData.setData("text/plain", data);
 	},
 	command(event: UserEvent) {
 		let shortcuts = event.on.$shortcuts || getShortcuts(event.on);

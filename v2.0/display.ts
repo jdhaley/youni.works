@@ -7,13 +7,48 @@ import {loadTypes} from "./loader.js";
 
 export type Viewer = ViewType<View>;
 
+/*
+The is global HTML attribute: Allows you to specify that a standard HTML element
+should behave like a registered custom built-in element.
+
+The "is" option of the Document.createElement() method.
+*/
+const OBSERVED_ATTRIBUTES = ["a", "b"];
+let NEXT_ID = 1;
+let ZWSP = "\u200b";
+
 export class View extends HTMLElement {
 	constructor() {
 		super();
 	}
+	static get observedAttributes() {
+		return OBSERVED_ATTRIBUTES;
+	}
+
+	declare parentElement: View;
 	$control: Viewer;
 	$model?: content;
 	$shortcuts?: bundle<string>;
+	
+	connectedCallback() {
+		this.id = "" + NEXT_ID++;
+		if (!this.$control) this.$control = this.view_type;
+	}
+	disconnectedCallback() {
+	}
+	adoptedCallback() {
+	}
+	attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+	}
+	get view_model() {
+		return this.$control?.toModel(this);
+	}
+	get view_type() {
+		let types = this.parentElement?.$control?.types;
+		if (types) {
+			return types[this.dataset.name || this.dataset.type]
+		}
+	}
 }
 
 class Record extends View {
@@ -78,9 +113,6 @@ export class Article extends Controller implements ContentType<View> {
 	}
 }
 
-let NEXT_ID = 1;
-let ZWSP = "\u200b";
-
 class DisplayContext implements ViewContext<View> {
 	constructor(display: Article) {
 		this.display = display;
@@ -111,10 +143,10 @@ class DisplayContext implements ViewContext<View> {
 	createView(type: Viewer): View {
 		let view = this.display.owner.create(type.tag || "div") as View;
 		view.$control = type;
-		view.id = "" + NEXT_ID++;
-		if (type.name) view.dataset.type = type.name;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
+		} else if (type.name) {
+			view.dataset.type = type.name;
 		}
 		return view;
 	}
