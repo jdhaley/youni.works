@@ -9,6 +9,7 @@ export interface ViewContext<V> extends Context<V> {
 	appendPart(view: V, part: V): void;
 	getText(view: V): string;
 	setText(view: V, value: string): void;
+	getPartType(view: V, type: ViewType<V>): ViewType<V>;
 }
 
 export class ViewType<V> extends Control<V> implements ContentType<V> {
@@ -56,8 +57,8 @@ export class RecordType<V> extends ViewType<V> {
 		let model = Object.create(null);
 		model.type$ = this.name;
 		for (let child of this.context.getPartsOf(view)) {
-			let type = this.context.getReceiver(child);
-			if (type?.propertyName) {
+			let type = this.context.getPartType(child,this);
+			if (type) {
 				let value = type.toModel(child);
 				if (value) model[type.propertyName] = value;	
 			}
@@ -75,7 +76,7 @@ export class ListType<V> extends ViewType<V> {
 
 		let parts = this.context.getPartsOf(view);
 		if (parts) for (let child of parts) {
-			let type = this.context.getReceiver(child);
+			let type = this.context.getPartType(child, this);
 			//if (!type) throw new Error(`Type "${typeName}" not found.`);
 			model.push(type.toModel(child));
 		}

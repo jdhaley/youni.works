@@ -1,14 +1,17 @@
 import {extend} from "../../util.js";
-import {ownerOf, UserEvent, View, Viewer} from "../../display.js";
-import { bundle } from "../../../../core/api/model.js";
-import { ViewType } from "../../viewTypes.js";
+import {copyRange, ownerOf, UserEvent, View, Viewer} from "../../display.js";
+import {bundle} from "../../../../core/api/model.js";
 
 export default extend(null, {
 	copy(this: Viewer, event: UserEvent) {
 		event.subject = "";
 		let range = event.owner.selectionRange;
-		let data = event.on.rangeContent(range);
-		event.clipboardData.setData("application/json", JSON.stringify(data));
+		let copy = copyRange(range, this);
+		event.clipboardData.setData("text/xml", copy.outerHTML);
+		let content = this.toModel(copy);
+		let data = JSON.stringify(content, null, 2);
+		event.clipboardData.setData("application/json", data);
+		event.clipboardData.setData("text/plain", typeof content == "string" ? content : data);
 	},
 	command(event: UserEvent) {
 		let shortcuts = event.on.$shortcuts || getShortcuts(event.on);
@@ -27,7 +30,7 @@ export default extend(null, {
 	enter(event: UserEvent) {
 		event.subject = "";
 	},
-	test(this: ViewType<any>, event: UserEvent) {
+	test(this: Viewer, event: UserEvent) {
 		event.subject = "";
 		let range = ownerOf(event.on).selectionRange;
 		range.setStartBefore(event.on.parentElement);

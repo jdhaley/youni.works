@@ -1,7 +1,7 @@
 import {Signal, content, ContentType, Type} from "./model.js";
 import {RemoteFileService} from "./remote.js";
 import {Controller, controller} from "./control.js";
-import {ViewContext, ViewType} from "./viewTypes.js";
+import {RecordType, ViewContext, ViewType} from "./viewTypes.js";
 import {bundle} from "./util.js";
 import {loadTypes} from "./loader.js";
 
@@ -11,17 +11,9 @@ export class View extends HTMLElement {
 	constructor() {
 		super();
 	}
-	$control?: Viewer;
+	$control: Viewer;
 	$model?: content;
 	$shortcuts?: bundle<string>;
-	rangeContent(range: Range): content {
-		let frag = range.cloneContents();
-		let copy = this.$control.context.createView(this.$control);
-		while (frag.firstChild) copy.append(frag.firstChild);
-		let content = copy.$control.toModel(copy);
-		console.log(copy, content);
-		return content;
-	}
 }
 
 class Record extends View {
@@ -94,7 +86,10 @@ class DisplayContext implements ViewContext<View> {
 		this.display = display;
 	}
 	readonly display: Article;
-
+	getPartType(view: View, type: Viewer): Viewer {
+		let attr = type instanceof RecordType ?  "data-name" : "data-type";
+		return type.types[view.getAttribute(attr)];
+	}
 	getReceiver(view: View): Viewer {
 		return view.$control;
 	}
@@ -105,7 +100,7 @@ class DisplayContext implements ViewContext<View> {
 		return view.parentElement as View;
 	}
 	getText(view: View): string {
-		return view.textContent || ZWSP;
+		return view.textContent == ZWSP ? "" : view.textContent;
 	}
 	setText(view: View, value: string): void {
 		view.textContent = value || ZWSP;
@@ -123,6 +118,13 @@ class DisplayContext implements ViewContext<View> {
 		}
 		return view;
 	}
+}
+
+export function copyRange(range: Range, type: Viewer) {
+	let frag = range.cloneContents();
+	let copy = type.context.createView(type);
+	while (frag.firstChild) copy.append(frag.firstChild);
+	return copy;
 }
 
 export function viewOf(node: Node | Range): View {
