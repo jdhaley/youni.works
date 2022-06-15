@@ -1,13 +1,12 @@
-import {Control, controller} from "../control";
-import {Signal} from "../model";
-import {bundle} from "../util";
+import {Signal, Control, controller, Owner, Receiver} from "../base/control";
+import {bundle} from "../base/util";
 
 export interface UiElement extends HTMLElement {
 	$control?: Control<UiElement>;
 	$shortcuts?: bundle<string>;
 }
 
-export class Frame {
+export class Frame implements Owner<UiElement> {
 	constructor(window: Window, controller: controller) {
 		window.document["$owner"] = this;
 		this.#window = window;
@@ -51,6 +50,16 @@ export class Frame {
 
 	create(tagName: string): UiElement {
 		return this.#window.document.createElement(tagName);
+	}
+
+	getPartOf(value: UiElement): UiElement {
+		return value.parentElement;
+	}
+	getPartsOf(value: UiElement): Iterable<UiElement> {
+		return value.children as Iterable<UiElement>;
+	}
+	getControllerOf(value: UiElement): Receiver {
+		return value.$control;
 	}
 }
 

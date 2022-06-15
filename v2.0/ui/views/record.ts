@@ -1,6 +1,6 @@
 import {View, ViewType} from "./view.js";
-import {Record} from "../../model.js";
-import {CHAR} from "../../util.js";
+import {content, Record} from "../../base/model.js";
+import {CHAR} from "../../base/util.js";
 
 class RecordView extends View {
 	constructor() {
@@ -16,7 +16,7 @@ export class RecordType extends ViewType {
 		for (let name in this.types) {
 			let type = this.types[name];
 			let value = model ? model[name] : null;
-			let member = type.toView(value);
+			let member = type.toView(value as content);
 			member.dataset.name = type.propertyName;
 			view.append(member);
 		}
@@ -25,7 +25,7 @@ export class RecordType extends ViewType {
 	toModel(view: View): Record {
 		let model = Object.create(null);
 		model.type$ = this.name;
-		for (let child of this.context.getPartsOf(view)) {
+		for (let child of this.owner.getPartsOf(view)) {
 			let type = child.view_type;
 			if (type) {
 				let value = type.toModel(child);

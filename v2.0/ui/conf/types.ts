@@ -1,4 +1,4 @@
-import {extend} from "../../util.js";
+import {extend} from "../../base/util.js";
 
 import {RecordType} from "../views/record.js";
 import {ListType} from "../views/list.js";

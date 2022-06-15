@@ -1,6 +1,6 @@
-import {View, ViewType} from "./view.js";
-import {content, List, typeOf} from "../../model.js";
-import {CHAR} from "../../util.js";
+import {View, ViewType, viewType} from "./view.js";
+import {content, List} from "../../base/model.js";
+import {CHAR} from "../../base/util.js";
 
 class ListView extends View {
 	constructor() {
@@ -16,7 +16,7 @@ export class ListType extends ViewType {
 		let model = [];
 		if (this.name) model["type$"] = this.name;
 
-		let parts = this.context.getPartsOf(view);
+		let parts = this.owner.getPartsOf(view);
 		if (parts) for (let child of parts) {
 			let type = child.view_type;
 			//if (!type) throw new Error(`Type "${typeName}" not found.`);
@@ -29,7 +29,7 @@ export class ListType extends ViewType {
 		// level++;
 		view.textContent = "";
 		if (model && model[Symbol.iterator]) for (let value of model) {
-			let type = this.types[typeOf(value)] || this.defaultType;
+			let type = this.types[viewType(value)] || this.defaultType;
 			let child = type.toView(value);
 			child.dataset.type = type.name;
 			view.append(child);

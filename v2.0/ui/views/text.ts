@@ -1,5 +1,5 @@
 import {View, ViewType } from "./view.js";
-import {CHAR} from "../../util.js";
+import {CHAR} from "../../base/util.js";
 
 class TextView extends View {
 	constructor() {

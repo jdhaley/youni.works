@@ -1,5 +1,5 @@
 import {bundle} from "./util.js";
-import {Receiver} from "./model.js";
+import {Receiver} from "./control.js";
 import {Message, Response} from "./message.js";
 
 class Request extends Message<any> {

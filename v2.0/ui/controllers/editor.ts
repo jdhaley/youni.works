@@ -1,5 +1,5 @@
 import {UserEvent} from "../ui.js";
-import {extend} from "../../util.js";
+import {extend} from "../../base/util.js";
 import article from "./article.js";
 
 let UNDONE = false;

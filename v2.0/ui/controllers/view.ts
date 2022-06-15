@@ -1,6 +1,5 @@
-import {CHAR, extend} from "../../util.js";
-import {typeOf} from "../../model.js";
-import {ViewType, View} from "../views/view.js";
+import {CHAR, extend} from "../../base/util.js";
+import {ViewType, viewType} from "../views/view.js";
 import {UserEvent} from "../ui.js";
 import {copyRange} from "../article.js";
 
@@ -15,7 +14,7 @@ export default extend(null, {
 		console.log(html)
 		event.clipboardData.setData("text/html", html.outerHTML);
 		let data = "";
-		if (typeOf(content) == "text") {
+		if (viewType(content) == "text") {
 			data = "" + content;
 		} else {
 			//pretty-print when copying to text.
@@ -43,7 +42,7 @@ export default extend(null, {
 	},
 	test(this: ViewType, event: UserEvent) {
 		event.subject = "";
-		let range = this.context.frame.selectionRange;
+		let range = this.owner.owner.selectionRange;
 		range.setStartBefore(event.on.parentElement);
 		range.collapse(true);
 		console.log(range.commonAncestorContainer.nodeName);

@@ -1,7 +1,7 @@
-import {Context, Control} from "../../control.js";
-import {content, ContentType, Type} from "../../model.js";
+import {Owner, Control} from "../../base/control.js";
+import {content, ContentType, Type} from "../../base/model.js";
 import {Frame} from "../ui.js";
-import {bundle, EMPTY} from "../../util.js";
+import {bundle, EMPTY} from "../../base/util.js";
 
 /*
 The is global HTML attribute: Allows you to specify that a standard HTML element
@@ -62,19 +62,19 @@ function getShortcuts(view: View) {
 	}
 }
 
-export interface ViewContext extends Context<View> {
-	frame: Frame;
+export interface ViewOwner extends Owner<View> {
+	owner: Frame;
 	createView(type: ViewType): View;
 }
 export class ViewType extends Control<View> implements ContentType<View> {
-	context: ViewContext;
+	owner: ViewOwner;
 	tag: string;
 	types: bundle<ViewType> = EMPTY.object;
 	declare name?: string;
 	declare propertyName?: string;
 
 	toView(model: content): View {
-		let view = this.context.createView(this);
+		let view = this.owner.createView(this);
 		this.viewContent(view, model);
 		return view;
 	}
@@ -89,3 +89,23 @@ export class ViewType extends Control<View> implements ContentType<View> {
 }
 
 let UNDEFINED_TYPE = new ViewType();
+
+export function viewType(value: any): string {
+	if (value?.valueOf) value = value.valueOf(value);
+	switch (typeof value) {
+		case "string":
+		case "number":
+		case "boolean":
+			return "text";
+		case "object":
+			if (value["type$"]) {
+				let type = value["type$"];
+				return type.name || "" + type;
+			}
+			if (value instanceof Date) return "date";
+			if (value[Symbol.iterator]) return "list";
+			return "record";
+		default:
+			return "null";
+	}
+}
