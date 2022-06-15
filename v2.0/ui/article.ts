@@ -1,5 +1,5 @@
+import {Context, Controller} from "../control.js";
 import {content, Receiver} from "../model.js";
-import {Context, Control, controller} from "../control.js";
 import {Frame} from "./ui.js";
 import {RemoteFileService} from "../remote.js";
 
@@ -7,7 +7,7 @@ import {View, ViewContext, ViewType} from "./views/view.js";
 import {bundle, EMPTY} from "../util.js";
 import {loadTypes} from "../loader.js";
 
-export class Article extends Control<View> implements ViewContext {
+export class Article extends Controller implements ViewContext {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.frame = frame;
