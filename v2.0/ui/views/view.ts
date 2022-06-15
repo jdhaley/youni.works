@@ -1,5 +1,5 @@
-import {content, ContentType, Type} from "../../model.js";
 import {Context, Control} from "../../control.js";
+import {content, ContentType, Type} from "../../model.js";
 import {Frame} from "../ui.js";
 import {bundle, EMPTY} from "../../util.js";
 
@@ -28,14 +28,20 @@ export class View extends HTMLElement {
 		return this.$control?.toModel(this);
 	}
 	get view_type() {
-		let types = this.parentElement?.$control?.types;
-		if (types) {
-			return types[this.dataset.name || this.dataset.type]
+		if (this.$control) return this.$control;
+		for (let view: Element = this; view; view = view.parentElement) {
+			if (view["$control"]) {
+				let ctx = view["$control"];
+				if (ctx?.types) {
+					let type = ctx.types[this.dataset.name || this.dataset.type];
+					this.$control = type || UNDEFINED_TYPE;
+					return type;
+				}
+			};
 		}
 	}
 	
 	connectedCallback() {
-		if (!this.$control) this.$control = this.view_type;
 		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
 		this.id = "" + NEXT_ID++;
 	}
@@ -81,3 +87,5 @@ export class ViewType extends Control<View> implements ContentType<View> {
 		return type == this;
 	}
 }
+
+let UNDEFINED_TYPE = new ViewType();

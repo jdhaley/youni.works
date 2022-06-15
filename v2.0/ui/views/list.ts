@@ -1,13 +1,13 @@
+import {View, ViewType} from "./view.js";
 import {content, List, typeOf} from "../../model.js";
 import {CHAR} from "../../util.js";
-import {View, ViewType} from "./view.js";
 
 class ListView extends View {
 	constructor() {
 		super();
 	}
 }
-customElements.define('ui-list', ListView);
+customElements.define("ui-list", ListView);
 
 export class ListType extends ViewType {
 	tag = "ui-list";

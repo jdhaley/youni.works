@@ -1,13 +1,13 @@
-import {Record} from "../../model.js";
-import { CHAR } from "../../util.js";
 import {View, ViewType} from "./view.js";
+import {Record} from "../../model.js";
+import {CHAR} from "../../util.js";
 
 class RecordView extends View {
 	constructor() {
 		super();
 	}
 }
-customElements.define('ui-record', RecordView);
+customElements.define("ui-record", RecordView);
 
 export class RecordType extends ViewType {
 	tag = "ui-record";
@@ -26,7 +26,7 @@ export class RecordType extends ViewType {
 		let model = Object.create(null);
 		model.type$ = this.name;
 		for (let child of this.context.getPartsOf(view)) {
-			let type = view.view_type;
+			let type = child.view_type;
 			if (type) {
 				let value = type.toModel(child);
 				if (value) model[type.propertyName] = value;	

@@ -33,7 +33,7 @@ export interface Receiver {
 }
 
 export function typeOf(value: any): string {
-	if (value && typeof value == "object") value = value.valueOf(value);
+	if (value?.valueOf) value = value.valueOf(value);
 	switch (typeof value) {
 		case "string":
 			//using STX/ETX control codes...

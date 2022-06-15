@@ -32,7 +32,9 @@ export class Article extends Control<View> implements ViewContext {
 	}
 
 	createView(type: ViewType): View {
-		return this.frame.create(type.tag) as View;
+		let view = this.frame.create(type.tag) as View;
+		view.$control = type;
+		return view;
 	}
 	getPartsOf(value: View): Iterable<View> {
 		return value.children as Iterable<View>;
@@ -73,18 +75,4 @@ export function copyRange(range: Range, type: ViewType) {
 	let copy = type.context.createView(type);
 	while (frag.firstChild) copy.append(frag.firstChild);
 	return copy;
-}
-
-export function viewOf(node: Node | Range): View {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node["$control"]) return node as View;
-		node = node.parentNode;
-	}
-}
-
-export function ownerOf(node: Node | Range): Frame  {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	if (node instanceof Document) return node["$owner"];
-	return (node as Node).ownerDocument["$owner"];
 }

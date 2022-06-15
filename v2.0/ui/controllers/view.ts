@@ -12,7 +12,7 @@ export default extend(null, {
 		let content = this.toModel(copy);
 		event.clipboardData.setData("application/json", JSON.stringify(content));
 		//TODO transform content into simple HTML markup.
-		//event.clipboardData.setData("text/xml", copy.outerHTML);
+		//event.clipboardData.setData("text/html", copy.outerHTML);
 		let data = "";
 		if (typeOf(content) == "text") {
 			data = "" + content;
@@ -20,6 +20,7 @@ export default extend(null, {
 			//pretty-print when copying to text.
 			data = JSON.stringify(content, null, 2);
 		}
+		console.log("text/plain", data);
 		event.clipboardData.setData("text/plain", data);
 	},
 	command(event: UserEvent) {

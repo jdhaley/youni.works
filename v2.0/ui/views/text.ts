@@ -6,7 +6,7 @@ class TextView extends View {
 		super();
 	}
 }
-customElements.define('ui-text', TextView);
+customElements.define("ui-text", TextView);
 
 export class TextType extends ViewType {
 	tag = "ui-text";
@@ -17,4 +17,3 @@ export class TextType extends ViewType {
 		return view.textContent == CHAR.ZWSP ? "" : view.textContent;
 	}
 }
-

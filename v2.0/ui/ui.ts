@@ -84,3 +84,17 @@ export interface UserEvent extends Signal, UIEvent {
 	moveX?: number;
 	moveY?: number;
 }
+
+export function viewOf(node: Node | Range): UiElement {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node["$control"]) return node as UiElement;
+		node = node.parentElement;
+	}
+}
+
+export function ownerOf(node: Node | Range): Frame  {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	if (node instanceof Document) return node["$owner"];
+	return (node as Node).ownerDocument["$owner"];
+}
