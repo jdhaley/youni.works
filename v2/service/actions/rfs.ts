@@ -1,6 +1,6 @@
 import {Request, Response} from "../request";
 
-export default function serveFile(res: Response) {
+export default function rfs(res: Response) {
 	let req: Request = res.req;
 	let f = "./journal" + req.path;
 	if (req.method == "GET") {

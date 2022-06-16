@@ -1,53 +1,48 @@
-import { bundle } from "../base/util.js";
+import { bundle, extend } from "../base/util.js";
 import {Request} from "./request.js";
 
-export default function start(serverConf: bundle<any>, serviceConf: bundle<any>) {
-	let modules = serverConf.modules;
+export default function start(conf: bundle<any>) {
+	let modules = conf.modules;
 	console.info(`Service file context "${modules.fs.realpathSync(".")}"`)
-	let service = startService(modules, {}, serviceConf);
+	let service = startService(conf);
 	const httpServer = modules.http.createServer(service);
-	httpServer.listen(serverConf.server.port, () => console.info());
-	console.info(`Service listening on HTTP port "${serverConf.server.port}"`)	
+	httpServer.listen(conf.server.port, () => console.info());
+	console.info(`Service listening on HTTP port "${conf.server.port}"`)	
 }
 
-function startService(modules: bundle<any>, context: bundle<any>, endpoints: bundle<any>) {
-	let conf = {
-		modules: modules,
-		engine: modules.express,
-		context: context
-	};
-	let app = modules.express();
-	app.use(modules.bodyParser.text({type: "*/*"}));
-	config(conf, app, endpoints);
-	return app;
+function startService(conf: bundle<any>) {
+	let service = conf.modules.express();
+	service.use(conf.modules.bodyParser.text({type: "*/*"}));
+	config(service, conf);
+	return service;
 }
 
-function config(conf: bundle<any>, ctx: any, endpoints: bundle<any>) {
-	for (let path in endpoints) {
-		let action = createAction(endpoints[path], conf, ctx);
-		ctx.use(path, action);
+function config(service: any, conf: bundle<any>) {
+	for (let path in conf.endpoints) {
+		createAction(service, conf, path, conf.endpoints[path]);
 	}
 }
 
-function createAction(endpoint: any, conf: bundle<any>, ctx: any) {
+function createAction(service: any, conf: bundle<any>, path: string, endpoint: any) {
 	let action: any;
 	switch (typeof endpoint) {
 		case "string":
 			action = conf.engine.static(endpoint);
+			console.log(path + ":", JSON.stringify(endpoint));
 			break;
-		case "object":
-			action = conf.engine.Router();
-			config(conf, ctx, endpoint);
-			break;
+		// case "object":
+		// 	action = conf.engine.Router();
+		// 	config(conf, ctx, endpoint);
+		// 	break;
 		case "function":
-			function service(req: Request) {
+			action = function doAction(req: Request) {
 				let res = req["res"];
 				res.fs = conf.modules.fs;
 				res.context = conf;
 				return endpoint(res);
 			}
-			action = service;
+			console.log(path, endpoint.name);
 			break;
 	}
-	return action;
+	service.use(path, action);
 }
