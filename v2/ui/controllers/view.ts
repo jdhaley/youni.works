@@ -1,6 +1,7 @@
 import {CHAR, extend} from "../../base/util.js";
 import {ViewType, viewType} from "../views/view.js";
 import {UserEvent} from "../ui.js";
+import { content } from "../../base/model.js";
 
 export default extend(null, {
 	copy(this: ViewType, event: UserEvent) {
@@ -12,13 +13,13 @@ export default extend(null, {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range, event.clipboardData);
-		//TODO do the cut.
+		this.edit("Cut", range, "");
 	},
 	paste(this: ViewType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		let model = getClipboard(event.clipboardData);
-		//TODO insert the cut.
+		this.edit("Paste", range, model);
 	},
 	command(event: UserEvent) {
 		let shortcuts = event.on.$shortcuts;
@@ -64,7 +65,7 @@ function setClipboard(type: ViewType, range: Range, clipboard: DataTransfer) {
 	clipboard.setData("text/plain", data);
 }
 
-function getClipboard(clipboard: DataTransfer) {
+function getClipboard(clipboard: DataTransfer): content {
 	let data = clipboard.getData("application/json");
 	if (data) return JSON.parse(data);
 	return clipboard.getData("text/plain");

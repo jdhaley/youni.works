@@ -92,6 +92,8 @@ export class ViewType extends Control<View> implements ContentType<View> {
 		while (frag.firstChild) view.append(frag.firstChild);
 		return view;
 	}
+	edit(commandName: string, range: Range, replacement: content) {
+	}
 }
 
 let UNDEFINED_TYPE = new ViewType();
