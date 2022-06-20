@@ -1,4 +1,4 @@
-import {Receiver, Owner, Controller} from "../base/control.js";
+import {Receiver, Controller} from "../base/control.js";
 import {content} from "../base/model.js";
 import {Frame} from "./ui.js";
 import {RemoteFileService} from "../base/remote.js";
@@ -61,11 +61,4 @@ export function loadBaseTypes(owner: Article): bundle<ViewType> {
 		types[name] = type;
 	}
 	return types;
-}
-
-export function copyRange(range: Range, type: ViewType) {
-	let frag = range.cloneContents();
-	let copy = type.owner.createView(type);
-	while (frag.firstChild) copy.append(frag.firstChild);
-	return copy;
 }

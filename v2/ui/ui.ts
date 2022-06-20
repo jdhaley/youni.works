@@ -64,7 +64,7 @@ export class Frame implements Owner<UiElement> {
 }
 
 export interface UserEvent extends Signal, UIEvent {
-	owner: Frame;
+	frame: Frame;
 	source: UiElement;
 	on: UiElement;
 	//all user events

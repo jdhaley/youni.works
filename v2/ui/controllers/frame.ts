@@ -135,7 +135,7 @@ function rangeEvent(event: UserEvent) {
 function sense(event: UserEvent) {
     let source = viewOf(event.source || event.target as Node);
     if (source?.$control) {
-        event.owner = ownerOf(source);
+        event.frame = ownerOf(source);
         event.source = source;
         event.from = ownerOf(event.target as Node);
         event.direction = "up";

@@ -1,27 +1,24 @@
 import {CHAR, extend} from "../../base/util.js";
 import {ViewType, viewType} from "../views/view.js";
 import {UserEvent} from "../ui.js";
-import {copyRange} from "../article.js";
 
 export default extend(null, {
 	copy(this: ViewType, event: UserEvent) {
 		event.subject = "";
-		let range = event.owner.selectionRange;
-		let copy = copyRange(range, this);
-		let content = this.toModel(copy);
-		event.clipboardData.setData("application/json", JSON.stringify(content));
-		let html = htmlify(copy);
-		console.log(html)
-		event.clipboardData.setData("text/html", html.outerHTML);
-		let data = "";
-		if (viewType(content) == "text") {
-			data = "" + content;
-		} else {
-			//pretty-print when copying to text.
-			data = JSON.stringify(content, null, 2);
-		}
-		console.log("text/plain", data);
-		event.clipboardData.setData("text/plain", data);
+		let range = event.frame.selectionRange;
+		setClipboard(this, range, event.clipboardData);
+	},
+	cut(this: ViewType, event: UserEvent) {
+		event.subject = "";
+		let range = event.frame.selectionRange;
+		setClipboard(this, range, event.clipboardData);
+		//TODO do the cut.
+	},
+	paste(this: ViewType, event: UserEvent) {
+		event.subject = "";
+		let range = event.frame.selectionRange;
+		let model = getClipboard(event.clipboardData);
+		//TODO insert the cut.
 	},
 	command(event: UserEvent) {
 		let shortcuts = event.on.$shortcuts;
@@ -48,6 +45,30 @@ export default extend(null, {
 		console.log(range.commonAncestorContainer.nodeName);
 	}
 });
+
+function setClipboard(type: ViewType, range: Range, clipboard: DataTransfer) {
+	let view = type.rangeView(range);
+	let model = type.toModel(view);
+	clipboard.setData("application/json", JSON.stringify(model));
+	let html = htmlify(view);
+	console.log(html);
+	clipboard.setData("text/html", html.outerHTML);
+	let data = "";
+	if (viewType(model) == "text") {
+		data = "" + model;
+	} else {
+		//pretty-print when copying to text.
+		data = JSON.stringify(model, null, 2);
+	}
+	console.log("text/plain", data);
+	clipboard.setData("text/plain", data);
+}
+
+function getClipboard(clipboard: DataTransfer) {
+	let data = clipboard.getData("application/json");
+	if (data) return JSON.parse(data);
+	return clipboard.getData("text/plain");
+}
 
 function htmlify(view: HTMLElement): HTMLElement {
 	let html: HTMLElement;

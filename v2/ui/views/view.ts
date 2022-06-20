@@ -86,6 +86,12 @@ export class ViewType extends Control<View> implements ContentType<View> {
 	generalizes(type: Type): boolean {
 		return type == this;
 	}
+	rangeView(range: Range) {
+		let view = this.owner.createView(this);
+		let frag = range.cloneContents();
+		while (frag.firstChild) view.append(frag.firstChild);
+		return view;
+	}
 }
 
 let UNDEFINED_TYPE = new ViewType();
