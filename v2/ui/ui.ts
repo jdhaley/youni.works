@@ -51,6 +51,9 @@ export class Frame implements Owner<UiElement> {
 	create(tagName: string): UiElement {
 		return this.#window.document.createElement(tagName);
 	}
+	createRange(): Range {
+		return this.#window.document.createRange();
+	}
 
 	getPartOf(value: UiElement): UiElement {
 		return value.parentElement;
@@ -60,6 +63,9 @@ export class Frame implements Owner<UiElement> {
 	}
 	getControllerOf(value: UiElement): Receiver {
 		return value.$control;
+	}
+	getElementById(id: string) {
+		return this.#window.document.getElementById(id);
 	}
 }
 
