@@ -1,5 +1,38 @@
 import {Article} from "../article.js";
 
+	// /**
+	//  * Returns a NOT LIVE array of nodes.
+	//  * Useful for adding/removing nodes without the
+	//  * problems of a live list.
+	//  */
+	//  createNodes(source: string | Range): Node[] {
+	// 	let list: NodeList;
+	// 	if (typeof source == "string") {
+	// 		let div = this.document.createElement("div");
+	// 		div.innerHTML = source;
+	// 		list = div.childNodes;
+	// 	} else if (source instanceof Range) {
+	// 		let frag = source.cloneContents();
+	// 		list = frag.childNodes;
+	// 	}
+	// 	let nodes = [];
+	// 	for (let node of list) {
+	// 		//Chrome adds a meta tag for UTF8 when the cliboard is just text.
+	// 		//TODO a more generalized transformation to be developed for all clipboard exchange.
+	// 		if (node.nodeName != "META") nodes.push(node);
+	// 	}
+	// 	return nodes;
+	// }
+
+export function markup(range: Range): string {
+	let frag = range.cloneContents();
+	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
+	while (frag.firstChild) {
+		div.append(frag.firstChild);
+	}
+	return div.innerHTML;
+}
+
 export function getElement(node: Node | Range, type: string): Element {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
@@ -42,13 +75,12 @@ export function getItemRange(document: Document, contextId: string, startId: str
 
 export function getItemContent(article: Article, point: "start" | "end", context: Element): Element {
 	let owner = article.owner;
-	let doc = owner.document;
 	
-	let edit = doc.getElementById(point + "-edit");
+	let edit = owner.getElementById(point + "-edit");
 	let item = getItem(edit, context);
 	if (item == edit) return;
 
-	let range = doc.createRange();
+	let range = owner.createRange();
 //	item = item.cloneNode(true) as Element
 	range.selectNodeContents(item);
 	point == "start" ? range.setStartAfter(edit) : range.setEndBefore(edit);

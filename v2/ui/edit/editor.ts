@@ -1,9 +1,19 @@
-import {Command, CommandBuffer} from "./command.js";
-import {markup} from "../../core/base/dom.js";
+import {Command, CommandBuffer} from "../../base/command.js";
 import {Article} from "../article.js";
-import {getElement, getItem, getItemContent, getItemRange, mark, unmark,  adjustRange, mungeText} from "./editing.js";
+import {getElement, getItem, getItemContent, getItemRange, mark, unmark,  adjustRange, mungeText, markup} from "./editing.js";
 
 let TRACK = null;
+
+interface Edit {
+	name: string;
+	timestamp: number;
+	contextId: string;
+	startId: string;
+	endId: string;
+	before: string;
+	after: string;
+}
+
 
 export type replacer = (start: Element, content: Element, end: Element) => string;
 
@@ -23,7 +33,7 @@ export class Editor extends Article {
 		TRACK = null;
 		let cmd = new EditCommand(this, name);
 		this.buffer.add(cmd);
-		let ele = this.owner.createElement("div");
+		let ele = this.owner.create("div");
 		ele.innerHTML = replacement;
 		range = cmd.do(range, ele, replacer);
 		console.log(cmd.items);
@@ -63,7 +73,7 @@ class EditCommand extends Command<Range> {
 
 	do(range: Range, replacement: Element, replacer: replacer) {
 		startEdit(this, range);
-		let context = this.article.owner.document.getElementById(this.items.contextId);
+		let context = this.article.owner.getElementById(this.items.contextId);
 		let startContent = getItemContent(this.article, "start", context);
 		let endContent = getItemContent(this.article, "end", context);
 		if (!replacer) replacer = split;
@@ -90,16 +100,6 @@ class EditCommand extends Command<Range> {
 		if (range) this.article.owner.selectionRange = range;
 		return range;
 	}
-}
-
-interface Edit {
-	name: string;
-	timestamp: number;
-	contextId: string;
-	startId: string;
-	endId: string;
-	before: string;
-	after: string;
 }
 
 function startEdit(cmd: EditCommand, range: Range) {

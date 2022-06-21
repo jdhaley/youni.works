@@ -42,8 +42,8 @@ export class View extends HTMLElement {
 	}
 	
 	connectedCallback() {
-		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
 		this.id = "" + NEXT_ID++;
+		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
 	}
 	adoptedCallback() {
 		this.connectedCallback();
