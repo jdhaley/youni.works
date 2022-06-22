@@ -1,4 +1,4 @@
-import {Article} from "../article.js";
+import {Article} from "./article.js";
 
 	// /**
 	//  * Returns a NOT LIVE array of nodes.

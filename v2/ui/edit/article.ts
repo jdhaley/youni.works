@@ -1,23 +1,24 @@
-import {Receiver, Controller} from "../base/control.js";
-import {content} from "../base/model.js";
-import {Frame} from "./ui.js";
-import {RemoteFileService} from "../base/remote.js";
+import {Receiver} from "../../base/control.js";
+import {content} from "../../base/model.js";
+import {RemoteFileService} from "../../base/remote.js";
+import {CommandBuffer} from "../../base/command.js";
+import {bundle, EMPTY} from "../../base/util.js";
+import {loadTypes} from "../../base/loader.js";
 
-import {View, ViewOwner, ViewType} from "./views/view.js";
-import {bundle, EMPTY} from "../base/util.js";
-import {loadTypes} from "../base/loader.js";
+import {View, ViewOwner, ViewType} from "../views/view.js";
+import {Frame} from "../ui.js";
 
-export class Article extends Controller implements ViewOwner {
+export class Article extends ViewOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
-		super();
-		this.owner = frame;
+		super(frame);
 		this.conf = conf;
 		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
+		this.buffer = new CommandBuffer<Range>();
 		this.controller = conf.controllers.article;
 		this.initTypes(conf.types, conf.baseTypes);
 	}
-	readonly owner: Frame;
 	readonly service: RemoteFileService;
+	readonly buffer: CommandBuffer<Range>;
 
 	types: bundle<ViewType>;
 	type: ViewType;

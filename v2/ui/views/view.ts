@@ -1,7 +1,8 @@
-import {Owner, Control} from "../../base/control.js";
+import {Owner, Control, Controller, Receiver} from "../../base/control.js";
 import {content, ContentType, Type} from "../../base/model.js";
-import {Frame} from "../ui.js";
+import {Command} from "../../base/command.js";
 import {bundle, EMPTY} from "../../base/util.js";
+import {Frame} from "../ui.js";
 
 /*
 The is global HTML attribute: Allows you to specify that a standard HTML element
@@ -62,10 +63,34 @@ function getShortcuts(view: View) {
 	}
 }
 
-export interface ViewOwner extends Owner<View> {
-	owner: Frame;
-	createView(type: ViewType): View;
+export class ViewOwner extends Controller implements Owner<View> {
+	constructor(frame: Frame) {
+		super();
+		this.owner = frame;
+	}
+	readonly owner: Frame;
+	//readonly buffer: CommandBuffer<Range>;
+	// types: bundle<ViewType>;
+	// type: ViewType;
+	// view: View;
+	// model: content;
+
+	createView(type: ViewType): View {
+		let view = this.owner.create(type.tag) as View;
+		view.$control = type;
+		return view;
+	}
+	getPartsOf(value: View): Iterable<View> {
+		return value.children as Iterable<View>;
+	}
+	getPartOf(value: View): View {
+		return value.parentElement;
+	}
+	getControllerOf(value: View): Receiver {
+		return value.$control;
+	}
 }
+
 export class ViewType extends Control<View> implements ContentType<View> {
 	owner: ViewOwner;
 	tag: string;
@@ -92,7 +117,15 @@ export class ViewType extends Control<View> implements ContentType<View> {
 		while (frag.firstChild) view.append(frag.firstChild);
 		return view;
 	}
-	edit(commandName: string, range: Range, replacement: content) {
+	edit(commandName: string, range: Range, replacement?: content): Range {
+		// let cmd = new EditCommand(this, commandName);
+		// this.owner.buffer.add(cmd);
+		// let ele = this.owner.createView(this);
+		// ele.innerHTML = replacement;
+		// range = cmd.do(range, ele, replacer);
+		// console.log(cmd.items);
+		// return range;
+		return null;
 	}
 }
 
@@ -115,5 +148,33 @@ export function viewType(value: any): string {
 			return "record";
 		default:
 			return "null";
+	}
+}
+
+
+export class ViewCommand extends Command<Range> {
+	constructor(owner: ViewOwner, name: string, view: View) {
+		super();
+		this.owner = owner;
+		this.name = name;
+		this.timestamp = Date.now();
+		this.viewId = view.id;
+	}
+	owner: ViewOwner;
+	name: string;
+	timestamp: number;
+	viewId: string;
+	before: string;
+	after: string;
+
+	undo() {
+		return this.exec(this.before);
+	}
+	redo() {
+		return this.exec(this.after);
+	}
+
+	protected exec(markup: string): Range {
+		return null;
 	}
 }

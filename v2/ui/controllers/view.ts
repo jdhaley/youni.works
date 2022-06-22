@@ -4,6 +4,11 @@ import {UserEvent} from "../ui.js";
 import { content } from "../../base/model.js";
 
 export default extend(null, {
+	command(event: UserEvent) {
+		let shortcuts = event.on.$shortcuts;
+		let command = shortcuts && shortcuts[event.shortcut];
+		if (command) event.subject = command;
+	},
 	copy(this: ViewType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
@@ -13,7 +18,7 @@ export default extend(null, {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range, event.clipboardData);
-		this.edit("Cut", range, "");
+		this.edit("Cut", range);
 	},
 	paste(this: ViewType, event: UserEvent) {
 		event.subject = "";
@@ -21,21 +26,20 @@ export default extend(null, {
 		let model = getClipboard(event.clipboardData);
 		this.edit("Paste", range, model);
 	},
-	command(event: UserEvent) {
-		let shortcuts = event.on.$shortcuts;
-		let command = shortcuts && shortcuts[event.shortcut];
-		if (command) event.subject = command;
-	},
-	charpress(event: UserEvent) {
-		event.subject = "";
-	},
 	delete(event: UserEvent) {
 		event.subject = "";
+		let range = event.frame.selectionRange;
+		if (!range.collapsed) this.edit("Delete", range);
 	},
 	erase(event: UserEvent) {
 		event.subject = "";
+		let range = event.frame.selectionRange;
+		if (!range.collapsed) this.edit("Delete", range);
 	},
 	enter(event: UserEvent) {
+		event.subject = "";
+	},
+	charpress(event: UserEvent) {
 		event.subject = "";
 	},
 	test(this: ViewType, event: UserEvent) {
