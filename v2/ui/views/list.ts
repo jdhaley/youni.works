@@ -2,8 +2,8 @@ import {View, ViewCommand, ViewOwner, ViewType, viewType} from "./view.js";
 import {content, List} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
 import {Frame} from "../ui.js";
-import {replace} from "../edit/util.js";
-import {unmark} from "../edit/editing.js";
+import {replace} from "../editor/util.js";
+import {unmark} from "../editor/editing.js";
 
 class ListView extends View {
 	constructor() {
