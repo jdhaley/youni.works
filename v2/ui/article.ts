@@ -4,8 +4,8 @@ import {content} from "../base/model.js";
 import {bundle, EMPTY} from "../base/util.js";
 import {loadTypes} from "../base/loader.js";
 
-import {View, ViewOwner, ViewType} from "./views/view.js";
 import {Frame} from "./ui.js";
+import {View, ViewOwner, ViewType} from "./views/view.js";
 
 export class Article extends ViewOwner {
 	constructor(frame: Frame, conf: bundle<any>) {

@@ -1,5 +1,5 @@
 import {controller} from "../../base/control.js";
-import {UserEvent, ownerOf, viewOf} from "../ui.js";
+import {Frame, UiElement, UserEvent} from "../ui.js";
 
 let TRACK: UserEvent = null;
 let SELECTION: UserEvent = null;
@@ -147,6 +147,20 @@ function sense(event: UserEvent) {
     }
 }
 
+
+export function viewOf(node: Node | Range): UiElement {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node["$control"]) return node as UiElement;
+		node = node.parentElement;
+	}
+}
+
+export function ownerOf(node: Node | Range): Frame  {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	if (node instanceof Document) return node["$owner"];
+	return (node as Node).ownerDocument["$owner"];
+}
 // function sense(event: UserEvent) {
 //     event.selection = (ownerOf(event.target as Node) as Frame).selectionRange;
 //     let ctl = controlOf(event.selection.commonAncestorContainer) as Display;
