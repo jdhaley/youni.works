@@ -115,7 +115,7 @@ class PartOwner implements Owner<Part> {
 	}
 }
 
-export class ElementOwner implements Owner<Element> {
+class ElementOwner implements Owner<Element> {
 	getPartOf(part: Element): Element {
 		return part?.parentElement;
 	}

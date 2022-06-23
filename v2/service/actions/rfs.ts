@@ -1,4 +1,4 @@
-import {Request, Response} from "../request";
+import {Request, Response} from "../response";
 
 export default function rfs(res: Response) {
 	let req: Request = res.req;

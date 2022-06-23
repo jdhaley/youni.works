@@ -1,5 +1,5 @@
 import { bundle, extend } from "../base/util.js";
-import {Request} from "./request.js";
+import {Request} from "./response.js";
 
 export default function start(conf: bundle<any>) {
 	let modules = conf.modules;
