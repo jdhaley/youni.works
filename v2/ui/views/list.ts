@@ -1,8 +1,7 @@
-import {View, ViewCommand, ViewOwner, ViewType, viewType} from "./view.js";
+import {View, ViewCommand, ViewOwner, ViewType, viewType, getView, mark, markup} from "./view.js";
 import {content, List} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
 import {Frame} from "../ui.js";
-import {getItem, mark, markup, replace, unmark} from "../editor/util.js";
 
 class ListView extends View {
 	constructor() {
@@ -40,7 +39,7 @@ export class ListType extends ViewType {
 		}
 	}
 	edit(commandName: string, range: Range, markup?: string): Range {
-		let view = getItem(range);
+		let view = getView(range);
 		if (view.view_type instanceof ListType) {
 			let cmd = new ListCommand(this.owner, commandName, view);
 			cmd.do(range, markup || "");

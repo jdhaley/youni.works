@@ -1,8 +1,7 @@
-import {View, ViewCommand, ViewOwner, ViewType} from "./view.js";
+import {View, ViewCommand, ViewOwner, ViewType, getView, mark, markup} from "./view.js";
 import {content, Record} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import { getItem, mark, markup } from "../editor/util.js";
-import { Frame } from "../ui.js";
+import {Frame} from "../ui.js";
 
 class RecordView extends View {
 	constructor() {
@@ -37,7 +36,7 @@ export class RecordType extends ViewType {
 		return model;
 	}
 	edit(commandName: string, range: Range, markup?: string): Range {
-		let view = getItem(range);
+		let view = getView(range);
 		if (view.view_type instanceof RecordType) {
 			let cmd = new RecordCommand(this.owner, commandName, view);
 			cmd.do(range, markup || "");

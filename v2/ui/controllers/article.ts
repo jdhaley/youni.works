@@ -4,7 +4,7 @@ import {extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 
 import view from "./view.js";
-import { Article } from "../editor/article.js";
+import { Article } from "../article.js";
 
 export default extend(view, {
 	open(this: Article, res: Response<string>) {

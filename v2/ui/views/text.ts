@@ -1,7 +1,6 @@
-import {View, ViewCommand, ViewOwner, ViewType } from "./view.js";
+import {View, ViewCommand, ViewOwner, ViewType, mark, markup} from "./view.js";
 import {CHAR} from "../../base/util.js";
-import { Frame } from "../ui.js";
-import { mark, markup } from "../editor/util.js";
+import {Frame} from "../ui.js";
 
 class TextView extends View {
 	constructor() {
