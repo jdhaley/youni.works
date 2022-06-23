@@ -1,8 +1,9 @@
 import {Owner, Control, Controller, Receiver} from "../../base/control.js";
 import {content, ContentType, Type} from "../../base/model.js";
-import {Command} from "../../base/command.js";
+import {Command, CommandBuffer} from "../../base/command.js";
 import {bundle, EMPTY} from "../../base/util.js";
 import {Frame} from "../ui.js";
+import {replace, unmark} from "../editor/util.js";
 
 /*
 The is global HTML attribute: Allows you to specify that a standard HTML element
@@ -67,9 +68,10 @@ export class ViewOwner extends Controller implements Owner<View> {
 	constructor(frame: Frame) {
 		super();
 		this.owner = frame;
+		this.buffer = new CommandBuffer();
 	}
 	readonly owner: Frame;
-	//readonly buffer: CommandBuffer<Range>;
+	readonly buffer: CommandBuffer<Range>;
 	// types: bundle<ViewType>;
 	// type: ViewType;
 	// view: View;
@@ -152,13 +154,14 @@ export function viewType(value: any): string {
 }
 
 
-export class ViewCommand extends Command<Range> {
+export abstract class ViewCommand extends Command<Range> {
 	constructor(owner: ViewOwner, name: string, view: View) {
 		super();
 		this.owner = owner;
 		this.name = name;
 		this.timestamp = Date.now();
 		this.viewId = view.id;
+		owner.buffer.add(this);
 	}
 	owner: ViewOwner;
 	name: string;
@@ -167,14 +170,19 @@ export class ViewCommand extends Command<Range> {
 	before: string;
 	after: string;
 
+	protected abstract getRange(): Range;
+	protected exec(markup: string) {
+		let range = this.getRange();
+		replace(range, markup);
+		range = unmark(range);
+		if (range) this.owner.owner.selectionRange = range;
+		return range;
+	}
+
 	undo() {
 		return this.exec(this.before);
 	}
 	redo() {
 		return this.exec(this.after);
-	}
-
-	protected exec(markup: string): Range {
-		return null;
 	}
 }

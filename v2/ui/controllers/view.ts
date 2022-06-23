@@ -3,6 +3,8 @@ import {ViewType, viewType} from "../views/view.js";
 import {UserEvent} from "../ui.js";
 import { content } from "../../base/model.js";
 
+let UNDONE = false;
+
 export default extend(null, {
 	command(event: UserEvent) {
 		let shortcuts = event.on.$shortcuts;
@@ -48,7 +50,34 @@ export default extend(null, {
 		range.setStartBefore(event.on.parentElement);
 		range.collapse(true);
 		console.log(range.commonAncestorContainer.nodeName);
-	}
+	},
+	input(event: UserEvent) {
+		/*
+		Input events should always be undone because the editor maintains its own
+		command buffer and allowing a change to the article that doesn't propagate through
+		the editor will break the command buffer. The editor traps most changes but some can't be
+		such as the user selecting "Undo" directly from the Browser Menu.
+
+		Unfortunately, input events can't be cancelled so hack it by undoing it. We also keep it
+		clean to handle recursive events being trigger.
+		*/
+		event.subject = "";
+		if (UNDONE) {
+			UNDONE = false;
+		} else {
+			UNDONE = true;
+			console.debug("undo input");	
+			document.execCommand("undo");
+		}
+	},
+	undo(this: ViewType, event: UserEvent) {
+		event.subject = "";
+		this.owner.buffer.undo();
+	},
+	redo(this: ViewType, event: UserEvent) {
+		event.subject = "";
+		this.owner.buffer.redo();
+	},
 });
 
 function setClipboard(type: ViewType, range: Range, clipboard: DataTransfer) {

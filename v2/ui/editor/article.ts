@@ -13,12 +13,10 @@ export class Article extends ViewOwner {
 		super(frame);
 		this.conf = conf;
 		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
-		this.buffer = new CommandBuffer<Range>();
 		this.controller = conf.controllers.article;
 		this.initTypes(conf.types, conf.baseTypes);
 	}
 	readonly service: RemoteFileService;
-	readonly buffer: CommandBuffer<Range>;
 
 	types: bundle<ViewType>;
 	type: ViewType;

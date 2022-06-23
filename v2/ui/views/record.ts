@@ -1,6 +1,8 @@
-import {View, ViewType} from "./view.js";
+import {View, ViewCommand, ViewOwner, ViewType} from "./view.js";
 import {content, Record} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
+import { getItem, mark, markup } from "../editor/util.js";
+import { Frame } from "../ui.js";
 
 class RecordView extends View {
 	constructor() {
@@ -34,4 +36,50 @@ export class RecordType extends ViewType {
 		}
 		return model;
 	}
+	edit(commandName: string, range: Range, markup?: string): Range {
+		let view = getItem(range);
+		if (view.view_type instanceof RecordType) {
+			let cmd = new RecordCommand(this.owner, commandName, view);
+			cmd.do(range, markup || "");
+		} else {
+			console.error("Invalid range for edit.");
+		}
+		return null;
+	}
+}
+
+class RecordCommand extends ViewCommand {
+	constructor(owner: ViewOwner, name: string, view: View) {
+		super(owner, name, view);
+	}
+	protected getRange(): Range {
+		return selectContents(this.owner.owner, this.viewId);
+	}
+	do(range: Range, markup: string) {
+		startEdit(this, range);
+		this.after = markup;
+		this.exec(markup);
+	}
+}
+
+export function selectContents(owner: Frame, contextId: string) {
+	let context = owner.getElementById(contextId);
+	if (!context) throw new Error("Can't find context element.");
+
+	let range = owner.createRange();
+	range.selectNodeContents(context);
+	return range;
+}
+
+function startEdit(cmd: RecordCommand, range: Range) {
+	mark(range);
+	/*
+	Expand the range to encompass the whole start/end items or markers (when 
+	a marker is a direct descendent of the list).
+	*/
+	let ctx = cmd.owner.owner.getElementById(cmd.viewId);
+	range.selectNodeContents(ctx);
+
+	//Capture the before image for undo.
+	cmd.before = markup(range);	
 }
