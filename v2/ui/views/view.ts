@@ -217,8 +217,11 @@ export function markup(range: Range): string {
 }
 
 export function mark(range: Range) {
-	insertMarker(range, "end");
-	insertMarker(range, "start");
+	let marker = insertMarker(range, "end");
+	range.setEndAfter(marker);
+	marker = insertMarker(range, "start");
+	range.setStartBefore(marker);
+
 	function insertMarker(range: Range, point: "start" | "end") {
 		let marker = range.commonAncestorContainer.ownerDocument.createElement("I");
 		marker.id = point + "-marker";

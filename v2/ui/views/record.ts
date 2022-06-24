@@ -35,11 +35,11 @@ export class RecordType extends ViewType {
 		}
 		return model;
 	}
-	edit(commandName: string, range: Range, markup?: string): Range {
+	edit(commandName: string, range: Range, record: Record): Range {
 		let view = getView(range);
 		if (view.view_type instanceof RecordType) {
 			let cmd = new RecordCommand(this.owner, commandName, view);
-			cmd.do(range, markup || "");
+			cmd.do(range, record);
 		} else {
 			console.error("Invalid range for edit.");
 		}
@@ -54,13 +54,27 @@ class RecordCommand extends ViewCommand {
 	protected getRange(): Range {
 		return selectContents(this.owner.owner, this.viewId);
 	}
-	do(range: Range, markup: string) {
+	do(range: Range, record: Record) {
+		let view = getView(range);
 		startEdit(this, range);
-		this.after = markup;
-		this.exec(markup);
+		range.deleteContents();
+		let model = view.$control.toModel(view) as Record;
+		merge(model, record);
+		let x = view.$control.toView(model);
+		this.after = x.innerHTML;
+		this.exec(this.after);
 	}
 }
 
+function merge(base: Record, ext: Record) {
+	for (let name in ext) {
+		switch (typeof base[name]) {
+			case "string":
+				base[name] = "" + base[name] + ext[name];
+				break;
+		}
+	}
+}
 export function selectContents(owner: Frame, contextId: string) {
 	let context = owner.getElementById(contextId);
 	if (!context) throw new Error("Can't find context element.");
@@ -77,6 +91,7 @@ function startEdit(cmd: RecordCommand, range: Range) {
 	a marker is a direct descendent of the list).
 	*/
 	let ctx = cmd.owner.owner.getElementById(cmd.viewId);
+	range = range.cloneRange();
 	range.selectNodeContents(ctx);
 
 	//Capture the before image for undo.
