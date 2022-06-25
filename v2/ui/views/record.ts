@@ -1,7 +1,7 @@
-import {View, ViewCommand, ViewOwner, ViewType, getView, mark, markup} from "./view.js";
+import {View, ViewCommand, ViewOwner, ViewType} from "./view.js";
 import {content, Record} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import {Frame} from "../ui.js";
+import {Frame, mark} from "../ui.js";
 
 class RecordView extends View {
 	constructor() {
@@ -36,7 +36,7 @@ export class RecordType extends ViewType {
 		return model;
 	}
 	edit(commandName: string, range: Range, record: Record): Range {
-		let view = getView(range);
+		let view = View.getView(range);
 		if (view.view_type instanceof RecordType) {
 			let cmd = new RecordCommand(this.owner, commandName, view);
 			cmd.do(range, record);
@@ -55,7 +55,7 @@ class RecordCommand extends ViewCommand {
 		return selectContents(this.owner.owner, this.viewId);
 	}
 	do(range: Range, record: Record) {
-		let view = getView(range);
+		let view = View.getView(range);
 		startEdit(this, range);
 		range.deleteContents();
 		let model = view.$control.toModel(view) as Record;
@@ -85,15 +85,9 @@ export function selectContents(owner: Frame, contextId: string) {
 }
 
 function startEdit(cmd: RecordCommand, range: Range) {
+	//Mark the actual range.
 	mark(range);
-	/*
-	Expand the range to encompass the whole start/end items or markers (when 
-	a marker is a direct descendent of the list).
-	*/
-	let ctx = cmd.owner.owner.getElementById(cmd.viewId);
-	range = range.cloneRange();
-	range.selectNodeContents(ctx);
-
-	//Capture the before image for undo.
-	cmd.before = markup(range);	
+	
+	range = selectContents(cmd.owner.owner, cmd.viewId);
+	cmd.before = View.toView(range).innerHTML;	
 }

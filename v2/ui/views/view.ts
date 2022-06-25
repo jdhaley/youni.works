@@ -2,7 +2,7 @@ import {Owner, Control, Controller, Receiver} from "../../base/control.js";
 import {Command, CommandBuffer} from "../../base/command.js";
 import {content, ContentType, Type} from "../../base/model.js";
 import {bundle, EMPTY} from "../../base/util.js";
-import {Frame} from "../ui.js";
+import {Frame, unmark} from "../ui.js";
 
 /*
 The is global HTML attribute: Allows you to specify that a standard HTML element
@@ -20,6 +20,20 @@ export class View extends HTMLElement {
 	static get observedAttributes() {
 		return OBSERVED_ATTRIBUTES;
 	}
+	static getView(node: Node | Range): View {
+		if (node instanceof Range) node = node.commonAncestorContainer;
+		while (node) {
+			if (node instanceof View) return node;
+			node = node.parentElement;
+		}
+	}
+	static toView(range: Range): View {
+		let type = View.getView(range)?.view_type;
+		let view = type.owner.createView(type);
+		let frag = range.cloneContents();
+		while (frag.firstChild) view.append(frag.firstChild);
+		return view;
+	}
 
 	declare parentElement: View;
 	$control: ViewType;
@@ -30,11 +44,12 @@ export class View extends HTMLElement {
 	}
 	get view_type() {
 		if (this.$control) return this.$control;
+		let typeName = this.dataset.name || this.dataset.type;
 		for (let view: Element = this; view; view = view.parentElement) {
 			if (view["$control"]) {
 				let ctx = view["$control"];
 				if (ctx?.types) {
-					let type = ctx.types[this.dataset.name || this.dataset.type];
+					let type = ctx.types[typeName];
 					this.$control = type || UNDEFINED_TYPE;
 					return type;
 				}
@@ -112,12 +127,6 @@ export class ViewType extends Control<View> implements ContentType<View> {
 	generalizes(type: Type): boolean {
 		return type == this;
 	}
-	rangeView(range: Range) {
-		let view = this.owner.createView(this);
-		let frag = range.cloneContents();
-		while (frag.firstChild) view.append(frag.firstChild);
-		return view;
-	}
 	edit(commandName: string, range: Range, replacement?: content): Range {
 		// let cmd = new EditCommand(this, commandName);
 		// this.owner.buffer.add(cmd);
@@ -166,36 +175,8 @@ export abstract class ViewCommand extends Command<Range> {
 
 let UNDEFINED_TYPE = new ViewType();
 
-export function viewType(value: any): string {
-	if (value?.valueOf) value = value.valueOf(value);
-	switch (typeof value) {
-		case "string":
-		case "number":
-		case "boolean":
-			return "text";
-		case "object":
-			if (value["type$"]) {
-				let type = value["type$"];
-				return type.name || "" + type;
-			}
-			if (value instanceof Date) return "date";
-			if (value[Symbol.iterator]) return "list";
-			return "record";
-		default:
-			return "null";
-	}
-}
-
-export function getView(node: Node | Range): View {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node instanceof View) return node;
-		node = node.parentElement;
-	}
-}
-
-export function replace(range: Range, markup: string) {
-	let view = getView(range);
+function replace(range: Range, markup: string) {
+	let view = View.getView(range);
 	let type = view.view_type;
 	view = type.owner.createView(type);
 	view.innerHTML = markup;
@@ -206,57 +187,4 @@ export function replace(range: Range, markup: string) {
 		range.insertNode(view.firstElementChild);
 		range.collapse();
 	}
-}
-export function markup(range: Range): string {
-	let frag = range.cloneContents();
-	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
-	while (frag.firstChild) {
-		div.append(frag.firstChild);
-	}
-	return div.innerHTML;
-}
-
-export function mark(range: Range) {
-	let marker = insertMarker(range, "end");
-	range.setEndAfter(marker);
-	marker = insertMarker(range, "start");
-	range.setStartBefore(marker);
-
-	function insertMarker(range: Range, point: "start" | "end") {
-		let marker = range.commonAncestorContainer.ownerDocument.createElement("I");
-		marker.id = point + "-marker";
-		range = range.cloneRange();
-		range.collapse(point == "start" ? true : false);
-		range.insertNode(marker);
-		return marker;
-	}	
-}
-
- export function unmark(range: Range) {
-	let doc = range.commonAncestorContainer.ownerDocument;
-	//Patch the replacement points.
-	let pt = patchPoint(doc.getElementById("start-marker"));
-	if (pt) range.setStart(pt.startContainer, pt.startOffset);
-	pt = patchPoint(doc.getElementById("end-marker"));
-	if (pt) range.setEnd(pt.startContainer, pt.startOffset);
-	return range;
-
-	function patchPoint(point: ChildNode) {
-		if (!point) return;
-		let range = point.ownerDocument.createRange();
-		if (point.previousSibling && point.previousSibling.nodeType == Node.TEXT_NODE &&
-			point.nextSibling && point.nextSibling.nodeType == Node.TEXT_NODE
-		) {
-			let offset = point.previousSibling.textContent.length;
-			point.previousSibling.textContent += point.nextSibling.textContent;
-			range.setStart(point.previousSibling, offset);
-			range.collapse(true);
-			point.nextSibling.remove();
-		} else {
-			range.setStartBefore(point);
-			range.collapse(true);
-		}
-		point.remove();
-		return range;
-	}	
 }

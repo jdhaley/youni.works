@@ -1,6 +1,6 @@
-import {View, ViewCommand, ViewOwner, ViewType, mark, markup} from "./view.js";
+import {View, ViewCommand, ViewOwner, ViewType} from "./view.js";
 import {CHAR} from "../../base/util.js";
-import {Frame} from "../ui.js";
+import {Frame, mark} from "../ui.js";
 
 class TextView extends View {
 	constructor() {
@@ -52,5 +52,5 @@ function startEdit(cmd: TextCommand, range: Range) {
 	range.selectNodeContents(ctx);
 
 	//Capture the before image for undo.
-	cmd.before = markup(range);	
+	cmd.before = View.toView(range).innerHTML;	
 }

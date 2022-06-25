@@ -1,7 +1,7 @@
 import {CHAR, extend} from "../../base/util.js";
-import {ViewType, viewType} from "../views/view.js";
+import {View, ViewType} from "../views/view.js";
 import {UserEvent} from "../ui.js";
-import { content } from "../../base/model.js";
+import {content, viewType} from "../../base/model.js";
 
 let UNDONE = false;
 
@@ -81,7 +81,7 @@ export default extend(null, {
 });
 
 function setClipboard(type: ViewType, range: Range, clipboard: DataTransfer) {
-	let view = type.rangeView(range);
+	let view = View.toView(range);
 	let model = type.toModel(view);
 	clipboard.setData("application/json", JSON.stringify(model));
 	let html = htmlify(view);

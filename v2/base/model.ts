@@ -43,3 +43,15 @@ export function typeOf(value: any): string {
 			return "null";
 	}
 }
+
+export function viewType(value: any): string {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+			return "text";
+		default:
+			return type;
+	}
+}

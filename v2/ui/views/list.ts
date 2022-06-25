@@ -1,7 +1,7 @@
-import {View, ViewCommand, ViewOwner, ViewType, viewType, getView, mark, markup} from "./view.js";
-import {content, List} from "../../base/model.js";
+import {View, ViewCommand, ViewOwner, ViewType} from "./view.js";
+import {content, List, viewType} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import {Frame} from "../ui.js";
+import {Frame, mark} from "../ui.js";
 
 class ListView extends View {
 	constructor() {
@@ -39,7 +39,7 @@ export class ListType extends ViewType {
 		}
 	}
 	edit(commandName: string, range: Range, markup?: string): Range {
-		let view = getView(range);
+		let view = View.getView(range);
 		if (view.view_type instanceof ListType) {
 			let cmd = new ListCommand(this.owner, commandName, view);
 			cmd.do(range, markup || "");
@@ -107,7 +107,7 @@ function startEdit(cmd: ListCommand, range: Range) {
 	range.setEndAfter(end);
 
 	//Capture the before image for undo.
-	cmd.before = markup(range);	
+	cmd.before = View.toView(range).innerHTML;	
 
 	/*
 	Get the items prior to the start/end to identify the id's prior-to-start or
