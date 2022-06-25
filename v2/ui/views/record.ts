@@ -1,7 +1,9 @@
-import {View, ViewCommand, ViewOwner, ViewType} from "./view.js";
+import {View, ViewOwner, ViewType} from "../../base/view.js";
 import {content, Record} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
 import {Frame, mark} from "../ui.js";
+import {Article, BaseType, ViewCommand} from "./view.js";
+
 
 class RecordView extends View {
 	constructor() {
@@ -10,7 +12,7 @@ class RecordView extends View {
 }
 customElements.define("ui-record", RecordView);
 
-export class RecordType extends ViewType {
+export class RecordType extends BaseType {
 	tag = "ui-record";
 	viewContent(view: View, model: Record): void {
 		view.textContent = "";
@@ -48,11 +50,11 @@ export class RecordType extends ViewType {
 }
 
 class RecordCommand extends ViewCommand {
-	constructor(owner: ViewOwner, name: string, view: View) {
+	constructor(owner: Article, name: string, view: View) {
 		super(owner, name, view);
 	}
 	protected getRange(): Range {
-		return selectContents(this.owner.owner, this.viewId);
+		return selectContents(this.owner.frame, this.viewId);
 	}
 	do(range: Range, record: Record) {
 		let view = View.getView(range);
@@ -88,6 +90,6 @@ function startEdit(cmd: RecordCommand, range: Range) {
 	//Mark the actual range.
 	mark(range);
 	
-	range = selectContents(cmd.owner.owner, cmd.viewId);
+	range = selectContents(cmd.owner.frame, cmd.viewId);
 	cmd.before = View.toView(range).innerHTML;	
 }

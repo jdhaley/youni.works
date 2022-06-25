@@ -1,7 +1,9 @@
-import {View, ViewCommand, ViewOwner, ViewType} from "./view.js";
+import {View, ViewType} from "../../base/view.js";
 import {content, List, viewType} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
 import {Frame, mark} from "../ui.js";
+import {Article, BaseType, ViewCommand} from "./view.js";
+
 
 class ListView extends View {
 	constructor() {
@@ -10,7 +12,7 @@ class ListView extends View {
 }
 customElements.define("ui-list", ListView);
 
-export class ListType extends ViewType {
+export class ListType extends BaseType {
 	tag = "ui-list";
 	defaultType: ViewType
 	toModel(view: View): content {
@@ -51,14 +53,14 @@ export class ListType extends ViewType {
 }
 
 class ListCommand extends ViewCommand {
-	constructor(owner: ViewOwner, name: string, view: View) {
+	constructor(owner: Article, name: string, view: View) {
 		super(owner, name, view);
 	}
 	startId: string;
 	endId: string;
 
 	protected getRange(): Range {
-		return getItemRange(this.owner.owner, this.viewId, this.startId, this.endId);
+		return getItemRange(this.owner.frame, this.viewId, this.startId, this.endId);
 	}
 	do(range: Range, markup: string) {
 		startEdit(this, range);
@@ -96,13 +98,13 @@ function startEdit(cmd: ListCommand, range: Range) {
 	Expand the range to encompass the whole start/end items or markers (when 
 	a marker is a direct descendent of the list).
 	*/
-	let ctx = cmd.owner.owner.getElementById(cmd.viewId);
+	let ctx = cmd.owner.frame.getElementById(cmd.viewId);
 
-	let start: Element = cmd.owner.owner.getElementById("start-marker");
+	let start: Element = cmd.owner.frame.getElementById("start-marker");
 	start = extend(ctx, start);
 	range.setStartBefore(start);
 
-	let end: Element = cmd.owner.owner.getElementById("end-marker");
+	let end: Element = cmd.owner.frame.getElementById("end-marker");
 	end = extend(ctx, end);
 	range.setEndAfter(end);
 

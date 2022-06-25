@@ -1,6 +1,7 @@
-import {View, ViewCommand, ViewOwner, ViewType} from "./view.js";
+import {View} from "../../base/view.js";
 import {CHAR} from "../../base/util.js";
 import {Frame, mark} from "../ui.js";
+import {Article, BaseType, ViewCommand} from "./view.js";
 
 class TextView extends View {
 	constructor() {
@@ -9,7 +10,7 @@ class TextView extends View {
 }
 customElements.define("ui-text", TextView);
 
-export class TextType extends ViewType {
+export class TextType extends BaseType {
 	tag = "ui-text";
 	viewContent(view: View, model: string): void {
 		view.textContent = model || CHAR.ZWSP;
@@ -20,11 +21,11 @@ export class TextType extends ViewType {
 }
 
 class TextCommand extends ViewCommand {
-	constructor(owner: ViewOwner, name: string, view: View) {
+	constructor(owner: Article, name: string, view: View) {
 		super(owner, name, view);
 	}
 	protected getRange(): Range {
-		return selectContents(this.owner.owner, this.viewId);
+		return selectContents(this.owner.frame, this.viewId);
 	}
 	do(range: Range, markup: string) {
 		startEdit(this, range);
@@ -48,7 +49,7 @@ function startEdit(cmd: TextCommand, range: Range) {
 	Expand the range to encompass the whole start/end items or markers (when 
 	a marker is a direct descendent of the list).
 	*/
-	let ctx = cmd.owner.owner.getElementById(cmd.viewId);
+	let ctx = cmd.owner.frame.getElementById(cmd.viewId);
 	range.selectNodeContents(ctx);
 
 	//Capture the before image for undo.
