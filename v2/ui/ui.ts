@@ -1,4 +1,4 @@
-import {Signal, Control, controller, Owner, Receiver} from "../base/control";
+import {Signal, Control, controller, Owner, Receiver} from "../base/controller";
 import {bundle} from "../base/util";
 
 export interface UiElement extends HTMLElement {

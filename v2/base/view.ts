@@ -1,4 +1,4 @@
-import {Owner, Control, Controller, Receiver} from "./control.js";
+import {Owner, Control, Controller, Receiver} from "./controller.js";
 import {content, ContentType, Type} from "./model.js";
 import {bundle, EMPTY} from "./util.js";
 
@@ -21,7 +21,7 @@ export class View extends HTMLElement {
 	}
 	static toView(range: Range): View {
 		let type = View.getView(range)?.view_type;
-		let view = type.owner.createView(type);
+		let view = type.createView();
 		let frag = range.cloneContents();
 		while (frag.firstChild) view.append(frag.firstChild);
 		return view;
@@ -41,9 +41,8 @@ export class View extends HTMLElement {
 			if (view["$control"]) {
 				let ctx = view["$control"];
 				if (ctx?.types) {
-					let type = ctx.types[typeName];
-					this.$control = type || UNDEFINED_TYPE;
-					return type;
+					this.$control = ctx.types[typeName] || ctx.owner.unknownType;
+					return this.$control;
 				}
 			};
 		}
@@ -63,7 +62,9 @@ export class View extends HTMLElement {
 }
 
 export abstract class ViewOwner extends Controller implements Owner<View> {
-	abstract createView(type: ViewType): View;
+	declare unknownType: ViewType;
+	declare types: bundle<ViewType>;
+
 	getPartsOf(value: View): Iterable<View> {
 		return value.children as Iterable<View>;
 	}
@@ -75,29 +76,25 @@ export abstract class ViewOwner extends Controller implements Owner<View> {
 	}
 }
 
-export class ViewType extends Control<View> implements ContentType<View> {
-	owner: ViewOwner;
-	tag: string;
-	types: bundle<ViewType> = EMPTY.object;
+export abstract class ViewType extends Control<View> implements ContentType<View> {
+	declare owner: ViewOwner;
 	declare name?: string;
 	declare propertyName?: string;
+	readonly tag: string;
+	types: bundle<ViewType> = EMPTY.object;
 
-	toView(model: content): View {
-		let view = this.owner.createView(this);
-		this.viewContent(view, model);
-		return view;
-	}
-	toModel(view: View): content {
-		return undefined;
-	}
-	viewContent(view: View, model: content): void {
-	}
 	generalizes(type: Type): boolean {
 		return type == this;
 	}
+	toView(model: content): View {
+		let view = this.createView();
+		this.viewContent(view, model);
+		return view;
+	}
+	abstract toModel(view: View): content;
+	abstract viewContent(view: View, model: content): void;
+	abstract createView(): View;
 }
-
-let UNDEFINED_TYPE = new ViewType();
 
 function getShortcuts(view: View) {
 	if (view.$shortcuts) return view.$shortcuts;

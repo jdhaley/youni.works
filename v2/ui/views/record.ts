@@ -1,4 +1,4 @@
-import {View, ViewOwner, ViewType} from "../../base/view.js";
+import {View} from "../../base/view.js";
 import {content, Record} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
 import {Frame, mark} from "../ui.js";

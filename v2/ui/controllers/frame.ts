@@ -1,4 +1,4 @@
-import {controller} from "../../base/control.js";
+import {controller} from "../../base/controller.js";
 import {Frame, UiElement, UserEvent} from "../ui.js";
 
 let TRACK: UserEvent = null;

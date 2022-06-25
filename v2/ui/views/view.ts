@@ -8,18 +8,42 @@ import {loadTypes} from "../../base/loader.js";
 
 import {Frame, unmark} from "../ui.js";
 
-export class BaseType extends ViewType {
-	declare owner: Article;
-	edit(commandName: string, range: Range, replacement?: content): Range {
-		// let cmd = new EditCommand(this, commandName);
-		// this.owner.buffer.add(cmd);
-		// let ele = this.owner.createView(this);
-		// ele.innerHTML = replacement;
-		// range = cmd.do(range, ele, replacer);
-		// console.log(cmd.items);
-		// return range;
-		return null;
+export class Article extends ViewOwner {
+	constructor(frame: Frame, conf: bundle<any>) {
+		super();
+		this.frame = frame;
+		this.conf = conf;
+		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
+		this.controller = conf.controllers.article;
+		this.initTypes(conf.types, conf.baseTypes);
 	}
+	readonly frame: Frame;
+	readonly service: RemoteFileService;
+	readonly buffer: CommandBuffer<Range> = new CommandBuffer();
+	type: ViewType;
+	view: View;
+	model: content;
+
+	initTypes(source: bundle<any>, base: bundle<ViewType>) {
+		base = loadBaseTypes(this);
+		this.types = loadTypes(source, base) as bundle<ViewType>;
+		this.unknownType = this.types[this.conf.unknownType];
+		this.type = this.types[this.conf.type] as ViewType;
+		this.type.conf = {
+			shortcuts: this.conf.shortcuts
+		}
+	}
+}
+
+export abstract class BaseType extends ViewType {
+	declare owner: Article;
+
+	createView(): View {
+		let view = this.owner.frame.create(this.tag) as View;
+		view.$control = this;
+		return view;
+	}
+	abstract edit(commandName: string, range: Range, replacement?: content): Range;
 }
 
 export abstract class ViewCommand extends Command<Range> {
@@ -59,7 +83,7 @@ export abstract class ViewCommand extends Command<Range> {
 function replace(range: Range, markup: string) {
 	let view = View.getView(range);
 	let type = view.view_type;
-	view = type.owner.createView(type);
+	view = type.createView();
 	view.innerHTML = markup;
 	
 	range.deleteContents();
@@ -67,38 +91,6 @@ function replace(range: Range, markup: string) {
 	while (view.firstElementChild) {
 		range.insertNode(view.firstElementChild);
 		range.collapse();
-	}
-}
-
-export class Article extends ViewOwner {
-	constructor(frame: Frame, conf: bundle<any>) {
-		super();
-		this.frame = frame;
-		this.conf = conf;
-		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		this.controller = conf.controllers.article;
-		this.initTypes(conf.types, conf.baseTypes);
-	}
-	readonly frame: Frame;
-	readonly service: RemoteFileService;
-	readonly buffer: CommandBuffer<Range> = new CommandBuffer();
-	types: bundle<ViewType>;
-	type: ViewType;
-	view: View;
-	model: content;
-
-	createView(type: ViewType): View {
-		let view = this.frame.create(type.tag) as View;
-		view.$control = type;
-		return view;
-	}
-	initTypes(source: bundle<any>, base: bundle<ViewType>) {
-		base = loadBaseTypes(this);
-		this.types = loadTypes(source, base) as bundle<ViewType>;
-		this.type = this.types[this.conf.type] as ViewType;
-		this.type.conf = {
-			shortcuts: this.conf.shortcuts
-		}
 	}
 }
 

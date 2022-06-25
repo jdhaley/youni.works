@@ -2,6 +2,7 @@ import {View} from "../../base/view.js";
 import {CHAR} from "../../base/util.js";
 import {Frame, mark} from "../ui.js";
 import {Article, BaseType, ViewCommand} from "./view.js";
+import { content } from "../../base/model.js";
 
 class TextView extends View {
 	constructor() {
@@ -17,6 +18,9 @@ export class TextType extends BaseType {
 	}
 	toModel(view: View): string {
 		return view.textContent == CHAR.ZWSP ? "" : view.textContent;
+	}
+	edit(commandName: string, range: Range, replacement?: content): Range {
+		throw new Error("Method not implemented.");
 	}
 }
 
