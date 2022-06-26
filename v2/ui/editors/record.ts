@@ -12,6 +12,7 @@ export class RecordEditor extends RecordType {
 			let cmd = new RecordCommand(this.owner, commandName, view);
 			cmd.do(range, record);
 		} else {
+			debugger;
 			console.error("Invalid range for edit.");
 		}
 		return null;

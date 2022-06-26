@@ -3,13 +3,14 @@ import {Frame} from "../ui.js";
 import {ViewCommand, mark} from "./edit.js";
 import {ListType} from "../views/list.js";
 import {Article } from "../views/view.js";
+import { content } from "../../base/model.js";
 
 export class ListEditor extends ListType {
-	edit(commandName: string, range: Range, markup?: string): Range {
+	edit(commandName: string, range: Range, content?: content): Range {
 		let view = View.getView(range);
 		if (view.view_type instanceof ListType) {
 			let cmd = new ListCommand(this.owner, commandName, view);
-			cmd.do(range, markup || "");
+			cmd.do(range, content);
 		} else {
 			console.error("Invalid range for edit.");
 		}
@@ -27,10 +28,17 @@ class ListCommand extends ViewCommand {
 	protected getRange(): Range {
 		return getItemRange(this.owner.frame, this.viewId, this.startId, this.endId);
 	}
-	do(range: Range, markup: string) {
+	do(range: Range, content: content) {
+		let start = getStartContent(range);
+		let end = getEndContent(range);
+		
 		startEdit(this, range);
-		this.after = markup;
-		this.exec(markup);
+		let after = "";
+		if (start) after += start.outerHTML;
+		if (content) after += "" + content;
+		if (end) after += end.outerHTML;
+		this.after = after;
+		this.exec(after);
 	}
 }
 
@@ -66,11 +74,11 @@ function startEdit(cmd: ListCommand, range: Range) {
 	let ctx = cmd.owner.frame.getElementById(cmd.viewId);
 
 	let start: Element = cmd.owner.frame.getElementById("start-marker");
-	start = extend(ctx, start);
+	start = getChildView(ctx, start);
 	range.setStartBefore(start);
 
 	let end: Element = cmd.owner.frame.getElementById("end-marker");
-	end = extend(ctx, end);
+	end = getChildView(ctx, end);
 	range.setEndAfter(end);
 
 	//Capture the before image for undo.
@@ -86,16 +94,33 @@ function startEdit(cmd: ListCommand, range: Range) {
 
 	end = end.nextElementSibling;
 	if (end) cmd.endId = end.id;
-
-	function extend(ctx: Element, ele: Element) {
-		while (ele && ele.parentElement != ctx) {
-			ele = ele.parentElement;
-		}
-		//We should always be able to get the element based on mark()'ing the range.
-		if (!ele) throw new Error("Cant extend() marked range");
-		return ele;
-	}	
 }
+
+function getChildView(ctx: Node, node: Node): View {
+	while (node && node.parentElement != ctx) {
+		node = node.parentElement;
+	}
+	if (node instanceof View) return node;
+
+	throw new Error("Cant extend() marked range");
+}
+
+// export function getItemContent(article: Article, point: "start" | "end", context: Element): Element {
+// 	let owner = article.owner;
+// 	let doc = owner.document;
+	
+// 	let edit = doc.getElementById(point + "-edit");
+// 	let item = getItem(edit, context);
+// 	if (item == edit) return;
+
+// 	let range = doc.createRange();
+// //	item = item.cloneNode(true) as Element
+// 	range.selectNodeContents(item);
+// 	point == "start" ? range.setStartAfter(edit) : range.setEndBefore(edit);
+// 	range.deleteContents();
+// 	console.log(point, item.outerHTML);
+// 	return item;
+// }
 
 
 // function doEdit(cmd: ListCommand, range: Range, replacement: string) {
@@ -126,3 +151,24 @@ function startEdit(cmd: ListCommand, range: Range) {
 // 	markupText += endContent ? endContent.outerHTML : "<i id='end-edit'></i>";
 // 	return markupText;
 // }
+
+function getStartContent(range: Range): View {
+	if (range.startContainer != range.commonAncestorContainer) {
+		let view = getChildView(range.commonAncestorContainer, range.startContainer);
+		range = range.cloneRange();
+		range.collapse(true);
+		range.setStart(view, 0);
+		return View.toView(range);
+	}
+	return null;
+}
+function getEndContent(range: Range): View {
+	if (range.endContainer != range.commonAncestorContainer) {
+		let view = getChildView(range.commonAncestorContainer, range.endContainer);
+		range = range.cloneRange();
+		range.collapse(false);
+		range.setEnd(view, view.childElementCount);
+		return View.toView(range);
+	}
+	return null;
+}
