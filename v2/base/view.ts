@@ -32,7 +32,7 @@ export class View extends HTMLElement {
 	$shortcuts: bundle<string>;
 
 	get view_model() {
-		return this.$control?.toModel(this);
+		return this.view_type?.toModel(this);
 	}
 	get view_type() {
 		if (this.$control) return this.$control;
@@ -49,7 +49,8 @@ export class View extends HTMLElement {
 	}
 	
 	connectedCallback() {
-		this.id = "" + NEXT_ID++;
+		if (!this.id) this.id = "" + NEXT_ID++;
+		this.view_type; //trigger the assignment of $control.
 		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
 	}
 	adoptedCallback() {
