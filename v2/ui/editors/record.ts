@@ -1,8 +1,8 @@
 import {View} from "../../base/view.js";
 import {Record} from "../../base/model.js";
-import {Frame, mark} from "../ui.js";
+import {Frame} from "../ui.js";
 import {RecordType} from "../views/record.js";
-import {ViewCommand} from "./view.js";
+import {ViewCommand, mark} from "./edit.js";
 import {Article} from "../views/view.js";
 
 export class RecordEditor extends RecordType {

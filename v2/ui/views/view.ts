@@ -1,12 +1,12 @@
 import {View, ViewOwner, ViewType} from "../../base/view.js";
-import {Command, CommandBuffer} from "../../base/command.js";
+import {CommandBuffer} from "../../base/command.js";
 import {RemoteFileService} from "../../base/remote.js";
 
 import {content} from "../../base/model.js";
 import {bundle, EMPTY} from "../../base/util.js";
 import {loadTypes} from "../../base/loader.js";
 
-import {Frame, unmark} from "../ui.js";
+import {Frame} from "../ui.js";
 
 export class Article extends ViewOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -43,58 +43,12 @@ export abstract class BaseType extends ViewType {
 		view.$control = this;
 		return view;
 	}
-	abstract edit(commandName: string, range: Range, replacement?: content): Range;
-}
-
-export abstract class ViewCommand extends Command<Range> {
-	constructor(owner: Article, name: string, view: View) {
-		super();
-		this.owner = owner;
-		this.name = name;
-		this.timestamp = Date.now();
-		this.viewId = view.id;
-		owner.buffer.add(this);
-	}
-	owner: Article;
-	name: string;
-	timestamp: number;
-	viewId: string;
-	before: string;
-	after: string;
-
-	protected abstract getRange(): Range;
-
-	protected exec(markup: string) {
-		let range = this.getRange();
-		replace(range, markup);
-		range = unmark(range);
-		if (range) this.owner.frame.selectionRange = range;
-		return range;
-	}
-
-	undo() {
-		return this.exec(this.before);
-	}
-	redo() {
-		return this.exec(this.after);
+	edit(commandName: string, range: Range, content?: content): Range {
+		throw new Error("Method not implemented.");
 	}
 }
 
-function replace(range: Range, markup: string) {
-	let view = View.getView(range);
-	let type = view.view_type;
-	view = type.createView();
-	view.innerHTML = markup;
-	
-	range.deleteContents();
-	range.collapse();
-	while (view.firstElementChild) {
-		range.insertNode(view.firstElementChild);
-		range.collapse();
-	}
-}
-
-export function loadBaseTypes(owner: Article): bundle<ViewType> {
+export function loadBaseTypes(owner: Article): bundle<BaseType> {
 	if (!owner.conf?.baseTypes) return;
 	let controllers = owner.conf?.controllers || EMPTY.object;
 	let types = Object.create(null);

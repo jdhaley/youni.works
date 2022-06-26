@@ -1,8 +1,8 @@
 import {View} from "../../base/view.js";
-import {Frame, mark} from "../ui.js";
-import {ViewCommand} from "./view.js";
+import {Frame} from "../ui.js";
+import {ViewCommand, mark} from "./edit.js";
 import {ListType} from "../views/list.js";
-import { Article } from "../views/view.js";
+import {Article } from "../views/view.js";
 
 export class ListEditor extends ListType {
 	edit(commandName: string, range: Range, markup?: string): Range {
