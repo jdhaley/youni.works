@@ -73,11 +73,11 @@ export default extend(null, {
 	},
 	undo(this: BaseType, event: UserEvent) {
 		event.subject = "";
-		this.owner.buffer.undo();
+		this.owner.commands.undo();
 	},
 	redo(this: BaseType, event: UserEvent) {
 		event.subject = "";
-		this.owner.buffer.redo();
+		this.owner.commands.redo();
 	},
 });
 

@@ -10,7 +10,7 @@ export abstract class ViewCommand extends Command<Range> {
 		this.name = name;
 		this.timestamp = Date.now();
 		this.viewId = view.id;
-		owner.buffer.add(this);
+		owner.commands.add(this);
 	}
 	owner: Article;
 	name: string;

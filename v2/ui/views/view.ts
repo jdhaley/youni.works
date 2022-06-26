@@ -19,7 +19,7 @@ export class Article extends ViewOwner {
 	}
 	readonly frame: Frame;
 	readonly service: RemoteFileService;
-	readonly buffer: CommandBuffer<Range> = new CommandBuffer();
+	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 	type: ViewType;
 	view: View;
 	model: content;
