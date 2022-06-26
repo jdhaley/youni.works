@@ -41,6 +41,11 @@ export abstract class BaseType extends ViewType {
 	createView(): View {
 		let view = this.owner.frame.create(this.tag) as View;
 		view.$control = this;
+		if (this.propertyName) {
+			view.dataset.name = this.propertyName;
+		} else {
+			view.dataset.type = this.name;
+		}
 		return view;
 	}
 	edit(commandName: string, range: Range, content?: content): Range {

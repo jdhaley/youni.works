@@ -18,7 +18,8 @@ export class RecordType extends BaseType {
 			let type = this.types[name];
 			let value = model ? model[name] : null;
 			let member = type.toView(value as content);
-			member.dataset.name = type.propertyName;
+			//now set in the type.create...
+			//member.dataset.name = type.propertyName;
 			view.append(member);
 		}
 		if (!view.textContent) view.textContent = CHAR.ZWSP;
