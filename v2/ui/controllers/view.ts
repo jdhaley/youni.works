@@ -86,7 +86,7 @@ function setClipboard(type: BaseType, range: Range, clipboard: DataTransfer) {
 	let model = type.toModel(view);
 	clipboard.setData("application/json", JSON.stringify(model));
 	let html = htmlify(view);
-	console.log(html);
+	//console.log(html);
 	clipboard.setData("text/html", html.outerHTML);
 	let data = "";
 	if (viewType(model) == "text") {
@@ -95,7 +95,7 @@ function setClipboard(type: BaseType, range: Range, clipboard: DataTransfer) {
 		//pretty-print when copying to text.
 		data = JSON.stringify(model, null, 2);
 	}
-	console.log("text/plain", data);
+	// console.log("text/plain", data);
 	clipboard.setData("text/plain", data);
 }
 
