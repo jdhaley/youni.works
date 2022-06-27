@@ -160,13 +160,11 @@ function getStartContent(range: Range): View {
 		range.collapse(true);
 		range.setStart(view, 0);
 		let vw = View.toView(range);
-
+		console.log("start content:", vw.textContent)
 		let content = vw.view_model;
-		vw.textContent = "";
-		if (!vw.textContent) return;
-		vw.textContent = "";
-		type.viewContent(vw, content);
-		return vw;
+		view = view.cloneNode(false) as View;
+		type.viewContent(view, content);
+		return view;
 	}
 	return null;
 }
