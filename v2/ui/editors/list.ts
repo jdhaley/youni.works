@@ -31,7 +31,7 @@ class ListCommand extends ViewCommand {
 	do(range: Range, content: content) {
 		let start = getStartContent(range);
 		let end = getEndContent(range);
-		
+
 		startEdit(this, range);
 		let after = "";
 		if (start) after += start.outerHTML;
@@ -155,20 +155,29 @@ function getChildView(ctx: Node, node: Node): View {
 function getStartContent(range: Range): View {
 	if (range.startContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.startContainer);
+		let type = view.view_type;
 		range = range.cloneRange();
 		range.collapse(true);
 		range.setStart(view, 0);
-		return View.toView(range);
+		let content = View.toView(range).view_model;
+		view = view.cloneNode(false) as View;
+		type.viewContent(view, content);
+		return view;
 	}
 	return null;
 }
 function getEndContent(range: Range): View {
 	if (range.endContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.endContainer);
+		let type = view.view_type;
+		if (!type) return;
 		range = range.cloneRange();
 		range.collapse(false);
 		range.setEnd(view, view.childElementCount);
-		return View.toView(range);
+		let content = View.toView(range).view_model;
+		view = view.cloneNode(false) as View;
+		type.viewContent(view, content);
+		return view;
 	}
 	return null;
 }
