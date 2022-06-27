@@ -159,10 +159,14 @@ function getStartContent(range: Range): View {
 		range = range.cloneRange();
 		range.collapse(true);
 		range.setStart(view, 0);
-		let content = View.toView(range).view_model;
-		view = view.cloneNode(false) as View;
-		type.viewContent(view, content);
-		return view;
+		let vw = View.toView(range);
+
+		let content = vw.view_model;
+		vw.textContent = "";
+		if (!vw.textContent) return;
+		vw.textContent = "";
+		type.viewContent(vw, content);
+		return vw;
 	}
 	return null;
 }
@@ -174,7 +178,9 @@ function getEndContent(range: Range): View {
 		range = range.cloneRange();
 		range.collapse(false);
 		range.setEnd(view, view.childElementCount);
-		let content = View.toView(range).view_model;
+		let vw = View.toView(range);
+		console.log("end content:", vw.textContent)
+		let content = vw.view_model;
 		view = view.cloneNode(false) as View;
 		type.viewContent(view, content);
 		return view;

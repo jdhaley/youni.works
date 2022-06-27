@@ -20,6 +20,10 @@ export class View extends HTMLElement {
 		}
 	}
 	static toView(range: Range): View {
+		// let view = View.getView(range);
+		// let type = view?.view_type;
+		// view = view.cloneNode(false) as View;
+		// view.$control = type; //cloneing a view doesn't reproduce custom properties.
 		let type = View.getView(range)?.view_type;
 		let view = type.createView();
 		let frag = range.cloneContents();
