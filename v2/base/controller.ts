@@ -1,4 +1,4 @@
-import {bundle, EMPTY} from "./util.js";
+import {bundle, EMPTY, extend} from "./util.js";
 
 export interface Signal {
 	readonly direction: "up" | "down"
@@ -46,7 +46,7 @@ export abstract class Control<V> extends Controller {
 	abstract get owner(): Owner<V>;
 
 	send(msg: Signal | string, to: V) {
-		if (typeof msg == "string") msg = new Msg(msg);
+		msg = signal("down", msg);
 		if (!msg.subject) return;
 		msg.on = to;
 		this.owner.getControlOf(to)?.receive(msg);
@@ -57,7 +57,7 @@ export abstract class Control<V> extends Controller {
 		}
 	}
 	sense(evt: Signal | string, on: V) {
-		if (typeof evt == "string") evt = new Evt(evt);
+		evt = signal("up", evt);
 		while (on) {
 			evt.on = on;
 			this.owner.getControlOf(on)?.receive(evt);
@@ -67,62 +67,38 @@ export abstract class Control<V> extends Controller {
 	}
 }
 
-class Msg implements Signal {
-	constructor(subject: string) {
-		this.subject = subject;
+export abstract class ViewOwner<V> extends Controller implements Owner<V> {
+	abstract getPartOf(value: V): V;
+	abstract getPartsOf(value: V): Iterable<V>;
+	abstract getControlOf(value: V): Receiver;
+
+	send(msg: Signal | string, to: V) {
+		msg = signal("down", msg);
+		if (!msg.subject) return;
+		msg.on = to;
+		this.getControlOf(to)?.receive(msg);
+		let parts = this.getPartsOf(to);
+		if (parts) for (let part of parts) {
+			msg.from = to;
+			this.send(msg, part);
+		}
 	}
-	readonly direction = "down";
-	subject: string;
-}
-
-class Evt implements Signal {
-	constructor(subject: string) {
-		this.subject = subject;
-	}
-	readonly direction = "up";
-	subject: string;
-}
-
-//DEVT only
-
-class Circuit  {
-	constructor(receiver: Receiver, from?: Circuit) {
-		this.receiver = receiver;
-		this.from = from;
-	}
-	receiver: Receiver;
-	from: Circuit;
-
-	receive(signal: Signal): void {
-		this.receiver.receive(signal);
+	sense(evt: Signal | string, on: V) {
+		evt = signal("up", evt);
+		while (on) {
+			evt.on = on;
+			this.getControlOf(on)?.receive(evt);
+			evt.from = on;
+			on = this.getPartOf(on);
+		}
 	}
 }
 
-interface Part extends Receiver {
-	partOf?: Part;
-	parts: Iterable<Part>;
-}
-
-class PartOwner implements Owner<Part> {
-	getPartOf(part: Part): Part {
-		return part?.partOf;
-	}
-	getPartsOf(part: Part): Iterable<Part> {
-		return part?.parts || EMPTY.array;
-	}
-	getControlOf(part: Part): Receiver {
-		return part;
-	}
-}
-
-class ElementOwner implements Owner<Element> {
-	getPartOf(part: Element): Element {
-		return part?.parentElement;
-	}
-	getPartsOf(part: Element): Iterable<Element> {
-		return part?.children || EMPTY.array;
-	}
-	getControlOf(part: Element): Receiver {
-		return part && part["$control"];
-	}
+export function signal(direction: "up" | "down", signal: string | Signal): Signal {
+	if (typeof signal == "string") return extend(null, {
+		direction: direction,
+		subject: signal
+	});
+	if (signal.direction != direction) throw new Error("Invalid direction");
+	return signal;
 }
