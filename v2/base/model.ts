@@ -50,6 +50,7 @@ export function viewType(value: any): string {
 		case "string":
 		case "number":
 		case "boolean":
+		case "date":
 			return "text";
 		default:
 			return type;
