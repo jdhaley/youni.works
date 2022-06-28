@@ -39,7 +39,7 @@ export class Controller implements Receiver {
 export interface Owner<V> {
 	getPartOf(value: V): V;
 	getPartsOf(value: V): Iterable<V>;
-	getControllerOf(value: V): Receiver;
+	getControlOf(value: V): Receiver;
 }
 
 export abstract class Control<V> extends Controller {
@@ -49,7 +49,7 @@ export abstract class Control<V> extends Controller {
 		if (typeof msg == "string") msg = new Msg(msg);
 		if (!msg.subject) return;
 		msg.on = to;
-		this.owner.getControllerOf(to)?.receive(msg);
+		this.owner.getControlOf(to)?.receive(msg);
 		let parts = this.owner.getPartsOf(to);
 		if (parts) for (let part of parts) {
 			msg.from = to;
@@ -60,7 +60,7 @@ export abstract class Control<V> extends Controller {
 		if (typeof evt == "string") evt = new Evt(evt);
 		while (on) {
 			evt.on = on;
-			this.owner.getControllerOf(on)?.receive(evt);
+			this.owner.getControlOf(on)?.receive(evt);
 			evt.from = on;
 			on = this.owner.getPartOf(on);
 		}
@@ -110,7 +110,7 @@ class PartOwner implements Owner<Part> {
 	getPartsOf(part: Part): Iterable<Part> {
 		return part?.parts || EMPTY.array;
 	}
-	getControllerOf(part: Part): Receiver {
+	getControlOf(part: Part): Receiver {
 		return part;
 	}
 }
@@ -122,7 +122,7 @@ class ElementOwner implements Owner<Element> {
 	getPartsOf(part: Element): Iterable<Element> {
 		return part?.children || EMPTY.array;
 	}
-	getControllerOf(part: Element): Receiver {
+	getControlOf(part: Element): Receiver {
 		return part && part["$control"];
 	}
 }

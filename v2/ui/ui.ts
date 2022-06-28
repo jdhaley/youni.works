@@ -61,7 +61,7 @@ export class Frame implements Owner<UiElement> {
 	getPartsOf(value: UiElement): Iterable<UiElement> {
 		return value.children as Iterable<UiElement>;
 	}
-	getControllerOf(value: UiElement): Receiver {
+	getControlOf(value: UiElement): Receiver {
 		return value.$control;
 	}
 	getElementById(id: string) {

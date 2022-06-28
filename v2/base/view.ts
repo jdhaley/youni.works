@@ -76,7 +76,7 @@ export abstract class ViewOwner extends Controller implements Owner<View> {
 	getPartOf(value: View): View {
 		return value.parentElement;
 	}
-	getControllerOf(value: View): Receiver {
+	getControlOf(value: View): Receiver {
 		return value.$control;
 	}
 }
