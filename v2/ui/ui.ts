@@ -1,4 +1,4 @@
-import {Signal, Control, controller, Owner, Receiver} from "../base/controller";
+import {Signal, controller, Owner, Receiver, Controller, Control} from "../base/controller.js";
 import {bundle} from "../base/util";
 
 export interface UiElement extends HTMLElement {
@@ -6,8 +6,9 @@ export interface UiElement extends HTMLElement {
 	$shortcuts?: bundle<string>;
 }
 
-export class Frame implements Owner<UiElement> {
+export class Frame extends Owner<UiElement> {
 	constructor(window: Window, controller: controller) {
+		super();
 		window.document["$owner"] = this;
 		this.#window = window;
 		for (let name in controller) {

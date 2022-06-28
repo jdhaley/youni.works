@@ -59,7 +59,7 @@ export default {
             event.track = priorEvent.track;
             event.moveX = event.x - priorEvent.x;
             event.moveY = event.y - priorEvent.y;
-            event.track.$control.send(event, event.track);
+            event.track.$control.owner.send(event, event.track);
             TRACK = event;
             return;
         } else {
@@ -84,7 +84,7 @@ export default {
             event.track = priorEvent.track;
             event.moveX = 0;
             event.moveY = 0;
-            event.track.$control.send(event, event.track);
+            event.track.$control.owner.send(event, event.track);
             TRACK = null;
             return;
         }
@@ -142,7 +142,7 @@ function sense(event: UserEvent) {
         if (!event.subject) event.subject = event.type;
  
         event.stopPropagation();
-        source.$control?.sense(event, source);
+        source.$control?.owner.sense(event, source);
         if (!event.subject) event.preventDefault();    
     }
 }

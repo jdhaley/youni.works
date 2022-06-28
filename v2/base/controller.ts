@@ -36,38 +36,11 @@ export class Controller implements Receiver {
 	}
 }
 
-export interface Owner<V> {
-	getPartOf(value: V): V;
-	getPartsOf(value: V): Iterable<V>;
-	getControlOf(value: V): Receiver;
-}
-
 export abstract class Control<V> extends Controller {
-	abstract get owner(): Owner<V>;
-
-	send(msg: Signal | string, to: V) {
-		msg = signal("down", msg);
-		if (!msg.subject) return;
-		msg.on = to;
-		this.owner.getControlOf(to)?.receive(msg);
-		let parts = this.owner.getPartsOf(to);
-		if (parts) for (let part of parts) {
-			msg.from = to;
-			this.send(msg, part);
-		}
-	}
-	sense(evt: Signal | string, on: V) {
-		evt = signal("up", evt);
-		while (on) {
-			evt.on = on;
-			this.owner.getControlOf(on)?.receive(evt);
-			evt.from = on;
-			on = this.owner.getPartOf(on);
-		}
-	}
+	owner: Owner<V>;
 }
 
-export abstract class ViewOwner<V> extends Controller implements Owner<V> {
+export abstract class Owner<V> extends Controller {
 	abstract getPartOf(value: V): V;
 	abstract getPartsOf(value: V): Iterable<V>;
 	abstract getControlOf(value: V): Receiver;
@@ -94,7 +67,7 @@ export abstract class ViewOwner<V> extends Controller implements Owner<V> {
 	}
 }
 
-export function signal(direction: "up" | "down", signal: string | Signal): Signal {
+function signal(direction: "up" | "down", signal: string | Signal): Signal {
 	if (typeof signal == "string") return extend(null, {
 		direction: direction,
 		subject: signal
