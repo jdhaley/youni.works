@@ -1,4 +1,4 @@
-import {Receiver, Controller, Owner, Control} from "./controller.js";
+import {Receiver, Owner, Control} from "./controller.js";
 import {content, ContentType, Type} from "./model.js";
 import {bundle, EMPTY} from "./util.js";
 
@@ -66,7 +66,7 @@ export class View extends HTMLElement {
 	}
 }
 
-export abstract class Viewer extends Owner<View> {
+export abstract class ViewOwner extends Owner<View> {
 	declare unknownType: ViewType;
 	declare types: bundle<ViewType>;
 
@@ -82,7 +82,7 @@ export abstract class Viewer extends Owner<View> {
 }
 
 export abstract class ViewType extends Control<View> implements ContentType<View> {
-	declare owner: Viewer;
+	declare owner: ViewOwner;
 	declare name?: string;
 	declare propertyName?: string;
 	readonly tag: string;

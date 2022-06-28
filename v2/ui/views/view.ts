@@ -1,4 +1,4 @@
-import {View, Viewer, ViewType} from "../../base/view.js";
+import {View, ViewOwner, ViewType} from "../../base/view.js";
 import {CommandBuffer} from "../../base/command.js";
 import {RemoteFileService} from "../../base/remote.js";
 
@@ -8,7 +8,7 @@ import {loadTypes} from "../../base/loader.js";
 
 import {Frame} from "../ui.js";
 
-export class Article extends Viewer {
+export class Article extends ViewOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.frame = frame;
