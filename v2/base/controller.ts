@@ -11,15 +11,16 @@ export interface Receiver {
 	receive(signal: Signal): void;
 }
 
-export interface controller {
+export interface Controller {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
-export class Controller implements Receiver {
+export class Control<T> implements Receiver {
 	constructor(conf?: bundle<any>) {
 		if (conf) this.conf = conf;
 	}
-	controller: controller = EMPTY.object;
+	owner: Owner<T>;
+	controller: Controller = EMPTY.object;
 	conf: bundle<any> = EMPTY.object;
 
 	receive(signal: Signal)  {
@@ -36,11 +37,7 @@ export class Controller implements Receiver {
 	}
 }
 
-export abstract class Control<V> extends Controller {
-	owner: Owner<V>;
-}
-
-export abstract class Owner<V> extends Controller {
+export abstract class Owner<V> extends Control<V> {
 	abstract getPartOf(value: V): V;
 	abstract getPartsOf(value: V): Iterable<V>;
 	abstract getControlOf(value: V): Receiver;

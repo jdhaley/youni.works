@@ -1,4 +1,4 @@
-import {controller} from "../../base/controller.js";
+import {Controller} from "../../base/controller.js";
 import {Frame, UiElement, UserEvent} from "../ui.js";
 
 let TRACK: UserEvent = null;
@@ -93,7 +93,7 @@ export default {
         event.subject = "moveout";
         sense(event);
     }
-} as controller;
+} as Controller;
 
 function  getShortcut(event: UserEvent) {
     let mod = getModifiers(event);

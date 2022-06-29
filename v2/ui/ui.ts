@@ -1,4 +1,4 @@
-import {Signal, controller, Owner, Receiver, Controller, Control} from "../base/controller.js";
+import {Signal, Controller, Owner, Receiver, Control} from "../base/controller.js";
 import {bundle} from "../base/util";
 
 export interface UiElement extends HTMLElement {
@@ -7,7 +7,7 @@ export interface UiElement extends HTMLElement {
 }
 
 export class Frame extends Owner<UiElement> {
-	constructor(window: Window, controller: controller) {
+	constructor(window: Window, controller: Controller) {
 		super();
 		window.document["$owner"] = this;
 		this.#window = window;
