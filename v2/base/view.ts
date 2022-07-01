@@ -23,7 +23,7 @@ export class View extends HTMLElement {
 		// let view = View.getView(range);
 		// let type = view?.view_type;
 		// view = view.cloneNode(false) as View;
-		// view.$control = type; //cloneing a view doesn't reproduce custom properties.
+		// view.type$ = type; //cloneing a view doesn't reproduce custom properties.
 		let type = View.getView(range)?.view_type;
 		let view = type.createView();
 		let frag = range.cloneContents();
@@ -32,21 +32,21 @@ export class View extends HTMLElement {
 	}
 
 	declare parentElement: View;
-	$control: ViewType;
+	type$: ViewType;
 	$shortcuts: bundle<string>;
 
 	get view_model() {
 		return this.view_type?.toModel(this);
 	}
 	get view_type() {
-		if (this.$control) return this.$control;
+		if (this.type$) return this.type$;
 		let typeName = this.dataset.name || this.dataset.type;
 		for (let view: Element = this; view; view = view.parentElement) {
-			if (view["$control"]) {
-				let ctx = view["$control"];
+			if (view["type$"]) {
+				let ctx = view["type$"];
 				if (ctx?.types) {
-					this.$control = ctx.types[typeName] || ctx.owner.unknownType;
-					return this.$control;
+					this.type$ = ctx.types[typeName] || ctx.owner.unknownType;
+					return this.type$;
 				}
 			};
 		}
@@ -54,7 +54,7 @@ export class View extends HTMLElement {
 	
 	connectedCallback() {
 		if (!this.id) this.id = "" + NEXT_ID++;
-		this.view_type; //trigger the assignment of $control.
+		this.view_type; //trigger the assignment of type$.
 		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
 	}
 	adoptedCallback() {
@@ -77,7 +77,7 @@ export abstract class ViewOwner extends Owner<View> {
 		return value.parentElement;
 	}
 	getControlOf(value: View): Receiver {
-		return value.$control;
+		return value.type$;
 	}
 }
 
@@ -104,7 +104,7 @@ export abstract class ViewType extends Control<View> implements ContentType<View
 function getShortcuts(view: View) {
 	if (view.$shortcuts) return view.$shortcuts;
 	while (view) {
-		let shortcuts = view.$control?.conf?.shortcuts;
+		let shortcuts = view.type$?.conf?.shortcuts;
 		if (shortcuts) return shortcuts;
 		view = view.parentElement;
 	}

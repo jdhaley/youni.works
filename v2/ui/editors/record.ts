@@ -30,9 +30,9 @@ class RecordCommand extends ViewCommand {
 		let view = View.getView(range);
 		startEdit(this, range);
 		range.deleteContents();
-		let model = view.$control.toModel(view) as Record;
+		let model = view.type$.toModel(view) as Record;
 		merge(model, record);
-		let x = view.$control.toView(model);
+		let x = view.type$.toView(model);
 		this.after = x.innerHTML;
 		this.exec(this.after);
 	}

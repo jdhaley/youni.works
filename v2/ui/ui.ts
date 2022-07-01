@@ -2,7 +2,7 @@ import {Signal, Controller, Owner, Receiver, Control} from "../base/controller.j
 import {bundle} from "../base/util";
 
 export interface UiElement extends HTMLElement {
-	$control?: Control<UiElement>;
+	type$?: Control<UiElement>;
 	$shortcuts?: bundle<string>;
 }
 
@@ -63,7 +63,7 @@ export class Frame extends Owner<UiElement> {
 		return value.children as Iterable<UiElement>;
 	}
 	getControlOf(value: UiElement): Receiver {
-		return value.$control;
+		return value.type$;
 	}
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);
