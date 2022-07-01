@@ -1,10 +1,10 @@
 //DEVT only
 
-import {Owner, Receiver, Signal} from "../base/controller";
+import {Owner, Receiver} from "../base/controller";
+import {ContentType} from "../base/model";
 import {EMPTY} from "../base/util";
 
 export interface Part extends Receiver {
-	owner: PartOwner;
 	partOf?: Part;
 	parts: Iterable<Part>;
 }
@@ -19,4 +19,13 @@ export class PartOwner extends Owner<Part> {
 	getControlOf(part: Part): Receiver {
 		return part;
 	}
+}
+
+export interface Markup extends Part {
+	type$: ContentType<Markup>;
+	textContent: string;
+	markupContent: string;
+	markup: string;
+	parts: Iterable<Markup>;
+	partOf?: Markup;
 }
