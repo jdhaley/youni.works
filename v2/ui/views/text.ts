@@ -10,7 +10,7 @@ class TextView extends View {
 customElements.define("ui-text", TextView);
 
 export class TextType extends BaseType {
-	tag = "ui-text";
+	tagName = "ui-text";
 	viewContent(view: View, model: string): void {
 		view.textContent = model || CHAR.ZWSP;
 	}

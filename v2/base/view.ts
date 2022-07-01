@@ -85,7 +85,7 @@ export abstract class ViewType extends Control<View> implements ContentType<View
 	declare owner: ViewOwner;
 	declare name?: string;
 	declare propertyName?: string;
-	readonly tag: string;
+	readonly tagName: string;
 	types: bundle<ViewType> = EMPTY.object;
 
 	generalizes(type: Type): boolean {

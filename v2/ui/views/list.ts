@@ -12,7 +12,7 @@ class ListView extends View {
 customElements.define("ui-list", ListView);
 
 export class ListType extends BaseType {
-	tag = "ui-list";
+	tagName = "ui-list";
 	defaultType: ViewType
 	toModel(view: View): content {
 		let model = [];

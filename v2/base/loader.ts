@@ -55,7 +55,8 @@ function createType(name: string, value: bundle<source>, types: types, source: s
 		} else {
 			member = getType(part, types, source);
 		}
-		if (type.tag == "ui-record") {
+		//TODO shouldn't use tagName to identify a record.
+		if (type.tagName == "ui-record") {
 			member = Object.create(member);
 			member.name = "";
 			member.propertyName = name;

@@ -39,7 +39,7 @@ export abstract class BaseType extends ViewType {
 	declare owner: Article;
 
 	createView(): View {
-		let view = this.owner.frame.create(this.tag) as View;
+		let view = this.owner.frame.create(this.tagName) as View;
 		view.type$ = this;
 		if (this.propertyName) {
 			view.dataset.name = this.propertyName;

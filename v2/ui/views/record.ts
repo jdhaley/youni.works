@@ -11,7 +11,7 @@ class RecordView extends View {
 customElements.define("ui-record", RecordView);
 
 export class RecordType extends BaseType {
-	tag = "ui-record";
+	tagName = "ui-record";
 	viewContent(view: View, model: Record): void {
 		view.textContent = "";
 		for (let name in this.types) {
