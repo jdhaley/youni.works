@@ -37,7 +37,28 @@ export class Task extends Item {
 	comments?: Comment[];
 	subtasks?: Task[];
 };
-
+/*
+Task:
+	username?: string;				assignedTo: Party
+									owner: Party [Group]
+									type: string
+									status: string
+    name: string;					title: string
+    datetime: string;				due: Date
+    datetimeformat?: string;
+    priority: string;				"low" | "medium" | "high"
+    privacy?: boolean;				
+    comments?: string[];			comments: Comment[]
+    subtasks?: Task[]
+Comment:
+									author: Party;
+									date: Date;
+									comment: string
+Party:
+									name: string
+Person extends Party
+Group extends Party
+*/
 export class Comment {
 	type: "comment" | "modfication"; //A modfication holds a JSON delta in the comment.
 	author: Party;
