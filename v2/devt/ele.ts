@@ -1,60 +1,25 @@
-import {Controller, Receiver, Signal} from "../base/controller.js";
-import {content, ContentType, Type} from "../base/model.js";
-import {bundle, EMPTY} from "../base/util.js";
-import { Markup } from "./part.js";
-
-interface Element extends Markup {
-	type$: ElementType;
-	//tagName: string;
-	//partOf?: Element;			//CUSTOM
-	//parts: Iterable<Element>;	//CUSTOM
-
-	getAttribute(name: string): string;
-	setAttribute(name: string, value: string): void;
-	removeAttribute(name: string): void;
-	append(...value: any): void;
-}
+import {Controller, Signal} from "../base/controller.js";
+import {Content, ContentType} from "../base/content.js";
 
 export interface ElementConf {
 	tagName: string;
 	controller: Controller;
 }
 
-export abstract class ElementType implements ContentType<Element> {
-	declare name?: string;
-	declare propertyName?: string;
-	types: bundle<ElementType> = EMPTY.object;
-	conf: ElementConf;
+export abstract class ElementType extends ContentType implements ElementConf {
+	tagName: string;
+	controller: Controller;
 
-	generalizes(type: Type): boolean {
-		return type == this;
+	get conf(): ElementConf {
+		return this;
 	}
-	toView(model: content): Element {
-		let view = this.createView();
-		this.viewContent(view, model);
-		return view;
-	}
-	abstract toModel(view: Element): content;
-	abstract viewContent(view: Element, model: content): void;
-	abstract createView(): Element;
 }
 
-interface Document {
-	//createElementNS(namespace, name);
-	/** mangle the namespace into the name if needed. */
-	createElement(name: string): Element;
-}
-
-interface Display {
-	// id: string;
-	// className: string;
-	// title: string;
-	box: DOMRect;
-	styles: Iterable<string>;
-	
-	getStyle(name?: string): CSSStyleDeclaration;
-	size(width: number, height: number): void;
-	position(x: number, y: number): void;
+interface Element extends Content {
+	getAttribute(name: string): string;
+	setAttribute(name: string, value: string): void;
+	removeAttribute(name: string): void;
+	append(...value: any): void;
 }
 
 export class Html extends HTMLElement implements Element {
@@ -112,6 +77,25 @@ export class Html extends HTMLElement implements Element {
 			}
 			return;
 		}
-		this.type$ = this.partOf.type$.types[typeName];
+		this.type$ = this.partOf.type$.types[typeName] as ElementType;
 	}
+}
+
+interface Document {
+	//createElementNS(namespace, name);
+	/** mangle the namespace into the name if needed. */
+	createElement(name: string): Element;
+}
+
+
+interface Display {
+	// id: string;
+	// className: string;
+	// title: string;
+	// box: DOMRect;
+	// styles: Iterable<string>;
+	
+	getStyle(name?: string): CSSStyleDeclaration;
+	size(width: number, height: number): void;
+	position(x: number, y: number): void;
 }

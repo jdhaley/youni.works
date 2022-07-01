@@ -72,3 +72,20 @@ function signal(direction: "up" | "down", signal: string | Signal): Signal {
 	if (signal.direction != direction) throw new Error("Invalid direction");
 	return signal;
 }
+
+export interface Part extends Receiver {
+	partOf?: Part;
+	parts: Iterable<Part>;
+}
+
+export class PartOwner extends Owner<Part> {
+	getPartOf(part: Part): Part {
+		return part?.partOf as Part;
+	}
+	getPartsOf(part: Part): Iterable<Part> {
+		return part?.parts || EMPTY.array;
+	}
+	getControlOf(part: Part): Receiver {
+		return part;
+	}
+}
