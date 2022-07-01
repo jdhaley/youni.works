@@ -1,5 +1,5 @@
 import {Receiver, Owner, Control} from "./controller.js";
-import {content, ContentType, Type} from "./model.js";
+import {content, Type} from "./model.js";
 import {bundle, EMPTY} from "./util.js";
 
 const OBSERVED_ATTRIBUTES = [];
@@ -81,9 +81,9 @@ export abstract class ViewOwner extends Owner<View> {
 	}
 }
 
-export abstract class ViewType extends Control<View> implements ContentType<View> {
+export abstract class ViewType extends Control<View> implements Type {
 	declare owner: ViewOwner;
-	declare name?: string;
+	declare name: string;
 	declare propertyName?: string;
 	readonly tagName: string;
 	types: bundle<ViewType> = EMPTY.object;

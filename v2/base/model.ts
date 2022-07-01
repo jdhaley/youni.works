@@ -16,13 +16,6 @@ export interface Record {
 	[key: string]: content | Type
 }
 
-export interface ContentType<V> extends Type {
-	types?: bundle<ContentType<V>>
-	propertyName?: string;
-	toModel(view: V): content;
-	toView(model: content): V;
-}
-
 export function typeOf(value: any): string {
 	if (value?.valueOf) value = value.valueOf(value);
 	let type = typeof value;

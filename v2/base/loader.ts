@@ -1,9 +1,14 @@
-import {ContentType} from "./model.js";
+import { Type } from "./model.js";
 import {bundle} from "./util.js";
 
-type Type = ContentType<unknown>;
+interface ContentType extends Type {
+	name: string;
+	types: bundle<ContentType>
+	propertyName?: string;
+}
 
-type types = bundle<Type>;
+
+type types = bundle<ContentType>;
 type source = bundle<string | source> | string
 
 export function loadTypes(source: bundle<source>, base: types): types {
@@ -48,7 +53,7 @@ function createType(name: string, value: bundle<source>, types: types, source: s
 	return type;
 
 	function getMember(name: string, part: source) {
-		let member: Type;
+		let member: ContentType;
 		if (typeof part == "object") {
 			member = createType("", part, types, source);
 			member.name = name;
