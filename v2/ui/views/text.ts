@@ -1,6 +1,5 @@
-import {View} from "../../base/view.js";
 import {CHAR} from "../../base/util.js";
-import {BaseType} from "./view.js";
+import {View, ViewType} from "./view.js";
 
 class TextView extends View {
 	constructor() {
@@ -9,7 +8,7 @@ class TextView extends View {
 }
 customElements.define("ui-text", TextView);
 
-export class TextType extends BaseType {
+export class TextType extends ViewType {
 	tagName = "ui-text";
 	viewContent(view: View, model: string): void {
 		view.textContent = model || CHAR.ZWSP;

@@ -1,5 +1,4 @@
-import {View} from "../../base/view.js";
-import {Article} from "../views/view.js";
+import {Article, View} from "../views/view.js";
 
 import {Command} from "../../base/command.js";
 

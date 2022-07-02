@@ -1,8 +1,7 @@
 import { content } from "../../base/model.js";
-import { View } from "../../base/view.js";
 import { Frame } from "../ui.js";
 import { TextType } from "../views/text.js";
-import { Article } from "../views/view.js";
+import { Article, View } from "../views/view.js";
 import { ViewCommand, mark } from "./edit.js";
 
 export class TextEditor extends TextType {

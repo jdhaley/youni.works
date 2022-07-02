@@ -1,22 +1,13 @@
-import {Content, ContentOwner, ContentType} from "./content.js";
+import {Content, ContentType} from "./content.js";
 import {Controller, Signal} from "./controller.js";
-import {content, Type} from "./model.js";
-import {bundle, EMPTY} from "./util.js";
-
-const OBSERVED_ATTRIBUTES = [];
-let NEXT_ID = 1;
+import {EMPTY} from "./util.js";
 
 
-export abstract class ViewOwner extends ContentOwner<View> {
-}
-
-function getShortcuts(view: View) {
-	if (view.$shortcuts) return view.$shortcuts;
-	while (view) {
-		let shortcuts = view.type$.shortcuts; //TODO - view.type$?.conf?.shortcuts;
-		if (shortcuts) return shortcuts;
-		view = view.partOf as View;
-	}
+export interface Element extends Content {
+	getAttribute(name: string): string;
+	setAttribute(name: string, value: string): void;
+	removeAttribute(name: string): void;
+	append(...value: any): void;
 }
 
 export interface ElementConf {
@@ -24,7 +15,7 @@ export interface ElementConf {
 	controller: Controller;
 }
 
-export abstract class ElementType extends ContentType implements ElementConf {
+export abstract class ElementType<T extends Content> extends ContentType<T> implements ElementConf {
 	tagName: string;
 	controller: Controller = EMPTY.object;
 
@@ -33,16 +24,8 @@ export abstract class ElementType extends ContentType implements ElementConf {
 	}
 }
 
-interface Element extends Content {
-	getAttribute(name: string): string;
-	setAttribute(name: string, value: string): void;
-	removeAttribute(name: string): void;
-	append(...value: any): void;
-}
-
 export class Html extends HTMLElement implements Element {
-	type$: ElementType
-
+	type$: ElementType<Html>
 	get partOf(): Html {
 		return this.parentElement as Html;
 	}
@@ -95,71 +78,10 @@ export class Html extends HTMLElement implements Element {
 			}
 			return;
 		}
-		this.type$ = this.partOf.type$.types[typeName] as ElementType;
+		this.type$ = this.partOf.type$.types[typeName] as ElementType<Html>
 	}
-}
-
-export class View extends Html {
-	constructor() {
-		super();
-	}
-	static get observedAttributes() {
-		return OBSERVED_ATTRIBUTES;
-	}
-	static getView(node: Node | Range): View {
-		if (node instanceof Range) node = node.commonAncestorContainer;
-		while (node) {
-			if (node instanceof View) return node;
-			node = node.parentElement;
-		}
-	}
-	static toView(range: Range): View {
-		// let view = View.getView(range);
-		// let type = view?.view_type;
-		// view = view.cloneNode(false) as View;
-		// view.type$ = type; //cloneing a view doesn't reproduce custom properties.
-		let type = View.getView(range)?.view_type;
-		let view = type.createView();
-		let frag = range.cloneContents();
-		while (frag.firstChild) view.append(frag.firstChild);
-		return view;
-	}
-
-	declare type$: ViewType;
-	$shortcuts: bundle<string>;
-
-	get view_model() {
-		return this.view_type?.toModel(this);
-	}
-
 	get view_type() {
 		if (!this.type$) this.connectedCallback();
 		return this.type$;
 	}
-	
-	connectedCallback() {
-		super.connectedCallback();
-		if (!this.id) this.id = "" + NEXT_ID++;
-		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
-	}
-	adoptedCallback() {
-		this.connectedCallback();
-	}
-	disconnectedCallback() {
-	}
-	attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-	}
-}
-
-export abstract class ViewType extends ElementType {
-	declare owner: ViewOwner;
-	shortcuts: bundle<string>;
-	toView(model: content): View {
-		let view = this.createView();
-		this.viewContent(view, model);
-		return view;
-	}
-	abstract toModel(view: View): content;
-	abstract viewContent(view: View, model: content): void;
-	abstract createView(): View;
 }

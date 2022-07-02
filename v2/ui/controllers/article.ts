@@ -2,14 +2,14 @@ import {Response} from "../../base/message.js";
 import {extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {Article} from "../views/view.js";
+import {Article, View} from "../views/view.js";
 
 //import view from "./view.js";
 
 export default extend(null, {
 	open(this: Article, res: Response<string>) {
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
-		this.view = this.type.toView(model);
+		this.view = this.type.toView(model) as View;
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.view);

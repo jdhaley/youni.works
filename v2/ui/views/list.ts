@@ -1,8 +1,6 @@
-import {View, ViewType} from "../../base/view.js";
 import {content, List, viewType} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import {BaseType} from "./view.js";
-
+import {View, ViewType} from "./view.js";
 
 class ListView extends View {
 	constructor() {
@@ -11,7 +9,7 @@ class ListView extends View {
 }
 customElements.define("ui-list", ListView);
 
-export class ListType extends BaseType {
+export class ListType extends ViewType {
 	tagName = "ui-list";
 	defaultType: ViewType
 	toModel(view: View): content {

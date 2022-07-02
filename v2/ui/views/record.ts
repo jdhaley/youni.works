@@ -1,7 +1,6 @@
-import {View} from "../../base/view.js";
 import {content, Record} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import {BaseType} from "./view.js";
+import {View, ViewType} from "./view.js";
 
 class RecordView extends View {
 	constructor() {
@@ -10,7 +9,7 @@ class RecordView extends View {
 }
 customElements.define("ui-record", RecordView);
 
-export class RecordType extends BaseType {
+export class RecordType extends ViewType {
 	tagName = "ui-record";
 	viewContent(view: View, model: Record): void {
 		view.textContent = "";
