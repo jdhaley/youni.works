@@ -1,14 +1,14 @@
-import {CommandBuffer} from "../../base/command.js";
-import {RemoteFileService} from "../../base/remote.js";
+import {CommandBuffer} from "../base/command.js";
+import {RemoteFileService} from "../base/remote.js";
+import {Controller} from "../base/controller.js";
 
-import {content} from "../../base/model.js";
-import {ContentOwner, ContentType} from "../../base/content.js";
-import {bundle, EMPTY} from "../../base/util.js";
-import {loadTypes} from "../../base/loader.js";
+import {content} from "../base/model.js";
+import {ContentOwner, ContentType} from "../base/content.js";
+import {bundle, EMPTY} from "../base/util.js";
+import {loadTypes} from "../base/loader.js";
 
-import {Html} from "../html.js";
-import {Frame} from "../ui.js";
-import {Controller} from "../../base/controller.js";
+import {HtmlView} from "./html.js";
+import {Frame} from "./ui.js";
 
 export interface DisplayConf {
 	tagName: string;
@@ -82,7 +82,7 @@ function getShortcuts(view: Display) {
 	}
 }
 
-export class Display extends Html {
+export class Display extends HtmlView {
 	static get observedAttributes() {
 		return OBSERVED_ATTRIBUTES;
 	}

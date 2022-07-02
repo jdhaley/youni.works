@@ -1,4 +1,4 @@
-import {Article, Display} from "../views/display.js";
+import {Article, Display} from "../display.js";
 
 import {Command} from "../../base/command.js";
 
@@ -39,7 +39,7 @@ export abstract class ViewCommand extends Command<Range> {
 function replace(range: Range, markup: string) {
 	let view = Display.getView(range);
 	let type = view.view_type;
-	view = type.createView();
+	view = type.owner.createView(type);
 	view.innerHTML = markup;
 	
 	range.deleteContents();

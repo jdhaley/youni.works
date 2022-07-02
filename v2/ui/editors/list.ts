@@ -1,7 +1,7 @@
 import {Frame} from "../ui.js";
 import {ViewCommand, mark} from "./edit.js";
 import {ListType} from "../views/list.js";
-import {Article, Display} from "../views/display.js";
+import {Article, Display} from "../display.js";
 import { content } from "../../base/model.js";
 
 export class ListEditor extends ListType {

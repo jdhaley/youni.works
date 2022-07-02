@@ -1,6 +1,6 @@
 import {content, List, viewType} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import {Display, DisplayType} from "./display.js";
+import {Display, DisplayType} from "../display.js";
 
 class ListView extends Display {
 	constructor() {

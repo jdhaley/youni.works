@@ -1,5 +1,5 @@
 import {CHAR, extend} from "../../base/util.js";
-import {Display, DisplayType} from "../views/display.js";
+import {Display, DisplayType} from "../display.js";
 import {UserEvent} from "../ui.js";
 import {content, viewType} from "../../base/model.js";
 

@@ -1,6 +1,6 @@
 import {content, Record} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import {Display, DisplayType} from "./display.js";
+import {Display, DisplayType} from "../display.js";
 
 class RecordView extends Display {
 	constructor() {

@@ -1,7 +1,7 @@
 import {UserEvent} from "../ui.js";
 import {extend} from "../../base/util.js";
 import view from "./view.js";
-import { DisplayType } from "../views/display.js";
+import { DisplayType } from "../display.js";
 
 export default extend(view, {
 	// cut(this: Article, event: UserEvent) {

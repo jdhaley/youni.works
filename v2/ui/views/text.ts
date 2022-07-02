@@ -1,5 +1,5 @@
 import {CHAR} from "../../base/util.js";
-import {Display, DisplayType} from "./display.js";
+import {Display, DisplayType} from "../display.js";
 
 class TextView extends Display {
 	constructor() {

@@ -1,13 +1,13 @@
-import {Content, ContentType, Entity} from "../base/content.js";
+import {View, ContentType} from "../base/content.js";
 import {Signal} from "../base/controller.js";
 
-export class Html extends HTMLElement implements Content, Entity {
-	type$: ContentType<Html>
-	get partOf(): Html {
-		return this.parentElement as Html;
+export class HtmlView extends HTMLElement implements View {
+	type$: ContentType<HtmlView>
+	get partOf(): HtmlView {
+		return this.parentElement as HtmlView;
 	}
-	get parts(): Iterable<Html> {
-		return this.children as Iterable<Html>;
+	get parts(): Iterable<HtmlView> {
+		return this.children as Iterable<HtmlView>;
 	}
 	get markup(): string {
 		return this.outerHTML;
