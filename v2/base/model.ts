@@ -1,5 +1,3 @@
-import {bundle} from "./util.js";
-
 export interface Type {
 	name?: string;
 	generalizes(type: Type): boolean;
@@ -8,12 +6,12 @@ export interface Type {
 export type content = string | number | boolean | Date | List | Record;
 
 export interface List extends Iterable<content> {
-	type$?: Type;
+	type$?: string;
 }
 
 export interface Record {
-	type$?: Type;
-	[key: string]: content | Type
+	type$?: string;
+	[key: string]: content;
 }
 
 export function typeOf(value: any): string {

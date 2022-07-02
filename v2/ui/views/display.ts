@@ -26,17 +26,6 @@ export abstract class DisplayType extends ContentType<Display> implements Displa
 	get conf(): DisplayConf {
 		return this;
 	}
-
-	createView(): Display {
-		let view = this.owner.frame.create(this.tagName) as Display;
-		view.type$ = this;
-		if (this.propertyName) {
-			view.dataset.name = this.propertyName;
-		} else {
-			view.dataset.type = this.name;
-		}
-		return view;
-	}
 	
 	edit(commandName: string, range: Range, content?: content): Range {
 		throw new Error("Method not implemented.");
@@ -59,6 +48,16 @@ export class Article extends ContentOwner<Display> {
 	view: Display;
 	model: content;
 
+	createView(type: DisplayType): Display {
+		let view = this.frame.create(type.tagName) as Display;
+		view.type$ = type;
+		if (type.propertyName) {
+			view.dataset.name = type.propertyName;
+		} else {
+			view.dataset.type = type.name;
+		}
+		return view;
+	}
 	initTypes(source: bundle<any>, base: bundle<DisplayType>) {
 		base = loadBaseTypes(this);
 		this.types = loadTypes(source, base) as bundle<DisplayType>;
@@ -100,7 +99,7 @@ export class Display extends Html {
 		// view = view.cloneNode(false) as View;
 		// view.type$ = type; //cloneing a view doesn't reproduce custom properties.
 		let type = Display.getView(range)?.view_type;
-		let view = type.createView();
+		let view = type.owner.createView(type);
 		let frag = range.cloneContents();
 		while (frag.firstChild) view.append(frag.firstChild);
 		return view;
