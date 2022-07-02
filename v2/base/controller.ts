@@ -78,14 +78,14 @@ export interface Part extends Receiver {
 	parts: Iterable<Part>;
 }
 
-export class PartOwner extends Owner<Part> {
-	getPartOf(part: Part): Part {
-		return part?.partOf as Part;
+export class PartOwner<T extends Part> extends Owner<Part> {
+	getPartOf(part: Part): T {
+		return part?.partOf as T;
 	}
-	getPartsOf(part: Part): Iterable<Part> {
-		return part?.parts || EMPTY.array;
+	getPartsOf(part: Part): Iterable<T> {
+		return (part?.parts || EMPTY.array) as Iterable<T>
 	}
 	getControlOf(part: Part): Receiver {
-		return part;
+		return part?.receive ? part : null;
 	}
 }

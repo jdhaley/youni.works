@@ -1,6 +1,6 @@
-import {Part, PartOwner} from "./controller";
-import {content, Type} from "./model";
-import {bundle, EMPTY} from "./util";
+import {Part, PartOwner} from "./controller.js";
+import {content, Type} from "./model.js";
+import {bundle, EMPTY} from "./util.js";
 
 export interface Content extends Part {
 	type$: ContentType;
@@ -12,7 +12,7 @@ export interface Content extends Part {
 }
 
 export abstract class ContentType implements Type {
-	owner: ContentOwner;
+	owner: ContentOwner<Content>;
 	declare name: string;
 	declare propertyName?: string;
 	types: bundle<ContentType> = EMPTY.object;
@@ -30,7 +30,7 @@ export abstract class ContentType implements Type {
 	abstract createView(): Content;
 }
 
-export abstract class ContentOwner extends PartOwner {
+export abstract class ContentOwner<T extends Content> extends PartOwner<T> {
 	unknownType: ContentType;
 	types: bundle<ContentType>;
 }

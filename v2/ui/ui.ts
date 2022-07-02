@@ -1,8 +1,8 @@
+import { Content, ContentType } from "../base/content.js";
 import {Signal, Controller, Owner, Receiver, Control} from "../base/controller.js";
 import {bundle} from "../base/util";
 
-export interface UiElement extends HTMLElement {
-	type$?: Control<UiElement>;
+export interface UiElement extends HTMLElement, Content {
 	$shortcuts?: bundle<string>;
 }
 
@@ -19,7 +19,7 @@ export class Frame extends Owner<UiElement> {
 	}
 	#window: Window;
 
-	get view(): UiElement {
+	get view(): HTMLElement {
 		return this.#window.document.body;
 	}
 	get location() {
@@ -50,20 +50,20 @@ export class Frame extends Owner<UiElement> {
 	}
 
 	create(tagName: string): UiElement {
-		return this.#window.document.createElement(tagName);
+		return this.#window.document.createElement(tagName) as UiElement;
 	}
 	createRange(): Range {
 		return this.#window.document.createRange();
 	}
 
 	getPartOf(value: UiElement): UiElement {
-		return value.parentElement;
+		return value.parentElement as UiElement;
 	}
 	getPartsOf(value: UiElement): Iterable<UiElement> {
 		return value.children as Iterable<UiElement>;
 	}
 	getControlOf(value: UiElement): Receiver {
-		return value.type$;
+		return value;
 	}
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);

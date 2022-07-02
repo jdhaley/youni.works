@@ -29,14 +29,16 @@ export class Article extends ViewOwner {
 		this.types = loadTypes(source, base) as bundle<ViewType>;
 		this.unknownType = this.types[this.conf.unknownType];
 		this.type = this.types[this.conf.type] as ViewType;
-		this.type.conf = {
-			shortcuts: this.conf.shortcuts
-		}
+		this.type.shortcuts = this.conf.shortcuts;
+		// this.type.conf = {
+		// 	shortcuts: this.conf.shortcuts
+		// }
 	}
 }
 
 export abstract class BaseType extends ViewType {
 	declare owner: Article;
+	declare types: bundle<ViewType>;
 
 	createView(): View {
 		let view = this.owner.frame.create(this.tagName) as View;
