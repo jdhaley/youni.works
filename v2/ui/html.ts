@@ -1,30 +1,8 @@
-import {Content, ContentType} from "../base/content.js";
-import {Controller, Signal} from "../base/controller.js";
-import {EMPTY} from "../base/util.js";
+import {Content, ContentType, Entity} from "../base/content.js";
+import {Signal} from "../base/controller.js";
 
-export interface Element extends Content {
-	getAttribute(name: string): string;
-	setAttribute(name: string, value: string): void;
-	removeAttribute(name: string): void;
-	append(...value: any): void;
-}
-
-export interface ElementConf {
-	tagName: string;
-	controller: Controller;
-}
-
-export abstract class ElementType<T extends Content> extends ContentType<T> implements ElementConf {
-	tagName: string;
-	controller: Controller = EMPTY.object;
-
-	get conf(): ElementConf {
-		return this;
-	}
-}
-
-export class Html extends HTMLElement implements Element {
-	type$: ElementType<Html>
+export class Html extends HTMLElement implements Content, Entity {
+	type$: ContentType<Html>
 	get partOf(): Html {
 		return this.parentElement as Html;
 	}
@@ -40,7 +18,7 @@ export class Html extends HTMLElement implements Element {
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
 		while (subject) try {
-			let action = this.type$.conf.controller[subject];
+			let action = this.view_controller[subject];
 			action && action.call(this.type$, signal);
 			subject = (subject != signal.subject ? signal.subject : "");	
 		} catch (error) {
@@ -77,10 +55,13 @@ export class Html extends HTMLElement implements Element {
 			}
 			return;
 		}
-		this.type$ = this.partOf.type$.types[typeName] as ElementType<Html>
+		this.type$ = this.partOf.type$.types[typeName];
 	}
 	get view_type() {
 		if (!this.type$) this.connectedCallback();
 		return this.type$;
+	}
+	get view_controller() {
+		return undefined;
 	}
 }

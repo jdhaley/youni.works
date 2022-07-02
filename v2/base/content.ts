@@ -7,8 +7,6 @@ export interface Content extends Part {
 	textContent: string;
 	markupContent: string;
 	markup: string;
-	parts: Iterable<Content>;
-	partOf?: Content;
 }
 
 export abstract class ContentType<T extends Content> implements Type {
@@ -33,4 +31,10 @@ export abstract class ContentType<T extends Content> implements Type {
 export abstract class ContentOwner<T extends Content> extends PartOwner<T> {
 	unknownType: ContentType<T>;
 	types: bundle<ContentType<T>>;
+}
+
+export interface Entity {
+	getAttribute(name: string): string;
+	setAttribute(name: string, value: string): void;
+	removeAttribute(name: string): void;
 }

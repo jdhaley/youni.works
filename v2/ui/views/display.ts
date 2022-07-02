@@ -2,17 +2,30 @@ import {CommandBuffer} from "../../base/command.js";
 import {RemoteFileService} from "../../base/remote.js";
 
 import {content} from "../../base/model.js";
-import {ContentOwner} from "../../base/content.js";
+import {ContentOwner, ContentType} from "../../base/content.js";
 import {bundle, EMPTY} from "../../base/util.js";
 import {loadTypes} from "../../base/loader.js";
 
-import {ElementType, Html} from "../html.js";
+import {Html} from "../html.js";
 import {Frame} from "../ui.js";
+import {Controller} from "../../base/controller.js";
 
-export abstract class DisplayType extends ElementType<Display> {
+export interface DisplayConf {
+	tagName: string;
+	controller: Controller;
+	shortcuts: bundle<string>
+	//[key: string]: any;
+}
+
+export abstract class DisplayType extends ContentType<Display> implements DisplayConf {
 	declare owner: Article;
-	declare types: bundle<DisplayType>;
 	declare shortcuts: bundle<string>
+	tagName: string;
+	controller: Controller = EMPTY.object;
+
+	get conf(): DisplayConf {
+		return this;
+	}
 
 	createView(): Display {
 		let view = this.owner.frame.create(this.tagName) as Display;
@@ -24,6 +37,7 @@ export abstract class DisplayType extends ElementType<Display> {
 		}
 		return view;
 	}
+	
 	edit(commandName: string, range: Range, content?: content): Range {
 		throw new Error("Method not implemented.");
 	}
@@ -70,9 +84,6 @@ function getShortcuts(view: Display) {
 }
 
 export class Display extends Html {
-	constructor() {
-		super();
-	}
 	static get observedAttributes() {
 		return OBSERVED_ATTRIBUTES;
 	}
@@ -95,18 +106,23 @@ export class Display extends Html {
 		return view;
 	}
 
+	constructor() {
+		super();
+	}
 	declare type$: DisplayType;
 	$shortcuts: bundle<string>;
 
 	get view_model() {
 		return this.view_type?.toModel(this);
 	}
-
 	get view_type() {
 		if (!this.type$) this.connectedCallback();
 		return this.type$;
 	}
-	
+	get view_controller(): Controller {
+		return this.type$.controller;
+	}
+
 	connectedCallback() {
 		super.connectedCallback();
 		if (!this.id) this.id = "" + NEXT_ID++;
