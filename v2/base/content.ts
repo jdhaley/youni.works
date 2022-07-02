@@ -14,6 +14,11 @@ export abstract class ContentType<T extends Content> implements Type {
 	declare name: string;
 	declare propertyName?: string;
 	types: bundle<ContentType<T>> = EMPTY.object;
+	
+	abstract get conf(): bundle<any>;
+	
+	abstract toModel(view: T): content;
+	abstract viewContent(view: T, model: content): void;
 
 	generalizes(type: Type): boolean {
 		return type == this;
@@ -23,8 +28,6 @@ export abstract class ContentType<T extends Content> implements Type {
 		this.viewContent(view, model);
 		return view;
 	}
-	abstract toModel(view: T): content;
-	abstract viewContent(view: T, model: content): void;
 }
 
 export abstract class ContentOwner<T extends Content> extends PartOwner<T> {
@@ -44,6 +47,10 @@ export interface View extends Content, Entity {
 }
 
 export class TextType<T extends View> extends ContentType<T> {
+	$conf: bundle<any>;
+	get conf(): bundle<any> {
+		return this.$conf;
+	}
 	toModel(view: T): string {
 		return view.textContent == CHAR.ZWSP ? "" : view.textContent;
 	}
@@ -53,7 +60,10 @@ export class TextType<T extends View> extends ContentType<T> {
 }
 
 export class ListType<T extends View> extends ContentType<T> {
-	tagName = "ui-list";
+	$conf: bundle<any>;
+	get conf(): bundle<any> {
+		return this.$conf;
+	}
 	defaultType: ContentType<T>
 	toModel(view: T): content {
 		let model = [];
@@ -82,6 +92,11 @@ export class ListType<T extends View> extends ContentType<T> {
 }
 
 export class RecordType<T extends View> extends ContentType<T> {
+	$conf: bundle<any>;
+	get conf(): bundle<any> {
+		return this.$conf;
+	}
+
 	toModel(view: T): Record {
 		let model = Object.create(null);
 		model.type$ = this.name;
