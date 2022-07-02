@@ -1,18 +1,18 @@
 import {content, List, viewType} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import {View, ViewType} from "./view.js";
+import {Display, DisplayType} from "./display.js";
 
-class ListView extends View {
+class ListView extends Display {
 	constructor() {
 		super();
 	}
 }
 customElements.define("ui-list", ListView);
 
-export class ListType extends ViewType {
+export class ListType extends DisplayType {
 	tagName = "ui-list";
-	defaultType: ViewType
-	toModel(view: View): content {
+	defaultType: DisplayType
+	toModel(view: Display): content {
 		let model = [];
 		if (this.name) model["type$"] = this.name;
 
@@ -24,7 +24,7 @@ export class ListType extends ViewType {
 		}
 		return model.length ? model : undefined;
 	}
-	viewContent(view: View, model: List): void {
+	viewContent(view: Display, model: List): void {
 		// let level = view.getAttribute("aria-level") as any * 1 || 0;
 		// level++;
 		view.textContent = "";

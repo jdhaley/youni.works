@@ -1,7 +1,7 @@
 import { content } from "../../base/model.js";
 import { Frame } from "../ui.js";
 import { TextType } from "../views/text.js";
-import { Article, View } from "../views/view.js";
+import { Article, Display } from "../views/display.js";
 import { ViewCommand, mark } from "./edit.js";
 
 export class TextEditor extends TextType {
@@ -11,7 +11,7 @@ export class TextEditor extends TextType {
 }
 
 class TextCommand extends ViewCommand {
-	constructor(owner: Article, name: string, view: View) {
+	constructor(owner: Article, name: string, view: Display) {
 		super(owner, name, view);
 	}
 	protected getRange(): Range {
@@ -43,5 +43,5 @@ function startEdit(cmd: TextCommand, range: Range) {
 	range.selectNodeContents(ctx);
 
 	//Capture the before image for undo.
-	cmd.before = View.toView(range).innerHTML;	
+	cmd.before = Display.toView(range).innerHTML;	
 }

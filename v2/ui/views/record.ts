@@ -1,17 +1,17 @@
 import {content, Record} from "../../base/model.js";
 import {CHAR} from "../../base/util.js";
-import {View, ViewType} from "./view.js";
+import {Display, DisplayType} from "./display.js";
 
-class RecordView extends View {
+class RecordView extends Display {
 	constructor() {
 		super();
 	}
 }
 customElements.define("ui-record", RecordView);
 
-export class RecordType extends ViewType {
+export class RecordType extends DisplayType {
 	tagName = "ui-record";
-	viewContent(view: View, model: Record): void {
+	viewContent(view: Display, model: Record): void {
 		view.textContent = "";
 		for (let name in this.types) {
 			let type = this.types[name];
@@ -23,7 +23,7 @@ export class RecordType extends ViewType {
 		}
 		if (!view.textContent) view.textContent = CHAR.ZWSP;
 	}
-	toModel(view: View): Record {
+	toModel(view: Display): Record {
 		let model = Object.create(null);
 		model.type$ = this.name;
 		for (let child of this.owner.getPartsOf(view)) {

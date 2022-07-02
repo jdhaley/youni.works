@@ -1,9 +1,9 @@
-import {Article, View} from "../views/view.js";
+import {Article, Display} from "../views/display.js";
 
 import {Command} from "../../base/command.js";
 
 export abstract class ViewCommand extends Command<Range> {
-	constructor(owner: Article, name: string, view: View) {
+	constructor(owner: Article, name: string, view: Display) {
 		super();
 		this.owner = owner;
 		this.name = name;
@@ -37,7 +37,7 @@ export abstract class ViewCommand extends Command<Range> {
 }
 
 function replace(range: Range, markup: string) {
-	let view = View.getView(range);
+	let view = Display.getView(range);
 	let type = view.view_type;
 	view = type.createView();
 	view.innerHTML = markup;

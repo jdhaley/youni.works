@@ -1,19 +1,19 @@
 import {CHAR} from "../../base/util.js";
-import {View, ViewType} from "./view.js";
+import {Display, DisplayType} from "./display.js";
 
-class TextView extends View {
+class TextView extends Display {
 	constructor() {
 		super();
 	}
 }
 customElements.define("ui-text", TextView);
 
-export class TextType extends ViewType {
+export class TextType extends DisplayType {
 	tagName = "ui-text";
-	viewContent(view: View, model: string): void {
+	viewContent(view: Display, model: string): void {
 		view.textContent = model || CHAR.ZWSP;
 	}
-	toModel(view: View): string {
+	toModel(view: Display): string {
 		return view.textContent == CHAR.ZWSP ? "" : view.textContent;
 	}
 }

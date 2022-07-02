@@ -1,5 +1,5 @@
 import {CHAR, extend} from "../../base/util.js";
-import {View, ViewType} from "../views/view.js";
+import {Display, DisplayType} from "../views/display.js";
 import {UserEvent} from "../ui.js";
 import {content, viewType} from "../../base/model.js";
 
@@ -11,18 +11,18 @@ export default extend(null, {
 		let command = shortcuts && shortcuts[event.shortcut];
 		if (command) event.subject = command;
 	},
-	copy(this: ViewType, event: UserEvent) {
+	copy(this: DisplayType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range, event.clipboardData);
 	},
-	cut(this: ViewType, event: UserEvent) {
+	cut(this: DisplayType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range, event.clipboardData);
 		this.edit("Cut", range);
 	},
-	paste(this: ViewType, event: UserEvent) {
+	paste(this: DisplayType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		let model = getClipboard(event.clipboardData);
@@ -44,7 +44,7 @@ export default extend(null, {
 	charpress(event: UserEvent) {
 		event.subject = "";
 	},
-	test(this: ViewType, event: UserEvent) {
+	test(this: DisplayType, event: UserEvent) {
 		event.subject = "";
 		let range = this.owner.frame.selectionRange;
 		range.setStartBefore(event.on.parentElement);
@@ -70,18 +70,18 @@ export default extend(null, {
 			document.execCommand("undo");
 		}
 	},
-	undo(this: ViewType, event: UserEvent) {
+	undo(this: DisplayType, event: UserEvent) {
 		event.subject = "";
 		this.owner.commands.undo();
 	},
-	redo(this: ViewType, event: UserEvent) {
+	redo(this: DisplayType, event: UserEvent) {
 		event.subject = "";
 		this.owner.commands.redo();
 	},
 });
 
-function setClipboard(type: ViewType, range: Range, clipboard: DataTransfer) {
-	let view = View.toView(range);
+function setClipboard(type: DisplayType, range: Range, clipboard: DataTransfer) {
+	let view = Display.toView(range);
 	let model = type.toModel(view);
 	clipboard.setData("application/json", JSON.stringify(model));
 	let html = htmlify(view);

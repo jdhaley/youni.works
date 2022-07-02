@@ -1,7 +1,6 @@
-import {Content, ContentType} from "./content.js";
-import {Controller, Signal} from "./controller.js";
-import {EMPTY} from "./util.js";
-
+import {Content, ContentType} from "../base/content.js";
+import {Controller, Signal} from "../base/controller.js";
+import {EMPTY} from "../base/util.js";
 
 export interface Element extends Content {
 	getAttribute(name: string): string;

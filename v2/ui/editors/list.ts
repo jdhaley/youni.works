@@ -1,12 +1,12 @@
 import {Frame} from "../ui.js";
 import {ViewCommand, mark} from "./edit.js";
 import {ListType} from "../views/list.js";
-import {Article, View} from "../views/view.js";
+import {Article, Display} from "../views/display.js";
 import { content } from "../../base/model.js";
 
 export class ListEditor extends ListType {
 	edit(commandName: string, range: Range, content?: content): Range {
-		let view = View.getView(range);
+		let view = Display.getView(range);
 		if (view.view_type instanceof ListType) {
 			let cmd = new ListCommand(this.owner, commandName, view);
 			cmd.do(range, content);
@@ -18,7 +18,7 @@ export class ListEditor extends ListType {
 }
 
 class ListCommand extends ViewCommand {
-	constructor(owner: Article, name: string, view: View) {
+	constructor(owner: Article, name: string, view: Display) {
 		super(owner, name, view);
 	}
 	startId: string;
@@ -81,7 +81,7 @@ function startEdit(cmd: ListCommand, range: Range) {
 	range.setEndAfter(end);
 
 	//Capture the before image for undo.
-	cmd.before = View.toView(range).innerHTML;	
+	cmd.before = Display.toView(range).innerHTML;	
 
 	/*
 	Get the items prior to the start/end to identify the id's prior-to-start or
@@ -95,11 +95,11 @@ function startEdit(cmd: ListCommand, range: Range) {
 	if (end) cmd.endId = end.id;
 }
 
-function getChildView(ctx: Node, node: Node): View {
+function getChildView(ctx: Node, node: Node): Display {
 	while (node && node.parentElement != ctx) {
 		node = node.parentElement;
 	}
-	if (node instanceof View) return node;
+	if (node instanceof Display) return node;
 
 	throw new Error("Cant extend() marked range");
 }
@@ -151,23 +151,23 @@ function getChildView(ctx: Node, node: Node): View {
 // 	return markupText;
 // }
 
-function getStartContent(range: Range): View {
+function getStartContent(range: Range): Display {
 	if (range.startContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.startContainer);
 		let type = view.view_type;
 		range = range.cloneRange();
 		range.collapse(true);
 		range.setStart(view, 0);
-		let vw = View.toView(range);
+		let vw = Display.toView(range);
 		console.log("start content:", vw.textContent)
 		let content = vw.view_model;
-		view = view.cloneNode(false) as View;
+		view = view.cloneNode(false) as Display;
 		type.viewContent(view, content);
 		return view;
 	}
 	return null;
 }
-function getEndContent(range: Range): View {
+function getEndContent(range: Range): Display {
 	if (range.endContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.endContainer);
 		let type = view.view_type;
@@ -175,10 +175,10 @@ function getEndContent(range: Range): View {
 		range = range.cloneRange();
 		range.collapse(false);
 		range.setEnd(view, view.childElementCount);
-		let vw = View.toView(range);
+		let vw = Display.toView(range);
 		console.log("end content:", vw.textContent)
 		let content = vw.view_model;
-		view = view.cloneNode(false) as View;
+		view = view.cloneNode(false) as Display;
 		type.viewContent(view, content);
 		return view;
 	}

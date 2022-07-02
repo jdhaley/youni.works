@@ -1,5 +1,5 @@
-import { Content, ContentType } from "../base/content.js";
-import {Signal, Controller, Owner, Receiver, Control} from "../base/controller.js";
+import {Content} from "../base/content.js";
+import {Signal, Controller, Owner, Receiver} from "../base/controller.js";
 import {bundle} from "../base/util";
 
 export interface UiElement extends HTMLElement, Content {

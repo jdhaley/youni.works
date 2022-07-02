@@ -2,11 +2,11 @@ import {Record} from "../../base/model.js";
 import {Frame} from "../ui.js";
 import {RecordType} from "../views/record.js";
 import {ViewCommand, mark} from "./edit.js";
-import {Article, View} from "../views/view.js";
+import {Article, Display} from "../views/display.js";
 
 export class RecordEditor extends RecordType {
 	edit(commandName: string, range: Range, record: Record): Range {
-		let view = View.getView(range);
+		let view = Display.getView(range);
 		if (view.view_type instanceof RecordType) {
 			let cmd = new RecordCommand(this.owner, commandName, view);
 			cmd.do(range, record);
@@ -19,14 +19,14 @@ export class RecordEditor extends RecordType {
 }
 
 class RecordCommand extends ViewCommand {
-	constructor(owner: Article, name: string, view: View) {
+	constructor(owner: Article, name: string, view: Display) {
 		super(owner, name, view);
 	}
 	protected getRange(): Range {
 		return selectContents(this.owner.frame, this.viewId);
 	}
 	do(range: Range, record: Record) {
-		let view = View.getView(range);
+		let view = Display.getView(range);
 		startEdit(this, range);
 		range.deleteContents();
 		let model = view.type$.toModel(view) as Record;
@@ -60,5 +60,5 @@ function startEdit(cmd: RecordCommand, range: Range) {
 	mark(range);
 	
 	range = selectContents(cmd.owner.frame, cmd.viewId);
-	cmd.before = View.toView(range).innerHTML;	
+	cmd.before = Display.toView(range).innerHTML;	
 }
