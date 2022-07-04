@@ -1,7 +1,7 @@
 import {UserEvent} from "../ui.js";
 import {extend} from "../../base/util.js";
 import view from "./view.js";
-import { DisplayType } from "../display.js";
+import {EditorType} from "../editors/edit.js";
 
 export default extend(view, {
 	// cut(this: Article, event: UserEvent) {
@@ -23,7 +23,7 @@ export default extend(view, {
 	// 	range = this.edit("Paste", range, view.innerHTML);
 	// 	range.collapse();
 	// },
-	charpress(this: DisplayType, event: UserEvent) {
+	charpress(this: EditorType, event: UserEvent) {
 		event.subject = "user_edit";
 		// event.subject = ""
 		// let range = this.owner.selectionRange;
@@ -35,7 +35,7 @@ export default extend(view, {
 		// text = text.substring(0, offset) + event.key + text.substring(offset);
 		// this.textEdit("Enter-Text", range, text, offset + 1);
 	},
-	delete(this: DisplayType, event: UserEvent) {
+	delete(this: EditorType, event: UserEvent) {
 		event.subject = "user_edit";
 		// event.subject = "";
 		// let range = this.owner.selectionRange;
@@ -53,7 +53,7 @@ export default extend(view, {
 		// text = text.substring(0, offset) + text.substring(offset + 1);
 		// this.textEdit("Delete-Text", range, text, offset);
 	},
-	erase(this: DisplayType, event: UserEvent) {
+	erase(this: EditorType, event: UserEvent) {
 		event.subject = "user_edit";
 		// event.subject = "";
 		// let range = this.owner.selectionRange;
@@ -69,7 +69,7 @@ export default extend(view, {
 		// text = text.substring(0, offset - 1) + text.substring(offset);
 		// this.textEdit("Erase-Text", range, text, offset - 1);
 	},
-	enter(this: DisplayType, event: UserEvent) {
+	enter(this: EditorType, event: UserEvent) {
 		// event.subject = "";
 	},
 });

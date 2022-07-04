@@ -12,9 +12,11 @@ export abstract class ViewType<T extends Content> implements ContentType<T> {
 	declare name: string;
 	declare propertyName?: string;
 	types: bundle<ViewType<T>> = EMPTY.object;
-	
-	abstract get conf(): bundle<any>;
-	
+
+	get conf(): bundle<any> {
+		return EMPTY.object;
+	}
+
 	abstract toModel(view: T): content;
 	abstract viewContent(view: T, model: content): void;
 
@@ -29,10 +31,6 @@ export abstract class ViewType<T extends Content> implements ContentType<T> {
 }
 
 export class TextType<T extends View> extends ViewType<T> {
-	$conf: bundle<any>;
-	get conf(): bundle<any> {
-		return this.$conf;
-	}
 	toModel(view: T): string {
 		return view.textContent == CHAR.ZWSP ? "" : view.textContent;
 	}
@@ -42,10 +40,6 @@ export class TextType<T extends View> extends ViewType<T> {
 }
 
 export class ListType<T extends View> extends ViewType<T> {
-	$conf: bundle<any>;
-	get conf(): bundle<any> {
-		return this.$conf;
-	}
 	defaultType: ViewType<T>
 	toModel(view: T): content {
 		let model = [];
@@ -74,11 +68,6 @@ export class ListType<T extends View> extends ViewType<T> {
 }
 
 export class RecordType<T extends View> extends ViewType<T> {
-	$conf: bundle<any>;
-	get conf(): bundle<any> {
-		return this.$conf;
-	}
-
 	toModel(view: T): Record {
 		let model = Object.create(null);
 		model.type$ = this.name;

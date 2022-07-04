@@ -1,6 +1,14 @@
 import {Article, Display} from "../display.js";
 
 import {Command} from "../../base/command.js";
+import { ContentType } from "../../base/content.js";
+import { View } from "../../base/view.js";
+import { content } from "../../base/model.js";
+
+export interface EditorType extends ContentType<View> {
+	owner: Article;
+	edit(commandName: string, range: Range, content?: content): Range;
+}
 
 export abstract class ViewCommand extends Command<Range> {
 	constructor(owner: Article, name: string, view: Display) {
@@ -39,7 +47,7 @@ export abstract class ViewCommand extends Command<Range> {
 function replace(range: Range, markup: string) {
 	let view = Display.getView(range);
 	let type = view.view_type;
-	view = type.owner.createView(type);
+	view = type.owner.createView(type) as Display;
 	view.innerHTML = markup;
 	
 	range.deleteContents();

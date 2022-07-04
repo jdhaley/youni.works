@@ -4,6 +4,7 @@ import {TextType, View} from "../../base/view.js";
 import {Frame} from "../ui.js";
 import {Article, Display} from "../display.js";
 import {ViewCommand, mark} from "./edit.js";
+import { bundle } from "../../base/util.js";
 
 class TextView extends Display {
 	constructor() {
@@ -15,6 +16,11 @@ customElements.define("ui-text", TextView);
 export class TextEditor extends TextType<View> {
 	readonly tagName = "ui-text";
 	declare owner: Article;
+
+	get conf(): bundle<any> {
+		return this;
+	}
+
 	edit(commandName: string, range: Range, replacement?: content): Range {
 		throw new Error("Method not implemented.");
 	}

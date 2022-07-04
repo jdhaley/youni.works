@@ -3,6 +3,7 @@ import {RecordType, View} from "../../base/view.js";
 import {Frame} from "../ui.js";
 import {ViewCommand, mark} from "./edit.js";
 import {Article, Display} from "../display.js";
+import { bundle } from "../../base/util.js";
 
 class RecordView extends Display {
 	constructor() {
@@ -15,6 +16,10 @@ customElements.define("ui-record", RecordView);
 export class RecordEditor extends RecordType<View> {
 	readonly tagName = "ui-record";
 	declare owner: Article;
+
+	get conf(): bundle<any> {
+		return this;
+	}
 	edit(commandName: string, range: Range, record: Record): Range {
 		let view = Display.getView(range);
 		if (view.view_type instanceof RecordType) {

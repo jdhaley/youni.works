@@ -4,6 +4,7 @@ import {ListType, View} from "../../base/view.js";
 import {Frame} from "../ui.js";
 import {ViewCommand, mark} from "./edit.js";
 import {Article, Display} from "../display.js";
+import { bundle } from "../../base/util.js";
 
 class ListView extends Display {
 	constructor() {
@@ -15,6 +16,10 @@ customElements.define("ui-list", ListView);
 export class ListEditor extends ListType<View> {
 	readonly tagName = "ui-list";
 	declare owner: Article;
+
+	get conf(): bundle<any> {
+		return this;
+	}
 	edit(commandName: string, range: Range, content?: content): Range {
 		let view = Display.getView(range);
 		if (view.view_type instanceof ListType) {

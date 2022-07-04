@@ -15,7 +15,6 @@ export interface DisplayConf {
 	tagName: string;
 	controller: Controller;
 	shortcuts: bundle<string>
-	//[key: string]: any;
 }
 
 	//owner: ContentOwner<V>;
@@ -24,7 +23,7 @@ export interface DisplayConf {
 	// types: bundle<ContentType<V>>;
 	// conf: bundle<any>;
 
-export abstract class DisplayType extends ViewType<Display> implements DisplayConf {
+abstract class DisplayType extends ViewType<Display> implements DisplayConf {
 	declare owner: Article;
 	declare shortcuts: bundle<string>
 	tagName: string;
@@ -83,7 +82,7 @@ let NEXT_ID = 1;
 function getShortcuts(view: Display) {
 	if (view.$shortcuts) return view.$shortcuts;
 	while (view) {
-		let shortcuts = view.type$.shortcuts; //TODO - view.type$?.conf?.shortcuts;
+		let shortcuts = view.type$.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
 		if (shortcuts) return shortcuts;
 		view = view.partOf as Display;
 	}
@@ -109,25 +108,10 @@ export class Display extends HtmlView {
 		let view = type.owner.createView(type);
 		let frag = range.cloneContents();
 		while (frag.firstChild) view.append(frag.firstChild);
-		return view;
+		return view as Display;
 	}
 
-	constructor() {
-		super();
-	}
-	declare type$: DisplayType;
 	$shortcuts: bundle<string>;
-
-	get view_model() {
-		return this.view_type?.toModel(this);
-	}
-	get view_type() {
-		if (!this.type$) this.connectedCallback();
-		return this.type$;
-	}
-	get view_controller(): Controller {
-		return this.type$.controller;
-	}
 
 	connectedCallback() {
 		super.connectedCallback();

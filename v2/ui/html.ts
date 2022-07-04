@@ -1,8 +1,9 @@
 import {View, ViewType} from "../base/view.js";
-import {Signal} from "../base/controller.js";
+import {Controller, Signal} from "../base/controller.js";
 
 export class HtmlView extends HTMLElement implements View {
 	type$: ViewType<HtmlView>
+
 	get partOf(): HtmlView {
 		return this.parentElement as HtmlView;
 	}
@@ -15,6 +16,17 @@ export class HtmlView extends HTMLElement implements View {
 	get markupContent(): string {
 		return this.innerHTML;
 	}
+	get view_type() {
+		if (!this.type$) this.connectedCallback();
+		return this.type$;
+	}
+	get view_model() {
+		return this.view_type?.toModel(this);
+	}
+	get view_controller(): Controller {
+		return this.view_type?.conf.controller;
+	}
+
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
 		while (subject) try {
@@ -56,12 +68,5 @@ export class HtmlView extends HTMLElement implements View {
 			return;
 		}
 		this.type$ = this.partOf.type$.types[typeName];
-	}
-	get view_type() {
-		if (!this.type$) this.connectedCallback();
-		return this.type$;
-	}
-	get view_controller() {
-		return undefined;
 	}
 }
