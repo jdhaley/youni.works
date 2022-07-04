@@ -1,10 +1,22 @@
-import {Article} from "../display.js";
-
 import {content, ContentType} from "../../base/model.js";
 import {Command} from "../../base/command.js";
 import {View} from "../../base/view.js";
 import { getView, HtmlView } from "../../base/html.js";
 import { bundle } from "../../base/util.js";
+import { Article } from "../ui.js";
+
+let NEXT_ID = 1;
+
+export class EditorView extends HtmlView {
+	$shortcuts: bundle<string>;
+
+	connectedCallback() {
+		super.connectedCallback();
+		if (!this.id) this.id = "" + NEXT_ID++;
+		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
+	}
+}
+
 
 export interface EditorType extends ContentType<View> {
 	owner: Article;
@@ -105,24 +117,11 @@ export function unmark(range: Range) {
 	}	
 }
 
-let NEXT_ID = 1;
-
-export class Display extends HtmlView {
-
-	$shortcuts: bundle<string>;
-
-	connectedCallback() {
-		super.connectedCallback();
-		if (!this.id) this.id = "" + NEXT_ID++;
-		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
-	}
-}
-
-function getShortcuts(view: Display) {
+function getShortcuts(view: EditorView) {
 	if (view.$shortcuts) return view.$shortcuts;
 	while (view) {
 		let shortcuts = view.type$.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
 		if (shortcuts) return shortcuts;
-		view = view.container as Display;
+		view = view.container as EditorView;
 	}
 }

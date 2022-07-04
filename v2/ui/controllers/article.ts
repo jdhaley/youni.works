@@ -1,8 +1,7 @@
 import {Response} from "../../base/message.js";
 import {extend} from "../../base/util.js";
 
-import {UserEvent} from "../ui.js";
-import {Article} from "../display.js";
+import {Article, UserEvent} from "../ui.js";
 
 //import view from "./view.js";
 

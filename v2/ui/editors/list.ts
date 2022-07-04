@@ -1,13 +1,12 @@
 import {content} from "../../base/model.js";
 import {ListType, View} from "../../base/view.js";
 
-import {Frame} from "../ui.js";
-import {ViewCommand, mark, Display} from "./edit.js";
-import {Article} from "../display.js";
+import {Frame, Article} from "../ui.js";
+import {ViewCommand, mark, EditorView} from "./edit.js";
 import { bundle } from "../../base/util.js";
 import { getView, toView } from "../../base/html.js";
 
-class ListView extends Display {
+class ListView extends EditorView {
 	constructor() {
 		super();
 	}
@@ -111,11 +110,11 @@ function startEdit(cmd: ListCommand, range: Range) {
 	if (end) cmd.endId = end.id;
 }
 
-function getChildView(ctx: Node, node: Node): Display {
+function getChildView(ctx: Node, node: Node): EditorView {
 	while (node && node.parentElement != ctx) {
 		node = node.parentElement;
 	}
-	if (node instanceof Display) return node;
+	if (node instanceof EditorView) return node;
 
 	throw new Error("Cant extend() marked range");
 }
@@ -167,7 +166,7 @@ function getChildView(ctx: Node, node: Node): Display {
 // 	return markupText;
 // }
 
-function getStartContent(range: Range): Display {
+function getStartContent(range: Range): EditorView {
 	if (range.startContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.startContainer);
 		let type = view.view_type;
@@ -177,13 +176,13 @@ function getStartContent(range: Range): Display {
 		let vw = toView(range);
 		console.log("start content:", vw.textContent)
 		let content = vw.view_model;
-		view = view.cloneNode(false) as Display;
+		view = view.cloneNode(false) as EditorView;
 		type.viewContent(view, content);
 		return view;
 	}
 	return null;
 }
-function getEndContent(range: Range): Display {
+function getEndContent(range: Range): EditorView {
 	if (range.endContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.endContainer);
 		let type = view.view_type;
@@ -194,7 +193,7 @@ function getEndContent(range: Range): Display {
 		let vw = toView(range);
 		console.log("end content:", vw.textContent)
 		let content = vw.view_model;
-		view = view.cloneNode(false) as Display;
+		view = view.cloneNode(false) as EditorView;
 		type.viewContent(view, content);
 		return view;
 	}
