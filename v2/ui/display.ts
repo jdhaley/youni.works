@@ -3,12 +3,13 @@ import {RemoteFileService} from "../base/remote.js";
 import {Controller} from "../base/controller.js";
 
 import {content} from "../base/model.js";
-import {ContentOwner, ViewType} from "../base/content.js";
+import {ContentOwner} from "../base/content.js";
 import {bundle, EMPTY} from "../base/util.js";
 import {loadTypes} from "../base/loader.js";
 
 import {HtmlView} from "./html.js";
 import {Frame} from "./ui.js";
+import { ViewType } from "../base/view.js";
 
 export interface DisplayConf {
 	tagName: string;

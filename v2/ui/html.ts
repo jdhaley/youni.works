@@ -1,4 +1,4 @@
-import {View, ViewType} from "../base/content.js";
+import {View, ViewType} from "../base/view.js";
 import {Signal} from "../base/controller.js";
 
 export class HtmlView extends HTMLElement implements View {

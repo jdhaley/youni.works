@@ -1,5 +1,5 @@
 import {content} from "../../base/model.js";
-import {TextType, View} from "../../base/content.js";
+import {TextType, View} from "../../base/view.js";
 
 import {Frame} from "../ui.js";
 import {Article, Display} from "../display.js";
