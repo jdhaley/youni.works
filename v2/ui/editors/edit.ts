@@ -1,13 +1,13 @@
 import {content, ContentType} from "../../base/model.js";
 import {Command} from "../../base/command.js";
-import {View} from "../../base/view.js";
-import { getView, HtmlView } from "../../base/html.js";
-import { bundle } from "../../base/util.js";
+import {getView, Display} from "../../base/display.js";
+import {bundle} from "../../base/util.js";
+
 import { Article } from "../ui.js";
 
 let NEXT_ID = 1;
 
-export class EditorView extends HtmlView {
+export class EditorView extends Display {
 	$shortcuts: bundle<string>;
 
 	connectedCallback() {
@@ -17,8 +17,7 @@ export class EditorView extends HtmlView {
 	}
 }
 
-
-export interface EditorType extends ContentType<View> {
+export interface EditorType extends ContentType<Display> {
 	owner: Article;
 	edit(commandName: string, range: Range, content?: content): Range;
 }

@@ -1,10 +1,10 @@
 import {content} from "../../base/model.js";
 import {ListType, View} from "../../base/view.js";
+import {getView, toView} from "../../base/display.js";
+import {bundle} from "../../base/util.js";
 
 import {Frame, Article} from "../ui.js";
 import {ViewCommand, mark, EditorView} from "./edit.js";
-import { bundle } from "../../base/util.js";
-import { getView, toView } from "../../base/html.js";
 
 class ListView extends EditorView {
 	constructor() {

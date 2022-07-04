@@ -1,6 +1,6 @@
 import {CommandBuffer} from "../base/command.js";
 import {Signal, Controller, Owner, Receiver} from "../base/controller.js";
-import {HtmlView} from "../base/html.js";
+import {Display} from "../base/display.js";
 import {loadTypes} from "../base/loader.js";
 import {content} from "../base/model.js";
 import {RemoteFileService} from "../base/remote.js";
@@ -10,9 +10,9 @@ import {ViewOwner, ViewType} from "../base/view.js";
 export interface UiElement extends HTMLElement, Receiver {
 	$shortcuts?: bundle<string>;
 }
-type UiType = ViewType<HtmlView>;
+type UiType = ViewType<Display>;
 
-export class Article extends ViewOwner<HtmlView> {
+export class Article extends ViewOwner<Display> {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.frame = frame;
@@ -25,11 +25,11 @@ export class Article extends ViewOwner<HtmlView> {
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 	type: UiType;
-	view: HtmlView;
+	view: Display;
 	model: content;
 
-	createView(type: ViewType<HtmlView>): HtmlView {
-		let view = this.frame.create(type.conf.tagName) as HtmlView;
+	createView(type: ViewType<Display>): Display {
+		let view = this.frame.create(type.conf.tagName) as Display;
 		view.type$ = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;

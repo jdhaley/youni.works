@@ -1,6 +1,5 @@
-import {View, ViewOwner, ViewType} from "./view.js";
+import {View, ViewType} from "./view.js";
 import {Controller, Signal} from "./controller.js";
-import { bundle, EMPTY } from "./util.js";
 
 export interface Entity<T> {
 	getAttribute(name: string): T;
@@ -13,21 +12,21 @@ export interface Markup {
 	markup: string;
 }
 
-export class HtmlView extends HTMLElement implements View, Markup, Entity<string> {
-	type$: ViewType<HtmlView>
+export class Display extends HTMLElement implements View /*, Markup*/, Entity<string> {
+	type$: ViewType<Display>
 
-	get container(): HtmlView {
-		return this.parentElement as HtmlView;
+	get container(): Display {
+		return this.parentElement as Display;
 	}
-	get content(): Iterable<HtmlView> {
-		return this.children as Iterable<HtmlView>;
+	get content(): Iterable<Display> {
+		return this.children as Iterable<Display>;
 	}
-	get markup(): string {
-		return this.outerHTML;
-	}
-	get markupContent(): string {
-		return this.innerHTML;
-	}
+	// get markup(): string {
+	// 	return this.outerHTML;
+	// }
+	// get markupContent(): string {
+	// 	return this.innerHTML;
+	// }
 	get view_type() {
 		if (!this.type$) this.connectedCallback();
 		return this.type$;
@@ -83,18 +82,14 @@ export class HtmlView extends HTMLElement implements View, Markup, Entity<string
 	}
 }
 
-export function getView(node: Node | Range): HtmlView {
+export function getView(node: Node | Range): Display {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node instanceof HtmlView) return node as HtmlView;
+		if (node instanceof Display) return node as Display;
 		node = node.parentElement;
 	}
 }
-export function toView(range: Range): HtmlView {
-	// let view = View.getView(range);
-	// let type = view?.view_type;
-	// view = view.cloneNode(false) as View;
-	// view.type$ = type; //cloneing a view doesn't reproduce custom properties.
+export function toView(range: Range): Display {
 	let type = getView(range)?.view_type;
 	let view = type.owner.createView(type);
 	let frag = range.cloneContents();
