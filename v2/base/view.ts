@@ -1,47 +1,72 @@
-import { Content, ContentOwner, ContentType, Entity } from "./content.js";
-import { content, List, Record, Type, viewType } from "./model.js";
-import { bundle, CHAR, EMPTY } from "./util.js";
+import {Owner, Receiver} from "./controller.js";
+import {Content, content, ContentType, List, Record, Type, typeOf} from "./model.js";
+import {bundle, CHAR, EMPTY} from "./util.js";
 
-export interface View extends Content, Entity {
+// export interface Entity {
+// 	getAttribute(name: string): string;
+// 	setAttribute(name: string, value: string): void;
+// 	removeAttribute(name: string): void;
+// }
+
+export abstract class ViewOwner<V extends View> extends Owner<V> {
+	unknownType: ContentType<V>;
+	types: bundle<ContentType<V>>;
+	abstract createView(type: ContentType<V>): V
+
+	getPartOf(part: V): V {
+		return part?.partOf as V;
+	}
+	getPartsOf(part: V): Iterable<V> {
+		return (part?.content || EMPTY.array) as Iterable<V>
+	}
+	getControlOf(part: V): Receiver {
+		return part?.receive ? part : null;
+	}
+}
+
+export interface View extends Content, Receiver {
+	partOf?: View
+	// markupContent: string;
+	// markup: string;
 	append(...content: any): void;
 	view_type: ViewType<View>
 }
 
-export abstract class ViewType<T extends Content> implements ContentType<T> {
-	owner: ContentOwner<T>;
+export abstract class ViewType<V extends View> implements ContentType<V> {
+	owner: ViewOwner<V>;
 	declare name: string;
 	declare propertyName?: string;
-	types: bundle<ViewType<T>> = EMPTY.object;
+	types: bundle<ViewType<V>> = EMPTY.object;
 
 	get conf(): bundle<any> {
 		return EMPTY.object;
 	}
 
-	abstract toModel(view: T): content;
-	abstract viewContent(view: T, model: content): void;
+	abstract toModel(view: V): content;
+	abstract viewContent(view: V, model: content): void;
 
 	generalizes(type: Type): boolean {
 		return type == this;
 	}
-	toView(model: content): T {
+	toView(model: content): V {
 		let view = this.owner.createView(this);
 		this.viewContent(view, model);
 		return view;
 	}
 }
 
-export class TextType<T extends View> extends ViewType<T> {
-	toModel(view: T): string {
+export class TextType<V extends View> extends ViewType<V> {
+	toModel(view: V): string {
 		return view.textContent == CHAR.ZWSP ? "" : view.textContent;
 	}
-	viewContent(view: T, model: string): void {
+	viewContent(view: V, model: string): void {
 		view.textContent = model || CHAR.ZWSP;
 	}
 }
 
-export class ListType<T extends View> extends ViewType<T> {
-	defaultType: ViewType<T>
-	toModel(view: T): content {
+export class ListType<V extends View> extends ViewType<V> {
+	defaultType: ViewType<V>
+	toModel(view: V): content {
 		let model = [];
 		if (this.name) model["type$"] = this.name;
 
@@ -53,22 +78,22 @@ export class ListType<T extends View> extends ViewType<T> {
 		}
 		return model.length ? model : undefined;
 	}
-	viewContent(view: T, model: List): void {
+	viewContent(view: V, model: List): void {
 		// let level = view.getAttribute("aria-level") as any * 1 || 0;
 		// level++;
 		view.textContent = "";
 		if (model && model[Symbol.iterator]) for (let value of model) {
 			let type = this.types[viewType(value)] || this.defaultType;
 			let child = type.toView(value);
-			child.setAttribute("data-type", type.name);
+		//	child.setAttribute("data-type", type.name);
 			view.append(child);
 		}
 		if (!view.textContent) view.append(CHAR.ZWSP);
 	}
 }
 
-export class RecordType<T extends View> extends ViewType<T> {
-	toModel(view: T): Record {
+export class RecordType<V extends View> extends ViewType<V> {
+	toModel(view: V): Record {
 		let model = Object.create(null);
 		model.type$ = this.name;
 		for (let child of this.owner.getPartsOf(view)) {
@@ -80,7 +105,7 @@ export class RecordType<T extends View> extends ViewType<T> {
 		}
 		return model;
 	}
-	viewContent(view: T, model: Record): void {
+	viewContent(view: V, model: Record): void {
 		view.textContent = "";
 		for (let name in this.types) {
 			let type = this.types[name];
@@ -92,7 +117,20 @@ export class RecordType<T extends View> extends ViewType<T> {
 		}
 		if (!view.textContent) view.textContent = CHAR.ZWSP;
 	}
-	viewMember(type: ViewType<T>, value: content): T {
+	viewMember(type: ViewType<V>, value: content): V {
 		return type.toView(value as content);
+	}
+}
+
+export function viewType(value: any): string {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+		case "date":
+			return "text";
+		default:
+			return type;
 	}
 }

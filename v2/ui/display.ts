@@ -3,13 +3,12 @@ import {RemoteFileService} from "../base/remote.js";
 import {Controller} from "../base/controller.js";
 
 import {content} from "../base/model.js";
-import {ContentOwner} from "../base/content.js";
 import {bundle, EMPTY} from "../base/util.js";
 import {loadTypes} from "../base/loader.js";
+import {ViewOwner, ViewType} from "../base/view.js";
 
 import {HtmlView} from "./html.js";
 import {Frame} from "./ui.js";
-import { ViewType } from "../base/view.js";
 
 export interface DisplayConf {
 	tagName: string;
@@ -38,7 +37,7 @@ abstract class DisplayType extends ViewType<Display> implements DisplayConf {
 	}
 }
 
-export class Article extends ContentOwner<Display> {
+export class Article extends ViewOwner<Display> {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.frame = frame;

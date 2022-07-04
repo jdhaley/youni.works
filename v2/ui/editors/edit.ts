@@ -1,9 +1,8 @@
 import {Article, Display} from "../display.js";
 
+import {content, ContentType} from "../../base/model.js";
 import {Command} from "../../base/command.js";
-import { ContentType } from "../../base/content.js";
-import { View } from "../../base/view.js";
-import { content } from "../../base/model.js";
+import {View} from "../../base/view.js";
 
 export interface EditorType extends ContentType<View> {
 	owner: Article;

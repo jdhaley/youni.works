@@ -7,7 +7,7 @@ export class HtmlView extends HTMLElement implements View {
 	get partOf(): HtmlView {
 		return this.parentElement as HtmlView;
 	}
-	get parts(): Iterable<HtmlView> {
+	get content(): Iterable<HtmlView> {
 		return this.children as Iterable<HtmlView>;
 	}
 	get markup(): string {

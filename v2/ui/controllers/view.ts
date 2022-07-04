@@ -1,10 +1,10 @@
+import {content} from "../../base/model.js";
+import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
+
 import {Display} from "../display.js";
 import {UserEvent} from "../ui.js";
-import {content, viewType} from "../../base/model.js";
-
 import {EditorType} from "../editors/edit.js";
-
 
 let UNDONE = false;
 
