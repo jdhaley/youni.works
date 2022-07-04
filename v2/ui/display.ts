@@ -7,7 +7,7 @@ import {bundle, EMPTY} from "../base/util.js";
 import {loadTypes} from "../base/loader.js";
 import {ViewOwner, ViewType} from "../base/view.js";
 
-import {HtmlView} from "./html.js";
+import {HtmlView} from "../base/html.js";
 import {Frame} from "./ui.js";
 
 export interface DisplayConf {
@@ -83,7 +83,7 @@ function getShortcuts(view: Display) {
 	while (view) {
 		let shortcuts = view.type$.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
 		if (shortcuts) return shortcuts;
-		view = view.partOf as Display;
+		view = view.container as Display;
 	}
 }
 

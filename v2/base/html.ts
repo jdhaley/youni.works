@@ -1,10 +1,21 @@
-import {View, ViewType} from "../base/view.js";
-import {Controller, Signal} from "../base/controller.js";
+import {View, ViewType} from "./view.js";
+import {Controller, Signal} from "./controller.js";
 
-export class HtmlView extends HTMLElement implements View {
+export interface Entity {
+	getAttribute(name: string): string;
+	setAttribute(name: string, value: string): void;
+	removeAttribute(name: string): void;
+}
+
+export interface Markup extends View, Entity {
+	markupContent: string;
+	markup: string;
+}
+
+export class HtmlView extends HTMLElement implements Markup {
 	type$: ViewType<HtmlView>
 
-	get partOf(): HtmlView {
+	get container(): HtmlView {
 		return this.parentElement as HtmlView;
 	}
 	get content(): Iterable<HtmlView> {
@@ -67,6 +78,6 @@ export class HtmlView extends HTMLElement implements View {
 			}
 			return;
 		}
-		this.type$ = this.partOf.type$.types[typeName];
+		this.type$ = this.container.type$.types[typeName];
 	}
 }

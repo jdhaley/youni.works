@@ -2,19 +2,13 @@ import {Owner, Receiver} from "./controller.js";
 import {Content, content, ContentType, List, Record, Type, typeOf} from "./model.js";
 import {bundle, CHAR, EMPTY} from "./util.js";
 
-// export interface Entity {
-// 	getAttribute(name: string): string;
-// 	setAttribute(name: string, value: string): void;
-// 	removeAttribute(name: string): void;
-// }
-
 export abstract class ViewOwner<V extends View> extends Owner<V> {
 	unknownType: ContentType<V>;
 	types: bundle<ContentType<V>>;
 	abstract createView(type: ContentType<V>): V
 
 	getPartOf(part: V): V {
-		return part?.partOf as V;
+		return part?.container as V;
 	}
 	getPartsOf(part: V): Iterable<V> {
 		return (part?.content || EMPTY.array) as Iterable<V>
@@ -25,9 +19,7 @@ export abstract class ViewOwner<V extends View> extends Owner<V> {
 }
 
 export interface View extends Content, Receiver {
-	partOf?: View
-	// markupContent: string;
-	// markup: string;
+	container?: View
 	append(...content: any): void;
 	view_type: ViewType<View>
 }
