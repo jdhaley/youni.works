@@ -18,6 +18,12 @@ export interface DisplayConf {
 	//[key: string]: any;
 }
 
+	//owner: ContentOwner<V>;
+	// name: string;
+	// propertyName?: string;
+	// types: bundle<ContentType<V>>;
+	// conf: bundle<any>;
+
 export abstract class DisplayType extends ViewType<Display> implements DisplayConf {
 	declare owner: Article;
 	declare shortcuts: bundle<string>

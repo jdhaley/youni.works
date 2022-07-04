@@ -1,6 +1,6 @@
 import {Part, PartOwner} from "./controller.js";
-import {content, List, Record, Type, viewType} from "./model.js";
-import {bundle, CHAR, EMPTY} from "./util.js";
+import {content, Type} from "./model.js";
+import {bundle} from "./util.js";
 
 export interface Content extends Part {
 	type$: ContentType<Content>;
@@ -16,11 +16,6 @@ export interface Entity {
 }
 
 export interface ContentType<V extends Content> extends Type {
-	//owner: ContentOwner<V>;
-	// name: string;
-	// propertyName?: string;
-	// types: bundle<ContentType<V>>;
-	// conf: bundle<any>;
 	generalizes(type: Type): boolean;
 	toView(model: content): V;
 	toModel(view: V): content;
