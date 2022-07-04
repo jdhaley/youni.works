@@ -9,11 +9,39 @@ export interface Content extends Part {
 	markup: string;
 }
 
-export abstract class ContentType<T extends Content> implements Type {
+export interface Entity {
+	getAttribute(name: string): string;
+	setAttribute(name: string, value: string): void;
+	removeAttribute(name: string): void;
+}
+
+export interface ContentType<V extends Content> extends Type {
+	//owner: ContentOwner<V>;
+	// name: string;
+	// propertyName?: string;
+	// types: bundle<ContentType<V>>;
+	// conf: bundle<any>;
+	generalizes(type: Type): boolean;
+	toView(model: content): V;
+	toModel(view: V): content;
+}
+
+export abstract class ContentOwner<V extends Content> extends PartOwner<V> {
+	unknownType: ContentType<V>;
+	types: bundle<ContentType<V>>;
+	abstract createView(type: ContentType<V>): V
+}
+
+export interface View extends Content, Entity {
+	append(...content: any): void;
+	view_type: ViewType<View>
+}
+
+export abstract class ViewType<T extends Content> implements ContentType<T> {
 	owner: ContentOwner<T>;
 	declare name: string;
 	declare propertyName?: string;
-	types: bundle<ContentType<T>> = EMPTY.object;
+	types: bundle<ViewType<T>> = EMPTY.object;
 	
 	abstract get conf(): bundle<any>;
 	
@@ -30,24 +58,7 @@ export abstract class ContentType<T extends Content> implements Type {
 	}
 }
 
-export abstract class ContentOwner<T extends Content> extends PartOwner<T> {
-	unknownType: ContentType<T>;
-	types: bundle<ContentType<T>>;
-	abstract createView(type: ContentType<T>): T
-}
-
-export interface Entity {
-	getAttribute(name: string): string;
-	setAttribute(name: string, value: string): void;
-	removeAttribute(name: string): void;
-}
-
-export interface View extends Content, Entity {
-	append(...content: any): void;
-	view_type: ContentType<View>
-}
-
-export class TextType<T extends View> extends ContentType<T> {
+export class TextType<T extends View> extends ViewType<T> {
 	$conf: bundle<any>;
 	get conf(): bundle<any> {
 		return this.$conf;
@@ -60,12 +71,12 @@ export class TextType<T extends View> extends ContentType<T> {
 	}
 }
 
-export class ListType<T extends View> extends ContentType<T> {
+export class ListType<T extends View> extends ViewType<T> {
 	$conf: bundle<any>;
 	get conf(): bundle<any> {
 		return this.$conf;
 	}
-	defaultType: ContentType<T>
+	defaultType: ViewType<T>
 	toModel(view: T): content {
 		let model = [];
 		if (this.name) model["type$"] = this.name;
@@ -92,7 +103,7 @@ export class ListType<T extends View> extends ContentType<T> {
 	}
 }
 
-export class RecordType<T extends View> extends ContentType<T> {
+export class RecordType<T extends View> extends ViewType<T> {
 	$conf: bundle<any>;
 	get conf(): bundle<any> {
 		return this.$conf;
@@ -122,7 +133,7 @@ export class RecordType<T extends View> extends ContentType<T> {
 		}
 		if (!view.textContent) view.textContent = CHAR.ZWSP;
 	}
-	viewMember(type: ContentType<T>, value: content): T {
+	viewMember(type: ViewType<T>, value: content): T {
 		return type.toView(value as content);
 	}
 }

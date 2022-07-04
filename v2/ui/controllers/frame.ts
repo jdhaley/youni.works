@@ -59,7 +59,7 @@ export default {
             event.track = priorEvent.track;
             event.moveX = event.x - priorEvent.x;
             event.moveY = event.y - priorEvent.y;
-            event.track.type$.owner.send(event, event.track);
+            ownerOf(event.track).send(event, event.track);
             TRACK = event;
             return;
         } else {
@@ -84,7 +84,7 @@ export default {
             event.track = priorEvent.track;
             event.moveX = 0;
             event.moveY = 0;
-            event.track.type$.owner.send(event, event.track);
+            ownerOf(event.track).send(event, event.track);
             TRACK = null;
             return;
         }
@@ -134,7 +134,7 @@ function rangeEvent(event: UserEvent) {
 
 function sense(event: UserEvent) {
     let source = viewOf(event.source || event.target as Node);
-    if (source?.type$) {
+    if (source) {
         event.frame = ownerOf(source);
         event.source = source;
         event.from = ownerOf(event.target as Node);
@@ -142,7 +142,7 @@ function sense(event: UserEvent) {
         if (!event.subject) event.subject = event.type;
  
         event.stopPropagation();
-        source.type$?.owner.sense(event, source);
+        event.frame.sense(event, source);
         if (!event.subject) event.preventDefault();    
     }
 }
@@ -161,16 +161,3 @@ export function ownerOf(node: Node | Range): Frame  {
 	if (node instanceof Document) return node["$owner"];
 	return (node as Node).ownerDocument["$owner"];
 }
-// function sense(event: UserEvent) {
-//     event.selection = (ownerOf(event.target as Node) as Frame).selectionRange;
-//     let ctl = controlOf(event.selection.commonAncestorContainer) as Display;
-//     if (ctl) {
-//         event.stopPropagation();
-//         event.direction = "up";
-//         event.from = ctl;
-//         event.source = ctl;
-//         if (!event.subject) event.subject = event.type;
-//         ctl.sense(event);
-//         if (!event.subject) event.preventDefault();    
-//     }
-// }

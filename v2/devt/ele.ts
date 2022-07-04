@@ -1,5 +1,5 @@
 import {Controller, Signal} from "../base/controller.js";
-import {Content, ContentType} from "../base/content.js";
+import {Content, ViewType} from "../base/content.js";
 
 interface Document {
 	//createElementNS(namespace, name);

@@ -3,7 +3,7 @@ import {RemoteFileService} from "../base/remote.js";
 import {Controller} from "../base/controller.js";
 
 import {content} from "../base/model.js";
-import {ContentOwner, ContentType} from "../base/content.js";
+import {ContentOwner, ViewType} from "../base/content.js";
 import {bundle, EMPTY} from "../base/util.js";
 import {loadTypes} from "../base/loader.js";
 
@@ -17,7 +17,7 @@ export interface DisplayConf {
 	//[key: string]: any;
 }
 
-export abstract class DisplayType extends ContentType<Display> implements DisplayConf {
+export abstract class DisplayType extends ViewType<Display> implements DisplayConf {
 	declare owner: Article;
 	declare shortcuts: bundle<string>
 	tagName: string;

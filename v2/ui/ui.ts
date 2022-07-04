@@ -1,8 +1,7 @@
-import {Content} from "../base/content.js";
 import {Signal, Controller, Owner, Receiver} from "../base/controller.js";
 import {bundle} from "../base/util";
 
-export interface UiElement extends HTMLElement, Content {
+export interface UiElement extends HTMLElement, Receiver {
 	$shortcuts?: bundle<string>;
 }
 
@@ -63,7 +62,7 @@ export class Frame extends Owner<UiElement> {
 		return value.children as Iterable<UiElement>;
 	}
 	getControlOf(value: UiElement): Receiver {
-		return value;
+		return value.receive ? value : null;
 	}
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);

@@ -1,8 +1,8 @@
-import {View, ContentType} from "../base/content.js";
+import {View, ViewType} from "../base/content.js";
 import {Signal} from "../base/controller.js";
 
 export class HtmlView extends HTMLElement implements View {
-	type$: ContentType<HtmlView>
+	type$: ViewType<HtmlView>
 	get partOf(): HtmlView {
 		return this.parentElement as HtmlView;
 	}
