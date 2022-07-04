@@ -1,33 +1,15 @@
 import {CommandBuffer} from "../base/command.js";
 import {RemoteFileService} from "../base/remote.js";
 import {Controller} from "../base/controller.js";
-
 import {content} from "../base/model.js";
+import {ViewOwner, ViewType} from "../base/view.js";
+import {HtmlView} from "../base/html.js";
 import {bundle, EMPTY} from "../base/util.js";
 import {loadTypes} from "../base/loader.js";
-import {ViewOwner, ViewType} from "../base/view.js";
 
-import {HtmlView} from "../base/html.js";
 import {Frame} from "./ui.js";
 
-export interface DisplayConf {
-	tagName: string;
-	controller: Controller;
-	shortcuts: bundle<string>
-}
-
-abstract class DisplayType extends ViewType<Display> implements DisplayConf {
-	declare owner: Article;
-	declare shortcuts: bundle<string>
-	tagName: string;
-	controller: Controller = EMPTY.object;
-
-	get conf(): DisplayConf {
-		return this;
-	}
-}
-
-export class Article extends ViewOwner<Display> {
+export class Article extends ViewOwner<HtmlView> {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.frame = frame;
@@ -40,11 +22,11 @@ export class Article extends ViewOwner<Display> {
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 	type: DisplayType;
-	view: Display;
+	view: HtmlView;
 	model: content;
 
-	createView(type: DisplayType): Display {
-		let view = this.frame.create(type.tagName) as Display;
+	createView(type: DisplayType): HtmlView {
+		let view = this.frame.create(type.tagName) as HtmlView;
 		view.type$ = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
@@ -65,25 +47,20 @@ export class Article extends ViewOwner<Display> {
 	}
 }
 
-let NEXT_ID = 1;
-
-export class Display extends HtmlView {
-
-	$shortcuts: bundle<string>;
-
-	connectedCallback() {
-		super.connectedCallback();
-		if (!this.id) this.id = "" + NEXT_ID++;
-		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
-	}
+export interface DisplayConf {
+	tagName: string;
+	controller: Controller;
+	shortcuts: bundle<string>
 }
 
-function getShortcuts(view: Display) {
-	if (view.$shortcuts) return view.$shortcuts;
-	while (view) {
-		let shortcuts = view.type$.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
-		if (shortcuts) return shortcuts;
-		view = view.container as Display;
+abstract class DisplayType extends ViewType<HtmlView> implements DisplayConf {
+	declare owner: Article;
+	declare shortcuts: bundle<string>
+	tagName: string;
+	controller: Controller = EMPTY.object;
+
+	get conf(): DisplayConf {
+		return this;
 	}
 }
 

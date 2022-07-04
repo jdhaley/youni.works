@@ -1,9 +1,10 @@
-import {Article, Display} from "../display.js";
+import {Article} from "../display.js";
 
 import {content, ContentType} from "../../base/model.js";
 import {Command} from "../../base/command.js";
 import {View} from "../../base/view.js";
-import { getView } from "../../base/html.js";
+import { getView, HtmlView } from "../../base/html.js";
+import { bundle } from "../../base/util.js";
 
 export interface EditorType extends ContentType<View> {
 	owner: Article;
@@ -47,7 +48,7 @@ export abstract class ViewCommand extends Command<Range> {
 function replace(range: Range, markup: string) {
 	let view = getView(range);
 	let type = view.view_type;
-	view = type.owner.createView(type) as Display;
+	view = type.owner.createView(type);
 	view.innerHTML = markup;
 	
 	range.deleteContents();
@@ -102,4 +103,26 @@ export function unmark(range: Range) {
 		point.remove();
 		return range;
 	}	
+}
+
+let NEXT_ID = 1;
+
+export class Display extends HtmlView {
+
+	$shortcuts: bundle<string>;
+
+	connectedCallback() {
+		super.connectedCallback();
+		if (!this.id) this.id = "" + NEXT_ID++;
+		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
+	}
+}
+
+function getShortcuts(view: Display) {
+	if (view.$shortcuts) return view.$shortcuts;
+	while (view) {
+		let shortcuts = view.type$.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
+		if (shortcuts) return shortcuts;
+		view = view.container as Display;
+	}
 }

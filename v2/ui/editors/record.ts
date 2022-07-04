@@ -1,8 +1,8 @@
 import {Record} from "../../base/model.js";
 import {RecordType, View} from "../../base/view.js";
 import {Frame} from "../ui.js";
-import {ViewCommand, mark} from "./edit.js";
-import {Article, Display} from "../display.js";
+import {ViewCommand, mark, Display} from "./edit.js";
+import {Article} from "../display.js";
 import { bundle } from "../../base/util.js";
 import { getView, toView } from "../../base/html.js";
 
