@@ -1,10 +1,20 @@
-import { content } from "../../base/model.js";
-import { Frame } from "../ui.js";
-import { TextType } from "../views/text.js";
-import { Article, Display } from "../display.js";
-import { ViewCommand, mark } from "./edit.js";
+import {content} from "../../base/model.js";
+import {TextType, View} from "../../base/content.js";
 
-export class TextEditor extends TextType {
+import {Frame} from "../ui.js";
+import {Article, Display} from "../display.js";
+import {ViewCommand, mark} from "./edit.js";
+
+class TextView extends Display {
+	constructor() {
+		super();
+	}
+}
+customElements.define("ui-text", TextView);
+
+export class TextEditor extends TextType<View> {
+	readonly tagName = "ui-text";
+	declare owner: Article;
 	edit(commandName: string, range: Range, replacement?: content): Range {
 		throw new Error("Method not implemented.");
 	}

@@ -9,5 +9,7 @@ export default {
 	article: article,
 	text: text,
 	record: record,
-	list: list
+	list: list,
+	markup: text,
+	tree: list
 }

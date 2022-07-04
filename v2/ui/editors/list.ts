@@ -1,10 +1,20 @@
+import {content} from "../../base/model.js";
+import {ListType, View} from "../../base/content.js";
+
 import {Frame} from "../ui.js";
 import {ViewCommand, mark} from "./edit.js";
-import {ListType} from "../views/list.js";
 import {Article, Display} from "../display.js";
-import { content } from "../../base/model.js";
 
-export class ListEditor extends ListType {
+class ListView extends Display {
+	constructor() {
+		super();
+	}
+}
+customElements.define("ui-list", ListView);
+
+export class ListEditor extends ListType<View> {
+	readonly tagName = "ui-list";
+	declare owner: Article;
 	edit(commandName: string, range: Range, content?: content): Range {
 		let view = Display.getView(range);
 		if (view.view_type instanceof ListType) {

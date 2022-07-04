@@ -44,6 +44,7 @@ export interface Entity {
 
 export interface View extends Content, Entity {
 	append(...content: any): void;
+	view_type: ContentType<View>
 }
 
 export class TextType<T extends View> extends ContentType<T> {
@@ -71,7 +72,7 @@ export class ListType<T extends View> extends ContentType<T> {
 
 		let parts = this.owner.getPartsOf(view);
 		if (parts) for (let child of parts) {
-			let type = child.type$;
+			let type = child.view_type;
 			//if (!type) throw new Error(`Type "${typeName}" not found.`);
 			model.push(type.toModel(child));
 		}
@@ -101,7 +102,7 @@ export class RecordType<T extends View> extends ContentType<T> {
 		let model = Object.create(null);
 		model.type$ = this.name;
 		for (let child of this.owner.getPartsOf(view)) {
-			let type = child.type$;
+			let type = child.view_type;
 			if (type) {
 				let value = type.toModel(child);
 				if (value) model[type.propertyName] = value;	

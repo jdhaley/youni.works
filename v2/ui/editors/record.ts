@@ -1,10 +1,20 @@
 import {Record} from "../../base/model.js";
+import {RecordType, View} from "../../base/content.js";
 import {Frame} from "../ui.js";
-import {RecordType} from "../views/record.js";
 import {ViewCommand, mark} from "./edit.js";
 import {Article, Display} from "../display.js";
 
-export class RecordEditor extends RecordType {
+class RecordView extends Display {
+	constructor() {
+		super();
+	}
+}
+customElements.define("ui-record", RecordView);
+
+
+export class RecordEditor extends RecordType<View> {
+	readonly tagName = "ui-record";
+	declare owner: Article;
 	edit(commandName: string, range: Range, record: Record): Range {
 		let view = Display.getView(range);
 		if (view.view_type instanceof RecordType) {
