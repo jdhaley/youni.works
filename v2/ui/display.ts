@@ -16,12 +16,6 @@ export interface DisplayConf {
 	shortcuts: bundle<string>
 }
 
-	//owner: ContentOwner<V>;
-	// name: string;
-	// propertyName?: string;
-	// types: bundle<ContentType<V>>;
-	// conf: bundle<any>;
-
 abstract class DisplayType extends ViewType<Display> implements DisplayConf {
 	declare owner: Article;
 	declare shortcuts: bundle<string>
@@ -30,10 +24,6 @@ abstract class DisplayType extends ViewType<Display> implements DisplayConf {
 
 	get conf(): DisplayConf {
 		return this;
-	}
-	
-	edit(commandName: string, range: Range, content?: content): Range {
-		throw new Error("Method not implemented.");
 	}
 }
 
@@ -75,40 +65,9 @@ export class Article extends ViewOwner<Display> {
 	}
 }
 
-const OBSERVED_ATTRIBUTES = [];
 let NEXT_ID = 1;
 
-function getShortcuts(view: Display) {
-	if (view.$shortcuts) return view.$shortcuts;
-	while (view) {
-		let shortcuts = view.type$.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
-		if (shortcuts) return shortcuts;
-		view = view.container as Display;
-	}
-}
-
 export class Display extends HtmlView {
-	static get observedAttributes() {
-		return OBSERVED_ATTRIBUTES;
-	}
-	static getView(node: Node | Range): Display {
-		if (node instanceof Range) node = node.commonAncestorContainer;
-		while (node) {
-			if (node instanceof Display) return node;
-			node = node.parentElement;
-		}
-	}
-	static toView(range: Range): Display {
-		// let view = View.getView(range);
-		// let type = view?.view_type;
-		// view = view.cloneNode(false) as View;
-		// view.type$ = type; //cloneing a view doesn't reproduce custom properties.
-		let type = Display.getView(range)?.view_type;
-		let view = type.owner.createView(type);
-		let frag = range.cloneContents();
-		while (frag.firstChild) view.append(frag.firstChild);
-		return view as Display;
-	}
 
 	$shortcuts: bundle<string>;
 
@@ -117,12 +76,14 @@ export class Display extends HtmlView {
 		if (!this.id) this.id = "" + NEXT_ID++;
 		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
 	}
-	adoptedCallback() {
-		this.connectedCallback();
-	}
-	disconnectedCallback() {
-	}
-	attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+}
+
+function getShortcuts(view: Display) {
+	if (view.$shortcuts) return view.$shortcuts;
+	while (view) {
+		let shortcuts = view.type$.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
+		if (shortcuts) return shortcuts;
+		view = view.container as Display;
 	}
 }
 

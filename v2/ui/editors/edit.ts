@@ -3,6 +3,7 @@ import {Article, Display} from "../display.js";
 import {content, ContentType} from "../../base/model.js";
 import {Command} from "../../base/command.js";
 import {View} from "../../base/view.js";
+import { getView } from "../../base/html.js";
 
 export interface EditorType extends ContentType<View> {
 	owner: Article;
@@ -10,12 +11,12 @@ export interface EditorType extends ContentType<View> {
 }
 
 export abstract class ViewCommand extends Command<Range> {
-	constructor(owner: Article, name: string, view: Display) {
+	constructor(owner: Article, name: string, viewId: string) {
 		super();
 		this.owner = owner;
 		this.name = name;
 		this.timestamp = Date.now();
-		this.viewId = view.id;
+		this.viewId = viewId;
 		owner.commands.add(this);
 	}
 	owner: Article;
@@ -44,7 +45,7 @@ export abstract class ViewCommand extends Command<Range> {
 }
 
 function replace(range: Range, markup: string) {
-	let view = Display.getView(range);
+	let view = getView(range);
 	let type = view.view_type;
 	view = type.owner.createView(type) as Display;
 	view.innerHTML = markup;

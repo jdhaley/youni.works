@@ -5,6 +5,7 @@ import {Frame} from "../ui.js";
 import {Article, Display} from "../display.js";
 import {ViewCommand, mark} from "./edit.js";
 import { bundle } from "../../base/util.js";
+import { toView } from "../../base/html.js";
 
 class TextView extends Display {
 	constructor() {
@@ -27,8 +28,8 @@ export class TextEditor extends TextType<View> {
 }
 
 class TextCommand extends ViewCommand {
-	constructor(owner: Article, name: string, view: Display) {
-		super(owner, name, view);
+	constructor(owner: Article, name: string, viewId: string) {
+		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
 		return selectContents(this.owner.frame, this.viewId);
@@ -59,5 +60,5 @@ function startEdit(cmd: TextCommand, range: Range) {
 	range.selectNodeContents(ctx);
 
 	//Capture the before image for undo.
-	cmd.before = Display.toView(range).innerHTML;	
+	cmd.before = toView(range).innerHTML;	
 }

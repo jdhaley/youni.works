@@ -81,3 +81,22 @@ export class HtmlView extends HTMLElement implements Markup {
 		this.type$ = this.container.type$.types[typeName];
 	}
 }
+
+export function getView(node: Node | Range): HtmlView {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node instanceof HtmlView) return node as HtmlView;
+		node = node.parentElement;
+	}
+}
+export function toView(range: Range): HtmlView {
+	// let view = View.getView(range);
+	// let type = view?.view_type;
+	// view = view.cloneNode(false) as View;
+	// view.type$ = type; //cloneing a view doesn't reproduce custom properties.
+	let type = getView(range)?.view_type;
+	let view = type.owner.createView(type);
+	let frag = range.cloneContents();
+	while (frag.firstChild) view.append(frag.firstChild);
+	return view;
+}

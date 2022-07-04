@@ -2,9 +2,9 @@ import {content} from "../../base/model.js";
 import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
-import {Display} from "../display.js";
 import {UserEvent} from "../ui.js";
 import {EditorType} from "../editors/edit.js";
+import {toView} from "../../base/html.js";
 
 let UNDONE = false;
 
@@ -84,7 +84,7 @@ export default extend(null, {
 });
 
 function setClipboard(type: EditorType, range: Range, clipboard: DataTransfer) {
-	let view = Display.toView(range);
+	let view = toView(range);
 	let model = type.toModel(view);
 	clipboard.setData("application/json", JSON.stringify(model));
 	let html = htmlify(view);

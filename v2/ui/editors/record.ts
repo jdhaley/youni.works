@@ -4,6 +4,7 @@ import {Frame} from "../ui.js";
 import {ViewCommand, mark} from "./edit.js";
 import {Article, Display} from "../display.js";
 import { bundle } from "../../base/util.js";
+import { getView, toView } from "../../base/html.js";
 
 class RecordView extends Display {
 	constructor() {
@@ -21,9 +22,9 @@ export class RecordEditor extends RecordType<View> {
 		return this;
 	}
 	edit(commandName: string, range: Range, record: Record): Range {
-		let view = Display.getView(range);
+		let view = getView(range);
 		if (view.view_type instanceof RecordType) {
-			let cmd = new RecordCommand(this.owner, commandName, view);
+			let cmd = new RecordCommand(this.owner, commandName, view.id);
 			cmd.do(range, record);
 		} else {
 			debugger;
@@ -34,14 +35,14 @@ export class RecordEditor extends RecordType<View> {
 }
 
 class RecordCommand extends ViewCommand {
-	constructor(owner: Article, name: string, view: Display) {
-		super(owner, name, view);
+	constructor(owner: Article, name: string, viewId: string) {
+		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
 		return selectContents(this.owner.frame, this.viewId);
 	}
 	do(range: Range, record: Record) {
-		let view = Display.getView(range);
+		let view = getView(range);
 		startEdit(this, range);
 		range.deleteContents();
 		let model = view.type$.toModel(view) as Record;
@@ -75,5 +76,5 @@ function startEdit(cmd: RecordCommand, range: Range) {
 	mark(range);
 	
 	range = selectContents(cmd.owner.frame, cmd.viewId);
-	cmd.before = Display.toView(range).innerHTML;	
+	cmd.before = toView(range).innerHTML;	
 }

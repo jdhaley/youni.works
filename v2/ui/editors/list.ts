@@ -5,6 +5,7 @@ import {Frame} from "../ui.js";
 import {ViewCommand, mark} from "./edit.js";
 import {Article, Display} from "../display.js";
 import { bundle } from "../../base/util.js";
+import { getView, toView } from "../../base/html.js";
 
 class ListView extends Display {
 	constructor() {
@@ -21,9 +22,9 @@ export class ListEditor extends ListType<View> {
 		return this;
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
-		let view = Display.getView(range);
+		let view = getView(range);
 		if (view.view_type instanceof ListType) {
-			let cmd = new ListCommand(this.owner, commandName, view);
+			let cmd = new ListCommand(this.owner, commandName, view.id);
 			cmd.do(range, content);
 		} else {
 			console.error("Invalid range for edit.");
@@ -33,8 +34,8 @@ export class ListEditor extends ListType<View> {
 }
 
 class ListCommand extends ViewCommand {
-	constructor(owner: Article, name: string, view: Display) {
-		super(owner, name, view);
+	constructor(owner: Article, name: string, viewId: string) {
+		super(owner, name, viewId);
 	}
 	startId: string;
 	endId: string;
@@ -96,7 +97,7 @@ function startEdit(cmd: ListCommand, range: Range) {
 	range.setEndAfter(end);
 
 	//Capture the before image for undo.
-	cmd.before = Display.toView(range).innerHTML;	
+	cmd.before = toView(range).innerHTML;	
 
 	/*
 	Get the items prior to the start/end to identify the id's prior-to-start or
@@ -173,7 +174,7 @@ function getStartContent(range: Range): Display {
 		range = range.cloneRange();
 		range.collapse(true);
 		range.setStart(view, 0);
-		let vw = Display.toView(range);
+		let vw = toView(range);
 		console.log("start content:", vw.textContent)
 		let content = vw.view_model;
 		view = view.cloneNode(false) as Display;
@@ -190,7 +191,7 @@ function getEndContent(range: Range): Display {
 		range = range.cloneRange();
 		range.collapse(false);
 		range.setEnd(view, view.childElementCount);
-		let vw = Display.toView(range);
+		let vw = toView(range);
 		console.log("end content:", vw.textContent)
 		let content = vw.view_model;
 		view = view.cloneNode(false) as Display;
