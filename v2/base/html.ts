@@ -2,18 +2,18 @@ import {View, ViewOwner, ViewType} from "./view.js";
 import {Controller, Signal} from "./controller.js";
 import { bundle, EMPTY } from "./util.js";
 
-export interface Entity {
-	getAttribute(name: string): string;
-	setAttribute(name: string, value: string): void;
+export interface Entity<T> {
+	getAttribute(name: string): T;
+	setAttribute(name: string, value: T): void;
 	removeAttribute(name: string): void;
 }
 
-export interface Markup extends View, Entity {
+export interface Markup {
 	markupContent: string;
 	markup: string;
 }
 
-export class HtmlView extends HTMLElement implements Markup {
+export class HtmlView extends HTMLElement implements View, Markup, Entity<string> {
 	type$: ViewType<HtmlView>
 
 	get container(): HtmlView {
@@ -100,21 +100,4 @@ export function toView(range: Range): HtmlView {
 	let frag = range.cloneContents();
 	while (frag.firstChild) view.append(frag.firstChild);
 	return view;
-}
-
-export interface DisplayConf {
-	tagName: string;
-	controller: Controller;
-	shortcuts: bundle<string>
-}
-
-export abstract class DisplayType extends ViewType<HtmlView> implements DisplayConf {
-	declare owner: ViewOwner<HtmlView>;
-	declare shortcuts: bundle<string>
-	tagName: string;
-	controller: Controller = EMPTY.object;
-
-	get conf(): DisplayConf {
-		return this;
-	}
 }

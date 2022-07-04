@@ -23,6 +23,23 @@ export interface EditorType extends ContentType<View> {
 	edit(commandName: string, range: Range, content?: content): Range;
 }
 
+// export interface DisplayConf {
+// 	tagName: string;
+// 	controller: Controller;
+// 	shortcuts: bundle<string>
+// }
+
+// export abstract class DisplayType extends ViewType<HtmlView> implements DisplayConf {
+// 	declare owner: ViewOwner<HtmlView>;
+// 	declare shortcuts: bundle<string>
+// 	tagName: string;
+// 	controller: Controller = EMPTY.object;
+
+// 	get conf(): DisplayConf 
+// 		return this;
+// 	}
+// }
+
 export abstract class ViewCommand extends Command<Range> {
 	constructor(owner: Article, name: string, viewId: string) {
 		super();

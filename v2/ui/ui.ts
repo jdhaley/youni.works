@@ -1,15 +1,16 @@
 import {CommandBuffer} from "../base/command.js";
 import {Signal, Controller, Owner, Receiver} from "../base/controller.js";
-import {DisplayType, HtmlView} from "../base/html.js";
+import {HtmlView} from "../base/html.js";
 import {loadTypes} from "../base/loader.js";
 import {content} from "../base/model.js";
 import {RemoteFileService} from "../base/remote.js";
 import {bundle, EMPTY} from "../base/util.js";
-import {ViewOwner} from "../base/view.js";
+import {ViewOwner, ViewType} from "../base/view.js";
 
 export interface UiElement extends HTMLElement, Receiver {
 	$shortcuts?: bundle<string>;
 }
+type UiType = ViewType<HtmlView>;
 
 export class Article extends ViewOwner<HtmlView> {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -23,12 +24,12 @@ export class Article extends ViewOwner<HtmlView> {
 	readonly frame: Frame;
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
-	type: DisplayType;
+	type: UiType;
 	view: HtmlView;
 	model: content;
 
-	createView(type: DisplayType): HtmlView {
-		let view = this.frame.create(type.tagName) as HtmlView;
+	createView(type: ViewType<HtmlView>): HtmlView {
+		let view = this.frame.create(type.conf.tagName) as HtmlView;
 		view.type$ = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
@@ -37,19 +38,16 @@ export class Article extends ViewOwner<HtmlView> {
 		}
 		return view;
 	}
-	initTypes(source: bundle<any>, base: bundle<DisplayType>) {
+	initTypes(source: bundle<any>, base: bundle<UiType>) {
 		base = loadBaseTypes(this);
-		this.types = loadTypes(source, base) as bundle<DisplayType>;
+		this.types = loadTypes(source, base) as bundle<UiType>;
 		this.unknownType = this.types[this.conf.unknownType];
-		this.type = this.types[this.conf.type] as DisplayType;
-		this.type.shortcuts = this.conf.shortcuts;
-		// this.type.conf = {
-		// 	shortcuts: this.conf.shortcuts
-		// }
+		this.type = this.types[this.conf.type] as UiType;
+		this.type.conf.shortcuts = this.conf.shortcuts;
 	}
 }
 
-export function loadBaseTypes(owner: Article): bundle<DisplayType> {
+export function loadBaseTypes(owner: Article): bundle<UiType> {
 	if (!owner.conf?.baseTypes) return;
 	let controllers = owner.conf?.controllers || EMPTY.object;
 	let types = Object.create(null);
