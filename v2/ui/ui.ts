@@ -1,14 +1,14 @@
-import {Signal, Controller, Receiver} from "../base/controller.js";
+import {Signal, Controller} from "../base/controller.js";
 import {ViewOwner, ViewType} from "../base/view.js";
 
 export abstract class UiOwner extends ViewOwner<HTMLElement> {
-	getTypeOf(view: HTMLElement): ViewType<HTMLElement> {
+	getControlOf(view: HTMLElement): ViewType<HTMLElement> {
 		let type = view["type$"];
 		if (!type) {
 			type = this.unknownType;
 			let parent = this.getPartOf(view);
 			if (parent) {
-				type = this.getTypeOf(parent);
+				type = this.getControlOf(parent);
 				type = type?.types[view.dataset.name || view.dataset.type] || this.unknownType;
 			}
 			view["type$"] = type;
@@ -29,9 +29,6 @@ export abstract class UiOwner extends ViewOwner<HTMLElement> {
 	}
 	getPartsOf(view: HTMLElement): Iterable<HTMLElement> {
 		return view.children as Iterable<HTMLElement>;
-	}
-	getControlOf(value: HTMLElement): Receiver {
-		if (value["receive"]) return value as unknown as Receiver;
 	}
 }
 

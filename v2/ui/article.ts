@@ -8,9 +8,8 @@ import {Frame, UiOwner} from "./ui.js";
 
 export class Article extends UiOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
-		super();
+		super(conf);
 		this.owner = frame;
-		this.conf = conf;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
 		this.controller = conf.controllers.article;
 		this.initTypes(conf.types, conf.baseTypes);

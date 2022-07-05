@@ -17,11 +17,15 @@ export interface Controller {
 
 export class Control<T> implements Receiver {
 	constructor(conf?: bundle<any>) {
-		if (conf) this.conf = conf;
+		this.#conf = conf || EMPTY.object;
 	}
+	#conf: bundle<any>
 	owner: Owner<T>;
 	controller: Controller = EMPTY.object;
-	conf: bundle<any> = EMPTY.object;
+
+	get conf(): bundle<any> {
+		return this.#conf;
+	}
 
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
