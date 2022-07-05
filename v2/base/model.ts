@@ -14,18 +14,6 @@ export interface Record {
 	[key: string]: content;
 }
 
-export interface Content {
-	type$: ContentType<Content>;
-	content: Iterable<Content>;
-	textContent: string;
-}
-
-export interface ContentType<V extends Content> extends Type {
-	generalizes(type: Type): boolean;
-	toView(model: content): V;
-	toModel(view: V): content;
-}
-
 export function typeOf(value: any): string {
 	if (value?.valueOf) value = value.valueOf(value);
 	let type = typeof value;

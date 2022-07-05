@@ -1,10 +1,9 @@
 import {content} from "../../base/model.js";
-import {toView} from "../../base/display.js";
 import {bundle} from "../../base/util.js";
 
-import {Frame, Article} from "../ui.js";
+import {Frame, Article, toView} from "../ui.js";
 import {ViewCommand, mark, EditorView} from "./edit.js";
-import { ViewType } from "../../base/view.js";
+import {ViewType} from "../../base/view.js";
 
 class TextView extends EditorView {
 	constructor() {

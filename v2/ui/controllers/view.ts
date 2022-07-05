@@ -1,16 +1,15 @@
 import {content} from "../../base/model.js";
 import {viewType} from "../../base/view.js";
-import {toView} from "../../base/display.js";
 import {CHAR, extend} from "../../base/util.js";
 
-import {UserEvent} from "../ui.js";
+import {UserEvent, toView} from "../ui.js";
 import {EditorType} from "../editors/edit.js";
 
 let UNDONE = false;
 
 export default extend(null, {
 	command(event: UserEvent) {
-		let shortcuts = event.on.$shortcuts;
+		let shortcuts = event.on["$shortcuts"];
 		let command = shortcuts && shortcuts[event.shortcut];
 		if (command) event.subject = command;
 	},

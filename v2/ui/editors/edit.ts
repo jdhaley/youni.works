@@ -1,9 +1,9 @@
-import {content, ContentType} from "../../base/model.js";
+import {content} from "../../base/model.js";
 import {Command} from "../../base/command.js";
-import {getView, Display} from "../../base/display.js";
 import {bundle} from "../../base/util.js";
 
-import { Article } from "../ui.js";
+import {Article, Display, getView} from "../ui.js";
+import {ViewType} from "../../base/view.js";
 
 let NEXT_ID = 1;
 
@@ -17,9 +17,9 @@ export class EditorView extends Display {
 	}
 }
 
-export interface EditorType extends ContentType<Display> {
-	owner: Article;
-	edit(commandName: string, range: Range, content?: content): Range;
+export abstract class EditorType extends ViewType<HTMLElement> {
+	declare owner: Article;
+	abstract edit(commandName: string, range: Range, content?: content): Range;
 }
 
 // export interface DisplayConf {
@@ -135,8 +135,8 @@ export function unmark(range: Range) {
 function getShortcuts(view: EditorView) {
 	if (view.$shortcuts) return view.$shortcuts;
 	while (view) {
-		let shortcuts = view.type$.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
+		let shortcuts = view.type$?.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
 		if (shortcuts) return shortcuts;
-		view = view.container as EditorView;
+		view = view.parentElement as EditorView;
 	}
 }

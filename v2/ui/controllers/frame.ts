@@ -1,5 +1,5 @@
 import {Controller} from "../../base/controller.js";
-import {Frame, UiElement, UserEvent} from "../ui.js";
+import {Frame, UserEvent} from "../ui.js";
 
 let TRACK: UserEvent = null;
 let SELECTION: UserEvent = null;
@@ -148,10 +148,10 @@ function sense(event: UserEvent) {
 }
 
 
-export function viewOf(node: Node | Range): UiElement {
+export function viewOf(node: Node | Range): HTMLElement {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node["type$"]) return node as UiElement;
+		if (node["type$"]) return node as HTMLElement;
 		node = node.parentElement;
 	}
 }

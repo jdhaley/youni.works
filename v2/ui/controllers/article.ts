@@ -19,7 +19,7 @@ export default extend(null, {
 			console.log("Saved: ", signal);
 			return;
 		}
-		let model = this.view.view_model;
+		let model = this.view["view_model"];
 		console.log(model);
 		this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
 	},

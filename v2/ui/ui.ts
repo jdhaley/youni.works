@@ -1,18 +1,14 @@
 import {CommandBuffer} from "../base/command.js";
-import {Signal, Controller, Owner, Receiver} from "../base/controller.js";
-import {Display} from "../base/display.js";
+import {Signal, Controller, Receiver} from "../base/controller.js";
 import {loadTypes} from "../base/loader.js";
 import {content} from "../base/model.js";
 import {RemoteFileService} from "../base/remote.js";
 import {bundle, EMPTY} from "../base/util.js";
 import {ViewOwner, ViewType} from "../base/view.js";
 
-export interface UiElement extends HTMLElement, Receiver {
-	$shortcuts?: bundle<string>;
-}
-type UiType = ViewType<Display>;
+type UiType = ViewType<HTMLElement>;
 
-export class UiOwner extends ViewOwner<HTMLElement> {
+export abstract class UiOwner extends ViewOwner<HTMLElement> {
 	getTypeOf(view: HTMLElement): ViewType<HTMLElement> {
 		let type = view["type$"];
 		if (!type) {
@@ -44,9 +40,6 @@ export class UiOwner extends ViewOwner<HTMLElement> {
 	getControlOf(value: HTMLElement): Receiver {
 		if (value["receive"]) return value as unknown as Receiver;
 	}
-	create(name: string): HTMLElement {
-		throw new Error("Method not implemented.");
-	}
 }
 
 export class Article extends UiOwner {
@@ -62,13 +55,13 @@ export class Article extends UiOwner {
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 	type: UiType;
-	view: Display;
+	view: HTMLElement;
 	model: content;
 
-	create(type: ViewType<Display> | string): Display {
-		if (typeof type == "string") return this.frame.create(type) as Display;
+	create(type: ViewType<HTMLElement> | string): HTMLElement {
+		if (typeof type == "string") return this.frame.create(type);
 		let view = this.create(typeof type == "string" ? type : type.conf.tagName);
-		view.type$ = type;
+		view["type$"] = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
 		} else {
@@ -142,21 +135,11 @@ export class Frame extends UiOwner {
 		selection.addRange(range);
 	}
 
-	create(tagName: string): UiElement {
-		return this.#window.document.createElement(tagName) as UiElement;
+	create(tagName: string): HTMLElement {
+		return this.#window.document.createElement(tagName) as HTMLElement;
 	}
 	createRange(): Range {
 		return this.#window.document.createRange();
-	}
-
-	getPartOf(value: UiElement): UiElement {
-		return value.parentElement as UiElement;
-	}
-	getPartsOf(value: UiElement): Iterable<UiElement> {
-		return value.children as Iterable<UiElement>;
-	}
-	getControlOf(value: UiElement): Receiver {
-		return value.receive ? value : null;
 	}
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);
@@ -165,8 +148,8 @@ export class Frame extends UiOwner {
 
 export interface UserEvent extends Signal, UIEvent {
 	frame: Frame;
-	source: UiElement;
-	on: UiElement;
+	source: HTMLElement;
+	on: HTMLElement;
 	//all user events
 	direction: "up";
 
@@ -187,9 +170,52 @@ export interface UserEvent extends Signal, UIEvent {
     key: string;
 
 	//mouse support - to be reviewed.
-    track: UiElement;
+    track: HTMLElement;
     x?: number;
     y?: number;
 	moveX?: number;
 	moveY?: number;
+}
+
+export class Display extends HTMLElement {
+	type$: ViewType<Display>;
+	connectedCallback() {
+		this.view_type; //triggers the assignment of type$ if not set.
+	}
+	get view_type() {
+		return this.ownerDocument["$owner"].getTypeOf(this);
+	}
+	get view_model() {
+		return this.view_type?.toModel(this);
+	}
+	get view_controller(): Controller {
+		return this.view_type?.conf.controller;
+	}
+	receive(signal: Signal)  {
+		let subject = signal?.subject;
+		while (subject) try {
+			let action = this.view_controller[subject];
+			action && action.call(this.type$, signal);
+			subject = (subject != signal.subject ? signal.subject : "");	
+		} catch (error) {
+			console.error(error);
+			//Stop all propagation - esp. important is the enclosing while loop
+			subject = "";
+		}
+	}
+}
+
+export function getView(node: Node | Range): Display {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node instanceof Display) return node as Display;
+		node = node.parentElement;
+	}
+}
+export function toView(range: Range): Display {
+	let type = getView(range)?.view_type;
+	let view = type.owner.create(type);
+	let frag = range.cloneContents();
+	while (frag.firstChild) view.append(frag.firstChild);
+	return view;
 }
