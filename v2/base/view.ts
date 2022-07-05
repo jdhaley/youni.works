@@ -1,4 +1,4 @@
-import {content, List, Record, Type, typeOf} from "./model.js";
+import {content, ContentType, List, Record, Type, typeOf} from "./model.js";
 import {Control, Owner} from "./controller.js";
 import {bundle, CHAR, EMPTY} from "./util.js";
 import {loadTypes} from "./loader.js";
@@ -104,7 +104,7 @@ export function loadBaseTypes(owner: ViewOwner<unknown>): bundle<ViewType<any>> 
 	return types;
 }
 
-export class ViewType<V> extends Control<V> {
+export class ViewType<V> extends Control<V> implements ContentType<V> {
 	declare owner: ViewOwner<V>;
 	declare model: "record" | "list" | "text";
 	declare name: string;

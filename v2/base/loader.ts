@@ -1,13 +1,7 @@
 import {bundle} from "./util.js";
+import {ViewType} from "./view.js";
 
-export interface ContentType {
-	name: string;
-	types: bundle<ContentType>
-	propertyName?: string;
-	conf: bundle<any>;
-}
-
-type types = bundle<ContentType>;
+type types = bundle<ViewType<unknown>>;
 type source = bundle<string | source> | string
 
 export function loadTypes(source: bundle<source>, base: types): types {
@@ -52,7 +46,7 @@ function createType(name: string, value: bundle<source>, types: types, source: s
 	return type;
 
 	function getMember(name: string, part: source) {
-		let member: ContentType;
+		let member: ViewType<unknown>;
 		if (typeof part == "object") {
 			member = createType("", part, types, source);
 			member.name = name;
