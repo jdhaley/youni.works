@@ -1,10 +1,10 @@
 import {Record} from "../../base/model.js";
-import {RecordType, View} from "../../base/view.js";
 import {getView, toView} from "../../base/display.js";
 import {bundle} from "../../base/util.js";
 
 import {Frame, Article} from "../ui.js";
 import {ViewCommand, mark, EditorView} from "./edit.js";
+import { ViewType } from "../../base/view.js";
 
 class RecordView extends EditorView {
 	constructor() {
@@ -13,7 +13,8 @@ class RecordView extends EditorView {
 }
 customElements.define("ui-record", RecordView);
 
-export class RecordEditor extends RecordType<View> {
+export class RecordEditor extends ViewType<unknown> {
+	readonly model = "record";
 	readonly tagName = "ui-record";
 	declare owner: Article;
 
@@ -22,7 +23,7 @@ export class RecordEditor extends RecordType<View> {
 	}
 	edit(commandName: string, range: Range, record: Record): Range {
 		let view = getView(range);
-		if (view.view_type instanceof RecordType) {
+		if (view.view_type.model == "record") {
 			let cmd = new RecordCommand(this.owner, commandName, view.id);
 			cmd.do(range, record);
 		} else {

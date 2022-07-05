@@ -1,10 +1,10 @@
 import {content} from "../../base/model.js";
-import {TextType, View} from "../../base/view.js";
 import {toView} from "../../base/display.js";
 import {bundle} from "../../base/util.js";
 
 import {Frame, Article} from "../ui.js";
 import {ViewCommand, mark, EditorView} from "./edit.js";
+import { ViewType } from "../../base/view.js";
 
 class TextView extends EditorView {
 	constructor() {
@@ -13,7 +13,8 @@ class TextView extends EditorView {
 }
 customElements.define("ui-text", TextView);
 
-export class TextEditor extends TextType<View> {
+export class TextEditor extends ViewType<unknown> {
+	readonly model = "text";
 	readonly tagName = "ui-text";
 	declare owner: Article;
 

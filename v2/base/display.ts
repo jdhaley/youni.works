@@ -1,5 +1,7 @@
-import {View, ViewType} from "./view.js";
-import {Controller, Signal} from "./controller.js";
+import {ViewOwner, ViewType} from "./view.js";
+import {Controller, Receiver, Signal} from "./controller.js";
+import { Content } from "./model.js";
+import view from "../ui/controllers/view.js";
 
 export interface Entity<T> {
 	getAttribute(name: string): T;
@@ -10,6 +12,12 @@ export interface Entity<T> {
 export interface Markup {
 	markupContent: string;
 	markup: string;
+}
+
+export interface View extends Content, Receiver {
+	container?: View
+	append(...content: any): void;
+	view_type: ViewType<View>
 }
 
 export class Display extends HTMLElement implements View /*, Markup*/, Entity<string> {
@@ -91,7 +99,7 @@ export function getView(node: Node | Range): Display {
 }
 export function toView(range: Range): Display {
 	let type = getView(range)?.view_type;
-	let view = type.owner.createView(type);
+	let view = type.owner.create(type);
 	let frag = range.cloneContents();
 	while (frag.firstChild) view.append(frag.firstChild);
 	return view;

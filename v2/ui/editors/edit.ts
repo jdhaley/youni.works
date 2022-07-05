@@ -76,7 +76,7 @@ export abstract class ViewCommand extends Command<Range> {
 function replace(range: Range, markup: string) {
 	let view = getView(range);
 	let type = view.view_type;
-	view = type.owner.createView(type);
+	view = type.owner.create(type);
 	view.innerHTML = markup;
 	
 	range.deleteContents();
@@ -86,7 +86,6 @@ function replace(range: Range, markup: string) {
 		range.collapse();
 	}
 }
-
 
 export function mark(range: Range) {
 	let marker = insertMarker(range, "end");

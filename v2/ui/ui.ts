@@ -12,7 +12,44 @@ export interface UiElement extends HTMLElement, Receiver {
 }
 type UiType = ViewType<Display>;
 
-export class Article extends ViewOwner<Display> {
+export class UiOwner extends ViewOwner<HTMLElement> {
+	getTypeOf(view: HTMLElement): ViewType<HTMLElement> {
+		let type = view["type$"];
+		if (!type) {
+			type = this.unknownType;
+			let parent = this.getPartOf(view);
+			if (parent) {
+				type = this.getTypeOf(parent);
+				type = type?.types[view.dataset.name || view.dataset.type] || this.unknownType;
+			}
+			view["type$"] = type;
+		}
+		return type;
+	}
+	getTextOf(view: HTMLElement): string {
+		return view.textContent;
+	}
+	setTextOf(view: HTMLElement, value: string): void {
+		view.textContent = value;
+	}
+	appendTo(view: HTMLElement, value: any): void {
+		view.append(value);
+	}
+	getPartOf(view: HTMLElement): HTMLElement {
+		return view.parentElement;
+	}
+	getPartsOf(view: HTMLElement): Iterable<HTMLElement> {
+		return view.children as Iterable<HTMLElement>;
+	}
+	getControlOf(value: HTMLElement): Receiver {
+		if (value["receive"]) return value as unknown as Receiver;
+	}
+	create(name: string): HTMLElement {
+		throw new Error("Method not implemented.");
+	}
+}
+
+export class Article extends UiOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.frame = frame;
@@ -28,8 +65,9 @@ export class Article extends ViewOwner<Display> {
 	view: Display;
 	model: content;
 
-	createView(type: ViewType<Display>): Display {
-		let view = this.create(type.conf.tagName);
+	create(type: ViewType<Display> | string): Display {
+		if (typeof type == "string") return this.frame.create(type) as Display;
+		let view = this.create(typeof type == "string" ? type : type.conf.tagName);
 		view.type$ = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
@@ -44,9 +82,6 @@ export class Article extends ViewOwner<Display> {
 		this.unknownType = this.types[this.conf.unknownType];
 		this.type = this.types[this.conf.type] as UiType;
 		this.type.conf.shortcuts = this.conf.shortcuts;
-	}
-	create(name: string): Display {
-		return this.frame.create(name) as Display;
 	}
 }
 
@@ -64,7 +99,7 @@ export function loadBaseTypes(owner: Article): bundle<UiType> {
 	return types;
 }
 
-export class Frame extends Owner<UiElement> {
+export class Frame extends UiOwner {
 	constructor(window: Window, controller: Controller) {
 		super();
 		window.document["$owner"] = this;

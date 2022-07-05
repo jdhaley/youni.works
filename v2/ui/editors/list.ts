@@ -1,10 +1,10 @@
 import {content} from "../../base/model.js";
-import {ListType, View} from "../../base/view.js";
 import {getView, toView} from "../../base/display.js";
 import {bundle} from "../../base/util.js";
 
 import {Frame, Article} from "../ui.js";
 import {ViewCommand, mark, EditorView} from "./edit.js";
+import { ViewType } from "../../base/view.js";
 
 class ListView extends EditorView {
 	constructor() {
@@ -13,7 +13,8 @@ class ListView extends EditorView {
 }
 customElements.define("ui-list", ListView);
 
-export class ListEditor extends ListType<View> {
+export class ListEditor extends ViewType<unknown> {
+	readonly model = "list";
 	readonly tagName = "ui-list";
 	declare owner: Article;
 
@@ -22,7 +23,7 @@ export class ListEditor extends ListType<View> {
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
 		let view = getView(range);
-		if (view.view_type instanceof ListType) {
+		if (view.view_type.model == "list") {
 			let cmd = new ListCommand(this.owner, commandName, view.id);
 			cmd.do(range, content);
 		} else {
