@@ -13,7 +13,6 @@ class RecordView extends EditorView {
 }
 customElements.define("ui-record", RecordView);
 
-
 export class RecordEditor extends RecordType<View> {
 	readonly tagName = "ui-record";
 	declare owner: Article;

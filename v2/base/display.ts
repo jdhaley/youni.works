@@ -14,17 +14,13 @@ export interface Markup {
 	markupContent: string;
 	markup: string;
 }
-interface Doc extends Owner<Display> {
-	create(name: string): Display;
-}
 export class Doclet extends ViewOwner<Display> {
-	declare owner: Doc;
 	type: ViewType<Display>;
 	view: Display;
 	model: content;
 
 	createView(type: ViewType<Display>): Display {
-		let view = this.owner.create(type.conf.tagName);
+		let view = this.view.ownerDocument.createElement(type.conf.tagName);
 		view.type$ = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
