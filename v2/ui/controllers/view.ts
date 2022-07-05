@@ -2,8 +2,9 @@ import {content} from "../../base/model.js";
 import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
-import {UserEvent, toView} from "../ui.js";
+import {UserEvent} from "../ui.js";
 import {EditorType} from "../editors/edit.js";
+import { toView } from "../article.js";
 
 let UNDONE = false;
 

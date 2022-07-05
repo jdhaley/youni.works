@@ -2,7 +2,7 @@ import {content} from "../../base/model.js";
 import {Command} from "../../base/command.js";
 import {bundle} from "../../base/util.js";
 
-import {Article, Display, getView} from "../ui.js";
+import {Article, Display, getView} from "../article.js";
 import {ViewType} from "../../base/view.js";
 
 let NEXT_ID = 1;

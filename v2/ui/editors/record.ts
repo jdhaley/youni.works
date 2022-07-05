@@ -1,9 +1,10 @@
 import {Record} from "../../base/model.js";
 import {bundle} from "../../base/util.js";
 
-import {Frame, Article, getView, toView} from "../ui.js";
+import {Article, getView, toView} from "../article.js";
 import {ViewCommand, mark, EditorView} from "./edit.js";
 import { ViewType } from "../../base/view.js";
+import { Frame } from "../ui.js";
 
 class RecordView extends EditorView {
 	constructor() {
