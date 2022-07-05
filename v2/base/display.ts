@@ -1,8 +1,5 @@
-import {View, ViewOwner, ViewType} from "./view.js";
-import {Controller, Owner, Signal} from "./controller.js";
-import { content } from "./model.js";
-import { bundle, EMPTY } from "./util.js";
-import { loadTypes } from "./loader.js";
+import {View, ViewType} from "./view.js";
+import {Controller, Signal} from "./controller.js";
 
 export interface Entity<T> {
 	getAttribute(name: string): T;
@@ -13,43 +10,6 @@ export interface Entity<T> {
 export interface Markup {
 	markupContent: string;
 	markup: string;
-}
-export class Doclet extends ViewOwner<Display> {
-	type: ViewType<Display>;
-	view: Display;
-	model: content;
-
-	createView(type: ViewType<Display>): Display {
-		let view = this.view.ownerDocument.createElement(type.conf.tagName);
-		view.type$ = type;
-		if (type.propertyName) {
-			view.dataset.name = type.propertyName;
-		} else {
-			view.dataset.type = type.name;
-		}
-		return view;
-	}
-	initTypes(source: bundle<any>, base: bundle<ViewType<Display>>) {
-		base = loadBaseTypes(this);
-		this.types = loadTypes(source, base) as bundle<ViewType<Display>>;
-		this.unknownType = this.types[this.conf.unknownType];
-		this.type = this.types[this.conf.type] as ViewType<Display>;
-		this.type.conf.shortcuts = this.conf.shortcuts;
-	}
-}
-
-export function loadBaseTypes(owner: Doclet): bundle<ViewType<Display>> {
-	if (!owner.conf?.baseTypes) return;
-	let controllers = owner.conf?.controllers || EMPTY.object;
-	let types = Object.create(null);
-	for (let name in owner.conf.baseTypes) {
-		let type = new owner.conf.baseTypes[name];
-		type.name = name;
-		type.owner = owner;
-		if (controllers[name]) type.controller = controllers[name];
-		types[name] = type;
-	}
-	return types;
 }
 
 export class Display extends HTMLElement implements View /*, Markup*/, Entity<string> {

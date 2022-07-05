@@ -41,7 +41,7 @@ export abstract class Owner<V> extends Control<V> {
 	abstract getPartOf(value: V): V;
 	abstract getPartsOf(value: V): Iterable<V>;
 	abstract getControlOf(value: V): Receiver;
-
+	abstract create(name: string): V;
 	send(msg: Signal | string, to: V) {
 		msg = signal("down", msg);
 		if (!msg.subject) return;

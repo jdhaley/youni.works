@@ -29,7 +29,7 @@ export class Article extends ViewOwner<Display> {
 	model: content;
 
 	createView(type: ViewType<Display>): Display {
-		let view = this.frame.create(type.conf.tagName) as Display;
+		let view = this.create(type.conf.tagName);
 		view.type$ = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
@@ -44,6 +44,9 @@ export class Article extends ViewOwner<Display> {
 		this.unknownType = this.types[this.conf.unknownType];
 		this.type = this.types[this.conf.type] as UiType;
 		this.type.conf.shortcuts = this.conf.shortcuts;
+	}
+	create(name: string): Display {
+		return this.frame.create(name) as Display;
 	}
 }
 
