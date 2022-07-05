@@ -1,12 +1,11 @@
-import { Type } from "./model.js";
 import {bundle} from "./util.js";
 
-interface ContentType extends Type {
+export interface ContentType {
 	name: string;
 	types: bundle<ContentType>
 	propertyName?: string;
+	conf: bundle<any>;
 }
-
 
 type types = bundle<ContentType>;
 type source = bundle<string | source> | string

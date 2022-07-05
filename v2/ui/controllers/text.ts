@@ -1,7 +1,7 @@
 import {UserEvent} from "../ui.js";
 import {extend} from "../../base/util.js";
 import view from "./view.js";
-import {EditorType} from "../editors/edit.js";
+import {EditorType} from "../editor/edit.js";
 
 export default extend(view, {
 	// cut(this: Article, event: UserEvent) {

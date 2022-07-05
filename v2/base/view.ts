@@ -1,6 +1,7 @@
 import {Owner} from "../base/controller.js";
 import {content, List, Record, Type, typeOf} from "../base/model.js";
 import {bundle, CHAR, EMPTY} from "../base/util.js";
+import { loadTypes } from "./loader.js";
 
 export function viewType(value: any): string {
 	let type = typeOf(value);
@@ -70,6 +71,7 @@ let MODELLERS = {
 	}
 }
 
+type UiType = ViewType<unknown>
 export abstract class ViewOwner<V> extends Owner<V> {
 	viewers = VIEWERS;
 	modellers = MODELLERS;
@@ -81,9 +83,29 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	abstract setTextOf(view: V, value: string): void;
 	abstract appendTo(view: V, value: unknown): void;
 	abstract create(type: string | ViewType<V>): V;
+
+	initTypes(source: bundle<any>, base: bundle<UiType>) {
+		base = loadBaseTypes(this);
+		this.types = loadTypes(source, base) as bundle<ViewType<V>>;
+		this.unknownType = this.types[this.conf.unknownType];
+	}	
 }
 
-export class ViewType<V> implements Type {
+export function loadBaseTypes(owner: ViewOwner<unknown>): bundle<UiType> {
+	if (!owner.conf?.baseTypes) return;
+	let controllers = owner.conf?.controllers || EMPTY.object;
+	let types = Object.create(null);
+	for (let name in owner.conf.baseTypes) {
+		let type = new owner.conf.baseTypes[name];
+		type.name = name;
+		type.owner = owner;
+		if (controllers[name]) type.controller = controllers[name];
+		types[name] = type;
+	}
+	return types;
+}
+
+export class ViewType<V> {
 	declare owner: ViewOwner<V>;
 	declare model: "record" | "list" | "text";
 	declare name: string;

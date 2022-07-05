@@ -1,7 +1,7 @@
 import {extend} from "../../base/util.js";
-import {ListEditor} from "../editors/list.js";
-import {RecordEditor} from "../editors/record.js";
-import {TextEditor} from "../editors/text.js";
+import {ListEditor} from "../editor/list.js";
+import {RecordEditor} from "../editor/record.js";
+import {TextEditor} from "../editor/text.js";
 
 
 export default Object.freeze(extend(null, {

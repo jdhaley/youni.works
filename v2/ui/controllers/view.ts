@@ -3,8 +3,7 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {EditorType} from "../editors/edit.js";
-import { toView } from "../article.js";
+import {EditorType, toView} from "../editor/edit.js";
 
 let UNDONE = false;
 

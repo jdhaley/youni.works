@@ -1,10 +1,6 @@
 import {content} from "../../base/model.js";
-import {bundle} from "../../base/util.js";
-
-import {Article, getView, toView} from "../article.js";
-import {ViewCommand, mark, EditorView} from "./edit.js";
-import {ViewType} from "../../base/view.js";
-import { Frame } from "../ui.js";
+import {ViewCommand, mark, EditorView, Editor, EditorType, getView, toView} from "./edit.js";
+import {Frame} from "../ui.js";
 
 class ListView extends EditorView {
 	constructor() {
@@ -13,14 +9,10 @@ class ListView extends EditorView {
 }
 customElements.define("ui-list", ListView);
 
-export class ListEditor extends ViewType<unknown> {
+export class ListEditor extends EditorType {
 	readonly model = "list";
 	readonly tagName = "ui-list";
-	declare owner: Article;
 
-	get conf(): bundle<any> {
-		return this;
-	}
 	edit(commandName: string, range: Range, content?: content): Range {
 		let view = getView(range);
 		if (view.view_type.model == "list") {
@@ -34,7 +26,7 @@ export class ListEditor extends ViewType<unknown> {
 }
 
 class ListCommand extends ViewCommand {
-	constructor(owner: Article, name: string, viewId: string) {
+	constructor(owner: Editor, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	startId: string;

@@ -1,24 +1,24 @@
 import {content} from "../../base/model.js";
-import {Command} from "../../base/command.js";
+import {Command, CommandBuffer} from "../../base/command.js";
 import {bundle} from "../../base/util.js";
 
-import {Article, Display, getView} from "../article.js";
+import {Article} from "../article.js";
 import {ViewType} from "../../base/view.js";
+import { Controller, Signal } from "../../base/controller.js";
 
 let NEXT_ID = 1;
 
-export class EditorView extends Display {
-	$shortcuts: bundle<string>;
-
-	connectedCallback() {
-		super.connectedCallback();
-		if (!this.id) this.id = "" + NEXT_ID++;
-		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
-	}
+export class Editor extends Article {
+	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 }
 
 export abstract class EditorType extends ViewType<HTMLElement> {
-	declare owner: Article;
+	declare owner: Editor;
+
+	get conf(): bundle<any> {
+		return this;
+	}
+
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 }
 
@@ -40,7 +40,7 @@ export abstract class EditorType extends ViewType<HTMLElement> {
 // }
 
 export abstract class ViewCommand extends Command<Range> {
-	constructor(owner: Article, name: string, viewId: string) {
+	constructor(owner: Editor, name: string, viewId: string) {
 		super();
 		this.owner = owner;
 		this.name = name;
@@ -139,4 +139,58 @@ function getShortcuts(view: EditorView) {
 		if (shortcuts) return shortcuts;
 		view = view.parentElement as EditorView;
 	}
+}
+
+
+export class Display extends HTMLElement {
+	type$: ViewType<Display>;
+	connectedCallback() {
+		this.view_type; //triggers the assignment of type$ if not set.
+	}
+	get view_type() {
+		return this.ownerDocument["$owner"].getTypeOf(this);
+	}
+	get view_model() {
+		return this.view_type?.toModel(this);
+	}
+	get view_controller(): Controller {
+		return this.view_type?.conf.controller;
+	}
+	receive(signal: Signal)  {
+		let subject = signal?.subject;
+		while (subject) try {
+			let action = this.view_controller[subject];
+			action && action.call(this.type$, signal);
+			subject = (subject != signal.subject ? signal.subject : "");	
+		} catch (error) {
+			console.error(error);
+			//Stop all propagation - esp. important is the enclosing while loop
+			subject = "";
+		}
+	}
+}
+
+export class EditorView extends Display {
+	$shortcuts: bundle<string>;
+
+	connectedCallback() {
+		super.connectedCallback();
+		if (!this.id) this.id = "" + NEXT_ID++;
+		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
+	}
+}
+
+export function getView(node: Node | Range): Display {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node instanceof Display) return node as Display;
+		node = node.parentElement;
+	}
+}
+export function toView(range: Range): Display {
+	let type = getView(range)?.view_type;
+	let view = type.owner.create(type);
+	let frag = range.cloneContents();
+	while (frag.firstChild) view.append(frag.firstChild);
+	return view;
 }

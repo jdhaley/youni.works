@@ -1,10 +1,7 @@
 import {content} from "../../base/model.js";
-import {bundle} from "../../base/util.js";
 
-import {Article, toView} from "../article.js";
-import {ViewCommand, mark, EditorView} from "./edit.js";
-import {ViewType} from "../../base/view.js";
-import { Frame } from "../ui.js";
+import {Frame} from "../ui.js";
+import {ViewCommand, mark, EditorView, EditorType, Editor, toView} from "./edit.js";
 
 class TextView extends EditorView {
 	constructor() {
@@ -13,14 +10,9 @@ class TextView extends EditorView {
 }
 customElements.define("ui-text", TextView);
 
-export class TextEditor extends ViewType<unknown> {
+export class TextEditor extends EditorType {
 	readonly model = "text";
 	readonly tagName = "ui-text";
-	declare owner: Article;
-
-	get conf(): bundle<any> {
-		return this;
-	}
 
 	edit(commandName: string, range: Range, replacement?: content): Range {
 		throw new Error("Method not implemented.");
@@ -28,7 +20,7 @@ export class TextEditor extends ViewType<unknown> {
 }
 
 class TextCommand extends ViewCommand {
-	constructor(owner: Article, name: string, viewId: string) {
+	constructor(owner: Editor, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
