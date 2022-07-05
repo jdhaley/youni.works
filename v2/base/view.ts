@@ -99,13 +99,13 @@ export class RecordType<V extends View> extends ViewType<V> {
 	}
 	viewContent(view: V, model: Record): void {
 		view.textContent = "";
+		view["$at"] = Object.create(null);
 		for (let name in this.types) {
 			let type = this.types[name];
 			let value = model ? model[name] : null;
 			let member = this.viewMember(type, value);
-			//now set in the type.create...
-			//member.dataset.name = type.propertyName;
 			view.append(member);
+			view["$at"][name] = member;
 		}
 		if (!view.textContent) view.textContent = CHAR.ZWSP;
 	}
