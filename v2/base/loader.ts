@@ -1,5 +1,5 @@
 import {Controller} from "./controller.js";
-import {bundle} from "./util.js";
+import {bundle, extend} from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
 export interface BaseConf {
@@ -7,6 +7,12 @@ export interface BaseConf {
 	tagName: string;
 	controller: Controller;
 	shortcuts: bundle<string>;
+}
+
+export interface ViewConf {
+	type: string;
+	types: bundle<source>;
+	conf: bundle<any>;
 }
 
 export function loadBaseTypes(owner: ViewOwner<unknown>): bundle<ViewType<any>> {
@@ -51,25 +57,25 @@ function getType(name: string, types: types, source: source) {
 	return type;
 }
 
-function createType(name: string, value: bundle<source>, types: types, source: source) {
-	let supertype = value["type$"] ? getType("" + value["type$"], types, source) : null;
+function createType(name: string, conf: ViewConf, types: types, source: source) {
+	let supertype = conf.type ? getType(conf.type, types, source) : null;
 	let type = Object.create(supertype);
+	type.conf = extend(supertype.conf, conf.conf);
+
 	if (name) {
 		type.name = name;
 		types[name] = type;
 	}
 	type.types = Object.create(supertype.types || null);
-	for (let name in value) {
-		if (name != "type$") {
-			type.types[name] = getMember(name, value[name]);
-		}
+	for (let name in conf.types) {
+		type.types[name] = getMember(name, conf.types[name]);
 	}
 	return type;
 
 	function getMember(name: string, part: source) {
 		let member: ViewType<unknown>;
 		if (typeof part == "object") {
-			member = createType("", part, types, source);
+			member = createType("", part as any, types, source);
 			member.name = name;
 		} else {
 			member = getType(part, types, source);

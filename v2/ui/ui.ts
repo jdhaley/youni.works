@@ -11,7 +11,7 @@ export class Display extends HtmlOwner {
 		this.owner = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
 		this.controller = conf.controllers.article;
-		this.initTypes(conf.types, conf.baseTypes);
+		this.initTypes(conf.viewTypes, conf.baseTypes);
 		this.type = this.types[this.conf.type] as ViewType<HTMLElement>;
 		this.type.conf.shortcuts = this.conf.shortcuts;
 	}
