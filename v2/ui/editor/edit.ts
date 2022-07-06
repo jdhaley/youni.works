@@ -1,19 +1,19 @@
 import {content} from "../../base/model.js";
+import {ViewType} from "../../base/view.js";
+import {Controller, Signal} from "../../base/controller.js";
 import {Command, CommandBuffer} from "../../base/command.js";
 import {bundle} from "../../base/util.js";
 
-import {Article} from "../article.js";
-import {ViewType} from "../../base/view.js";
-import { Controller, Signal } from "../../base/controller.js";
+import {Display} from "../ui.js";
 
 let NEXT_ID = 1;
 
-export class Editor extends Article {
+export class Article extends Display {
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 }
 
-export abstract class EditorType extends ViewType<HTMLElement> {
-	declare owner: Editor;
+export abstract class ArticleType extends ViewType<HTMLElement> {
+	declare owner: Article;
 
 	get conf(): bundle<any> {
 		return this;
@@ -22,25 +22,8 @@ export abstract class EditorType extends ViewType<HTMLElement> {
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 }
 
-// export interface DisplayConf {
-// 	tagName: string;
-// 	controller: Controller;
-// 	shortcuts: bundle<string>
-// }
-
-// export abstract class DisplayType extends ViewType<HtmlView> implements DisplayConf {
-// 	declare owner: ViewOwner<HtmlView>;
-// 	declare shortcuts: bundle<string>
-// 	tagName: string;
-// 	controller: Controller = EMPTY.object;
-
-// 	get conf(): DisplayConf 
-// 		return this;
-// 	}
-// }
-
-export abstract class ViewCommand extends Command<Range> {
-	constructor(owner: Editor, name: string, viewId: string) {
+export abstract class Edit extends Command<Range> {
+	constructor(owner: Article, name: string, viewId: string) {
 		super();
 		this.owner = owner;
 		this.name = name;
@@ -132,23 +115,39 @@ export function unmark(range: Range) {
 	}	
 }
 
-function getShortcuts(view: EditorView) {
+function getShortcuts(view: EditableElement) {
 	if (view.$shortcuts) return view.$shortcuts;
 	while (view) {
 		let shortcuts = view.type$?.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
 		if (shortcuts) return shortcuts;
-		view = view.parentElement as EditorView;
+		view = view.parentElement as EditableElement;
 	}
 }
 
+// export interface DisplayConf {
+// 	tagName: string;
+// 	controller: Controller;
+// 	shortcuts: bundle<string>
+// }
 
-export class Display extends HTMLElement {
-	type$: ViewType<Display>;
+// export abstract class DisplayType extends ViewType<HtmlView> implements DisplayConf {
+// 	declare owner: ViewOwner<HtmlView>;
+// 	declare shortcuts: bundle<string>
+// 	tagName: string;
+// 	controller: Controller = EMPTY.object;
+
+// 	get conf(): DisplayConf 
+// 		return this;
+// 	}
+// }
+
+class DisplayElement extends HTMLElement {
+	type$: ViewType<DisplayElement>;
 	connectedCallback() {
 		this.view_type; //triggers the assignment of type$ if not set.
 	}
 	get view_type() {
-		return this.ownerDocument["$owner"].getTypeOf(this);
+		return this.ownerDocument["$owner"].getControlOf(this);
 	}
 	get view_model() {
 		return this.view_type?.toModel(this);
@@ -170,7 +169,7 @@ export class Display extends HTMLElement {
 	}
 }
 
-export class EditorView extends Display {
+export class EditableElement extends DisplayElement {
 	$shortcuts: bundle<string>;
 
 	connectedCallback() {
@@ -180,14 +179,14 @@ export class EditorView extends Display {
 	}
 }
 
-export function getView(node: Node | Range): Display {
+export function getView(node: Node | Range): DisplayElement {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node instanceof Display) return node as Display;
+		if (node instanceof DisplayElement) return node as DisplayElement;
 		node = node.parentElement;
 	}
 }
-export function toView(range: Range): Display {
+export function toView(range: Range): DisplayElement {
 	let type = getView(range)?.view_type;
 	let view = type.owner.create(type);
 	let frag = range.cloneContents();

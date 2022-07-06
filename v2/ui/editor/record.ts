@@ -1,16 +1,16 @@
 import {Record} from "../../base/model.js";
 
-import {Editor, ViewCommand, mark, EditorView, EditorType, getView, toView} from "./edit.js";
+import {Article, Edit, mark, EditableElement, ArticleType, getView, toView} from "./edit.js";
 import {Frame} from "../ui.js";
 
-class RecordView extends EditorView {
+class RecordView extends EditableElement {
 	constructor() {
 		super();
 	}
 }
 customElements.define("ui-record", RecordView);
 
-export class RecordEditor extends EditorType {
+export class RecordEditor extends ArticleType {
 	readonly model = "record";
 	readonly tagName = "ui-record";
 
@@ -27,8 +27,8 @@ export class RecordEditor extends EditorType {
 	}
 }
 
-class RecordCommand extends ViewCommand {
-	constructor(owner: Editor, name: string, viewId: string) {
+class RecordCommand extends Edit {
+	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	protected getRange(): Range {

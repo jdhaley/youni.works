@@ -3,7 +3,7 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {EditorType, toView} from "../editor/edit.js";
+import {ArticleType, toView} from "../editor/edit.js";
 
 let UNDONE = false;
 
@@ -13,18 +13,18 @@ export default extend(null, {
 		let command = shortcuts && shortcuts[event.shortcut];
 		if (command) event.subject = command;
 	},
-	copy(this: EditorType, event: UserEvent) {
+	copy(this: ArticleType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range, event.clipboardData);
 	},
-	cut(this: EditorType, event: UserEvent) {
+	cut(this: ArticleType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range, event.clipboardData);
 		this.edit("Cut", range);
 	},
-	paste(this: EditorType, event: UserEvent) {
+	paste(this: ArticleType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		let model = getClipboard(event.clipboardData);
@@ -46,7 +46,7 @@ export default extend(null, {
 	charpress(event: UserEvent) {
 		event.subject = "";
 	},
-	test(this: EditorType, event: UserEvent) {
+	test(this: ArticleType, event: UserEvent) {
 		event.subject = "";
 		let range = this.owner.frame.selectionRange;
 		range.setStartBefore(event.on.parentElement);
@@ -72,17 +72,17 @@ export default extend(null, {
 			document.execCommand("undo");
 		}
 	},
-	undo(this: EditorType, event: UserEvent) {
+	undo(this: ArticleType, event: UserEvent) {
 		event.subject = "";
 		this.owner.commands.undo();
 	},
-	redo(this: EditorType, event: UserEvent) {
+	redo(this: ArticleType, event: UserEvent) {
 		event.subject = "";
 		this.owner.commands.redo();
 	},
 });
 
-function setClipboard(type: EditorType, range: Range, clipboard: DataTransfer) {
+function setClipboard(type: ArticleType, range: Range, clipboard: DataTransfer) {
 	let view = toView(range);
 	let model = type.toModel(view);
 	clipboard.setData("application/json", JSON.stringify(model));

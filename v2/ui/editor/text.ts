@@ -1,16 +1,16 @@
 import {content} from "../../base/model.js";
 
 import {Frame} from "../ui.js";
-import {ViewCommand, mark, EditorView, EditorType, Editor, toView} from "./edit.js";
+import {Edit, mark, EditableElement, ArticleType, Article, toView} from "./edit.js";
 
-class TextView extends EditorView {
+class TextView extends EditableElement {
 	constructor() {
 		super();
 	}
 }
 customElements.define("ui-text", TextView);
 
-export class TextEditor extends EditorType {
+export class TextEditor extends ArticleType {
 	readonly model = "text";
 	readonly tagName = "ui-text";
 
@@ -19,8 +19,8 @@ export class TextEditor extends EditorType {
 	}
 }
 
-class TextCommand extends ViewCommand {
-	constructor(owner: Editor, name: string, viewId: string) {
+class TextCommand extends Edit {
+	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
