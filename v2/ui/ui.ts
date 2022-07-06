@@ -12,8 +12,7 @@ export class Display extends HtmlOwner {
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
 		this.controller = conf.controllers.article;
 		this.initTypes(conf.viewTypes, conf.baseTypes);
-		this.type = this.types[this.conf.type] as ViewType<HTMLElement>;
-		this.type.conf.shortcuts = this.conf.shortcuts;
+		this.type = this.types[this.conf.type];
 	}
 	declare readonly owner: Frame;
 	declare readonly types: bundle<ViewType<HTMLElement>>;
