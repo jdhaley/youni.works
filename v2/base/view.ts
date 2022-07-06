@@ -1,7 +1,7 @@
 import {content, ContentType, List, Record, Type, typeOf} from "./model.js";
 import {Control, Owner} from "./controller.js";
 import {bundle, CHAR, EMPTY} from "./util.js";
-import {loadTypes} from "./loader.js";
+import {loadBaseTypes, loadTypes} from "./loader.js";
 
 export function viewType(value: any): string {
 	let type = typeOf(value);
@@ -88,20 +88,6 @@ export abstract class ViewOwner<V> extends Owner<V> {
 		this.types = loadTypes(source, base) as bundle<ViewType<V>>;
 		this.unknownType = this.types[this.conf.unknownType];
 	}
-}
-
-export function loadBaseTypes(owner: ViewOwner<unknown>): bundle<ViewType<any>> {
-	if (!owner.conf?.baseTypes) return;
-	let controllers = owner.conf?.controllers || EMPTY.object;
-	let types = Object.create(null);
-	for (let name in owner.conf.baseTypes) {
-		let type = new owner.conf.baseTypes[name];
-		type.name = name;
-		type.owner = owner;
-		if (controllers[name]) type.controller = controllers[name];
-		types[name] = type;
-	}
-	return types;
 }
 
 export class ViewType<V> extends Control<V> implements ContentType<V> {

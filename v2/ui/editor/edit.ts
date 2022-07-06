@@ -15,9 +15,9 @@ export class Article extends Display {
 export abstract class ArticleType extends ViewType<HTMLElement> {
 	declare owner: Article;
 
-	get conf(): bundle<any> {
-		return this;
-	}
+	// get conf(): bundle<any> {
+	// 	return this;
+	// }
 
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 }

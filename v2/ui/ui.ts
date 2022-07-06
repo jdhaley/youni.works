@@ -28,7 +28,7 @@ export class Display extends HtmlOwner {
 
 	create(type: ViewType<HTMLElement> | string): HTMLElement {
 		if (typeof type == "string") return this.frame.create(type);
-		let view = this.create(typeof type == "string" ? type : type.conf.tagName);
+		let view = this.frame.create(type.conf.tagName || "div");
 		view["type$"] = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
