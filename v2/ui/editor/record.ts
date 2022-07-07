@@ -1,16 +1,16 @@
 import {Record} from "../../base/model.js";
 
-import {Article, Edit, mark, EditableElement, ArticleType, getView, toView} from "./edit.js";
+import {Article, Edit, mark, EditElement, EditType, getView, toView} from "./edit.js";
 import {Frame} from "../ui.js";
 
-class RecordView extends EditableElement {
+class RecordView extends EditElement {
 	constructor() {
 		super();
 	}
 }
 customElements.define("ui-record", RecordView);
 
-export class RecordEditor extends ArticleType {
+export class RecordEditor extends EditType {
 	readonly model = "record";
 	readonly tagName = "ui-record";
 

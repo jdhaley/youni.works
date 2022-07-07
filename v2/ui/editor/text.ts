@@ -1,16 +1,16 @@
 import {content} from "../../base/model.js";
 
 import {Frame} from "../ui.js";
-import {Edit, mark, EditableElement, ArticleType, Article, toView} from "./edit.js";
+import {Edit, mark, EditElement, EditType, Article, toView} from "./edit.js";
 
-class TextView extends EditableElement {
+class TextView extends EditElement {
 	constructor() {
 		super();
 	}
 }
 customElements.define("ui-text", TextView);
 
-export class TextEditor extends ArticleType {
+export class TextEditor extends EditType {
 	readonly model = "text";
 	readonly tagName = "ui-text";
 

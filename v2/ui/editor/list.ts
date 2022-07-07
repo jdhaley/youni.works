@@ -1,15 +1,15 @@
 import {content} from "../../base/model.js";
-import {Edit, mark, EditableElement, Article, ArticleType, getView, toView} from "./edit.js";
+import {Edit, mark, EditElement, Article, EditType, getView, toView} from "./edit.js";
 import {Frame} from "../ui.js";
 
-class ListView extends EditableElement {
+class ListView extends EditElement {
 	constructor() {
 		super();
 	}
 }
 customElements.define("ui-list", ListView);
 
-export class ListEditor extends ArticleType {
+export class ListEditor extends EditType {
 	readonly model = "list";
 	readonly tagName = "ui-list";
 
@@ -103,11 +103,11 @@ function startEdit(cmd: ListCommand, range: Range) {
 	if (end) cmd.endId = end.id;
 }
 
-function getChildView(ctx: Node, node: Node): EditableElement {
+function getChildView(ctx: Node, node: Node): EditElement {
 	while (node && node.parentElement != ctx) {
 		node = node.parentElement;
 	}
-	if (node instanceof EditableElement) return node;
+	if (node instanceof EditElement) return node;
 
 	throw new Error("Cant extend() marked range");
 }
@@ -159,7 +159,7 @@ function getChildView(ctx: Node, node: Node): EditableElement {
 // 	return markupText;
 // }
 
-function getStartContent(range: Range): EditableElement {
+function getStartContent(range: Range): EditElement {
 	if (range.startContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.startContainer);
 		let type = view.view_type;
@@ -169,13 +169,13 @@ function getStartContent(range: Range): EditableElement {
 		let vw = toView(range);
 		console.log("start content:", vw.textContent)
 		let content = vw.view_type.toModel(vw);
-		view = view.cloneNode(false) as EditableElement;
+		view = view.cloneNode(false) as EditElement;
 		type.viewContent(view, content);
 		return view;
 	}
 	return null;
 }
-function getEndContent(range: Range): EditableElement {
+function getEndContent(range: Range): EditElement {
 	if (range.endContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.endContainer);
 		let type = view.view_type;
@@ -186,7 +186,7 @@ function getEndContent(range: Range): EditableElement {
 		let vw = toView(range);
 		console.log("end content:", vw.textContent)
 		let content = vw.view_type.toModel(vw);
-		view = view.cloneNode(false) as EditableElement;
+		view = view.cloneNode(false) as EditElement;
 		type.viewContent(view, content);
 		return view;
 	}

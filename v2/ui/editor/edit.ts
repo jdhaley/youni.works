@@ -13,14 +13,14 @@ export class Article extends Display {
 	}
 }
 
-export abstract class ArticleType extends ViewType<HTMLElement> {
+export abstract class EditType extends ViewType<HTMLElement> {
 	declare readonly owner: Article;
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 }
 
 let NEXT_ID = 1;
 
-export class EditableElement extends DisplayElement {
+export class EditElement extends DisplayElement {
 	connectedCallback() {
 		super.connectedCallback();
 		if (!this.id) this.id = "" + NEXT_ID++;

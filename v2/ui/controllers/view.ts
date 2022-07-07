@@ -3,32 +3,32 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {Article, ArticleType, toView} from "../editor/edit.js";
+import {EditType, toView} from "../editor/edit.js";
 
 let UNDONE = false;
 
 export default extend(null, {
-	command(this: ArticleType, event: UserEvent) {
+	command(this: EditType, event: UserEvent) {
 		let shortcuts = this.conf.shortcuts;
 		let command = shortcuts && shortcuts[event.shortcut];
 		if (command) event.subject = command;
 	},
-	save(this: ArticleType, event: UserEvent) {
+	save(this: EditType, event: UserEvent) {
 		event.subject = "";
 		this.owner.save();
 	},
-	copy(this: ArticleType, event: UserEvent) {
+	copy(this: EditType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range, event.clipboardData);
 	},
-	cut(this: ArticleType, event: UserEvent) {
+	cut(this: EditType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range, event.clipboardData);
 		this.edit("Cut", range);
 	},
-	paste(this: ArticleType, event: UserEvent) {
+	paste(this: EditType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		let model = getClipboard(event.clipboardData);
@@ -50,7 +50,7 @@ export default extend(null, {
 	charpress(event: UserEvent) {
 		event.subject = "";
 	},
-	test(this: ArticleType, event: UserEvent) {
+	test(this: EditType, event: UserEvent) {
 		event.subject = "";
 		let range = this.owner.frame.selectionRange;
 		range.setStartBefore(event.on.parentElement);
@@ -76,17 +76,17 @@ export default extend(null, {
 			document.execCommand("undo");
 		}
 	},
-	undo(this: ArticleType, event: UserEvent) {
+	undo(this: EditType, event: UserEvent) {
 		event.subject = "";
 		this.owner.commands.undo();
 	},
-	redo(this: ArticleType, event: UserEvent) {
+	redo(this: EditType, event: UserEvent) {
 		event.subject = "";
 		this.owner.commands.redo();
 	},
 });
 
-function setClipboard(type: ArticleType, range: Range, clipboard: DataTransfer) {
+function setClipboard(type: EditType, range: Range, clipboard: DataTransfer) {
 	let view = toView(range);
 	let model = type.toModel(view);
 	clipboard.setData("application/json", JSON.stringify(model));
