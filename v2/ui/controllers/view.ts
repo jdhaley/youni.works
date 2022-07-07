@@ -3,15 +3,19 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {ArticleType, toView} from "../editor/edit.js";
+import {Article, ArticleType, toView} from "../editor/edit.js";
 
 let UNDONE = false;
 
 export default extend(null, {
-	command(event: UserEvent) {
-		let shortcuts = event.on["$shortcuts"];
+	command(this: ArticleType, event: UserEvent) {
+		let shortcuts = this.conf.shortcuts;
 		let command = shortcuts && shortcuts[event.shortcut];
 		if (command) event.subject = command;
+	},
+	save(this: ArticleType, event: UserEvent) {
+		event.subject = "";
+		this.owner.save();
 	},
 	copy(this: ArticleType, event: UserEvent) {
 		event.subject = "";

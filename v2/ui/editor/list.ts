@@ -168,7 +168,7 @@ function getStartContent(range: Range): EditableElement {
 		range.setStart(view, 0);
 		let vw = toView(range);
 		console.log("start content:", vw.textContent)
-		let content = vw.view_model;
+		let content = vw.view_type.toModel(vw);
 		view = view.cloneNode(false) as EditableElement;
 		type.viewContent(view, content);
 		return view;
@@ -185,7 +185,7 @@ function getEndContent(range: Range): EditableElement {
 		range.setEnd(view, view.childElementCount);
 		let vw = toView(range);
 		console.log("end content:", vw.textContent)
-		let content = vw.view_model;
+		let content = vw.view_type.toModel(vw);
 		view = view.cloneNode(false) as EditableElement;
 		type.viewContent(view, content);
 		return view;

@@ -1,25 +1,30 @@
 import {content} from "../../base/model.js";
 import {ViewType} from "../../base/view.js";
-import {Controller, Signal} from "../../base/controller.js";
 import {Command, CommandBuffer} from "../../base/command.js";
-import {bundle} from "../../base/util.js";
 
-import {Display} from "../ui.js";
-
-let NEXT_ID = 1;
+import {Display, DisplayElement} from "../ui.js";
 
 export class Article extends Display {
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
+	save(): void {
+		let model = this.type.toModel(this.view);
+		console.log(model);
+		this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
+	}
 }
 
 export abstract class ArticleType extends ViewType<HTMLElement> {
-	declare owner: Article;
-
-	// get conf(): bundle<any> {
-	// 	return this;
-	// }
-
+	declare readonly owner: Article;
 	abstract edit(commandName: string, range: Range, content?: content): Range;
+}
+
+let NEXT_ID = 1;
+
+export class EditableElement extends DisplayElement {
+	connectedCallback() {
+		super.connectedCallback();
+		if (!this.id) this.id = "" + NEXT_ID++;
+	}
 }
 
 export abstract class Edit extends Command<Range> {
@@ -54,6 +59,21 @@ export abstract class Edit extends Command<Range> {
 	redo() {
 		return this.exec(this.after);
 	}
+}
+
+export function getView(node: Node | Range): DisplayElement {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node instanceof DisplayElement) return node as DisplayElement;
+		node = node.parentElement;
+	}
+}
+export function toView(range: Range): DisplayElement {
+	let type = getView(range)?.view_type;
+	let view = type.owner.create(type);
+	let frag = range.cloneContents();
+	while (frag.firstChild) view.append(frag.firstChild);
+	return view;
 }
 
 function replace(range: Range, markup: string) {
@@ -113,83 +133,4 @@ export function unmark(range: Range) {
 		point.remove();
 		return range;
 	}	
-}
-
-function getShortcuts(view: EditableElement) {
-	if (view.$shortcuts) return view.$shortcuts;
-	while (view) {
-		let shortcuts = view.type$?.conf.shortcuts; //TODO - view.type$?.conf?.shortcuts;
-		if (shortcuts) return shortcuts;
-		view = view.parentElement as EditableElement;
-	}
-}
-
-// export interface DisplayConf {
-// 	tagName: string;
-// 	controller: Controller;
-// 	shortcuts: bundle<string>
-// }
-
-// export abstract class DisplayType extends ViewType<HtmlView> implements DisplayConf {
-// 	declare owner: ViewOwner<HtmlView>;
-// 	declare shortcuts: bundle<string>
-// 	tagName: string;
-// 	controller: Controller = EMPTY.object;
-
-// 	get conf(): DisplayConf 
-// 		return this;
-// 	}
-// }
-
-class DisplayElement extends HTMLElement {
-	type$: ViewType<DisplayElement>;
-	connectedCallback() {
-		this.view_type; //triggers the assignment of type$ if not set.
-	}
-	get view_type() {
-		return this.ownerDocument["$owner"].getControlOf(this);
-	}
-	get view_model() {
-		return this.view_type?.toModel(this);
-	}
-	get view_controller(): Controller {
-		return this.view_type?.conf.controller;
-	}
-	receive(signal: Signal)  {
-		let subject = signal?.subject;
-		while (subject) try {
-			let action = this.view_controller[subject];
-			action && action.call(this.type$, signal);
-			subject = (subject != signal.subject ? signal.subject : "");	
-		} catch (error) {
-			console.error(error);
-			//Stop all propagation - esp. important is the enclosing while loop
-			subject = "";
-		}
-	}
-}
-
-export class EditableElement extends DisplayElement {
-	$shortcuts: bundle<string>;
-
-	connectedCallback() {
-		super.connectedCallback();
-		if (!this.id) this.id = "" + NEXT_ID++;
-		if (!this.$shortcuts) this.$shortcuts = getShortcuts(this);
-	}
-}
-
-export function getView(node: Node | Range): DisplayElement {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node instanceof DisplayElement) return node as DisplayElement;
-		node = node.parentElement;
-	}
-}
-export function toView(range: Range): DisplayElement {
-	let type = getView(range)?.view_type;
-	let view = type.owner.create(type);
-	let frag = range.cloneContents();
-	while (frag.firstChild) view.append(frag.firstChild);
-	return view;
 }

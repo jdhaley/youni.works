@@ -38,6 +38,19 @@ export class Display extends HtmlOwner {
 	}
 }
 
+/** Base class for custom HTML Elements */
+export class DisplayElement extends HTMLElement {
+	type$: ViewType<DisplayElement>;
+	
+	get view_type() {
+		return this.ownerDocument["$owner"].getControlOf(this);
+	}
+
+	connectedCallback() {
+		this.view_type; //triggers the assignment of type$ if not set.
+	}
+}
+
 export class Frame extends HtmlOwner {
 	constructor(window: Window, controller: Controller) {
 		super();
