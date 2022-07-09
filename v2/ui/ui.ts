@@ -15,7 +15,6 @@ export class Display extends HtmlOwner {
 		this.type = this.types[this.conf.type];
 	}
 	declare readonly owner: Frame;
-	declare readonly types: bundle<ViewType<HTMLElement>>;
 	readonly service: RemoteFileService;
 	type: ViewType<HTMLElement>;
 	view: HTMLElement;
