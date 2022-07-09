@@ -10,9 +10,9 @@ export interface bundle<T> {
 	[key: string]: T
 }
 
-export interface ItemType {
+export interface ContentType {
 	name: string;
-	types?: bundle<ItemType>;
+	types?: bundle<ContentType>;
 }
 
 export class Item {
@@ -88,7 +88,7 @@ export class Party {
 
 export class Group extends Party {
 	members: Member[];
-	types: bundle<ItemType>;
+	types: bundle<ContentType>;
 	getArtifact(id: string, revision?: Date): Artifact {
 		return undefined;
 	}
