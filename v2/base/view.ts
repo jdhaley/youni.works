@@ -43,8 +43,8 @@ let VIEWERS = {
 }
 
 let MODELLERS = {
-	list(this: ViewType<unknown>, view: unknown): content {
-		let model = null;
+	list(this: ViewType<unknown>, view: unknown): content[] {
+		let model: content[] = null;
 		for (let part of (this.owner.getPartsOf(view) || EMPTY.array)) {
 			let type = this.owner.getControlOf(part) || this.owner.unknownType;
 			if (!model) model = [];
