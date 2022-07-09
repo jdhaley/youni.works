@@ -96,7 +96,6 @@ export class ViewType<V> extends Control<V> implements ContentType<V> {
 	declare name: string;
 	declare propertyName?: string;
 	declare types: bundle<ViewType<V>>;
-	declare unknownType: ViewType<V>
 
 	generalizes(type: Type): boolean {
 		return type == this;
