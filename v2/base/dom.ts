@@ -1,7 +1,19 @@
 import {ViewOwner, ViewType} from "./view.js";
 
-export abstract class HtmlOwner extends ViewOwner<HTMLElement> {
-	getControlOf(view: HTMLElement): ViewType<HTMLElement> {
+interface View {
+	type$?: ViewType<View>
+	$container?: View;
+	$content?: Iterable<View>;
+}
+
+export interface ViewElement extends HTMLElement, View {
+	type$?: ViewType<ViewElement>
+	$container?: ViewElement;
+	$content?: Iterable<ViewElement>;
+}
+
+export abstract class HtmlOwner extends ViewOwner<ViewElement> {
+	getControlOf(view: ViewElement): ViewType<ViewElement> {
 		let type = view["type$"];
 		if (!type) {
 			type = this.unknownType;
@@ -14,19 +26,19 @@ export abstract class HtmlOwner extends ViewOwner<HTMLElement> {
 		}
 		return type;
 	}
-	getTextOf(view: HTMLElement): string {
+	getTextOf(view: ViewElement): string {
 		return view.textContent;
 	}
-	setTextOf(view: HTMLElement, value: string): void {
+	setTextOf(view: ViewElement, value: string): void {
 		view.textContent = value;
 	}
-	appendTo(view: HTMLElement, value: any): void {
+	appendTo(view: ViewElement, value: any): void {
 		view.append(value);
 	}
-	getPartOf(view: HTMLElement): HTMLElement {
-		return view.parentElement;
+	getPartOf(view: ViewElement): ViewElement {
+		return view.$container || view.parentElement;
 	}
-	getPartsOf(view: HTMLElement): Iterable<HTMLElement> {
-		return view.children as Iterable<HTMLElement>;
+	getPartsOf(view: ViewElement): Iterable<ViewElement> {
+		return view.$content || view.children as Iterable<ViewElement>;
 	}
 }
