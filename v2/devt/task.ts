@@ -122,3 +122,19 @@ export class Member {
 		co-ordinate
 		address
 */
+
+/*
+Input
+Output
+Context
+State
+
+do(I): O
+
+Decision:
+IF (x) doTrue(I): O
+
+Things that can be done:
+- i -> i
+- i -> o Transform
+*/
