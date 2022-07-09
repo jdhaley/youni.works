@@ -1,3 +1,16 @@
+	// SHADOW TEST
+	// toView(model: content): HTMLElement {
+	// 	let view = this.owner.create(this);
+	// 	let shadow = view.attachShadow({mode: "open"});
+	// 	let head = this.owner.create("header");
+	// 	head.textContent = this.conf.title || "";
+	// 	shadow.append(head);
+	// 	let content = this.owner.create("div");
+	// 	shadow.append(content);
+	// 	this.viewContent(content, model);
+	// 	return view;
+	// }
+
 import {content} from "../base/model.js";
 import {ViewType} from "../base/view.js";
 import {Command, CommandBuffer} from "../base/command.js";
