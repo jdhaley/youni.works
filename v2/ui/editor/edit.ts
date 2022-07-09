@@ -2,7 +2,8 @@ import {content} from "../../base/model.js";
 import {ViewType} from "../../base/view.js";
 import {Command, CommandBuffer} from "../../base/command.js";
 
-import {Display, DisplayElement} from "../ui.js";
+import {Display} from "../ui.js";
+import {getView} from "../../base/dom.js";
 
 export class Article extends Display {
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
@@ -16,15 +17,6 @@ export class Article extends Display {
 export abstract class EditType extends ViewType<HTMLElement> {
 	declare readonly owner: Article;
 	abstract edit(commandName: string, range: Range, content?: content): Range;
-}
-
-let NEXT_ID = 1;
-
-export class EditElement extends DisplayElement {
-	connectedCallback() {
-		super.connectedCallback();
-		if (!this.id) this.id = "" + NEXT_ID++;
-	}
 }
 
 export abstract class Edit extends Command<Range> {
@@ -61,24 +53,9 @@ export abstract class Edit extends Command<Range> {
 	}
 }
 
-export function getView(node: Node | Range): DisplayElement {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node instanceof DisplayElement) return node as DisplayElement;
-		node = node.parentElement;
-	}
-}
-export function toView(range: Range): DisplayElement {
-	let type = getView(range)?.view_type;
-	let view = type.owner.create(type);
-	let frag = range.cloneContents();
-	while (frag.firstChild) view.append(frag.firstChild);
-	return view;
-}
-
 function replace(range: Range, markup: string) {
 	let view = getView(range);
-	let type = view.view_type;
+	let type = view.$type;
 	view = type.owner.create(type);
 	view.innerHTML = markup;
 	

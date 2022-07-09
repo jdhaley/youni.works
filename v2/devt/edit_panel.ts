@@ -12,10 +12,12 @@
 	// }
 
 import {content} from "../base/model.js";
+import {DisplayElement} from "../base/dom.js";
+
 import {ViewType} from "../base/view.js";
 import {Command, CommandBuffer} from "../base/command.js";
 
-import {Display, DisplayElement} from "../ui/ui.js";
+import {Display} from "../ui/ui.js";
 
 export class Article extends Display {
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
@@ -65,15 +67,6 @@ export abstract class EditType extends ViewType<HTMLElement> {
 	// }
 }
 
-let NEXT_ID = 1;
-
-export class EditElement extends DisplayElement {
-	connectedCallback() {
-		super.connectedCallback();
-		if (!this.id) this.id = "" + NEXT_ID++;
-	}
-}
-
 export abstract class Edit extends Command<Range> {
 	constructor(owner: Article, name: string, viewId: string) {
 		super();
@@ -116,7 +109,7 @@ export function getView(node: Node | Range): DisplayElement {
 	}
 }
 export function toView(range: Range): DisplayElement {
-	let type = getView(range)?.view_type;
+	let type = getView(range)?.$type;
 	let view = type.toView(undefined);
 	view.children[1].textContent = "";
 	let frag = range.cloneContents();
@@ -126,7 +119,7 @@ export function toView(range: Range): DisplayElement {
 
 function replace(range: Range, markup: string) {
 	let view = getView(range);
-	let type = view.view_type;
+	let type = view.$type;
 	view = type.owner.create(type);
 	view.innerHTML = markup;
 	

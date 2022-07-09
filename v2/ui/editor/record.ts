@@ -1,9 +1,10 @@
 import {Record} from "../../base/model.js";
+import {DisplayElement, getView, toView} from "../../base/dom.js";
 
-import {Article, Edit, mark, EditElement, EditType, getView, toView} from "./edit.js";
+import {Article, Edit, mark, EditType} from "./edit.js";
 import {Frame} from "../ui.js";
 
-class RecordView extends EditElement {
+class RecordView extends DisplayElement {
 	constructor() {
 		super();
 	}
@@ -16,7 +17,7 @@ export class RecordEditor extends EditType {
 
 	edit(commandName: string, range: Range, record: Record): Range {
 		let view = getView(range);
-		if (view.view_type.model == "record") {
+		if (view.$type.model == "record") {
 			let cmd = new RecordCommand(this.owner, commandName, view.id);
 			cmd.do(range, record);
 		} else {
