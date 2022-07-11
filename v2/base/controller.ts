@@ -15,15 +15,13 @@ export interface Controller {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
-export class Control<T> implements Receiver {
+export class BaseReceiver implements Receiver {
 	constructor(conf?: bundle<any>) {
 		this.conf = conf || EMPTY.object;
 		if (this.conf.controller) this.controller = this.conf.controller;
 	}
 	readonly conf: bundle<any>
-	owner: Owner<T>;
 	controller: Controller = EMPTY.object;
-
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
 		while (subject) try {
@@ -38,19 +36,24 @@ export class Control<T> implements Receiver {
 	}
 }
 
+export abstract class Control<T> extends BaseReceiver {
+	owner: Owner<T>;
+
+	abstract getPartOf(value: T): T;
+	abstract getPartsOf(value: T): Iterable<T>;
+}
+
 export abstract class Owner<V> extends Control<V> {
-	abstract create(type: unknown): V;
-	abstract getPartOf(value: V): V;
-	abstract getPartsOf(value: V): Iterable<V>;
-	abstract getControlOf(value: V): Receiver;
+	abstract getControlOf(value: V): Control<V>;
 	
 	send(msg: Signal | string, to: V) {
 		msg = signal("down", msg);
 		if (!msg.subject) return;
 		msg.on = to;
-		this.getControlOf(to)?.receive(msg);
-		let parts = this.getPartsOf(to);
-		if (parts) for (let part of parts) {
+		let control = this.getControlOf(to);
+		control?.receive(msg);
+		let parts = control?.getPartsOf(to) || EMPTY.array;
+		for (let part of parts) {
 			msg.from = to;
 			this.send(msg, part);
 		}
@@ -59,9 +62,10 @@ export abstract class Owner<V> extends Control<V> {
 		evt = signal("up", evt);
 		while (on) {
 			evt.on = on;
-			this.getControlOf(on)?.receive(evt);
+			let control = this.getControlOf(on);
+			control?.receive(evt);
 			evt.from = on;
-			on = this.getPartOf(on);
+			on = control?.getPartOf(on);
 		}
 	}
 }

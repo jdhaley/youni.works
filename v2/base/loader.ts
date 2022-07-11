@@ -1,9 +1,9 @@
-import {Controller} from "./controller.js";
+import {BaseReceiver, Control, Controller} from "./controller.js";
 import {bundle, extend} from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
 export interface BaseConf {
-	class: typeof ViewType;
+	class: typeof BaseReceiver;
 	tagName: string;
 	controller: Controller;
 	shortcuts: bundle<string>;
@@ -20,7 +20,7 @@ export function loadBaseTypes(owner: ViewOwner<unknown>): bundle<ViewType<any>> 
 	let types = Object.create(null);
 	for (let name in owner.conf.baseTypes) {
 		let conf: BaseConf = owner.conf.baseTypes[name];
-		let type = new conf.class(conf);
+		let type = new conf.class(conf) as ViewType<unknown>;
 		type.name = name;
 		type.owner = owner;
 		types[name] = type;

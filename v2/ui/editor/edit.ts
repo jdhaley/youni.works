@@ -3,7 +3,7 @@ import {ViewType} from "../../base/view.js";
 import {Command, CommandBuffer} from "../../base/command.js";
 
 import {Display} from "../ui.js";
-import {getView} from "../../base/dom.js";
+import {getView, ViewElement} from "../../base/dom.js";
 
 export class Article extends Display {
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
@@ -16,7 +16,46 @@ export class Article extends Display {
 
 export abstract class EditType extends ViewType<HTMLElement> {
 	declare readonly owner: Article;
+
+	get isPanel() {
+		return true;
+	}
 	abstract edit(commandName: string, range: Range, content?: content): Range;
+
+	create(): HTMLElement {
+		let view = this.owner.frame.create(this.conf.tagName || "div");
+		view["type$"] = this;
+		if (this.propertyName) {
+			view.dataset.name = this.propertyName;
+		} else {
+			view.dataset.type = this.name;
+		}
+		if (this.isPanel) {
+			view.append(this.owner.frame.create("header"));
+			view.firstChild.textContent = this.conf.title || "";
+			view.append(this.owner.frame.create("div"));
+		}
+		return view;
+	}
+
+	getPartOf(view: ViewElement): ViewElement {
+		return view.$container || view.parentElement;
+	}
+	getPartsOf(view: ViewElement): Iterable<ViewElement> {
+		return view.$content || view.children as Iterable<ViewElement>;
+	}
+	getTextOf(view: HTMLElement): string {
+		let ele = this.isPanel ? view.children[1] : view;
+		return ele ? ele.textContent : "";
+	}
+	setTextOf(view: HTMLElement, value: string): void {
+		let ele = this.isPanel ? view.children[1] : view;
+		ele.textContent = value;
+	}
+	appendTo(view: HTMLElement, value: any): void {
+		let ele = this.isPanel ? view.children[1] : view;
+		ele.append(value);
+	}
 }
 
 export abstract class Edit extends Command<Range> {
@@ -56,7 +95,7 @@ export abstract class Edit extends Command<Range> {
 function replace(range: Range, markup: string) {
 	let view = getView(range);
 	let type = view.$type;
-	view = type.owner.create(type);
+	view = type.create();
 	view.innerHTML = markup;
 	
 	range.deleteContents();

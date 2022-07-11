@@ -1,5 +1,4 @@
 import {BaseConf} from "../../base/loader.js";
-import {ViewType} from "../../base/view.js";
 import {bundle} from "../../base/util.js";
 
 import {ListEditor} from "../editor/list.js";
@@ -14,31 +13,31 @@ import shortcuts from "./shortcuts.js";
 
 const conf: bundle<BaseConf> = {
 	text: {
-		class: TextEditor as typeof ViewType,
+		class: TextEditor,
 		tagName: "ui-text",
 		controller: text,
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: TextEditor as typeof ViewType,
+		class: TextEditor,
 		tagName: "ui-text",
 		controller: text,
 		shortcuts: shortcuts
 	},
 	list: {
-		class: ListEditor as typeof ViewType,
+		class: ListEditor,
 		tagName: "ui-list",
 		controller: list,
 		shortcuts: shortcuts
 	},
 	record: {
-		class: RecordEditor as typeof ViewType,
+		class: RecordEditor,
 		tagName: "ui-record",
 		controller: record,
 		shortcuts: shortcuts
 	},
 	tree: {
-		class: ListEditor as typeof ViewType,
+		class: ListEditor,
 		tagName: "ui-tree",
 		controller: list,
 		shortcuts: shortcuts

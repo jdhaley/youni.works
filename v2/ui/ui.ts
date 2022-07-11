@@ -13,6 +13,8 @@ export class Display extends HtmlOwner {
 		this.controller = conf.controllers.article;
 		this.initTypes(conf.viewTypes, conf.baseTypes);
 		this.type = this.types[this.conf.type];
+		console.log(this.types, this.conf.unknownType);
+		this.unknownType = this.types[this.conf.unknownType]
 	}
 	declare readonly owner: Frame;
 	readonly service: RemoteFileService;
@@ -22,18 +24,6 @@ export class Display extends HtmlOwner {
 
 	get frame(): Frame {
 		return this.owner;
-	}
-
-	create(type: ViewType<HTMLElement> | string): HTMLElement {
-		if (typeof type == "string") return this.frame.create(type);
-		let view = this.frame.create(type.conf.tagName || "div");
-		view["type$"] = type;
-		if (type.propertyName) {
-			view.dataset.name = type.propertyName;
-		} else {
-			view.dataset.type = type.name;
-		}
-		return view;
 	}
 }
 

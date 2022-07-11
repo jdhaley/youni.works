@@ -42,6 +42,22 @@ export class Article extends Display {
 	setTextOf(view: HTMLElement, value: string): void {
 		view.children[1].textContent = value;
 	}
+	create(type: ViewType<HTMLElement> | string): HTMLElement {
+		if (typeof type == "string") return this.frame.create(type);
+		let view = this.frame.create(type.conf.tagName || "div");
+		view["type$"] = type;
+		if (type.propertyName) {
+			view.dataset.name = type.propertyName;
+		} else {
+			view.dataset.type = type.name;
+		}
+		if (type["isPanel"]) {
+			view.append(this.frame.create("header"));
+			view.firstChild.textContent = type.conf.title || "";
+			view.append(this.frame.create("div"));
+		}
+		return view;
+	}
 }
 
 export abstract class EditType extends ViewType<HTMLElement> {

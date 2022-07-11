@@ -26,15 +26,6 @@ export abstract class HtmlOwner extends ViewOwner<ViewElement> {
 		}
 		return type;
 	}
-	getTextOf(view: ViewElement): string {
-		return view.textContent;
-	}
-	setTextOf(view: ViewElement, value: string): void {
-		view.textContent = value;
-	}
-	appendTo(view: ViewElement, value: any): void {
-		view.append(value);
-	}
 	getPartOf(view: ViewElement): ViewElement {
 		return view.$container || view.parentElement;
 	}
@@ -50,10 +41,15 @@ export class DisplayElement extends HTMLElement implements ViewElement {
 	type$: ViewType<DisplayElement>;
 	
 	get $container() {
-		return this.parentElement;
+		for (let parent = this.parentElement; parent; parent = parent.parentElement) {
+			if (parent instanceof DisplayElement) return parent as DisplayElement;
+		}
+	}
+	get $header() {
+		if (this.$type?.isPanel) return this.children[0]
 	}
 	get $content() {
-		return this.children as Iterable<ViewElement>;
+		return (this.$type?.isPanel ? this.children[1].children : this.children) as Iterable<ViewElement>;
 	}
 	get $type() {
 		return this.type$ || this.ownerDocument["$owner"].getControlOf(this);
@@ -74,8 +70,8 @@ export function getView(node: Node | Range): DisplayElement {
 }
 export function toView(range: Range): DisplayElement {
 	let type = getView(range)?.$type;
-	let view = type.owner.create(type);
+	let view = type.create();
 	let frag = range.cloneContents();
-	while (frag.firstChild) view.append(frag.firstChild);
+	while (frag.firstChild) type.appendTo(view, frag.firstChild);
 	return view;
 }

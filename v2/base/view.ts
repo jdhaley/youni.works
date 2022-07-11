@@ -18,7 +18,7 @@ export function viewType(value: any): string {
 
 let VIEWERS = {
 	text(this: ViewType<unknown>, view: unknown, model: string): void {
-		this.owner.setTextOf(view, model || CHAR.ZWSP);
+		this.setTextOf(view, model || CHAR.ZWSP);
 	},
 	record(this: ViewType<unknown>, view: unknown, model: Record) {
 		view["$at"] = Object.create(null);
@@ -26,7 +26,7 @@ let VIEWERS = {
 			let type = this.types[name];
 			let value = model ? model[name] : null;
 			let member = type.toView(value);
-			this.owner.appendTo(view, member);
+			this.appendTo(view, member);
 			view["$at"][name] = member;
 		}
 		//if (!view.textContent) view.textContent = CHAR.ZWSP;
@@ -36,7 +36,7 @@ let VIEWERS = {
 		if (model && model[Symbol.iterator]) for (let value of model) {
 			let type = this.types[viewType(value)] || this.owner.unknownType;
 			let part = type.toView(value);
-			this.owner.appendTo(view, part);
+			this.appendTo(view, part);
 		}
 		//if (!view.textContent) view.append(CHAR.ZWSP);
 	}
@@ -66,7 +66,7 @@ let MODELLERS = {
 		return model;
 	},
 	text(this: ViewType<unknown>, view: unknown): string {
-		let text = this.owner.getTextOf(view);
+		let text = this.getTextOf(view);
 		return text == CHAR.ZWSP ? "" : text;
 	}
 }
@@ -78,10 +78,9 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	types: bundle<ViewType<V>>;
 
 	abstract getControlOf(value: V): ViewType<V>;
-	abstract getTextOf(view: V): string;
-	abstract setTextOf(view: V, value: string): void;
-	abstract appendTo(view: V, value: unknown): void;
-	abstract create(type: string | ViewType<V>): V;
+	// abstract getTextOf(view: V): string;
+	// abstract setTextOf(view: V, value: string): void;
+	// abstract appendTo(view: V, value: unknown): void;
 
 	initTypes(source: bundle<any>, base: bundle<ViewType<V>>) {
 		base = loadBaseTypes(this);
@@ -90,7 +89,7 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	}
 }
 
-export class ViewType<V> extends Control<V> implements ContentType<V> {
+export abstract class ViewType<V> extends Control<V> implements ContentType<V> {
 	declare owner: ViewOwner<V>;
 	declare model: "record" | "list" | "text";
 	declare name: string;
@@ -104,11 +103,16 @@ export class ViewType<V> extends Control<V> implements ContentType<V> {
 		return this.owner.modellers[this.model].call(this, view);
 	}
 	toView(model: content): V {
-		let view = this.owner.create(this);
+		let view = this.create();
 		this.viewContent(view, model);
 		return view;
 	}
 	viewContent(view: V, model: content): void {
 		this.owner.viewers[this.model].call(this, view, model);
 	}
+
+	abstract create(): V;
+	abstract getTextOf(view: V): string;
+	abstract setTextOf(view: V, value: string): void;
+	abstract appendTo(view: V, value: any): void 
 }
