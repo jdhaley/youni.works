@@ -1,7 +1,7 @@
 import {content} from "../base/model.js";
 import {Signal, Actions} from "../base/controller.js";
 import {ViewType} from "../base/view.js";
-import {DisplayOwner} from "../base/display.js";
+import {DisplayOwner, ViewElement} from "../base/display.js";
 import {RemoteFileService} from "../base/remote.js";
 import {bundle} from "../base/util.js";
 
@@ -18,8 +18,8 @@ export class Display extends DisplayOwner {
 	}
 	readonly frame: Frame;
 	readonly service: RemoteFileService;
-	type: ViewType<HTMLElement>;
-	view: HTMLElement;
+	type: ViewType<ViewElement>;
+	view: ViewElement;
 	model: content;
 
 	createElement(tagName: string): HTMLElement {

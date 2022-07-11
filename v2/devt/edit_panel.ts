@@ -12,7 +12,7 @@
 	// }
 
 import {content} from "../base/model.js";
-import {DisplayElement} from "../base/display.js";
+import {DisplayElement, ViewElement} from "../base/display.js";
 
 import {ViewType} from "../base/view.js";
 import {Command, CommandBuffer} from "../base/command.js";
@@ -42,7 +42,7 @@ export class Article extends Display {
 	setTextOf(view: HTMLElement, value: string): void {
 		view.children[1].textContent = value;
 	}
-	create(type: ViewType<HTMLElement> | string): HTMLElement {
+	create(type: ViewType<ViewElement> | string): HTMLElement {
 		if (typeof type == "string") return this.frame.createElement(type);
 		let view = this.frame.createElement(type.conf.tagName || "div");
 		view["type$"] = type;
@@ -60,7 +60,7 @@ export class Article extends Display {
 	}
 }
 
-export abstract class EditType extends ViewType<HTMLElement> {
+export abstract class EditType extends ViewType<ViewElement> {
 	declare readonly owner: Article;
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 	toView(model: content): HTMLElement {

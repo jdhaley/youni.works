@@ -1,10 +1,10 @@
 import {View, ViewOwner, ViewType} from "./view.js";
 
-export interface ViewElement extends HTMLElement, View<ViewElement> {
+export interface ViewElement extends Element, View<ViewElement> {
 }
 
 export abstract class DisplayOwner extends ViewOwner<ViewElement> {
-	abstract createElement(tagName: string): HTMLElement;
+	abstract createElement(tagName: string): Element;
 	getControlOf(view: ViewElement): ViewType<ViewElement> {
 		let type = view["type$"];
 		if (!type) {
@@ -12,7 +12,8 @@ export abstract class DisplayOwner extends ViewOwner<ViewElement> {
 			let parent = this.getPartOf(view);
 			if (parent) {
 				type = this.getControlOf(parent);
-				type = type?.types[view.dataset.name || view.dataset.type] || this.unknownType;
+				let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+				type = type?.types[name] || this.unknownType;
 			}
 			view["type$"] = type;
 		}
@@ -26,20 +27,20 @@ export abstract class DisplayOwner extends ViewOwner<ViewElement> {
 	}
 }
 
-export abstract class DisplayType extends ViewType<HTMLElement> {
+export abstract class DisplayType extends ViewType<ViewElement> {
 	declare readonly owner: DisplayOwner;
 
 	get isPanel() {
 		return false;
 	}
 
-	createView(): HTMLElement {
+	createView(): ViewElement {
 		let view = this.owner.createElement(this.conf.tagName || "div");
 		view["type$"] = this;
 		if (this.propertyName) {
-			view.dataset.name = this.propertyName;
+			view.setAttribute("data-name", this.propertyName);
 		} else {
-			view.dataset.type = this.name;
+			view.setAttribute("data-type", this.name);
 		}
 		if (this.isPanel) {
 			view.append(this.owner.createElement("header"));
@@ -55,15 +56,15 @@ export abstract class DisplayType extends ViewType<HTMLElement> {
 	getPartsOf(view: ViewElement): Iterable<ViewElement> {
 		return (view.$content || view.children) as Iterable<ViewElement>;
 	}
-	getTextOf(view: HTMLElement): string {
+	getTextOf(view: ViewElement): string {
 		let ele = this.isPanel ? view.children[1] : view;
 		return ele ? ele.textContent : "";
 	}
-	setTextOf(view: HTMLElement, value: string): void {
+	setTextOf(view: ViewElement, value: string): void {
 		let ele = this.isPanel ? view.children[1] : view;
 		ele.textContent = value;
 	}
-	appendTo(view: HTMLElement, value: any): void {
+	appendTo(view: ViewElement, value: any): void {
 		let ele = this.isPanel ? view.children[1] : view;
 		ele.append(value);
 	}
