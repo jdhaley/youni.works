@@ -15,31 +15,31 @@ const conf: bundle<BaseConf> = {
 	text: {
 		class: TextEditor,
 		tagName: "ui-text",
-		controller: text,
+		actions: text,
 		shortcuts: shortcuts
 	},
 	markup: {
 		class: TextEditor,
 		tagName: "ui-text",
-		controller: text,
+		actions: text,
 		shortcuts: shortcuts
 	},
 	list: {
 		class: ListEditor,
 		tagName: "ui-list",
-		controller: list,
+		actions: list,
 		shortcuts: shortcuts
 	},
 	record: {
 		class: RecordEditor,
 		tagName: "ui-record",
-		controller: record,
+		actions: record,
 		shortcuts: shortcuts
 	},
 	tree: {
 		class: ListEditor,
 		tagName: "ui-tree",
-		controller: list,
+		actions: list,
 		shortcuts: shortcuts
 	}
 }

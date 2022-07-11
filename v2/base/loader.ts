@@ -1,11 +1,11 @@
-import {BaseReceiver, Control, Controller} from "./controller.js";
+import {Controller, Actions} from "./controller.js";
 import {bundle, extend} from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
 export interface BaseConf {
-	class: typeof BaseReceiver;
+	class: typeof Controller;
 	tagName: string;
-	controller: Controller;
+	actions: Actions;
 	shortcuts: bundle<string>;
 }
 

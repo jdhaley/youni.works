@@ -11,21 +11,21 @@ export interface Receiver {
 	receive(signal: Signal): void;
 }
 
-export interface Controller {
+export interface Actions {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
-export class BaseReceiver implements Receiver {
+export class Controller implements Receiver {
 	constructor(conf?: bundle<any>) {
 		this.conf = conf || EMPTY.object;
-		if (this.conf.controller) this.controller = this.conf.controller;
+		if (this.conf.actions) this.actions = this.conf.actions;
 	}
 	readonly conf: bundle<any>
-	controller: Controller = EMPTY.object;
+	actions: Actions = EMPTY.object;
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
 		while (subject) try {
-			let action = this.controller[subject];
+			let action = this.actions[subject];
 			action && action.call(this, signal);
 			subject = (subject != signal.subject ? signal.subject : "");	
 		} catch (error) {
@@ -36,7 +36,7 @@ export class BaseReceiver implements Receiver {
 	}
 }
 
-export abstract class Control<T> extends BaseReceiver {
+export abstract class Control<T> extends Controller {
 	owner: Owner<T>;
 
 	abstract getPartOf(value: T): T;

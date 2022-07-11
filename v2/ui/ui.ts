@@ -1,5 +1,5 @@
 import {content} from "../base/model.js";
-import {Signal, Controller} from "../base/controller.js";
+import {Signal, Actions} from "../base/controller.js";
 import {ViewType} from "../base/view.js";
 import {DisplayOwner} from "../base/display.js";
 import {RemoteFileService} from "../base/remote.js";
@@ -10,7 +10,7 @@ export class Display extends DisplayOwner {
 		super(conf);
 		this.owner = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		this.controller = conf.controllers.article;
+		this.actions = conf.actions.article;
 		this.initTypes(conf.viewTypes, conf.baseTypes);
 		this.type = this.types[this.conf.type];
 		console.log(this.types, this.conf.unknownType);
@@ -32,12 +32,12 @@ export class Display extends DisplayOwner {
 }
 
 export class Frame extends DisplayOwner {
-	constructor(window: Window, controller: Controller) {
+	constructor(window: Window, actions: Actions) {
 		super();
 		window.document["$owner"] = this;
 		this.#window = window;
-		for (let name in controller) {
-			let listener = controller[name];
+		for (let name in actions) {
+			let listener = actions[name];
 			let target = name == "selectionchange" ? window.document : this.#window;
 			target.addEventListener(name, listener as any);
 		}
