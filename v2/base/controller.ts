@@ -15,7 +15,7 @@ export interface Actions {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
-export class Controller implements Receiver {
+export class Control implements Receiver {
 	constructor(conf?: bundle<any>) {
 		this.conf = conf || EMPTY.object;
 		if (this.conf.actions) this.actions = this.conf.actions;
@@ -36,15 +36,15 @@ export class Controller implements Receiver {
 	}
 }
 
-export abstract class Control<T> extends Controller {
-	owner: Owner<T>;
+export abstract class Controller<V> extends Control {
+	owner: Owner<V>;
 
-	abstract getPartOf(value: T): T;
-	abstract getPartsOf(value: T): Iterable<T>;
+	abstract getPartOf(value: V): V;
+	abstract getPartsOf(value: V): Iterable<V>;
 }
 
-export abstract class Owner<V> extends Control<V> {
-	abstract getControlOf(value: V): Control<V>;
+export abstract class Owner<V> extends Control {
+	abstract getControlOf(value: V): Controller<V>;
 	
 	send(msg: Signal | string, to: V) {
 		msg = signal("down", msg);

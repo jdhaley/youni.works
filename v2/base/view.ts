@@ -1,5 +1,5 @@
 import {content, ContentType, List, Record, Type, typeOf} from "./model.js";
-import {Control, Owner} from "./controller.js";
+import {Controller, Owner} from "./controller.js";
 import {bundle, CHAR, EMPTY} from "./util.js";
 import {loadBaseTypes, loadTypes} from "./loader.js";
 
@@ -51,7 +51,7 @@ let VIEWERS = {
 let MODELLERS = {
 	list(this: ViewType<unknown>, view: unknown): List {
 		let model: content[] = null;
-		for (let part of (this.owner.getPartsOf(view) || EMPTY.array)) {
+		for (let part of (this.getPartsOf(view) || EMPTY.array)) {
 			let type = this.owner.getControlOf(part) || this.owner.unknownType;
 			if (!model) model = [];
 			model.push(type.toModel(part));
@@ -64,7 +64,7 @@ let MODELLERS = {
 	record(this: ViewType<unknown>, view: unknown): Record {
 		let model = Object.create(null);
 		model.type$ = this.name;
-		for (let part of this.owner.getPartsOf(view)) {
+		for (let part of this.getPartsOf(view)) {
 			let type = this.owner.getControlOf(part) || this.owner.unknownType;
 			let value = type.toModel(part);
 			if (value) model[type.propertyName] = value;	
@@ -84,10 +84,7 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	types: bundle<ViewType<V>>;
 
 	abstract getControlOf(value: V): ViewType<V>;
-	// abstract getTextOf(view: V): string;
-	// abstract setTextOf(view: V, value: string): void;
-	// abstract appendTo(view: V, value: unknown): void;
-
+	
 	initTypes(source: bundle<any>, base: bundle<ViewType<V>>) {
 		base = loadBaseTypes(this);
 		this.types = loadTypes(source, base) as bundle<ViewType<V>>;
@@ -95,7 +92,7 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	}
 }
 
-export abstract class ViewType<V> extends Control<V> implements ContentType<V> {
+export abstract class ViewType<V> extends Controller<V> implements ContentType<V> {
 	declare owner: ViewOwner<V>;
 	declare model: "record" | "list" | "text";
 	declare name: string;

@@ -1,9 +1,9 @@
-import {Controller, Actions} from "./controller.js";
+import {Control, Actions} from "./controller.js";
 import {bundle, extend} from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
 export interface BaseConf {
-	class: typeof Controller;
+	class: typeof Control;
 	tagName: string;
 	actions: Actions;
 	shortcuts: bundle<string>;

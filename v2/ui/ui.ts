@@ -8,7 +8,7 @@ import {bundle} from "../base/util.js";
 export class Display extends DisplayOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
-		this.owner = frame;
+		this.frame = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
 		this.actions = conf.actions.article;
 		this.initTypes(conf.viewTypes, conf.baseTypes);
@@ -16,18 +16,14 @@ export class Display extends DisplayOwner {
 		console.log(this.types, this.conf.unknownType);
 		this.unknownType = this.types[this.conf.unknownType]
 	}
-	declare readonly owner: Frame;
+	readonly frame: Frame;
 	readonly service: RemoteFileService;
 	type: ViewType<HTMLElement>;
 	view: HTMLElement;
 	model: content;
 
-	get frame(): Frame {
-		return this.owner;
-	}
-
 	createElement(tagName: string): HTMLElement {
-		return this.owner.createElement(tagName);
+		return this.frame.createElement(tagName);
 	}
 }
 
