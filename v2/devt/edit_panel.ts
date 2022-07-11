@@ -12,7 +12,7 @@
 	// }
 
 import {content} from "../base/model.js";
-import {DisplayElement} from "../base/dom.js";
+import {DisplayElement} from "../base/display.js";
 
 import {ViewType} from "../base/view.js";
 import {Command, CommandBuffer} from "../base/command.js";
@@ -43,8 +43,8 @@ export class Article extends Display {
 		view.children[1].textContent = value;
 	}
 	create(type: ViewType<HTMLElement> | string): HTMLElement {
-		if (typeof type == "string") return this.frame.create(type);
-		let view = this.frame.create(type.conf.tagName || "div");
+		if (typeof type == "string") return this.frame.createElement(type);
+		let view = this.frame.createElement(type.conf.tagName || "div");
 		view["type$"] = type;
 		if (type.propertyName) {
 			view.dataset.name = type.propertyName;
@@ -52,9 +52,9 @@ export class Article extends Display {
 			view.dataset.type = type.name;
 		}
 		if (type["isPanel"]) {
-			view.append(this.frame.create("header"));
+			view.append(this.frame.createElement("header"));
 			view.firstChild.textContent = type.conf.title || "";
-			view.append(this.frame.create("div"));
+			view.append(this.frame.createElement("div"));
 		}
 		return view;
 	}

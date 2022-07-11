@@ -1,5 +1,5 @@
 import {Record} from "../../base/model.js";
-import {DisplayElement, getView, toView} from "../../base/dom.js";
+import {DisplayElement, getView, toView} from "../../base/display.js";
 
 import {Article, Edit, mark, EditType} from "./edit.js";
 import {Frame} from "../ui.js";

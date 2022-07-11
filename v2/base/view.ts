@@ -3,6 +3,12 @@ import {Control, Owner} from "./controller.js";
 import {bundle, CHAR, EMPTY} from "./util.js";
 import {loadBaseTypes, loadTypes} from "./loader.js";
 
+export interface View<T> {
+	$type?: ViewType<T>
+	$container?: View<T>;
+	$content?: Iterable<View<T>>;
+}
+
 export function viewType(value: any): string {
 	let type = typeOf(value);
 	switch (type) {
@@ -103,7 +109,7 @@ export abstract class ViewType<V> extends Control<V> implements ContentType<V> {
 		return this.owner.modellers[this.model].call(this, view);
 	}
 	toView(model: content): V {
-		let view = this.create();
+		let view = this.createView();
 		this.viewContent(view, model);
 		return view;
 	}
@@ -111,7 +117,7 @@ export abstract class ViewType<V> extends Control<V> implements ContentType<V> {
 		this.owner.viewers[this.model].call(this, view, model);
 	}
 
-	abstract create(): V;
+	abstract createView(): V;
 	abstract getTextOf(view: V): string;
 	abstract setTextOf(view: V, value: string): void;
 	abstract appendTo(view: V, value: any): void 

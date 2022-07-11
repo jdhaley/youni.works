@@ -1,11 +1,11 @@
 import {content} from "../base/model.js";
 import {Signal, Controller} from "../base/controller.js";
 import {ViewType} from "../base/view.js";
-import {HtmlOwner} from "../base/dom.js";
+import {DisplayOwner} from "../base/display.js";
 import {RemoteFileService} from "../base/remote.js";
 import {bundle} from "../base/util.js";
 
-export class Display extends HtmlOwner {
+export class Display extends DisplayOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
 		this.owner = frame;
@@ -25,9 +25,13 @@ export class Display extends HtmlOwner {
 	get frame(): Frame {
 		return this.owner;
 	}
+
+	createElement(tagName: string): HTMLElement {
+		return this.owner.createElement(tagName);
+	}
 }
 
-export class Frame extends HtmlOwner {
+export class Frame extends DisplayOwner {
 	constructor(window: Window, controller: Controller) {
 		super();
 		window.document["$owner"] = this;
@@ -70,7 +74,7 @@ export class Frame extends HtmlOwner {
 		selection.addRange(range);
 	}
 
-	create(tagName: string): HTMLElement {
+	createElement(tagName: string): HTMLElement {
 		return this.#window.document.createElement(tagName) as HTMLElement;
 	}
 	createRange(): Range {
