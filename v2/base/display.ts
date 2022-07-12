@@ -34,7 +34,9 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 		if (this.isPanel) {
 			view.append(this.owner.createElement("header"));
 			view.firstChild.textContent = this.conf.title || "";
-			view.append(this.owner.createElement("div"));
+			let content = this.owner.createElement("div");
+			content.classList.add("view");
+			view.append(content);
 		}
 		return view;
 	}

@@ -3,6 +3,7 @@ import {Command, CommandBuffer} from "../../base/command.js";
 
 import {Display} from "../ui.js";
 import {DisplayType, getView, replace} from "../../base/display.js";
+import { CHAR } from "../../base/util.js";
 
 let NEXT_ID = 1;
 export class EditElement extends HTMLElement {
@@ -121,4 +122,26 @@ export function unmark(range: Range) {
 		point.remove();
 		return range;
 	}	
+}
+
+
+export function rangeIterator(range: Range) {
+	return document.createNodeIterator(getView(range), NodeFilter.SHOW_ALL, 
+		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+	)
+}
+
+export function deleteText(range: Range) {
+	let it = rangeIterator(range);
+	for (let node = it.nextNode(); node; node = it.nextNode()) {
+		if (node.nodeType == Node.TEXT_NODE && node.parentElement.classList.contains("view")) {
+			if (node == range.startContainer) {
+				node.textContent = node.textContent.substring(0, range.startOffset);
+			} else if (node == range.endContainer) {
+				node.textContent = node.textContent.substring(range.endOffset);
+			} else {
+				node.textContent = CHAR.ZWSP;
+			}
+		}
+	}
 }
