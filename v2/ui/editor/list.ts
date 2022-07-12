@@ -1,10 +1,10 @@
 import {content} from "../../base/model.js";
-import {DisplayElement, getView, toView} from "../../base/display.js";
+import {getView, toView, ViewElement} from "../../base/display.js";
 
 import {Frame} from "../ui.js";
-import {Edit, mark, Article, EditType} from "./edit.js";
+import {Edit, mark, Article, EditType, EditElement} from "./edit.js";
 
-class ListView extends DisplayElement {
+class ListView extends EditElement {
 	constructor() {
 		super();
 	}
@@ -17,7 +17,7 @@ export class ListEditor extends EditType {
 
 	edit(commandName: string, range: Range, content?: content): Range {
 		let view = getView(range);
-		if (view.$type.model == "list") {
+		if (view.type$.model == "list") {
 			let cmd = new ListCommand(this.owner, commandName, view.id);
 			cmd.do(range, content);
 		} else {
@@ -105,11 +105,11 @@ function startEdit(cmd: ListCommand, range: Range) {
 	if (end) cmd.endId = end.id;
 }
 
-function getChildView(ctx: Node, node: Node): DisplayElement {
+function getChildView(ctx: Node, node: Node): ViewElement {
 	while (node && node.parentElement != ctx) {
 		node = node.parentElement;
 	}
-	if (node instanceof DisplayElement) return node;
+	if (node["type$"]) return node as ViewElement;
 
 	throw new Error("Cant extend() marked range");
 }
@@ -161,34 +161,34 @@ function getChildView(ctx: Node, node: Node): DisplayElement {
 // 	return markupText;
 // }
 
-function getStartContent(range: Range): DisplayElement {
+function getStartContent(range: Range): ViewElement {
 	if (range.startContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.startContainer);
-		let type = view.$type;
+		let type = view.type$;
 		range = range.cloneRange();
 		range.collapse(true);
 		range.setStart(view, 0);
 		let vw = toView(range);
 		console.log("start content:", vw.textContent)
-		let content = vw.$type.toModel(vw);
-		view = view.cloneNode(false) as DisplayElement;
+		let content = vw.type$.toModel(vw);
+		view = view.cloneNode(false) as ViewElement;
 		type.viewContent(view, content);
 		return view;
 	}
 	return null;
 }
-function getEndContent(range: Range): DisplayElement {
+function getEndContent(range: Range): ViewElement {
 	if (range.endContainer != range.commonAncestorContainer) {
 		let view = getChildView(range.commonAncestorContainer, range.endContainer);
-		let type = view.$type;
+		let type = view.type$;
 		if (!type) return;
 		range = range.cloneRange();
 		range.collapse(false);
 		range.setEnd(view, view.childElementCount);
 		let vw = toView(range);
 		console.log("end content:", vw.textContent)
-		let content = vw.$type.toModel(vw);
-		view = view.cloneNode(false) as DisplayElement;
+		let content = vw.type$.toModel(vw);
+		view = view.cloneNode(false) as ViewElement;
 		type.viewContent(view, content);
 		return view;
 	}

@@ -3,12 +3,6 @@ import {Controller, Owner} from "./controller.js";
 import {bundle, CHAR, EMPTY} from "./util.js";
 import {loadBaseTypes, loadTypes} from "./loader.js";
 
-export interface View<T> {
-	$type?: ViewType<T>
-	$container?: View<T>;
-	$content?: Iterable<View<T>>;
-}
-
 export function viewType(value: any): string {
 	let type = typeOf(value);
 	switch (type) {

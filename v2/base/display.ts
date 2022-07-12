@@ -1,29 +1,18 @@
-import {View, ViewOwner, ViewType} from "./view.js";
+import { EMPTY } from "./util.js";
+import {ViewOwner, ViewType} from "./view.js";
 
-export interface ViewElement extends Element, View<ViewElement> {
+export interface ViewElement extends Element {
+	type$?: DisplayType
 }
 
 export abstract class DisplayOwner extends ViewOwner<ViewElement> {
 	abstract createElement(tagName: string): Element;
 	getControlOf(view: ViewElement): ViewType<ViewElement> {
-		let type = view["type$"];
+		let type = view.type$;
 		if (!type) {
-			type = this.unknownType;
-			let parent = this.getPartOf(view);
-			if (parent) {
-				type = this.getControlOf(parent);
-				let name = view.getAttribute("data-name") || view.getAttribute("data-type");
-				type = type?.types[name] || this.unknownType;
-			}
-			view["type$"] = type;
+			console.log(view);
 		}
 		return type;
-	}
-	getPartOf(view: ViewElement): ViewElement {
-		return (view.$container || view.parentElement) as ViewElement;
-	}
-	getPartsOf(view: ViewElement): Iterable<ViewElement> {
-		return (view.$content || view.children) as Iterable<ViewElement>;
 	}
 }
 
@@ -35,8 +24,8 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 	}
 
 	createView(): ViewElement {
-		let view = this.owner.createElement(this.conf.tagName || "div");
-		view["type$"] = this;
+		let view = this.owner.createElement(this.conf.tagName || "div") as ViewElement;
+		view.type$ = this;
 		if (this.propertyName) {
 			view.setAttribute("data-name", this.propertyName);
 		} else {
@@ -51,10 +40,16 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 	}
 
 	getPartOf(view: ViewElement): ViewElement {
-		return (view.$container || view.parentElement) as ViewElement;
+		for (let parent: Element = view.parentElement; parent; parent = parent.parentElement) {
+			if (parent["type$"]) return parent as ViewElement;
+		}
 	}
 	getPartsOf(view: ViewElement): Iterable<ViewElement> {
-		return (view.$content || view.children) as Iterable<ViewElement>;
+		let content: any = view.children;
+		if (view.type$?.isPanel) {
+			content = view.children[1] ? view.children[1].children : EMPTY.array;
+		}
+		return content as Iterable<ViewElement>;
 	}
 	getTextOf(view: ViewElement): string {
 		let ele = this.isPanel ? view.children[1] : view;
@@ -70,57 +65,33 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 	}
 }
 
-/** Base class for custom HTML Elements */
-let NEXT_ID = 1;
-
-export class DisplayElement extends HTMLElement implements ViewElement {
-	type$: ViewType<DisplayElement>;
-	
-	get $container() {
-		for (let parent = this.parentElement; parent; parent = parent.parentElement) {
-			if (parent instanceof DisplayElement) return parent as DisplayElement;
-		}
-	}
-	get $header() {
-		if (this.$type?.isPanel) return this.children[0]
-	}
-	get $content() {
-		return (this.$type?.isPanel ? this.children[1].children : this.children) as Iterable<ViewElement>;
-	}
-	get $type() {
-		return this.type$ || this.ownerDocument["$owner"].getControlOf(this);
-	}
-
-	connectedCallback() {
-		this.$type; //triggers the assignment of type$ if not set.
-		if (!this.id) this.id = "" + NEXT_ID++;
-	}
-}
-
-export function getView(node: Node | Range): DisplayElement {
+export function getView(node: Node | Range): ViewElement {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node instanceof DisplayElement) return node as DisplayElement;
+		if (node["type$"]) return node as ViewElement;
 		node = node.parentElement;
 	}
 }
-export function toView(range: Range): DisplayElement {
-	let type = getView(range)?.$type;
+export function toView(range: Range): ViewElement {
+	let type = getView(range)?.type$;
 	let view = type.createView();
 	let frag = range.cloneContents();
-	while (frag.firstChild) type.appendTo(view, frag.firstChild);
+	let content = (type.isPanel ? view.firstChild.nextSibling : view) as Element;
+	while (frag.firstChild) content.append(frag.firstChild);
 	return view;
 }
 export function replace(range: Range, markup: string) {
 	let view = getView(range);
-	let type = view.$type;
-	view = type.createView();
-	view.innerHTML = markup;
+	range.selectNodeContents(view);
+	// let type = view.$type;
+	// view = type.createView();
+	// view.innerHTML = markup;
 	
 	range.deleteContents();
-	range.collapse();
-	while (view.firstElementChild) {
-		range.insertNode(view.firstElementChild);
-		range.collapse();
-	}
+	view.innerHTML = markup;
+	// range.collapse();
+	// while (view.firstElementChild) {
+	// 	range.insertNode(view.firstElementChild);
+	// 	range.collapse();
+	// }
 }

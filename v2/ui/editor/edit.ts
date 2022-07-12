@@ -2,7 +2,30 @@ import {content} from "../../base/model.js";
 import {Command, CommandBuffer} from "../../base/command.js";
 
 import {Display} from "../ui.js";
-import {DisplayType, replace} from "../../base/display.js";
+import {DisplayType, getView, replace} from "../../base/display.js";
+
+let NEXT_ID = 1;
+export class EditElement extends HTMLElement {
+	type$: DisplayType;
+	
+	connectedCallback() {
+		if (!this.type$) setType(this);
+		if (!this.id) this.id = "" + NEXT_ID++;
+	}
+}
+function setType(view: EditElement) {
+	let type = view.type$;
+	if (!type) {
+		let parent = getView(view.parentElement);
+		if (!parent) return;
+		if (parent) {
+			let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
+		}
+		view.type$ = type;
+	}
+	return type;
+}
 
 export class Article extends Display {
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();

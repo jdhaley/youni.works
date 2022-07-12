@@ -91,7 +91,7 @@ function setClipboard(type: EditType, range: Range, clipboard: DataTransfer) {
 	let view = toView(range);
 	let model = type.toModel(view);
 	clipboard.setData("application/json", JSON.stringify(model));
-	let html = htmlify(view);
+	let html = htmlify(view as HTMLElement);
 	//console.log(html);
 	clipboard.setData("text/html", html.outerHTML);
 	let data = "";

@@ -1,10 +1,10 @@
 import {content} from "../../base/model.js";
-import {DisplayElement, toView} from "../../base/display.js";
+import {toView} from "../../base/display.js";
 
 import {Frame} from "../ui.js";
-import {Edit, mark, EditType, Article} from "./edit.js";
+import {Edit, mark, EditType, Article, EditElement} from "./edit.js";
 
-class TextView extends DisplayElement {
+class TextView extends EditElement {
 	constructor() {
 		super();
 	}
