@@ -2,7 +2,7 @@ import {content} from "../../base/model.js";
 import {Command, CommandBuffer} from "../../base/command.js";
 
 import {Display} from "../ui.js";
-import {DisplayType, getView, replace} from "../../base/display.js";
+import {DisplayType, getView} from "../../base/display.js";
 import { CHAR } from "../../base/util.js";
 
 let NEXT_ID = 1;
@@ -143,5 +143,15 @@ export function deleteText(range: Range) {
 				node.textContent = CHAR.ZWSP;
 			}
 		}
+	}
+}
+
+export function replace(range: Range, markup: string) {
+	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
+	div.innerHTML = markup;
+	range.deleteContents();
+	while (div.firstElementChild) {
+		range.insertNode(div.firstElementChild);
+		range.collapse();
 	}
 }

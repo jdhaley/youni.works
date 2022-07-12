@@ -41,29 +41,30 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 		return view;
 	}
 
+	getModelView(view: ViewElement) {
+		if (view.type$?.isPanel) {
+			view = view.children[1]?.classList.contains("view") ? view.children[1] : null;
+		}
+		return view;
+	}
 	getPartOf(view: ViewElement): ViewElement {
 		for (let parent: ViewElement = view.parentElement; parent; parent = parent.parentElement) {
 			if (parent.type$) return parent;
 		}
 	}
 	getPartsOf(view: ViewElement): Iterable<ViewElement> {
-		let content: any = view.children;
-		if (view.type$?.isPanel) {
-			content = view.children[1] ? view.children[1].children : EMPTY.array;
-		}
-		return content as Iterable<ViewElement>;
+		return (this.getModelView(view)?.children || EMPTY.array) as Iterable<ViewElement>;
 	}
 	getTextOf(view: ViewElement): string {
-		let ele = this.isPanel ? view.children[1] : view;
-		return ele ? ele.textContent : "";
+		return this.getModelView(view)?.textContent || "";
 	}
 	setTextOf(view: ViewElement, value: string): void {
-		let ele = this.isPanel ? view.children[1] : view;
-		ele.textContent = value;
+		let ele = this.getModelView(view);
+		if (ele) ele.textContent = value;
 	}
 	appendTo(view: ViewElement, value: any): void {
-		let ele = this.isPanel ? view.children[1] : view;
-		ele.append(value);
+		let ele = this.getModelView(view);
+		if (ele) ele.append(value);
 	}
 }
 
@@ -81,19 +82,4 @@ export function toView(range: Range): ViewElement {
 	let content = (type.isPanel ? view.firstChild.nextSibling : view) as Element;
 	while (frag.firstChild) content.append(frag.firstChild);
 	return view;
-}
-export function replace(range: Range, markup: string) {
-	let view = getView(range);
-	range.selectNodeContents(view);
-	// let type = view.$type;
-	// view = type.createView();
-	// view.innerHTML = markup;
-	
-	range.deleteContents();
-	view.innerHTML = markup;
-	// range.collapse();
-	// while (view.firstElementChild) {
-	// 	range.insertNode(view.firstElementChild);
-	// 	range.collapse();
-	// }
 }

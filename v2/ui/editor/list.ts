@@ -18,6 +18,10 @@ export class ListEditor extends EditType {
 	edit(commandName: string, range: Range, content?: content): Range {
 		let view = getView(range);
 		if (view.type$.model == "list") {
+			let ctx = view.type$.getModelView(view);
+			//TODO - better handling if the header is selected...
+			if (range.commonAncestorContainer != ctx) range.setStart(ctx.firstChild, 0);
+
 			let cmd = new ListCommand(this.owner, commandName, view.id);
 			cmd.do(range, content);
 		} else {
@@ -51,10 +55,11 @@ class ListCommand extends Edit {
 	}
 }
 
-export function getItemRange(owner: Frame, contextId: string, startId: string, endId: string) {
-	let context = owner.getElementById(contextId);
-	if (!context) throw new Error("Can't find context element.");
-
+function getItemRange(owner: Frame, contextId: string, startId: string, endId: string) {
+	let context = owner.getElementById(contextId) as ViewElement;
+	if (!context?.type$) throw new Error("Can't find context element.");
+	//TODO: fix the children[1] hack:
+	context = context.type$.getModelView(context);
 	let range = owner.createRange();
 	range.selectNodeContents(context);
 	if (startId) {
@@ -80,7 +85,8 @@ function startEdit(cmd: ListCommand, range: Range) {
 	Expand the range to encompass the whole start/end items or markers (when 
 	a marker is a direct descendent of the list).
 	*/
-	let ctx = cmd.owner.frame.getElementById(cmd.viewId);
+	let ctx = cmd.owner.frame.getElementById(cmd.viewId) as ViewElement;
+	ctx = ctx.type$.getModelView(ctx);
 
 	let start: Element = cmd.owner.frame.getElementById("start-marker");
 	start = getChildView(ctx, start);
@@ -111,7 +117,7 @@ function getChildView(ctx: Node, node: Node): ViewElement {
 	}
 	if (node["type$"]) return node as ViewElement;
 
-	throw new Error("Cant extend() marked range");
+	//throw new Error("Cant extend() marked range");
 }
 
 // export function getItemContent(article: Article, point: "start" | "end", context: Element): Element {
@@ -162,8 +168,10 @@ function getChildView(ctx: Node, node: Node): ViewElement {
 // }
 
 function getStartContent(range: Range): ViewElement {
-	if (range.startContainer != range.commonAncestorContainer) {
-		let view = getChildView(range.commonAncestorContainer, range.startContainer);
+	let ctx = getView(range.commonAncestorContainer);
+	ctx = ctx.type$.getModelView(ctx);
+	if (range.startContainer != ctx) {
+		let view = getChildView(ctx, range.startContainer);
 		let type = view.type$;
 		range = range.cloneRange();
 		range.collapse(true);
@@ -178,7 +186,9 @@ function getStartContent(range: Range): ViewElement {
 	return null;
 }
 function getEndContent(range: Range): ViewElement {
-	if (range.endContainer != range.commonAncestorContainer) {
+	let ctx = getView(range.commonAncestorContainer);
+	ctx = ctx.type$.getModelView(ctx);
+	if (range.endContainer != ctx) {
 		let view = getChildView(range.commonAncestorContainer, range.endContainer);
 		let type = view.type$;
 		if (!type) return;
