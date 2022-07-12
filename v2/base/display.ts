@@ -40,8 +40,8 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 	}
 
 	getPartOf(view: ViewElement): ViewElement {
-		for (let parent: Element = view.parentElement; parent; parent = parent.parentElement) {
-			if (parent["type$"]) return parent as ViewElement;
+		for (let parent: ViewElement = view.parentElement; parent; parent = parent.parentElement) {
+			if (parent.type$) return parent;
 		}
 	}
 	getPartsOf(view: ViewElement): Iterable<ViewElement> {

@@ -18,10 +18,9 @@ function setType(view: EditElement) {
 	if (!type) {
 		let parent = getView(view.parentElement);
 		if (!parent) return;
-		if (parent) {
-			let name = view.getAttribute("data-name") || view.getAttribute("data-type");
-			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
-		}
+
+		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+		type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
 		view.type$ = type;
 	}
 	return type;
