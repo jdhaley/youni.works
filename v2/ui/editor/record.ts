@@ -1,7 +1,7 @@
 import {Record} from "../../base/model.js";
 import {getView} from "../../base/display.js";
 
-import {Article, Edit, mark, EditType, EditElement, unmark, deleteText} from "./edit.js";
+import {Article, Edit, mark, EditType, EditElement, unmark, clearContent} from "./edit.js";
 
 class RecordView extends EditElement {
 	constructor() {
@@ -43,7 +43,7 @@ class RecordCommand extends Edit {
 		mark(range);
 		this.before = getView(range).innerHTML;
 
-		deleteText(range);
+		clearContent(range);
 		this.after = view.innerHTML;
 
 		unmark(range);	

@@ -42,8 +42,11 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 	}
 
 	getModelView(view: ViewElement) {
-		if (view.type$?.isPanel) {
-			view = view.children[1]?.classList.contains("view") ? view.children[1] : null;
+		if (this.isPanel) {
+			if (view.children[1]?.classList.contains("view")) return view.children[1];
+			//The header may be missing when views are created from ranges.
+			//TODO have the edit logic ensure there is always a header.
+			if (view.children[0]?.classList.contains("view")) return view.children[0];
 		}
 		return view;
 	}
@@ -68,6 +71,11 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 	}
 }
 
+export function getViewContent(node: Node | Range) {
+	let view = getView(node);
+	return view?.type$.getModelView(view);
+}
+
 export function getView(node: Node | Range): ViewElement {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
@@ -77,9 +85,33 @@ export function getView(node: Node | Range): ViewElement {
 }
 export function toView(range: Range): ViewElement {
 	let type = getView(range)?.type$;
+	if (!type) return;
 	let view = type.createView();
+	let content = type.getModelView(view);
 	let frag = range.cloneContents();
-	let content = (type.isPanel ? view.firstChild.nextSibling : view) as Element;
-	while (frag.firstChild) content.append(frag.firstChild);
+	while (frag.firstChild) {
+		content.append(frag.firstChild);
+	}
+	for (let ele of type.getPartsOf(view)) {
+		bindView(ele);
+		if (ele.type$.isPanel && ele.children[0].tagName != "HEADER") {
+			ele.insertBefore(type.owner.createElement("HEADER"), ele.firstChild);
+		}
+	}
 	return view;
 }
+export function bindView(view: ViewElement): void {
+	let type = view.type$;
+	if (!type) {
+		let parent = getView(view.parentElement);
+		if (!parent) return;
+
+		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+		type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
+		view.type$ = type;
+	}
+	for (let child of getViewContent(view)?.children) {
+		bindView(child);
+	}
+}
+
