@@ -2,7 +2,8 @@ import { EMPTY } from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
 export interface ViewElement extends Element {
-	type$?: DisplayType
+	type$?: DisplayType;
+	v_content?: Element
 }
 
 export abstract class DisplayOwner extends ViewOwner<ViewElement> {
@@ -34,21 +35,29 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 		if (this.isPanel) {
 			view.append(this.owner.createElement("header"));
 			view.firstChild.textContent = this.conf.title || "";
-			let content = this.owner.createElement("div");
-			content.classList.add("view");
-			view.append(content);
+			view.v_content = this.owner.createElement("div");
+			view.v_content.classList.add("view");
+			view.append(view.v_content);	
+		} else {
+			view.v_content = view;
 		}
 		return view;
 	}
-
 	getModelView(view: ViewElement) {
-		if (this.isPanel) {
-			if (view.children[1]?.classList.contains("view")) return view.children[1];
-			//The header may be missing when views are created from ranges.
-			//TODO have the edit logic ensure there is always a header.
-			if (view.children[0]?.classList.contains("view")) return view.children[0];
+		let content = view.v_content
+		if (!content) {
+			if (this.isPanel) {
+				if (view.children[1]?.classList.contains("view")) {
+					content = view.children[1];
+				} else if (view.children[0]?.classList.contains("view")) {
+					content = view.children[0];
+				}
+				view.v_content = content;
+			} else {
+				view.v_content = view;
+			}
 		}
-		return view;
+		return content;
 	}
 	getPartOf(view: ViewElement): ViewElement {
 		for (let parent: ViewElement = view.parentElement; parent; parent = parent.parentElement) {
@@ -79,26 +88,6 @@ export function getView(node: Node | Range): ViewElement {
 	}
 }
 
-export function bindView(view: ViewElement): void {
-	let type = view.type$;
-	if (!type) {
-		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
-		let parent = getView(view.parentElement);
-		if (name && parent) {
-			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
-			view.type$ = type;	
-		}
-		if (!type) return;
-	}
-	//Handle where a view's header doesn't get created in editing operations.
-	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
-		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
-	}
-	for (let child of type.getPartsOf(view)) {
-		bindView(child);
-	}
-}
-
 export function atStart(ctx: Node, node: Node, offset: number) {
 	if (offset != 0) return false;
 	while (node && node != ctx) {
@@ -115,4 +104,10 @@ export function atEnd(ctx: Node, node: Node, offset: number) {
 		node = node.parentNode;
 	}
 	return true;
+}
+
+export function rangeIterator(range: Range) {
+	return document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_ALL, 
+		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+	)
 }

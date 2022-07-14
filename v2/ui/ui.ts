@@ -13,7 +13,7 @@ export class Display extends DisplayOwner {
 		this.actions = conf.actions.article;
 		this.initTypes(conf.viewTypes, conf.baseTypes);
 		this.type = this.types[this.conf.type];
-		console.log(this.types, this.conf.unknownType);
+		console.info("Types:", this.types, this.conf.unknownType);
 		this.unknownType = this.types[this.conf.unknownType]
 	}
 	readonly frame: Frame;

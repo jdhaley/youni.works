@@ -16,11 +16,10 @@ export class RecordEditor extends EditType {
 
 	edit(commandName: string, range: Range, record: Record): Range {
 		let view = getView(range);
-		if (view.type$.model == "record") {
+		if (view?.type$.model == "record") {
 			let cmd = new RecordCommand(this.owner, commandName, view.id);
 			cmd.do(range, record);
 		} else {
-			debugger;
 			console.error("Invalid range for edit.");
 		}
 		return null;

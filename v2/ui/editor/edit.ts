@@ -2,7 +2,7 @@ import {content} from "../../base/model.js";
 import {Command, CommandBuffer} from "../../base/command.js";
 
 import {Display} from "../ui.js";
-import {DisplayType, getView, bindView, ViewElement} from "../../base/display.js";
+import {DisplayType, getView, rangeIterator, ViewElement} from "../../base/display.js";
 import { CHAR } from "../../base/util.js";
 
 let NEXT_ID = 1;
@@ -10,7 +10,7 @@ export class EditElement extends HTMLElement {
 	type$: DisplayType;
 	
 	connectedCallback() {
-		bindView(this);
+		//bindView(this); - handled via the toView & replace functions.
 		if (!this.id) this.id = "" + NEXT_ID++;
 	}
 }
@@ -51,19 +51,19 @@ export abstract class Edit extends Command<Range> {
 
 	protected abstract getRange(): Range;
 
-	protected exec(markup: string) {
+	undo() {
+		return this.#exec(this.before);
+	}
+	redo() {
+		return this.#exec(this.after);
+	}
+
+	#exec(markup: string) {
 		let range = this.getRange();
 		replace(range, markup);
 		range = unmark(range);
 		if (range) this.owner.frame.selectionRange = range;
 		return range;
-	}
-
-	undo() {
-		return this.exec(this.before);
-	}
-	redo() {
-		return this.exec(this.after);
 	}
 }
 
@@ -112,12 +112,6 @@ export function unmark(range: Range) {
 	}	
 }
 
-export function rangeIterator(range: Range) {
-	return document.createNodeIterator(getView(range), NodeFilter.SHOW_ALL, 
-		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
-	)
-}
-
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
@@ -146,8 +140,15 @@ export function replace(range: Range, markup: string) {
 }
 
 export function toView(range: Range): ViewElement {
-	let type = getView(range)?.type$;
+	let source = getView(range);
+	let type = source?.type$;
 	if (!type) return;
+	if (type.isPanel) {
+		let content = type.getModelView(source);
+		if (range.commonAncestorContainer != content) {
+			range.setStart(content, 0);
+		}
+	}
 	let view = type.createView();
 	let content = type.getModelView(view);
 	let frag = range.cloneContents();
@@ -157,4 +158,24 @@ export function toView(range: Range): ViewElement {
 		bindView(ele);
 	}
 	return view;
+}
+
+function bindView(view: ViewElement): void {
+	let type = view.type$;
+	if (!type) {
+		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+		let parent = getView(view.parentElement);
+		if (name && parent) {
+			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
+			view.type$ = type;	
+		}
+		if (!type) return;
+	}
+	//Handle where a view's header doesn't get created in editing operations.
+	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
+		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
+	}
+	for (let child of type.getPartsOf(view)) {
+		bindView(child);
+	}
 }

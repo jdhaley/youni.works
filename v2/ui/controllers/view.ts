@@ -25,7 +25,10 @@ export default extend(null, {
 	cut(this: EditType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
-		setClipboard(this, range, event.clipboardData);
+		if (range.collapsed) {
+			return;
+		}
+		setClipboard(this, range.cloneRange(), event.clipboardData);
 		this.edit("Cut", range);
 	},
 	paste(this: EditType, event: UserEvent) {

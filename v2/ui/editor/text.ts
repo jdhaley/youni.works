@@ -29,7 +29,8 @@ class TextCommand extends Edit {
 	do(range: Range, markup: string) {
 		startEdit(this, range);
 		this.after = markup;
-		this.exec(markup);
+		throw new Error("UNIMPLEMENTED.")
+		//this.exec(markup);
 	}
 }
 

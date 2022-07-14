@@ -135,15 +135,18 @@ function startEdit(cmd: ListCommand, range: Range) {
 	If the range is at the start or end of the collect they will be undefined.
 	*/
 	start = start.previousElementSibling;
+	if (start?.id.endsWith("-marker")) start = start.previousElementSibling;
 	if (start) cmd.startId = start.id;
 
 	end = end.nextElementSibling;
+	if (end?.id.endsWith("-marker")) end = end.nextElementSibling;
 	if (end) cmd.endId = end.id;
 }
 
 
 function getChildView(ctx: Node, node: Node, offset?: number): ViewElement {
-	if (node == ctx && offset !== undefined) {
+	if (node == ctx) {
+		if (offset === undefined) return null;
 		node = ctx.childNodes[offset];
 	} else while (node && node.parentElement != ctx) {
 		node = node.parentElement;
