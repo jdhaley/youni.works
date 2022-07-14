@@ -71,11 +71,6 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 	}
 }
 
-export function getViewContent(node: Node | Range) {
-	let view = getView(node);
-	return view?.type$.getModelView(view);
-}
-
 export function getView(node: Node | Range): ViewElement {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
@@ -83,35 +78,41 @@ export function getView(node: Node | Range): ViewElement {
 		node = node.parentElement;
 	}
 }
-export function toView(range: Range): ViewElement {
-	let type = getView(range)?.type$;
-	if (!type) return;
-	let view = type.createView();
-	let content = type.getModelView(view);
-	let frag = range.cloneContents();
-	while (frag.firstChild) {
-		content.append(frag.firstChild);
-	}
-	for (let ele of type.getPartsOf(view)) {
-		bindView(ele);
-		if (ele.type$.isPanel && ele.children[0].tagName != "HEADER") {
-			ele.insertBefore(type.owner.createElement("HEADER"), ele.firstChild);
-		}
-	}
-	return view;
-}
+
 export function bindView(view: ViewElement): void {
 	let type = view.type$;
 	if (!type) {
-		let parent = getView(view.parentElement);
-		if (!parent) return;
-
 		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
-		type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
-		view.type$ = type;
+		let parent = getView(view.parentElement);
+		if (name && parent) {
+			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
+			view.type$ = type;	
+		}
+		if (!type) return;
 	}
-	for (let child of getViewContent(view)?.children) {
+	//Handle where a view's header doesn't get created in editing operations.
+	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
+		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
+	}
+	for (let child of type.getPartsOf(view)) {
 		bindView(child);
 	}
 }
 
+export function atStart(ctx: Node, node: Node, offset: number) {
+	if (offset != 0) return false;
+	while (node && node != ctx) {
+		if (node.previousSibling) return false;
+		node = node.parentNode;
+	}
+	return true;
+}
+
+export function atEnd(ctx: Node, node: Node, offset: number) {
+	if (node.nodeType == Node.TEXT_NODE && offset != node.textContent.length) return false;
+	while (node && node != ctx) {
+		if (node.nextSibling) return false;
+		node = node.parentNode;
+	}
+	return true;
+}

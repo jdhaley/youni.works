@@ -1,5 +1,5 @@
 import {content} from "../../base/model.js";
-import {getView, getViewContent, ViewElement} from "../../base/display.js";
+import {ViewElement, getView, atStart, atEnd} from "../../base/display.js";
 
 import {Frame} from "../ui.js";
 import {Edit, mark, Article, EditType, EditElement, clearContent, unmark, replace} from "./edit.js";
@@ -21,7 +21,7 @@ export class ListEditor extends EditType {
 		let cmd = new ListCommand(this.owner, commandName, view.id);
 		let markup = "";
 		if (content) {
-			markup = getViewContent(this.toView(content)).innerHTML;
+			markup = this.getModelView(this.toView(content)).innerHTML;
 		}
 		return cmd.do(range, markup);
 	}
@@ -57,6 +57,11 @@ class ListCommand extends Edit {
 		range.collapse();
 		return range;
 	}
+}
+
+function getViewContent(node: Node | Range) {
+	let view = getView(node);
+	return view?.type$.getModelView(view);
 }
 
 function handleStartContainer(ctx: ViewElement, range: Range) {
@@ -95,22 +100,17 @@ function handleEndContainer(ctx: ViewElement, range: Range) {
 function getItemRange(owner: Frame, contextId: string, startId: string, endId: string) {
 	let context = owner.getElementById(contextId) as ViewElement;
 	if (!context?.type$) throw new Error("Can't find context element.");
-	//TODO: fix the children[1] hack:
 	context = getViewContent(context);
 	let range = owner.createRange();
 	range.selectNodeContents(context);
 	if (startId) {
 		let start = owner.getElementById(startId);
 		if (!start) throw new Error(`Start item.id '${startId}' not found.`);
-		// //TODO - this is experimental to handle the markers.
-		// while (start.parentElement != context) start = start.parentElement;
 		range.setStartAfter(start);
 	}
 	if (endId) {
 		let end = owner.getElementById(endId);
 		if (!end) throw new Error(`End item.id '${endId}' not found.`);
-		// //TODO - this is experimental to handle the markers.
-		// while (end.parentElement != context) end = end.parentElement;
 		range.setEndBefore(end);
 	}
 	return range;
@@ -124,6 +124,7 @@ function startEdit(cmd: ListCommand, range: Range) {
 	let end = getChildView(ctx, range.endContainer, range.endOffset);
 	mark(range);
 	//Capture the before image for undo.
+	cmd.before = "";
 	for (let ele = start; ele; ele = ele.nextElementSibling) {
 		cmd.before += ele.outerHTML;
 		if (ele == end) break;
@@ -151,20 +152,3 @@ function getChildView(ctx: Node, node: Node, offset?: number): ViewElement {
 	return node as ViewElement;
 }
 
-function atStart(ctx: Node, node: Node, offset: number) {
-	if (offset != 0) return false;
-	while (node && node != ctx) {
-		if (node.previousSibling) return false;
-		node = node.parentNode;
-	}
-	return true;
-}
-
-function atEnd(ctx: Node, node: Node, offset: number) {
-	if (node.nodeType == Node.TEXT_NODE && offset != node.textContent.length) return false;
-	while (node && node != ctx) {
-		if (node.nextSibling) return false;
-		node = node.parentNode;
-	}
-	return true;
-}

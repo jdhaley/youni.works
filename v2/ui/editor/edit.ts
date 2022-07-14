@@ -112,7 +112,6 @@ export function unmark(range: Range) {
 	}	
 }
 
-
 export function rangeIterator(range: Range) {
 	return document.createNodeIterator(getView(range), NodeFilter.SHOW_ALL, 
 		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
@@ -139,7 +138,23 @@ export function replace(range: Range, markup: string) {
 	div.innerHTML = markup;
 	range.deleteContents();
 	while (div.firstElementChild) {
-		range.insertNode(div.firstElementChild);
+		let ele = div.firstChild as ViewElement;
+		range.insertNode(ele);
 		range.collapse();
+		bindView(ele);
 	}
+}
+
+export function toView(range: Range): ViewElement {
+	let type = getView(range)?.type$;
+	if (!type) return;
+	let view = type.createView();
+	let content = type.getModelView(view);
+	let frag = range.cloneContents();
+	while (frag.firstChild) {
+		let ele = frag.firstChild as ViewElement;
+		content.append(ele); //moves firstChild from fragment to content.
+		bindView(ele);
+	}
+	return view;
 }
