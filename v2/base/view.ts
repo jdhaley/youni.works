@@ -44,26 +44,34 @@ let VIEWERS = {
 
 let MODELLERS = {
 	list(this: ViewType<unknown>, view: unknown): List {
-		let model: content[] = null;
+		let model: content[];
 		let parts = this.getPartsOf(view) || EMPTY.array;
 		//console.debug("Parts:", parts, view);
 		for (let part of parts) {
 			let type = this.owner.getControlOf(part) || this.owner.unknownType;
-			if (!model) model = [];
-			model.push(type.toModel(part));
+			let value = type.toModel(part);
+			if (value) {
+				if (!model) {
+					model = [];
+					if (this.name) model["type$"] = this.name;
+				}
+				model.push(value);	
+			}
 		}
-		if (model) {
-			if (this.name) model["type$"] = this.name;
-			return model;
-		}
+		return model;
 	},
 	record(this: ViewType<unknown>, view: unknown): Record {
-		let model = Object.create(null);
-		model.type$ = this.name;
+		let model: Record;
 		for (let part of this.getPartsOf(view)) {
 			let type = this.owner.getControlOf(part) || this.owner.unknownType;
 			let value = type.toModel(part);
-			if (value) model[type.propertyName] = value;	
+			if (value) {
+				if (!model) {
+					model = Object.create(null);
+					model.type$ = this.name;
+				}
+				model[type.propertyName] = value;
+			}
 		}
 		return model;
 	},
