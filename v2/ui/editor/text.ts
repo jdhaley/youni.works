@@ -39,9 +39,11 @@ class TextCommand extends Edit {
 		let view = getView(range);
 		this.before = view.innerHTML;	
 		range.deleteContents();
-		let ins = this.owner.createElement("I");
-		ins.textContent = text;
-		range.insertNode(ins.firstChild);
+		if (text) {
+			let ins = this.owner.createElement("I");
+			ins.textContent = text;
+			range.insertNode(ins.firstChild);	
+		}
 		this.after = view.innerHTML;
 		unmark(range);
 	}
