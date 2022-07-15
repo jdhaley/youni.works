@@ -69,9 +69,9 @@ export abstract class Edit extends Command<Range> {
 
 export function mark(range: Range) {
 	let marker = insertMarker(range, "end");
-	range.setEndAfter(marker);
+	range.setEndBefore(marker);
 	marker = insertMarker(range, "start");
-	range.setStartBefore(marker);
+	range.setStartAfter(marker);
 
 	function insertMarker(range: Range, point: "start" | "end") {
 		let marker = range.commonAncestorContainer.ownerDocument.createElement("I");
