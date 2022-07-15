@@ -91,20 +91,20 @@ export function getView(node: Node | Range): ViewElement {
 export function atStart(ctx: Node, node: Node, offset: number) {
 	if (offset != 0) return false;
 	while (node && node != ctx) {
-		if (node.previousSibling) return false;
+		if (node.previousSibling && node.previousSibling.nodeName != "HEADER") return false;
 		node = node.parentNode;
 	}
 	return true;
 }
 
-export function atEnd(ctx: Node, node: Node, offset: number) {
-	if (node.nodeType == Node.TEXT_NODE && offset != node.textContent.length) return false;
-	while (node && node != ctx) {
-		if (node.nextSibling) return false;
-		node = node.parentNode;
-	}
-	return true;
-}
+// export function atEnd(ctx: Node, node: Node, offset: number) {
+// 	if (node.nodeType == Node.TEXT_NODE && offset != node.textContent.length) return false;
+// 	while (node && node != ctx) {
+// 		if (node.nextSibling) return false;
+// 		node = node.parentNode;
+// 	}
+// 	return true;
+// }
 
 export function rangeIterator(range: Range) {
 	return document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_ALL, 
