@@ -36,24 +36,12 @@ export default extend(null, {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		let model = getClipboard(event.clipboardData);
-		if (range.collapsed) {
-			if (model instanceof Array) {
-				while (true) {
-					let view = getView(range);
-					if (view?.type$.model == "list") {
-						(view.type$ as EditType).edit("Paste", range, model);
-						return;
-					}
-					if (atStart(view, range.startContainer, range.startOffset)) {
-						range.setStartBefore(view);
-						range.collapse(true);
-					} else {
-						break;
-					}
-				}
-			}
+		if (range.collapsed && model instanceof Array) {
+			range = getInsertableList(range);
+			if (range) ((getView(range)).type$ as EditType).edit("Paste", range, model);
+		} else {
+			this.edit("Paste", range, model);
 		}
-		this.edit("Paste", range, model);
 	},
 	delete(event: UserEvent) {
 		event.subject = "";
@@ -107,6 +95,23 @@ export default extend(null, {
 	},
 });
 
+/**
+ * 
+ */
+function getInsertableList(range: Range) {
+	range = range.cloneRange();
+	let view = getView(range);
+	while (view) {
+		if (view?.type$.model == "list") {
+			return range;
+		}
+		if (!atStart(view, range.startContainer, range.startOffset)) return;
+
+		range.setStartBefore(view);
+		range.collapse(true);
+		view = getView(range);
+	}
+}
 function setClipboard(type: EditType, range: Range, clipboard: DataTransfer) {
 	let view = toView(range);
 	let model = type.toModel(view);
@@ -159,7 +164,7 @@ function htmlify(view: HTMLElement): HTMLElement {
 				li.append(htmlify(child as HTMLElement));
 				html.append(li)
 			}
-			return html;		
+			return html;
 		default:
 			html = view.ownerDocument.createElement("span");
 			html.className = "text";
