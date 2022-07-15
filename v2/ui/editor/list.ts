@@ -1,5 +1,5 @@
 import {content} from "../../base/model.js";
-import {ViewElement, getView, atStart, atEnd} from "../../base/display.js";
+import {ViewElement, getView} from "../../base/display.js";
 
 import {Frame} from "../ui.js";
 import {Edit, mark, Article, EditType, EditElement, clearContent, unmark, replace} from "./edit.js";
@@ -67,32 +67,25 @@ function getViewContent(node: Node | Range) {
 function handleStartContainer(ctx: ViewElement, range: Range) {
 	let start = getChildView(ctx, range.startContainer);
 	if (start) {
-		if (atStart(ctx, range.startContainer, range.startOffset)) {
-			range.setStartBefore(start);
-		} else {
-			let r = range.cloneRange();
-			r.setEndAfter(start.lastChild);
-			clearContent(r);
+		let r = range.cloneRange();
+		r.setEndAfter(start.lastChild);
+		clearContent(r);
+		if (start.type$.toModel(start)) {
 			range.setStartAfter(start);
-			return start.outerHTML;
-
+			return start.outerHTML;	
 		}
+		range.setStartBefore(start);
 	}
 	return "";
 }
 function handleEndContainer(ctx: ViewElement, range: Range) {
 	let end = getChildView(ctx, range.endContainer);
 	if (end) {
-		if (atEnd(ctx, range.endContainer, range.endOffset)) {
-			range.setEndAfter(end);
-			end = null;
-		} else {
-			let r = range.cloneRange();
-			r.setStartBefore(end.firstChild);
-			clearContent(r);
-			range.setEndBefore(end);
-			return end.outerHTML;
-		}
+		let r = range.cloneRange();
+		r.setStartBefore(end.firstChild);
+		clearContent(r);
+		range.setEndBefore(end);
+		return end.outerHTML;
 	}
 	return "";
 }
@@ -134,13 +127,22 @@ function startEdit(cmd: ListCommand, range: Range) {
 	following-end.
 	If the range is at the start or end of the collect they will be undefined.
 	*/
-	start = start.previousElementSibling;
-	if (start?.id.endsWith("-marker")) start = start.previousElementSibling;
-	if (start) cmd.startId = start.id;
-
-	end = end.nextElementSibling;
-	if (end?.id.endsWith("-marker")) end = end.nextElementSibling;
-	if (end) cmd.endId = end.id;
+	while (start) {
+		start = start.previousElementSibling;
+		//Make sure the start is a view item and not a marker.
+		if (start?.type$ && start.id) {
+			cmd.startId = start.id;
+			start = null;
+		}
+	}
+	while (end) {
+		end = end.nextElementSibling;
+		//Make sure the end is a view item and not a marker.
+		if (end?.type$ && end.id) {
+			cmd.endId = end.id;
+			end = null;
+		}
+	}
 }
 
 
