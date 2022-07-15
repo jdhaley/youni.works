@@ -1,18 +1,15 @@
 import {UserEvent} from "../ui.js";
 import {extend} from "../../base/util.js";
 import view from "./view.js";
-import {EditType} from "../editor/edit.js";
+import {Edit, EditType, mark, unmark} from "../editor/edit.js";
+import { getView } from "../../base/display.js";
 
+let TEXT_EDIT = {
+	node: null,
+	start: 0,
+	end: 0
+}
 export default extend(view, {
-	// cut(this: Article, event: UserEvent) {
-	// 	event.subject = "";
-	// 	let range = this.owner.selectionRange;
-	// 	if (range.collapsed) return;
-	// 	range = adjustRange(range, getElement(range, "list"));
-	// 	event.clipboardData.setData("text/json", JSON.stringify(this.toModel(range)));
-	// 	range = this.edit("Cut", range, "");
-	// 	range.collapse();
-	// },
 	paste(this: EditType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
@@ -20,16 +17,44 @@ export default extend(view, {
 		this.edit("Paste", range, text);
 	},
 	charpress(this: EditType, event: UserEvent) {
-		event.subject = "user_edit";
-		// event.subject = ""
-		// let range = this.owner.selectionRange;
-		// let node = range.commonAncestorContainer;
-		// if (node.nodeType != Node.TEXT_NODE) return;
+		event.subject = ""
+		let range = this.owner.frame.selectionRange;
+		let node = range.commonAncestorContainer;
+		if (node.parentElement.classList.contains("view")) {
+			if (range.collapsed && node == TEXT_EDIT.node) {
+				let offset = range.startOffset;
+				if (offset == TEXT_EDIT.end) {	
+					let view = getView(range);
+					let cmd = this.owner.commands.peek() as Edit;
+					if (view?.id == cmd?.viewId) {
+						let text = node.textContent;
+						text = text.substring(0, offset) + event.key + text.substring(offset);
+						node.textContent = text;
+						range.setStart(node, TEXT_EDIT.start);
+						range.setEnd(node, offset + 1);
+						TEXT_EDIT.end++;
+						mark(range);
+						console.log(TEXT_EDIT.start, TEXT_EDIT.end, node.parentElement.innerHTML);
 
-		// let offset = range.startOffset;
-		// let text = range.commonAncestorContainer.textContent;
-		// text = text.substring(0, offset) + event.key + text.substring(offset);
-		// this.textEdit("Enter-Text", range, text, offset + 1);
+						cmd.after = view.innerHTML;
+						unmark(range);
+						range.collapse();
+						return;
+					}
+				}
+			}
+			TEXT_EDIT.node = null;
+			if (range.collapsed) {
+				TEXT_EDIT.node = node;
+				TEXT_EDIT.start = range.startOffset;
+				TEXT_EDIT.end = range.endOffset + 1;
+			}
+			this.edit("Replace", range, event.key);
+			range.collapse();
+			
+			// let offset = range.startOffset;
+			// this.textEdit("Enter-Text", range, text, offset + 1);	
+		}
 	},
 	delete(this: EditType, event: UserEvent) {
 		event.subject = "user_edit";
