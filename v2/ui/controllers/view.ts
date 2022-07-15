@@ -113,6 +113,12 @@ function getInsertableList(range: Range) {
 	}
 }
 function setClipboard(type: EditType, range: Range, clipboard: DataTransfer) {
+	let node = range.commonAncestorContainer;
+	if (node.nodeType == Node.TEXT_NODE) {
+		let data = node.textContent.substring(range.startOffset, range.endOffset);
+		clipboard.setData("text/plain", data);
+		return;
+	}
 	let view = toView(range);
 	let model = type.toModel(view);
 	if (type.model == "record") model = [model];

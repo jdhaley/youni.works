@@ -1,7 +1,8 @@
+import { getView } from "../../base/display.js";
 import {content} from "../../base/model.js";
 
 import {Frame} from "../ui.js";
-import {Article, Edit, EditElement, EditType, mark, toView} from "./edit.js";
+import {Article, Edit, EditElement, EditType, mark, toView, unmark} from "./edit.js";
 
 class TextView extends EditElement {
 	constructor() {
@@ -14,8 +15,15 @@ export class TextEditor extends EditType {
 	readonly model = "text";
 	readonly tagName = "ui-text";
 
-	edit(commandName: string, range: Range, replacement?: content): Range {
-		throw new Error("Method not implemented.");
+	edit(commandName: string, range: Range, text: string): Range {
+		let view = getView(range);
+		if (view?.type$.model == "text") {
+			let cmd = new TextCommand(this.owner, commandName, view.id);
+			cmd.do(range, text);
+		} else {
+			console.error("Invalid range for edit.");
+		}
+		return null;
 	}
 }
 
@@ -26,32 +34,23 @@ class TextCommand extends Edit {
 	protected getRange(): Range {
 		return selectContents(this.owner.frame, this.viewId);
 	}
-	do(range: Range, markup: string) {
-		startEdit(this, range);
-		this.after = markup;
-		throw new Error("UNIMPLEMENTED.")
-		//this.exec(markup);
+	do(range: Range, text: string) {
+		mark(range);
+		let view = getView(range);
+		this.before = view.innerHTML;	
+		range.deleteContents();
+		let ins = this.owner.createElement("I");
+		ins.textContent = text;
+		range.insertNode(ins.firstChild);
+		this.after = view.innerHTML;
+		unmark(range);
 	}
 }
-
-export function selectContents(owner: Frame, contextId: string) {
+function selectContents(owner: Frame, contextId: string) {
 	let context = owner.getElementById(contextId);
 	if (!context) throw new Error("Can't find context element.");
 
 	let range = owner.createRange();
 	range.selectNodeContents(context);
 	return range;
-}
-
-function startEdit(cmd: TextCommand, range: Range) {
-	mark(range);
-	/*
-	Expand the range to encompass the whole start/end items or markers (when 
-	a marker is a direct descendent of the list).
-	*/
-	let ctx = cmd.owner.frame.getElementById(cmd.viewId);
-	range.selectNodeContents(ctx);
-
-	//Capture the before image for undo.
-	cmd.before = toView(range).innerHTML;	
 }

@@ -13,16 +13,12 @@ export default extend(view, {
 	// 	range = this.edit("Cut", range, "");
 	// 	range.collapse();
 	// },
-	// paste(this: Article, event: UserEvent) {
-	// 	event.subject = "";
-	// 	let range = this.owner.selectionRange;
-	// 	let data = event.clipboardData.getData("text/json");
-	// 	console.log(data);
-	// 	let model = JSON.parse(data);
-	// 	let view = this.type.toView(model, this.view);
-	// 	range = this.edit("Paste", range, view.innerHTML);
-	// 	range.collapse();
-	// },
+	paste(this: EditType, event: UserEvent) {
+		event.subject = "";
+		let range = event.frame.selectionRange;
+		let text = event.clipboardData.getData("text/plain");
+		this.edit("Paste", range, text);
+	},
 	charpress(this: EditType, event: UserEvent) {
 		event.subject = "user_edit";
 		// event.subject = ""

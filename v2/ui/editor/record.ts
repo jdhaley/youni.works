@@ -45,7 +45,7 @@ class RecordCommand extends Edit {
 		clearContent(range);
 		this.after = view.innerHTML;
 
-		unmark(range);	
+		unmark(range);
 		range.collapse();
 	}
 }
