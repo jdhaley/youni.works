@@ -4,6 +4,7 @@ import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
 import {EditType, toView} from "../editor/edit.js";
+import { atStart, getView } from "../../base/display.js";
 
 let UNDONE = false;
 
@@ -20,7 +21,7 @@ export default extend(null, {
 	copy(this: EditType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
-		setClipboard(this, range, event.clipboardData);
+		setClipboard(this, range.cloneRange(), event.clipboardData);
 	},
 	cut(this: EditType, event: UserEvent) {
 		event.subject = "";
@@ -35,6 +36,23 @@ export default extend(null, {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		let model = getClipboard(event.clipboardData);
+		if (range.collapsed) {
+			if (model instanceof Array) {
+				while (true) {
+					let view = getView(range);
+					if (view?.type$.model == "list") {
+						(view.type$ as EditType).edit("Paste", range, model);
+						return;
+					}
+					if (atStart(view, range.startContainer, range.startOffset)) {
+						range.setStartBefore(view);
+						range.collapse(true);
+					} else {
+						break;
+					}
+				}
+			}
+		}
 		this.edit("Paste", range, model);
 	},
 	delete(event: UserEvent) {
@@ -92,7 +110,9 @@ export default extend(null, {
 function setClipboard(type: EditType, range: Range, clipboard: DataTransfer) {
 	let view = toView(range);
 	let model = type.toModel(view);
+	if (type.model == "record") model = [model];
 	clipboard.setData("application/json", JSON.stringify(model));
+	console.log("clipboard:", model);
 	let html = htmlify(view as HTMLElement);
 	//console.log(html);
 	clipboard.setData("text/html", html.outerHTML);
