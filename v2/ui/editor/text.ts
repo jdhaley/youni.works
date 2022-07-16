@@ -1,8 +1,7 @@
 import { getView, ViewElement } from "../../base/display.js";
 import { CHAR } from "../../base/util.js";
 
-import {Frame} from "../ui.js";
-import {Article, Edit, EditElement, EditType, mark, toView, unmark} from "./edit.js";
+import {Article, Edit, EditElement, EditType, mark, unmark} from "./edit.js";
 
 class TextView extends EditElement {
 	constructor() {
