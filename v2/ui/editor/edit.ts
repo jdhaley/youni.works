@@ -131,11 +131,13 @@ export function replace(range: Range, markup: string) {
 	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
 	div.innerHTML = markup;
 	range.deleteContents();
-	while (div.firstElementChild) {
-		let ele = div.firstChild as ViewElement;
-		range.insertNode(ele);
+	while (div.firstChild) {
+		let node = div.firstChild;
+		range.insertNode(node);
 		range.collapse();
-		bindView(ele);
+		if (node.nodeType == Node.ELEMENT_NODE) {
+			bindView(node as ViewElement);
+		}
 	}
 }
 
@@ -153,9 +155,11 @@ export function toView(range: Range): ViewElement {
 	let content = type.getModelView(view);
 	let frag = range.cloneContents();
 	while (frag.firstChild) {
-		let ele = frag.firstChild as ViewElement;
-		content.append(ele); //moves firstChild from fragment to content.
-		bindView(ele);
+		let node = frag.firstChild;
+		content.append(node); //moves firstChild from fragment to content.
+		if (node.nodeType == Node.ELEMENT_NODE) {
+			bindView(node as ViewElement);
+		}
 	}
 	return view;
 }
@@ -175,6 +179,7 @@ function bindView(view: ViewElement): void {
 	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
 		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
 	}
+	type.getModelView(view); // set the v_content property.
 	for (let child of type.getPartsOf(view)) {
 		bindView(child);
 	}

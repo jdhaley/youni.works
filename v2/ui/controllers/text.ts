@@ -1,8 +1,8 @@
 import {UserEvent} from "../ui.js";
-import {extend} from "../../base/util.js";
+import {CHAR, extend} from "../../base/util.js";
 import view from "./view.js";
 import {Edit, EditType, mark, unmark} from "../editor/edit.js";
-import { getView, ViewElement } from "../../base/display.js";
+import {getView} from "../../base/display.js";
 
 let TEXT_EDIT = {
 	action: "",
@@ -26,16 +26,6 @@ export default extend(view, {
 		let node = range.commonAncestorContainer;
 		if (node.parentElement != view.v_content) return;
 
-		if (range.collapsed && node == TEXT_EDIT.node && range.startOffset == TEXT_EDIT.end) {
-			let cmd = this.owner.commands.peek() as Edit;
-			if (cmd?.name == "Text-Entry" && view?.id == cmd.viewId) return editAgain(range, cmd,  event.key);
-		}
-		TEXT_EDIT.node = null;
-		if (range.collapsed) {
-			TEXT_EDIT.node = node;
-			TEXT_EDIT.start = range.startOffset;
-			TEXT_EDIT.end = range.endOffset + 1;
-		}
 		this.edit("Text-Entry", range, event.key);
 		range.collapse();
 	},
@@ -49,7 +39,7 @@ export default extend(view, {
 
 		if (range.collapsed && node == TEXT_EDIT.node && range.startOffset == TEXT_EDIT.start) {
 			let cmd = this.owner.commands.peek() as Edit;
-			if (cmd?.name == "Text-Delete" && view?.id == cmd.viewId) return eraseAgain(range, cmd);
+			if (cmd?.name == "Text-Erase" && view?.id == cmd.viewId) return eraseAgain(range, cmd);
 		}
 		TEXT_EDIT.node = null;
 		if (range.collapsed) {
@@ -58,7 +48,7 @@ export default extend(view, {
 			TEXT_EDIT.start = range.startOffset;
 			TEXT_EDIT.end = range.endOffset;
 		}
-		this.edit("Text-Delete", range, "");
+		this.edit("Text-Erase", range, "");
 		range.collapse(true);
 	},
 	delete(this: EditType, event: UserEvent) {
@@ -81,20 +71,6 @@ export default extend(view, {
 		// event.subject = "";
 	},
 });
-
-function editAgain(range: Range, cmd: Edit, char: string) {
-	let node = range.commonAncestorContainer;
-	let text = node.textContent;
-	text = text.substring(0, TEXT_EDIT.end) + char + text.substring(TEXT_EDIT.end);
-	node.textContent = text;
-	range.setStart(node, TEXT_EDIT.start);
-	range.setEnd(node, ++TEXT_EDIT.end);
-
-	mark(range);
-	cmd.after = getView(range).innerHTML;
-	unmark(range);
-	range.collapse();
-}
 
 function eraseAgain(range: Range, cmd: Edit) {
 	let node = range.commonAncestorContainer;
@@ -126,17 +102,17 @@ function deleteAgain(range: Range, cmd: Edit) {
 function markText(range: Range) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
-	let out = text.substring(0, range.startOffset) + "[";
+	let out = text.substring(0, range.startOffset) + CHAR.STX;
 	out += text.substring(range.startOffset, range.endOffset);
-	out += "]" + text.substring(range.endOffset);
+	out += CHAR.ETX + text.substring(range.endOffset);
 	node.textContent = out;
 	console.log("mark:", out, range)
 }
 function unmarkText(range: Range) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
-	let start = text.indexOf("[");
-	let end = text.indexOf("]");
+	let start = text.indexOf(CHAR.STX);
+	let end = text.indexOf(CHAR.ETX);
 	let out = text.substring(0, start);
 	out += text.substring(start + 1, end);
 	out += text.substring(end + 1);
