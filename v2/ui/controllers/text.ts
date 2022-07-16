@@ -1,55 +1,33 @@
-import {UserEvent} from "../ui.js";
-import {CHAR, extend} from "../../base/util.js";
-import view from "./view.js";
-import {Edit, EditType, mark, unmark} from "../editor/edit.js";
 import {getView} from "../../base/display.js";
+import {extend} from "../../base/util.js";
+import {UserEvent} from "../ui.js";
+import {EditType} from "../editor/edit.js";
 
-let TEXT_EDIT = {
-	action: "",
-	node: null,
-	start: 0,
-	end: 0
-}
+import view from "./view.js";
+
 export default extend(view, {
 	paste(this: EditType, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
+		//TODO Q: should paste [cut] happen when there is no clipboard data?
+		if (!inView(range)) return;
 
 		let text = event.clipboardData.getData("text/plain");
-		this.edit("Paste", range, text);
+		this.edit("Paste", range, text);	
 	},
 	charpress(this: EditType, event: UserEvent) {
 		event.subject = ""
 		let range = this.owner.frame.selectionRange;
-		let view = getView(range);
+		if (!inView(range)) return;
 
-		let node = range.commonAncestorContainer;
-		if (node.parentElement != view.v_content) return;
-
-		this.edit("Text-Entry", range, event.key);
-		range.collapse();
+		this.edit("Entry", range, event.key);
 	},
 	erase(this: EditType, event: UserEvent) {
 		event.subject = ""
 		let range = this.owner.frame.selectionRange;
-		let view = getView(range);
+		if (!inView(range)) return;
 
-		let node = range.commonAncestorContainer;
-		if (node.parentElement != view.v_content) return;
-
-		if (range.collapsed && node == TEXT_EDIT.node && range.startOffset == TEXT_EDIT.start) {
-			let cmd = this.owner.commands.peek() as Edit;
-			if (cmd?.name == "Text-Erase" && view?.id == cmd.viewId) return eraseAgain(range, cmd);
-		}
-		TEXT_EDIT.node = null;
-		if (range.collapsed) {
-			range.setStart(range.startContainer, range.startOffset - 1)
-			TEXT_EDIT.node = node;
-			TEXT_EDIT.start = range.startOffset;
-			TEXT_EDIT.end = range.endOffset;
-		}
-		this.edit("Text-Erase", range, "");
-		range.collapse(true);
+		this.edit("Erase", range, "");
 	},
 	delete(this: EditType, event: UserEvent) {
 		event.subject = "user_edit";
@@ -71,54 +49,8 @@ export default extend(view, {
 		// event.subject = "";
 	},
 });
-
-function eraseAgain(range: Range, cmd: Edit) {
+function inView(range: Range) {
 	let node = range.commonAncestorContainer;
-	let text = node.textContent;
-	text = text.substring(0, TEXT_EDIT.start) + text.substring(TEXT_EDIT.end);
-	node.textContent = text;
-	range.setStart(node, --TEXT_EDIT.start);
-	range.collapse();
-
-	markText(range);
-	cmd.after = getView(range).innerHTML;
-	unmarkText(range);
-	range.collapse(true);
-}
-function deleteAgain(range: Range, cmd: Edit) {
-	let node = range.commonAncestorContainer;
-	let text = node.textContent;
-	text = text.substring(0, TEXT_EDIT.start) + text.substring(TEXT_EDIT.end);
-	node.textContent = text;
-	range.setStart(node, TEXT_EDIT.start);
-	range.setEnd(node, ++TEXT_EDIT.end);
-
-	mark(range);
-	cmd.after = getView(range).innerHTML;
-	unmark(range);
-	range.collapse();
-}
-
-function markText(range: Range) {
-	let node = range.commonAncestorContainer;
-	let text = node.textContent;
-	let out = text.substring(0, range.startOffset) + CHAR.STX;
-	out += text.substring(range.startOffset, range.endOffset);
-	out += CHAR.ETX + text.substring(range.endOffset);
-	node.textContent = out;
-	console.log("mark:", out, range)
-}
-function unmarkText(range: Range) {
-	let node = range.commonAncestorContainer;
-	let text = node.textContent;
-	let start = text.indexOf(CHAR.STX);
-	let end = text.indexOf(CHAR.ETX);
-	let out = text.substring(0, start);
-	out += text.substring(start + 1, end);
-	out += text.substring(end + 1);
-	node.textContent = out;
-	range.setStart(node, start);
-	range.setEnd(node, end);
-
-	console.log("unmark:", out, range)
+	let view = getView(node);
+	return node.parentElement == view.v_content ? true : false;
 }
