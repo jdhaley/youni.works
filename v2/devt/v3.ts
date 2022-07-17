@@ -1,6 +1,6 @@
-import {content, ContentType} from "./model.js";
-import {bundle, EMPTY, extend} from "./util.js";
-import {ViewOwner, ViewType} from "./view.js";
+import {content, ContentType} from "../base/model.js";
+import {bundle, EMPTY, extend} from "../base/util.js";
+import {ViewOwner, ViewType} from "../base/view.js";
 
 export interface Signal {
 	readonly direction: "up" | "down"
@@ -16,7 +16,6 @@ export interface Receiver {
 export interface Actions {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
-
 
 export class Control implements Receiver {
 	actions: Actions = EMPTY.object;
@@ -34,10 +33,11 @@ export class Control implements Receiver {
 	}
 }
 
+/* PARTS */
+
 interface Part extends Receiver {
 	container?: Part;
 	parts: Iterable<Part>;
-//	part(name: string): Part<T>; //For records only.
 }
 
 function send(msg: Signal | string, to: Part) {
@@ -70,29 +70,30 @@ function signal(direction: "up" | "down", signal: string | Signal): Signal {
 	if (signal.direction != direction) throw new Error("Invalid direction");
 	return signal;
 }
-////////////////////////////////
+
+class DomPart extends Element implements Part {
+	$controller?: Receiver
+	get container(): DomPart {
+		for (let e = this.parentElement; e; e = e.parentElement) {
+			if (e["receive"]) return e as unknown as DomPart;
+		}
+	}
+	get parts(): Iterable<DomPart> {
+		return this.children as Iterable<DomPart>;
+	}
+	receive(signal: Signal): void {
+		signal.on = this;
+		this.$controller?.receive(signal);
+	}
+}
+
+/* CONTENT */
 
 interface Content extends Part {
 	type: ContentType<Content>;
 	content: content;
 	textContent: string;
 	markupContent: string;
-}
-
-class E extends Element implements Part {
-	$controller: Receiver
-	get container(): E {
-		for (let e = this.parentElement; e; e = e.parentElement) {
-			if (e["receive"]) return e as unknown as E;
-		}
-	}
-	get parts(): Iterable<E> {
-		return this.children as Iterable<E>;
-	}
-	receive(signal: Signal): void {
-		signal.on = this;
-		this.$controller.receive(signal);
-	}
 }
 
 interface ViewElement extends Element {
