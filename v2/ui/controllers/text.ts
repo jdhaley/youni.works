@@ -25,9 +25,13 @@ export default extend(view, {
 	erase(this: EditType, event: UserEvent) {
 		event.subject = ""
 		let range = this.owner.frame.selectionRange;
-		if (!inView(range)) return;
+		if (inView(range)) {
+			if (range.collapsed && !range.startOffset) {
 
-		this.edit("Erase", range, "");
+			} else {
+				this.edit("Erase", range, "");
+			}
+		}
 	},
 	delete(this: EditType, event: UserEvent) {
 		event.subject = "user_edit";

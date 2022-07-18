@@ -10,7 +10,7 @@ class TextView extends EditElement {
 }
 customElements.define("ui-text", TextView);
 
-let TEXT_EDIT = {
+let lastEdit = {
 	action: "",
 	node: null,
 	start: 0,
@@ -27,32 +27,30 @@ export class TextEditor extends EditType {
 		if (view?.type$.model != "text") {
 			console.error("Invalid range for edit.");
 		}
-		if (range.collapsed && node == TEXT_EDIT.node) {
+		if (range.collapsed && commandName == "Erase") {
+			if (!range.startOffset) return range;
+		}
+
+		if (range.collapsed && node == lastEdit.node) {
 			let cmd = this.owner.commands.peek() as Edit;
 			if (cmd?.name == commandName && view?.id == cmd.viewId) {
-				switch (cmd.name) {
-					case "Entry":
-						if (range.startOffset == TEXT_EDIT.end) {
-							return editAgain(range, cmd,  text);
-						}
-						break;
-					case "Erase":
-						if (range.startOffset == TEXT_EDIT.start) {
-							return eraseAgain(range, cmd);
-						}
-						break;
-				}
+				let r = doAgain(cmd, range, text);
+				if (r) return r;		
 			}
 		}
-		TEXT_EDIT.node = null;
 		if (range.collapsed) {
-			if (commandName == "Erase") range.setStart(range.startContainer, range.startOffset - 1)
-
-			TEXT_EDIT.node = node;
-			TEXT_EDIT.start = range.startOffset;
-			TEXT_EDIT.end = commandName == "Entry" ? range.endOffset + 1 : range.endOffset;
+			lastEdit.node = range.commonAncestorContainer
+	
+			if (commandName == "Erase") {
+				//Extend the range over the character for the cmd.do()
+				range.setStart(lastEdit.node, range.startOffset - 1);
+			}
+			lastEdit.start = range.startOffset;
+			lastEdit.end = commandName == "Erase" ? range.endOffset : range.endOffset + 1;
+		} else {
+			lastEdit.node = null;
 		}
-
+	
 		let cmd = new TextCommand(this.owner, commandName, view.id);
 		cmd.do(range, text);
 		range.collapse();
@@ -60,6 +58,21 @@ export class TextEditor extends EditType {
 	}
 }
 
+function doAgain(cmd: Edit, range: Range, text: string) {
+	let currentOffset = range.startOffset; //start & end are the same.
+	switch (cmd.name) {
+		case "Entry":
+			if (currentOffset == lastEdit.end) {
+				return editAgain(range, cmd,  text);
+			}
+			break;
+		case "Erase":
+			if (currentOffset == lastEdit.start) {
+				return eraseAgain(range, cmd);
+			}
+			break;
+	}
+}
 class TextCommand extends Edit {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
@@ -83,20 +96,20 @@ class TextCommand extends Edit {
 			range.insertNode(ins.firstChild);	
 		}
 		this.after = view.v_content.innerHTML;
-		unmark(range);
+		return unmark(range);
 	}
 }
 
 function editAgain(range: Range, cmd: Edit, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
-	text = text.substring(0, TEXT_EDIT.end) + char + text.substring(TEXT_EDIT.end);
+	text = text.substring(0, lastEdit.end) + char + text.substring(lastEdit.end);
 	node.textContent = text;
-	range.setStart(node, TEXT_EDIT.start);
-	range.setEnd(node, ++TEXT_EDIT.end);
+	range.setStart(node, lastEdit.start);
+	range.setEnd(node, ++lastEdit.end);
 
 	mark(range);
-	cmd.after = getView(range).innerHTML;
+	cmd.after = getView(range).v_content.innerHTML;
 	unmark(range);
 	range.collapse();
 	return range;
@@ -105,14 +118,14 @@ function editAgain(range: Range, cmd: Edit, char: string) {
 function eraseAgain(range: Range, cmd: Edit) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
-	text = text.substring(0, TEXT_EDIT.start) + text.substring(TEXT_EDIT.end);
+	text = text.substring(0, lastEdit.start - 1) + text.substring(lastEdit.start);
 	node.textContent = text;
-	range.setStart(node, --TEXT_EDIT.start);
-	range.collapse();
 
-	markText(range);
-	cmd.after = getView(range).innerHTML;
-	unmarkText(range);
+	range.setStart(node, --lastEdit.start);
+	range.collapse(true);
+	mark(range);
+	cmd.after = getView(range).v_content.innerHTML;
+	unmark(range);
 	range.collapse(true);
 	return range;
 }
