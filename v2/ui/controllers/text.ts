@@ -27,31 +27,21 @@ export default extend(view, {
 		let range = this.owner.frame.selectionRange;
 		if (inView(range)) {
 			if (range.collapsed && !range.startOffset) {
-
 			} else {
 				this.edit("Erase", range, "");
 			}
 		}
 	},
 	delete(this: EditType, event: UserEvent) {
-		event.subject = "user_edit";
-		// event.subject = "";
-		// let range = this.owner.selectionRange;
-		// if (!range.collapsed) {
-		// 	this.edit("Delete", range, "");
-		// 	return;
-		// } 
-		// let node = range.commonAncestorContainer;
-		// if (node.nodeType != Node.TEXT_NODE) return;
-		// let offset = range.startOffset;
-		// let text = range.commonAncestorContainer.textContent;
-		// if (offset < 1) return;
-		// text = text.substring(0, offset - 1) + text.substring(offset);
-		// this.textEdit("Erase-Text", range, text, offset - 1);
-	},
-	enter(this: EditType, event: UserEvent) {
-		// event.subject = "";
-	},
+		event.subject = ""
+		let range = this.owner.frame.selectionRange;
+		if (inView(range)) {
+			if (range.collapsed && range.startOffset == range.startContainer.textContent.length) {
+\			} else {
+				this.edit("Delete", range, "");
+			}
+		}
+	}
 });
 function inView(range: Range) {
 	let node = range.commonAncestorContainer;

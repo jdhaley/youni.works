@@ -46,7 +46,10 @@ export class TextEditor extends EditType {
 				range.setStart(lastEdit.node, range.startOffset - 1);
 			}
 			lastEdit.start = range.startOffset;
-			lastEdit.end = commandName == "Erase" ? range.endOffset : range.endOffset + 1;
+			if (commandName == "Delete") {
+				range.setEnd(lastEdit.node, range.endOffset + 1);
+			}
+			lastEdit.end = commandName == "Entry" ? range.endOffset + 1 : range.endOffset;
 		} else {
 			lastEdit.node = null;
 		}
@@ -58,21 +61,6 @@ export class TextEditor extends EditType {
 	}
 }
 
-function doAgain(cmd: Edit, range: Range, text: string) {
-	let currentOffset = range.startOffset; //start & end are the same.
-	switch (cmd.name) {
-		case "Entry":
-			if (currentOffset == lastEdit.end) {
-				return editAgain(range, cmd,  text);
-			}
-			break;
-		case "Erase":
-			if (currentOffset == lastEdit.start) {
-				return eraseAgain(range, cmd);
-			}
-			break;
-	}
-}
 class TextCommand extends Edit {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
@@ -100,6 +88,27 @@ class TextCommand extends Edit {
 	}
 }
 
+function doAgain(cmd: Edit, range: Range, text: string) {
+	let currentOffset = range.startOffset; //start & end are the same.
+	switch (cmd.name) {
+		case "Entry":
+			if (currentOffset == lastEdit.end) {
+				return editAgain(range, cmd,  text);
+			}
+			break;
+		case "Delete":
+			if (currentOffset == lastEdit.start) {
+				return deleteAgain(range, cmd,  text);
+			}
+			break;
+		case "Erase":
+			if (currentOffset == lastEdit.start) {
+				return eraseAgain(range, cmd);
+			}
+			break;
+	}
+}
+
 function editAgain(range: Range, cmd: Edit, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
@@ -108,6 +117,19 @@ function editAgain(range: Range, cmd: Edit, char: string) {
 	range.setStart(node, lastEdit.start);
 	range.setEnd(node, ++lastEdit.end);
 
+	mark(range);
+	cmd.after = getView(range).v_content.innerHTML;
+	unmark(range);
+	range.collapse();
+	return range;
+}
+function deleteAgain(range: Range, cmd: Edit, char: string) {
+	let node = range.commonAncestorContainer;
+	let text = node.textContent;
+	text = text.substring(0, lastEdit.start) + text.substring(lastEdit.start + 1);
+	node.textContent = text;
+	range.setStart(node, lastEdit.start);
+	range.collapse(true);
 	mark(range);
 	cmd.after = getView(range).v_content.innerHTML;
 	unmark(range);
