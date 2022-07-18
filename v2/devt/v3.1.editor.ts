@@ -3,7 +3,6 @@ import {CHAR} from "../base/util.js";
 
 import {Display, DisplayElement, DisplayType} from "./v3.1.ui.js";
 
-
 export abstract class Edit extends Command<Range> {
 	constructor(owner: Display, name: string, viewId: string) {
 		super();
@@ -35,6 +34,20 @@ export abstract class Edit extends Command<Range> {
 		range = unmark(range);
 		if (range) this.owner.frame.selectionRange = range;
 		return range;
+
+		function replace(range: Range, markup: string) {
+			let div = range.commonAncestorContainer.ownerDocument.createElement("div");
+			div.innerHTML = markup;
+			range.deleteContents();
+			while (div.firstChild) {
+				let node = div.firstChild;
+				range.insertNode(node);
+				range.collapse();
+				if (node.nodeType == Node.ELEMENT_NODE) {
+					bindView(node as DisplayElement);
+				}
+			}
+		}	
 	}
 }
 
@@ -98,20 +111,6 @@ export function clearContent(range: Range) {
 	}
 }
 
-export function replace(range: Range, markup: string) {
-	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
-	div.innerHTML = markup;
-	range.deleteContents();
-	while (div.firstChild) {
-		let node = div.firstChild;
-		range.insertNode(node);
-		range.collapse();
-		if (node.nodeType == Node.ELEMENT_NODE) {
-			bindView(node as DisplayElement);
-		}
-	}
-}
-
 export function toView(range: Range): DisplayElement {
 	let source = getView(range) as DisplayElement;
 	let type = source?.type$ as DisplayType;
@@ -123,11 +122,10 @@ export function toView(range: Range): DisplayElement {
 		}
 	}
 	let view = type.createView() as DisplayElement;
-	let content = view.$content;
 	let frag = range.cloneContents();
 	while (frag.firstChild) {
 		let node = frag.firstChild;
-		content.append(node); //moves firstChild from fragment to content.
+		view.$content.append(node); //moves firstChild from fragment to content.
 		if (node.nodeType == Node.ELEMENT_NODE) {
 			bindView(node as DisplayElement);
 		}
@@ -146,12 +144,13 @@ function bindView(view: DisplayElement): void {
 		}
 		if (!type) return;
 	}
-	//Handle where a view's header doesn't get created in editing operations.
-	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
-		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
-	}
-//	type.getModelView(view); // set the v_content property.
-	for (let child of view.parts as Iterable<DisplayElement>) {
+	/*
+	When bindView is called via Range fragments, the structure of the view
+	may be invalid (missing header or content). The view.$content accessor is required to
+	check this condition.
+	*/
+	let content = view.$content;
+	if (content) for (let child of content.children as Iterable<DisplayElement>) {
 		bindView(child);
 	}
 }

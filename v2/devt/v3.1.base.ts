@@ -78,7 +78,6 @@ export interface View extends Part {
 	//content: content;
 	textContent: string;
 	append(partsOrText: any): void
-	//append(...partsOrText: (Part | string)[]): void;
 	//markupContent: string;
 }
 
