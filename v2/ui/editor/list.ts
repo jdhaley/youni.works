@@ -2,7 +2,7 @@ import {content} from "../../base/model.js";
 import {ViewElement, getView} from "../../base/display.js";
 
 import {Frame} from "../ui.js";
-import {Edit, mark, Article, EditType, EditElement, clearContent, unmark, replace} from "./edit.js";
+import {Edit, mark, Article, EditType, EditElement, clearContent, unmark, replace, narrowRange} from "./edit.js";
 
 class ListView extends EditElement {
 	constructor() {
@@ -40,11 +40,7 @@ class ListCommand extends Edit {
 	do(range: Range, content: string): Range {
 		let ctx = this.owner.frame.getElementById(this.viewId) as ViewElement;
 		ctx = getViewContent(ctx);
-		/* 
-		TODO - better handling if the header is selected...
-		right now it's assuming that the start is in the header part of a panel.
-		*/
-		if (range.commonAncestorContainer != ctx) range.setStart(ctx, 0);
+		narrowRange(range);
 
 		startEdit(this, range);
 		
@@ -58,6 +54,7 @@ class ListCommand extends Edit {
 		return range;
 	}
 }
+
 
 function getViewContent(node: Node | Range) {
 	let view = getView(node);
@@ -148,12 +145,16 @@ function startEdit(cmd: ListCommand, range: Range) {
 
 function getChildView(ctx: Node, node: Node, offset?: number): ViewElement {
 	if (node == ctx) {
-		if (offset === undefined) return null;
-		node = ctx.childNodes[offset];
-	} else while (node && node.parentElement != ctx) {
+		if (!offset) return null;
+		node = ctx.childNodes[offset - 1];
+		return getView(node);
+	}
+	while (node?.parentElement != ctx) {
 		node = node.parentElement;
 	}
-	if (!node || !node["type$"]) console.warn("Invalid/corrupted view", ctx);
+	if (!node || !node["type$"]) {
+		console.warn("Invalid/corrupted view", ctx);
+	}
 	return node as ViewElement;
 }
 
