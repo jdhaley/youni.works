@@ -29,6 +29,7 @@ export function typeOf(value: any): string {
 		case "boolean":
 			return type;
 		case "object":
+			if (value == null) break;
 			if (value["type$"]) {
 				let type = value["type$"];
 				return type.name || "" + type;
@@ -36,7 +37,6 @@ export function typeOf(value: any): string {
 			if (value instanceof Date) return "date";
 			if (value[Symbol.iterator]) return "list";
 			return "record";
-		default:
-			return "null";
 	}
+	return "null";
 }
