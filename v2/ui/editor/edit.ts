@@ -186,3 +186,35 @@ function bindView(view: ViewElement): void {
 		bindView(child);
 	}
 }
+
+export function narrowRange(range: Range) {
+	let view = getView(range);
+	if (!view) return;
+
+	let start = range.startContainer;
+	let end = range.endContainer;
+
+	if (getHeader(view, start)) {
+		range.setStart(view.v_content, 0);
+	}
+	if (getFooter(view, start)) {
+		range.setStart(view.v_content, view.v_content.childNodes.length);
+	}
+	if (getFooter(view, end)) {
+		range.setEnd(view.v_content, view.v_content.childNodes.length);
+	}
+	console.log("narrow", range);
+}
+
+export function getHeader(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
+}
+export function getFooter(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
+}

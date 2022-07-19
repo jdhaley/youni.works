@@ -3,12 +3,26 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {EditType, toView} from "../editor/edit.js";
+import {EditType, getHeader, narrowRange, toView} from "../editor/edit.js";
 import { atStart, getView } from "../../base/display.js";
 
 let UNDONE = false;
 
 export default extend(null, {
+	click(event: UserEvent) {
+		if (getHeader(event.on, event.target as Node)) {
+			event.subject = "";
+			let range = event.frame.selectionRange;
+			range.setStartBefore(event.on);
+			range.setEndAfter(event.on);
+		}
+	},
+	dblclick(event: UserEvent) {
+		event.frame.selectionRange.collapse(true);
+	},
+	// release(event: UserEvent) {
+	// 	narrowRange(event.frame.selectionRange);
+	// },
 	command(this: EditType, event: UserEvent) {
 		let shortcuts = this.conf.shortcuts;
 		let command = shortcuts && shortcuts[event.shortcut];
@@ -113,6 +127,7 @@ function getInsertableList(range: Range) {
 	}
 }
 function setClipboard(type: EditType, range: Range, clipboard: DataTransfer) {
+	narrowRange(range);
 	let node = range.commonAncestorContainer;
 	if (node.nodeType == Node.TEXT_NODE) {
 		let data = node.textContent.substring(range.startOffset, range.endOffset);

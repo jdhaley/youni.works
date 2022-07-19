@@ -59,7 +59,8 @@ export default {
             event.track = priorEvent.track;
             event.moveX = event.x - priorEvent.x;
             event.moveY = event.y - priorEvent.y;
-            ownerOf(event.track).send(event, event.track);
+            sense(event);
+          //  ownerOf(event.track).sense(event, event.track);
             TRACK = event;
             return;
         } else {
@@ -78,16 +79,16 @@ export default {
     },
     mouseup(event: UserEvent) {
         let priorEvent = TRACK;
+        event.preventDefault();
+        event.subject = "release"
         if (priorEvent) {
-            event.preventDefault();
-            event.subject = "release"
             event.track = priorEvent.track;
+            event.source = event.track;
             event.moveX = 0;
             event.moveY = 0;
-            ownerOf(event.track).send(event, event.track);
-            TRACK = null;
-            return;
         }
+        sense(event);
+        TRACK = null;
     },
     mouseout(event: UserEvent) {
         event.subject = "moveout";

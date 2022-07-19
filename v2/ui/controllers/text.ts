@@ -37,7 +37,7 @@ export default extend(view, {
 		let range = this.owner.frame.selectionRange;
 		if (inView(range)) {
 			if (range.collapsed && range.startOffset == range.startContainer.textContent.length) {
-\			} else {
+			} else {
 				this.edit("Delete", range, "");
 			}
 		}
