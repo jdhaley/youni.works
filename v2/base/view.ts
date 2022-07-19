@@ -48,8 +48,8 @@ let MODELLERS = {
 		let parts = this.getPartsOf(view) || EMPTY.array;
 		//console.debug("Parts:", parts, view);
 		for (let part of parts) {
-			let type = this.owner.getControlOf(part) || this.owner.unknownType;
-			let value = type.toModel(part);
+			let type = this.owner.getControlOf(part);
+			let value = type?.toModel(part);
 			if (value) {
 				if (!model) {
 					model = [];

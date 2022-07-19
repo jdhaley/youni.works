@@ -1,4 +1,5 @@
-import { EMPTY } from "./util.js";
+import {content} from "./model.js";
+import {CHAR, EMPTY} from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
 export interface ViewElement extends Element {
@@ -40,6 +41,10 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 			view.append(view.v_content);	
 		} else {
 			view.v_content = view;
+		}
+		if (this.model == "list") {
+			view.append(this.owner.createElement("footer"));
+			view.lastElementChild.textContent = CHAR.ZWSP;
 		}
 		return view;
 	}
