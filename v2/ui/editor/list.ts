@@ -124,6 +124,10 @@ function startEdit(cmd: ListCommand, range: Range) {
 	following-end.
 	If the range is at the start or end of the collect they will be undefined.
 	*/
+	if (!start && range.startContainer == ctx) {
+		console.log(range,ctx.childNodes.length);
+		start = ctx.lastChild as ViewElement;
+	}
 	while (start) {
 		start = start.previousElementSibling;
 		//Make sure the start is a view item and not a marker.
@@ -145,9 +149,10 @@ function startEdit(cmd: ListCommand, range: Range) {
 
 function getChildView(ctx: Node, node: Node, offset?: number): ViewElement {
 	if (node == ctx) {
-		if (!offset) return null;
-		node = ctx.childNodes[offset - 1];
-		return getView(node);
+		return null;
+		// if (!offset) return null;
+		// node = ctx.childNodes[offset - 1];
+		// return getView(node);
 	}
 	while (node?.parentElement != ctx) {
 		node = node.parentElement;
