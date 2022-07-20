@@ -2,7 +2,7 @@ import {content} from "../../base/model.js";
 import {ViewElement, getView} from "../../base/display.js";
 
 import {Frame} from "../ui.js";
-import {Edit, mark, Article, EditType, EditElement, clearContent, unmark, replace, narrowRange} from "./edit.js";
+import {Edit, mark, Article, EditType, EditElement, clearContent, unmark, replace, narrowRange, getHeader} from "./edit.js";
 
 class ListView extends EditElement {
 	constructor() {
@@ -40,8 +40,8 @@ class ListCommand extends Edit {
 	do(range: Range, content: string): Range {
 		let ctx = this.owner.frame.getElementById(this.viewId) as ViewElement;
 		ctx = getViewContent(ctx);
-		narrowRange(range);
-
+		adjustRange(ctx, range);
+		mark(range);
 		startEdit(this, range);
 		
 		this.after = handleStartContainer(ctx, range);
@@ -55,6 +55,13 @@ class ListCommand extends Edit {
 	}
 }
 
+function adjustRange(ctx: Element, range: Range) {
+	narrowRange(range);
+	let view = getChildView(ctx, range.startContainer);
+	if (view && getHeader(view, range.startContainer)) range.setStartBefore(view);
+
+	//don't think we need to worry about the end view.
+}
 
 function getViewContent(node: Node | Range) {
 	let view = getView(node);
@@ -65,21 +72,19 @@ function handleStartContainer(ctx: ViewElement, range: Range) {
 	let start = getChildView(ctx, range.startContainer);
 	if (start) {
 		let r = range.cloneRange();
-		r.setEndAfter(start.lastChild);
+		r.setEnd(start.v_content, start.v_content.childNodes.length);
 		clearContent(r);
-		if (start.type$.toModel(start)) {
-			range.setStartAfter(start);
-			return start.outerHTML;	
-		}
-		range.setStartBefore(start);
+		range.setStartAfter(start);
+		return start.outerHTML;
 	}
 	return "";
 }
+
 function handleEndContainer(ctx: ViewElement, range: Range) {
 	let end = getChildView(ctx, range.endContainer);
 	if (end) {
 		let r = range.cloneRange();
-		r.setStartBefore(end.firstChild);
+		r.setStart(end.v_content, 0);
 		clearContent(r);
 		range.setEndBefore(end);
 		return end.outerHTML;
@@ -107,41 +112,40 @@ function getItemRange(owner: Frame, contextId: string, startId: string, endId: s
 }
 
 function startEdit(cmd: ListCommand, range: Range) {
+	range = range.cloneRange();
+
 	let ctx = cmd.owner.frame.getElementById(cmd.viewId) as ViewElement;
 	ctx = getViewContent(ctx);
 
 	let start = getChildView(ctx, range.startContainer, range.startOffset);
+	if (start) range.setStartBefore(start);
 	let end = getChildView(ctx, range.endContainer, range.endOffset);
-	mark(range);
+	if (end) range.setEndAfter(end);
+
+	if (!(range.startContainer == ctx && range.endContainer == ctx)) {
+		throw new Error("Invalid range for edit.");
+	}
 	//Capture the before image for undo.
 	cmd.before = "";
-	for (let ele = start; ele; ele = ele.nextElementSibling) {
-		cmd.before += ele.outerHTML;
-		if (ele == end) break;
+	for (let i = range.startOffset; i < range.endOffset; i++) {
+		let node = ctx.childNodes[i] as Element;
+		if (node.outerHTML) cmd.before += node.outerHTML;
 	}
-	/*
-	Get the items prior to the start/end to identify the id's prior-to-start or
-	following-end.
-	If the range is at the start or end of the collect they will be undefined.
-	*/
-	if (!start && range.startContainer == ctx) {
-		console.log(range,ctx.childNodes.length);
-		start = ctx.lastChild as ViewElement;
-	}
-	while (start) {
-		start = start.previousElementSibling;
-		//Make sure the start is a view item and not a marker.
-		if (start?.type$ && start.id) {
-			cmd.startId = start.id;
-			start = null;
+
+	console.log("BEFORE", cmd.before);
+
+	for (let i = range.startOffset; i; i--) {
+		let node = ctx.childNodes[i - 1] as ViewElement;
+		if (node.type$) {
+			cmd.startId = node.id;
+			break;
 		}
 	}
-	while (end) {
-		end = end.nextElementSibling;
-		//Make sure the end is a view item and not a marker.
-		if (end?.type$ && end.id) {
-			cmd.endId = end.id;
-			end = null;
+	for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
+		let node = ctx.childNodes[i] as ViewElement;
+		if (node.type$) {
+			cmd.endId = node.id;
+			break;
 		}
 	}
 }

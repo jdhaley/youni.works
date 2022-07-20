@@ -13,8 +13,12 @@ export default extend(null, {
 		if (getHeader(event.on, event.target as Node)) {
 			event.subject = "";
 			let range = event.frame.selectionRange;
-			range.setStartBefore(event.on);
-			range.setEndAfter(event.on);
+			if (range.collapsed) {
+				range.setStartBefore(event.on);
+				range.setEndAfter(event.on);	
+			} else {
+				range.collapse(true);
+			}
 		}
 	},
 	dblclick(event: UserEvent) {
