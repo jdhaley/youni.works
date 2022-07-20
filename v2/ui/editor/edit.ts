@@ -144,15 +144,10 @@ export function replace(range: Range, markup: string) {
 }
 
 export function toView(range: Range): ViewElement {
+	narrowRange(range);
 	let source = getView(range);
 	let type = source?.type$;
 	if (!type) return;
-	if (type.isPanel) {
-		let content = type.getModelView(source);
-		if (range.commonAncestorContainer != content) {
-			range.setStart(content, 0);
-		}
-	}
 	let view = type.createView();
 	let content = type.getModelView(view);
 	let frag = range.cloneContents();
@@ -203,7 +198,6 @@ export function narrowRange(range: Range) {
 	if (getFooter(view, end)) {
 		range.setEnd(view.v_content, view.v_content.childNodes.length);
 	}
-	console.log("narrow", range);
 }
 
 export function getHeader(view: Element, node: Node) {
