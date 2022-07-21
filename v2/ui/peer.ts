@@ -1,5 +1,6 @@
 import {Signal, Receiver} from "../base/controller";
 import { ContentType } from "../base/model";
+import { CHAR } from "../base/util";
 import { ViewOwner, ViewType } from "../base/view";
 
 export interface Part extends Receiver {
@@ -10,20 +11,24 @@ export interface Part extends Receiver {
 export interface View extends Part {
 	type$: ContentType<View>;
 	textContent: string;
-	append(partsOrText: any): void
+	append(partsOrText: any): void;
 	//content: content;
 	//markupContent: string;
 }
 
 interface $Peer extends Element {
+	$type: ViewType<View>
 	$viewer: Viewer;
 }
 export class Viewer implements View {
 	constructor(peer: $Peer) {
 		this.#peer = peer;
+		peer.$viewer = this;
 	}
 	#peer: $Peer;
-	type$: ViewType<View>;
+	get type$() {
+		return this.#peer.$type;
+	}
 	get owner() {
 		return this.#peer.ownerDocument["$owner"];
 	}
@@ -75,27 +80,42 @@ export class Viewer implements View {
 	}
 }
 
-export class ViewElement extends HTMLElement implements View {
-	type$: ViewType<View>
-	get container(): Part {
-		for (let parent = this.parentElement; parent; parent = parent.parentElement) {
-			if (parent["recieve"]) return parent as unknown as Part;
-		}
-		return null;
-	}
-	get parts(): Iterable<Part> {
-		return this.children as Iterable<Part>;
-	}
-	receive(signal: Signal): void {
-		signal.on = this;
-		this.type$.receive(signal);
-	}
+export interface DisplayView extends View {
+	v_content: Element;
 }
 
+// export class DisplayView extends HTMLElement implements DisplayView {
+// 	type$: DisplayType
+// 	get container(): Part {
+// 		for (let parent = this.parentElement; parent; parent = parent.parentElement) {
+// 			if (parent["recieve"]) return parent as unknown as Part;
+// 		}
+// 		return null;
+// 	}
+// 	get parts(): Iterable<Part> {
+// 		return this.children as Iterable<Part>;
+// 	}
+// 	receive(signal: Signal): void {
+// 		signal.on = this;
+// 		this.type$.receive(signal);
+// 	}
+// 	get v_content() {
+// 		return this.type$.isPanel ? this.children[1] : this;
+// 	}
+//}
+
 interface $View extends HTMLElement {
+	$type: DisplayType;
 	$viewer: Display;
 }
-class Display extends Viewer {
+
+class Display extends Viewer implements DisplayView {
+	get type$(): DisplayType {
+		return super.type$ as DisplayType;
+	}
+	get v_content(): Element {
+		return this.type$.isPanel ? this.peer.children[1] : this.peer;
+	}
 	get peer(): $View {
 		return super.peer as $View;
 	}
@@ -129,7 +149,9 @@ class Display extends Viewer {
 }
 
 export class DisplayOwner extends ViewOwner<View> {
-//	abstract createElement(tagName: string): Element;
+	createElement(tagName: string): Element {
+		return //this.owner.createElement(tagName);
+	}
 	getControlOf(view: View): ViewType<View> {
 		let type = view.type$;
 		if (!type) {
@@ -137,4 +159,61 @@ export class DisplayOwner extends ViewOwner<View> {
 		}
 		return type as ViewType<View>
 	}
+}
+
+export abstract class DisplayType extends ViewType<View> {
+	declare readonly owner: DisplayOwner;
+
+	get isPanel() {
+		return false;
+	}
+
+	createView(): View {
+		let view = this.owner.createElement(this.conf.tagName || "div") as $Peer;
+		view.$type = this;
+		return new Display(view);
+	}
+	getModelView(view: DisplayView) {
+		return view.v_content;
+	}
+	getPartOf(view: DisplayView): DisplayView {
+		return view.container as DisplayView;
+	}
+	getPartsOf(view: DisplayView): Iterable<DisplayView> {
+		return view.parts as Iterable<DisplayView>;
+	}
+	getTextOf(view: DisplayView): string {
+		return this.getModelView(view)?.textContent || "";
+	}
+	setTextOf(view: DisplayView, value: string): void {
+		let ele = this.getModelView(view);
+		if (ele) ele.textContent = value;
+	}
+	appendTo(view: DisplayView, value: any): void {
+		let ele = this.getModelView(view);
+		if (ele) ele.append(value);
+	}
+}
+
+export function getView(node: Node | Range): DisplayView {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node["type$"]) return node as any;
+		node = node.parentElement;
+	}
+}
+
+export function atStart(ctx: Node, node: Node, offset: number) {
+	if (offset != 0) return false;
+	while (node && node != ctx) {
+		if (node.previousSibling && node.previousSibling.nodeName != "HEADER") return false;
+		node = node.parentNode;
+	}
+	return true;
+}
+
+export function rangeIterator(range: Range) {
+	return document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_ALL, 
+		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+	)
 }
