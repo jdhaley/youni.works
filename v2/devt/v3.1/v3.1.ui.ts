@@ -1,9 +1,10 @@
-import { CommandBuffer } from "../base/command.js";
-import {content} from "../base/model.js";
-import {RemoteFileService} from "../base/remote.js";
-import {bundle} from "../base/util.js";
+import { CommandBuffer } from "../../base/command.js";
+import {content} from "../../base/model.js";
+import {RemoteFileService} from "../../base/remote.js";
+import {bundle} from "../../base/util.js";
 
-import {Receiver, Signal, Actions, ViewOwner, ViewType, ViewElement} from "./v3.1.base.js";
+import {Receiver, Signal, Actions, ViewOwner, ViewType} from "./v3.1.base.js";
+import { ViewElement } from "./v3.1.dom.js";
 
 let NEXT_ID = 1;
 export class DisplayElement extends ViewElement {

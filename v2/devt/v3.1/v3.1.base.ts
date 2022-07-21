@@ -1,6 +1,6 @@
-import { loadBaseTypes, loadTypes } from "../base/loader.js";
-import {content, ContentType, List, Record, Type, typeOf} from "../base/model.js";
-import {bundle, CHAR, EMPTY, extend} from "../base/util.js";
+import { loadBaseTypes, loadTypes } from "../../base/loader.js";
+import {content, ContentType, List, Record, Type, typeOf} from "../../base/model.js";
+import {bundle, CHAR, EMPTY, extend} from "../../base/util.js";
 
 export interface Signal {
 	readonly direction: "up" | "down"
@@ -35,7 +35,7 @@ export class Control implements Receiver {
 
 /* PARTS */
 
-interface Part extends Receiver {
+export interface Part extends Receiver {
 	container?: Part;
 	parts: Iterable<Part>;
 }
@@ -80,24 +80,6 @@ export interface View extends Part {
 	append(partsOrText: any): void
 	//markupContent: string;
 }
-
-export class ViewElement extends HTMLElement implements View {
-	type$: ViewType
-	get container(): Part {
-		for (let parent = this.parentElement; parent; parent = parent.parentElement) {
-			if (parent["recieve"]) return parent as unknown as Part;
-		}
-		return null;
-	}
-	get parts(): Iterable<Part> {
-		return this.children as Iterable<Part>;
-	}
-	receive(signal: Signal): void {
-		signal.on = this;
-		this.type$.receive(signal);
-	}
-}
-
 
 export function viewType(value: any): string {
 	let type = typeOf(value);

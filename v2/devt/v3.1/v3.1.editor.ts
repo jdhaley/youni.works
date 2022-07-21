@@ -1,5 +1,5 @@
-import {Command} from "../base/command.js";
-import {CHAR} from "../base/util.js";
+import {Command} from "../../base/command.js";
+import {CHAR} from "../../base/util.js";
 
 import {Display, DisplayElement, DisplayType} from "./v3.1.ui.js";
 
