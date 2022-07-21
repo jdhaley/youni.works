@@ -2,7 +2,8 @@ import {content} from "../../base/model.js";
 import {ViewElement, getView} from "../../base/display.js";
 
 import {Frame} from "../ui.js";
-import {Edit, mark, Article, EditType, EditElement, clearContent, unmark, replace, narrowRange, getHeader} from "./edit.js";
+import {Edit, mark, EditType, EditElement, clearContent, unmark, replace, narrowRange, getHeader} from "./edit.js";
+import { Article } from "./article.js";
 
 class ListView extends EditElement {
 	constructor() {

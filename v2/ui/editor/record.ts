@@ -1,7 +1,8 @@
 import {Record} from "../../base/model.js";
 import {getView} from "../../base/display.js";
 
-import {Article, Edit, mark, EditType, EditElement, unmark, clearContent} from "./edit.js";
+import {Edit, mark, EditType, EditElement, unmark, clearContent} from "./edit.js";
+import { Article } from "./article.js";
 
 class RecordView extends EditElement {
 	constructor() {

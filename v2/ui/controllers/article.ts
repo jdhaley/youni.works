@@ -1,6 +1,6 @@
 import {Response} from "../../base/message.js";
 import {extend} from "../../base/util.js";
-import { Article } from "../editor/edit.js";
+import { Article } from "../editor/article.js";
 
 import {UserEvent} from "../ui.js";
 

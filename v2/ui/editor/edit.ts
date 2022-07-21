@@ -1,7 +1,7 @@
 import {content} from "../../base/model.js";
-import {Command, CommandBuffer} from "../../base/command.js";
+import {Command} from "../../base/command.js";
 
-import {Display} from "../ui.js";
+import {Article} from "./article.js";
 import {DisplayType, getView, rangeIterator, ViewElement} from "../../base/display.js";
 import { CHAR } from "../../base/util.js";
 
@@ -12,15 +12,6 @@ export class EditElement extends HTMLElement {
 	connectedCallback() {
 		//bindView(this); - handled via the toView & replace functions.
 		if (!this.id) this.id = "" + NEXT_ID++;
-	}
-}
-
-export class Article extends Display {
-	readonly commands: CommandBuffer<Range> = new CommandBuffer();
-	save(): void {
-		let model = this.type.toModel(this.view);
-		console.log(model);
-		this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
 	}
 }
 
