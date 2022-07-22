@@ -100,8 +100,8 @@ export class DisplayOwner extends ElementOwner {
 	}
 }
 
-export function bindView(view: Element): void {
-	let type = view["type$"];
+export function bindView(view: Display): void {
+	let type = view.type$;
 	if (!type) {
 		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
 		let parent = getView(view.parentElement);
@@ -116,9 +116,9 @@ export function bindView(view: Element): void {
 	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
 		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
 	}
-	type.getContent(view); // set the v_content property.
+	type.getContentOf(view); // set the v_content property.
 	for (let child of type.getPartsOf(view)) {
-		bindView(child);
+		bindView(child as Display);
 	}
 }
 

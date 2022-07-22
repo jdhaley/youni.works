@@ -90,26 +90,26 @@ export abstract class ElementType extends ViewType<Element> {
 		}
 		return view;
 	}
-	getContent(view: Element) {
-		return view;
-	}
 	getPartOf(view: Element): Element {
 		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
 			if (parent["type$"]) return parent;
 		}
 	}
+	getContentOf(view: Element) {
+		return view;
+	}
 	getPartsOf(view: Element): Iterable<Element> {
-		return (this.getContent(view)?.children || EMPTY.array) as Iterable<Element>;
+		return (this.getContentOf(view)?.children || EMPTY.array) as Iterable<Element>;
 	}
 	getTextOf(view: Element): string {
-		return this.getContent(view)?.textContent || "";
+		return this.getContentOf(view)?.textContent || "";
 	}
 	setTextOf(view: Element, value: string): void {
-		let ele = this.getContent(view);
+		let ele = this.getContentOf(view);
 		if (ele) ele.textContent = value;
 	}
 	appendTo(view: Element, value: any): void {
-		let ele = this.getContent(view);
+		let ele = this.getContentOf(view);
 		if (ele) ele.append(value);
 	}
 }
