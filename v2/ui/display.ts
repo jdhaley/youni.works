@@ -5,17 +5,15 @@ import {bundle, CHAR} from "../base/util.js";
 import {Frame} from "./ui.js";
 
 let NEXT_ID = 1;
+
 export class Display extends HTMLElement {
 	constructor() {
 		super();
 	}
 	type$?: DisplayType;
-	v_content?: Element;
-
-	connectedCallback() {
-		//bindView(this); - handled via the toView & replace functions.
-		if (!this.id) this.id = "" + NEXT_ID++;
-	}
+	v_header?: HTMLElement;
+	v_content?: HTMLElement;
+	v_footer?: HTMLElement;
 }
 
 export abstract class DisplayType extends ElementType {
@@ -25,6 +23,7 @@ export abstract class DisplayType extends ElementType {
 		this.isPanel = conf.panel;
 
 	}
+	declare owner: DisplayOwner;
 	readonly isPanel: boolean;
 
 	toView(model: content): Display {
@@ -32,29 +31,45 @@ export abstract class DisplayType extends ElementType {
 	}
 	createView(): Display {
 		let view = super.createView() as Display;
-		if (this.isPanel) {
-			view.append(this.owner.createElement("header"));
-			view.firstChild.textContent = this.conf.title || "";
-			view.v_content = this.owner.createElement("div");
-			view.v_content.classList.add("view");
-			view.append(view.v_content);	
-		} else {
-			view.v_content = view;
-		}
-		if (this.model == "list") {
-			view.append(this.owner.createElement("footer"));
-			view.lastElementChild.textContent = CHAR.ZWSP;
-		}
+		view.id = "" + NEXT_ID++;
+		view.v_content = view;
 		return view;
+	}
+	viewContent(view: Display, model: content): void {
+		view.textContent = "";
+		if (this.isPanel) {
+			this.createHeader(view, model);
+			this.createContent(view, model);
+			this.createFooter(view, model);
+		}
+		super.viewContent(view, model);
+	}
+	createHeader(view: Display, model: content) {
+		view.v_header = this.owner.createElement("header");
+		view.v_header.textContent = this.conf.title || "";
+		view.append(view.v_header);
+	}
+	createContent(view: Display, model: content) {
+		view.v_content = this.owner.createElement("div");
+		view.v_content.classList.add("view");
+		view.append(view.v_content);
+	}
+	createFooter(view: Display, model: content) {
+		if (this.model == "list") {
+			let footer = this.owner.createElement("footer");
+			footer.textContent = CHAR.ZWSP;
+			view.v_footer = footer;
+			view.append(footer);
+		}
 	}
 	getContent(view: Display): Element {
 		let content = view.v_content
 		if (!content) {
 			if (this.isPanel) {
 				if (view.children[1]?.classList.contains("view")) {
-					content = view.children[1];
+					content = view.children[1] as HTMLElement;
 				} else if (view.children[0]?.classList.contains("view")) {
-					content = view.children[0];
+					content = view.children[0] as HTMLElement;
 				}
 				view.v_content = content;
 			} else {
@@ -82,6 +97,28 @@ export class DisplayOwner extends ElementOwner {
 
 	createElement(tagName: string): HTMLElement {
 		return this.frame.createElement(tagName);
+	}
+}
+
+export function bindView(view: Element): void {
+	let type = view["type$"];
+	if (!type) {
+		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+		let parent = getView(view.parentElement);
+		if (name && parent) {
+			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
+			view["type$"] = type;	
+		}
+		if (!type) return;
+	}
+	if (!view.id) view.id = "" + NEXT_ID++;
+	//Handle where a view's header doesn't get created in editing operations.
+	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
+		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
+	}
+	type.getContent(view); // set the v_content property.
+	for (let child of type.getPartsOf(view)) {
+		bindView(child);
 	}
 }
 

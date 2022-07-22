@@ -1,4 +1,4 @@
-import {DisplayType, Display, getView, getHeader, getFooter} from "../display.js";
+import {Display, getView, getHeader, getFooter, bindView} from "../display.js";
 import {CHAR} from "../../base/util.js";
 
 export function mark(range: Range) {
@@ -95,26 +95,6 @@ export function toView(range: Range): Display {
 	return view;
 }
 
-function bindView(view: Element): void {
-	let type = view["type$"];
-	if (!type) {
-		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
-		let parent = getView(view.parentElement);
-		if (name && parent) {
-			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
-			view["type$"] = type;	
-		}
-		if (!type) return;
-	}
-	//Handle where a view's header doesn't get created in editing operations.
-	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
-		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
-	}
-	type.getContent(view); // set the v_content property.
-	for (let child of type.getPartsOf(view)) {
-		bindView(child);
-	}
-}
 
 export function narrowRange(range: Range) {
 	let view = getView(range);
