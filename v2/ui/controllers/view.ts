@@ -3,8 +3,9 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {Editor, narrowRange, toView} from "../editor/edit.js";
-import {getView, getHeader} from "../../base/display.js";
+import {narrowRange, toView} from "../editor/edit.js";
+import {getView, getHeader} from "../display.js";
+import { Editor } from "../article.js";
 
 let UNDONE = false;
 

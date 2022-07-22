@@ -1,8 +1,8 @@
 import {Record} from "../../base/model.js";
-import {getView} from "../../base/display.js";
+import {getView} from "../display.js";
 
-import {Edit, mark, Editor, unmark, clearContent} from "./edit.js";
-import { Article } from "./article.js";
+import {mark, unmark, clearContent, replace} from "./edit.js";
+import { Article, Edit, Editor } from "../article.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
 	let view = getView(range);
@@ -36,6 +36,13 @@ class RecordEdit extends Edit {
 
 		unmark(range);
 		range.collapse();
+	}
+	exec(markup: string) {
+		let range = this.getRange();
+		replace(range, markup);
+		range = unmark(range);
+		if (range) this.owner.frame.selectionRange = range;
+		return range;
 	}
 }
 

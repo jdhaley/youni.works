@@ -1,8 +1,8 @@
-import {getView, ViewElement} from "../../base/display.js";
+import {getView, Display} from "../display.js";
 import {CHAR} from "../../base/util.js";
 
-import {Article} from "./article.js";
-import {Edit, mark, unmark} from "./edit.js";
+import {Article, Edit} from "../article.js";
+import {mark, replace, unmark} from "./edit.js";
 
 let lastEdit = {
 	action: "",
@@ -56,7 +56,7 @@ class TextEdit extends Edit {
 		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
-		let view = this.owner.frame.getElementById(this.viewId) as ViewElement;
+		let view = this.owner.frame.getElementById(this.viewId) as Display;
 		if (!view) throw new Error(`Can't find view element ${this.viewId}`);
 	
 		let range = this.owner.frame.createRange();
@@ -75,6 +75,13 @@ class TextEdit extends Edit {
 		}
 		this.after = view.v_content.innerHTML;
 		return unmark(range);
+	}
+	exec(markup: string) {
+		let range = this.getRange();
+		replace(range, markup);
+		range = unmark(range);
+		if (range) this.owner.frame.selectionRange = range;
+		return range;
 	}
 }
 

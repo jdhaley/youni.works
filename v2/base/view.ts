@@ -1,6 +1,6 @@
 import {content, ContentType, Type, typeOf} from "./model.js";
 import {Controller, Owner} from "./controller.js";
-import {bundle} from "./util.js";
+import {bundle, EMPTY} from "./util.js";
 import {loadBaseTypes, loadTypes} from "./loader.js";
 
 export function viewType(value: any): string {
@@ -71,4 +71,45 @@ export abstract class ViewType<V> extends Controller<V> implements ContentType<V
 	abstract getTextOf(view: V): string;
 	abstract setTextOf(view: V, value: string): void;
 	abstract appendTo(view: V, value: any): void 
+}
+
+export abstract class ElementOwner extends ViewOwner<Element> {
+	abstract createElement(tagName: string): Element;
+}
+
+export abstract class ElementType extends ViewType<Element> {
+	declare readonly owner: ElementOwner;
+
+	createView(): Element {
+		let view = this.owner.createElement(this.conf.tagName);
+		view["type$"] = this;
+		if (this.propertyName) {
+			view.setAttribute("data-name", this.propertyName);
+		} else {
+			view.setAttribute("data-type", this.name);
+		}
+		return view;
+	}
+	getContent(view: Element) {
+		return view;
+	}
+	getPartOf(view: Element): Element {
+		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
+			if (parent["type$"]) return parent;
+		}
+	}
+	getPartsOf(view: Element): Iterable<Element> {
+		return (this.getContent(view)?.children || EMPTY.array) as Iterable<Element>;
+	}
+	getTextOf(view: Element): string {
+		return this.getContent(view)?.textContent || "";
+	}
+	setTextOf(view: Element, value: string): void {
+		let ele = this.getContent(view);
+		if (ele) ele.textContent = value;
+	}
+	appendTo(view: Element, value: any): void {
+		let ele = this.getContent(view);
+		if (ele) ele.append(value);
+	}
 }

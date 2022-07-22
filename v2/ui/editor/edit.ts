@@ -1,88 +1,5 @@
-import {content} from "../../base/model.js";
-import {Command} from "../../base/command.js";
-
-import {Article} from "./article.js";
-import {DisplayType, ViewElement, getView, getHeader, getFooter} from "../../base/display.js";
+import {DisplayType, Display, getView, getHeader, getFooter} from "../display.js";
 import {CHAR} from "../../base/util.js";
-
-let NEXT_ID = 1;
-
-export class EditElement extends HTMLElement {
-	constructor() {
-		super();
-	}
-	type$: DisplayType;
-	
-	connectedCallback() {
-		//bindView(this); - handled via the toView & replace functions.
-		if (!this.id) this.id = "" + NEXT_ID++;
-	}
-}
-customElements.define("ui-view", EditElement);
-
-export class RecordElement extends EditElement {
-	constructor() {
-		super();
-	}
-}
-customElements.define("ui-record", RecordElement);
-
-class TextElement extends EditElement {
-	constructor() {
-		super();
-	}
-}
-customElements.define("ui-text", TextElement);
-
-class ListElement extends EditElement {
-	constructor() {
-		super();
-	}
-}
-customElements.define("ui-list", ListElement);
-
-export class Editor extends DisplayType {
-	declare readonly owner: Article;
-	edit(commandName: string, range: Range, content?: content): Range {
-		return this.owner.editors[this.model].call(this, commandName, range, content);
-	}
-}
-
-export abstract class Edit extends Command<Range> {
-	constructor(owner: Article, name: string, viewId: string) {
-		super();
-		this.owner = owner;
-		this.name = name;
-		this.timestamp = Date.now();
-		this.viewId = viewId;
-		owner.commands.add(this);
-	}
-	owner: Article;
-	name: string;
-	timestamp: number;
-	viewId: string;
-	before: string;
-	after: string;
-
-	protected abstract getRange(): Range;
-
-	undo() {
-		console.log("undo - " + this.name, this["startId"], this["endId"]);
-		return this.#exec(this.before);
-	}
-	redo() {
-		console.log("redo - " + this.name, this["startId"], this["endId"]);
-		return this.#exec(this.after);
-	}
-
-	#exec(markup: string) {
-		let range = this.getRange();
-		replace(range, markup);
-		range = unmark(range);
-		if (range) this.owner.frame.selectionRange = range;
-		return range;
-	}
-}
 
 export function mark(range: Range) {
 	let marker = insertMarker(range, "end");
@@ -155,12 +72,12 @@ export function replace(range: Range, markup: string) {
 		range.insertNode(node);
 		range.collapse();
 		if (node.nodeType == Node.ELEMENT_NODE) {
-			bindView(node as ViewElement);
+			bindView(node as Display);
 		}
 	}
 }
 
-export function toView(range: Range): ViewElement {
+export function toView(range: Range): Display {
 	narrowRange(range);
 	let source = getView(range);
 	let type = source?.type$;
@@ -172,20 +89,20 @@ export function toView(range: Range): ViewElement {
 		let node = frag.firstChild;
 		content.append(node); //moves firstChild from fragment to content.
 		if (node.nodeType == Node.ELEMENT_NODE) {
-			bindView(node as ViewElement);
+			bindView(node as Display);
 		}
 	}
 	return view;
 }
 
-function bindView(view: ViewElement): void {
-	let type = view.type$;
+function bindView(view: Element): void {
+	let type = view["type$"];
 	if (!type) {
 		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
 		let parent = getView(view.parentElement);
 		if (name && parent) {
 			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
-			view.type$ = type;	
+			view["type$"] = type;	
 		}
 		if (!type) return;
 	}

@@ -1,34 +1,37 @@
-import { BaseConf } from "./loader.js";
-import {CHAR, EMPTY} from "./util.js";
-import {ViewOwner, ViewType} from "./view.js";
+import {ElementOwner, ElementType} from "../base/view.js";
+import {BaseConf} from "../base/loader.js";
+import {content} from "../base/model.js";
+import {bundle, CHAR} from "../base/util.js";
+import {Frame} from "./ui.js";
 
-export interface ViewElement extends Element {
+let NEXT_ID = 1;
+export class Display extends HTMLElement {
+	constructor() {
+		super();
+	}
 	type$?: DisplayType;
-	v_content?: Element
+	v_content?: Element;
+
+	connectedCallback() {
+		//bindView(this); - handled via the toView & replace functions.
+		if (!this.id) this.id = "" + NEXT_ID++;
+	}
 }
 
-export abstract class DisplayOwner extends ViewOwner<ViewElement> {
-	abstract createElement(tagName: string): Element;
-}
-
-export abstract class DisplayType extends ViewType<ViewElement> {
+export abstract class DisplayType extends ElementType {
 	constructor(conf: BaseConf) {
 		super(conf);
 		this.model = conf.model;
 		this.isPanel = conf.panel;
 
 	}
-	declare readonly owner: DisplayOwner;
 	readonly isPanel: boolean;
 
-	createView(): ViewElement {
-		let view = this.owner.createElement(this.conf.tagName || "div") as ViewElement;
-		view.type$ = this;
-		if (this.propertyName) {
-			view.setAttribute("data-name", this.propertyName);
-		} else {
-			view.setAttribute("data-type", this.name);
-		}
+	toView(model: content): Display {
+		return super.toView(model) as Display;
+	}
+	createView(): Display {
+		let view = super.createView() as Display;
 		if (this.isPanel) {
 			view.append(this.owner.createElement("header"));
 			view.firstChild.textContent = this.conf.title || "";
@@ -44,7 +47,7 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 		}
 		return view;
 	}
-	getContent(view: ViewElement) {
+	getContent(view: Display): Element {
 		let content = view.v_content
 		if (!content) {
 			if (this.isPanel) {
@@ -60,31 +63,32 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 		}
 		return content;
 	}
-	getPartOf(view: ViewElement): ViewElement {
-		for (let parent: ViewElement = view.parentElement; parent; parent = parent.parentElement) {
-			if (parent.type$) return parent;
-		}
+}
+
+export class DisplayOwner extends ElementOwner {
+	constructor(frame: Frame, conf: bundle<any>) {
+		super(conf);
+		this.frame = frame;
+		this.actions = conf.actions.article;
+		this.initTypes(conf.viewTypes, conf.baseTypes);
+		this.type = this.types[this.conf.type];
+		console.info("Types:", this.types, this.conf.unknownType);
+		this.unknownType = this.types[this.conf.unknownType]
 	}
-	getPartsOf(view: ViewElement): Iterable<ViewElement> {
-		return (this.getContent(view)?.children || EMPTY.array) as Iterable<ViewElement>;
-	}
-	getTextOf(view: ViewElement): string {
-		return this.getContent(view)?.textContent || "";
-	}
-	setTextOf(view: ViewElement, value: string): void {
-		let ele = this.getContent(view);
-		if (ele) ele.textContent = value;
-	}
-	appendTo(view: ViewElement, value: any): void {
-		let ele = this.getContent(view);
-		if (ele) ele.append(value);
+	declare types: bundle<DisplayType>;
+	readonly frame: Frame;
+	type: DisplayType;
+	view: Display;
+
+	createElement(tagName: string): HTMLElement {
+		return this.frame.createElement(tagName);
 	}
 }
 
-export function getView(node: Node | Range): ViewElement {
+export function getView(node: Node | Range): Display {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node["type$"]) return node as ViewElement;
+		if (node["type$"]) return node as Display;
 		node = node.parentElement;
 	}
 }
@@ -94,7 +98,7 @@ export function getViewContent(node: Node | Range) {
 	return view?.type$.getContent(view);
 }
 
-export function getChildView(ctx: Node, node: Node): ViewElement {
+export function getChildView(ctx: Node, node: Node): Display {
 	if (node == ctx) return null;
 	while (node?.parentElement != ctx) {
 		node = node.parentElement;
@@ -102,7 +106,7 @@ export function getChildView(ctx: Node, node: Node): ViewElement {
 	if (!node || !node["type$"]) {
 		console.warn("Invalid/corrupted view", ctx);
 	}
-	return node as ViewElement;
+	return node as Display;
 }
 
 export function getHeader(view: Element, node: Node) {

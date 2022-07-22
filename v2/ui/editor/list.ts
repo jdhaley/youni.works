@@ -1,9 +1,9 @@
 import {content} from "../../base/model.js";
-import {ViewElement, getView, getChildView, getViewContent, getHeader} from "../../base/display.js";
 
+import {Display, getView, getChildView, getViewContent, getHeader} from "../display.js";
 import {Frame} from "../ui.js";
-import {Article} from "./article.js";
-import {Editor, Edit, mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
+import {Article, Edit, Editor} from "../article.js";
+import {mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
 
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
@@ -12,7 +12,7 @@ export default function edit(this: Editor, commandName: string, range: Range, co
 	let cmd = new ListEdit(this.owner, commandName, view.id);
 	let markup = "";
 	if (content) {
-		markup = this.getContent(this.toView(content)).innerHTML;
+		markup = this.getContent(this.toView(content) as Display).innerHTML;
 	}
 	return cmd.do(range, markup);
 }
@@ -28,7 +28,7 @@ class ListEdit extends Edit {
 		return getItemRange(this.owner.frame, this.viewId, this.startId, this.endId);
 	}
 	do(range: Range, content: string): Range {
-		let ctx = this.owner.frame.getElementById(this.viewId) as ViewElement;
+		let ctx = this.owner.frame.getElementById(this.viewId) as Element;
 		ctx = getViewContent(ctx);
 		adjustRange(ctx, range);
 		mark(range);
@@ -43,6 +43,13 @@ class ListEdit extends Edit {
 		range.collapse();
 		return range;
 	}
+	exec(markup: string) {
+		let range = this.getRange();
+		replace(range, markup);
+		range = unmark(range);
+		if (range) this.owner.frame.selectionRange = range;
+		return range;
+	}
 }
 
 function adjustRange(ctx: Element, range: Range) {
@@ -53,7 +60,7 @@ function adjustRange(ctx: Element, range: Range) {
 	//don't think we need to worry about the end view.
 }
 
-function handleStartContainer(ctx: ViewElement, range: Range) {
+function handleStartContainer(ctx: Element, range: Range) {
 	let start = getChildView(ctx, range.startContainer);
 	if (start) {
 		let r = range.cloneRange();
@@ -65,7 +72,7 @@ function handleStartContainer(ctx: ViewElement, range: Range) {
 	return "";
 }
 
-function handleEndContainer(ctx: ViewElement, range: Range) {
+function handleEndContainer(ctx: Element, range: Range) {
 	let end = getChildView(ctx, range.endContainer);
 	if (end) {
 		let r = range.cloneRange();
@@ -78,8 +85,8 @@ function handleEndContainer(ctx: ViewElement, range: Range) {
 }
 
 function getItemRange(owner: Frame, contextId: string, startId: string, endId: string) {
-	let context = owner.getElementById(contextId) as ViewElement;
-	if (!context?.type$) throw new Error("Can't find context element.");
+	let context = owner.getElementById(contextId) as Element;
+	if (!(context && context["type$"])) throw new Error("Can't find context element.");
 	context = getViewContent(context);
 	let range = owner.createRange();
 	range.selectNodeContents(context);
@@ -99,7 +106,7 @@ function getItemRange(owner: Frame, contextId: string, startId: string, endId: s
 function startEdit(cmd: ListEdit, range: Range) {
 	range = range.cloneRange();
 
-	let ctx = cmd.owner.frame.getElementById(cmd.viewId) as ViewElement;
+	let ctx = cmd.owner.frame.getElementById(cmd.viewId) as Element;
 	ctx = getViewContent(ctx);
 
 	let start = getChildView(ctx, range.startContainer);
@@ -120,14 +127,14 @@ function startEdit(cmd: ListEdit, range: Range) {
 	console.log("BEFORE", cmd.before);
 
 	for (let i = range.startOffset; i; i--) {
-		let node = ctx.childNodes[i - 1] as ViewElement;
+		let node = ctx.childNodes[i - 1] as Display;
 		if (node.type$) {
 			cmd.startId = node.id;
 			break;
 		}
 	}
 	for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
-		let node = ctx.childNodes[i] as ViewElement;
+		let node = ctx.childNodes[i] as Display;
 		if (node.type$) {
 			cmd.endId = node.id;
 			break;

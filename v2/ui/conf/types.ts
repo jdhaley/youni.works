@@ -6,7 +6,7 @@ import record from "../controllers/record.js";
 import list from "../controllers/list.js";
 
 import shortcuts from "./shortcuts.js";
-import { Editor } from "../editor/edit.js";
+import { Editor } from "../article.js";
 
 const conf: bundle<BaseConf> = {
 	text: {
