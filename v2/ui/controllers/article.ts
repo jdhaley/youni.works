@@ -1,7 +1,6 @@
-import { Display } from "../../../../noted/v2/base/display.js";
 import {Response} from "../../base/message.js";
 import {extend} from "../../base/util.js";
-import { Article } from "../article.js";
+import {Article} from "../article.js";
 
 import {UserEvent} from "../ui.js";
 
