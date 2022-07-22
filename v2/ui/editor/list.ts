@@ -12,7 +12,7 @@ export default function edit(this: Editor, commandName: string, range: Range, co
 	let cmd = new ListEdit(this.owner, commandName, view.id);
 	let markup = "";
 	if (content) {
-		markup = this.getContent(this.toView(content) as Display).innerHTML;
+		markup = this.getContentOf(this.toView(content) as Display).innerHTML;
 	}
 	return cmd.do(range, markup);
 }

@@ -83,7 +83,7 @@ export function toView(range: Range): Display {
 	let type = source?.type$;
 	if (!type) return;
 	let view = type.createView();
-	let content = type.getContent(view);
+	let content = type.getContentOf(view);
 	let frag = range.cloneContents();
 	while (frag.firstChild) {
 		let node = frag.firstChild;

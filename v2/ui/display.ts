@@ -62,7 +62,7 @@ export abstract class DisplayType extends ElementType {
 			view.append(footer);
 		}
 	}
-	getContent(view: Display): Element {
+	getContentOf(view: Display): Element {
 		let content = view.v_content
 		if (!content) {
 			if (this.isPanel) {
@@ -132,7 +132,7 @@ export function getView(node: Node | Range): Display {
 
 export function getViewContent(node: Node | Range) {
 	let view = getView(node);
-	return view?.type$.getContent(view);
+	return view?.type$.getContentOf(view);
 }
 
 export function getChildView(ctx: Node, node: Node): Display {
