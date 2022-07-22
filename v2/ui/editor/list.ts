@@ -48,7 +48,7 @@ class ListCommand extends Edit {
 		this.after = handleStartContainer(ctx, range);
 		this.after += content;
 		this.after += handleEndContainer(ctx, range);
-
+		console.log(this.name, this.startId, this.endId);
 		replace(range, content);
 		unmark(range);
 		range.collapse();

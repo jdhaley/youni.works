@@ -43,9 +43,11 @@ export abstract class Edit extends Command<Range> {
 	protected abstract getRange(): Range;
 
 	undo() {
+		console.log("undo - " + this.name, this["startId"], this["endId"]);
 		return this.#exec(this.before);
 	}
 	redo() {
+		console.log("redo - " + this.name, this["startId"], this["endId"]);
 		return this.#exec(this.after);
 	}
 

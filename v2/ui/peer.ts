@@ -1,6 +1,5 @@
 import {Signal, Receiver} from "../base/controller";
 import { ContentType } from "../base/model";
-import { CHAR } from "../base/util";
 import { ViewOwner, ViewType } from "../base/view";
 
 export interface Part extends Receiver {
