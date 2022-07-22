@@ -3,8 +3,8 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {EditType, getHeader, narrowRange, toView} from "../editor/edit.js";
-import { atStart, getView } from "../../base/display.js";
+import {EditType, narrowRange, toView} from "../editor/edit.js";
+import {getView, getHeader} from "../../base/display.js";
 
 let UNDONE = false;
 
@@ -130,6 +130,16 @@ function getInsertableList(range: Range) {
 		view = getView(range);
 	}
 }
+
+export function atStart(view: Element, node: Node, offset: number) {
+	if (offset != 0) return false;
+	while (node && node != view) {
+		if (node.previousSibling && node.previousSibling.nodeName != "HEADER") return false;
+		node = node.parentNode;
+	}
+	return true;
+}
+
 function setClipboard(type: EditType, range: Range, clipboard: DataTransfer) {
 	narrowRange(range);
 	let node = range.commonAncestorContainer;

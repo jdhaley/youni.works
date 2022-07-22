@@ -85,17 +85,31 @@ export function getView(node: Node | Range): ViewElement {
 	}
 }
 
-export function atStart(ctx: Node, node: Node, offset: number) {
-	if (offset != 0) return false;
-	while (node && node != ctx) {
-		if (node.previousSibling && node.previousSibling.nodeName != "HEADER") return false;
-		node = node.parentNode;
-	}
-	return true;
+export function getViewContent(node: Node | Range) {
+	let view = getView(node);
+	return view?.type$.getContent(view);
 }
 
-export function rangeIterator(range: Range) {
-	return document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_ALL, 
-		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
-	)
+export function getChildView(ctx: Node, node: Node): ViewElement {
+	if (node == ctx) return null;
+	while (node?.parentElement != ctx) {
+		node = node.parentElement;
+	}
+	if (!node || !node["type$"]) {
+		console.warn("Invalid/corrupted view", ctx);
+	}
+	return node as ViewElement;
+}
+
+export function getHeader(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
+}
+export function getFooter(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
 }

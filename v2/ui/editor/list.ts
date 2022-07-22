@@ -1,9 +1,9 @@
 import {content} from "../../base/model.js";
-import {ViewElement, getView} from "../../base/display.js";
+import {ViewElement, getView, getChildView, getViewContent, getHeader} from "../../base/display.js";
 
 import {Frame} from "../ui.js";
-import {Edit, mark, EditType, EditElement, clearContent, unmark, replace, narrowRange, getHeader} from "./edit.js";
-import { Article } from "./article.js";
+import {Article} from "./article.js";
+import {Edit, mark, EditType, EditElement, clearContent, unmark, replace, narrowRange} from "./edit.js";
 
 class ListView extends EditElement {
 	constructor() {
@@ -64,11 +64,6 @@ function adjustRange(ctx: Element, range: Range) {
 	//don't think we need to worry about the end view.
 }
 
-function getViewContent(node: Node | Range) {
-	let view = getView(node);
-	return view?.type$.getContent(view);
-}
-
 function handleStartContainer(ctx: ViewElement, range: Range) {
 	let start = getChildView(ctx, range.startContainer);
 	if (start) {
@@ -118,9 +113,9 @@ function startEdit(cmd: ListCommand, range: Range) {
 	let ctx = cmd.owner.frame.getElementById(cmd.viewId) as ViewElement;
 	ctx = getViewContent(ctx);
 
-	let start = getChildView(ctx, range.startContainer, range.startOffset);
+	let start = getChildView(ctx, range.startContainer);
 	if (start) range.setStartBefore(start);
-	let end = getChildView(ctx, range.endContainer, range.endOffset);
+	let end = getChildView(ctx, range.endContainer);
 	if (end) range.setEndAfter(end);
 
 	if (!(range.startContainer == ctx && range.endContainer == ctx)) {
@@ -149,22 +144,5 @@ function startEdit(cmd: ListCommand, range: Range) {
 			break;
 		}
 	}
-}
-
-
-function getChildView(ctx: Node, node: Node, offset?: number): ViewElement {
-	if (node == ctx) {
-		return null;
-		// if (!offset) return null;
-		// node = ctx.childNodes[offset - 1];
-		// return getView(node);
-	}
-	while (node?.parentElement != ctx) {
-		node = node.parentElement;
-	}
-	if (!node || !node["type$"]) {
-		console.warn("Invalid/corrupted view", ctx);
-	}
-	return node as ViewElement;
 }
 

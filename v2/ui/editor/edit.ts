@@ -2,8 +2,8 @@ import {content} from "../../base/model.js";
 import {Command} from "../../base/command.js";
 
 import {Article} from "./article.js";
-import {DisplayType, getView, rangeIterator, ViewElement} from "../../base/display.js";
-import { CHAR } from "../../base/util.js";
+import {DisplayType, ViewElement, getView, getHeader, getFooter} from "../../base/display.js";
+import {CHAR} from "../../base/util.js";
 
 let NEXT_ID = 1;
 export class EditElement extends HTMLElement {
@@ -193,15 +193,8 @@ export function narrowRange(range: Range) {
 	}
 }
 
-export function getHeader(view: Element, node: Node) {
-	while (node && node != view) {
-		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
-		node = node.parentElement;
-	}
-}
-export function getFooter(view: Element, node: Node) {
-	while (node && node != view) {
-		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
-		node = node.parentElement;
-	}
+export function rangeIterator(range: Range) {
+	return document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_ALL, 
+		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+	)
 }
