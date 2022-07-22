@@ -1,43 +1,50 @@
 import {BaseConf} from "../../base/loader.js";
 import {bundle} from "../../base/util.js";
 
-import {ListEditor} from "../editor/list.js";
-import {RecordEditor} from "../editor/record.js";
-import {TextEditor} from "../editor/text.js";
-
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
 import list from "../controllers/list.js";
 
 import shortcuts from "./shortcuts.js";
+import { Editor } from "../editor/edit.js";
 
 const conf: bundle<BaseConf> = {
 	text: {
-		class: TextEditor,
+		class: Editor,
+		model: "text",
+		panel: true,
 		tagName: "ui-text",
 		actions: text,
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: TextEditor,
+		class: Editor,
+		model: "text",
+		panel: true,
 		tagName: "ui-text",
 		actions: text,
 		shortcuts: shortcuts
 	},
 	list: {
-		class: ListEditor,
+		class: Editor,
+		model: "list",
+		panel: true,
 		tagName: "ui-list",
 		actions: list,
 		shortcuts: shortcuts
 	},
 	record: {
-		class: RecordEditor,
+		class: Editor,
+		model: "record",
+		panel: true,
 		tagName: "ui-record",
 		actions: record,
 		shortcuts: shortcuts
 	},
 	tree: {
-		class: ListEditor,
+		class: Editor,
+		model: "list",
+		panel: true,
 		tagName: "ui-tree",
 		actions: list,
 		shortcuts: shortcuts

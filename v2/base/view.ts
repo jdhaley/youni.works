@@ -1,6 +1,6 @@
-import {content, ContentType, List, Record, Type, typeOf} from "./model.js";
+import {content, ContentType, Type, typeOf} from "./model.js";
 import {Controller, Owner} from "./controller.js";
-import {bundle, CHAR, EMPTY} from "./util.js";
+import {bundle} from "./util.js";
 import {loadBaseTypes, loadTypes} from "./loader.js";
 
 export function viewType(value: any): string {
@@ -15,75 +15,18 @@ export function viewType(value: any): string {
 			return type;
 	}
 }
-
-let VIEWERS = {
-	text(this: ViewType<unknown>, view: unknown, model: string): void {
-		this.setTextOf(view, model || CHAR.ZWSP);
-	},
-	record(this: ViewType<unknown>, view: unknown, model: Record) {
-		view["$at"] = Object.create(null);
-		for (let name in this.types) {
-			let type = this.types[name];
-			let value = model ? model[name] : null;
-			let member = type.toView(value);
-			this.appendTo(view, member);
-			view["$at"][name] = member;
-		}
-		//if (!view.textContent) view.textContent = CHAR.ZWSP;
-	},
-	list(this: ViewType<unknown>, view: unknown, model: List) {
-		//view.textContent = "";
-		if (model && model[Symbol.iterator]) for (let value of model) {
-			let type = this.types[viewType(value)] || this.owner.unknownType;
-			let part = type.toView(value);
-			this.appendTo(view, part);
-		}
-		//if (!view.textContent) view.append(CHAR.ZWSP);
-	}
-}
-
-let MODELLERS = {
-	list(this: ViewType<unknown>, view: unknown): List {
-		let model: content[];
-		let parts = this.getPartsOf(view) || EMPTY.array;
-		//console.debug("Parts:", parts, view);
-		for (let part of parts) {
-			let type = this.owner.getControlOf(part);
-			let value = type?.toModel(part);
-			if (value) {
-				if (!model) {
-					model = [];
-					if (this.name) model["type$"] = this.name;
-				}
-				model.push(value);	
-			}
-		}
-		return model;
-	},
-	record(this: ViewType<unknown>, view: unknown): Record {
-		let model: Record;
-		for (let part of this.getPartsOf(view)) {
-			let type = this.owner.getControlOf(part) || this.owner.unknownType;
-			let value = type.toModel(part);
-			if (value) {
-				if (!model) {
-					model = Object.create(null);
-					model.type$ = this.name;
-				}
-				model[type.propertyName] = value;
-			}
-		}
-		return model;
-	},
-	text(this: ViewType<unknown>, view: unknown): string {
-		let text = this.getTextOf(view);
-		return text == CHAR.ZWSP ? "" : text;
-	}
-}
-
+type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
+type modeller = (this: ViewType<unknown>, view: unknown) => content;
 export abstract class ViewOwner<V> extends Owner<V> {
-	viewers = VIEWERS;
-	modellers = MODELLERS;
+	constructor(conf?: bundle<any>) {
+		super(conf);
+		if (conf) {
+			this.viewers = conf.viewers;
+			this.modellers = conf.modellers;
+		}
+	}
+	viewers: bundle<viewer>
+	modellers: bundle<modeller>;
 	unknownType: ViewType<V>;
 	types: bundle<ViewType<V>>;
 

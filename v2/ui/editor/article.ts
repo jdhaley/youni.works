@@ -4,19 +4,23 @@ import { content } from "../../base/model.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { bundle } from "../../base/util.js";
 import { ViewType } from "../../base/view.js";
+import { DisplayType } from "../peer.js";
 import { Frame } from "../ui.js";
 
+type editor = (this: DisplayType, commandName: string, range: Range, content?: content) => Range;
 export class Article extends DisplayOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
 		this.frame = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
+		this.editors = conf.editors;
 		this.actions = conf.actions.article;
 		this.initTypes(conf.viewTypes, conf.baseTypes);
 		this.type = this.types[this.conf.type];
 		console.info("Types:", this.types, this.conf.unknownType);
 		this.unknownType = this.types[this.conf.unknownType]
 	}
+	editors: bundle<editor>;
 	readonly frame: Frame;
 	readonly service: RemoteFileService;
 	type: ViewType<ViewElement>;

@@ -6,7 +6,11 @@ import {DisplayType, ViewElement, getView, getHeader, getFooter} from "../../bas
 import {CHAR} from "../../base/util.js";
 
 let NEXT_ID = 1;
+
 export class EditElement extends HTMLElement {
+	constructor() {
+		super();
+	}
 	type$: DisplayType;
 	
 	connectedCallback() {
@@ -14,14 +18,34 @@ export class EditElement extends HTMLElement {
 		if (!this.id) this.id = "" + NEXT_ID++;
 	}
 }
+customElements.define("ui-view", EditElement);
 
-export abstract class EditType extends DisplayType {
-	declare readonly owner: Article;
-
-	get isPanel() {
-		return true;
+export class RecordElement extends EditElement {
+	constructor() {
+		super();
 	}
-	abstract edit(commandName: string, range: Range, content?: content): Range;
+}
+customElements.define("ui-record", RecordElement);
+
+class TextElement extends EditElement {
+	constructor() {
+		super();
+	}
+}
+customElements.define("ui-text", TextElement);
+
+class ListElement extends EditElement {
+	constructor() {
+		super();
+	}
+}
+customElements.define("ui-list", ListElement);
+
+export class Editor extends DisplayType {
+	declare readonly owner: Article;
+	edit(commandName: string, range: Range, content?: content): Range {
+		return this.owner.editors[this.model].call(this, commandName, range, content);
+	}
 }
 
 export abstract class Edit extends Command<Range> {

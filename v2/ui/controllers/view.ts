@@ -3,7 +3,7 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {EditType, narrowRange, toView} from "../editor/edit.js";
+import {Editor, narrowRange, toView} from "../editor/edit.js";
 import {getView, getHeader} from "../../base/display.js";
 
 let UNDONE = false;
@@ -27,21 +27,21 @@ export default extend(null, {
 	// release(event: UserEvent) {
 	// 	narrowRange(event.frame.selectionRange);
 	// },
-	command(this: EditType, event: UserEvent) {
+	command(this: Editor, event: UserEvent) {
 		let shortcuts = this.conf.shortcuts;
 		let command = shortcuts && shortcuts[event.shortcut];
 		if (command) event.subject = command;
 	},
-	save(this: EditType, event: UserEvent) {
+	save(this: Editor, event: UserEvent) {
 		event.subject = "";
 		this.owner.save();
 	},
-	copy(this: EditType, event: UserEvent) {
+	copy(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		setClipboard(this, range.cloneRange(), event.clipboardData);
 	},
-	cut(this: EditType, event: UserEvent) {
+	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		if (range.collapsed) {
@@ -50,13 +50,13 @@ export default extend(null, {
 		setClipboard(this, range.cloneRange(), event.clipboardData);
 		this.edit("Cut", range);
 	},
-	paste(this: EditType, event: UserEvent) {
+	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;
 		let model = getClipboard(event.clipboardData);
 		if (range.collapsed && model instanceof Array) {
 			range = getInsertableList(range);
-			if (range) ((getView(range)).type$ as EditType).edit("Paste", range, model);
+			if (range) ((getView(range)).type$ as Editor).edit("Paste", range, model);
 		} else {
 			this.edit("Paste", range, model);
 		}
@@ -77,7 +77,7 @@ export default extend(null, {
 	charpress(event: UserEvent) {
 		event.subject = "";
 	},
-	test(this: EditType, event: UserEvent) {
+	test(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = this.owner.frame.selectionRange;
 		range.setStartBefore(event.on.parentElement);
@@ -103,11 +103,11 @@ export default extend(null, {
 			document.execCommand("undo");
 		}
 	},
-	undo(this: EditType, event: UserEvent) {
+	undo(this: Editor, event: UserEvent) {
 		event.subject = "";
 		this.owner.commands.undo();
 	},
-	redo(this: EditType, event: UserEvent) {
+	redo(this: Editor, event: UserEvent) {
 		event.subject = "";
 		this.owner.commands.redo();
 	},
@@ -140,7 +140,7 @@ export function atStart(view: Element, node: Node, offset: number) {
 	return true;
 }
 
-function setClipboard(type: EditType, range: Range, clipboard: DataTransfer) {
+function setClipboard(type: Editor, range: Range, clipboard: DataTransfer) {
 	narrowRange(range);
 	let node = range.commonAncestorContainer;
 	if (node.nodeType == Node.TEXT_NODE) {

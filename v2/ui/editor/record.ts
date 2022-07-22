@@ -1,33 +1,21 @@
 import {Record} from "../../base/model.js";
 import {getView} from "../../base/display.js";
 
-import {Edit, mark, EditType, EditElement, unmark, clearContent} from "./edit.js";
+import {Edit, mark, Editor, unmark, clearContent} from "./edit.js";
 import { Article } from "./article.js";
 
-class RecordView extends EditElement {
-	constructor() {
-		super();
+export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
+	let view = getView(range);
+	if (view?.type$.model == "record") {
+		let cmd = new RecordEdit(this.owner, commandName, view.id);
+		cmd.do(range, record);
+	} else {
+		console.error("Invalid range for edit.");
 	}
-}
-customElements.define("ui-record", RecordView);
-
-export class RecordEditor extends EditType {
-	readonly model = "record";
-	readonly tagName = "ui-record";
-
-	edit(commandName: string, range: Range, record: Record): Range {
-		let view = getView(range);
-		if (view?.type$.model == "record") {
-			let cmd = new RecordCommand(this.owner, commandName, view.id);
-			cmd.do(range, record);
-		} else {
-			console.error("Invalid range for edit.");
-		}
-		return null;
-	}
+	return null;
 }
 
-class RecordCommand extends Edit {
+class RecordEdit extends Edit {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}

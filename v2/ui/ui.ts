@@ -1,11 +1,6 @@
-import {content} from "../base/model.js";
-import {Signal, Actions} from "../base/controller.js";
-import {ViewType} from "../base/view.js";
-import {DisplayOwner, ViewElement} from "../base/display.js";
-import {RemoteFileService} from "../base/remote.js";
-import {bundle} from "../base/util.js";
+import {Signal, Actions, Owner, Controller} from "../base/controller.js";
 
-export class Frame extends DisplayOwner {
+export class Frame extends Owner<HTMLElement> {
 	constructor(window: Window, actions: Actions) {
 		super();
 		window.document["$owner"] = this;
@@ -56,6 +51,9 @@ export class Frame extends DisplayOwner {
 	}
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);
+	}
+	getControlOf(view: HTMLElement): Controller<HTMLElement> {
+		return view["type$"];
 	}
 }
 

@@ -1,15 +1,8 @@
-import { getView, ViewElement } from "../../base/display.js";
-import { CHAR } from "../../base/util.js";
-import { Article } from "./article.js";
+import {getView, ViewElement} from "../../base/display.js";
+import {CHAR} from "../../base/util.js";
 
-import {Edit, EditElement, EditType, mark, unmark} from "./edit.js";
-
-class TextView extends EditElement {
-	constructor() {
-		super();
-	}
-}
-customElements.define("ui-text", TextView);
+import {Article} from "./article.js";
+import {Edit, mark, unmark} from "./edit.js";
 
 let lastEdit = {
 	action: "",
@@ -18,51 +11,47 @@ let lastEdit = {
 	end: 0
 }
 
-export class TextEditor extends EditType {
-	readonly model = "text";
+export default function edit(commandName: string, range: Range, text: string): Range {
+	let node = range.commonAncestorContainer;
+	let view = getView(node);
 
-	edit(commandName: string, range: Range, text: string): Range {
-		let node = range.commonAncestorContainer;
-		let view = getView(node);
-
-		if (view?.type$.model != "text") {
-			console.error("Invalid range for edit.");
-		}
-		if (range.collapsed && commandName == "Erase") {
-			if (!range.startOffset) return range;
-		}
-
-		if (range.collapsed && node == lastEdit.node) {
-			let cmd = this.owner.commands.peek() as Edit;
-			if (cmd?.name == commandName && view?.id == cmd.viewId) {
-				let r = doAgain(cmd, range, text);
-				if (r) return r;		
-			}
-		}
-		if (range.collapsed) {
-			lastEdit.node = range.commonAncestorContainer
-	
-			if (commandName == "Erase") {
-				//Extend the range over the character for the cmd.do()
-				range.setStart(lastEdit.node, range.startOffset - 1);
-			}
-			lastEdit.start = range.startOffset;
-			if (commandName == "Delete") {
-				range.setEnd(lastEdit.node, range.endOffset + 1);
-			}
-			lastEdit.end = commandName == "Entry" ? range.endOffset + 1 : range.endOffset;
-		} else {
-			lastEdit.node = null;
-		}
-	
-		let cmd = new TextCommand(this.owner, commandName, view.id);
-		cmd.do(range, text);
-		range.collapse();
-		return range;
+	if (view?.type$.model != "text") {
+		console.error("Invalid range for edit.");
 	}
+	if (range.collapsed && commandName == "Erase") {
+		if (!range.startOffset) return range;
+	}
+
+	if (range.collapsed && node == lastEdit.node) {
+		let cmd = this.owner.commands.peek() as Edit;
+		if (cmd?.name == commandName && view?.id == cmd.viewId) {
+			let r = doAgain(cmd, range, text);
+			if (r) return r;		
+		}
+	}
+	if (range.collapsed) {
+		lastEdit.node = range.commonAncestorContainer
+
+		if (commandName == "Erase") {
+			//Extend the range over the character for the cmd.do()
+			range.setStart(lastEdit.node, range.startOffset - 1);
+		}
+		lastEdit.start = range.startOffset;
+		if (commandName == "Delete") {
+			range.setEnd(lastEdit.node, range.endOffset + 1);
+		}
+		lastEdit.end = commandName == "Entry" ? range.endOffset + 1 : range.endOffset;
+	} else {
+		lastEdit.node = null;
+	}
+
+	let cmd = new TextEdit(this.owner, commandName, view.id);
+	cmd.do(range, text);
+	range.collapse();
+	return range;
 }
 
-class TextCommand extends Edit {
+class TextEdit extends Edit {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}

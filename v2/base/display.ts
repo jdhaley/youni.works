@@ -1,3 +1,4 @@
+import { BaseConf } from "./loader.js";
 import {CHAR, EMPTY} from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
@@ -11,11 +12,14 @@ export abstract class DisplayOwner extends ViewOwner<ViewElement> {
 }
 
 export abstract class DisplayType extends ViewType<ViewElement> {
-	declare readonly owner: DisplayOwner;
+	constructor(conf: BaseConf) {
+		super(conf);
+		this.model = conf.model;
+		this.isPanel = conf.panel;
 
-	get isPanel() {
-		return false;
 	}
+	declare readonly owner: DisplayOwner;
+	readonly isPanel: boolean;
 
 	createView(): ViewElement {
 		let view = this.owner.createElement(this.conf.tagName || "div") as ViewElement;

@@ -3,32 +3,21 @@ import {ViewElement, getView, getChildView, getViewContent, getHeader} from "../
 
 import {Frame} from "../ui.js";
 import {Article} from "./article.js";
-import {Edit, mark, EditType, EditElement, clearContent, unmark, replace, narrowRange} from "./edit.js";
+import {Editor, Edit, mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
 
-class ListView extends EditElement {
-	constructor() {
-		super();
+
+export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
+	let view = getView(range);
+	if (view.type$.model != "list") console.warn("View is not a list:", view);
+	let cmd = new ListEdit(this.owner, commandName, view.id);
+	let markup = "";
+	if (content) {
+		markup = this.getContent(this.toView(content)).innerHTML;
 	}
-}
-customElements.define("ui-list", ListView);
-
-export class ListEditor extends EditType {
-	readonly model = "list";
-	readonly tagName = "ui-list";
-
-	edit(commandName: string, range: Range, content?: content): Range {
-		let view = getView(range);
-		if (view.type$.model != "list") console.warn("View is not a list:", view);
-		let cmd = new ListCommand(this.owner, commandName, view.id);
-		let markup = "";
-		if (content) {
-			markup = this.getContent(this.toView(content)).innerHTML;
-		}
-		return cmd.do(range, markup);
-	}
+	return cmd.do(range, markup);
 }
 
-class ListCommand extends Edit {
+class ListEdit extends Edit {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
@@ -107,7 +96,7 @@ function getItemRange(owner: Frame, contextId: string, startId: string, endId: s
 	return range;
 }
 
-function startEdit(cmd: ListCommand, range: Range) {
+function startEdit(cmd: ListEdit, range: Range) {
 	range = range.cloneRange();
 
 	let ctx = cmd.owner.frame.getElementById(cmd.viewId) as ViewElement;

@@ -4,6 +4,8 @@ import {ViewOwner, ViewType} from "./view.js";
 
 export interface BaseConf {
 	class: typeof Control;
+	model: "text" | "record" | "list";
+	panel: boolean;
 	tagName: string;
 	actions: Actions;
 	shortcuts: bundle<string>;
@@ -80,8 +82,7 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 		} else {
 			member = getType(part, types, source);
 		}
-		//TODO shouldn't use tagName to identify a record.
-		if (type.tagName == "ui-record") {
+		if (type.model == "record") {
 			member = Object.create(member);
 			member.name = "";
 			member.propertyName = name;
