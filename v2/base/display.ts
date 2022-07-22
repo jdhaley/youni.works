@@ -1,4 +1,3 @@
-import {content} from "./model.js";
 import {CHAR, EMPTY} from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
@@ -9,13 +8,6 @@ export interface ViewElement extends Element {
 
 export abstract class DisplayOwner extends ViewOwner<ViewElement> {
 	abstract createElement(tagName: string): Element;
-	getControlOf(view: ViewElement): ViewType<ViewElement> {
-		let type = view.type$;
-		if (!type) {
-			console.log(view);
-		}
-		return type;
-	}
 }
 
 export abstract class DisplayType extends ViewType<ViewElement> {
@@ -48,7 +40,7 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 		}
 		return view;
 	}
-	getModelView(view: ViewElement) {
+	getContent(view: ViewElement) {
 		let content = view.v_content
 		if (!content) {
 			if (this.isPanel) {
@@ -70,17 +62,17 @@ export abstract class DisplayType extends ViewType<ViewElement> {
 		}
 	}
 	getPartsOf(view: ViewElement): Iterable<ViewElement> {
-		return (this.getModelView(view)?.children || EMPTY.array) as Iterable<ViewElement>;
+		return (this.getContent(view)?.children || EMPTY.array) as Iterable<ViewElement>;
 	}
 	getTextOf(view: ViewElement): string {
-		return this.getModelView(view)?.textContent || "";
+		return this.getContent(view)?.textContent || "";
 	}
 	setTextOf(view: ViewElement, value: string): void {
-		let ele = this.getModelView(view);
+		let ele = this.getContent(view);
 		if (ele) ele.textContent = value;
 	}
 	appendTo(view: ViewElement, value: any): void {
-		let ele = this.getModelView(view);
+		let ele = this.getContent(view);
 		if (ele) ele.append(value);
 	}
 }

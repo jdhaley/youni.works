@@ -87,7 +87,13 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	unknownType: ViewType<V>;
 	types: bundle<ViewType<V>>;
 
-	abstract getControlOf(value: V): ViewType<V>;
+	getControlOf(view: V): ViewType<V> {
+		let type = view["type$"];
+		if (!type) {
+			console.log(view);
+		}
+		return type;
+	}
 	
 	initTypes(source: bundle<any>, base: bundle<ViewType<V>>) {
 		base = loadBaseTypes(this);

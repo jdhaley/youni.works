@@ -142,7 +142,7 @@ export function toView(range: Range): ViewElement {
 	let type = source?.type$;
 	if (!type) return;
 	let view = type.createView();
-	let content = type.getModelView(view);
+	let content = type.getContent(view);
 	let frag = range.cloneContents();
 	while (frag.firstChild) {
 		let node = frag.firstChild;
@@ -169,7 +169,7 @@ function bindView(view: ViewElement): void {
 	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
 		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
 	}
-	type.getModelView(view); // set the v_content property.
+	type.getContent(view); // set the v_content property.
 	for (let child of type.getPartsOf(view)) {
 		bindView(child);
 	}

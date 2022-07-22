@@ -22,7 +22,7 @@ export class ListEditor extends EditType {
 		let cmd = new ListCommand(this.owner, commandName, view.id);
 		let markup = "";
 		if (content) {
-			markup = this.getModelView(this.toView(content)).innerHTML;
+			markup = this.getContent(this.toView(content)).innerHTML;
 		}
 		return cmd.do(range, markup);
 	}
@@ -66,7 +66,7 @@ function adjustRange(ctx: Element, range: Range) {
 
 function getViewContent(node: Node | Range) {
 	let view = getView(node);
-	return view?.type$.getModelView(view);
+	return view?.type$.getContent(view);
 }
 
 function handleStartContainer(ctx: ViewElement, range: Range) {
