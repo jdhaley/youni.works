@@ -1,4 +1,4 @@
-import {getView, Display} from "../display.js";
+import {getView, Display, bindView} from "../display.js";
 import {CHAR} from "../../base/util.js";
 
 import {Article, Edit} from "../article.js";
@@ -57,8 +57,13 @@ class TextEdit extends Edit {
 	}
 	protected getRange(): Range {
 		let view = this.owner.frame.getElementById(this.viewId) as Display;
-		if (!view) throw new Error(`Can't find view element ${this.viewId}`);
-	
+		if (!view) throw new Error("Can't find context element.");
+		if (!view.type$) {
+			console.warn("context.type$ missing... binding...");
+			bindView(view);
+			if (!view.type$) throw new Error("unable to bind missing type$");
+		}
+
 		let range = this.owner.frame.createRange();
 		range.selectNodeContents(view.v_content);
 		return range;

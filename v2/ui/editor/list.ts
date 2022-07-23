@@ -1,6 +1,6 @@
 import {content} from "../../base/model.js";
 
-import {Display, getView, getChildView, getViewContent, getHeader} from "../display.js";
+import {Display, getView, getChildView, getViewContent, getHeader, bindView} from "../display.js";
 import {Frame} from "../ui.js";
 import {Article, Edit, Editor} from "../article.js";
 import {mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
@@ -85,11 +85,15 @@ function handleEndContainer(ctx: Element, range: Range) {
 }
 
 function getItemRange(owner: Frame, contextId: string, startId: string, endId: string) {
-	let context = owner.getElementById(contextId) as Element;
-	if (!(context && context["type$"])) throw new Error("Can't find context element.");
-	context = getViewContent(context);
+	let context = owner.getElementById(contextId) as Display;
+	if (!context) throw new Error("Can't find context element.");
+	if (!context.type$) {
+		console.warn("context.type$ missing... binding...");
+		bindView(context);
+		if (!context.type$) throw new Error("unable to bind missing type$");
+	}
 	let range = owner.createRange();
-	range.selectNodeContents(context);
+	range.selectNodeContents(getViewContent(context));
 	if (startId) {
 		let start = owner.getElementById(startId);
 		if (!start) throw new Error(`Start item.id '${startId}' not found.`);

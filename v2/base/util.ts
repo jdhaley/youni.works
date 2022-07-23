@@ -1,4 +1,5 @@
 export const CHAR = Object.freeze(extend(null, {
+	NBSP: "\u00a0",
 	ZWSP: "\u200b",
 	STX: "\u0002",
 	ETX: "\u0003"

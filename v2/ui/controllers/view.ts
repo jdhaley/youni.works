@@ -4,26 +4,28 @@ import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
 import {narrowRange, toView} from "../editor/edit.js";
-import {getView, getHeader} from "../display.js";
+import {getView, getHeader, getViewContent} from "../display.js";
 import { Editor } from "../article.js";
 
 let UNDONE = false;
 
 export default extend(null, {
 	click(event: UserEvent) {
+
 		if (getHeader(event.on, event.target as Node)) {
 			event.subject = "";
 			let range = event.frame.selectionRange;
-			if (range.collapsed) {
-				range.setStartBefore(event.on);
-				range.setEndAfter(event.on);	
-			} else {
-				range.collapse(true);
-			}
+			range.setStart(getViewContent(event.on), 0);
+			range.collapse(true);
 		}
 	},
 	dblclick(event: UserEvent) {
-		event.frame.selectionRange.collapse(true);
+		event.subject = "";
+		let range = event.frame.selectionRange;
+		if (getHeader(event.on, event.target as Node)) {
+			range.setStartBefore(event.on);
+			range.setEndAfter(event.on);		
+		}
 	},
 	// release(event: UserEvent) {
 	// 	narrowRange(event.frame.selectionRange);

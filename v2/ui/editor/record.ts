@@ -1,5 +1,5 @@
 import {Record} from "../../base/model.js";
-import {getView} from "../display.js";
+import {bindView, Display, getView} from "../display.js";
 
 import {mark, unmark, clearContent, replace} from "./edit.js";
 import { Article, Edit, Editor } from "../article.js";
@@ -20,8 +20,13 @@ class RecordEdit extends Edit {
 		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
-		let context = this.owner.frame.getElementById(this.viewId);
+		let context = this.owner.frame.getElementById(this.viewId) as Display;
 		if (!context) throw new Error("Can't find context element.");
+		if (!context.type$) {
+			console.warn("context.type$ missing... binding...");
+			bindView(context);
+			if (!context.type$) throw new Error("unable to bind missing type$");
+		}
 		let range = this.owner.frame.createRange();
 		range.selectNodeContents(context);
 		return range;
