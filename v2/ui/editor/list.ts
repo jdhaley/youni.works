@@ -11,40 +11,24 @@ export default function edit(this: Editor, commandName: string, range: Range, co
 	let ctx = getViewContent(view);
 
 	let cmd = new ListEdit(this.owner, commandName, view.id);
+	let markup = toMarkup(this, content);
 
 	adjustRange(ctx, range);
 
 	mark(range);
-	startEdit(cmd, range);
-	
-	let markup = toMarkup(this, content);
-	cmd.after = handleStartContainer(ctx, range);
-	cmd.after += markup;
-	cmd.after += handleEndContainer(ctx, range);
-	replace(range, markup);
-
+	startEdit(cmd, ctx, range);
+	doEdit(cmd, ctx, range, markup);
 	unmark(range);
+
 	range.collapse();
 	return range;
 }
 
-class ListEdit extends Edit {
-	constructor(owner: Article, name: string, viewId: string) {
-		super(owner, name, viewId);
-	}
-	startId: string;
-	endId: string;
-
-	protected getRange(): Range {
-		return getItemRange(this.owner.frame, this.viewId, this.startId, this.endId);
-	}
-	exec(markup: string) {
-		let range = this.getRange();
-		replace(range, markup);
-		range = unmark(range);
-		if (range) this.owner.frame.selectionRange = range;
-		return range;
-	}
+function doEdit(cmd: ListEdit, ctx: Element, range: Range, markup: string) {
+	cmd.after = handleStartContainer(ctx, range);
+	cmd.after += markup;
+	cmd.after += handleEndContainer(ctx, range);
+	replace(range, markup);
 }
 
 function toMarkup(editor: Editor, content: content) {
@@ -76,28 +60,6 @@ function handleEndContainer(ctx: Element, range: Range) {
 	return "";
 }
 
-function getItemRange(owner: Frame, contextId: string, startId: string, endId: string) {
-	let context = owner.getElementById(contextId) as Display;
-	if (!context) throw new Error("Can't find context element.");
-	if (!context.type$) {
-		console.warn("context.type$ missing... binding...");
-		bindView(context);
-		if (!context.type$) throw new Error("unable to bind missing type$");
-	}
-	let range = owner.createRange();
-	range.selectNodeContents(getViewContent(context));
-	if (startId) {
-		let start = owner.getElementById(startId);
-		if (!start) throw new Error(`Start item.id '${startId}' not found.`);
-		range.setStartAfter(start);
-	}
-	if (endId) {
-		let end = owner.getElementById(endId);
-		if (!end) throw new Error(`End item.id '${endId}' not found.`);
-		range.setEndBefore(end);
-	}
-	return range;
-}
 
 /**
  * Adjusts the range to be in the view content.  If the start of the
@@ -119,12 +81,10 @@ function getItemRange(owner: Frame, contextId: string, startId: string, endId: s
  * @param cmd 
  * @param range 
  */
-function startEdit(cmd: ListEdit, range: Range) {
-
-	let ctx = cmd.owner.frame.getElementById(cmd.viewId) as Element;
-	ctx = getViewContent(ctx);
-
-	range = getEditRange(ctx, range);
+function startEdit(cmd: ListEdit, ctx: Element, range: Range) {
+	//NB - the edit extent range is a different range from the
+	//passed range and should only be used within this method.
+	range = getEditExtent(ctx, range);
 	recordRange(cmd, ctx, range);
 
 	//Capture the before image for undo.
@@ -165,7 +125,7 @@ function recordRange(cmd: ListEdit, ctx: Element, range: Range) {
  * @param ctx 
  * @param range 
  */
-function getEditRange(ctx: Element, range: Range) {
+function getEditExtent(ctx: Element, range: Range) {
 	range = range.cloneRange();
 	let start = getChildView(ctx, range.startContainer);
 	if (start) range.setStartBefore(start);
@@ -178,3 +138,42 @@ function getEditRange(ctx: Element, range: Range) {
 	return range;
 }
 
+class ListEdit extends Edit {
+	constructor(owner: Article, name: string, viewId: string) {
+		super(owner, name, viewId);
+	}
+	startId: string;
+	endId: string;
+
+	protected exec(markup: string) {
+		let range = getExecRange(this);
+		replace(range, markup);
+		range = unmark(range);
+		if (range) this.owner.frame.selectionRange = range;
+		return range;
+	}
+}
+
+function getExecRange(cmd: ListEdit) {
+	let frame = cmd.owner.frame;
+	let view = frame.getElementById(cmd.viewId) as Display;
+	if (!view) throw new Error("Can't find view element.");
+	if (!view.type$) {
+		console.warn("view.type$ missing... binding...");
+		bindView(view);
+		if (!view.type$) throw new Error("unable to bind missing type$");
+	}
+	let range = frame.createRange();
+	range.selectNodeContents(getViewContent(view));
+	if (cmd.startId) {
+		let start = frame.getElementById(cmd.startId);
+		if (!start) throw new Error(`Start item.id '${cmd.startId}' not found.`);
+		range.setStartAfter(start);
+	}
+	if (cmd.endId) {
+		let end = frame.getElementById(cmd.endId);
+		if (!end) throw new Error(`End item.id '${cmd.endId}' not found.`);
+		range.setEndBefore(end);
+	}
+	return range;
+}
