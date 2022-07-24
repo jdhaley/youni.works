@@ -1,7 +1,8 @@
-import {getHeader, getView, getViewContent} from "../display.js";
+import {getHeader, getView} from "../display.js";
 import {CHAR, extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 import {Editor} from "../article.js";
+import {getEditContext, narrowRange} from "../editor/edit.js";
 
 import view from "./view.js";
 
@@ -20,10 +21,12 @@ export default extend(view, {
 		let range = this.owner.frame.selectionRange;
 		positionToText(range);
 		if (range.collapsed) {
-			let content = getViewContent(event.on);	
-			if (content.textContent == CHAR.ZWSP) content.textContent = "";
-			if (char == " " && range.endOffset == content.textContent.length) {
-				char = CHAR.NBSP;
+			let content = getEditContext(event.on);
+			if (content) {
+				if (content.textContent == CHAR.ZWSP) content.textContent = "";
+				if (char == " " && range.endOffset == content.textContent.length) {
+					char = CHAR.NBSP;
+				}	
 			}
 		}
 		this.edit("Entry", range, char);
@@ -58,18 +61,15 @@ function inView(range: Range) {
 	return node == view.v_content || node.parentElement == view.v_content ? true : false;
 }
 function positionToText(range: Range) {
-	let view = getView(range);
-	let ctx = range.commonAncestorContainer;
-	let inHeader = getHeader(view, ctx);
-	if (inHeader) {
-		range.setStart(view.v_content, 0);
-	}
 	if (range.collapsed) {
+		let view = getView(range);
+		let inHeader = getHeader(view, range.startContainer);
+		narrowRange(range);	
 		if (view.v_content.childNodes.length != 1) {
 			//force single text node...
 			view.v_content.textContent = view.v_content.textContent;
 		}
-		if (ctx.nodeType != Node.TEXT_NODE) {
+		if (range.commonAncestorContainer.nodeType != Node.TEXT_NODE) {
 			range.selectNodeContents(view.v_content.lastChild);
 			range.collapse(inHeader ? true : false);	
 		}

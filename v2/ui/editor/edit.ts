@@ -1,6 +1,11 @@
 import {Display, getView, getHeader, getFooter, bindView} from "../display.js";
 import {CHAR} from "../../base/util.js";
 
+export function getEditContext(node: Node | Range) {
+	let view = getView(node);
+	return view?.type$.getContentOf(view);
+}
+
 export function mark(range: Range) {
 	let marker = insertMarker(range, "end");
 	range.setEndBefore(marker);
@@ -51,13 +56,16 @@ export function unmark(range: Range) {
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
-		if (node.nodeType == Node.TEXT_NODE && node.parentElement.classList.contains("view")) {
-			if (node == range.startContainer) {
-				node.textContent = node.textContent.substring(0, range.startOffset);
-			} else if (node == range.endContainer) {
-				node.textContent = node.textContent.substring(range.endOffset);
-			} else {
-				node.textContent = CHAR.ZWSP;
+		if (node.nodeType == Node.TEXT_NODE) {
+			let view = getView(node);
+			if (view && node.parentElement == view.type$.getContentOf(view)) {
+				if (node == range.startContainer) {
+					node.textContent = node.textContent.substring(0, range.startOffset);
+				} else if (node == range.endContainer) {
+					node.textContent = node.textContent.substring(range.endOffset);
+				} else {
+					node.textContent = CHAR.ZWSP;
+				}	
 			}
 		}
 	}
@@ -76,25 +84,6 @@ export function replace(range: Range, markup: string) {
 		}
 	}
 }
-
-export function toView(range: Range): Display {
-	narrowRange(range);
-	let source = getView(range);
-	let type = source?.type$;
-	if (!type) return;
-	let view = type.createView();
-	let content = type.getContentOf(view);
-	let frag = range.cloneContents();
-	while (frag.firstChild) {
-		let node = frag.firstChild;
-		content.append(node); //moves firstChild from fragment to content.
-		if (node.nodeType == Node.ELEMENT_NODE) {
-			bindView(node as Display);
-		}
-	}
-	return view;
-}
-
 
 export function narrowRange(range: Range) {
 	let view = getView(range);

@@ -7,13 +7,12 @@ import {Frame} from "./ui.js";
 let NEXT_ID = 1;
 
 export class Display extends HTMLElement {
-	constructor() {
-		super();
-	}
 	type$?: DisplayType;
-	v_header?: HTMLElement;
-	v_content?: HTMLElement;
-	v_footer?: HTMLElement;
+	// v_header?: HTMLElement;
+	get v_content(): HTMLElement {
+		return this.type$?.getContentOf(this) as HTMLElement;
+	}
+	// v_footer?: HTMLElement;
 }
 
 export abstract class DisplayType extends ElementType {
@@ -33,51 +32,39 @@ export abstract class DisplayType extends ElementType {
 	createView(): Display {
 		let view = super.createView() as Display;
 		view.id = "" + NEXT_ID++;
-		view.v_content = view;
 		return view;
 	}
 	viewContent(view: Display, model: content): void {
 		view.textContent = "";
 		if (this.isPanel) {
-			this.createHeader(view, model);
-			this.createContent(view, model);
-			this.createFooter(view, model);
+			view.append(this.createHeader(view, model));
+			view.append(this.createContent(view, model));
+			if (this.model == "list")  view.append(this.createFooter(view, model));
 		}
 		super.viewContent(view, model);
 	}
-	createHeader(view: Display, model: content) {
-		view.v_header = this.owner.createElement("header");
-		view.v_header.textContent = this.conf.title || "";
-		view.append(view.v_header);
+	createHeader(view: Display, model?: content) {
+		let header = this.owner.createElement("header");
+		header.textContent = this.conf.title || "";
+		return header;
 	}
-	createContent(view: Display, model: content) {
-		view.v_content = this.owner.createElement("div");
-		view.v_content.classList.add("view");
-		view.append(view.v_content);
+	createContent(view: Display, model?: content) {
+		let content = this.owner.createElement("div");
+		content.classList.add("view");
+		return content;
 	}
-	createFooter(view: Display, model: content) {
-		if (this.model == "list") {
-			let footer = this.owner.createElement("footer");
-			footer.textContent = CHAR.ZWSP;
-			view.v_footer = footer;
-			view.append(footer);
-		}
+	createFooter(view: Display, model?: content) {
+		let footer = this.owner.createElement("footer");
+		footer.textContent = CHAR.ZWSP;
+		return footer;
 	}
 	getContentOf(view: Display): Element {
-		let content = view.v_content
-		if (!content) {
-			if (this.isPanel) {
-				if (view.children[1]?.classList.contains("view")) {
-					content = view.children[1] as HTMLElement;
-				} else if (view.children[0]?.classList.contains("view")) {
-					content = view.children[0] as HTMLElement;
-				}
-				view.v_content = content;
-			} else {
-				view.v_content = view;
-			}
+		if (this.isPanel) {
+			let content = view.children[1];
+			if (content?.classList.contains("view")) return content;	
+			throw new Error("corrupted view");
 		}
-		return content;
+		return view;
 	}
 }
 
@@ -111,14 +98,31 @@ export function bindView(view: Display): void {
 		if (!type) return;
 	}
 	if (!view.id) view.id = "" + NEXT_ID++;
-	//Handle where a view's header doesn't get created in editing operations.
-	if (type.isPanel && view.firstChild?.nodeName != "HEADER") {
-		view.insertBefore(type.owner.createElement("HEADER"), view.firstChild);
+
+	/*
+	Panels created from a range operation may be missing one or more of the
+	header, content, footer.
+	*/
+	if (type.isPanel && !(view.children[1] && view.children[1].classList.contains("view"))) {
+		rebuildView(view);
 	}
-	type.getContentOf(view); // set the v_content property.
 	for (let child of type.getPartsOf(view)) {
 		bindView(child as Display);
 	}
+}
+
+function rebuildView(view: Display) {
+	let content: Element;
+	for (let ele of view.children) {
+		if (ele.classList.contains("view"))
+			content = ele;
+	}
+	view.textContent = "";
+	let type = view.type$;
+	view.append(type.createHeader(view));
+	view.append(content || type.createContent(view));
+	if (type.model == "list")
+		view.append(type.createFooter(view));
 }
 
 export function getView(node: Node | Range): Display {
@@ -129,12 +133,7 @@ export function getView(node: Node | Range): Display {
 	}
 }
 
-export function getViewContent(node: Node | Range) {
-	let view = getView(node);
-	return view?.type$.getContentOf(view);
-}
-
-export function getChildView(ctx: Node, node: Node): Display {
+export function getChildView(ctx: Element, node: Node): Display {
 	if (node == ctx) return null;
 	while (node?.parentElement != ctx) {
 		node = node.parentElement;

@@ -1,14 +1,13 @@
 import {content} from "../../base/model.js";
 
-import {Display, getView, getChildView, getViewContent, getHeader, bindView} from "../display.js";
-import {Frame} from "../ui.js";
+import {Display, getView, getChildView, getHeader, bindView} from "../display.js";
 import {Article, Edit, Editor} from "../article.js";
-import {mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
+import {mark, clearContent, unmark, replace, narrowRange, getEditContext} from "./edit.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
+	let ctx = getEditContext(range);
 	let view = getView(range);
 	if (view.type$.model != "list") console.warn("View is not a list:", view);
-	let ctx = getViewContent(view);
 
 	let cmd = new ListEdit(this.owner, commandName, view.id);
 	let markup = toMarkup(this, content);
@@ -164,7 +163,7 @@ function getExecRange(cmd: ListEdit) {
 		if (!view.type$) throw new Error("unable to bind missing type$");
 	}
 	let range = frame.createRange();
-	range.selectNodeContents(getViewContent(view));
+	range.selectNodeContents(getEditContext(view));
 	if (cmd.startId) {
 		let start = frame.getElementById(cmd.startId);
 		if (!start) throw new Error(`Start item.id '${cmd.startId}' not found.`);

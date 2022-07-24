@@ -3,8 +3,8 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {narrowRange, toView} from "../editor/edit.js";
-import {getView, getHeader, getViewContent} from "../display.js";
+import {getEditContext, narrowRange} from "../editor/edit.js";
+import {getView, getHeader, Display, bindView} from "../display.js";
 import { Editor } from "../article.js";
 
 let UNDONE = false;
@@ -15,7 +15,7 @@ export default extend(null, {
 		if (getHeader(event.on, event.target as Node)) {
 			event.subject = "";
 			let range = event.frame.selectionRange;
-			range.setStart(getViewContent(event.on), 0);
+			range.setStart(getEditContext(event.on), 0);
 			range.collapse(true);
 		}
 	},
@@ -141,6 +141,25 @@ export function atStart(view: Element, node: Node, offset: number) {
 		node = node.parentNode;
 	}
 	return true;
+}
+
+
+export function toView(range: Range): Display {
+	narrowRange(range);
+	let source = getView(range);
+	let type = source?.type$;
+	if (!type) return;
+	let view = type.toView(undefined);
+	let content = type.getContentOf(view);
+	let frag = range.cloneContents();
+	while (frag.firstChild) {
+		let node = frag.firstChild;
+		content.append(node); //moves firstChild from fragment to content.
+		if (node.nodeType == Node.ELEMENT_NODE) {
+			bindView(node as Display);
+		}
+	}
+	return view;
 }
 
 function setClipboard(type: Editor, range: Range, clipboard: DataTransfer) {
