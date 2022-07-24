@@ -7,11 +7,28 @@ export default extend(view, {
 	dblclick(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let view = event.on as Display;
-		if (getHeader(event.on, event.target as Node)) {
-			if(view.type$.propertyName=="tasks") {
-				let content = view.v_content;
-				content.hidden = content.hidden ? false : true;
+		let header = getHeader(event.on, event.target as Node);
+		if (header) {
+			if (view.classList.contains("collapsed")) {
+				view.classList.remove("collapsed");
+			} else {
+				view.classList.add("collapsed");
 			}
+			// if (content.style.display == "none") {
+			// 	header.classList.remove("collapsed")
+			// 	content.style.display = content["restore_display"];
+			// 	if (view.v_footer) {
+			// 		view.v_footer.style.display = view.v_footer["restore_display"];
+			// 	}
+			// } else {
+			// 	header.classList.add("collapsed")
+			// 	content["restore_display"] = content.style.display;
+			// 	content.style.display = "none";
+			// 	if (view.v_footer) {
+			// 		view.v_footer["restore_display"] = view.v_footer.style.display;
+			// 		view.v_footer.style.display = "none";
+			// 	}
+			// }
 		}
 	}
 	// copy(this: Editor, event: UserEvent) {

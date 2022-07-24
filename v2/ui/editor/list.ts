@@ -5,16 +5,27 @@ import {Frame} from "../ui.js";
 import {Article, Edit, Editor} from "../article.js";
 import {mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
 
-
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getView(range);
 	if (view.type$.model != "list") console.warn("View is not a list:", view);
+	let ctx = getViewContent(view);
+
 	let cmd = new ListEdit(this.owner, commandName, view.id);
-	let markup = "";
-	if (content) {
-		markup = this.getContentOf(this.toView(content) as Display).innerHTML;
-	}
-	return cmd.do(range, markup);
+
+	adjustRange(ctx, range);
+
+	mark(range);
+	startEdit(cmd, range);
+	
+	let markup = toMarkup(this, content);
+	cmd.after = handleStartContainer(ctx, range);
+	cmd.after += markup;
+	cmd.after += handleEndContainer(ctx, range);
+	replace(range, markup);
+
+	unmark(range);
+	range.collapse();
+	return range;
 }
 
 class ListEdit extends Edit {
@@ -27,22 +38,6 @@ class ListEdit extends Edit {
 	protected getRange(): Range {
 		return getItemRange(this.owner.frame, this.viewId, this.startId, this.endId);
 	}
-	do(range: Range, content: string): Range {
-		let ctx = this.owner.frame.getElementById(this.viewId) as Element;
-		ctx = getViewContent(ctx);
-		adjustRange(ctx, range);
-		mark(range);
-		startEdit(this, range);
-		
-		this.after = handleStartContainer(ctx, range);
-		this.after += content;
-		this.after += handleEndContainer(ctx, range);
-		console.log(this.name, this.startId, this.endId);
-		replace(range, content);
-		unmark(range);
-		range.collapse();
-		return range;
-	}
 	exec(markup: string) {
 		let range = this.getRange();
 		replace(range, markup);
@@ -52,12 +47,9 @@ class ListEdit extends Edit {
 	}
 }
 
-function adjustRange(ctx: Element, range: Range) {
-	narrowRange(range);
-	let view = getChildView(ctx, range.startContainer);
-	if (view && getHeader(view, range.startContainer)) range.setStartBefore(view);
-
-	//don't think we need to worry about the end view.
+function toMarkup(editor: Editor, content: content) {
+	if (!content) return "";
+	return editor.getContentOf(editor.toView(content)).innerHTML;
 }
 
 function handleStartContainer(ctx: Element, range: Range) {
@@ -107,29 +99,51 @@ function getItemRange(owner: Frame, contextId: string, startId: string, endId: s
 	return range;
 }
 
+/**
+ * Adjusts the range to be in the view content.  If the start of the
+ * range is in a view header, move it to prior to the view so it's fully
+ * contained within the edit operation.
+ * @param ctx 
+ * @param range 
+ */
+ function adjustRange(ctx: Element, range: Range) {
+	narrowRange(range);
+	let view = getChildView(ctx, range.startContainer);
+	if (view && getHeader(view, range.startContainer)) range.setStartBefore(view);
+
+	//don't think we need to worry about the end view.
+}
+
+/**
+ * Records the edit extent and captures the before image for undo.
+ * @param cmd 
+ * @param range 
+ */
 function startEdit(cmd: ListEdit, range: Range) {
-	range = range.cloneRange();
 
 	let ctx = cmd.owner.frame.getElementById(cmd.viewId) as Element;
 	ctx = getViewContent(ctx);
 
-	let start = getChildView(ctx, range.startContainer);
-	if (start) range.setStartBefore(start);
-	let end = getChildView(ctx, range.endContainer);
-	if (end) range.setEndAfter(end);
+	range = getEditRange(ctx, range);
+	recordRange(cmd, ctx, range);
 
-	if (!(range.startContainer == ctx && range.endContainer == ctx)) {
-		throw new Error("Invalid range for edit.");
-	}
 	//Capture the before image for undo.
 	cmd.before = "";
 	for (let i = range.startOffset; i < range.endOffset; i++) {
 		let node = ctx.childNodes[i] as Element;
 		if (node.outerHTML) cmd.before += node.outerHTML;
 	}
+}
 
-	console.log("BEFORE", cmd.before);
-
+/**
+ * Finds the views before the range start (if any) and after the range end (if any).
+ * Record their ids in the command.
+ * This is used to get the extent of the list to be replaced by undo & redo.
+ * @param cmd 
+ * @param ctx 
+ * @param range 
+ */
+function recordRange(cmd: ListEdit, ctx: Element, range: Range) {
 	for (let i = range.startOffset; i; i--) {
 		let node = ctx.childNodes[i - 1] as Display;
 		if (node.type$) {
@@ -144,5 +158,23 @@ function startEdit(cmd: ListEdit, range: Range) {
 			break;
 		}
 	}
+}
+
+/**
+ * Returns a range of the direct descendent views of the list content.
+ * @param ctx 
+ * @param range 
+ */
+function getEditRange(ctx: Element, range: Range) {
+	range = range.cloneRange();
+	let start = getChildView(ctx, range.startContainer);
+	if (start) range.setStartBefore(start);
+	let end = getChildView(ctx, range.endContainer);
+	if (end) range.setEndAfter(end);
+
+	if (!(range.startContainer == ctx && range.endContainer == ctx)) {
+		throw new Error("Invalid range for edit.");
+	}
+	return range;
 }
 
