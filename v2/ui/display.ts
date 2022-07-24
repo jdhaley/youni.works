@@ -20,11 +20,12 @@ export abstract class DisplayType extends ElementType {
 	constructor(conf: BaseConf) {
 		super(conf);
 		this.model = conf.model;
-		this.isPanel = conf.panel;
 
 	}
 	declare owner: DisplayOwner;
-	readonly isPanel: boolean;
+	get isPanel(): boolean {
+		return this.conf.panel;
+	}
 
 	toView(model: content): Display {
 		return super.toView(model) as Display;
@@ -86,13 +87,11 @@ export class DisplayOwner extends ElementOwner {
 		this.frame = frame;
 		this.actions = conf.actions.article;
 		this.initTypes(conf.viewTypes, conf.baseTypes);
-		this.type = this.types[this.conf.type];
 		console.info("Types:", this.types, this.conf.unknownType);
 		this.unknownType = this.types[this.conf.unknownType]
 	}
 	declare types: bundle<DisplayType>;
 	readonly frame: Frame;
-	type: DisplayType;
 	view: Display;
 
 	createElement(tagName: string): HTMLElement {
