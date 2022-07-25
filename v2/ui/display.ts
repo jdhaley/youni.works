@@ -58,10 +58,10 @@ export abstract class DisplayType extends ElementType {
 		footer.textContent = CHAR.ZWSP;
 		return footer;
 	}
-	getContentOf(view: Display): Element {
+	getContentOf(view: Display): HTMLElement {
 		if (this.isPanel) {
 			let content = view.children[1];
-			if (content?.classList.contains("view")) return content;	
+			if (content?.classList.contains("view")) return content as HTMLElement;	
 			throw new Error("corrupted view");
 		}
 		return view;
