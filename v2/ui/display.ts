@@ -8,11 +8,7 @@ let NEXT_ID = 1;
 
 export class Display extends HTMLElement {
 	type$?: DisplayType;
-	// v_header?: HTMLElement;
-	get v_content(): HTMLElement {
-		return this.type$?.getContentOf(this) as HTMLElement;
-	}
-	// v_footer?: HTMLElement;
+	v_content: HTMLElement;
 }
 
 export abstract class DisplayType extends ElementType {
@@ -39,7 +35,11 @@ export abstract class DisplayType extends ElementType {
 		if (this.isPanel) {
 			view.append(this.createHeader(view, model));
 			view.append(this.createContent(view, model));
-			if (this.model == "list")  view.append(this.createFooter(view, model));
+			if (this.model == "list") {
+				view.append(this.createFooter(view, model));
+			}
+		} else {
+			view.v_content = view;
 		}
 		super.viewContent(view, model);
 	}
@@ -49,9 +49,9 @@ export abstract class DisplayType extends ElementType {
 		return header;
 	}
 	createContent(view: Display, model?: content) {
-		let content = this.owner.createElement("div");
-		content.classList.add("view");
-		return content;
+		view.v_content = this.owner.createElement("div");
+		view.v_content.classList.add("view");
+		return view.v_content;
 	}
 	createFooter(view: Display, model?: content) {
 		let footer = this.owner.createElement("footer");
@@ -60,9 +60,10 @@ export abstract class DisplayType extends ElementType {
 	}
 	getContentOf(view: Display): HTMLElement {
 		if (this.isPanel) {
-			let content = view.children[1];
-			if (content?.classList.contains("view")) return content as HTMLElement;	
-			throw new Error("corrupted view");
+			if (!view.v_content || view.v_content != view.children[1])  {
+				rebuildView(view);
+			}
+			return view.v_content;
 		}
 		return view;
 	}
@@ -103,10 +104,8 @@ export function bindView(view: Display): void {
 	Panels created from a range operation may be missing one or more of the
 	header, content, footer.
 	*/
-	if (type.isPanel && !(view.children[1] && view.children[1].classList.contains("view"))) {
-		rebuildView(view);
-	}
-	for (let child of type.getPartsOf(view)) {
+	let content = view.type$.getContentOf(view); //ensures view isn't corrupted.
+	for (let child of content.children) {
 		bindView(child as Display);
 	}
 }
@@ -114,21 +113,29 @@ export function bindView(view: Display): void {
 function rebuildView(view: Display) {
 	let content: Element;
 	for (let ele of view.children) {
-		if (ele.classList.contains("view"))
-			content = ele;
+		if (ele.classList.contains("view")) {
+			content = ele ;
+			view.v_content = ele as HTMLElement;
+			break;
+		}
 	}
 	view.textContent = "";
 	let type = view.type$;
 	view.append(type.createHeader(view));
 	view.append(content || type.createContent(view));
-	if (type.model == "list")
+	if (type.model == "list") {
 		view.append(type.createFooter(view));
+	}
 }
 
 export function getView(node: Node | Range): Display {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node["type$"]) return node as Display;
+		if (node["type$"]) {
+			let view = node as Display;
+			view.type$.getContentOf(view); //ensures view isn't corrupted.
+			return view;
+		} 
 		node = node.parentElement;
 	}
 }

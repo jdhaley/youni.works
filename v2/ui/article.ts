@@ -3,7 +3,7 @@ import { Command, CommandBuffer } from "../base/command.js";
 import { RemoteFileService } from "../base/remote.js";
 import { bundle } from "../base/util.js";
 
-import { Display, DisplayOwner, DisplayType } from "./display.js";
+import { DisplayOwner, DisplayType } from "./display.js";
 import { Frame } from "./ui.js";
 
 type editor = (this: DisplayType, commandName: string, range: Range, content?: content) => Range;
@@ -24,26 +24,6 @@ export class Article extends DisplayOwner {
 	}
 }
 
-export class RecordElement extends Display {
-	constructor() {
-		super();
-	}
-}
-customElements.define("ui-record", RecordElement);
-
-class TextElement extends Display {
-	constructor() {
-		super();
-	}
-}
-customElements.define("ui-text", TextElement);
-
-class ListElement extends Display {
-	constructor() {
-		super();
-	}
-}
-customElements.define("ui-list", ListElement);
 
 export class Editor extends DisplayType {
 	declare readonly owner: Article;
