@@ -47,19 +47,6 @@ export default extend(view, {
 		this.edit("Delete", range, "");
 	}
 });
-function inView(range: Range) {
-	// if (range.commonAncestorContainer.nodeType != Node.TEXT_NODE) {
-	// 	let view = getView(range);
-	// 	if (view.v_content.childNodes.length != 1) {
-	// 		//force single text node...
-	// 		view.v_content.textContent = view.v_content.textContent;
-	// 		range.selectNodeContents(view.v_content);
-	// 		range.collapse();
-	// 	}
-	// }
-	let node = range.commonAncestorContainer;
-	return node == view.v_content || node.parentElement == view.v_content ? true : false;
-}
 function positionToText(range: Range) {
 	if (range.collapsed) {
 		let view = getView(range);

@@ -46,11 +46,11 @@ export abstract class ViewOwner<V> extends Owner<V> {
 }
 
 export abstract class ViewType<V> extends Controller<V> implements ContentType<V> {
+	types: bundle<ViewType<V>> = EMPTY.object;
 	declare owner: ViewOwner<V>;
 	declare model: "record" | "list" | "text";
 	declare name: string;
 	declare propertyName?: string;
-	declare types: bundle<ViewType<V>>;
 
 	generalizes(type: Type): boolean {
 		return type == this;
