@@ -1,11 +1,6 @@
 import {Display, getView, getHeader, getFooter, bindView} from "../display.js";
 import {CHAR} from "../../base/util.js";
 
-export function getEditContext(node: Node | Range) {
-	let view = getView(node);
-	return view?.type$.getContentOf(view);
-}
-
 export function mark(range: Range) {
 	let marker = insertMarker(range, "end");
 	range.setEndBefore(marker);

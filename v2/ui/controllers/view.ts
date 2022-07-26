@@ -3,22 +3,22 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {getEditContext, narrowRange} from "../editor/edit.js";
+import {narrowRange} from "../editor/edit.js";
 import {getView, getHeader, Display, bindView} from "../display.js";
 import { Editor } from "../article.js";
 
 let UNDONE = false;
 
 export default extend(null, {
-	click(event: UserEvent) {
+	// click(event: UserEvent) {
 
-		if (getHeader(event.on, event.target as Node)) {
-			event.subject = "";
-			let range = event.frame.selectionRange;
-			range.setStart(getEditContext(event.on), 0);
-			range.collapse(true);
-		}
-	},
+	// 	if (getHeader(event.on, event.target as Node)) {
+	// 		event.subject = "";
+	// 		let range = event.frame.selectionRange;
+	// 		range.setStart(getView(event.on).v_content, 0);
+	// 		range.collapse(true);
+	// 	}
+	// },
 	dblclick(event: UserEvent) {
 		event.subject = "";
 		let range = event.frame.selectionRange;

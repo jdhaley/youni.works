@@ -15,9 +15,9 @@ export abstract class DisplayType extends ElementType {
 	constructor(conf: BaseConf) {
 		super(conf);
 		this.model = conf.model;
-
 	}
 	declare owner: DisplayOwner;
+	
 	get isPanel(): boolean {
 		return this.conf.panel;
 	}

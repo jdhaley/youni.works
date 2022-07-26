@@ -5,22 +5,22 @@ let TRACK: UserEvent = null;
 let SELECTION: UserEvent = null;
 
 export default {
-    selectionchange(event: UserEvent) {
-        //selectionchange comes from the Document, not the Window.
-        event.range = ownerOf(event.target as Node).selectionRange;
-        event.source = viewOf(event.range.commonAncestorContainer);
-        event.subject = "select";
-        if (SELECTION) {
-            if (SELECTION.source != event.source) {
-                SELECTION.subject = "unselect";
-                SELECTION.range = event.range;
-                sense(SELECTION);    
-            }
-            if (SELECTION.source == event.source) event.subject = "selecting";
-        }
-        SELECTION = event;
-        sense(event);
-    },
+    // selectionchange(event: UserEvent) {
+    //     //selectionchange comes from the Document, not the Window.
+    //     event.range = ownerOf(event.target as Node).selectionRange;
+    //     event.source = viewOf(event.range.commonAncestorContainer);
+    //     event.subject = "select";
+    //     if (SELECTION) {
+    //         if (SELECTION.source != event.source) {
+    //             SELECTION.subject = "unselect";
+    //             SELECTION.range = event.range;
+    //             sense(SELECTION);    
+    //         }
+    //         if (SELECTION.source == event.source) event.subject = "selecting";
+    //     }
+    //     SELECTION = event;
+    //     sense(event);
+    // },
     input: sense,
     cut: rangeEvent,
     copy: rangeEvent,
@@ -37,36 +37,38 @@ export default {
         sense(event);
     },
     mousedown(event: UserEvent) {
-        if (event.ctrlKey) {
-            event.subject = "select";
-            sense(event);
-            return;
-        }
-        event.subject = "touch";
         sense(event);
-        if (event.track) {
-//          event.preventDefault();
-            TRACK = event;
-        } else {
-            TRACK = null;
-        }
+//         if (event.ctrlKey) {
+//             event.subject = "select";
+//             sense(event);
+//             return;
+//         }
+//         event.subject = "touch";
+//         sense(event);
+//         if (event.track) {
+// //          event.preventDefault();
+//             TRACK = event;
+//         } else {
+//             TRACK = null;
+//         }
     },    
     mousemove(event: UserEvent) {
-        let priorEvent = TRACK;
-        if (priorEvent) {
-            event.preventDefault();
-            event.subject = "drag";
-            event.track = priorEvent.track;
-            event.moveX = event.x - priorEvent.x;
-            event.moveY = event.y - priorEvent.y;
-            sense(event);
-          //  ownerOf(event.track).sense(event, event.track);
-            TRACK = event;
-            return;
-        } else {
-            event.subject = "moveover";
-            sense(event);
-        }
+        sense(event);
+        // let priorEvent = TRACK;
+        // if (priorEvent) {
+        //     event.preventDefault();
+        //     event.subject = "drag";
+        //     event.track = priorEvent.track;
+        //     event.moveX = event.x - priorEvent.x;
+        //     event.moveY = event.y - priorEvent.y;
+        //     sense(event);
+        //   //  ownerOf(event.track).sense(event, event.track);
+        //     TRACK = event;
+        //     return;
+        // } else {
+        //     event.subject = "moveover";
+        //     sense(event);
+        // }
     },
     click(event: UserEvent) {
         sense(event);
@@ -78,17 +80,18 @@ export default {
         if (event.ctrlKey) event.preventDefault();
     },
     mouseup(event: UserEvent) {
-        let priorEvent = TRACK;
-        event.preventDefault();
-        event.subject = "release"
-        if (priorEvent) {
-            event.track = priorEvent.track;
-            event.source = event.track;
-            event.moveX = 0;
-            event.moveY = 0;
-        }
         sense(event);
-        TRACK = null;
+        // let priorEvent = TRACK;
+        // event.preventDefault();
+        // event.subject = "release"
+        // if (priorEvent) {
+        //     event.track = priorEvent.track;
+        //     event.source = event.track;
+        //     event.moveX = 0;
+        //     event.moveY = 0;
+        // }
+        // sense(event);
+        // TRACK = null;
     },
     mouseout(event: UserEvent) {
         event.subject = "moveout";

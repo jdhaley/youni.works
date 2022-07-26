@@ -2,7 +2,7 @@ import {getHeader, getView} from "../display.js";
 import {CHAR, extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 import {Editor} from "../article.js";
-import {getEditContext, narrowRange} from "../editor/edit.js";
+import {narrowRange} from "../editor/edit.js";
 
 import view from "./view.js";
 
@@ -21,7 +21,7 @@ export default extend(view, {
 		let range = this.owner.frame.selectionRange;
 		positionToText(range);
 		if (range.collapsed) {
-			let content = getEditContext(event.on);
+			let content = getView(event.on).v_content;
 			if (content) {
 				if (content.textContent == CHAR.ZWSP) content.textContent = "";
 				if (char == " " && range.endOffset == content.textContent.length) {
