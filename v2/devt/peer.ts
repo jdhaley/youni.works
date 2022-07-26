@@ -197,7 +197,7 @@ export abstract class DisplayType extends ViewType<View> {
 export function getView(node: Node | Range): DisplayView {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node["type$"]) return node as any;
+		if (node["$controller"]) return node as any;
 		node = node.parentElement;
 	}
 }

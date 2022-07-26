@@ -15,7 +15,7 @@ export default function edit(commandName: string, range: Range, text: string): R
 	let node = range.commonAncestorContainer;
 	let view = getView(node);
 
-	if (view?.type$.model != "text") {
+	if (view?.$controller.model != "text") {
 		console.error("Invalid range for edit.");
 	}
 	if (range.collapsed && commandName == "Erase") {
@@ -58,10 +58,10 @@ class TextEdit extends Edit {
 	protected getRange(): Range {
 		let view = this.owner.frame.getElementById(this.viewId) as Display;
 		if (!view) throw new Error("Can't find context element.");
-		if (!view.type$) {
+		if (!view.$controller) {
 			console.warn("context.type$ missing... binding...");
 			bindView(view);
-			if (!view.type$) throw new Error("unable to bind missing type$");
+			if (!view.$controller) throw new Error("unable to bind missing type$");
 		}
 
 		let range = this.owner.frame.createRange();

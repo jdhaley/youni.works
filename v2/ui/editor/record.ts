@@ -6,7 +6,7 @@ import { Article, Edit, Editor } from "../article.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
 	let view = getView(range);
-	if (view?.type$.model == "record") {
+	if (view?.$controller.model == "record") {
 		let cmd = new RecordEdit(this.owner, commandName, view.id);
 		cmd.do(range, record);
 	} else {
@@ -44,13 +44,13 @@ class RecordEdit extends Edit {
 function getRange(cmd: Edit): Range {
 	let view = cmd.owner.frame.getElementById(cmd.viewId) as Display;
 	if (!view) throw new Error("Can't find context element.");
-	if (!view.type$) {
+	if (!view.$controller) {
 		console.warn("context.type$ missing... binding...");
 		bindView(view);
-		if (!view.type$) throw new Error("unable to bind missing type$");
+		if (!view.$controller) throw new Error("unable to bind missing type$");
 	}
 	let range = cmd.owner.frame.createRange();
-	range.selectNodeContents(view.type$.getContentOf(view));
+	range.selectNodeContents(view.$controller.getContentOf(view));
 	return range;
 }
 

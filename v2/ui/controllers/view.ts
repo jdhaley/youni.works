@@ -59,7 +59,7 @@ export default extend(null, {
 		let model = getClipboard(event.clipboardData);
 		if (range.collapsed && model instanceof Array) {
 			range = getInsertableList(range);
-			if (range) ((getView(range)).type$ as Editor).edit("Paste", range, model);
+			if (range) ((getView(range)).$controller as Editor).edit("Paste", range, model);
 		} else {
 			this.edit("Paste", range, model);
 		}
@@ -123,7 +123,7 @@ function getInsertableList(range: Range) {
 	range = range.cloneRange();
 	let view = getView(range);
 	while (view) {
-		if (view?.type$.model == "list") {
+		if (view?.$controller.model == "list") {
 			return range;
 		}
 		if (!atStart(view, range.startContainer, range.startOffset)) return;
@@ -147,7 +147,7 @@ export function atStart(view: Element, node: Node, offset: number) {
 export function toView(range: Range): Display {
 	narrowRange(range);
 	let source = getView(range);
-	let type = source?.type$;
+	let type = source?.$controller;
 	if (!type) return;
 	let view = type.toView(undefined);
 	let content = type.getContentOf(view);

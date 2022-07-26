@@ -6,7 +6,7 @@ import {mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getView(range);
-	if (view.type$.model != "list") console.warn("View is not a list:", view);
+	if (view.$controller.model != "list") console.warn("View is not a list:", view);
 
 	let cmd = new ListEdit(this.owner, commandName, view.id);
 	let ctx = view.$content;
@@ -105,14 +105,14 @@ function startEdit(cmd: ListEdit, ctx: Element, range: Range) {
 function recordRange(cmd: ListEdit, ctx: Element, range: Range) {
 	for (let i = range.startOffset; i; i--) {
 		let node = ctx.childNodes[i - 1] as Display;
-		if (node.type$) {
+		if (node.$controller) {
 			cmd.startId = node.id;
 			break;
 		}
 	}
 	for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
 		let node = ctx.childNodes[i] as Display;
-		if (node.type$) {
+		if (node.$controller) {
 			cmd.endId = node.id;
 			break;
 		}
@@ -157,10 +157,10 @@ function getExecRange(cmd: ListEdit) {
 	let frame = cmd.owner.frame;
 	let view = frame.getElementById(cmd.viewId) as Display;
 	if (!view) throw new Error("Can't find view element.");
-	if (!view.type$) {
+	if (!view.$controller) {
 		console.warn("view.type$ missing... binding...");
 		bindView(view);
-		if (!view.type$) throw new Error("unable to bind missing type$");
+		if (!view.$controller) throw new Error("unable to bind missing type$");
 	}
 	let range = frame.createRange();
 	range.selectNodeContents(view.$content);

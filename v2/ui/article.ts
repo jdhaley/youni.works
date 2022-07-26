@@ -18,7 +18,7 @@ export class Article extends DisplayOwner {
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 	editors: bundle<editor>;
 	save(): void {
-		let model = this.view.type$.toModel(this.view);
+		let model = this.view.$controller.toModel(this.view);
 		console.log(model);
 		this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
 	}

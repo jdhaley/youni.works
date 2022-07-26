@@ -53,7 +53,7 @@ export class Frame extends Owner<HTMLElement> {
 		return this.#window.document.getElementById(id);
 	}
 	getControlOf(view: HTMLElement): Controller<HTMLElement> {
-		return view["type$"];
+		return view["$controller"];
 	}
 }
 

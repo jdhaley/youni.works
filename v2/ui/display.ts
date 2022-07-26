@@ -7,7 +7,7 @@ import {Frame} from "./ui.js";
 let NEXT_ID = 1;
 
 export class Display extends HTMLElement {
-	type$?: DisplayType;
+	$controller?: DisplayType;
 	$content: HTMLElement;
 }
 
@@ -88,13 +88,13 @@ export class DisplayOwner extends ElementOwner {
 }
 
 export function bindView(view: Display): void {
-	let type = view.type$;
+	let type = view.$controller;
 	if (!type) {
 		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
 		let parent = getView(view.parentElement);
 		if (name && parent) {
-			type = (parent.type$.types[name] || parent.type$.owner.unknownType) as DisplayType;
-			view["type$"] = type;	
+			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
+			view["$controller"] = type;	
 		}
 		if (!type) return;
 	}
@@ -104,7 +104,7 @@ export function bindView(view: Display): void {
 	Panels created from a range operation may be missing one or more of the
 	header, content, footer.
 	*/
-	let content = view.type$.getContentOf(view); //ensures view isn't corrupted.
+	let content = view.$controller.getContentOf(view); //ensures view isn't corrupted.
 	for (let child of content.children) {
 		bindView(child as Display);
 	}
@@ -120,7 +120,7 @@ function rebuildView(view: Display) {
 		}
 	}
 	view.textContent = "";
-	let type = view.type$;
+	let type = view.$controller;
 	view.append(type.createHeader(view));
 	view.append(content || type.createContent(view));
 	if (type.model == "list") {
@@ -131,9 +131,9 @@ function rebuildView(view: Display) {
 export function getView(node: Node | Range): Display {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node["type$"]) {
+		if (node["$controller"]) {
 			let view = node as Display;
-			view.type$.getContentOf(view); //ensures view isn't corrupted.
+			view.$controller.getContentOf(view); //ensures view isn't corrupted.
 			return view;
 		} 
 		node = node.parentElement;
@@ -145,7 +145,7 @@ export function getChildView(ctx: Element, node: Node): Display {
 	while (node?.parentElement != ctx) {
 		node = node.parentElement;
 	}
-	if (!node || !node["type$"]) {
+	if (!node || !node["$controller"]) {
 		console.warn("Invalid/corrupted view", ctx);
 	}
 	return node as Display;

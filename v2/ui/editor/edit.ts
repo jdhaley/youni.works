@@ -53,7 +53,7 @@ export function clearContent(range: Range) {
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		if (node.nodeType == Node.TEXT_NODE) {
 			let view = getView(node);
-			if (view && node.parentElement == view.type$.getContentOf(view)) {
+			if (view && node.parentElement == view.$controller.getContentOf(view)) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
 				} else if (node == range.endContainer) {

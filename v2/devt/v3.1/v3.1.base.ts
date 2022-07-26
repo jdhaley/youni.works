@@ -129,7 +129,7 @@ let MODELLERS = {
 			if (value) {
 				if (!model) {
 					model = [];
-					if (this.name) model["type$"] = this.name;
+					if (this.name) model["$controller"] = this.name;
 				}
 				model.push(value);	
 			}

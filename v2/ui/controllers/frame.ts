@@ -155,7 +155,7 @@ function sense(event: UserEvent) {
 export function viewOf(node: Node | Range): HTMLElement {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node["type$"]) return node as HTMLElement;
+		if (node["$controller"]) return node as HTMLElement;
 		node = node.parentElement;
 	}
 }

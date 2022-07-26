@@ -158,7 +158,7 @@ function bindView(view: DisplayElement): void {
 export function getView(node: Node | Range): DisplayElement {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node["type$"]) return node as DisplayElement;
+		if (node["$controller"]) return node as DisplayElement;
 		node = node.parentElement;
 	}
 }

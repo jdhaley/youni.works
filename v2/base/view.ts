@@ -31,7 +31,7 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	types: bundle<ViewType<V>>;
 
 	getControlOf(view: V): ViewType<V> {
-		let type = view["type$"];
+		let type = view["$controller"];
 		if (!type) {
 			console.log(view);
 		}
@@ -82,7 +82,7 @@ export abstract class ElementType extends ViewType<Element> {
 
 	createView(): Element {
 		let view = this.owner.createElement(this.conf.tagName);
-		view["type$"] = this;
+		view["$controller"] = this;
 		if (this.propertyName) {
 			view.setAttribute("data-name", this.propertyName);
 		} else {
@@ -92,7 +92,7 @@ export abstract class ElementType extends ViewType<Element> {
 	}
 	getPartOf(view: Element): Element {
 		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
-			if (parent["type$"]) return parent;
+			if (parent["$controller"]) return parent;
 		}
 	}
 	getContentOf(view: Element) {
