@@ -65,20 +65,20 @@ class TextEdit extends Edit {
 		}
 
 		let range = this.owner.frame.createRange();
-		range.selectNodeContents(view.v_content);
+		range.selectNodeContents(view.$content);
 		return range;
 	}
 	do(range: Range, text: string) {
 		mark(range);
 		let view = getView(range);
-		this.before = view.v_content.innerHTML;	
+		this.before = view.$content.innerHTML;	
 		range.deleteContents();
 		if (text) {
 			let ins = this.owner.createElement("I");
 			ins.textContent = text;
 			range.insertNode(ins.firstChild);	
 		}
-		this.after = view.v_content.innerHTML;
+		this.after = view.$content.innerHTML;
 		return unmark(range);
 	}
 	exec(markup: string) {
@@ -120,7 +120,7 @@ function editAgain(range: Range, cmd: Edit, char: string) {
 	range.setEnd(node, ++lastEdit.end);
 
 	mark(range);
-	cmd.after = getView(range).v_content.innerHTML;
+	cmd.after = getView(range).$content.innerHTML;
 	unmark(range);
 	range.collapse();
 	return range;
@@ -133,7 +133,7 @@ function deleteAgain(range: Range, cmd: Edit, char: string) {
 	range.setStart(node, lastEdit.start);
 	range.collapse(true);
 	mark(range);
-	cmd.after = getView(range).v_content.innerHTML;
+	cmd.after = getView(range).$content.innerHTML;
 	unmark(range);
 	range.collapse();
 	return range;
@@ -148,7 +148,7 @@ function eraseAgain(range: Range, cmd: Edit) {
 	range.setStart(node, --lastEdit.start);
 	range.collapse(true);
 	mark(range);
-	cmd.after = getView(range).v_content.innerHTML;
+	cmd.after = getView(range).$content.innerHTML;
 	unmark(range);
 	range.collapse(true);
 	return range;

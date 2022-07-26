@@ -88,13 +88,13 @@ export function narrowRange(range: Range) {
 	let end = range.endContainer;
 
 	if (getHeader(view, start)) {
-		range.setStart(view.v_content, 0);
+		range.setStart(view.$content, 0);
 	}
 	if (getFooter(view, start)) {
-		range.setStart(view.v_content, view.v_content.childNodes.length);
+		range.setStart(view.$content, view.$content.childNodes.length);
 	}
 	if (getFooter(view, end)) {
-		range.setEnd(view.v_content, view.v_content.childNodes.length);
+		range.setEnd(view.$content, view.$content.childNodes.length);
 	}
 }
 

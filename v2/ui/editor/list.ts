@@ -9,7 +9,7 @@ export default function edit(this: Editor, commandName: string, range: Range, co
 	if (view.type$.model != "list") console.warn("View is not a list:", view);
 
 	let cmd = new ListEdit(this.owner, commandName, view.id);
-	let ctx = view.v_content;
+	let ctx = view.$content;
 	let markup = toMarkup(this, content);
 
 	adjustRange(ctx, range);
@@ -39,7 +39,7 @@ function handleStartContainer(ctx: Element, range: Range) {
 	let start = getChildView(ctx, range.startContainer);
 	if (start) {
 		let r = range.cloneRange();
-		r.setEnd(start.v_content, start.v_content.childNodes.length);
+		r.setEnd(start.$content, start.$content.childNodes.length);
 		clearContent(r);
 		range.setStartAfter(start);
 		return start.outerHTML;
@@ -51,7 +51,7 @@ function handleEndContainer(ctx: Element, range: Range) {
 	let end = getChildView(ctx, range.endContainer);
 	if (end) {
 		let r = range.cloneRange();
-		r.setStart(end.v_content, 0);
+		r.setStart(end.$content, 0);
 		clearContent(r);
 		range.setEndBefore(end);
 		return end.outerHTML;
@@ -163,7 +163,7 @@ function getExecRange(cmd: ListEdit) {
 		if (!view.type$) throw new Error("unable to bind missing type$");
 	}
 	let range = frame.createRange();
-	range.selectNodeContents(view.v_content);
+	range.selectNodeContents(view.$content);
 	if (cmd.startId) {
 		let start = frame.getElementById(cmd.startId);
 		if (!start) throw new Error(`Start item.id '${cmd.startId}' not found.`);

@@ -8,7 +8,7 @@ let NEXT_ID = 1;
 
 export class Display extends HTMLElement {
 	type$?: DisplayType;
-	v_content: HTMLElement;
+	$content: HTMLElement;
 }
 
 export abstract class DisplayType extends ElementType {
@@ -39,7 +39,7 @@ export abstract class DisplayType extends ElementType {
 				view.append(this.createFooter(view, model));
 			}
 		} else {
-			view.v_content = view;
+			view.$content = view;
 		}
 		super.viewContent(view, model);
 	}
@@ -49,9 +49,9 @@ export abstract class DisplayType extends ElementType {
 		return header;
 	}
 	createContent(view: Display, model?: content) {
-		view.v_content = this.owner.createElement("div");
-		view.v_content.classList.add("view");
-		return view.v_content;
+		view.$content = this.owner.createElement("div");
+		view.$content.classList.add("view");
+		return view.$content;
 	}
 	createFooter(view: Display, model?: content) {
 		let footer = this.owner.createElement("footer");
@@ -60,10 +60,10 @@ export abstract class DisplayType extends ElementType {
 	}
 	getContentOf(view: Display): HTMLElement {
 		if (this.isPanel) {
-			if (!view.v_content || view.v_content != view.children[1])  {
+			if (!view.$content || view.$content != view.children[1])  {
 				rebuildView(view);
 			}
-			return view.v_content;
+			return view.$content;
 		}
 		return view;
 	}
@@ -115,7 +115,7 @@ function rebuildView(view: Display) {
 	for (let ele of view.children) {
 		if (ele.classList.contains("view")) {
 			content = ele ;
-			view.v_content = ele as HTMLElement;
+			view.$content = ele as HTMLElement;
 			break;
 		}
 	}

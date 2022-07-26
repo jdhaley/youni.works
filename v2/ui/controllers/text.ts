@@ -21,7 +21,7 @@ export default extend(view, {
 		let range = this.owner.frame.selectionRange;
 		positionToText(range);
 		if (range.collapsed) {
-			let content = getView(event.on).v_content;
+			let content = getView(event.on).$content;
 			if (content) {
 				if (content.textContent == CHAR.ZWSP) content.textContent = "";
 				if (char == " " && range.endOffset == content.textContent.length) {
@@ -52,12 +52,12 @@ function positionToText(range: Range) {
 		let view = getView(range);
 		let inHeader = getHeader(view, range.startContainer);
 		narrowRange(range);	
-		if (view.v_content.childNodes.length != 1) {
+		if (view.$content.childNodes.length != 1) {
 			//force single text node...
-			view.v_content.textContent = view.v_content.textContent;
+			view.$content.textContent = view.$content.textContent;
 		}
 		if (range.commonAncestorContainer.nodeType != Node.TEXT_NODE) {
-			range.selectNodeContents(view.v_content.lastChild);
+			range.selectNodeContents(view.$content.lastChild);
 			range.collapse(inHeader ? true : false);	
 		}
 	}

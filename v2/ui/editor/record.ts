@@ -23,10 +23,10 @@ class RecordEdit extends Edit {
 		narrowRange(range);
 		let view = getView(range);
 		mark(range);
-		this.before = getView(range).v_content.innerHTML;
+		this.before = getView(range).$content.innerHTML;
 
 		clearContent(range);
-		this.after = view.v_content.innerHTML;
+		this.after = view.$content.innerHTML;
 
 		unmark(range);
 		range.collapse();
