@@ -5,6 +5,7 @@ import { bundle } from "../base/util.js";
 
 import { DisplayOwner, DisplayType } from "./display.js";
 import { Frame } from "./ui.js";
+import { BaseConf } from "../base/loader.js";
 
 type editor = (this: DisplayType, commandName: string, range: Range, content?: content) => Range;
 
@@ -59,3 +60,33 @@ export abstract class Edit extends Command<Range> {
 
 	protected abstract exec(markup: string): Range;
 }
+
+export class Table extends Editor {
+	constructor(conf: BaseConf) {
+		super(conf);
+	}
+	rowType: DisplayType;
+}
+
+function createTableHeader(type: DisplayType) {
+	let header = type.owner.createElement("HEADER");
+	header["$at"] = Object.create(null);
+	for (let name in type.types) {
+		let col = type.owner.createElement("DIV");
+		col.textContent = type.types[name].conf.title;
+		col.dataset.name = name;
+		header.append(col);
+		header["$at"][name] = col;
+	}
+	return header;
+}
+
+// class ContainerType extends ElementType {
+// 	getContentOf(view: Display): HTMLElement {
+// 		for (let e = this.getContentOf(view); e[])
+// 		if (!view.$content || view.$content != view.children[1])  {
+// 			rebuildView(view);
+// 		}
+// 		return view.$content;
+// 	}
+// }
