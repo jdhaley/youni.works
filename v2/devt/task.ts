@@ -22,7 +22,7 @@ export class Item {
 	//path: string; - virtual or physical path
 	/** The Party owning the item.  Geneally a group or individual user */
 	owner: Party;
-	status: string
+	status: string;
 }
 
 /** All items have the following statuses. Subtypes can have additional ones. */

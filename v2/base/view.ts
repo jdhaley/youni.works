@@ -17,6 +17,7 @@ export function viewType(value: any): string {
 }
 type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
 type modeller = (this: ViewType<unknown>, view: unknown) => content;
+
 export abstract class ViewOwner<V> extends Owner<V> {
 	constructor(conf?: bundle<any>) {
 		super(conf);
@@ -77,7 +78,7 @@ export abstract class ElementOwner extends ViewOwner<Element> {
 	abstract createElement(tagName: string): Element;
 }
 
-export abstract class ElementType extends ViewType<Element> {
+export class ElementType extends ViewType<Element> {
 	declare readonly owner: ElementOwner;
 
 	createView(): Element {
