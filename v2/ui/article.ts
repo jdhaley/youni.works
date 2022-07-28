@@ -69,7 +69,7 @@ export class Table extends Editor {
 	}
 	start() {
 		this.rowType = Object.create(this.types[this.conf.rowType] as DisplayType);
-		this.rowType.isPanel = false;
+//		this.rowType.isPanel = false;
 		let types = this.rowType.types;
 		for (let name in types) {
 			let type = Object.create(types[name]);

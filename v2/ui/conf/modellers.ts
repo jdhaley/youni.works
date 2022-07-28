@@ -1,13 +1,11 @@
 import { content, List, Record } from "../../base/model.js";
-import { ViewType } from "../../base/view.js";
+import { ElementType, ViewType } from "../../base/view.js";
 import { CHAR, EMPTY } from "../../base/util.js";
 
 export default {
-	list(this: ViewType<unknown>, view: unknown): List {
+	list(this: ElementType, view: Element): List {
 		let model: content[];
-		let parts = this.getPartsOf(view) || EMPTY.array;
-		//console.debug("Parts:", parts, view);
-		for (let part of parts) {
+		for (let part of this.getContentOf(view).children) {
 			let type = this.owner.getControlOf(part);
 			let value = type?.toModel(part);
 			if (value) {
@@ -20,11 +18,11 @@ export default {
 		}
 		return model;
 	},
-	record(this: ViewType<unknown>, view: unknown): Record {
+	record(this: ElementType, view: Element): Record {
 		let model: Record;
-		for (let part of this.getPartsOf(view)) {
-			let type = this.owner.getControlOf(part) || this.owner.unknownType;
-			let value = type.toModel(part);
+		for (let part of this.getContentOf(view).children) {
+			let type = this.owner.getControlOf(part);
+			let value = type?.toModel(part);
 			if (value) {
 				if (!model) {
 					model = Object.create(null);
@@ -35,8 +33,8 @@ export default {
 		}
 		return model;
 	},
-	text(this: ViewType<unknown>, view: unknown): string {
-		let text = this.getTextOf(view);
+	text(this: ElementType, view: Element): string {
+		let text = view.textContent;
 		return text == CHAR.ZWSP ? "" : text;
 	}
 }

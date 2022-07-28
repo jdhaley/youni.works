@@ -177,10 +177,10 @@ export class View extends Control implements Content {
 			if (e.getAttribute("data-property") == name) return e["$control"];
 		}
 	}
-	display(model: content) {
-		this.#view.textContent = "";
-		this.type.viewContent(this, model);
-	}
+	// display(model: content) {
+	// 	this.#view.textContent = "";
+	// 	this.type.viewContent(this, model);
+	// }
 
 	// getPartOf(value: View): View {
 	// 	return value.container;

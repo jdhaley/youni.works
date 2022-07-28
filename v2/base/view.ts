@@ -1,7 +1,7 @@
 import {content, ContentType, Type, typeOf} from "./model.js";
 import {Controller, Owner} from "./controller.js";
 import {bundle, EMPTY} from "./util.js";
-import {loadBaseTypes, loadTypes} from "./loader.js";
+import {BaseConf, loadBaseTypes, loadTypes} from "./loader.js";
 
 export function viewType(value: any): string {
 	let type = typeOf(value);
@@ -21,10 +21,11 @@ type modeller = (this: ViewType<unknown>, view: unknown) => content;
 export abstract class ViewOwner<V> extends Owner<V> {
 	constructor(conf?: bundle<any>) {
 		super(conf);
-		if (conf) {
-			this.viewers = conf.viewers;
-			this.modellers = conf.modellers;
-		}
+		this.viewers = conf.viewers;
+		this.modellers = conf.modellers;
+		this.initTypes(conf.viewTypes, conf.baseTypes);
+		console.info("Types:", this.types, this.conf.unknownType);
+		this.unknownType = this.types[this.conf.unknownType]
 	}
 	viewers: bundle<viewer>
 	modellers: bundle<modeller>;
@@ -47,6 +48,10 @@ export abstract class ViewOwner<V> extends Owner<V> {
 }
 
 export abstract class ViewType<V> extends Controller<V> implements ContentType<V> {
+	constructor(conf: BaseConf) {
+		super(conf);
+		this.model = conf.model;
+	}
 	types: bundle<ViewType<V>> = EMPTY.object;
 	declare owner: ViewOwner<V>;
 	declare model: "record" | "list" | "text";
@@ -56,22 +61,8 @@ export abstract class ViewType<V> extends Controller<V> implements ContentType<V
 	generalizes(type: Type): boolean {
 		return type == this;
 	}
-	toModel(view: V): content {
-		return this.owner.modellers[this.model].call(this, view);
-	}
-	toView(model: content): V {
-		let view = this.createView();
-		this.viewContent(view, model);
-		return view;
-	}
-	viewContent(view: V, model: content): void {
-		this.owner.viewers[this.model].call(this, view, model);
-	}
-
-	abstract createView(): V;
-	abstract getTextOf(view: V): string;
-	abstract setTextOf(view: V, value: string): void;
-	abstract appendTo(view: V, value: any): void 
+	abstract toModel(view: V): content;
+	abstract toView(model: content): V;
 }
 
 export abstract class ElementOwner extends ViewOwner<Element> {
@@ -96,21 +87,18 @@ export class ElementType extends ViewType<Element> {
 			if (parent["$controller"]) return parent;
 		}
 	}
+	getPartsOf(view: Element): Iterable<Element> {
+		return view.children; //(this.getContentOf(view)?.children || EMPTY.array) as Iterable<Element>;
+	}
 	getContentOf(view: Element) {
 		return view;
 	}
-	getPartsOf(view: Element): Iterable<Element> {
-		return (this.getContentOf(view)?.children || EMPTY.array) as Iterable<Element>;
+	toModel(view: Element): content {
+		return this.owner.modellers[this.model].call(this, view);
 	}
-	getTextOf(view: Element): string {
-		return this.getContentOf(view)?.textContent || "";
-	}
-	setTextOf(view: Element, value: string): void {
-		let ele = this.getContentOf(view);
-		if (ele) ele.textContent = value;
-	}
-	appendTo(view: Element, value: any): void {
-		let ele = this.getContentOf(view);
-		if (ele) ele.append(value);
+	toView(model: content): Element {
+		let view = this.createView();
+		this.owner.viewers[this.model].call(this, view, model);
+		return view;
 	}
 }

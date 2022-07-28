@@ -1,5 +1,4 @@
 import {ElementOwner, ElementType} from "../base/view.js";
-import {BaseConf} from "../base/loader.js";
 import {content} from "../base/model.js";
 import {bundle, CHAR} from "../base/util.js";
 import {Frame} from "./ui.js";
@@ -11,35 +10,46 @@ export class Display extends HTMLElement {
 	$content: HTMLElement;
 }
 
-export abstract class DisplayType extends ElementType {
-	constructor(conf: BaseConf) {
+export class DisplayOwner extends ElementOwner {
+	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
-		this.model = conf.model;
-		this.isPanel = conf.panel;
+		this.frame = frame;
+		this.actions = conf.actions.article;
 	}
-	declare owner: DisplayOwner;
-	declare isPanel: boolean;
+	declare types: bundle<DisplayType>;
+	readonly frame: Frame;
+	view: Display;
 
-	toView(model: content): Display {
-		return super.toView(model) as Display;
+	createElement(tagName: string): HTMLElement {
+		return this.frame.createElement(tagName);
 	}
+}
+
+export abstract class DisplayType extends ElementType {
+	declare owner: DisplayOwner;
+
 	createView(): Display {
 		let view = super.createView() as Display;
 		view.id = "" + NEXT_ID++;
 		return view;
 	}
-	viewContent(view: Display, model: content): void {
+	toView(model: content): Display {
+		let view = this.createView();
+		this.display(view, model);
+		return view;
+	}
+	display(view: Display, model: content): void {
+		return this.owner.viewers[this.model].call(this, view, model);
+	}
+}
+export abstract class PanelType extends DisplayType {
+	display(view: Display, model: content): void {
 		view.textContent = "";
-		if (this.isPanel) {
-			view.append(this.createHeader(view, model));
-			view.append(this.createContent(view, model));
-			if (this.model == "list") {
-				view.append(this.createFooter(view, model));
-			}
-		} else {
-			view.$content = view;
+		view.append(this.createHeader(view));
+		view.append(this.createContent(view, model));
+		if (this.model == "list") {
+			view.append(this.createFooter(view));
 		}
-		super.viewContent(view, model);
 	}
 	createHeader(view: Display, model?: content) {
 		let header = this.owner.createElement("header");
@@ -49,39 +59,30 @@ export abstract class DisplayType extends ElementType {
 	createContent(view: Display, model?: content) {
 		view.$content = this.owner.createElement("div");
 		view.$content.classList.add("view");
+		this.owner.viewers[this.model].call(this, view.$content, model);
 		return view.$content;
+	}
+	getContentOf(view: Display): HTMLElement {
+		if (!view.$content || view.$content != view.children[1])  {
+			this.rebuildView(view);
+		}
+		return view.$content;
+	}
+	protected rebuildView(view: Display) {
+		for (let ele of view.children) {
+			if (ele.classList.contains("view")) {
+				view.$content = ele as HTMLElement;
+				break;
+			}
+		}
+		view.textContent = "";
+		view.append(this.createHeader(view));
+		view.append(view.$content || this.createContent(view, undefined));
 	}
 	createFooter(view: Display, model?: content) {
 		let footer = this.owner.createElement("footer");
 		footer.textContent = CHAR.ZWSP;
 		return footer;
-	}
-	getContentOf(view: Display): HTMLElement {
-		if (this.isPanel) {
-			if (!view.$content || view.$content != view.children[1])  {
-				rebuildView(view);
-			}
-			return view.$content;
-		}
-		return view;
-	}
-}
-
-export class DisplayOwner extends ElementOwner {
-	constructor(frame: Frame, conf: bundle<any>) {
-		super(conf);
-		this.frame = frame;
-		this.actions = conf.actions.article;
-		this.initTypes(conf.viewTypes, conf.baseTypes);
-		console.info("Types:", this.types, this.conf.unknownType);
-		this.unknownType = this.types[this.conf.unknownType]
-	}
-	declare types: bundle<DisplayType>;
-	readonly frame: Frame;
-	view: Display;
-
-	createElement(tagName: string): HTMLElement {
-		return this.frame.createElement(tagName);
 	}
 }
 
@@ -105,24 +106,6 @@ export function bindView(view: Display): void {
 	let content = view.$controller.getContentOf(view); //ensures view isn't corrupted.
 	for (let child of content.children) {
 		bindView(child as Display);
-	}
-}
-
-function rebuildView(view: Display) {
-	let content: Element;
-	for (let ele of view.children) {
-		if (ele.classList.contains("view")) {
-			content = ele ;
-			view.$content = ele as HTMLElement;
-			break;
-		}
-	}
-	view.textContent = "";
-	let type = view.$controller;
-	view.append(type.createHeader(view));
-	view.append(content || type.createContent(view));
-	if (type.model == "list") {
-		view.append(type.createFooter(view));
 	}
 }
 
