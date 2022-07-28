@@ -3,7 +3,7 @@ import { Command, CommandBuffer } from "../base/command.js";
 import { RemoteFileService } from "../base/remote.js";
 import { bundle } from "../base/util.js";
 
-import { DisplayOwner, DisplayType } from "./display.js";
+import { Display, DisplayOwner, DisplayType } from "./display.js";
 import { Frame } from "./ui.js";
 import { BaseConf } from "../base/loader.js";
 
@@ -62,31 +62,38 @@ export abstract class Edit extends Command<Range> {
 }
 
 export class Table extends Editor {
-	constructor(conf: BaseConf) {
-		super(conf);
-	}
 	rowType: DisplayType;
-}
-
-function createTableHeader(type: DisplayType) {
-	let header = type.owner.createElement("HEADER");
-	header["$at"] = Object.create(null);
-	for (let name in type.types) {
-		let col = type.owner.createElement("DIV");
-		col.textContent = type.types[name].conf.title;
-		col.dataset.name = name;
-		header.append(col);
-		header["$at"][name] = col;
+	toView(content: content) {
+		if (this.rowType == null) this.start();
+		return super.toView(content);
 	}
-	return header;
-}
+	start() {
+		this.rowType = Object.create(this.types[this.conf.rowType] as DisplayType);
+		this.rowType.isPanel = false;
+		let types = this.rowType.types;
+		for (let name in types) {
+			let type = Object.create(types[name]);
+			type.isPanel = false;
+			types[name] = type;
+		}
+	}
+	createHeader(view: Display, model?: content): HTMLElement {
+		let header = this.owner.createElement("HEADER");
+		let title = this.owner.createElement("div");
+		title.textContent = this.conf.title;
+		header.append(title);
+		let columns = this.owner.createElement("div");
+		columns.classList.add("columns");
+		header.append(columns);
 
-// class ContainerType extends ElementType {
-// 	getContentOf(view: Display): HTMLElement {
-// 		for (let e = this.getContentOf(view); e[])
-// 		if (!view.$content || view.$content != view.children[1])  {
-// 			rebuildView(view);
-// 		}
-// 		return view.$content;
-// 	}
-// }
+		header["$at"] = Object.create(null);
+		for (let name in this.rowType.types) {
+			let col = this.owner.createElement("DIV");
+			col.textContent = this.rowType.types[name].conf.title;
+			col.dataset.name = name;
+			columns.append(col);
+			header["$at"][name] = col;
+		}
+		return header;			
+	}
+}

@@ -35,7 +35,7 @@ type source = bundle<string | source> | string
 
 export function loadTypes(source: bundle<source>, base: types): types {
 	base = Object.create(base);
-	let types = Object.create(null);
+	let types: types = Object.create(null);
 	for (let name in source) {
 		types[name] = getType(name, base, source);
 	}

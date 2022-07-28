@@ -20,7 +20,7 @@ export default {
 	list(this: ViewType<unknown>, view: unknown, model: List) {
 		//view.textContent = "";
 		if (model && model[Symbol.iterator]) for (let value of model) {
-			let type = this.types[viewType(value)] || this.owner.unknownType;
+			let type = this["rowType"] || this.types[viewType(value)] || this.owner.unknownType;
 			let part = type.toView(value);
 			this.appendTo(view, part);
 		}

@@ -20,7 +20,7 @@ export class Control implements Receiver {
 		this.conf = conf || EMPTY.object;
 		if (this.conf.actions) this.actions = this.conf.actions;
 	}
-	readonly conf: bundle<any>
+	conf: bundle<any>
 	actions: Actions = EMPTY.object;
 	receive(signal: Signal)  {
 		let subject = signal?.subject;

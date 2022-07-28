@@ -15,12 +15,10 @@ export abstract class DisplayType extends ElementType {
 	constructor(conf: BaseConf) {
 		super(conf);
 		this.model = conf.model;
+		this.isPanel = conf.panel;
 	}
 	declare owner: DisplayOwner;
-	
-	get isPanel(): boolean {
-		return this.conf.panel;
-	}
+	declare isPanel: boolean;
 
 	toView(model: content): Display {
 		return super.toView(model) as Display;
