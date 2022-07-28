@@ -1,5 +1,5 @@
 import {Record} from "../../base/model.js";
-import {bindView, Display, getView} from "../display.js";
+import {Display, getView} from "../display.js";
 
 import {mark, unmark, clearContent, replace, narrowRange} from "./edit.js";
 import { Article, Edit, Editor } from "../article.js";
@@ -42,13 +42,7 @@ class RecordEdit extends Edit {
 }
 
 function getRange(cmd: Edit): Range {
-	let view = cmd.owner.frame.getElementById(cmd.viewId) as Display;
-	if (!view) throw new Error("Can't find context element.");
-	if (!view.$controller) {
-		console.warn("context.type$ missing... binding...");
-		bindView(view);
-		if (!view.$controller) throw new Error("unable to bind missing type$");
-	}
+	let view = cmd.getView();
 	let range = cmd.owner.frame.createRange();
 	range.selectNodeContents(view.$controller.getContentOf(view));
 	return range;

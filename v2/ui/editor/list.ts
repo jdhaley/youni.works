@@ -1,8 +1,8 @@
 import {content} from "../../base/model.js";
 
-import {Display, getView, getChildView, getHeader, bindView} from "../display.js";
-import {Article, Edit, Editor} from "../article.js";
-import {mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
+import {Display, getView, getChildView} from "../display.js";
+import {Article, Edit, Editor, bindView} from "../article.js";
+import {mark, clearContent, unmark, replace, narrowRange, getHeader} from "./edit.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getView(range);
@@ -155,13 +155,7 @@ class ListEdit extends Edit {
 
 function getExecRange(cmd: ListEdit) {
 	let frame = cmd.owner.frame;
-	let view = frame.getElementById(cmd.viewId) as Display;
-	if (!view) throw new Error("Can't find view element.");
-	if (!view.$controller) {
-		console.warn("view.type$ missing... binding...");
-		bindView(view);
-		if (!view.$controller) throw new Error("unable to bind missing type$");
-	}
+	let view = cmd.getView();
 	let range = frame.createRange();
 	range.selectNodeContents(view.$content);
 	if (cmd.startId) {

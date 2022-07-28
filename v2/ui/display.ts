@@ -1,36 +1,43 @@
 import {ElementOwner, ElementType} from "../base/view.js";
 import {content} from "../base/model.js";
-import {bundle, CHAR} from "../base/util.js";
+import {bundle, CHAR, EMPTY} from "../base/util.js";
 import {Frame} from "./ui.js";
-
-let NEXT_ID = 1;
 
 export class Display extends HTMLElement {
 	$controller?: DisplayType;
 	$content: HTMLElement;
 }
 
+type editor = (this: DisplayType, commandName: string, range: Range, content?: content) => Range;
+
 export class DisplayOwner extends ElementOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
 		this.frame = frame;
 		this.actions = conf.actions.article;
+		this.editors = conf.editors || EMPTY.object;
 	}
-	declare types: bundle<DisplayType>;
+	#nextId = 1;
+	declare readonly types: bundle<DisplayType>;
 	readonly frame: Frame;
+	readonly editors: bundle<editor>;
 	view: Display;
 
 	createElement(tagName: string): HTMLElement {
 		return this.frame.createElement(tagName);
 	}
+	nextId() {
+		return "" + this.#nextId++
+	}
 }
 
-export abstract class DisplayType extends ElementType {
+export class DisplayType extends ElementType {
 	declare owner: DisplayOwner;
 
 	createView(): Display {
 		let view = super.createView() as Display;
-		view.id = "" + NEXT_ID++;
+		view.$content = view;
+		view.id = this.owner.nextId();
 		return view;
 	}
 	toView(model: content): Display {
@@ -41,71 +48,9 @@ export abstract class DisplayType extends ElementType {
 	display(view: Display, model: content): void {
 		return this.owner.viewers[this.model].call(this, view, model);
 	}
-}
-export abstract class PanelType extends DisplayType {
-	display(view: Display, model: content): void {
-		view.textContent = "";
-		view.append(this.createHeader(view));
-		view.append(this.createContent(view, model));
-		if (this.model == "list") {
-			view.append(this.createFooter(view));
-		}
-	}
-	createHeader(view: Display, model?: content) {
-		let header = this.owner.createElement("header");
-		header.textContent = this.conf.title || "";
-		return header;
-	}
-	createContent(view: Display, model?: content) {
-		view.$content = this.owner.createElement("div");
-		view.$content.classList.add("view");
-		this.owner.viewers[this.model].call(this, view.$content, model);
-		return view.$content;
-	}
-	getContentOf(view: Display): HTMLElement {
-		if (!view.$content || view.$content != view.children[1])  {
-			this.rebuildView(view);
-		}
-		return view.$content;
-	}
-	protected rebuildView(view: Display) {
-		for (let ele of view.children) {
-			if (ele.classList.contains("view")) {
-				view.$content = ele as HTMLElement;
-				break;
-			}
-		}
-		view.textContent = "";
-		view.append(this.createHeader(view));
-		view.append(view.$content || this.createContent(view, undefined));
-	}
-	createFooter(view: Display, model?: content) {
-		let footer = this.owner.createElement("footer");
-		footer.textContent = CHAR.ZWSP;
-		return footer;
-	}
-}
-
-export function bindView(view: Display): void {
-	let type = view.$controller;
-	if (!type) {
-		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
-		let parent = getView(view.parentElement);
-		if (name && parent) {
-			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
-			view["$controller"] = type;	
-		}
-		if (!type) return;
-	}
-	if (!view.id) view.id = "" + NEXT_ID++;
-
-	/*
-	Panels created from a range operation may be missing one or more of the
-	header, content, footer.
-	*/
-	let content = view.$controller.getContentOf(view); //ensures view isn't corrupted.
-	for (let child of content.children) {
-		bindView(child as Display);
+	edit(commandName: string, range: Range, content?: content): Range {
+		let editor = this.owner.editors[this.model];
+		return editor?.call(this, commandName, range, content);
 	}
 }
 
@@ -130,17 +75,4 @@ export function getChildView(ctx: Element, node: Node): Display {
 		console.warn("Invalid/corrupted view", ctx);
 	}
 	return node as Display;
-}
-
-export function getHeader(view: Element, node: Node) {
-	while (node && node != view) {
-		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
-		node = node.parentElement;
-	}
-}
-export function getFooter(view: Element, node: Node) {
-	while (node && node != view) {
-		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
-		node = node.parentElement;
-	}
 }

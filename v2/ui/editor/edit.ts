@@ -1,5 +1,6 @@
-import {Display, getView, getHeader, getFooter, bindView} from "../display.js";
+import {Display, DisplayType, getView} from "../display.js";
 import {CHAR} from "../../base/util.js";
+import { bindView } from "../article.js";
 
 export function mark(range: Range) {
 	let marker = insertMarker(range, "end");
@@ -103,3 +104,17 @@ export function rangeIterator(range: Range) {
 		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
 	)
 }
+
+export function getHeader(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
+}
+export function getFooter(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
+}
+

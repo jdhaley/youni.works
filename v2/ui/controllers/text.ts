@@ -1,8 +1,8 @@
-import {getHeader, getView} from "../display.js";
+import { getView} from "../display.js";
 import {CHAR, extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 import {Editor} from "../article.js";
-import {narrowRange} from "../editor/edit.js";
+import {getHeader, narrowRange} from "../editor/edit.js";
 
 import view from "./view.js";
 

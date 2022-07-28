@@ -1,35 +1,29 @@
-import { content } from "../base/model.js";
 import { Command, CommandBuffer } from "../base/command.js";
 import { RemoteFileService } from "../base/remote.js";
 import { bundle } from "../base/util.js";
 
-import { Display, DisplayOwner, DisplayType } from "./display.js";
+import { Display, DisplayOwner, DisplayType, getView } from "./display.js";
 import { Frame } from "./ui.js";
-import { BaseConf } from "../base/loader.js";
 
-type editor = (this: DisplayType, commandName: string, range: Range, content?: content) => Range;
+/**
+ * The Editor interface simply declares the DisplayType owner as an Article, i.e.
+ * you can now extend directly from DisplayType rather than Editor.
+ */
+export interface Editor extends DisplayType {
+	owner: Article;
+}
 
 export class Article extends DisplayOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(frame, conf);
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		this.editors = conf.editors;
 	}
-	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
-	editors: bundle<editor>;
+	readonly service: RemoteFileService;
 	save(): void {
 		let model = this.view.$controller.toModel(this.view);
 		console.log(model);
 		this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
-	}
-}
-
-
-export class Editor extends DisplayType {
-	declare readonly owner: Article;
-	edit(commandName: string, range: Range, content?: content): Range {
-		return this.owner.editors[this.model].call(this, commandName, range, content);
 	}
 }
 
@@ -49,6 +43,16 @@ export abstract class Edit extends Command<Range> {
 	before: string;
 	after: string;
 
+	getView() {
+		let view = this.owner.frame.getElementById(this.viewId) as Display;
+		if (!view) throw new Error("Can't find command view.");
+		if (!view.$controller) {
+			console.warn("command view.type$ missing... binding...");
+			bindView(view);
+			if (!view.$controller) throw new Error("unable to bind missing type$");
+		}
+		return view;
+	}
 	undo() {
 		//console.log("undo - " + this.name, this["startId"], this["endId"]);
 		return this.exec(this.before);
@@ -61,39 +65,25 @@ export abstract class Edit extends Command<Range> {
 	protected abstract exec(markup: string): Range;
 }
 
-export class Table extends Editor {
-	rowType: DisplayType;
-	toView(content: content) {
-		if (this.rowType == null) this.start();
-		return super.toView(content);
-	}
-	start() {
-		this.rowType = Object.create(this.types[this.conf.rowType] as DisplayType);
-//		this.rowType.isPanel = false;
-		let types = this.rowType.types;
-		for (let name in types) {
-			let type = Object.create(types[name]);
-			type.isPanel = false;
-			types[name] = type;
+export function bindView(view: Display): void {
+	let type = view.$controller;
+	if (!type) {
+		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+		let parent = getView(view.parentElement);
+		if (name && parent) {
+			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
+			view["$controller"] = type;	
 		}
+		if (!type) return;
 	}
-	createHeader(view: Display, model?: content): HTMLElement {
-		let header = this.owner.createElement("HEADER");
-		let title = this.owner.createElement("div");
-		title.textContent = this.conf.title;
-		header.append(title);
-		let columns = this.owner.createElement("div");
-		columns.classList.add("columns");
-		header.append(columns);
+	if (!view.id) view.id = type.owner.nextId();
 
-		header["$at"] = Object.create(null);
-		for (let name in this.rowType.types) {
-			let col = this.owner.createElement("DIV");
-			col.textContent = this.rowType.types[name].conf.title;
-			col.dataset.name = name;
-			columns.append(col);
-			header["$at"][name] = col;
-		}
-		return header;			
+	/*
+	Panels created from a range operation may be missing one or more of the
+	header, content, footer.
+	*/
+	let content = view.$controller.getContentOf(view); //ensures view isn't corrupted.
+	for (let child of content.children) {
+		bindView(child as Display);
 	}
 }

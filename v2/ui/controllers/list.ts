@@ -1,8 +1,10 @@
-import {extend} from "../../base/util.js";
+import { extend } from "../../base/util.js";
 import { Editor } from "../article.js";
-import { Display, getHeader } from "../display.js";
+import { Display } from "../display.js";
+import { getHeader } from "../editor/edit.js";
 import { UserEvent } from "../ui.js";
 import view from "./view.js";
+
 export default extend(view, {
 	dblclick(this: Editor, event: UserEvent) {
 		event.subject = "";
