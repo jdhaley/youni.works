@@ -95,8 +95,8 @@ export class ElementType extends ViewType<Element> {
 	getContentOf(view: Element) {
 		return view;
 	}
-	toModel(view: Element): content {
-		return this.owner.modellers[this.model].call(this, view);
+	toModel(view: Element, range?: Range): content {
+		return this.owner.modellers[this.model].call(this, view, range);
 	}
 	toView(model: content): Element {
 		let view = this.createView();
