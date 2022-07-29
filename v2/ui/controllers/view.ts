@@ -170,8 +170,9 @@ function setClipboard(type: Editor, range: Range, clipboard: DataTransfer) {
 		clipboard.setData("text/plain", data);
 		return;
 	}
-	let view = toView(range);
-	let model = type.toModel(view);
+	let view = getView(range);
+	if (!view) return;
+	let model = type.toModel(view, range);
 	if (type.model == "record") model = [model];
 	clipboard.setData("application/json", JSON.stringify(model));
 	console.log("clipboard:", model);
