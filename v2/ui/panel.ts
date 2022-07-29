@@ -2,7 +2,7 @@ import { content } from "../base/model.js";
 import { CHAR } from "../base/util.js";
 import { Display, DisplayType, getView } from "./display.js";
 
-export abstract class PanelType extends DisplayType {
+export class PanelType extends DisplayType {
 	display(view: Display, model: content): void {
 		view.textContent = "";
 		view.append(this.createHeader(view));
@@ -48,19 +48,8 @@ export abstract class PanelType extends DisplayType {
 
 export class Table extends PanelType {
 	rowType: DisplayType;
-	toView(content: content) {
-		if (this.rowType == null) this.start();
-		return super.toView(content);
-	}
 	start() {
 		this.rowType = Object.create(this.types[this.conf.rowType] as DisplayType);
-//		this.rowType.isPanel = false;
-		let types = this.rowType.types;
-		for (let name in types) {
-			let type = Object.create(types[name]);
-			type.isPanel = false;
-			types[name] = type;
-		}
 	}
 	createHeader(view: Display, model?: content): HTMLElement {
 		let header = this.owner.createElement("HEADER");
@@ -80,5 +69,10 @@ export class Table extends PanelType {
 			header["$at"][name] = col;
 		}
 		return header;			
+	}
+}
+
+export class Row extends PanelType {
+	start() {
 	}
 }

@@ -6,8 +6,8 @@ import record from "../controllers/record.js";
 import list from "../controllers/list.js";
 
 import shortcuts from "./shortcuts.js";
-import { DisplayType } from "../display.js";
-import { Table } from "../panel.js";
+import {DisplayType} from "../display.js";
+import {PanelType, Row, Table} from "../panel.js";
 
 const conf: bundle<BaseConf> = {
 	list: {
@@ -42,12 +42,28 @@ const conf: bundle<BaseConf> = {
 		actions: text,
 		shortcuts: shortcuts
 	},
+	form: {
+		class: PanelType,
+		model: "record",
+		panel: true,
+		tagName: "ui-record",
+		actions: record,
+		shortcuts: shortcuts
+	},
 	table: {
 		class: Table,
 		model: "list",
 		panel: true,
 		tagName: "ui-list",
 		actions: list,
+		shortcuts: shortcuts
+	},
+	row: {
+		class: Row,
+		model: "record",
+		panel: true,
+		tagName: "ui-record",
+		actions: record,
 		shortcuts: shortcuts
 	},
 	tree: {
