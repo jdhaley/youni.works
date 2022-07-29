@@ -1,11 +1,14 @@
 import {content} from "../base/model.js";
+import { bundle } from "../base/util.js";
 import {Display, DisplayType} from "./display.js";
 
 export class Panel extends DisplayType {
 	header?: DisplayType;
 	content: DisplayType;
 	footer?: DisplayType;
-	
+	start(conf: bundle<any>) {
+		super.start(conf);
+	}
 	display(view: Display, model: content): void {
 		return super.display(view, model);
 		view.textContent = "";
@@ -42,7 +45,8 @@ export class Panel extends DisplayType {
 
 export class Table extends Panel {
 	rowType: DisplayType;
-	start() {
+	start(conf: bundle<any>) {
+		super.start(conf);
 		this.rowType = Object.create(this.types[this.conf.rowType] as DisplayType);
 	}
 	createHeader(view: Display, model?: content): HTMLElement {
@@ -68,5 +72,15 @@ export class Table extends Panel {
 
 export class Row extends Panel {
 	start() {
+	}
+}
+
+export class Caption extends DisplayType {
+	title: string;
+	toView(model: content): Display {
+		let header = this.owner.createElement("HEADER") as Display;
+		header.$controller = this;
+		header.textContent = this.title;
+		return header;
 	}
 }

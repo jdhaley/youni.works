@@ -83,7 +83,7 @@ export function bindView(view: Display): void {
 	header, content, footer.
 	*/
 	let content = view.$controller.getContentOf(view); //ensures view isn't corrupted.
-	for (let child of content.children) {
+	if (content) for (let child of content.children) {
 		bindView(child as Display);
 	}
 }
