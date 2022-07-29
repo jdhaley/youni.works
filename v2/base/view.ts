@@ -58,6 +58,8 @@ export abstract class ViewType<V> extends Controller<V> implements ContentType<V
 	declare name: string;
 	declare propertyName?: string;
 
+	start() {
+	}
 	generalizes(type: Type): boolean {
 		return type == this;
 	}

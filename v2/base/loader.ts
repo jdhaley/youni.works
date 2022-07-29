@@ -72,6 +72,7 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 	for (let name in conf.types) {
 		type.types[name] = getMember(name, conf.types[name]);
 	}
+	type.start(conf);
 	return type;
 
 	function getMember(name: string, part: source) {
