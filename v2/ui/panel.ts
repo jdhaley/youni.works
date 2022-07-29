@@ -1,26 +1,19 @@
-import { content } from "../base/model.js";
-import { CHAR } from "../base/util.js";
-import { Display, DisplayType, getView } from "./display.js";
+import {content} from "../base/model.js";
+import {Display, DisplayType} from "./display.js";
 
-export class PanelType extends DisplayType {
+export class Panel extends DisplayType {
+	header?: DisplayType;
+	content: DisplayType;
+	footer?: DisplayType;
+	
 	display(view: Display, model: content): void {
+		return super.display(view, model);
 		view.textContent = "";
-		view.append(this.createHeader(view));
-		view.append(this.createContent(view, model));
-		if (this.model == "list") {
-			view.append(this.createFooter(view));
-		}
-	}
-	createHeader(view: Display, model?: content) {
-		let header = this.owner.createElement("header");
-		header.textContent = this.conf.title || "";
-		return header;
-	}
-	createContent(view: Display, model?: content) {
-		view.$content = this.owner.createElement("div");
+		if (this.header) view.append(this.header.toView(model));
+		view.append(this.content.toView(model));
+		view.$content = view.children[1] as HTMLElement;
 		view.$content.classList.add("view");
-		this.owner.viewers[this.model].call(this, view.$content, model);
-		return view.$content;
+		if (this.footer) view.append(this.footer.toView(model));
 	}
 	getContentOf(view: Display): HTMLElement {
 		if (!view.$content || view.$content != view.children[1])  {
@@ -29,24 +22,25 @@ export class PanelType extends DisplayType {
 		return view.$content;
 	}
 	protected rebuildView(view: Display) {
-		for (let ele of view.children) {
-			if (ele.classList.contains("view")) {
-				view.$content = ele as HTMLElement;
-				break;
-			}
-		}
-		view.textContent = "";
-		view.append(this.createHeader(view));
-		view.append(view.$content || this.createContent(view, undefined));
-	}
-	createFooter(view: Display, model?: content) {
-		let footer = this.owner.createElement("footer");
-		footer.textContent = CHAR.ZWSP;
-		return footer;
+		// //TODO need to review & improve this method.
+
+		// for (let ele of view.children) {
+		// 	if (ele.classList.contains("view")) {
+
+		// 		view.$content = ele as HTMLElement;
+		// 		break;
+		// 	}
+		// }
+		// view.textContent = "";
+		// view.append(this.header.toView(undefined));
+		// view.append(view.$content || this.content.toView(undefined));
+		// view.$content = view.children[1] as HTMLElement;
+		// view.$content.classList.add("view");
+		// if (this.footer) view.append(this.footer.toView(undefined));
 	}
 }
 
-export class Table extends PanelType {
+export class Table extends Panel {
 	rowType: DisplayType;
 	start() {
 		this.rowType = Object.create(this.types[this.conf.rowType] as DisplayType);
@@ -72,7 +66,7 @@ export class Table extends PanelType {
 	}
 }
 
-export class Row extends PanelType {
+export class Row extends Panel {
 	start() {
 	}
 }

@@ -1,4 +1,4 @@
-import {Display, DisplayType, getView} from "../display.js";
+import {Display, getView} from "../display.js";
 import {CHAR} from "../../base/util.js";
 import { bindView } from "../article.js";
 

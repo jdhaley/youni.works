@@ -7,7 +7,7 @@ import list from "../controllers/list.js";
 
 import shortcuts from "./shortcuts.js";
 import {DisplayType} from "../display.js";
-import {PanelType, Row, Table} from "../panel.js";
+import {Panel, Row, Table} from "../panel.js";
 
 const conf: bundle<BaseConf> = {
 	list: {
@@ -43,7 +43,7 @@ const conf: bundle<BaseConf> = {
 		shortcuts: shortcuts
 	},
 	form: {
-		class: PanelType,
+		class: Panel,
 		model: "record",
 		panel: true,
 		tagName: "ui-record",
