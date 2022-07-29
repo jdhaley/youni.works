@@ -43,7 +43,7 @@ export function loadTypes(source: bundle<source>, base: types): types {
 }
 
 function getType(name: string, types: types, source: source) {
-	let type = types[name];
+	let type = types[name || "default"];
 	if (!type && source[name]) {
 		let value = source[name];
 		if (typeof value == "object") {
@@ -61,8 +61,8 @@ function getType(name: string, types: types, source: source) {
 
 function createType(name: string, conf: ViewConf, types: types, source: source) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
+	if (!supertype) throw new Error("Can't define a supertype.");
 	let type = Object.create(supertype);
-	type.conf = extend(supertype.conf, conf.conf);
 
 	if (name) {
 		type.name = name;
@@ -72,7 +72,7 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 	for (let name in conf.types) {
 		type.types[name] = getMember(name, conf.types[name]);
 	}
-	type.start(conf);
+	type.start(extend(supertype.conf, conf.conf));
 	return type;
 
 	function getMember(name: string, part: source) {
