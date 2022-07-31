@@ -31,5 +31,5 @@ function getType(article: Article, path: string, data: any) {
 	if (!typeName && data && typeof data == "object" && data.type$) {
 		typeName = data.type$;
 	}
-	return article.types[typeName] || article.types[article.conf.type];
+	return article.types[typeName] || article.fallbackType;
 }

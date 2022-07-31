@@ -1,4 +1,3 @@
-import {BaseConf} from "../../base/loader.js";
 import {bundle} from "../../base/util.js";
 
 import text from "../controllers/text.js";
@@ -9,7 +8,15 @@ import shortcuts from "./shortcuts.js";
 import {DisplayType} from "../display.js";
 import {Panel, Row, Table} from "../panel.js";
 
-const conf: bundle<BaseConf> = {
+/* BASE CONF
+	class: typeof Control;
+	model: "text" | "record" | "list";
+	actions: Actions;
+	panel: boolean;
+	tagName: string;
+	shortcuts: bundle<string>;
+*/
+const conf: bundle<any> = {
 	list: {
 		class: DisplayType,
 		model: "list",

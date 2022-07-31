@@ -2,13 +2,10 @@ import {Control, Actions} from "./controller.js";
 import {bundle, extend} from "./util.js";
 import {ViewOwner, ViewType} from "./view.js";
 
-export interface BaseConf {
+interface BaseConf {
 	class: typeof Control;
 	model: "text" | "record" | "list";
-	panel: boolean;
-	tagName: string;
 	actions: Actions;
-	shortcuts: bundle<string>;
 }
 
 export interface ViewConf {
@@ -17,29 +14,30 @@ export interface ViewConf {
 	conf: bundle<any>;
 }
 
-export function loadBaseTypes(owner: ViewOwner<unknown>): bundle<ViewType<any>> {
-	if (!owner.conf?.baseTypes) return;
+export function loadBaseTypes(owner: ViewOwner<unknown>, baseTypes: bundle<BaseConf>): bundle<ViewType<any>> {
 	let types = Object.create(null);
-	for (let name in owner.conf.baseTypes) {
-		let conf: BaseConf = owner.conf.baseTypes[name];
-		let type = new conf.class(conf) as ViewType<unknown>;
+	for (let name in baseTypes) {
+		let conf: BaseConf = baseTypes[name];
+		let type = new conf.class() as ViewType<unknown>;
 		type.name = name;
 		type.owner = owner;
+		type.model = conf.model;
+		type.start(conf);
 		types[name] = type;
 	}
 	return types;
 }
 
-type types = bundle<ViewType<unknown>>;
+type types = bundle<ViewType<any>>;
 type source = bundle<string | source> | string
 
-export function loadTypes(source: bundle<source>, base: types): types {
-	base = Object.create(base);
+export function loadTypes(owner: ViewOwner<any>, source: bundle<source>, base: bundle<BaseConf>): types {
+	let baseTypes = loadBaseTypes(owner, base);
 	let types: types = Object.create(null);
 	for (let name in source) {
-		types[name] = getType(name, base, source);
+		types[name] = getType(name, baseTypes, source);
 	}
-	return types
+	return types;
 }
 
 function getType(name: string, types: types, source: source) {
@@ -72,7 +70,7 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 	for (let name in conf.types) {
 		type.types[name] = getMember(name, conf.types[name]);
 	}
-	type.start(extend(supertype.conf, conf.conf));
+	type.start(extend(supertype.conf || null, conf.conf));
 	return type;
 
 	function getMember(name: string, part: source) {
