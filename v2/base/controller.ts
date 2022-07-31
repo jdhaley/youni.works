@@ -16,11 +16,6 @@ export interface Actions {
 }
 
 export class Control implements Receiver {
-	constructor(conf?: bundle<any>) {
-		this.conf = conf || EMPTY.object;
-		if (this.conf.actions) this.actions = this.conf.actions;
-	}
-	conf: bundle<any>
 	actions: Actions = EMPTY.object;
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
@@ -37,8 +32,6 @@ export class Control implements Receiver {
 }
 
 export abstract class Controller<V> extends Control {
-	owner: Owner<V>;
-
 	abstract getPartOf(value: V): V;
 	abstract getPartsOf(value: V): Iterable<V>;
 }

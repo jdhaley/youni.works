@@ -17,7 +17,9 @@ export class Article extends DisplayOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(frame, conf);
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
+		this.fallbackType = this.types[conf.type];	
 	}
+	fallbackType: DisplayType;
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 	readonly service: RemoteFileService;
 	save(): void {

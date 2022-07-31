@@ -48,7 +48,8 @@ export class DisplayType extends ElementType {
 	display(view: Display, model: content): void {
 		return this.owner.viewers[this.model].call(this, view, model);
 	}
-	edit(commandName: string, range: Range, content?: content): Range {
+
+	 edit(commandName: string, range: Range, content?: content): Range {
 		let editor = this.owner.editors[this.model];
 		return editor?.call(this, commandName, range, content);
 	}

@@ -1,7 +1,7 @@
 import {content, ContentType, Type, typeOf} from "./model.js";
 import {Controller, Owner} from "./controller.js";
 import {bundle, EMPTY} from "./util.js";
-import {BaseConf, loadBaseTypes, loadTypes} from "./loader.js";
+import {loadTypes} from "./loader.js";
 
 export function viewType(value: any): string {
 	let type = typeOf(value);
@@ -20,12 +20,12 @@ type modeller = (this: ViewType<unknown>, view: unknown) => content;
 
 export abstract class ViewOwner<V> extends Owner<V> {
 	constructor(conf?: bundle<any>) {
-		super(conf);
+		super();
 		this.viewers = conf.viewers;
 		this.modellers = conf.modellers;
-		this.initTypes(conf.viewTypes, conf.baseTypes);
-		console.info("Types:", this.types, this.conf.unknownType);
-		this.unknownType = this.types[this.conf.unknownType]
+		this.types = loadTypes(this, conf.viewTypes, conf.baseTypes);
+		this.unknownType = this.types[conf.unknownType];
+		console.info("Types:", this.types, conf.unknownType);
 	}
 	viewers: bundle<viewer>
 	modellers: bundle<modeller>;
@@ -39,26 +39,18 @@ export abstract class ViewOwner<V> extends Owner<V> {
 		}
 		return type;
 	}
-	
-	initTypes(source: bundle<any>, base: bundle<ViewType<V>>) {
-		base = loadBaseTypes(this);
-		this.types = loadTypes(source, base) as bundle<ViewType<V>>;
-		this.unknownType = this.types[this.conf.unknownType];
-	}
 }
 
 export abstract class ViewType<V> extends Controller<V> implements ContentType<V> {
-	constructor(conf: BaseConf) {
-		super(conf);
-		this.model = conf.model;
-	}
-	types: bundle<ViewType<V>> = EMPTY.object;
 	declare owner: ViewOwner<V>;
 	declare model: "record" | "list" | "text";
-	declare name: string;
+	name: string;
+	types: bundle<ViewType<V>> = EMPTY.object;
 	declare propertyName?: string;
+	conf: bundle<any>
 
 	start(conf: any) {
+		if (conf.actions) this.actions = conf.actions;
 		this.conf = conf;
 	}
 	generalizes(type: Type): boolean {
