@@ -56,9 +56,9 @@ export function clearContent(range: Range) {
 			let view = getView(node);
 			if (view && node.parentElement == view.$controller.getContentOf(view)) {
 				if (node == range.startContainer) {
-					node.textContent = node.textContent.substring(0, range.startOffset);
+					node.textContent = node.textContent.substring(0, range.startOffset) || CHAR.ZWSP;
 				} else if (node == range.endContainer) {
-					node.textContent = node.textContent.substring(range.endOffset);
+					node.textContent = node.textContent.substring(range.endOffset) || CHAR.ZWSP;
 				} else {
 					node.textContent = CHAR.ZWSP;
 				}	
