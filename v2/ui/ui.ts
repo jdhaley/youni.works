@@ -1,4 +1,4 @@
-import {Signal, Actions, Owner, Controller} from "../base/controller.js";
+import {Signal, Actions, Control, Owner} from "../base/controller.js";
 
 export class Frame extends Owner<HTMLElement> {
 	constructor(window: Window, actions: Actions) {
@@ -52,8 +52,14 @@ export class Frame extends Owner<HTMLElement> {
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);
 	}
-	getControlOf(view: HTMLElement): Controller<HTMLElement> {
+	getControlOf(view: HTMLElement): Control {
 		return view["$controller"];
+	}
+	getPartOf(view: HTMLElement): HTMLElement {
+		return view.parentElement;
+	}
+	getPartsOf(view: HTMLElement): Iterable<HTMLElement> {
+		return view.children as Iterable<HTMLElement>;
 	}
 }
 

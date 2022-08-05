@@ -4,6 +4,7 @@ import {ViewOwner, ViewType} from "./view.js";
 
 export interface BaseConf {
 	class: typeof Control;
+	view: "text" | "record" | "list";
 	model: "text" | "record" | "list";
 	panel: boolean;
 	tagName: string;

@@ -11,6 +11,7 @@ import { Editor } from "../article.js";
 const conf: bundle<BaseConf> = {
 	text: {
 		class: Editor,
+		view: "text",
 		model: "text",
 		panel: true,
 		tagName: "ui-text",
@@ -19,6 +20,7 @@ const conf: bundle<BaseConf> = {
 	},
 	markup: {
 		class: Editor,
+		view: "text",
 		model: "text",
 		panel: true,
 		tagName: "ui-text",
@@ -27,6 +29,7 @@ const conf: bundle<BaseConf> = {
 	},
 	list: {
 		class: Editor,
+		view: "list",
 		model: "list",
 		panel: true,
 		tagName: "ui-list",
@@ -35,6 +38,7 @@ const conf: bundle<BaseConf> = {
 	},
 	record: {
 		class: Editor,
+		view: "record",
 		model: "record",
 		panel: true,
 		tagName: "ui-record",
@@ -43,6 +47,7 @@ const conf: bundle<BaseConf> = {
 	},
 	tree: {
 		class: Editor,
+		view: "list",
 		model: "list",
 		panel: true,
 		tagName: "ui-tree",

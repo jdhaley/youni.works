@@ -1,5 +1,4 @@
 import {ElementOwner, ElementType} from "../base/view.js";
-import {BaseConf} from "../base/loader.js";
 import {content} from "../base/model.js";
 import {bundle, CHAR} from "../base/util.js";
 import {Frame} from "./ui.js";
@@ -12,10 +11,6 @@ export class Display extends HTMLElement {
 }
 
 export abstract class DisplayType extends ElementType {
-	constructor(conf: BaseConf) {
-		super(conf);
-		this.model = conf.model;
-	}
 	declare owner: DisplayOwner;
 	
 	get isPanel(): boolean {
@@ -41,7 +36,7 @@ export abstract class DisplayType extends ElementType {
 		} else {
 			view.$content = view;
 		}
-		super.viewContent(view, model);
+		super.viewContent(view.$content, model);
 	}
 	createHeader(view: Display, model?: content) {
 		let header = this.owner.createElement("header");
@@ -73,7 +68,6 @@ export class DisplayOwner extends ElementOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
 		this.frame = frame;
-		this.actions = conf.actions.article;
 		this.initTypes(conf.viewTypes, conf.baseTypes);
 		console.info("Types:", this.types, this.conf.unknownType);
 		this.unknownType = this.types[this.conf.unknownType]

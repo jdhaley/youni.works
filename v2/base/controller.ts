@@ -17,11 +17,11 @@ export interface Actions {
 
 export class Control implements Receiver {
 	constructor(conf?: bundle<any>) {
-		this.conf = conf || EMPTY.object;
-		if (this.conf.actions) this.actions = this.conf.actions;
+		if (conf?.owner) this.owner = conf.owner;
+		if (conf?.actions) this.actions = conf.actions;
 	}
-	readonly conf: bundle<any>
-	actions: Actions = EMPTY.object;
+	readonly owner: Owner<unknown>;
+	readonly actions: Actions = EMPTY.object;
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
 		while (subject) try {
@@ -36,15 +36,10 @@ export class Control implements Receiver {
 	}
 }
 
-export abstract class Controller<V> extends Control {
-	owner: Owner<V>;
-
+export abstract class Owner<V> extends Control {
+	abstract getControlOf(value: V): Control;
 	abstract getPartOf(value: V): V;
 	abstract getPartsOf(value: V): Iterable<V>;
-}
-
-export abstract class Owner<V> extends Control {
-	abstract getControlOf(value: V): Controller<V>;
 	
 	send(msg: Signal | string, to: V) {
 		msg = signal("down", msg);
@@ -52,7 +47,7 @@ export abstract class Owner<V> extends Control {
 		msg.on = to;
 		let control = this.getControlOf(to);
 		control?.receive(msg);
-		let parts = control?.getPartsOf(to) || EMPTY.array;
+		let parts = this.getPartsOf(to) || EMPTY.array;
 		for (let part of parts) {
 			msg.from = to;
 			this.send(msg, part);
@@ -65,7 +60,7 @@ export abstract class Owner<V> extends Control {
 			let control = this.getControlOf(on);
 			control?.receive(evt);
 			evt.from = on;
-			on = control?.getPartOf(on);
+			on = this.getPartOf(on);
 		}
 	}
 }

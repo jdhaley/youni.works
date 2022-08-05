@@ -1,15 +1,14 @@
 import { content, List, Record } from "../../base/model.js";
-import { ViewType } from "../../base/view.js";
-import { CHAR, EMPTY } from "../../base/util.js";
+import { ElementType } from "../../base/view.js";
+import { CHAR } from "../../base/util.js";
 
 export default {
-	list(this: ViewType<unknown>, view: unknown): List {
+	list(this: ElementType, view: Element, range?: Range): List {
 		let model: content[];
-		let parts = this.getPartsOf(view) || EMPTY.array;
-		//console.debug("Parts:", parts, view);
-		for (let part of parts) {
-			let type = this.owner.getControlOf(part);
-			let value = type?.toModel(part);
+		let content = getContent(view, range);
+		if (content) for (let part of content.children) {
+			let type = this.owner.getControlOf(part) as ElementType;
+			let value = type?.toModel(part, range);
 			if (value) {
 				if (!model) {
 					model = [];
@@ -20,11 +19,12 @@ export default {
 		}
 		return model;
 	},
-	record(this: ViewType<unknown>, view: unknown): Record {
+	record(this: ElementType, view: Element, range?: Range): Record {
 		let model: Record;
-		for (let part of this.getPartsOf(view)) {
-			let type = this.owner.getControlOf(part) || this.owner.unknownType;
-			let value = type.toModel(part);
+		let content = getContent(view, range);
+		if (content) for (let part of content.children) {
+			let type = this.owner.getControlOf(part) as ElementType;
+			let value = type?.toModel(part, range);
 			if (value) {
 				if (!model) {
 					model = Object.create(null);
@@ -35,8 +35,24 @@ export default {
 		}
 		return model;
 	},
-	text(this: ViewType<unknown>, view: unknown): string {
-		let text = this.getTextOf(view);
-		return text == CHAR.ZWSP ? "" : text;
+	text(this: ElementType, view: Element, range?: Range): string {
+		let model = "";
+		let content = getContent(view, range);
+		if (content) for (let node of content.childNodes) {
+			if (node == range?.startContainer) {
+				model += CHAR.STX + node.textContent.substring(range.startOffset);
+			} else if (node == range?.endContainer) {
+				model += node.textContent.substring(0, range.endOffset) + CHAR.ETX;
+			} else {
+				model += node.textContent;
+			}
+		}
+		return model === CHAR.ZWSP ? "" : model;
 	}
+}
+
+function getContent(view: Element, range: Range) {
+	let content = view["$content"];
+	if (!content || range && !range.intersectsNode(content)) return;
+	return content;
 }

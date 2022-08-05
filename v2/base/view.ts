@@ -1,7 +1,7 @@
 import {content, ContentType, Type, typeOf} from "./model.js";
-import {Controller, Owner} from "./controller.js";
+import {Control, Owner} from "./controller.js";
 import {bundle, EMPTY} from "./util.js";
-import {loadBaseTypes, loadTypes} from "./loader.js";
+import {BaseConf, loadBaseTypes, loadTypes} from "./loader.js";
 
 export function viewType(value: any): string {
 	let type = typeOf(value);
@@ -15,8 +15,10 @@ export function viewType(value: any): string {
 			return type;
 	}
 }
+
 type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
 type modeller = (this: ViewType<unknown>, view: unknown) => content;
+
 export abstract class ViewOwner<V> extends Owner<V> {
 	constructor(conf?: bundle<any>) {
 		super(conf);
@@ -24,7 +26,9 @@ export abstract class ViewOwner<V> extends Owner<V> {
 			this.viewers = conf.viewers;
 			this.modellers = conf.modellers;
 		}
+		this.conf = conf;
 	}
+	conf: bundle<any>;
 	viewers: bundle<viewer>
 	modellers: bundle<modeller>;
 	unknownType: ViewType<V>;
@@ -45,41 +49,62 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	}
 }
 
-export abstract class ViewType<V> extends Controller<V> implements ContentType<V> {
-	types: bundle<ViewType<V>> = EMPTY.object;
-	declare owner: ViewOwner<V>;
+export abstract class ViewType<V> extends Control implements ContentType<V> {
+	constructor(conf: BaseConf) {
+		super(conf);
+		if (conf) {
+			this.view = conf.view;
+			this.model = conf.model;
+		}
+		this.conf = conf || EMPTY.object;
+	}
 	declare model: "record" | "list" | "text";
+	declare view: "record" | "list" | "text";
 	declare name: string;
 	declare propertyName?: string;
+	types: bundle<ViewType<V>> = EMPTY.object;
+	declare conf: bundle<any>;
+	declare owner: ViewOwner<V>;
 
 	generalizes(type: Type): boolean {
 		return type == this;
 	}
 	toModel(view: V): content {
-		return this.owner.modellers[this.model].call(this, view);
+		if (this.model) return this.owner.modellers[this.model].call(this, view);
 	}
 	toView(model: content): V {
 		let view = this.createView();
-		this.viewContent(view, model);
+		if (this.view) this.viewContent(view, model);
 		return view;
 	}
 	viewContent(view: V, model: content): void {
-		this.owner.viewers[this.model].call(this, view, model);
+		this.owner.viewers[this.view].call(this, view, model);
 	}
 
 	abstract createView(): V;
-	abstract getTextOf(view: V): string;
-	abstract setTextOf(view: V, value: string): void;
-	abstract appendTo(view: V, value: any): void 
 }
 
-export abstract class ElementOwner extends ViewOwner<Element> {
-	abstract createElement(tagName: string): Element;
+export class ElementOwner extends ViewOwner<Element> {
+	declare owner: ElementOwner;
+	createElement(tagName: string): Element {
+		return this.owner.createElement(tagName);
+	}
+	getPartOf(view: Element): Element {
+		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
+			if (parent["$controller"]) return parent;
+		}
+	}
+	getPartsOf(view: Element): Iterable<Element> {
+		return view.children as Iterable<Element>;
+	}
 }
 
-export abstract class ElementType extends ViewType<Element> {
+export class ElementType extends ViewType<Element> {
 	declare readonly owner: ElementOwner;
 
+	toModel(view: Element, range?: Range): content {
+		if (this.model) return this.owner.modellers[this.model].call(this, view, range);
+	}
 	createView(): Element {
 		let view = this.owner.createElement(this.conf.tagName);
 		view["$controller"] = this;
@@ -89,27 +114,5 @@ export abstract class ElementType extends ViewType<Element> {
 			view.setAttribute("data-type", this.name);
 		}
 		return view;
-	}
-	getPartOf(view: Element): Element {
-		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
-			if (parent["$controller"]) return parent;
-		}
-	}
-	getContentOf(view: Element) {
-		return view;
-	}
-	getPartsOf(view: Element): Iterable<Element> {
-		return (this.getContentOf(view)?.children || EMPTY.array) as Iterable<Element>;
-	}
-	getTextOf(view: Element): string {
-		return this.getContentOf(view)?.textContent || "";
-	}
-	setTextOf(view: Element, value: string): void {
-		let ele = this.getContentOf(view);
-		if (ele) ele.textContent = value;
-	}
-	appendTo(view: Element, value: any): void {
-		let ele = this.getContentOf(view);
-		if (ele) ele.append(value);
 	}
 }
