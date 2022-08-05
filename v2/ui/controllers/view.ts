@@ -173,7 +173,7 @@ function setClipboard(type: Editor, range: Range, clipboard: DataTransfer) {
 	let view = toView(range);
 	let model = type.toModel(view);
 	if (type.model == "record") model = [model];
-	clipboard.setData("application/json", JSON.stringify(model));
+	clipboard.setData("application/json", JSON.stringify(model || null));
 	console.log("clipboard:", model);
 	let html = htmlify(view as HTMLElement);
 	//console.log(html);
