@@ -140,17 +140,6 @@ export function getView(node: Node | Range): Display {
 	}
 }
 
-export function getChildView(ctx: Element, node: Node): Display {
-	if (node == ctx) return null;
-	while (node?.parentElement != ctx) {
-		node = node.parentElement;
-	}
-	if (!node || !node["$controller"]) {
-		console.warn("Invalid/corrupted view", ctx);
-	}
-	return node as Display;
-}
-
 export function getHeader(view: Element, node: Node) {
 	while (node && node != view) {
 		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;

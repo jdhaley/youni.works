@@ -1,6 +1,6 @@
 import {content} from "../../base/model.js";
 
-import {Display, getView, getChildView, getHeader, bindView} from "../display.js";
+import {Display, getView, getHeader, bindView} from "../display.js";
 import {Article, Edit, Editor} from "../article.js";
 import {mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
 
@@ -175,4 +175,15 @@ function getExecRange(cmd: ListEdit) {
 		range.setEndBefore(end);
 	}
 	return range;
+}
+
+export function getChildView(ctx: Element, node: Node): Display {
+	if (node == ctx) return null;
+	while (node?.parentElement != ctx) {
+		node = node.parentElement;
+	}
+	if (!node || !node["$controller"]) {
+		console.warn("Invalid/corrupted view", ctx);
+	}
+	return node as Display;
 }
