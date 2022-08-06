@@ -1,6 +1,6 @@
 import {CHAR} from "../../base/util.js";
 
-import {Article, Edit} from "../article.js";
+import {Article, Edit} from "./article.js";
 import {getDisplay, mark, replace, unmark} from "./edit.js";
 
 let lastEdit = {
@@ -55,8 +55,8 @@ class TextEdit extends Edit {
 		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
-		let view = this.getView();
-		let range = this.owner.frame.createRange();
+		let view = this.owner.getView(this.viewId);
+		let range = view.ownerDocument.createRange();
 		range.selectNodeContents(view.$content);
 		return range;
 	}
@@ -66,7 +66,7 @@ class TextEdit extends Edit {
 		this.before = view.$content.innerHTML;	
 		range.deleteContents();
 		if (text) {
-			let ins = this.owner.createElement("I");
+			let ins = view.ownerDocument.createElement("I");
 			ins.textContent = text;
 			range.insertNode(ins.firstChild);
 		}
@@ -77,8 +77,7 @@ class TextEdit extends Edit {
 		let range = this.getRange();
 		replace(range, markup);
 		range = unmark(range);
-		if (range) this.owner.frame.selectionRange = range;
-		return range;
+		return this.owner._setRange(range);
 	}
 }
 

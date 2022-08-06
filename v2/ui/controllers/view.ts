@@ -3,8 +3,7 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {Display, bindView} from "../display.js";
-import {Editor} from "../article.js";
+import {Editor} from "../editor/article.js";
 import {getDisplay, getHeader, narrowRange} from "../editor/edit.js";
 
 let UNDONE = false;
@@ -31,7 +30,7 @@ export default extend(null, {
 	// 	narrowRange(event.frame.selectionRange);
 	// },
 	command(this: Editor, event: UserEvent) {
-		let shortcuts = this.conf.shortcuts;
+		let shortcuts = this.shortcuts;
 		let command = shortcuts && shortcuts[event.shortcut];
 		if (command) event.subject = command;
 	},
@@ -79,13 +78,6 @@ export default extend(null, {
 	},
 	charpress(event: UserEvent) {
 		event.subject = "";
-	},
-	test(this: Editor, event: UserEvent) {
-		event.subject = "";
-		let range = this.owner.frame.selectionRange;
-		range.setStartBefore(event.on.parentElement);
-		range.collapse(true);
-		console.log(range.commonAncestorContainer.nodeName);
 	},
 	input(event: UserEvent) {
 		/*
@@ -141,25 +133,6 @@ export function atStart(view: Element, node: Node, offset: number) {
 		node = node.parentNode;
 	}
 	return true;
-}
-
-
-export function toView(range: Range): Display {
-	narrowRange(range);
-	let source = getDisplay(range);
-	let type = source?.$controller;
-	if (!type) return;
-	let view = type.toView(undefined);
-	let content = type.getContentOf(view);
-	let frag = range.cloneContents();
-	while (frag.firstChild) {
-		let node = frag.firstChild;
-		content.append(node); //moves firstChild from fragment to content.
-		if (node.nodeType == Node.ELEMENT_NODE) {
-			bindView(node as Display);
-		}
-	}
-	return view;
 }
 
 function setClipboard(type: Editor, range: Range, clipboard: DataTransfer) {

@@ -1,6 +1,6 @@
 import {CHAR, extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
-import {Editor} from "../article.js";
+import {Editor} from "../editor/article.js";
 import {getHeader, getDisplay, narrowRange} from "../editor/edit.js";
 
 import view from "./view.js";
@@ -17,7 +17,7 @@ export default extend(view, {
 	charpress(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let char = event.key;
-		let range = this.owner.frame.selectionRange;
+		let range = event.range;
 		positionToText(range);
 		if (range.collapsed) {
 			let content = getDisplay(event.on).$content;
@@ -29,18 +29,17 @@ export default extend(view, {
 			}
 		}
 		this.edit("Entry", range, char);
-		console.log(this.owner.frame.selectionRange.commonAncestorContainer);
 	},
 	erase(this: Editor, event: UserEvent) {
 		event.subject = ""
-		let range = this.owner.frame.selectionRange;
+		let range = event.range;
 		positionToText(range);
 		if (range.collapsed && !range.startOffset) return;
 		this.edit("Erase", range, "");
 	},
 	delete(this: Editor, event: UserEvent) {
 		event.subject = ""
-		let range = this.owner.frame.selectionRange;
+		let range = event.range;
 		positionToText(range);
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;
 		this.edit("Delete", range, "");

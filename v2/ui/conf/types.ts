@@ -6,11 +6,11 @@ import record from "../controllers/record.js";
 import list from "../controllers/list.js";
 
 import shortcuts from "./shortcuts.js";
-import { Editor } from "../article.js";
+import {DisplayType} from "../display.js";
 
 const conf: bundle<BaseConf> = {
 	text: {
-		class: Editor,
+		class: DisplayType,
 		view: "text",
 		model: "text",
 		panel: true,
@@ -19,7 +19,7 @@ const conf: bundle<BaseConf> = {
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: Editor,
+		class: DisplayType,
 		view: "text",
 		model: "text",
 		panel: true,
@@ -28,7 +28,7 @@ const conf: bundle<BaseConf> = {
 		shortcuts: shortcuts
 	},
 	list: {
-		class: Editor,
+		class: DisplayType,
 		view: "list",
 		model: "list",
 		panel: true,
@@ -37,7 +37,7 @@ const conf: bundle<BaseConf> = {
 		shortcuts: shortcuts
 	},
 	record: {
-		class: Editor,
+		class: DisplayType,
 		view: "record",
 		model: "record",
 		panel: true,
@@ -46,7 +46,7 @@ const conf: bundle<BaseConf> = {
 		shortcuts: shortcuts
 	},
 	tree: {
-		class: Editor,
+		class: DisplayType,
 		view: "list",
 		model: "list",
 		panel: true,

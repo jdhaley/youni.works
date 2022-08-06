@@ -1,10 +1,10 @@
-import {Display, bindView} from "../display.js";
+import {bindView} from "../display.js";
 import {getView} from "../../base/view.js";
 import {CHAR} from "../../base/util.js";
+import {Editable} from "./article.js";
 
-
-export function getDisplay(node: Node | Range): Display {
-	let view = getView(node) as Display;
+export function getDisplay(node: Node | Range): Editable {
+	let view = getView(node) as Editable;
 	view.$controller.getContentOf(view); //ensures view isn't corrupted.
 	return view;
 }
@@ -143,7 +143,7 @@ export function replace(range: Range, markup: string) {
 		range.insertNode(node);
 		range.collapse();
 		if (node.nodeType == Node.ELEMENT_NODE) {
-			bindView(node as Display);
+			bindView(node as any);
 		}
 	}
 }

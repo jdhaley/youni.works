@@ -1,7 +1,6 @@
 import {content} from "../../base/model.js";
 
-import {Display} from "../display.js";
-import {Article, Edit, Editor} from "../article.js";
+import {Article, Editable, Edit, Editor} from "./article.js";
 import {getDisplay, getHeader, mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
@@ -104,14 +103,14 @@ function startEdit(cmd: ListEdit, ctx: Element, range: Range) {
  */
 function recordRange(cmd: ListEdit, ctx: Element, range: Range) {
 	for (let i = range.startOffset; i; i--) {
-		let node = ctx.childNodes[i - 1] as Display;
+		let node = ctx.childNodes[i - 1] as Editable;
 		if (node.$controller) {
 			cmd.startId = node.id;
 			break;
 		}
 	}
 	for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
-		let node = ctx.childNodes[i] as Display;
+		let node = ctx.childNodes[i] as Editable;
 		if (node.$controller) {
 			cmd.endId = node.id;
 			break;
@@ -148,30 +147,28 @@ class ListEdit extends Edit {
 		let range = getExecRange(this);
 		replace(range, markup);
 		range = unmark(range);
-		if (range) this.owner.frame.selectionRange = range;
-		return range;
+		return this.owner._setRange(range);
 	}
 }
 
 function getExecRange(cmd: ListEdit) {
-	let view = cmd.getView();
-	let frame = cmd.owner.frame;
-	let range = frame.createRange();
+	let view = cmd.owner.getView(cmd.viewId);
+	let range = view.ownerDocument.createRange();
 	range.selectNodeContents(view.$content);
 	if (cmd.startId) {
-		let start = frame.getElementById(cmd.startId);
+		let start = cmd.owner.getView(cmd.startId);
 		if (!start) throw new Error(`Start item.id '${cmd.startId}' not found.`);
 		range.setStartAfter(start);
 	}
 	if (cmd.endId) {
-		let end = frame.getElementById(cmd.endId);
+		let end = cmd.owner.getView(cmd.endId);
 		if (!end) throw new Error(`End item.id '${cmd.endId}' not found.`);
 		range.setEndBefore(end);
 	}
 	return range;
 }
 
-export function getChildView(ctx: Element, node: Node): Display {
+export function getChildView(ctx: Element, node: Node): Editable {
 	if (node == ctx) return null;
 	while (node?.parentElement != ctx) {
 		node = node.parentElement;
@@ -179,5 +176,5 @@ export function getChildView(ctx: Element, node: Node): Display {
 	if (!node || !node["$controller"]) {
 		console.warn("Invalid/corrupted view", ctx);
 	}
-	return node as Display;
+	return node as Editable;
 }

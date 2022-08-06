@@ -2,19 +2,74 @@ import {ElementOwner, ElementType, getView} from "../base/view.js";
 import {content} from "../base/model.js";
 import {bundle, CHAR} from "../base/util.js";
 import {Frame} from "./ui.js";
+import { RemoteFileService } from "../base/remote.js";
+import { CommandBuffer } from "../base/command.js";
 
 let NEXT_ID = 1;
 
-export class Display extends HTMLElement {
+type editor = (this: DisplayType, commandName: string, range: Range, content?: content) => Range;
+
+export class DisplayOwner extends ElementOwner {
+	constructor(frame: Frame, conf: bundle<any>) {
+		super(conf);
+		this.frame = frame;
+		this.initTypes(conf.viewTypes, conf.baseTypes);
+		console.info("Types:", this.types, this.conf.unknownType);
+		this.unknownType = this.types[this.conf.unknownType];
+		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
+		this.editors = conf.editors;
+	}
+	readonly service: RemoteFileService;
+	readonly commands: CommandBuffer<Range> = new CommandBuffer();
+	declare editors: bundle<editor>;
+	declare types: bundle<DisplayType>;
+	readonly frame: Frame;
+	view: HTMLElement;
+
+	createElement(tagName: string): HTMLElement {
+		return this.frame.createElement(tagName);
+	}
+	save(): void {
+		let controller = this.view["$controller"];
+		let model = controller?.toModel(this.view);
+		console.log(model);
+		this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
+	}
+	getView(id: string) {
+		let view = this.frame.getElementById(id) as Display;
+		if (!view) throw new Error("Can't find view element.");
+		if (!view.$controller) {
+			console.warn("view.type$ missing... binding...");
+			bindView(view as any);
+			if (!view.$controller) throw new Error("unable to bind missing type$");
+		} else {
+			view.$controller.getContentOf(view); //checks the view isn't corrupted.
+		}
+		return view;
+	}
+	//TODO remove this method (should be done by the controller action)
+	_setRange(range: Range): Range {
+		if (range) {
+			this.frame.selectionRange = range;
+		}
+		return range;
+	}
+
+}
+
+class Display extends HTMLElement {
 	$controller?: DisplayType;
 	$content: HTMLElement;
 }
 
-export abstract class DisplayType extends ElementType {
+export class DisplayType extends ElementType {
 	declare owner: DisplayOwner;
 	
 	get isPanel(): boolean {
 		return this.conf.panel;
+	}
+	get shortcuts(): bundle<string> {
+		return this.conf.shortcuts;
 	}
 
 	toView(model: content): Display {
@@ -64,22 +119,9 @@ export abstract class DisplayType extends ElementType {
 		if (!view.$content) view.$content = content;
 		return content;
 	}
-}
-
-export class DisplayOwner extends ElementOwner {
-	constructor(frame: Frame, conf: bundle<any>) {
-		super(conf);
-		this.frame = frame;
-		this.initTypes(conf.viewTypes, conf.baseTypes);
-		console.info("Types:", this.types, this.conf.unknownType);
-		this.unknownType = this.types[this.conf.unknownType]
-	}
-	declare types: bundle<DisplayType>;
-	readonly frame: Frame;
-	view: Display;
-
-	createElement(tagName: string): HTMLElement {
-		return this.frame.createElement(tagName);
+	edit(commandName: string, range: Range, content?: content): Range {
+		let editor = this.owner.editors[this.model];
+		if (editor) return editor.call(this, commandName, range, content);
 	}
 }
 
