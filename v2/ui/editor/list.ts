@@ -154,14 +154,8 @@ class ListEdit extends Edit {
 }
 
 function getExecRange(cmd: ListEdit) {
+	let view = cmd.getView();
 	let frame = cmd.owner.frame;
-	let view = frame.getElementById(cmd.viewId) as Display;
-	if (!view) throw new Error("Can't find view element.");
-	if (!view.$controller) {
-		console.warn("view.type$ missing... binding...");
-		bindView(view);
-		if (!view.$controller) throw new Error("unable to bind missing type$");
-	}
 	let range = frame.createRange();
 	range.selectNodeContents(view.$content);
 	if (cmd.startId) {

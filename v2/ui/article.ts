@@ -3,7 +3,7 @@ import { Command, CommandBuffer } from "../base/command.js";
 import { RemoteFileService } from "../base/remote.js";
 import { bundle } from "../base/util.js";
 
-import { DisplayOwner, DisplayType } from "./display.js";
+import { bindView, Display, DisplayOwner, DisplayType } from "./display.js";
 import { Frame } from "./ui.js";
 
 type editor = (this: DisplayType, commandName: string, range: Range, content?: content) => Range;
@@ -58,4 +58,18 @@ export abstract class Edit extends Command<Range> {
 	}
 
 	protected abstract exec(markup: string): Range;
+
+	getView() {
+		let frame = this.owner.frame;
+		let view = frame.getElementById(this.viewId) as Display;
+		if (!view) throw new Error("Can't find view element.");
+		if (!view.$controller) {
+			console.warn("view.type$ missing... binding...");
+			bindView(view);
+			if (!view.$controller) throw new Error("unable to bind missing type$");
+		} else {
+			view.$controller.getContentOf(view); //checks the view isn't corrupted.
+		}
+		return view;
+	}
 }

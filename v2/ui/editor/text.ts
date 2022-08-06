@@ -56,14 +56,7 @@ class TextEdit extends Edit {
 		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
-		let view = this.owner.frame.getElementById(this.viewId) as Display;
-		if (!view) throw new Error("Can't find context element.");
-		if (!view.$controller) {
-			console.warn("context.type$ missing... binding...");
-			bindView(view);
-			if (!view.$controller) throw new Error("unable to bind missing type$");
-		}
-
+		let view = this.getView();
 		let range = this.owner.frame.createRange();
 		range.selectNodeContents(view.$content);
 		return range;
@@ -76,7 +69,7 @@ class TextEdit extends Edit {
 		if (text) {
 			let ins = this.owner.createElement("I");
 			ins.textContent = text;
-			range.insertNode(ins.firstChild);	
+			range.insertNode(ins.firstChild);
 		}
 		this.after = view.$content.innerHTML;
 		return unmark(range);

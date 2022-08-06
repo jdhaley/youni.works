@@ -54,13 +54,15 @@ export abstract class DisplayType extends ElementType {
 		return footer;
 	}
 	getContentOf(view: Display): HTMLElement {
+		let content: HTMLElement = view;
 		if (this.isPanel) {
-			if (!view.$content || view.$content != view.children[1])  {
-				rebuildView(view);
+			content = view.children[1] as HTMLElement;
+			if (!(content && content.classList.contains("view"))) {
+				content = rebuildView(view);
 			}
-			return view.$content;
 		}
-		return view;
+		if (!view.$content) view.$content = content;
+		return content;
 	}
 }
 
@@ -105,6 +107,7 @@ export function bindView(view: Display): void {
 }
 
 function rebuildView(view: Display) {
+	console.warn("REPORT: Rebuilding view.");
 	let content: Element;
 	for (let ele of view.children) {
 		if (ele.classList.contains("view")) {
@@ -120,6 +123,7 @@ function rebuildView(view: Display) {
 	if (type.model == "list") {
 		view.append(type.createFooter(view));
 	}
+	return view.$content;
 }
 
 export function getView(node: Node | Range): Display {
