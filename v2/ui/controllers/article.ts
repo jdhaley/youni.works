@@ -19,14 +19,13 @@ export default extend(null, {
 		if (signal instanceof Response) {
 			console.log("Saved: ", signal);
 			return;
+		} else {
+			let controller = this.view["$controller"];
+			let model = controller?.toModel(this.view);
+			console.log("Save: ", model);
+			this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
 		}
-		this.save();
-	},
-	// selectAll(this: Article, event: UserEvent) {
-	// 	event.subject = "";
-	// 	let range = this.frame.selectionRange;
-	// 	range.selectNodeContents(this.view)
-	// }
+	}
 });
 
 function getType(article: DisplayOwner, path: string, data: any) {

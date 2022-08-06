@@ -1,4 +1,5 @@
 import { Command, CommandBuffer } from "../../base/command.js";
+import { Receiver } from "../../base/controller.js";
 import { content } from "../../base/model.js";
 import { bundle } from "../../base/util.js";
 
@@ -18,13 +19,12 @@ export interface Editor  {
 	edit(commandName: string, range: Range, content?: content): Range;
 }
 
-export interface Article {
+export interface Article extends Receiver {
 	readonly commands: CommandBuffer<Range>;
-	readonly view: Editable;
+	//readonly view: Editable;
 
 	getView(viewId: string): Editable;
 	_setRange(range: Range): Range;
-	save(): void;
 }
 
 export abstract class Edit extends Command<Range> {

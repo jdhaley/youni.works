@@ -29,12 +29,6 @@ export class DisplayOwner extends ElementOwner {
 	createElement(tagName: string): HTMLElement {
 		return this.frame.createElement(tagName);
 	}
-	save(): void {
-		let controller = this.view["$controller"];
-		let model = controller?.toModel(this.view);
-		console.log(model);
-		this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
-	}
 	getView(id: string) {
 		let view = this.frame.getElementById(id) as Display;
 		if (!view) throw new Error("Can't find view element.");

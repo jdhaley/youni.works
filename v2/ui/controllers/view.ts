@@ -35,8 +35,8 @@ export default extend(null, {
 		if (command) event.subject = command;
 	},
 	save(this: Editor, event: UserEvent) {
+		this.owner.receive(event);
 		event.subject = "";
-		this.owner.save();
 	},
 	copy(this: Editor, event: UserEvent) {
 		event.subject = "";
