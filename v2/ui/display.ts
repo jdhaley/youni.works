@@ -1,4 +1,4 @@
-import {ElementOwner, ElementType} from "../base/view.js";
+import {ElementOwner, ElementType, getView} from "../base/view.js";
 import {content} from "../base/model.js";
 import {bundle, CHAR} from "../base/util.js";
 import {Frame} from "./ui.js";
@@ -87,7 +87,7 @@ export function bindView(view: Display): void {
 	let type = view.$controller;
 	if (!type) {
 		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
-		let parent = getView(view.parentElement);
+		let parent = getView(view.parentElement) as Display;
 		if (name && parent) {
 			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
 			view["$controller"] = type;	
@@ -100,7 +100,7 @@ export function bindView(view: Display): void {
 	Panels created from a range operation may be missing one or more of the
 	header, content, footer.
 	*/
-	let content = view.$controller.getContentOf(view); //ensures view isn't corrupted.
+	let content = type.getContentOf(view); //ensures view isn't corrupted.
 	for (let child of content.children) {
 		bindView(child as Display);
 	}
@@ -124,29 +124,4 @@ function rebuildView(view: Display) {
 		view.append(type.createFooter(view));
 	}
 	return view.$content;
-}
-
-export function getView(node: Node | Range): Display {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node["$controller"]) {
-			let view = node as Display;
-			view.$controller.getContentOf(view); //ensures view isn't corrupted.
-			return view;
-		} 
-		node = node.parentElement;
-	}
-}
-
-export function getHeader(view: Element, node: Node) {
-	while (node && node != view) {
-		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
-		node = node.parentElement;
-	}
-}
-export function getFooter(view: Element, node: Node) {
-	while (node && node != view) {
-		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
-		node = node.parentElement;
-	}
 }

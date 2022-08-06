@@ -116,3 +116,11 @@ export class ElementType extends ViewType<Element> {
 		return view;
 	}
 }
+
+export function getView(node: Node | Range): Element {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node["$controller"]) return node as Element;
+		node = node.parentElement;
+	}
+}

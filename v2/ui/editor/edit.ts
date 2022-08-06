@@ -1,5 +1,73 @@
-import {Display, getView, getHeader, getFooter, bindView} from "../display.js";
+import {Display, bindView} from "../display.js";
+import {getView} from "../../base/view.js";
 import {CHAR} from "../../base/util.js";
+
+
+export function getDisplay(node: Node | Range): Display {
+	let view = getView(node) as Display;
+	view.$controller.getContentOf(view); //ensures view isn't corrupted.
+	return view;
+}
+
+export function getHeader(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
+}
+export function getFooter(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
+}
+
+export function getEditRange(range: Range): Range {
+	range = range.cloneRange();
+	let view = getDisplay(range.commonAncestorContainer);
+	let content = view?.$controller.getContentOf(view);
+	if (!content) return;
+
+	//TODO check elements after each range change?
+	if (view != content) {
+		let start = getChildView(range.startContainer, view);
+		let end = getChildView(range.endContainer, view);
+
+		if (isBefore(start, content)) range.setStart(content, 0);
+		if (isAfter(start, content)) {
+			range.setStart(content, content.childNodes.length);
+			range.collapse(true);
+		}
+		if (isAfter(end, content)) range.setEnd(content, content.childNodes.length);
+	}
+	return range;
+}
+
+function getChildView(node: Node, ctx: Element): Element {
+	if (node == ctx) return null;
+	while (node?.parentElement != ctx) {
+		node = node.parentElement;
+	}
+	if (!node || !node["$controller"]) {
+		console.warn("Invalid/corrupted view", ctx);
+	}
+	return node as Element;
+}
+
+function isAfter(node: Node, rel: Node): boolean {
+	if (node.parentNode != rel.parentNode) while (node) {
+	   if (node.nextSibling == rel) return true;
+	   node = node.nextSibling;
+   }
+   return false;
+}
+function isBefore(node: Node, rel: Node): boolean {
+	if (node.parentNode != rel.parentNode) while (node) {
+	   if (node.previousSibling == rel) return true;
+	   node = node.previousSibling;
+   }
+   return false;
+}
 
 export function mark(range: Range) {
 	let marker = insertMarker(range, "end");
@@ -52,7 +120,7 @@ export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		if (node.nodeType == Node.TEXT_NODE) {
-			let view = getView(node);
+			let view = getDisplay(node);
 			if (view && node.parentElement == view.$controller.getContentOf(view)) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
@@ -81,7 +149,7 @@ export function replace(range: Range, markup: string) {
 }
 
 export function narrowRange(range: Range) {
-	let view = getView(range);
+	let view = getDisplay(range);
 	if (!view) return;
 
 	let start = range.startContainer;

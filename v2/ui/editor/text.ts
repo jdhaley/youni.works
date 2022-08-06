@@ -1,8 +1,7 @@
-import {getView, Display, bindView} from "../display.js";
 import {CHAR} from "../../base/util.js";
 
 import {Article, Edit} from "../article.js";
-import {mark, replace, unmark} from "./edit.js";
+import {getDisplay, mark, replace, unmark} from "./edit.js";
 
 let lastEdit = {
 	action: "",
@@ -13,7 +12,7 @@ let lastEdit = {
 
 export default function edit(commandName: string, range: Range, text: string): Range {
 	let node = range.commonAncestorContainer;
-	let view = getView(node);
+	let view = getDisplay(node);
 
 	if (view?.$controller.model != "text") {
 		console.error("Invalid range for edit.");
@@ -63,7 +62,7 @@ class TextEdit extends Edit {
 	}
 	do(range: Range, text: string) {
 		mark(range);
-		let view = getView(range);
+		let view = getDisplay(range);
 		this.before = view.$content.innerHTML;	
 		range.deleteContents();
 		if (text) {
@@ -113,7 +112,7 @@ function editAgain(range: Range, cmd: Edit, char: string) {
 	range.setEnd(node, ++lastEdit.end);
 
 	mark(range);
-	cmd.after = getView(range).$content.innerHTML;
+	cmd.after = getDisplay(range).$content.innerHTML;
 	unmark(range);
 	range.collapse();
 	return range;
@@ -126,7 +125,7 @@ function deleteAgain(range: Range, cmd: Edit, char: string) {
 	range.setStart(node, lastEdit.start);
 	range.collapse(true);
 	mark(range);
-	cmd.after = getView(range).$content.innerHTML;
+	cmd.after = getDisplay(range).$content.innerHTML;
 	unmark(range);
 	range.collapse();
 	return range;
@@ -141,7 +140,7 @@ function eraseAgain(range: Range, cmd: Edit) {
 	range.setStart(node, --lastEdit.start);
 	range.collapse(true);
 	mark(range);
-	cmd.after = getView(range).$content.innerHTML;
+	cmd.after = getDisplay(range).$content.innerHTML;
 	unmark(range);
 	range.collapse(true);
 	return range;

@@ -1,8 +1,7 @@
-import {getHeader, getView} from "../display.js";
 import {CHAR, extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 import {Editor} from "../article.js";
-import {narrowRange} from "../editor/edit.js";
+import {getHeader, getDisplay, narrowRange} from "../editor/edit.js";
 
 import view from "./view.js";
 
@@ -21,7 +20,7 @@ export default extend(view, {
 		let range = this.owner.frame.selectionRange;
 		positionToText(range);
 		if (range.collapsed) {
-			let content = getView(event.on).$content;
+			let content = getDisplay(event.on).$content;
 			if (content) {
 				if (content.textContent == CHAR.ZWSP) content.textContent = "";
 				if (char == " " && range.endOffset == content.textContent.length) {
@@ -49,7 +48,7 @@ export default extend(view, {
 });
 function positionToText(range: Range) {
 	if (range.collapsed) {
-		let view = getView(range);
+		let view = getDisplay(range);
 		let inHeader = getHeader(view, range.startContainer);
 		narrowRange(range);	
 		if (view.$content.childNodes.length != 1) {

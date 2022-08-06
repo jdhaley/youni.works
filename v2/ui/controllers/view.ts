@@ -3,9 +3,9 @@ import {viewType} from "../../base/view.js";
 import {CHAR, extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {narrowRange} from "../editor/edit.js";
-import {getView, getHeader, Display, bindView} from "../display.js";
-import { Editor } from "../article.js";
+import {Display, bindView} from "../display.js";
+import {Editor} from "../article.js";
+import {getDisplay, getHeader, narrowRange} from "../editor/edit.js";
 
 let UNDONE = false;
 
@@ -59,7 +59,7 @@ export default extend(null, {
 		let model = getClipboard(event.clipboardData);
 		if (range.collapsed && model instanceof Array) {
 			range = getInsertableList(range);
-			if (range) ((getView(range)).$controller as Editor).edit("Paste", range, model);
+			if (range) ((getDisplay(range)).$controller as Editor).edit("Paste", range, model);
 		} else {
 			this.edit("Paste", range, model);
 		}
@@ -121,7 +121,7 @@ export default extend(null, {
  */
 function getInsertableList(range: Range) {
 	range = range.cloneRange();
-	let view = getView(range);
+	let view = getDisplay(range);
 	while (view) {
 		if (view?.$controller.model == "list") {
 			return range;
@@ -130,7 +130,7 @@ function getInsertableList(range: Range) {
 
 		range.setStartBefore(view);
 		range.collapse(true);
-		view = getView(range);
+		view = getDisplay(range);
 	}
 }
 
@@ -146,7 +146,7 @@ export function atStart(view: Element, node: Node, offset: number) {
 
 export function toView(range: Range): Display {
 	narrowRange(range);
-	let source = getView(range);
+	let source = getDisplay(range);
 	let type = source?.$controller;
 	if (!type) return;
 	let view = type.toView(undefined);
@@ -170,7 +170,7 @@ function setClipboard(type: Editor, range: Range, clipboard: DataTransfer) {
 		clipboard.setData("text/plain", data);
 		return;
 	}
-	let model = type.toModel(getView(range), range);
+	let model = type.toModel(getDisplay(range), range);
 	if (type.model == "record") model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
 	console.log("clipboard:", model);
