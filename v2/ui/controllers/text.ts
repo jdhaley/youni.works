@@ -10,7 +10,7 @@ export default extend(view, {
 		event.subject = "";
 		let text = event.clipboardData.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
-		let range = event.frame.selectionRange;
+		let range = event.range;
 		positionToText(range);
 		this.edit("Paste", range, text);	
 	},
@@ -45,6 +45,7 @@ export default extend(view, {
 		this.edit("Delete", range, "");
 	}
 });
+
 function positionToText(range: Range) {
 	if (range.collapsed) {
 		let view = getDisplay(range);

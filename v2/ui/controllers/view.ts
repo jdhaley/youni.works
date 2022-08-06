@@ -9,26 +9,15 @@ import {getDisplay, getHeader, narrowRange} from "../editor/edit.js";
 let UNDONE = false;
 
 export default extend(null, {
-	// click(event: UserEvent) {
-
-	// 	if (getHeader(event.on, event.target as Node)) {
-	// 		event.subject = "";
-	// 		let range = event.frame.selectionRange;
-	// 		range.setStart(getView(event.on).v_content, 0);
-	// 		range.collapse(true);
-	// 	}
-	// },
 	dblclick(event: UserEvent) {
 		event.subject = "";
-		let range = event.frame.selectionRange;
 		if (getHeader(event.on, event.target as Node)) {
+			let range = event.on.ownerDocument.createRange();
 			range.setStartBefore(event.on);
-			range.setEndAfter(event.on);		
+			range.setEndAfter(event.on);
+			event.frame.selectionRange = range;
 		}
 	},
-	// release(event: UserEvent) {
-	// 	narrowRange(event.frame.selectionRange);
-	// },
 	command(this: Editor, event: UserEvent) {
 		let shortcuts = this.shortcuts;
 		let command = shortcuts && shortcuts[event.shortcut];
@@ -40,12 +29,12 @@ export default extend(null, {
 	},
 	copy(this: Editor, event: UserEvent) {
 		event.subject = "";
-		let range = event.frame.selectionRange;
+		let range = event.range;
 		setClipboard(this, range.cloneRange(), event.clipboardData);
 	},
 	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
-		let range = event.frame.selectionRange;
+		let range = event.range;
 		if (range.collapsed) {
 			return;
 		}
@@ -54,7 +43,7 @@ export default extend(null, {
 	},
 	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
-		let range = event.frame.selectionRange;
+		let range = event.range;
 		let model = getClipboard(event.clipboardData);
 		if (range.collapsed && model instanceof Array) {
 			range = getInsertableList(range);
@@ -65,12 +54,12 @@ export default extend(null, {
 	},
 	delete(event: UserEvent) {
 		event.subject = "";
-		let range = event.frame.selectionRange;
+		let range = event.range;
 		if (!range.collapsed) this.edit("Delete", range);
 	},
 	erase(event: UserEvent) {
 		event.subject = "";
-		let range = event.frame.selectionRange;
+		let range = event.range;
 		if (!range.collapsed) this.edit("Delete", range);
 	},
 	enter(event: UserEvent) {

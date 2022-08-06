@@ -70,7 +70,7 @@ export interface UserEvent extends Signal, UIEvent {
 	//all user events
 	direction: "up";
 
-	//selection change events.
+	//selection events (selection, keyboard, clipboard)
 	range: Range;
 
 	//clipboard events
