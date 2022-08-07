@@ -1,14 +1,14 @@
 import {content} from "../../base/model.js";
 
-import {Article, Editable, Edit, Editor} from "./article.js";
-import {getDisplay, getHeader, mark, clearContent, unmark, replace, narrowRange} from "./edit.js";
+import {Article, Editable, Edit, Editor, getContent} from "./edit.js";
+import {getDisplay, getHeader, mark, clearContent, unmark, replace, narrowRange} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getDisplay(range);
 	if (view.$controller.model != "list") console.warn("View is not a list:", view);
 
 	let cmd = new ListEdit(this.owner, commandName, view.id);
-	let ctx = view.$content;
+	let ctx = getContent(view);
 	let markup = toMarkup(this, content);
 
 	adjustRange(ctx, range);
@@ -38,7 +38,8 @@ function handleStartContainer(ctx: Element, range: Range) {
 	let start = getChildView(ctx, range.startContainer);
 	if (start) {
 		let r = range.cloneRange();
-		r.setEnd(start.$content, start.$content.childNodes.length);
+		let content = getContent(start);
+		r.setEnd(content, content.childNodes.length);
 		clearContent(r);
 		range.setStartAfter(start);
 		return start.outerHTML;
@@ -50,7 +51,8 @@ function handleEndContainer(ctx: Element, range: Range) {
 	let end = getChildView(ctx, range.endContainer);
 	if (end) {
 		let r = range.cloneRange();
-		r.setStart(end.$content, 0);
+		let content = getContent(end);
+		r.setStart(content, 0);
 		clearContent(r);
 		range.setEndBefore(end);
 		return end.outerHTML;
@@ -154,7 +156,7 @@ class ListEdit extends Edit {
 function getExecRange(cmd: ListEdit) {
 	let view = cmd.owner.getView(cmd.viewId);
 	let range = view.ownerDocument.createRange();
-	range.selectNodeContents(view.$content);
+	range.selectNodeContents(getContent(view));
 	if (cmd.startId) {
 		let start = cmd.owner.getView(cmd.startId);
 		if (!start) throw new Error(`Start item.id '${cmd.startId}' not found.`);

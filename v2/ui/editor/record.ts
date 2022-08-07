@@ -1,7 +1,7 @@
 import {Record} from "../../base/model.js";
 
-import {getDisplay, mark, unmark, clearContent, replace, narrowRange} from "./edit.js";
-import { Article, Edit, Editor } from "./article.js";
+import {getDisplay, mark, unmark, clearContent, replace, narrowRange} from "./util.js";
+import { Article, Edit, Editor, getContent } from "./edit.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
 	let view = getDisplay(range);
@@ -22,10 +22,10 @@ class RecordEdit extends Edit {
 		narrowRange(range);
 		let view = getDisplay(range);
 		mark(range);
-		this.before = getDisplay(range).$content.innerHTML;
-
+		let content = getContent(range);
+		this.before = content?.innerHTML || "";
 		clearContent(range);
-		this.after = view.$content.innerHTML;
+		this.after = content?.innerHTML || "";
 
 		unmark(range);
 		range.collapse();

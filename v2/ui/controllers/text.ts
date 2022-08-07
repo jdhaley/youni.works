@@ -1,11 +1,11 @@
 import {CHAR, extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
-import {Editor} from "../editor/article.js";
-import {getHeader, getDisplay, narrowRange} from "../editor/edit.js";
+import {Editor, getContent} from "../editor/edit.js";
+import {getHeader, narrowRange} from "../editor/util.js";
 
-import view from "./view.js";
+import editable from "./editable.js";
 
-export default extend(view, {
+export default extend(editable, {
 	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let text = event.clipboardData.getData("text/plain");
@@ -21,7 +21,7 @@ export default extend(view, {
 		let range = event.range;
 		positionToText(range);
 		if (range.collapsed) {
-			let content = getDisplay(event.on).$content;
+			let content = getContent(event.on);
 			if (content) {
 				if (content.textContent == CHAR.ZWSP) content.textContent = "";
 				if (char == " " && range.endOffset == content.textContent.length) {
@@ -52,15 +52,15 @@ export default extend(view, {
 
 function positionToText(range: Range) {
 	if (range.collapsed) {
-		let view = getDisplay(range);
-		let inHeader = getHeader(view, range.startContainer);
+		let content = getContent(range);
+		let inHeader = getHeader(editable, range.startContainer);
 		narrowRange(range);	
-		if (view.$content.childNodes.length != 1) {
+		if (content.childNodes.length != 1) {
 			//force single text node...
-			view.$content.textContent = view.$content.textContent;
+			content.textContent = content.textContent;
 		}
 		if (range.commonAncestorContainer.nodeType != Node.TEXT_NODE) {
-			range.selectNodeContents(view.$content.lastChild);
+			range.selectNodeContents(content.lastChild);
 			range.collapse(inHeader ? true : false);	
 		}
 	}

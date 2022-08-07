@@ -1,5 +1,5 @@
 import {extend} from "../../base/util.js";
-import view from "./view.js";
+import editable from "./editable.js";
 
-export default extend(view, {
+export default extend(editable, {
 });

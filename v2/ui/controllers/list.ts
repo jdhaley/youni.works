@@ -1,10 +1,10 @@
 import {extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
-import {Editor} from "../editor/article.js";
-import {getHeader} from "../editor/edit.js";
-import view from "./view.js";
+import {Editor} from "../editor/edit.js";
+import {getHeader} from "../editor/util.js";
+import editable from "./editable.js";
 
-export default extend(view, {
+export default extend(editable, {
 	dblclick(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let view = event.on;

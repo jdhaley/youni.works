@@ -1,7 +1,7 @@
 import {CHAR} from "../../base/util.js";
 
-import {Article, Edit} from "./article.js";
-import {getDisplay, mark, replace, unmark} from "./edit.js";
+import {Article, Edit, getContent} from "./edit.js";
+import {getDisplay, mark, replace, unmark} from "./util.js";
 
 let lastEdit = {
 	action: "",
@@ -57,20 +57,22 @@ class TextEdit extends Edit {
 	protected getRange(): Range {
 		let view = this.owner.getView(this.viewId);
 		let range = view.ownerDocument.createRange();
-		range.selectNodeContents(view.$content);
+		range.selectNodeContents(getContent(view));
 		return range;
 	}
 	do(range: Range, text: string) {
 		mark(range);
-		let view = getDisplay(range);
-		this.before = view.$content.innerHTML;	
+		let content = getContent(range);
+		if (!content) return;
+		//let view = getDisplay(range);
+		this.before = content.innerHTML;	
 		range.deleteContents();
 		if (text) {
-			let ins = view.ownerDocument.createElement("I");
+			let ins = content.ownerDocument.createElement("I");
 			ins.textContent = text;
 			range.insertNode(ins.firstChild);
 		}
-		this.after = view.$content.innerHTML;
+		this.after = content.innerHTML;
 		return unmark(range);
 	}
 	exec(markup: string) {
@@ -111,7 +113,7 @@ function editAgain(range: Range, cmd: Edit, char: string) {
 	range.setEnd(node, ++lastEdit.end);
 
 	mark(range);
-	cmd.after = getDisplay(range).$content.innerHTML;
+	cmd.after = getContent(range).innerHTML || "";
 	unmark(range);
 	range.collapse();
 	return range;
@@ -124,7 +126,7 @@ function deleteAgain(range: Range, cmd: Edit, char: string) {
 	range.setStart(node, lastEdit.start);
 	range.collapse(true);
 	mark(range);
-	cmd.after = getDisplay(range).$content.innerHTML;
+	cmd.after = getContent(range)?.innerHTML || "";
 	unmark(range);
 	range.collapse();
 	return range;
@@ -139,7 +141,7 @@ function eraseAgain(range: Range, cmd: Edit) {
 	range.setStart(node, --lastEdit.start);
 	range.collapse(true);
 	mark(range);
-	cmd.after = getDisplay(range).$content.innerHTML;
+	cmd.after = getContent(range)?.innerHTML || "";
 	unmark(range);
 	range.collapse(true);
 	return range;
