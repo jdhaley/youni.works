@@ -35,7 +35,7 @@ class RecordEdit extends Edit {
 		let range = getRange(this);
 		replace(range, markup);
 		range = unmark(range);
-		return this.owner._setRange(range);
+		return range;
 	}
 }
 

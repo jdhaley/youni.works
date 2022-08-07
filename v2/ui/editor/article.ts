@@ -21,10 +21,8 @@ export interface Editor  {
 
 export interface Article extends Receiver {
 	readonly commands: CommandBuffer<Range>;
-	//readonly view: Editable;
-
 	getView(viewId: string): Editable;
-	_setRange(range: Range): Range;
+	setRange(range: Range, collapse?: boolean): void;
 }
 
 export abstract class Edit extends Command<Range> {

@@ -12,7 +12,8 @@ export default extend(view, {
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
 		positionToText(range);
-		this.edit("Paste", range, text);	
+		range = this.edit("Paste", range, text);
+		range && this.owner.setRange(range, true);
 	},
 	charpress(this: Editor, event: UserEvent) {
 		event.subject = "";
@@ -28,21 +29,24 @@ export default extend(view, {
 				}	
 			}
 		}
-		this.edit("Entry", range, char);
+		range = this.edit("Entry", range, char);
+		range && this.owner.setRange(range, true);
 	},
 	erase(this: Editor, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		positionToText(range);
 		if (range.collapsed && !range.startOffset) return;
-		this.edit("Erase", range, "");
+		range = this.edit("Erase", range, "");
+		range && this.owner.setRange(range, true);
 	},
 	delete(this: Editor, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		positionToText(range);
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;
-		this.edit("Delete", range, "");
+		range = this.edit("Delete", range, "");
+		range && this.owner.setRange(range, true);
 	}
 });
 

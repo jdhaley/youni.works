@@ -77,7 +77,7 @@ class TextEdit extends Edit {
 		let range = this.getRange();
 		replace(range, markup);
 		range = unmark(range);
-		return this.owner._setRange(range);
+		return range;
 	}
 }
 

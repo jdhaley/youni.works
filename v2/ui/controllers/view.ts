@@ -39,28 +39,36 @@ export default extend(null, {
 			return;
 		}
 		setClipboard(this, range.cloneRange(), event.clipboardData);
-		this.edit("Cut", range);
+		range = this.edit("Cut", range);
+		range && this.owner.setRange(range, true);
 	},
 	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
+		let target = this;
 		if (range.collapsed && model instanceof Array) {
-			range = getInsertableList(range);
-			if (range) ((getDisplay(range)).$controller as Editor).edit("Paste", range, model);
-		} else {
-			this.edit("Paste", range, model);
-		}
+			range = getInsertableRange(range);
+			if (range) target = getDisplay(range).$controller;
+		} 
+		range = target.edit("Paste", range, model);
+		range &&  this.owner.setRange(range, true);
 	},
 	delete(event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		if (!range.collapsed) this.edit("Delete", range);
+		if (!range.collapsed) {
+			range = this.edit("Delete", range);
+			range && this.owner.setRange(range, true);	
+		}
 	},
 	erase(event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		if (!range.collapsed) this.edit("Delete", range);
+		if (!range.collapsed) {
+			range = this.edit("Delete", range);
+			range && this.owner.setRange(range, true);
+		}
 	},
 	enter(event: UserEvent) {
 		event.subject = "";
@@ -89,18 +97,18 @@ export default extend(null, {
 	},
 	undo(this: Editor, event: UserEvent) {
 		event.subject = "";
-		this.owner.commands.undo();
+		this.owner.setRange(this.owner.commands.undo(), false);
 	},
 	redo(this: Editor, event: UserEvent) {
 		event.subject = "";
-		this.owner.commands.redo();
+		this.owner.setRange(this.owner.commands.redo(), false);
 	},
 });
 
 /**
  * 
  */
-function getInsertableList(range: Range) {
+function getInsertableRange(range: Range) {
 	range = range.cloneRange();
 	let view = getDisplay(range);
 	while (view) {

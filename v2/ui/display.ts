@@ -42,11 +42,11 @@ export class DisplayOwner extends ElementOwner {
 		return view;
 	}
 	//TODO remove this method (should be done by the controller action)
-	_setRange(range: Range): Range {
+	setRange(range: Range, collapse?: boolean): void {
 		if (range) {
+			if (collapse) range.collapse();
 			this.frame.selectionRange = range;
 		}
-		return range;
 	}
 
 }

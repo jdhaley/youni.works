@@ -147,7 +147,7 @@ class ListEdit extends Edit {
 		let range = getExecRange(this);
 		replace(range, markup);
 		range = unmark(range);
-		return this.owner._setRange(range);
+		return range;
 	}
 }
 

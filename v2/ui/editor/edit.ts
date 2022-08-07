@@ -9,19 +9,6 @@ export function getDisplay(node: Node | Range): Editable {
 	return view;
 }
 
-export function getHeader(view: Element, node: Node) {
-	while (node && node != view) {
-		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
-		node = node.parentElement;
-	}
-}
-export function getFooter(view: Element, node: Node) {
-	while (node && node != view) {
-		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
-		node = node.parentElement;
-	}
-}
-
 export function getEditRange(range: Range): Range {
 	range = range.cloneRange();
 	let view = getDisplay(range.commonAncestorContainer);
@@ -67,6 +54,20 @@ function isBefore(node: Node, rel: Node): boolean {
 	   node = node.previousSibling;
    }
    return false;
+}
+
+export function getHeader(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
+}
+
+export function getFooter(view: Element, node: Node) {
+	while (node && node != view) {
+		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
+		node = node.parentElement;
+	}
 }
 
 export function mark(range: Range) {
