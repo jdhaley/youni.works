@@ -1,6 +1,6 @@
 import {content, Type, typeOf} from "./model.js";
 import {Control, Controller} from "./controller.js";
-import {BaseConf, TypeOwner} from "./type.js";
+import {TypeOwner} from "./type.js";
 import {bundle, EMPTY, extend} from "./util.js";
 
 type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;

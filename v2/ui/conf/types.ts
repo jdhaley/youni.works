@@ -1,4 +1,3 @@
-import {BaseConf} from "../../base/type.js";
 import {bundle} from "../../base/util.js";
 
 import text from "../controllers/text.js";
@@ -6,9 +5,10 @@ import record from "../controllers/record.js";
 import list from "../controllers/list.js";
 
 import shortcuts from "./shortcuts.js";
-import {DisplayType} from "../display.js";
 
-const conf: bundle<BaseConf> = {
+import {DisplayConf, DisplayType} from "../display.js";
+
+const conf: bundle<DisplayConf> = {
 	text: {
 		class: DisplayType,
 		view: "text",

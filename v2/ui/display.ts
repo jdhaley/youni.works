@@ -4,6 +4,18 @@ import {bundle, CHAR, EMPTY} from "../base/util.js";
 import {Frame} from "./ui.js";
 import { RemoteFileService } from "../base/remote.js";
 import { CommandBuffer } from "../base/command.js";
+import { Actions } from "../base/controller.js";
+
+
+export interface DisplayConf {
+	class: typeof DisplayType;
+	view: "text" | "record" | "list";
+	model: "text" | "record" | "list";
+	panel: boolean;
+	tagName: string;
+	actions: Actions;
+	shortcuts: bundle<string>;
+}
 
 let NEXT_ID = 1;
 
