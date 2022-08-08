@@ -1,7 +1,7 @@
 import { Command, CommandBuffer } from "../../base/command.js";
 import { content } from "../../base/model.js";
-import { getView } from "../../base/view.js";
 import { Receiver } from "../../base/controller.js";
+import { getView } from "../../base/dom.js";
 
 export function getContent(node: Node | Range): Editable {
 	let view = getView(node) as Editable;

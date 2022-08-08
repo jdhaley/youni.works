@@ -3,11 +3,6 @@ export interface Type {
 	generalizes(type: Type): boolean;
 }
 
-export interface ContentType<V> extends Type {
-	toView(model: content): V;
-	toModel(view: V): content;
-}
-
 export type content = string | number | boolean | Date | List | Record;
 
 export interface List extends Iterable<content> {

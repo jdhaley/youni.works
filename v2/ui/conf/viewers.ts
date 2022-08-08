@@ -1,5 +1,6 @@
-import {ElementType, viewType} from "../../base/view.js";
 import {List, Record} from "../../base/model.js";
+import {viewType} from "../../base/view.js";
+import {ElementType} from "../../base/dom.js";
 import {CHAR} from "../../base/util.js";
 
 export default {

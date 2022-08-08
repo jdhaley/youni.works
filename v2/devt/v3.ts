@@ -1,4 +1,5 @@
-import {content, ContentType} from "../base/model.js";
+import { Controller } from "../base/controller.js";
+import {content} from "../base/model.js";
 import {bundle, EMPTY, extend} from "../base/util.js";
 import {ViewOwner, ViewType} from "../base/view.js";
 
@@ -88,9 +89,9 @@ class DomPart extends Element implements Part {
 }
 
 /* CONTENT */
-
+type ContentType = Controller<content, Content>;
 interface Content extends Part {
-	type: ContentType<Content>;
+	type: ContentType;
 	content: content;
 	textContent: string;
 	markupContent: string;
@@ -119,9 +120,9 @@ export class View extends Control implements Content {
 		return this.#view;
 	}
 	get conf(): bundle<any> {
-		return this.#view.$conf || this.type.conf;
+		return this.#view.$conf // || this.type.conf;
 	}
-	get type(): ViewType<Content> {
+	get type(): ContentType {
 		return this.conf?.type;
 	}
 	get owner(): ViewOwner<View> {
@@ -179,7 +180,7 @@ export class View extends Control implements Content {
 	}
 	display(model: content) {
 		this.#view.textContent = "";
-		this.type.viewContent(this, model);
+	//	this.type.viewContent(this, model);
 	}
 
 	// getPartOf(value: View): View {

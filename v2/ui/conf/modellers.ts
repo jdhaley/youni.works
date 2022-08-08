@@ -1,5 +1,5 @@
 import { content, List, Record } from "../../base/model.js";
-import { ElementType } from "../../base/view.js";
+import { ElementType } from "../../base/dom.js";
 import { CHAR } from "../../base/util.js";
 
 export default {

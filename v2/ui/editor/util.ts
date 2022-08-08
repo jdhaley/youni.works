@@ -1,6 +1,7 @@
-import {bindView} from "../display.js";
-import {getView} from "../../base/view.js";
+import {getView} from "../../base/dom.js";
 import {CHAR} from "../../base/util.js";
+
+import {bindView} from "../display.js";
 import {Editable, getContent} from "./edit.js";
 
 export function getDisplay(node: Node | Range): Editable {

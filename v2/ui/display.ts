@@ -1,4 +1,4 @@
-import {ElementOwner, ElementType, getView} from "../base/view.js";
+import {ElementOwner, ElementType, getView} from "../base/dom.js";
 import {content} from "../base/model.js";
 import {bundle, CHAR} from "../base/util.js";
 import {Frame} from "./ui.js";

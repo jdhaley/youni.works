@@ -1,5 +1,5 @@
-import { loadBaseTypes, loadTypes } from "../../base/loader.js";
-import {content, ContentType, List, Record, Type, typeOf} from "../../base/model.js";
+import { Controller } from "../../base/controller.js";
+import {content, List, Record, Type, typeOf} from "../../base/model.js";
 import {bundle, CHAR, EMPTY, extend} from "../../base/util.js";
 
 export interface Signal {
@@ -74,7 +74,7 @@ function signal(direction: "up" | "down", signal: string | Signal): Signal {
 /* CONTENT */
 
 export interface View extends Part {
-	type$: ContentType<View>;
+	type$: Controller<content, View>;
 	//content: content;
 	textContent: string;
 	append(partsOrText: any): void
@@ -170,7 +170,7 @@ export abstract class ViewOwner {
 	}
 }
 
-export abstract class ViewType extends Control implements ContentType<View> {
+export abstract class ViewType extends Control implements Controller<content, View> {
 	declare owner: ViewOwner;
 	declare model: "record" | "list" | "text";
 	declare name: string;

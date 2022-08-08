@@ -1,20 +1,7 @@
-import {content, ContentType, Type, typeOf} from "./model.js";
-import {Control, Owner} from "./controller.js";
+import {content, Type, typeOf} from "./model.js";
+import {Control, Controller, Owner} from "./controller.js";
 import {bundle, EMPTY} from "./util.js";
 import {BaseConf, loadBaseTypes, loadTypes} from "./loader.js";
-
-export function viewType(value: any): string {
-	let type = typeOf(value);
-	switch (type) {
-		case "string":
-		case "number":
-		case "boolean":
-		case "date":
-			return "text";
-		default:
-			return type;
-	}
-}
 
 type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
 type modeller = (this: ViewType<unknown>, view: unknown) => content;
@@ -49,7 +36,7 @@ export abstract class ViewOwner<V> extends Owner<V> {
 	}
 }
 
-export abstract class ViewType<V> extends Control implements ContentType<V> {
+export abstract class ViewType<V> extends Control implements Controller<content, V> {
 	constructor(conf: BaseConf) {
 		super(conf);
 		if (conf) {
@@ -84,43 +71,15 @@ export abstract class ViewType<V> extends Control implements ContentType<V> {
 	abstract createView(): V;
 }
 
-export class ElementOwner extends ViewOwner<Element> {
-	declare owner: ElementOwner;
-	createElement(tagName: string): Element {
-		return this.owner.createElement(tagName);
-	}
-	getPartOf(view: Element): Element {
-		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
-			if (parent["$controller"]) return parent;
-		}
-	}
-	getPartsOf(view: Element): Iterable<Element> {
-		return view.children as Iterable<Element>;
-	}
-}
-
-export class ElementType extends ViewType<Element> {
-	declare readonly owner: ElementOwner;
-
-	toModel(view: Element, range?: Range): content {
-		if (this.model) return this.owner.modellers[this.model].call(this, view, range);
-	}
-	createView(): Element {
-		let view = this.owner.createElement(this.conf.tagName);
-		view["$controller"] = this;
-		if (this.propertyName) {
-			view.setAttribute("data-name", this.propertyName);
-		} else {
-			view.setAttribute("data-type", this.name);
-		}
-		return view;
-	}
-}
-
-export function getView(node: Node | Range): Element {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node["$controller"]) return node as Element;
-		node = node.parentElement;
+export function viewType(value: any): string {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+		case "date":
+			return "text";
+		default:
+			return type;
 	}
 }
