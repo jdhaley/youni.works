@@ -1,6 +1,6 @@
 import {content} from "../../base/model.js";
 
-import {Article, Editable, Edit, Editor} from "./edit.js";
+import {Article, Editable, Edit, Editor} from "./editor.js";
 import {getContent, getDisplay, getHeader, mark, clearContent, unmark, replace, narrowRange} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
@@ -26,7 +26,7 @@ function doEdit(cmd: ListEdit, ctx: Element, range: Range, markup: string) {
 	cmd.after = handleStartContainer(ctx, range);
 	cmd.after += markup;
 	cmd.after += handleEndContainer(ctx, range);
-	replace(range, markup);
+	replace(cmd.owner, range, markup);
 }
 
 function toMarkup(editor: Editor, content: content) {
@@ -147,7 +147,7 @@ class ListEdit extends Edit {
 
 	protected exec(markup: string) {
 		let range = getExecRange(this);
-		replace(range, markup);
+		replace(this.owner, range, markup);
 		range = unmark(range);
 		return range;
 	}

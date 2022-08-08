@@ -1,6 +1,6 @@
 import {ElementOwner, ElementType, getView} from "../base/dom.js";
 import {content} from "../base/model.js";
-import {bundle, CHAR} from "../base/util.js";
+import {bundle, CHAR, EMPTY} from "../base/util.js";
 import {Frame} from "./ui.js";
 import { RemoteFileService } from "../base/remote.js";
 import { CommandBuffer } from "../base/command.js";
@@ -8,6 +8,11 @@ import { CommandBuffer } from "../base/command.js";
 let NEXT_ID = 1;
 
 type editor = (this: DisplayType, commandName: string, range: Range, content?: content) => Range;
+
+class Display extends HTMLElement {
+	$controller?: DisplayType;
+	$content: HTMLElement;
+}
 
 export class DisplayOwner extends ElementOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -17,7 +22,7 @@ export class DisplayOwner extends ElementOwner {
 		console.info("Types:", this.types, this.conf.unknownType);
 		this.unknownType = this.types[this.conf.unknownType];
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		this.editors = conf.editors;
+		this.editors = conf.editors || EMPTY.object;
 	}
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
@@ -34,14 +39,36 @@ export class DisplayOwner extends ElementOwner {
 		if (!view) throw new Error("Can't find view element.");
 		if (!view.$controller) {
 			console.warn("view.type$ missing... binding...");
-			bindView(view as any);
+			this.bindView(view as any);
 			if (!view.$controller) throw new Error("unable to bind missing type$");
 		} else {
 			view.$controller.getContentOf(view); //checks the view isn't corrupted.
 		}
 		return view;
 	}
-	//TODO remove this method (should be done by the controller action)
+	bindView(view: Display): void {
+		let type = view.$controller;
+		if (!type) {
+			let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+			let parent = getView(view.parentElement) as Display;
+			if (name && parent) {
+				type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
+				view["$controller"] = type;	
+			}
+			if (!type) return;
+		}
+		if (!view.id) view.id = "" + NEXT_ID++;
+	
+		/*
+		Panels created from a range operation may be missing one or more of the
+		header, content, footer.
+		*/
+		let content = type.getContentOf(view); //ensures view isn't corrupted.
+		for (let child of content.children) {
+			this.bindView(child as Display);
+		}
+	}	
+	/* Supports the Article interface (which has no owner dependency) */
 	setRange(range: Range, collapse?: boolean): void {
 		if (range) {
 			if (collapse) range.collapse();
@@ -49,11 +76,6 @@ export class DisplayOwner extends ElementOwner {
 		}
 	}
 
-}
-
-class Display extends HTMLElement {
-	$controller?: DisplayType;
-	$content: HTMLElement;
 }
 
 export class DisplayType extends ElementType {
@@ -116,29 +138,6 @@ export class DisplayType extends ElementType {
 	edit(commandName: string, range: Range, content?: content): Range {
 		let editor = this.owner.editors[this.model];
 		if (editor) return editor.call(this, commandName, range, content);
-	}
-}
-
-export function bindView(view: Display): void {
-	let type = view.$controller;
-	if (!type) {
-		let name = view.getAttribute("data-name") || view.getAttribute("data-type");
-		let parent = getView(view.parentElement) as Display;
-		if (name && parent) {
-			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
-			view["$controller"] = type;	
-		}
-		if (!type) return;
-	}
-	if (!view.id) view.id = "" + NEXT_ID++;
-
-	/*
-	Panels created from a range operation may be missing one or more of the
-	header, content, footer.
-	*/
-	let content = type.getContentOf(view); //ensures view isn't corrupted.
-	for (let child of content.children) {
-		bindView(child as Display);
 	}
 }
 

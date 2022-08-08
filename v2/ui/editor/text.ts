@@ -1,6 +1,6 @@
 import {CHAR} from "../../base/util.js";
 
-import {Article, Edit} from "./edit.js";
+import {Article, Edit} from "./editor.js";
 import {getContent, getDisplay, mark, replace, unmark} from "./util.js";
 
 let lastEdit = {
@@ -77,7 +77,7 @@ class TextEdit extends Edit {
 	}
 	exec(markup: string) {
 		let range = this.getRange();
-		replace(range, markup);
+		replace(this.owner, range, markup);
 		range = unmark(range);
 		return range;
 	}

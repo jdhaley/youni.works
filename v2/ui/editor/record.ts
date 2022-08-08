@@ -1,6 +1,6 @@
 import {Record} from "../../base/model.js";
 
-import { Article, Edit, Editor } from "./edit.js";
+import { Article, Edit, Editor } from "./editor.js";
 import {getContent, getDisplay, mark, unmark, clearContent, replace, narrowRange} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
@@ -33,7 +33,7 @@ class RecordEdit extends Edit {
 	}
 	exec(markup: string) {
 		let range = getRange(this);
-		replace(range, markup);
+		replace(this.owner, range, markup);
 		range = unmark(range);
 		return range;
 	}

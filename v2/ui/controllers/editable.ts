@@ -1,7 +1,7 @@
 import {extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
-import {Editor} from "../editor/edit.js";
+import {Editor} from "../editor/editor.js";
 import {getDisplay} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";

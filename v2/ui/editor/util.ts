@@ -1,8 +1,7 @@
 import {getView} from "../../base/dom.js";
 import {CHAR} from "../../base/util.js";
 
-import {bindView} from "../display.js";
-import {Editable} from "./edit.js";
+import {Article, Editable} from "./editor.js";
 
 export function getDisplay(node: Node | Range): Editable {
 	let view = getView(node) as Editable;
@@ -141,7 +140,7 @@ export function clearContent(range: Range) {
 	}
 }
 
-export function replace(range: Range, markup: string) {
+export function replace(article: Article, range: Range, markup: string) {
 	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
 	div.innerHTML = markup;
 	range.deleteContents();
@@ -150,7 +149,7 @@ export function replace(range: Range, markup: string) {
 		range.insertNode(node);
 		range.collapse();
 		if (node.nodeType == Node.ELEMENT_NODE) {
-			bindView(node as any);
+			article.bindView(node as any);
 		}
 	}
 }
