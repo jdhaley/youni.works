@@ -1,6 +1,5 @@
-import {Control, Actions} from "./controller.js";
+import {Control, Actions, Controller, Owner} from "./controller.js";
 import {bundle, extend} from "./util.js";
-import {ViewOwner, ViewType} from "./view.js";
 
 export interface BaseConf {
 	class: typeof Control;
@@ -11,19 +10,40 @@ export interface BaseConf {
 	actions: Actions;
 	shortcuts: bundle<string>;
 }
-
-export interface ViewConf {
+interface ViewConf {
 	type: string;
 	types: bundle<source>;
 	conf: bundle<any>;
 }
+type types = bundle<Type>;
+type source = bundle<string | source> | string;
 
-export function loadBaseTypes(owner: ViewOwner<unknown>): bundle<ViewType<any>> {
-	if (!owner.conf?.baseTypes) return;
+interface Type {
+	owner: Owner<unknown>;
+	conf: bundle<any>;
+	name: string;
+	propertyName?: string;
+	model: string;
+	types: bundle<Type>;
+}
+
+export abstract class TypeOwner<V> extends Owner<V> {
+	constructor(conf: bundle<any>) {
+		super(conf);
+		let base = loadBaseTypes(this, conf.baseTypes);
+		this.types = loadTypes(conf.viewTypes, base);
+		this.unknownType = this.types[conf.unknownType];
+		console.info("Types:", this.types, "uknown type:", this.unknownType);
+	}
+	types: bundle<Type>;
+	unknownType: Type;
+}
+
+function loadBaseTypes(owner: TypeOwner<unknown>, baseTypes: bundle<BaseConf>): bundle<Type> {
 	let types = Object.create(null);
-	for (let name in owner.conf.baseTypes) {
-		let conf: BaseConf = owner.conf.baseTypes[name];
-		let type = new conf.class(conf) as ViewType<unknown>;
+	for (let name in baseTypes) {
+		let conf: BaseConf = baseTypes[name];
+		let type: Type = new conf.class(conf) as any;
 		type.name = name;
 		type.owner = owner;
 		types[name] = type;
@@ -31,10 +51,7 @@ export function loadBaseTypes(owner: ViewOwner<unknown>): bundle<ViewType<any>> 
 	return types;
 }
 
-type types = bundle<ViewType<unknown>>;
-type source = bundle<string | source> | string
-
-export function loadTypes(source: bundle<source>, base: types): types {
+function loadTypes(source: bundle<source>, base: types): types {
 	base = Object.create(base);
 	let types = Object.create(null);
 	for (let name in source) {
@@ -43,7 +60,7 @@ export function loadTypes(source: bundle<source>, base: types): types {
 	return types
 }
 
-function getType(name: string, types: types, source: source) {
+function getType(name: string, types: types, source: source): Type {
 	let type = types[name];
 	if (!type && source[name]) {
 		let value = source[name];
@@ -76,7 +93,7 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 	return type;
 
 	function getMember(name: string, part: source) {
-		let member: ViewType<unknown>;
+		let member: Type;
 		if (typeof part == "object") {
 			member = createType("", part as any, types, source);
 			member.name = name;

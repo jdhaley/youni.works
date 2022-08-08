@@ -7,29 +7,28 @@ export default function edit(this: Editor, commandName: string, range: Range, re
 	let view = getView(range);
 	if (view?.$controller.model == "record") {
 		let cmd = new RecordEdit(this.owner, commandName, view.id);
-		cmd.do(range, record);
+		return doEdit(cmd, range, record);
 	} else {
 		console.error("Invalid range for edit.");
 	}
-	return null;
+}
+
+function doEdit(cmd: Edit, range: Range, record: Record): Range {
+	narrowRange(range);
+	mark(range);
+	let content = getContent(range);
+	cmd.before = content?.innerHTML || "";
+	clearContent(range);
+	cmd.after = content?.innerHTML || "";
+
+	unmark(range);
+	range.collapse();
+	return range;
 }
 
 class RecordEdit extends Edit {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
-	}
-	do(range: Range, record: Record) {
-		narrowRange(range);
-		let view = getView(range);
-		mark(range);
-		let content = getContent(range);
-		this.before = content?.innerHTML || "";
-		clearContent(range);
-		this.after = content?.innerHTML || "";
-
-		unmark(range);
-		range.collapse();
-		console.log(this);
 	}
 	exec(markup: string) {
 		let range = getRange(this);

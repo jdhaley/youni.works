@@ -16,19 +16,19 @@ class Display extends HTMLElement {
 
 export class DisplayOwner extends ElementOwner {
 	constructor(frame: Frame, conf: bundle<any>) {
+		/*
+		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
+		*/
 		super(conf);
 		this.frame = frame;
-		this.initTypes(conf.viewTypes, conf.baseTypes);
-		console.info("Types:", this.types, this.conf.unknownType);
-		this.unknownType = this.types[this.conf.unknownType];
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
 		this.editors = conf.editors || EMPTY.object;
 	}
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range> = new CommandBuffer();
 	declare editors: bundle<editor>;
-	declare types: bundle<DisplayType>;
 	readonly frame: Frame;
+	type: DisplayType;
 	view: HTMLElement;
 
 	createElement(tagName: string): HTMLElement {

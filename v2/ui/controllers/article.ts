@@ -1,6 +1,6 @@
 import {Response} from "../../base/message.js";
 import {extend} from "../../base/util.js";
-import {DisplayOwner} from "../display.js";
+import {DisplayOwner, DisplayType} from "../display.js";
 
 import {UserEvent} from "../ui.js";
 
@@ -28,12 +28,12 @@ export default extend(null, {
 	}
 });
 
-function getType(article: DisplayOwner, path: string, data: any) {
+function getType(article: DisplayOwner, path: string, data: any): DisplayType {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";
 	if (!typeName && data && typeof data == "object" && data.type$) {
 		typeName = data.type$;
 	}
-	return article.types[typeName] || article.types[article.conf.type];
+	return article.types[typeName] as DisplayType || article.type;
 }

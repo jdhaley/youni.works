@@ -1,4 +1,4 @@
-import {BaseConf} from "../../base/loader.js";
+import {BaseConf} from "../../base/type.js";
 import {bundle} from "../../base/util.js";
 
 import text from "../controllers/text.js";

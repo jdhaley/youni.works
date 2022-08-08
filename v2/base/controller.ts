@@ -42,7 +42,7 @@ export class Control implements Receiver {
 }
 
 export abstract class Owner<V> extends Control {
-	abstract getControlOf(value: V): Control;
+	abstract getControlOf(value: V): Receiver;
 	abstract getPartOf(value: V): V;
 	abstract getPartsOf(value: V): Iterable<V>;
 	

@@ -1,7 +1,7 @@
 import {content, Type, typeOf} from "./model.js";
-import {Control, Controller, Owner} from "./controller.js";
+import {Control, Controller} from "./controller.js";
+import {BaseConf, TypeOwner} from "./type.js";
 import {bundle, EMPTY} from "./util.js";
-import {BaseConf, loadBaseTypes, loadTypes} from "./loader.js";
 
 type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
 type modeller = (this: ViewType<unknown>, view: unknown) => content;
@@ -45,33 +45,22 @@ export abstract class ViewType<V> extends Control implements Controller<content,
 	abstract createView(): V;
 }
 
-export abstract class ViewOwner<V> extends Owner<V> {
+export abstract class ViewOwner<V> extends TypeOwner<V> {
 	constructor(conf?: bundle<any>) {
 		super(conf);
 		if (conf) {
 			this.viewers = conf.viewers;
 			this.modellers = conf.modellers;
 		}
-		this.conf = conf;
 	}
-	conf: bundle<any>;
 	viewers: bundle<viewer>
 	modellers: bundle<modeller>;
-	unknownType: ViewType<V>;
-	types: bundle<ViewType<V>>;
-
 	getControlOf(view: V): ViewType<V> {
 		let type = view["$controller"];
 		if (!type) {
 			console.log(view);
 		}
 		return type;
-	}
-	
-	initTypes(source: bundle<any>, base: bundle<ViewType<V>>) {
-		base = loadBaseTypes(this);
-		this.types = loadTypes(source, base) as bundle<ViewType<V>>;
-		this.unknownType = this.types[this.conf.unknownType];
 	}
 }
 
