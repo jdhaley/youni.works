@@ -6,37 +6,11 @@ import {BaseConf, loadBaseTypes, loadTypes} from "./loader.js";
 type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
 type modeller = (this: ViewType<unknown>, view: unknown) => content;
 
-export abstract class ViewOwner<V> extends Owner<V> {
-	constructor(conf?: bundle<any>) {
-		super(conf);
-		if (conf) {
-			this.viewers = conf.viewers;
-			this.modellers = conf.modellers;
-		}
-		this.conf = conf;
-	}
-	conf: bundle<any>;
-	viewers: bundle<viewer>
-	modellers: bundle<modeller>;
-	unknownType: ViewType<V>;
-	types: bundle<ViewType<V>>;
-
-	getControlOf(view: V): ViewType<V> {
-		let type = view["$controller"];
-		if (!type) {
-			console.log(view);
-		}
-		return type;
-	}
-	
-	initTypes(source: bundle<any>, base: bundle<ViewType<V>>) {
-		base = loadBaseTypes(this);
-		this.types = loadTypes(source, base) as bundle<ViewType<V>>;
-		this.unknownType = this.types[this.conf.unknownType];
-	}
+export interface View {
+	$controller?: Controller<content, View>
 }
 
-export abstract class ViewType<V> extends Control implements Controller<content, V> {
+export abstract class ViewType<V> extends Control implements Controller<content, V>, Type {
 	constructor(conf: BaseConf) {
 		super(conf);
 		if (conf) {
@@ -69,6 +43,36 @@ export abstract class ViewType<V> extends Control implements Controller<content,
 	}
 
 	abstract createView(): V;
+}
+
+export abstract class ViewOwner<V> extends Owner<V> {
+	constructor(conf?: bundle<any>) {
+		super(conf);
+		if (conf) {
+			this.viewers = conf.viewers;
+			this.modellers = conf.modellers;
+		}
+		this.conf = conf;
+	}
+	conf: bundle<any>;
+	viewers: bundle<viewer>
+	modellers: bundle<modeller>;
+	unknownType: ViewType<V>;
+	types: bundle<ViewType<V>>;
+
+	getControlOf(view: V): ViewType<V> {
+		let type = view["$controller"];
+		if (!type) {
+			console.log(view);
+		}
+		return type;
+	}
+	
+	initTypes(source: bundle<any>, base: bundle<ViewType<V>>) {
+		base = loadBaseTypes(this);
+		this.types = loadTypes(source, base) as bundle<ViewType<V>>;
+		this.unknownType = this.types[this.conf.unknownType];
+	}
 }
 
 export function viewType(value: any): string {

@@ -1,7 +1,7 @@
 import {Record} from "../../base/model.js";
 
-import {getDisplay, mark, unmark, clearContent, replace, narrowRange} from "./util.js";
-import { Article, Edit, Editor, getContent } from "./edit.js";
+import { Article, Edit, Editor } from "./edit.js";
+import {getContent, getDisplay, mark, unmark, clearContent, replace, narrowRange} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
 	let view = getDisplay(range);

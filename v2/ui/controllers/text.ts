@@ -1,7 +1,7 @@
 import {CHAR, extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
-import {Editor, getContent} from "../editor/edit.js";
-import {getHeader, narrowRange} from "../editor/util.js";
+import {Editor} from "../editor/edit.js";
+import {getContent, getHeader, narrowRange} from "../editor/util.js";
 
 import editable from "./editable.js";
 

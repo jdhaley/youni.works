@@ -1,7 +1,7 @@
 import {CHAR} from "../../base/util.js";
 
-import {Article, Edit, getContent} from "./edit.js";
-import {getDisplay, mark, replace, unmark} from "./util.js";
+import {Article, Edit} from "./edit.js";
+import {getContent, getDisplay, mark, replace, unmark} from "./util.js";
 
 let lastEdit = {
 	action: "",

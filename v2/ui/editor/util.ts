@@ -2,12 +2,17 @@ import {getView} from "../../base/dom.js";
 import {CHAR} from "../../base/util.js";
 
 import {bindView} from "../display.js";
-import {Editable, getContent} from "./edit.js";
+import {Editable} from "./edit.js";
 
 export function getDisplay(node: Node | Range): Editable {
 	let view = getView(node) as Editable;
 	view.$controller.getContentOf(view); //ensures view isn't corrupted.
 	return view;
+}
+
+export function getContent(node: Node | Range): Editable {
+	let view = getDisplay(node);
+	return view?.$controller.getContentOf(view);
 }
 
 export function getEditRange(range: Range): Range {

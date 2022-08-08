@@ -1,24 +1,16 @@
 import { Command, CommandBuffer } from "../../base/command.js";
 import { content } from "../../base/model.js";
-import { Receiver } from "../../base/controller.js";
-import { getView } from "../../base/dom.js";
+import { View } from "../../base/view.js";
+import { Controller, Receiver } from "../../base/controller.js";
 
-export function getContent(node: Node | Range): Editable {
-	let view = getView(node) as Editable;
-	return view?.$controller.getContentOf(view);
-}
-
-export interface Editable extends Element {
+export interface Editable extends View, Element {
 	$controller?: Editor
 }
 
-export interface Editor  {
-	readonly owner: Article;
+export interface Editor extends Controller<content, Editable>  {
 	readonly model: string;
-
+	readonly owner: Article;
 	getContentOf(node: Node): Element;
-	toView(model: content): Editable
-	toModel(view: Editable, range?: Range): content;
 	edit(commandName: string, range: Range, content?: content): Range;
 }
 
