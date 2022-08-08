@@ -1,18 +1,17 @@
-import { content } from "../../base/model.js";
-import { CHAR } from "../../base/util.js";
-import { viewType } from "../../base/view.js";
-import { DisplayType } from "../display.js";
-import { getDisplay } from "./util.js";
+import { ElementType, getView } from "../base/dom.js";
+import { content } from "../base/model.js";
+import { CHAR } from "../base/util.js";
+import { viewType } from "../base/view.js";
 
 
-export function setClipboard(type: DisplayType, range: Range, clipboard: DataTransfer) {
+export function setClipboard(type: ElementType, range: Range, clipboard: DataTransfer) {
 	let node = range.commonAncestorContainer;
 	if (node.nodeType == Node.TEXT_NODE) {
 		let data = node.textContent.substring(range.startOffset, range.endOffset);
 		clipboard.setData("text/plain", data);
 		return;
 	}
-	let model = type.toModel(getDisplay(range), range);
+	let model = type.toModel(getView(range), range);
 	if (type.model == "record") model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
 	console.log("clipboard:", model);

@@ -4,7 +4,7 @@ import {UserEvent} from "../ui.js";
 import {Editor} from "../editor/edit.js";
 import {getDisplay} from "../editor/util.js";
 import display from "./display.js";
-import { getClipboard, setClipboard } from "../editor/clipboard.js";
+import { getClipboard, setClipboard } from "../clipboard.js";
 
 let UNDONE = false;
 

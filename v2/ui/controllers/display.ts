@@ -2,7 +2,7 @@ import { extend } from "../../base/util.js";
 
 import { UserEvent } from "../ui.js";
 import { DisplayType } from "../display.js";
-import { setClipboard } from "../editor/clipboard.js";
+import { setClipboard } from "../clipboard.js";
 import { getHeader } from "../editor/util.js";
 
 export default extend(null, {
