@@ -1,10 +1,10 @@
 import {Record} from "../../base/model.js";
 
 import { Article, Edit, Editor } from "./editor.js";
-import {getContent, getDisplay, mark, unmark, clearContent, replace, narrowRange} from "./util.js";
+import {getContent, getView, mark, unmark, clearContent, replace, narrowRange} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
-	let view = getDisplay(range);
+	let view = getView(range);
 	if (view?.$controller.model == "record") {
 		let cmd = new RecordEdit(this.owner, commandName, view.id);
 		cmd.do(range, record);
@@ -20,7 +20,7 @@ class RecordEdit extends Edit {
 	}
 	do(range: Range, record: Record) {
 		narrowRange(range);
-		let view = getDisplay(range);
+		let view = getView(range);
 		mark(range);
 		let content = getContent(range);
 		this.before = content?.innerHTML || "";

@@ -2,7 +2,7 @@ import {extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
-import {getDisplay} from "../editor/util.js";
+import {getView} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";
 
@@ -26,7 +26,7 @@ export default extend(display, {
 		let target = this;
 		if (range.collapsed && model instanceof Array) {
 			range = getInsertableRange(range);
-			if (range) target = getDisplay(range).$controller;
+			if (range) target = getView(range).$controller;
 		} 
 		range = target.edit("Paste", range, model);
 		range &&  this.owner.setRange(range, true);
@@ -87,7 +87,7 @@ export default extend(display, {
  */
 function getInsertableRange(range: Range) {
 	range = range.cloneRange();
-	let view = getDisplay(range);
+	let view = getView(range);
 	while (view) {
 		if (view?.$controller.model == "list") {
 			return range;
@@ -96,7 +96,7 @@ function getInsertableRange(range: Range) {
 
 		range.setStartBefore(view);
 		range.collapse(true);
-		view = getDisplay(range);
+		view = getView(range);
 	}
 }
 

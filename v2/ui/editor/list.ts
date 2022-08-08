@@ -1,10 +1,10 @@
 import {content} from "../../base/model.js";
 
 import {Article, Editable, Edit, Editor} from "./editor.js";
-import {getContent, getDisplay, getHeader, mark, clearContent, unmark, replace, narrowRange} from "./util.js";
+import {getContent, getView, getHeader, mark, clearContent, unmark, replace, narrowRange} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
-	let view = getDisplay(range);
+	let view = getView(range);
 	if (view.$controller.model != "list") console.warn("View is not a list:", view);
 
 	let cmd = new ListEdit(this.owner, commandName, view.id);

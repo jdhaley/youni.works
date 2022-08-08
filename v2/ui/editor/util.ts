@@ -1,22 +1,26 @@
-import {getView} from "../../base/dom.js";
 import {CHAR} from "../../base/util.js";
 
 import {Article, Editable} from "./editor.js";
 
-export function getDisplay(node: Node | Range): Editable {
-	let view = getView(node) as Editable;
-	view.$controller.getContentOf(view); //ensures view isn't corrupted.
-	return view;
+export function getView(node: Node | Range): Editable {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node["$controller"]) {
+			(node as Editable).$controller.getContentOf(node); //ensures view isn't corrupted.
+			return node as Editable;
+		}
+		node = node.parentElement;
+	}
 }
 
 export function getContent(node: Node | Range): Editable {
-	let view = getDisplay(node);
+	let view = getView(node);
 	return view?.$controller.getContentOf(view);
 }
 
 export function getEditRange(range: Range): Range {
 	range = range.cloneRange();
-	let view = getDisplay(range.commonAncestorContainer);
+	let view = getView(range.commonAncestorContainer);
 	let content = view?.$controller.getContentOf(view);
 	if (!content) return;
 
@@ -126,7 +130,7 @@ export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		if (node.nodeType == Node.TEXT_NODE) {
-			let view = getDisplay(node);
+			let view = getView(node);
 			if (view && node.parentElement == view.$controller.getContentOf(view)) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
@@ -155,7 +159,7 @@ export function replace(article: Article, range: Range, markup: string) {
 }
 
 export function narrowRange(range: Range) {
-	let view = getDisplay(range);
+	let view = getView(range);
 	if (!view) return;
 
 	let start = range.startContainer;
