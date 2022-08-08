@@ -1,7 +1,7 @@
 import {content, Type, typeOf} from "./model.js";
 import {Control, Controller} from "./controller.js";
 import {BaseConf, TypeOwner} from "./type.js";
-import {bundle, EMPTY} from "./util.js";
+import {bundle, EMPTY, extend} from "./util.js";
 
 type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
 type modeller = (this: ViewType<unknown>, view: unknown) => content;
@@ -11,21 +11,18 @@ export interface View {
 }
 
 export abstract class ViewType<V> extends Control implements Controller<content, V>, Type {
-	constructor(conf: BaseConf) {
-		super(conf);
-		if (conf) {
-			this.view = conf.view;
-			this.model = conf.model;
-		}
-		this.conf = conf || EMPTY.object;
+	constructor(owner: ViewOwner<V>) {
+		super();
+		this.owner = owner;
 	}
+	owner: ViewOwner<V>;
+	types: bundle<ViewType<V>> = EMPTY.object;
+
 	declare model: "record" | "list" | "text";
 	declare view: "record" | "list" | "text";
 	declare name: string;
 	declare propertyName?: string;
-	types: bundle<ViewType<V>> = EMPTY.object;
 	declare conf: bundle<any>;
-	declare owner: ViewOwner<V>;
 
 	generalizes(type: Type): boolean {
 		return type == this;
@@ -43,6 +40,16 @@ export abstract class ViewType<V> extends Control implements Controller<content,
 	}
 
 	abstract createView(): V;
+
+	start(name: string, conf: bundle<any>): void {
+		this.name = name;
+		if (conf) {
+			this.conf = extend(this.conf || null, conf);
+			if (conf.actions) this.actions = conf.actions;
+			if (conf.view) this.view = conf.view;
+			if (conf.model) this.model = conf.model;	
+		}
+	}
 }
 
 export abstract class ViewOwner<V> extends TypeOwner<V> {

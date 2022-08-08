@@ -1,4 +1,4 @@
-import {bundle, EMPTY, extend} from "./util.js";
+import {EMPTY, extend} from "./util.js";
 
 export interface Signal {
 	readonly direction: "up" | "down"
@@ -21,12 +21,7 @@ export interface Actions {
 }
 
 export class Control implements Receiver {
-	constructor(conf?: bundle<any>) {
-		if (conf?.owner) this.owner = conf.owner;
-		if (conf?.actions) this.actions = conf.actions;
-	}
-	readonly owner: Owner<unknown>;
-	readonly actions: Actions = EMPTY.object;
+	declare actions: Actions;
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
 		while (subject) try {

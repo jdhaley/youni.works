@@ -35,5 +35,5 @@ function getType(article: DisplayOwner, path: string, data: any): DisplayType {
 	if (!typeName && data && typeof data == "object" && data.type$) {
 		typeName = data.type$;
 	}
-	return article.types[typeName] as DisplayType || article.type;
+	return article.types[typeName] as any || article.type;
 }

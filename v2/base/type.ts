@@ -1,8 +1,15 @@
 import {Control, Actions, Controller, Owner} from "./controller.js";
 import {bundle, extend} from "./util.js";
 
+class BaseType extends Control {
+	constructor(owner: TypeOwner<unknown>) {
+		super();
+		this.owner = owner;
+	}
+	owner: TypeOwner<unknown>;
+}
 export interface BaseConf {
-	class: typeof Control;
+	class: typeof BaseType;
 	view: "text" | "record" | "list";
 	model: "text" | "record" | "list";
 	panel: boolean;
@@ -19,8 +26,7 @@ type types = bundle<Type>;
 type source = bundle<string | source> | string;
 
 interface Type {
-	owner: Owner<unknown>;
-	conf: bundle<any>;
+	start(name: string, conf: bundle<any>): void;
 	name: string;
 	propertyName?: string;
 	model: string;
@@ -29,8 +35,9 @@ interface Type {
 
 export abstract class TypeOwner<V> extends Owner<V> {
 	constructor(conf: bundle<any>) {
-		super(conf);
+		super();
 		let base = loadBaseTypes(this, conf.baseTypes);
+		this.actions = conf.actions;
 		this.types = loadTypes(conf.viewTypes, base);
 		this.unknownType = this.types[conf.unknownType];
 		console.info("Types:", this.types, "uknown type:", this.unknownType);
@@ -43,10 +50,9 @@ function loadBaseTypes(owner: TypeOwner<unknown>, baseTypes: bundle<BaseConf>): 
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf: BaseConf = baseTypes[name];
-		let type: Type = new conf.class(conf) as any;
-		type.name = name;
-		type.owner = owner;
+		let type: Type = new conf.class(owner) as any;
 		types[name] = type;
+		type.start(name, conf);
 	}
 	return types;
 }
@@ -79,8 +85,8 @@ function getType(name: string, types: types, source: source): Type {
 
 function createType(name: string, conf: ViewConf, types: types, source: source) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
-	let type = Object.create(supertype);
-	type.conf = extend(supertype.conf, conf.conf);
+	let type = Object.create(supertype) as Type;
+	type.start(name, conf.conf)
 
 	if (name) {
 		type.name = name;
