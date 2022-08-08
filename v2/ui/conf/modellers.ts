@@ -40,9 +40,9 @@ export default {
 		let content = getContent(view, range);
 		if (content) for (let node of content.childNodes) {
 			if (node == range?.startContainer) {
-				model += CHAR.STX + node.textContent.substring(range.startOffset);
+				model += node.textContent.substring(range.startOffset);
 			} else if (node == range?.endContainer) {
-				model += node.textContent.substring(0, range.endOffset) + CHAR.ETX;
+				model += node.textContent.substring(0, range.endOffset);
 			} else {
 				model += node.textContent;
 			}
