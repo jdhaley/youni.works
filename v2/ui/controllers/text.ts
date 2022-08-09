@@ -20,14 +20,16 @@ export default extend(editable, {
 		let char = event.key;
 		let range = event.range;
 		positionToText(range);
-		if (range.collapsed) {
-			let content = getContent(event.on);
-			if (content) {
-				if (content.textContent == CHAR.ZWSP) content.textContent = "";
-				if (char == " " && range.endOffset == content.textContent.length) {
-					char = CHAR.NBSP;
-				}	
-			}
+		let text = range.endContainer;
+		let textEnd = range.endOffset;
+		if (text && range.collapsed) {
+			if (text.textContent == CHAR.ZWSP) text.textContent = "";
+			text.textContent = text.textContent.replace(CHAR.NBSP, " ");
+			range.setEnd(text, textEnd);
+			range.collapse();
+		}
+		if (char == " " && textEnd == text.textContent.length) {
+			char = CHAR.NBSP;
 		}
 		range = this.edit("Entry", range, char);
 		range && this.owner.setRange(range, true);
