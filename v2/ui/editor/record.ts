@@ -1,9 +1,10 @@
 import {Record} from "../../base/model.js";
 
 import { Article, Edit, Editor } from "./editor.js";
-import {getContent, getView, mark, unmark, clearContent, replace, narrowRange} from "./util.js";
+import {getContent, getView, mark, unmark, clearContent, replace, narrowRange, getChildView} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
+	if (record && typeof record[0] == "object") record = record[0] as Record;
 	let view = getView(range);
 	if (view?.$controller.model == "record") {
 		let cmd = new RecordEdit(this.owner, commandName, view.id);
@@ -19,6 +20,7 @@ function doEdit(cmd: Edit, range: Range, record: Record): Range {
 	let content = getContent(range);
 	cmd.before = content?.innerHTML || "";
 	clearContent(range);
+	if (record) mergeContent(this, range, record)
 	cmd.after = content?.innerHTML || "";
 
 	unmark(range);
@@ -46,12 +48,18 @@ function getRange(cmd: Edit): Range {
 }
 
 
-// function merge(base: Record, ext: Record) {
-// 	for (let name in ext) {
-// 		switch (typeof base[name]) {
-// 			case "string":
-// 				base[name] = "" + base[name] + ext[name];
-// 				break;
-// 		}
-// 	}
-// }
+function mergeContent(cmd: Edit, range: Range, record: Record) {
+	let ctx = getContent(range);
+	let start = getChildView(ctx, range.startContainer);
+	let end = getChildView(ctx, range.endContainer);
+	for (let member = start; member; member = member.nextElementSibling) {
+		let type = member.$controller;
+		if (type.model == "text") {
+			let value = record[type["propertyName"]];
+			if (value) {
+				member.children[1].textContent += value;
+			}
+		}
+		if (member == end) break;
+	}
+}

@@ -18,6 +18,17 @@ export function getContent(node: Node | Range): Editable {
 	return view?.$controller.getContentOf(view);
 }
 
+export function getChildView(ctx: Element, node: Node): Editable {
+	if (node == ctx) return null;
+	while (node?.parentElement != ctx) {
+		node = node.parentElement;
+	}
+	if (!node || !node["$controller"]) {
+		console.warn("", ctx);
+	}
+	return node as Editable;
+}
+
 export function getEditRange(range: Range): Range {
 	range = range.cloneRange();
 	let view = getView(range.commonAncestorContainer);
@@ -26,8 +37,8 @@ export function getEditRange(range: Range): Range {
 
 	//TODO check elements after each range change?
 	if (view != content) {
-		let start = getChildView(range.startContainer, view);
-		let end = getChildView(range.endContainer, view);
+		let start = getChildView(view, range.startContainer);
+		let end = getChildView(view, range.endContainer);
 
 		if (isBefore(start, content)) range.setStart(content, 0);
 		if (isAfter(start, content)) {
@@ -37,17 +48,6 @@ export function getEditRange(range: Range): Range {
 		if (isAfter(end, content)) range.setEnd(content, content.childNodes.length);
 	}
 	return range;
-}
-
-function getChildView(node: Node, ctx: Element): Element {
-	if (node == ctx) return null;
-	while (node?.parentElement != ctx) {
-		node = node.parentElement;
-	}
-	if (!node || !node["$controller"]) {
-		console.warn("Invalid/corrupted view", ctx);
-	}
-	return node as Element;
 }
 
 function isAfter(node: Node, rel: Node): boolean {

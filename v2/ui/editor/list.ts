@@ -1,7 +1,7 @@
 import {content} from "../../base/model.js";
 
 import {Article, Editable, Edit, Editor} from "./editor.js";
-import {getContent, getView, getHeader, mark, clearContent, unmark, replace, narrowRange} from "./util.js";
+import {getContent, getView, getHeader, mark, clearContent, unmark, replace, narrowRange, getChildView} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getView(range);
@@ -168,15 +168,4 @@ function getExecRange(cmd: ListEdit) {
 		range.setEndBefore(end);
 	}
 	return range;
-}
-
-export function getChildView(ctx: Element, node: Node): Editable {
-	if (node == ctx) return null;
-	while (node?.parentElement != ctx) {
-		node = node.parentElement;
-	}
-	if (!node || !node["$controller"]) {
-		console.warn("Invalid/corrupted view", ctx);
-	}
-	return node as Editable;
 }
