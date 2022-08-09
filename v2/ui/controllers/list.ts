@@ -5,11 +5,11 @@ import {getHeader} from "../editor/util.js";
 import editable from "./editable.js";
 
 export default extend(editable, {
-	dblclick(this: Editor, event: UserEvent) {
-		event.subject = "";
+	click(this: Editor, event: UserEvent) {
 		let view = event.on;
 		let header = getHeader(event.on, event.target as Node);
 		if (header) {
+			event.subject = "";
 			if (view.classList.contains("collapsed")) {
 				view.classList.remove("collapsed");
 			} else {
