@@ -1,9 +1,8 @@
 import { Command, CommandBuffer } from "../../base/command.js";
 import { content } from "../../base/model.js";
-import { View } from "../../base/view.js";
 import { Controller, Receiver } from "../../base/controller.js";
 
-export interface Editable extends View, Element {
+export interface Editable extends Element {
 	$controller?: Editor
 }
 
