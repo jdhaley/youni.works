@@ -1,12 +1,13 @@
-import {Control, Actions, Controller, Owner} from "./controller.js";
-import {bundle, extend} from "./util.js";
+import {Owner} from "./controller.js";
+import {bundle} from "./util.js";
 
 interface Type {
-	start(name: string, conf: bundle<any>): void;
 	name: string;
+	types: bundle<Type>;
 	propertyName?: string;
 	model: string;
-	types: bundle<Type>;
+	
+	start(name: string, conf: bundle<any>): void;
 }
 
 interface ViewConf {
@@ -71,7 +72,7 @@ function getType(name: string, types: types, source: source): Type {
 function createType(name: string, conf: ViewConf, types: types, source: source) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
 	let type = Object.create(supertype) as Type;
-	type.start(name, conf.conf)
+	type.start(name, conf)
 
 	if (name) {
 		type.name = name;
