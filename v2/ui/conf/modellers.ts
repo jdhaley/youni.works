@@ -30,7 +30,7 @@ export default {
 					model = Object.create(null);
 					model.type$ = this.name;
 				}
-				model[type.propertyName] = value;
+				model[type.name] = value;
 			}
 		}
 		return model;

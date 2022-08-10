@@ -4,7 +4,7 @@ import {bundle} from "./util.js";
 interface Type {
 	name: string;
 	types: bundle<Type>;
-	propertyName?: string;
+	isProperty: boolean;
 	model: string;
 	
 	start(name: string, conf: bundle<any>): void;
@@ -88,15 +88,12 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 		let member: Type;
 		if (typeof part == "object") {
 			member = createType("", part as any, types, source);
-			member.name = name;
 		} else {
 			member = getType(part, types, source);
-		}
-		if (type.model == "record") {
 			member = Object.create(member);
-			member.name = "";
-			member.propertyName = name;
 		}
+		member.name = name;
+		member.isProperty = type.model == "record" ? true : false;
 		return member;
 	}
 }

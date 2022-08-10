@@ -25,11 +25,8 @@ export class ElementType extends ViewType<Element> {
 	createView(): Element {
 		let view = this.owner.createElement(this.conf.tagName);
 		view["$controller"] = this;
-		if (this.propertyName) {
-			view.setAttribute("data-name", this.propertyName);
-		} else {
-			view.setAttribute("data-type", this.name);
-		}
+		let attr = "data-" + (this.isProperty ? "name" : "type");
+		view.setAttribute(attr, this.name);
 		return view;
 	}
 }

@@ -21,7 +21,7 @@ export abstract class ViewType<V> extends Control implements Controller<content,
 	declare model: "record" | "list" | "text";
 	declare view: "record" | "list" | "text";
 	declare name: string;
-	declare propertyName?: string;
+	declare isProperty: boolean;
 	declare conf: bundle<any>;
 
 	generalizes(type: Type): boolean {
