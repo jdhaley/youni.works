@@ -20,19 +20,8 @@ export default {
 		return model;
 	},
 	record(this: ElementType, view: Element, range?: Range): Record {
-		let model: Record;
-		let content = getContent(view, range);
-		if (content) for (let part of content.children) {
-			let type = this.owner.getControlOf(part) as ElementType;
-			let value = type?.toModel(part, range);
-			if (value) {
-				if (!model) {
-					model = Object.create(null);
-					model.type$ = this.name;
-				}
-				model[type.name] = value;
-			}
-		}
+		let model = down(this, null, view, range);
+		if (model) model["type$"] = this.name;
 		return model;
 	},
 	text(this: ElementType, view: Element, range?: Range): string {
@@ -55,4 +44,25 @@ function getContent(view: Element, range: Range) {
 	let content = view["$content"];
 	if (!content || range && !range.intersectsNode(content)) return;
 	return content;
+}
+
+function down(recordType: ElementType, model: Record, element: Element, range: Range): Record {
+	if (range && !range.intersectsNode(element)) return model;
+	
+	for (let child of element.children) {
+		let type = child["$controller"];
+		if (type?.isProperty) {
+			if (!recordType?.types[type.name]) {
+				console.warn(`Found property "${type.name}" that is not part of the record type.`);
+			}
+			let value = type?.toModel(child, range);
+			if (value) {
+				if (!model) model = Object.create(null);
+				model[type.name] = value;
+			}
+		} else {
+			model = down(recordType, model, child, range);
+		}
+	}
+	return model;
 }
