@@ -66,7 +66,7 @@ function recordContent(contextType: ElementType, model: Record, element: Element
 }
 
 function getContentElement(view: Element, range: Range) {
-	if (!range?.intersectsNode(view)) return;
+	if (range && !range.intersectsNode(view)) return;
 	if (view.classList.contains("view")) return view;
 	for (let child of view.children) {
 		child = getContentElement(child, range);

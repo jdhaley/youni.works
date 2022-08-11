@@ -23,7 +23,10 @@ export default extend(editable, {
 		let text = range.endContainer;
 		let textEnd = range.endOffset;
 		if (text && range.collapsed) {
-			if (text.textContent == CHAR.ZWSP) text.textContent = "";
+			if (text.textContent == CHAR.ZWSP) {
+				text.textContent = "";
+				textEnd = 0;
+			}
 			text.textContent = text.textContent.replace(CHAR.NBSP, " ");
 			range.setEnd(text, textEnd);
 			range.collapse();
