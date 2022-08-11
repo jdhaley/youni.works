@@ -55,7 +55,7 @@ function mergeContent(cmd: Edit, range: Range, record: Record) {
 	for (let member = start; member; member = member.nextElementSibling) {
 		let type = member.$controller;
 		if (type.model == "text") {
-			let value = record[type["propertyName"]];
+			let value = record[type["name"]];
 			if (value) {
 				member.children[1].textContent += value;
 			}

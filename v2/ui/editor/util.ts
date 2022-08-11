@@ -148,6 +148,13 @@ export function clearContent(range: Range) {
 	}
 }
 
+/*
+compareToRange(node, range):
+- OUTSIDE	Node does not intersect the range.
+- START		The Node intersects the start of the range.
+- INSIDE	The Node is enclosed by the range.
+- END		The Node intersects the end of the range.
+*/
 function enclosedInRange(view: Element, range: Range) {
 	let r = view.ownerDocument.createRange();
 	r.selectNode(view);
