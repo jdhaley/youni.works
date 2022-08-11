@@ -129,8 +129,12 @@ export function unmark(range: Range) {
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
-		if (node.nodeType == Node.TEXT_NODE) {
-			let view = getView(node);
+		let view = getView(node);
+		if (view?.$controller.model == "record") {
+			if (getView(view.parentElement)?.$controller.model == "list") {
+				if (enclosedInRange(view, range)) view.remove();	
+			}
+		} else if (node.nodeType == Node.TEXT_NODE) {
 			if (view && node.parentElement == view.$controller.getContentOf(view)) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
@@ -141,6 +145,18 @@ export function clearContent(range: Range) {
 				}	
 			}
 		}
+	}
+}
+
+function enclosedInRange(view: Element, range: Range) {
+	let r = view.ownerDocument.createRange();
+	r.selectNode(view);
+	// before −1.
+	// equal 0.
+	// after 1.
+	if (range.compareBoundaryPoints(Range.START_TO_START, r) != 1
+		&& range.compareBoundaryPoints(Range.END_TO_END, r) != -1) {
+		return true;
 	}
 }
 
