@@ -7,7 +7,7 @@ type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
 type modeller = (this: ViewType<unknown>, view: unknown) => content;
 
 export interface View {
-	$controller?: Controller<content, View>
+	$controller?: ViewType<unknown>;
 }
 
 export abstract class ViewType<V> extends Control implements Controller<content, V>, Type {
@@ -39,8 +39,6 @@ export abstract class ViewType<V> extends Control implements Controller<content,
 		this.owner.viewers[this.view].call(this, view, model);
 	}
 
-	abstract createView(): V;
-
 	start(name: string, conf: bundle<any>): void {
 		this.name = name;
 		if (conf) {
@@ -50,6 +48,9 @@ export abstract class ViewType<V> extends Control implements Controller<content,
 			if (conf.model) this.model = conf.model;	
 		}
 	}
+
+	abstract createView(): V;
+	abstract getContentOf(view: V): any;
 }
 
 export abstract class ViewOwner<V> extends TypeOwner<V> {
