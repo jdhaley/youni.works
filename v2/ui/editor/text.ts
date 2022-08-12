@@ -68,9 +68,8 @@ class TextEdit extends Edit {
 		this.before = content.innerHTML;	
 		range.deleteContents();
 		if (text) {
-			let ins = content.ownerDocument.createElement("I");
-			ins.textContent = text;
-			range.insertNode(ins.firstChild);
+			let ins = content.ownerDocument.createTextNode(text);
+			range.insertNode(ins);
 		}
 		this.after = content.innerHTML;
 		return unmark(range);
