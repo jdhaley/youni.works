@@ -18,24 +18,6 @@ const conf: bundle<DisplayConf> = {
 		actions: text,
 		shortcuts: shortcuts
 	},
-	markup: {
-		class: DisplayType,
-		view: "text",
-		model: "text",
-		panel: true,
-		tagName: "ui-text",
-		actions: text,
-		shortcuts: shortcuts
-	},
-	list: {
-		class: DisplayType,
-		view: "list",
-		model: "list",
-		panel: true,
-		tagName: "ui-list",
-		actions: list,
-		shortcuts: shortcuts
-	},
 	record: {
 		class: DisplayType,
 		view: "record",
@@ -45,12 +27,12 @@ const conf: bundle<DisplayConf> = {
 		actions: record,
 		shortcuts: shortcuts
 	},
-	tree: {
+	list: {
 		class: DisplayType,
 		view: "list",
 		model: "list",
 		panel: true,
-		tagName: "ui-tree",
+		tagName: "ui-list",
 		actions: list,
 		shortcuts: shortcuts
 	}

@@ -64,7 +64,6 @@ class TextEdit extends Edit {
 		mark(range);
 		let content = getContent(range);
 		if (!content) return;
-		//let view = getDisplay(range);
 		this.before = content.innerHTML;	
 		range.deleteContents();
 		if (text) {
@@ -111,12 +110,9 @@ function editAgain(range: Range, cmd: Edit, char: string) {
 	range.setStart(node, lastEdit.start);
 	range.setEnd(node, ++lastEdit.end);
 
-	mark(range);
-	cmd.after = getContent(range).innerHTML || "";
-	unmark(range);
-	range.collapse();
-	return range;
+	return endagain(range, cmd);
 }
+
 function deleteAgain(range: Range, cmd: Edit, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
@@ -124,11 +120,7 @@ function deleteAgain(range: Range, cmd: Edit, char: string) {
 	node.textContent = text;
 	range.setStart(node, lastEdit.start);
 	range.collapse(true);
-	mark(range);
-	cmd.after = getContent(range)?.innerHTML || "";
-	unmark(range);
-	range.collapse();
-	return range;
+	return endagain(range, cmd);
 }
 
 function eraseAgain(range: Range, cmd: Edit) {
@@ -139,10 +131,14 @@ function eraseAgain(range: Range, cmd: Edit) {
 
 	range.setStart(node, --lastEdit.start);
 	range.collapse(true);
+	return endagain(range, cmd);
+}
+
+function endagain(range: Range, cmd: Edit) {
 	mark(range);
-	cmd.after = getContent(range)?.innerHTML || "";
+	cmd.after = getContent(range).innerHTML || "";
 	unmark(range);
-	range.collapse(true);
+	range.collapse();
 	return range;
 }
 
