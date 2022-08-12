@@ -3,6 +3,7 @@ import {Signal, Actions, Control, Owner} from "../base/controller.js";
 export class Frame extends Owner<HTMLElement> {
 	constructor(window: Window, actions: Actions) {
 		super();
+		window.document.body.textContent = "";
 		window.document["$owner"] = this;
 		this.#window = window;
 		for (let name in actions) {
