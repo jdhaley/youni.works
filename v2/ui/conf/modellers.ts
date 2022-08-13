@@ -28,8 +28,11 @@ export default {
 		let model = "";
 		let content = getContentElement(view, range);
 
-		//HACK TO HANDLE PANEL-LESS TEXT... (DIRECT TEXT IN VIEW)
-		if (!view.children.length) content = view;
+		// USING editable class should remove the need for this hack
+		// (editable is either on the view or the content element)
+		//
+		// //HACK TO HANDLE PANEL-LESS TEXT... (DIRECT TEXT IN VIEW)
+		// if (!view.children.length) content = view;
 
 		if (content) for (let node of content.childNodes) {
 			if (node == range?.startContainer) {
@@ -40,14 +43,17 @@ export default {
 				model += node.textContent;
 			}
 		}
-		return model === CHAR.ZWSP ? "" : model;
+		model = model.replace(CHAR.ZWSP, "");
+		model = model.replace(CHAR.NBSP, " ");
+		model = model.trim();
+		return model;
 	}
 }
 
-function recordContent(contextType: ElementType, model: Record, element: Element, range: Range): Record {
-	if (range && !range.intersectsNode(element)) return model;
+function recordContent(contextType: ElementType, model: Record, view: Element, range: Range): Record {
+	if (range && !range.intersectsNode(view)) return model;
 	
-	for (let child of element.children) {
+	for (let child of view.children) {
 		let type = child["$controller"] as ElementType;
 		if (type?.model) {
 			if (contextType.model == "record" && !(type.isProperty && contextType.types[type.name])) {
@@ -65,9 +71,9 @@ function recordContent(contextType: ElementType, model: Record, element: Element
 	return model;
 }
 
-function getContentElement(view: Element, range: Range) {
+function getContentElement(view: Element, range?: Range) {
 	if (range && !range.intersectsNode(view)) return;
-	if (view.classList.contains("view")) return view;
+	if (view.classList.contains("content")) return view;
 	for (let child of view.children) {
 		child = getContentElement(child, range);
 		if (child) return child;

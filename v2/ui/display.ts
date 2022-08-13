@@ -117,7 +117,7 @@ export class DisplayType extends ElementType {
 				view.append(this.createFooter(view, model));
 			}
 		} else {
-			view.classList.add("editable");
+			view.classList.add("content");
 			view.$content = view;
 		}
 		super.viewContent(view.$content, model);
@@ -130,7 +130,7 @@ export class DisplayType extends ElementType {
 	createContent(view: Display, model?: content) {
 		view.$content = this.owner.createElement("div");
 		view.$content.classList.add("view");
-		view.$content.classList.add("editable");
+		view.$content.classList.add("content");
 		return view.$content;
 	}
 	createFooter(view: Display, model?: content) {
