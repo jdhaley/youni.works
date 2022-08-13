@@ -2,19 +2,19 @@ import {CHAR} from "../../base/util.js";
 
 import {Article, Editable} from "./editor.js";
 
-export function getView(node: Node | Range): Editable {
+export function getEditableView(node: Node | Range): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node["$controller"]) {
-			(node as Editable).$controller.getContentOf(node); //ensures view isn't corrupted.
-			return node as Editable;
+	if (node.nodeType == Node.ELEMENT_NODE) node = node.parentElement;
+	for (let ele = node as Editable; ele; ele = ele.parentElement) {
+		if (ele.$controller?.model) {
+			ele.$controller.getContentOf(node); //ensures view isn't corrupted.
+			return ele as any as Editable;
 		}
-		node = node.parentElement;
 	}
 }
 
 export function getContent(node: Node | Range): Editable {
-	let view = getView(node);
+	let view = getEditableView(node);
 	return view?.$controller.getContentOf(view);
 }
 
@@ -31,7 +31,7 @@ export function getChildView(ctx: Element, node: Node): Editable {
 
 export function getEditRange(range: Range): Range {
 	range = range.cloneRange();
-	let view = getView(range.commonAncestorContainer);
+	let view = getEditableView(range.commonAncestorContainer);
 	let content = view?.$controller.getContentOf(view);
 	if (!content) return;
 
@@ -129,9 +129,9 @@ export function unmark(range: Range) {
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
-		let view = getView(node);
+		let view = getEditableView(node);
 		if (view?.$controller.model == "record") {
-			if (getView(view.parentElement)?.$controller.model == "list") {
+			if (getEditableView(view.parentElement)?.$controller.model == "list") {
 				if (enclosedInRange(view, range)) view.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
@@ -182,7 +182,7 @@ export function replace(article: Article, range: Range, markup: string) {
 }
 
 export function narrowRange(range: Range) {
-	let view = getView(range);
+	let view = getEditableView(range);
 	if (!view) return;
 
 	let start = range.startContainer;

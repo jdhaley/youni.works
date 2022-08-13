@@ -1,7 +1,7 @@
 import {CHAR} from "../../base/util.js";
 
 import {Article, Edit} from "./editor.js";
-import {getContent, getView, mark, replace, unmark} from "./util.js";
+import {getContent, getEditableView, mark, replace, unmark} from "./util.js";
 
 let lastEdit = {
 	action: "",
@@ -12,7 +12,7 @@ let lastEdit = {
 
 export default function edit(commandName: string, range: Range, text: string): Range {
 	let node = range.commonAncestorContainer;
-	let view = getView(node);
+	let view = getEditableView(node);
 
 	if (view?.$controller.model != "text") {
 		console.error("Invalid range for edit.");
