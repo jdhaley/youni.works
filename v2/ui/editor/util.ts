@@ -4,10 +4,10 @@ import {Article, Editable} from "./editor.js";
 
 export function getEditableView(node: Node | Range): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
-	if (node.nodeType == Node.ELEMENT_NODE) node = node.parentElement;
+	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
 	for (let ele = node as Editable; ele; ele = ele.parentElement) {
 		if (ele.$controller?.model) {
-			ele.$controller.getContentOf(node); //ensures view isn't corrupted.
+			ele.$controller.getContentOf(ele); //ensures view isn't corrupted.
 			return ele as any as Editable;
 		}
 	}
