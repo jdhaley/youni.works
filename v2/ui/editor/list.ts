@@ -88,7 +88,7 @@ function startEdit(cmd: ListEdit, ctx: Element, range: Range) {
 	//passed range and should only be used within this method.
 	range = getEditExtent(ctx, range);
 	let view = getEditableView(ctx);
-	console.log("BEFORE:", view.$controller.toModel(view, range, true));
+	console.log("BEFORE:", JSON.stringify(view.$controller.toModel(view, range, true)));
 	recordRange(cmd, ctx, range);
 	//Capture the before image for undo.
 	cmd.before = "";

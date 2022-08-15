@@ -20,8 +20,8 @@ export default {
 			if (value) {
 				if (!model) {
 					model = [];
+					if (id) model.push(view.id);
 					if (this.name) model["type$"] = this.name;
-					if (id) model["id$"] = view.id;
 				}
 				model.push(value);
 			}
