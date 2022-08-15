@@ -4,8 +4,19 @@ import {Editor} from "../editor/editor.js";
 import {getContent, getHeader, narrowRange} from "../editor/util.js";
 
 import editable from "./editable.js";
+import { getView } from "../../base/dom.js";
+import { setClipboard } from "../clipboard.js";
 
 export default extend(editable, {
+	cut(this: Editor, event: UserEvent) {
+		event.subject = "";
+		let range = event.range;
+		positionToText(range);
+		if (range.collapsed) return;
+		setClipboard(this as any, range.cloneRange(), event.clipboardData);
+		range = this.edit("Cut", range);
+		range && this.owner.setRange(range, true);
+	},
 	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let text = event.clipboardData.getData("text/plain");
@@ -56,10 +67,10 @@ export default extend(editable, {
 });
 
 function positionToText(range: Range) {
+	let inHeader = getHeader(getView(range), range.startContainer);
+	narrowRange(range);
 	if (range.collapsed) {
 		let content = getContent(range);
-		let inHeader = getHeader(editable, range.startContainer);
-		narrowRange(range);	
 		if (content.childNodes.length != 1) {
 			//force single text node...
 			content.textContent = content.textContent;
