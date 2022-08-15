@@ -1,3 +1,4 @@
+import { getView, toXmlModel } from "../../base/dom.js";
 import {content} from "../../base/model.js";
 
 import {Article, Editable, Edit, Editor} from "./editor.js";
@@ -27,6 +28,7 @@ function doEdit(cmd: ListEdit, ctx: Element, range: Range, markup: string) {
 	cmd.after += markup;
 	cmd.after += handleEndContainer(ctx, range);
 	replace(cmd.owner, range, markup);
+	console.log("AFTER:", toXmlModel(range));
 }
 
 function toMarkup(editor: Editor, content: content) {
@@ -85,8 +87,9 @@ function startEdit(cmd: ListEdit, ctx: Element, range: Range) {
 	//NB - the edit extent range is a different range from the
 	//passed range and should only be used within this method.
 	range = getEditExtent(ctx, range);
+	let view = getEditableView(ctx);
+	console.log("BEFORE:", view.$controller.toModel(view, range, true));
 	recordRange(cmd, ctx, range);
-
 	//Capture the before image for undo.
 	cmd.before = "";
 	for (let i = range.startOffset; i < range.endOffset; i++) {

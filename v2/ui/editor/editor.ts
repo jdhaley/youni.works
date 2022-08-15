@@ -9,6 +9,7 @@ export interface Editable extends Element {
 export interface Editor extends Controller<content, Editable>  {
 	readonly model: string;
 	readonly owner: Article;
+	toModel(view: Element, range?: Range, id?: true): content;
 	getContentOf(node: Node): Element;
 	edit(commandName: string, range: Range, content?: content): Range;
 }

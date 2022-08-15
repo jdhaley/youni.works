@@ -1,4 +1,4 @@
-import { content } from "./model.js";
+import { content, Record } from "./model.js";
 import { ViewOwner, ViewType } from "./view.js";
 
 interface ElementView extends Element {
@@ -8,8 +8,8 @@ interface ElementView extends Element {
 export class ElementType extends ViewType<Element> {
 	declare readonly owner: ElementOwner;
 
-	toModel(view: Element, range?: Range): content {
-		if (this.model) return this.owner.modellers[this.model].call(this, view, range);
+	toModel(view: Element, range?: Range, id?: true): content {
+		if (this.model) return this.owner.modellers[this.model].call(this, view, range, id);
 	}
 	createView(): Element {
 		let view = this.owner.createElement(this.conf.tagName);
@@ -46,24 +46,35 @@ export function getView(node: Node | Range): Element {
 	}
 }
 
-export function toXmlModel(node: Node | Range) {
-	let view: ElementView = getView(node) as any;
+export function toXmlModel(range: Range) {
+	let view: ElementView = getView(range) as any;
 	let doc = document.implementation.createDocument("xmlModel", view.$controller.name);
 	let model: Element = doc.documentElement;
-	xmlify(view, model);
+	xmlify(view, model, range);
 	return model;
 }
 
-function xmlify(view: ElementView, model: Element): void {
+export function fromXmlModel(type: ElementType, model: Element): Record {
+	let content: Record = Object.create(null);
+	content.type$ = type.name;
+	for (let child of model.children) {
+		let ptype = type.types[child.tagName] as ElementType;
+		content[child.tagName] = fromXmlModel(ptype, model);
+	}
+	return content;
+}
+function xmlify(view: ElementView, model: Element, range: Range): void {
+	if (!range.intersectsNode(view)) return;
 	let content = getContent(view);
-	for (let childView of content?.children as Iterable<ElementView>) {
+	if (content) for (let childView of content.children as Iterable<ElementView>) {
 		let childModel = model.ownerDocument.createElement(childView.$controller.name);
 		if (childView.id) childModel.id = childView.id;
+		if (childView.ariaLevel) childModel.setAttribute("level", childView.ariaLevel);
 		model.append(childModel);
 		if (childView.$controller.model == "text") {
-			childModel.innerHTML = "" + childView.$controller.toModel(childView);
+			childModel.innerHTML = "" + childView.$controller.toModel(childView, range);
 		} else {
-			xmlify(childView, childModel);
+			xmlify(childView, childModel, range);
 		}
 	}
 }

@@ -3,28 +3,32 @@ import { ElementType } from "../../base/dom.js";
 import { CHAR } from "../../base/util.js";
 
 export default {
-	record(this: ElementType, view: Element, range?: Range): Record {
-		let model = recordContent(this, null, view, range);
-		if (model) model["type$"] = this.name;
+	record(this: ElementType, view: Element, range?: Range, id?: true): Record {
+		let model = recordContent(this, null, view, range, id);
+		if (model) {
+			model["type$"] = this.name;
+			if (id) model["id$"] = view.id;
+		}
 		return model;
 	},
-	list(this: ElementType, view: Element, range?: Range): List {
+	list(this: ElementType, view: Element, range?: Range, id?: true): List {
 		let model: content[];
 		let content = getContentElement(view, range);
 		if (content) for (let part of content.children) {
 			let type = this.owner.getControlOf(part) as ElementType;
-			let value = type?.toModel(part, range);
+			let value = type?.toModel(part, range, id);
 			if (value) {
 				if (!model) {
 					model = [];
 					if (this.name) model["type$"] = this.name;
+					if (id) model["id$"] = view.id;
 				}
-				model.push(value);	
+				model.push(value);
 			}
 		}
 		return model;
 	},
-	text(this: ElementType, view: Element, range?: Range): string {
+	text(this: ElementType, view: Element, range?: Range, id?: true): string {
 		let model = "";
 		let content = getContentElement(view, range);
 
@@ -46,11 +50,12 @@ export default {
 		model = model.replace(CHAR.ZWSP, "");
 		model = model.replace(CHAR.NBSP, " ");
 		model = model.trim();
+		if (id) model = view.id + ":" + model;
 		return model;
 	}
 }
 
-function recordContent(contextType: ElementType, model: Record, view: Element, range: Range): Record {
+function recordContent(contextType: ElementType, model: Record, view: Element, range: Range, id?: true): Record {
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {
@@ -59,13 +64,13 @@ function recordContent(contextType: ElementType, model: Record, view: Element, r
 			if (contextType.model == "record" && !(type.isProperty && contextType.types[type.name])) {
 				console.warn(`Found property "${type.name}" that is not part of the record type.`);
 			}
-			let value = type.toModel(child, range);
+			let value = type.toModel(child, range, id);
 			if (value) {
 				if (!model) model = Object.create(null);
 				model[type.name] = value;
 			}
 		} else {
-			model = recordContent(contextType, model, child, range);
+			model = recordContent(contextType, model, child, range, id);
 		}
 	}
 	return model;
