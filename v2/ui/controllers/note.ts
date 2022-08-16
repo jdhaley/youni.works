@@ -1,12 +1,20 @@
 import {extend} from "../../base/util.js";
-import {Frame, UserEvent} from "../ui.js"
+import {CommandBuffer} from "../../base/command.js";
 
-import {RangeCommands} from "../../devt/note/items/editor.js";
+import {Frame, UserEvent} from "../ui.js";
+import {getContent} from "../editor/util.js";
+
 import items from "../../devt/note/items/items.js";
 import text from "../../devt/note/items/text.js";
 
 import baseController from "./editable.js";
 
+/***************
+ Priorities:
+ 	toView
+	toModel
+	get & set clipboard
+ ***************/
 // import { Controller, Receiver } from "../../base/controller.js";
 // import { content } from "../../base/model.js";
 // import { CommandBuffer } from "../../base/command.js";
@@ -29,19 +37,55 @@ import baseController from "./editable.js";
 // 	setRange(range: Range, collapse?: boolean): void;
 // }
 
+/* RangeCommands is the implementation */
+import {RangeCommands} from "../../devt/note/items/editor.js";
+import { setClipboard } from "../clipboard.js";
+import { ElementType } from "../../base/dom.js";
+
 interface NoteOwner {
 	frame: Frame;
-	commands: RangeCommands;
-	document: Document;
-	selectionRange: Range;
+	commands: CommandBuffer<Range>;
 	markup(x: string | Range): string;
 }
-interface Note {
+
+interface Note /* Editor */ {
 	owner: NoteOwner;
-	transform: any;
-	navigateToText(range: Range, bf: string): Range;
+	//transform: any;
+	toView(model: string): Element;
+	//toModel(view: Element, range?: Range): content;
+	
+	//Standard editor inteface.
+	edit(commandName: string, range: Range, content?: string): Range;
+
+	/////// extended editor commands /////////
+
+	//Might be able to factor out using the text editor command.
+	editText(name: string, range: Range, content: string, offset: number): Range;
+
+	insert(range: Range): Range;
+	split(range: Range): Range;
+	level(name: "Promote" | "Demote", range: Range): Range;
+
 }
 
+function navigateToText(range: Range, direction: "prior" | "next"): Range {
+	let note = getContent(range);
+	let node = range.commonAncestorContainer;
+	if (node == note) {
+		node = note.childNodes[range.startOffset];
+		if (!node) return null;
+		node = direction == "prior" ? text.lastText(node) : text.firstText(node);
+	} else {
+		node = direction == "prior" ? text.priorText(node) : text.nextText(node);
+	}
+	if (node?.nodeType == Node.TEXT_NODE) {
+		range.selectNodeContents(node);
+		range.collapse(direction == "prior" ? false : true);
+		return range;
+	}
+	return null;	
+}
+///////////////////////////
 const tag = {
 	"b": "STRONG",
 	"i": "EM",
@@ -51,67 +95,70 @@ const tag = {
 export default extend(baseController, {
 	cut(this: Note, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
+		let range = event.range;
 		if (range.collapsed) return;
-		let source = this.owner.document.createElement("DIV");
+/*	REPLACE:
+		let source = range.commonAncestorContainer.ownerDocument.createElement("DIV");
 		source.innerHTML = this.owner.markup(range);
 		let target = this.transform.fromView(source) as HTMLElement;
-
-		this.owner.commands.replace("Cut", range, "");
 		event.clipboardData.setData("text/html", target.innerHTML);
 		event.clipboardData.setData("text/plain", items.toTextLines(range));
+	WITH */
+		setClipboard(this as any, range, event.clipboardData);
+		this.edit("Cut", range, "");
 	},
 	copy(this: Note, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
-		let source = this.owner.document.createElement("DIV");
+		let range = event.range;
+/*	REPLACE:
+		let source = this.owner.frame.createElement("DIV");
 		source.innerHTML = this.owner.markup(range);
 		let target = this.transform.fromView(source) as HTMLElement;
 		event.clipboardData.setData("text/html", target.innerHTML);
 		event.clipboardData.setData("text/plain", items.toTextLines(range));
+	WITH */
+		setClipboard(this as any, range, event.clipboardData);
 	},
 	paste(this: Note, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
+		let range = event.range;
 		let data = event.clipboardData.getData("text/html");
 		if (data) {
-			let source = this.owner.document.createElement("DIV");
-			source.innerHTML = data;
-			data = this.transform.toView(source).innerHTML;
+			data = this.toView(data).innerHTML;
 		} else {
 			data = event.clipboardData.getData("text/plain");
 			if (!data) return console.warn("no data to paste");	
 			if (data.indexOf("\n")) {
-				data = items.itemsFromText(this.owner.document, data).innerHTML;
+				data = items.itemsFromText(event.on.ownerDocument, data).innerHTML;
 			}
 		}
-		this.owner.commands.replace("Paste", range, data);
+		this.edit("Paste", range, data);
 		range.collapse();
 	},
 	charpress(this: Note, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
+		let range = event.range;
 		if (!range.collapsed) {
 			/* TODO The range's start after the replace is from
 				the start of the item (or text node) - not the actual selected range.
 				This i think is a limitation of the replace algo.  There's not much harm here
 				particularly when we collapse the range.
 			*/
-			this.owner.commands.replace("Replace", range, `<P>${event.key}</P>`);
+			this.edit("Replace", range, `<P>${event.key}</P>`);
 			range.collapse();
 			return;
 		}
 		let node = range.commonAncestorContainer;
 		if (node.nodeType != Node.TEXT_NODE) {
-			let to = this.navigateToText(range, "next");
-			if (!to) to = this.navigateToText(range, "prior");
+			let to = navigateToText(range, "next");
+			if (!to) to = navigateToText(range, "prior");
 			if (to) {
 				range = to;
 			} else {
 				range.selectNodeContents(items.getItems(range));
 				range.collapse(true);
 				let value = event.key == " " ? "\xa0" : event.key;
-				this.owner.commands.replace("Insert", range, "<P>" + value + "</P>");
+				this.edit("Insert", range, "<P>" + value + "</P>");
 				to = range;
 			}
 		}
@@ -119,23 +166,23 @@ export default extend(baseController, {
 		let offset = range.startOffset;
 		let text = range.commonAncestorContainer.textContent;
 		text = text.substring(0, offset) + event.key + text.substring(offset);
-		this.owner.commands.edit("Enter-Text", range, text, offset + 1);
+		this.editText("Enter-Text", range, text, offset + 1);
 	},
 	delete(this: Note, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
+		let range = event.range;
 		if (!range.collapsed) {
-			this.owner.commands.replace("Delete", range, "");
+			this.edit("Delete", range, "");
 			return;
 		} 
 		let node = range.commonAncestorContainer;
 		if (node.nodeType != Node.TEXT_NODE || range.startOffset >= node.textContent.length) {
-			range = this.navigateToText(range, "next");
+			range = navigateToText(range, "next");
 			if (!range) return console.warn("cant navigate to text node.");
 		}
 		if (items.getItem(range.commonAncestorContainer) != items.getItem(node)) {
 			range.setStartAfter(items.getItem(node).lastChild);
-			this.owner.commands.replace("Join", range, "");
+			this.edit("Join", range, "");
 			return;
 		}
 
@@ -143,34 +190,34 @@ export default extend(baseController, {
 		let text = range.commonAncestorContainer.textContent;
 		if (offset >= text.length) return;
 		text = text.substring(0, offset) + text.substring(offset + 1);
-		this.owner.commands.edit("Delete-Text", range, text, offset);
+		this.editText("Delete-Text", range, text, offset);
 	},
 	erase(this: Note, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
+		let range = event.range;
 		if (!range.collapsed) {
-			this.owner.commands.replace("Delete", range, "");
+			this.edit("Delete", range, "");
 			return;
 		}
 		let node = range.commonAncestorContainer;
 		if (node.nodeType != Node.TEXT_NODE || range.startOffset == 0) {
-			range = this.navigateToText(range, "prior");
+			range = navigateToText(range, "prior");
 			if (!range) return console.warn("cant navigate to text node.");
 		}
 		if (items.getItem(range.commonAncestorContainer) != items.getItem(node)) {
 			range.setEndBefore(items.getItem(node).firstChild);
-			this.owner.commands.replace("Join", range, "");
+			this.edit("Join", range, "");
 			return;
 		}
 		let offset = range.startOffset;
 		let text = range.commonAncestorContainer.textContent;
 		if (offset < 1) return;
 		text = text.substring(0, offset - 1) + text.substring(offset);
-		this.owner.commands.edit("Erase-Text", range, text, offset - 1);
+		this.editText("Erase-Text", range, text, offset - 1);
 	},
 	enter(this: Note, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
+		let range = event.range;
 		if (!range.collapsed) return console.warn("TODO: split when selection is a range.");
 		let point = {
 			node: range.startContainer,
@@ -187,31 +234,31 @@ export default extend(baseController, {
 		if (!this.owner.markup(range)) {
 
 			//For some reason, the selection range gets whacked.
-			this.owner.selectionRange = this.owner.commands.insert(range);
+			this.owner.frame.selectionRange = this.insert(range);
 			return;
 		}
 
 		range.selectNodeContents(item);
 		range.setStart(point.node, point.offset);
-		this.owner.commands.split(range);
+		this.split(range);
 		range.selectNodeContents(text.firstText(item.nextElementSibling));
 		range.collapse(true);
 
 	},
 	promote(this: Note, event: UserEvent) {
 		event.subject = "";
-		this.owner.commands.level("Promote", this.owner.selectionRange);
+		this.level("Promote", event.range);
 	},
 	demote(this: Note, event: UserEvent) {
 		event.subject = "";
-		this.owner.commands.level("Demote", this.owner.selectionRange);
+		this.level("Demote", event.range);
 	},
 	tag(this: Note, event: UserEvent) {
 		event.subject = "";
-		let range = this.owner.selectionRange;
+		let range = event.range;
 		let tagName = tag[event.key] || "SPAN";
 		let content = this.owner.markup(range) || "&nbsp;";
-		this.owner.commands.replace("Tag", range, `<p><${tagName}>${content}</${tagName}></p>`);
+		this.edit("Tag", range, `<p><${tagName}>${content}</${tagName}></p>`);
 		let node = range.startContainer.childNodes[range.startOffset];
 		range.selectNodeContents(node.firstChild);
 		range.collapse();
