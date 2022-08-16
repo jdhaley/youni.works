@@ -28,7 +28,7 @@ function doEdit(cmd: ListEdit, ctx: Element, range: Range, markup: string) {
 	cmd.after += markup;
 	cmd.after += handleEndContainer(ctx, range);
 	replace(cmd.owner, range, markup);
-	console.log("AFTER:", toXmlModel(range));
+	//console.log("AFTER:", toXmlModel(range));
 }
 
 function toMarkup(editor: Editor, content: content) {

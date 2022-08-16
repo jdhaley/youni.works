@@ -4,6 +4,12 @@ import { CHAR } from "../base/util.js";
 import { viewType } from "../base/view.js";
 
 
+export function getClipboard(clipboard: DataTransfer): content {
+	let data = clipboard.getData("application/json");
+	if (data) return JSON.parse(data);
+	return clipboard.getData("text/plain");
+}
+
 export function setClipboard(type: ElementType, range: Range, clipboard: DataTransfer) {
 	let node = range.commonAncestorContainer;
 	if (node.nodeType == Node.TEXT_NODE) {
@@ -62,10 +68,4 @@ function htmlify(view: HTMLElement): HTMLElement {
 			html.innerHTML = view.innerHTML;
 			return html;
 	}
-}
-
-export function getClipboard(clipboard: DataTransfer): content {
-	let data = clipboard.getData("application/json");
-	if (data) return JSON.parse(data);
-	return clipboard.getData("text/plain");
 }
