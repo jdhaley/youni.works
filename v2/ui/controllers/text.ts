@@ -1,10 +1,9 @@
 import {CHAR, extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
-import {getContent, getHeader, narrowRange} from "../editor/util.js";
+import {getEditableView, getContent, getHeader, narrowRange} from "../editor/util.js";
 
 import editable from "./editable.js";
-import { getView } from "../../base/dom.js";
 import { setClipboard } from "../clipboard.js";
 
 export default extend(editable, {
@@ -67,7 +66,7 @@ export default extend(editable, {
 });
 
 function positionToText(range: Range) {
-	let inHeader = getHeader(getView(range), range.startContainer);
+	let inHeader = getHeader(getEditableView(range), range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
 		let content = getContent(range);
