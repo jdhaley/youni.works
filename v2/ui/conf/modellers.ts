@@ -57,7 +57,7 @@ export default {
 		let model: Record[] = [];
 		let content = getContentElement(view, range);
 		if (content) for (let part of content.children) {
-			if (!range.intersectsNode(part)) break;
+			if (range && !range.intersectsNode(part)) break;
 
 			let type = part.tagName;
 			let level = part.getAttribute("aria-level") || "";
