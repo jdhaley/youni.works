@@ -1,9 +1,9 @@
-import { DisplayType } from "../display.js";
+import { DisplayType } from "../../display.js";
 
-import {RangeCommand, LevelCommand} from "../../devt/note/items/commands.js";
-import items from "../../devt/note/items/items.js";
-import {startEdit, replace, edit} from "../../devt/note/items/edit.js";
-import { mark, unmark } from "./util.js";
+import {RangeCommand, LevelCommand} from "../../../devt/note/items/commands.js";
+import items from "../../../devt/note/items/items.js";
+import {startEdit, replace, edit} from "../../../devt/note/items/edit.js";
+import { mark, unmark } from "../util.js";
 
 export class NoteEditor extends DisplayType {
 	#trk: Node = null;
