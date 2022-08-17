@@ -29,42 +29,6 @@ export function getChildView(ctx: Element, node: Node): Editable {
 	return node as Editable;
 }
 
-export function getEditRange(range: Range): Range {
-	range = range.cloneRange();
-	let view = getEditableView(range.commonAncestorContainer);
-	let content = view?.$controller.getContentOf(view);
-	if (!content) return;
-
-	//TODO check elements after each range change?
-	if (view != content) {
-		let start = getChildView(view, range.startContainer);
-		let end = getChildView(view, range.endContainer);
-
-		if (isBefore(start, content)) range.setStart(content, 0);
-		if (isAfter(start, content)) {
-			range.setStart(content, content.childNodes.length);
-			range.collapse(true);
-		}
-		if (isAfter(end, content)) range.setEnd(content, content.childNodes.length);
-	}
-	return range;
-}
-
-function isAfter(node: Node, rel: Node): boolean {
-	if (node.parentNode != rel.parentNode) while (node) {
-	   if (node.nextSibling == rel) return true;
-	   node = node.nextSibling;
-   }
-   return false;
-}
-function isBefore(node: Node, rel: Node): boolean {
-	if (node.parentNode != rel.parentNode) while (node) {
-	   if (node.previousSibling == rel) return true;
-	   node = node.previousSibling;
-   }
-   return false;
-}
-
 export function getHeader(view: Element, node: Node) {
 	while (node && node != view) {
 		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
