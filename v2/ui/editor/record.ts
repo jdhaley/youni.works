@@ -1,7 +1,7 @@
 import {Record} from "../../base/model.js";
 
 import { Article, Edit, Editor } from "./editor.js";
-import {getContent, getEditableView, mark, unmark, clearContent, replace, narrowRange, getChildView} from "./util.js";
+import {getContent, getEditableView, mark, unmark, clearContent, replace, narrowRange, getChildView, getArticleView} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
 	if (record && typeof record[0] == "object") record = record[0] as Record;
@@ -41,7 +41,7 @@ class RecordEdit extends Edit {
 }
 
 function getRange(cmd: Edit): Range {
-	let view = cmd.owner.getView(cmd.viewId);
+	let view = getArticleView(cmd.owner, cmd.viewId);
 	let range = view.ownerDocument.createRange();
 	range.selectNodeContents(view.$controller.getContentOf(view));
 	return range;

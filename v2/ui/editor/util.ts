@@ -168,3 +168,16 @@ export function rangeIterator(range: Range) {
 		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
 	)
 }
+
+export function getArticleView(owner: Article, id: string) {
+	let view = owner.getElementById(id) as Editable;
+	if (!view) throw new Error("Can't find view element.");
+	if (!view.$controller) {
+		console.warn("view.type$ missing... binding...");
+		owner.bindView(view as any);
+		if (!view.$controller) throw new Error("unable to bind missing type$");
+	} else {
+		view.$controller.getContentOf(view); //checks the view isn't corrupted.
+	}
+	return view;
+}

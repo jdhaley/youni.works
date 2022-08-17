@@ -17,7 +17,7 @@ export interface Editor extends Controller<content, Editable>  {
 export interface Article extends Receiver {
 	readonly commands: CommandBuffer<Range>;
 	bindView(element: Element): void;
-	getView(viewId: string): Editable;
+	getElementById(id: string): Element;
 	setRange(range: Range, collapse?: boolean): void;
 }
 

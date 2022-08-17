@@ -46,17 +46,8 @@ export class DisplayOwner extends ElementOwner {
 	createElement(tagName: string): HTMLElement {
 		return this.frame.createElement(tagName);
 	}
-	getView(id: string) {
-		let view = this.frame.getElementById(id) as Display;
-		if (!view) throw new Error("Can't find view element.");
-		if (!view.$controller) {
-			console.warn("view.type$ missing... binding...");
-			this.bindView(view as any);
-			if (!view.$controller) throw new Error("unable to bind missing type$");
-		} else {
-			view.$controller.getContentOf(view); //checks the view isn't corrupted.
-		}
-		return view;
+	getElementById(id: string): Element {
+		return this.frame.getElementById(id);
 	}
 	bindView(view: Display): void {
 		let type = view.$controller;

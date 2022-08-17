@@ -2,7 +2,7 @@ import { getView, toXmlModel } from "../../base/dom.js";
 import {content} from "../../base/model.js";
 
 import {Article, Editable, Edit, Editor} from "./editor.js";
-import {getContent, getEditableView, getHeader, mark, clearContent, unmark, replace, narrowRange, getChildView} from "./util.js";
+import {getContent, getEditableView, getHeader, mark, clearContent, unmark, replace, narrowRange, getChildView, getArticleView} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
@@ -157,16 +157,16 @@ class ListEdit extends Edit {
 }
 
 function getExecRange(cmd: ListEdit) {
-	let view = cmd.owner.getView(cmd.viewId);
+	let view = getArticleView(cmd.owner, cmd.viewId);
 	let range = view.ownerDocument.createRange();
 	range.selectNodeContents(getContent(view));
 	if (cmd.startId) {
-		let start = cmd.owner.getView(cmd.startId);
+		let start = getArticleView(cmd.owner, cmd.startId);
 		if (!start) throw new Error(`Start item.id '${cmd.startId}' not found.`);
 		range.setStartAfter(start);
 	}
 	if (cmd.endId) {
-		let end = cmd.owner.getView(cmd.endId);
+		let end = getArticleView(cmd.owner, cmd.endId);
 		if (!end) throw new Error(`End item.id '${cmd.endId}' not found.`);
 		range.setEndBefore(end);
 	}

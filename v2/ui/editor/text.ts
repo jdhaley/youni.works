@@ -1,7 +1,7 @@
 import {CHAR} from "../../base/util.js";
 
 import {Article, Edit} from "./editor.js";
-import {getContent, getEditableView, mark, replace, unmark} from "./util.js";
+import {getArticleView, getContent, getEditableView, mark, replace, unmark} from "./util.js";
 
 let lastEdit = {
 	action: "",
@@ -55,7 +55,7 @@ class TextEdit extends Edit {
 		super(owner, name, viewId);
 	}
 	protected getRange(): Range {
-		let view = this.owner.getView(this.viewId);
+		let view = getArticleView(this.owner, this.viewId);
 		let range = view.ownerDocument.createRange();
 		range.selectNodeContents(getContent(view));
 		return range;
