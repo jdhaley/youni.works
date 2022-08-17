@@ -1,7 +1,7 @@
 import {CHAR} from "../../base/util.js";
 
-import {Article, Edit} from "./editor.js";
-import {getArticleView, getContent, getEditableView, mark, replace, unmark} from "./util.js";
+import {Edit} from "./editor.js";
+import {getContent, getEditableView, mark, unmark} from "./util.js";
 
 let lastEdit = {
 	action: "",
@@ -44,42 +44,26 @@ export default function edit(commandName: string, range: Range, text: string): R
 		lastEdit.node = null;
 	}
 
-	let cmd = new TextEdit(this.owner, commandName, view.id);
-	cmd.do(range, text);
+	let cmd = new Edit(this.owner, commandName, view.id);
+	doEdit(cmd, range, text);
 	range.collapse();
 	return range;
 }
 
-class TextEdit extends Edit {
-	constructor(owner: Article, name: string, viewId: string) {
-		super(owner, name, viewId);
+function doEdit(cmd: Edit, range: Range, text: string) {
+	mark(range);
+	let content = getContent(range);
+	if (!content) return;
+	cmd.before = content.innerHTML;	
+	range.deleteContents();
+	if (text) {
+		let ins = content.ownerDocument.createTextNode(text);
+		range.insertNode(ins);
 	}
-	protected getRange(): Range {
-		let view = getArticleView(this.owner, this.viewId);
-		let range = view.ownerDocument.createRange();
-		range.selectNodeContents(getContent(view));
-		return range;
-	}
-	do(range: Range, text: string) {
-		mark(range);
-		let content = getContent(range);
-		if (!content) return;
-		this.before = content.innerHTML;	
-		range.deleteContents();
-		if (text) {
-			let ins = content.ownerDocument.createTextNode(text);
-			range.insertNode(ins);
-		}
-		this.after = content.innerHTML;
-		return unmark(range);
-	}
-	exec(markup: string) {
-		let range = this.getRange();
-		replace(this.owner, range, markup);
-		range = unmark(range);
-		return range;
-	}
+	cmd.after = content.innerHTML;
+	return unmark(range);
 }
+
 
 function doAgain(cmd: Edit, range: Range, text: string) {
 	let currentOffset = range.startOffset; //start & end are the same.

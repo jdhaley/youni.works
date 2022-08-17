@@ -1,14 +1,12 @@
-import { getView, toXmlModel } from "../../base/dom.js";
 import {content} from "../../base/model.js";
 
-import {Article, Editable, Edit, Editor} from "./editor.js";
+import {Editable, Editor, RangeEdit} from "./editor.js";
 import {getContent, getEditableView, getHeader, mark, clearContent, unmark, replace, narrowRange, getChildView, getArticleView} from "./util.js";
-
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 	if (view.$controller.model != "list") console.warn("View is not a list:", view);
 
-	let cmd = new ListEdit(this.owner, commandName, view.id);
+	let cmd = new RangeEdit(this.owner, commandName, view.id);
 	let ctx = getContent(view);
 	let markup = toMarkup(this, content);
 
@@ -23,7 +21,7 @@ export default function edit(this: Editor, commandName: string, range: Range, co
 	return range;
 }
 
-function doEdit(cmd: ListEdit, ctx: Element, range: Range, markup: string) {
+function doEdit(cmd: RangeEdit, ctx: Element, range: Range, markup: string) {
 	cmd.after = handleStartContainer(ctx, range);
 	cmd.after += markup;
 	cmd.after += handleEndContainer(ctx, range);
@@ -83,7 +81,7 @@ function handleEndContainer(ctx: Element, range: Range) {
  * @param cmd 
  * @param range 
  */
-function startEdit(cmd: ListEdit, ctx: Element, range: Range) {
+function startEdit(cmd: RangeEdit, ctx: Element, range: Range) {
 	//NB - the edit extent range is a different range from the
 	//passed range and should only be used within this method.
 	range = getEditExtent(ctx, range);
@@ -106,7 +104,7 @@ function startEdit(cmd: ListEdit, ctx: Element, range: Range) {
  * @param ctx 
  * @param range 
  */
-function recordRange(cmd: ListEdit, ctx: Element, range: Range) {
+function recordRange(cmd: RangeEdit, ctx: Element, range: Range) {
 	for (let i = range.startOffset; i; i--) {
 		let node = ctx.childNodes[i - 1] as Editable;
 		if (node.$controller) {
@@ -137,38 +135,6 @@ function getEditExtent(ctx: Element, range: Range) {
 
 	if (!(range.startContainer == ctx && range.endContainer == ctx)) {
 		throw new Error("Invalid range for edit.");
-	}
-	return range;
-}
-
-class ListEdit extends Edit {
-	constructor(owner: Article, name: string, viewId: string) {
-		super(owner, name, viewId);
-	}
-	startId: string;
-	endId: string;
-
-	protected exec(markup: string) {
-		let range = getExecRange(this);
-		replace(this.owner, range, markup);
-		range = unmark(range);
-		return range;
-	}
-}
-
-function getExecRange(cmd: ListEdit) {
-	let view = getArticleView(cmd.owner, cmd.viewId);
-	let range = view.ownerDocument.createRange();
-	range.selectNodeContents(getContent(view));
-	if (cmd.startId) {
-		let start = getArticleView(cmd.owner, cmd.startId);
-		if (!start) throw new Error(`Start item.id '${cmd.startId}' not found.`);
-		range.setStartAfter(start);
-	}
-	if (cmd.endId) {
-		let end = getArticleView(cmd.owner, cmd.endId);
-		if (!end) throw new Error(`End item.id '${cmd.endId}' not found.`);
-		range.setEndBefore(end);
 	}
 	return range;
 }
