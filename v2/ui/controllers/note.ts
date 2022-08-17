@@ -9,12 +9,6 @@ import text from "../../devt/note/items/text.js";
 
 import baseController from "./editable.js";
 
-/***************
- Priorities:
- 	toView
-	toModel
-	get & set clipboard
- ***************/
 // import { Controller, Receiver } from "../../base/controller.js";
 // import { content } from "../../base/model.js";
 // import { CommandBuffer } from "../../base/command.js";
@@ -47,6 +41,14 @@ interface NoteOwner {
 	frame: Frame;
 	commands: CommandBuffer<Range>;
 	markup(x: string | Range): string;
+}
+
+interface Editor {
+	edit(name: string, range: Range, replacement: string): Range;
+	editText(name: string, range: Range, replacement: string, offset: number): Range;
+	insert(range: Range): Range;
+	split(range: Range): Range;
+	level(name: "Promote" | "Demote", range: Range): Range;
 }
 
 interface Note /* Editor */ {
@@ -98,41 +100,18 @@ export default extend(baseController, {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) return;
-/*	REPLACE:
-		let source = range.commonAncestorContainer.ownerDocument.createElement("DIV");
-		source.innerHTML = this.owner.markup(range);
-		let target = this.transform.fromView(source) as HTMLElement;
-		event.clipboardData.setData("text/html", target.innerHTML);
-		event.clipboardData.setData("text/plain", items.toTextLines(range));
-	WITH */
 		setClipboard(this as any, range, event.clipboardData);
 		this.edit("Cut", range, "");
 	},
 	copy(this: Note, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-/*	REPLACE:
-		let source = this.owner.frame.createElement("DIV");
-		source.innerHTML = this.owner.markup(range);
-		let target = this.transform.fromView(source) as HTMLElement;
-		event.clipboardData.setData("text/html", target.innerHTML);
-		event.clipboardData.setData("text/plain", items.toTextLines(range));
-	WITH */
 		setClipboard(this as any, range, event.clipboardData);
 	},
 	paste(this: Note, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let data = getClipboard(event.clipboardData);
-		// if (data) {
-		// 	data = this.toView(data).innerHTML;
-		// } else {
-		// 	data = event.clipboardData.getData("text/plain");
-		// 	if (!data) return console.warn("no data to paste");	
-		// 	if (data.indexOf("\n")) {
-		// 		data = items.itemsFromText(event.on.ownerDocument, data).innerHTML;
-		// 	}
-		// }
 		this.edit("Paste", range, data);
 		range.collapse();
 	},
