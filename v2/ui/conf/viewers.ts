@@ -26,5 +26,15 @@ export default {
 			view.append(part);
 		}
 		//if (!view.textContent) view.append(CHAR.ZWSP);
+	},
+	note(this: ElementType, view: Element, model: Record[]): void {
+		for (let part of model) {
+			let line = this.owner.createElement(part.type$);
+			line.id = "" + NEXT_LINE++;
+			if (part.level) line.setAttribute("aria-level", "" + part.level);
+			line.innerHTML = "" + part.content;
+			view.append(line);
+		}
 	}
 }
+let NEXT_LINE = 1;

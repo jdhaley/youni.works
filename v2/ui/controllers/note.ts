@@ -39,8 +39,9 @@ import baseController from "./editable.js";
 
 /* RangeCommands is the implementation */
 import {RangeCommands} from "../../devt/note/items/editor.js";
-import { setClipboard } from "../clipboard.js";
+import { getClipboard, setClipboard } from "../clipboard.js";
 import { ElementType } from "../../base/dom.js";
+import { content } from "../../base/model.js";
 
 interface NoteOwner {
 	frame: Frame;
@@ -51,11 +52,11 @@ interface NoteOwner {
 interface Note /* Editor */ {
 	owner: NoteOwner;
 	//transform: any;
-	toView(model: string): Element;
+	toView(model: content): Element;
 	//toModel(view: Element, range?: Range): content;
 	
 	//Standard editor inteface.
-	edit(commandName: string, range: Range, content?: string): Range;
+	edit(commandName: string, range: Range, content?: content): Range;
 
 	/////// extended editor commands /////////
 
@@ -122,16 +123,16 @@ export default extend(baseController, {
 	paste(this: Note, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		let data = event.clipboardData.getData("text/html");
-		if (data) {
-			data = this.toView(data).innerHTML;
-		} else {
-			data = event.clipboardData.getData("text/plain");
-			if (!data) return console.warn("no data to paste");	
-			if (data.indexOf("\n")) {
-				data = items.itemsFromText(event.on.ownerDocument, data).innerHTML;
-			}
-		}
+		let data = getClipboard(event.clipboardData);
+		// if (data) {
+		// 	data = this.toView(data).innerHTML;
+		// } else {
+		// 	data = event.clipboardData.getData("text/plain");
+		// 	if (!data) return console.warn("no data to paste");	
+		// 	if (data.indexOf("\n")) {
+		// 		data = items.itemsFromText(event.on.ownerDocument, data).innerHTML;
+		// 	}
+		// }
 		this.edit("Paste", range, data);
 		range.collapse();
 	},

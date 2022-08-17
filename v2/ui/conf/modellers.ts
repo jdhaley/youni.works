@@ -52,6 +52,25 @@ export default {
 		model = model.trim();
 		if (id) model = view.id + ":" + model;
 		return model;
+	},
+	note(this: ElementType, view: Element, range?: Range, id?: true): Record[] {
+		let model: Record[] = [];
+		let content = getContentElement(view, range);
+		if (content) for (let part of content.children) {
+			if (!range.intersectsNode(part)) break;
+
+			let type = part.tagName;
+			let level = part.getAttribute("aria-level") || "";
+			let item: Record = {
+				type$: type,
+				content: part.innerHTML
+			}
+			if (level) item.level = level;
+			model.push(item);
+			//let line = `<${type}${level} id='${part.id}'>${part.innerHTML}</${type}>\n`;
+			//model += line;
+		}
+		return model;
 	}
 }
 

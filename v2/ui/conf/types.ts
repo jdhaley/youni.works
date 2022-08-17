@@ -3,6 +3,7 @@ import {bundle} from "../../base/util.js";
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
 import list from "../controllers/list.js";
+import note from "../controllers/note.js";
 
 import shortcuts from "./shortcuts.js";
 
@@ -34,6 +35,15 @@ const conf: bundle<DisplayConf> = {
 		panel: true,
 		tagName: "ui-list",
 		actions: list,
+		shortcuts: shortcuts
+	},
+	note: {
+		class: DisplayType,
+		panel: true,
+		view: "note",
+		model: "note",
+		tagName: "ui-note",
+		actions: note,
 		shortcuts: shortcuts
 	}
 }
