@@ -13,6 +13,7 @@ export default function edit(commandName: string, range: Range, content: string)
 const COMMANDS = {
 	"Cut": doit,
 	"Paste": doit,
+	"Replace": doit,
 	"Insert": noop,
 
 	"Entry": doit,

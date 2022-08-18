@@ -64,6 +64,16 @@ export class Frame extends Owner<HTMLElement> {
 	}
 }
 
+export interface EditEvent extends Signal, InputEvent {
+	frame: Frame;
+	source: HTMLElement;
+	on: HTMLElement;
+	//all user events
+	direction: "up";
+
+	//selection events (selection, keyboard, clipboard)
+	range: Range;
+}
 export interface UserEvent extends Signal, UIEvent {
 	frame: Frame;
 	source: HTMLElement;

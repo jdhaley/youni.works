@@ -5,10 +5,8 @@ import { DisplayType } from "../display.js";
 import { setClipboard } from "../clipboard.js";
 
 export default extend(null, {
-	command(this: DisplayType, event: UserEvent) {
-		let shortcuts = this.shortcuts;
-		let command = shortcuts && shortcuts[event.shortcut];
-		if (command) event.subject = command;
+	keydown(this: DisplayType, event: UserEvent) {
+		event.subject = this.shortcuts[event.shortcut] || "keydown";
 	},
 	save(this: DisplayType, event: UserEvent) {
 		this.owner.receive(event);

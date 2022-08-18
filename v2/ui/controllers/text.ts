@@ -1,5 +1,5 @@
 import {CHAR, extend} from "../../base/util.js";
-import {UserEvent} from "../ui.js";
+import {EditEvent, UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
 import {getEditableView, getContent, getHeader, narrowRange} from "../editor/util.js";
 
@@ -23,9 +23,17 @@ export default extend(editable, {
 		range = this.edit("Paste", range, text);
 		range && this.owner.setRange(range, true);
 	},
-	charpress(this: Editor, event: UserEvent) {
+	replaceText(this: Editor, event: EditEvent) {
 		event.subject = "";
-		let char = event.key;
+		let text = event.dataTransfer.getData("text/plain");
+		if (!text) return; //Don't proceed & clear the range when there is nothing to replace.
+		let range = event.range;
+		range = this.edit("Replace", range, text);
+		range && this.owner.setRange(range, true);
+	},
+	insertText(this: Editor, event: EditEvent) {
+		event.subject = "";
+		let char = event.data;
 		let range = event.range;
 		let text = range.endContainer;
 		let textEnd = range.endOffset;

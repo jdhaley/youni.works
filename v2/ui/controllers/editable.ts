@@ -1,6 +1,6 @@
 import {extend} from "../../base/util.js";
 
-import {UserEvent} from "../ui.js";
+import {EditEvent, UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
 import {getEditableView} from "../editor/util.js";
 import display from "./display.js";
@@ -8,7 +8,17 @@ import { getClipboard, setClipboard } from "../clipboard.js";
 
 let UNDONE = false;
 
+const EDIT_MAPPING = {
+	"insertText": "insertText",
+	"insertReplacementText": "replaceText",
+	"deleteContentForward": "delete",
+	"deleteContentBackward": "erase"
+}
 export default extend(display, {
+	beforeinput(event: EditEvent) {
+		event.subject = EDIT_MAPPING[event.inputType] || "";
+		if (!event.subject) console.log(event.inputType);
+	},
 	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
@@ -57,11 +67,9 @@ export default extend(display, {
 		/*
 		Input events should always be undone because the editor maintains its own
 		command buffer and allowing a change to the article that doesn't propagate through
-		the editor will break the command buffer. The editor traps most changes but some can't be
-		such as the user selecting "Undo" directly from the Browser Menu.
+		the editor will break the command buffer.
 
-		Unfortunately, input events can't be cancelled so hack it by undoing it. We also keep it
-		clean to handle recursive events being trigger.
+		If this event actually fires, consider it a bug in the beforeinput handling.
 		*/
 		event.subject = "";
 		if (UNDONE) {
@@ -71,9 +79,6 @@ export default extend(display, {
 			console.debug("undo input");	
 			document.execCommand("undo");
 		}
-	},
-	beforeinput(event: UserEvent) {
-		console.log(event["inputType"]);
 	},
 	undo(this: Editor, event: UserEvent) {
 		event.subject = "";

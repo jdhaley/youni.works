@@ -42,9 +42,7 @@ export default {
         // SELECTION = event;
         // sense(event);
     },
-    beforeinput(event: UserEvent) {
-        console.log(event["inputType"]);
-    },
+    beforeinput: rangeEvent,
     input: sense,
     cut: rangeEvent,
     copy: rangeEvent,
@@ -53,11 +51,6 @@ export default {
         event.range = ownerOf(event.target as Node).selectionRange;
         event.source = viewOf(event.range.commonAncestorContainer);
         event.shortcut = getShortcut(event);
-        if (event.shortcut) {
-            event.subject = "command";
-        } else {
-            event.subject = "charpress";
-        }
         sense(event);
     },
     mousedown(event: UserEvent) {
