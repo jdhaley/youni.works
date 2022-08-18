@@ -10,7 +10,6 @@ export default extend(editable, {
 	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		positionToText(range);
 		if (range.collapsed) return;
 		setClipboard(this as any, range.cloneRange(), event.clipboardData);
 		range = this.edit("Cut", range);
@@ -21,7 +20,6 @@ export default extend(editable, {
 		let text = event.clipboardData.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
-		positionToText(range);
 		range = this.edit("Paste", range, text);
 		range && this.owner.setRange(range, true);
 	},
@@ -29,7 +27,6 @@ export default extend(editable, {
 		event.subject = "";
 		let char = event.key;
 		let range = event.range;
-		positionToText(range);
 		let text = range.endContainer;
 		let textEnd = range.endOffset;
 		if (text && range.collapsed) {
@@ -50,33 +47,16 @@ export default extend(editable, {
 	erase(this: Editor, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
-		positionToText(range);
 		if (range.collapsed && !range.startOffset) return;
 		range = this.edit("Erase", range, "");
 		range && this.owner.setRange(range, true);
 	},
 	delete(this: Editor, event: UserEvent) {
-		event.subject = ""
+		event.subject = "";
 		let range = event.range;
-		positionToText(range);
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;
 		range = this.edit("Delete", range, "");
 		range && this.owner.setRange(range, true);
 	}
 });
 
-function positionToText(range: Range) {
-	let inHeader = getHeader(getEditableView(range), range.startContainer);
-	narrowRange(range);
-	if (range.collapsed) {
-		let content = getContent(range);
-		if (content.childNodes.length != 1) {
-			//force single text node...
-			content.textContent = content.textContent;
-		}
-		if (range.commonAncestorContainer.nodeType != Node.TEXT_NODE) {
-			range.selectNodeContents(content.lastChild);
-			range.collapse(inHeader ? true : false);	
-		}
-	}
-}

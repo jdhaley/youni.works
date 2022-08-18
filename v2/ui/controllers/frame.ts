@@ -42,6 +42,9 @@ export default {
         // SELECTION = event;
         // sense(event);
     },
+    beforeinput(event: UserEvent) {
+        console.log(event["inputType"]);
+    },
     input: sense,
     cut: rangeEvent,
     copy: rangeEvent,

@@ -1,7 +1,31 @@
 import {CHAR} from "../../base/util.js";
 
 import {Edit} from "./editor.js";
-import {getContent, getEditableView, mark, unmark} from "./util.js";
+import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "./util.js";
+
+export default function edit(commandName: string, range: Range, content: string) {
+	positionToText(range);
+	let cmd = COMMANDS[commandName];
+	if (!cmd) throw new Error("Unrecognized command");
+	return cmd.call(this, commandName, range, content);
+}
+
+const COMMANDS = {
+	"Cut": doit,
+	"Paste": doit,
+	"Insert": noop,
+
+	"Entry": doit,
+	"Erase": doit,
+	"Delete": doit,
+	"Promote": noop,
+	"Demote": noop,
+	"Split": noop,
+	"Join": noop,
+}
+
+function noop() {
+}
 
 let lastEdit = {
 	action: "",
@@ -9,8 +33,7 @@ let lastEdit = {
 	start: 0,
 	end: 0
 }
-
-export default function edit(commandName: string, range: Range, text: string): Range {
+function doit(commandName: string, range: Range, text: string): Range {
 	let node = range.commonAncestorContainer;
 	let view = getEditableView(node);
 
@@ -45,12 +68,12 @@ export default function edit(commandName: string, range: Range, text: string): R
 	}
 
 	let cmd = new Edit(this.owner, commandName, view.id);
-	doEdit(cmd, range, text);
+	doReplace(cmd, range, text);
 	range.collapse();
 	return range;
 }
 
-function doEdit(cmd: Edit, range: Range, text: string) {
+function doReplace(cmd: Edit, range: Range, text: string) {
 	mark(range);
 	let content = getContent(range);
 	if (!content) return;
@@ -148,4 +171,20 @@ function unmarkText(range: Range) {
 	range.setEnd(node, end);
 
 	console.log("unmark:", out, range)
+}
+
+function positionToText(range: Range) {
+	let inHeader = getHeader(getEditableView(range), range.startContainer);
+	narrowRange(range);
+	if (range.collapsed) {
+		let content = getContent(range);
+		if (content.childNodes.length != 1) {
+			//force single text node...
+			content.textContent = content.textContent;
+		}
+		if (range.commonAncestorContainer.nodeType != Node.TEXT_NODE) {
+			range.selectNodeContents(content.lastChild);
+			range.collapse(inHeader ? true : false);	
+		}
+	}
 }

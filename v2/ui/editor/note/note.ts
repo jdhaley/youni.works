@@ -4,7 +4,13 @@ import { RangeEdit } from "../editor.js";
 import {Editable, Editor} from "../editor.js";
 import {getContent, getEditableView, getHeader, mark, clearContent, unmark, replace, narrowRange, getChildView} from "../util.js";
 
-const commands = {
+export default function edit(commandName: string, range: Range, content: string) {
+	let cmd = COMMANDS[commandName];
+	if (!cmd) throw new Error("Unrecognized command");
+	return cmd(commandName, range, content);
+}
+
+const COMMANDS = {
 	"Cut": doReplace,
 	"Paste": doReplace,
 	"Insert": noop,
@@ -21,13 +27,7 @@ const commands = {
 function noop() {
 }
 
-function edit(commandName: string, range: Range, content: string) {
-	let cmd = commands[commandName];
-	if (!cmd) throw new Error("Unrecognized command");
-	return cmd(commandName, range, content);
-}
-
-export default function doReplace(this: Editor, commandName: string, range: Range, content?: content): Range {
+function doReplace(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 	if (view.$controller.model != "note") console.warn("View is not a note:", view);
 
@@ -39,19 +39,14 @@ export default function doReplace(this: Editor, commandName: string, range: Rang
 
 	mark(range);
 	startEdit(cmd, ctx, range);
-	doEdit(cmd, ctx, range, markup);
-	unmark(range);
-
-	range.collapse();
-	return range;
-}
-
-function doEdit(cmd: RangeEdit, ctx: Element, range: Range, markup: string) {
 	cmd.after = handleStartContainer(ctx, range);
 	cmd.after += markup;
 	cmd.after += handleEndContainer(ctx, range);
 	replace(cmd.owner, range, markup);
-	//console.log("AFTER:", toXmlModel(range));
+	unmark(range);
+
+	range.collapse();
+	return range;
 }
 
 function toMarkup(editor: Editor, content: content) {

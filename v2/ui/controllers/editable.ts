@@ -72,6 +72,9 @@ export default extend(display, {
 			document.execCommand("undo");
 		}
 	},
+	beforeinput(event: UserEvent) {
+		console.log(event["inputType"]);
+	},
 	undo(this: Editor, event: UserEvent) {
 		event.subject = "";
 		this.owner.setRange(this.owner.commands.undo(), false);
