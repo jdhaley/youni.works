@@ -126,7 +126,6 @@ export class DisplayType extends ElementType {
 	}
 	createFooter(view: Display, model?: content) {
 		let footer = this.owner.createElement("footer");
-		footer.textContent = CHAR.ZWSP;
 		return footer;
 	}
 	getContentOf(view: Display): HTMLElement {

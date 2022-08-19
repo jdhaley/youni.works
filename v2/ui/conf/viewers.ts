@@ -5,7 +5,7 @@ import {CHAR} from "../../base/util.js";
 
 export default {
 	text(this: ElementType, view: Element, model: string): void {
-		view.textContent =  model || CHAR.ZWSP;
+		view.textContent =  model || "";
 	},
 	record(this: ElementType, view: Element, model: Record): void {
 		view["$at"] = Object.create(null);

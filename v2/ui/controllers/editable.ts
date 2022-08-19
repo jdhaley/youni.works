@@ -11,13 +11,15 @@ let UNDONE = false;
 const EDIT_MAPPING = {
 	"insertText": "insertText",
 	"insertReplacementText": "replaceText",
+	"insertParagraph": "split",
+	"deleteSoftLineBackward": "join",
 	"deleteContentForward": "delete",
-	"deleteContentBackward": "erase"
+	"deleteContentBackward": "erase",
 }
 export default extend(display, {
 	beforeinput(event: EditEvent) {
 		event.subject = EDIT_MAPPING[event.inputType] || "";
-		if (!event.subject) console.log(event.inputType);
+		console.log(event.subject || event.inputType);
 	},
 	cut(this: Editor, event: UserEvent) {
 		event.subject = "";

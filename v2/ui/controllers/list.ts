@@ -1,7 +1,7 @@
-import {extend} from "../../base/util.js";
-import {UserEvent} from "../ui.js";
+import {CHAR, extend} from "../../base/util.js";
+import {EditEvent, UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
-import {getHeader} from "../editor/util.js";
+import {getContent, getFooter, getHeader, rangeIterator} from "../editor/util.js";
 import editable from "./editable.js";
 
 export default extend(editable, {
@@ -16,5 +16,26 @@ export default extend(editable, {
 				view.classList.add("collapsed");
 			}
 		}
+	},
+	insertText(this: Editor, event: EditEvent) {
+		if (getFooter(event.on, event.range.commonAncestorContainer)) {
+			event.subject = "";
+			let model = {
+				"title": event.data,
+				"type$": "task"
+			}
+			event.range.selectNodeContents(getContent(event.on));
+			event.range.collapse();
+			let range = this.edit("Insert", event.range, [model]);
+			goToTask(event.on, range);
+		}
 	}
 });
+
+function goToTask(view: Element, range: Range) {
+	let go = getContent(view).lastElementChild;
+	go = getContent(go).firstElementChild;
+	go = getContent(go);
+	range.setStart(go.firstChild, go.firstChild.textContent.length);
+	range.collapse(true);
+}
