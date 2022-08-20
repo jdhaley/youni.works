@@ -1,12 +1,12 @@
 import {content} from "../../base/model.js";
 
-import {Editable, Editor, RangeEdit} from "./editor.js";
+import {Editable, Editor, ReplaceRange} from "./editor.js";
 import {getContent, getEditableView, getHeader, mark, clearContent, unmark, replace, narrowRange, getChildView, getArticleView} from "./util.js";
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 	if (view.$controller.model != "list") console.warn("View is not a list:", view);
 
-	let cmd = new RangeEdit(this.owner, commandName, view.id);
+	let cmd = new ReplaceRange(this.owner, commandName, view.id);
 	let ctx = getContent(view);
 	let markup = toMarkup(this, content);
 
@@ -21,7 +21,7 @@ export default function edit(this: Editor, commandName: string, range: Range, co
 	return range;
 }
 
-function doEdit(cmd: RangeEdit, ctx: Element, range: Range, markup: string) {
+function doEdit(cmd: ReplaceRange, ctx: Element, range: Range, markup: string) {
 	cmd.after = handleStartContainer(ctx, range);
 	cmd.after += markup;
 	cmd.after += handleEndContainer(ctx, range);
@@ -81,7 +81,7 @@ function handleEndContainer(ctx: Element, range: Range) {
  * @param cmd 
  * @param range 
  */
-function startEdit(cmd: RangeEdit, ctx: Element, range: Range) {
+function startEdit(cmd: ReplaceRange, ctx: Element, range: Range) {
 	//NB - the edit extent range is a different range from the
 	//passed range and should only be used within this method.
 	range = getEditExtent(ctx, range);
@@ -104,7 +104,7 @@ function startEdit(cmd: RangeEdit, ctx: Element, range: Range) {
  * @param ctx 
  * @param range 
  */
-function recordRange(cmd: RangeEdit, ctx: Element, range: Range) {
+function recordRange(cmd: ReplaceRange, ctx: Element, range: Range) {
 	for (let i = range.startOffset; i; i--) {
 		let node = ctx.childNodes[i - 1] as Editable;
 		if (node.$controller) {

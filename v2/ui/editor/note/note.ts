@@ -1,5 +1,5 @@
 import {content} from "../../../base/model.js";
-import { Article, RangeEdit, Edit } from "../editor.js";
+import { Article, Replace, ReplaceRange } from "../editor.js";
 
 import {Editable, Editor} from "../editor.js";
 import {getContent, getEditableView, mark, unmark, narrowRange} from "../util.js";
@@ -72,7 +72,7 @@ function noop() {
 function doReplace(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 
-	let cmd = new RangeEdit(this.owner, commandName, view.id);
+	let cmd = new ReplaceRange(this.owner, commandName, view.id);
 
 	narrowRange(range);
 
@@ -134,7 +134,7 @@ function handleEndContainer(ctx: Element, range: Range, content: content) {
  * @param cmd 
  * @param range 
  */
-function beforeImage(cmd: RangeEdit, range: Range): string {
+function beforeImage(cmd: ReplaceRange, range: Range): string {
 	let view = getEditableView(range);
 	let ctx = getContent(view);
 	//NB - the edit extent range is a different range from the
@@ -167,7 +167,7 @@ function afterImage(range: Range, content: content): string {
  * @param ctx 
  * @param range 
  */
-function recordRange(cmd: RangeEdit, ctx: Element, range: Range) {
+function recordRange(cmd: ReplaceRange, ctx: Element, range: Range) {
 	for (let i = range.startOffset; i; i--) {
 		let node = ctx.childNodes[i - 1] as Editable;
 		if (node.$controller) {

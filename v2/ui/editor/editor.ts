@@ -23,7 +23,7 @@ export interface Article extends Receiver {
 	setRange(range: Range, collapse?: boolean): void;
 }
 
-export class Edit extends Command<Range> {
+export abstract class Edit extends Command<Range> {
 	constructor(owner: Article, name: string, viewId: string) {
 		super();
 		this.owner = owner;
@@ -40,16 +40,18 @@ export class Edit extends Command<Range> {
 	after: string;
 
 	undo() {
-		//console.log("undo - " + this.name, this["startId"], this["endId"]);
-		return this.exec(this.before);
+		return this.do(this.before);
 	}
 	redo() {
-		//console.log("redo - " + this.name, this["startId"], this["endId"]);
-		return this.exec(this.after);
+		return this.do(this.after);
 	}
 
-	protected exec(markup: string) {
-		let range = this.getExecRange();
+	protected abstract do(markup: string): Range;
+}
+
+export class Replace extends Edit {
+	protected do(markup: string) {
+		let range = this.getDoRange();
 		let div = range.commonAncestorContainer.ownerDocument.createElement("div");
 		div.innerHTML = markup;
 		range.deleteContents();
@@ -65,7 +67,7 @@ export class Edit extends Command<Range> {
 		return range;
 	}
 	
-	protected getExecRange(): Range {
+	protected getDoRange(): Range {
 		let view = getView(this.owner, this.viewId);
 		if (!view) throw new Error(`View "${this.viewId}" not found.`);
 		let range = view.ownerDocument.createRange();
@@ -74,14 +76,15 @@ export class Edit extends Command<Range> {
 	}
 }
 
-export class RangeEdit extends Edit {
+export class ReplaceRange extends Replace {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	startId: string;
 	endId: string;
-	protected getExecRange() {
-		let range = super.getExecRange();
+	
+	protected getDoRange() {
+		let range = super.getDoRange();
 		if (this.startId) {
 			let start = getView(this.owner, this.startId);
 			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);

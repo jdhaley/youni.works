@@ -1,6 +1,6 @@
 import {CHAR} from "../../base/util.js";
 
-import {Edit} from "./editor.js";
+import {Edit, Replace} from "./editor.js";
 import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {
@@ -68,7 +68,7 @@ function doit(commandName: string, range: Range, text: string): Range {
 		lastEdit.node = null;
 	}
 
-	let cmd = new Edit(this.owner, commandName, view.id);
+	let cmd = new Replace(this.owner, commandName, view.id);
 	doReplace(cmd, range, text);
 	range.collapse();
 	return range;

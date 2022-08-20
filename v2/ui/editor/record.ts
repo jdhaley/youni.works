@@ -1,20 +1,20 @@
 import {Record} from "../../base/model.js";
 
-import { Editor, Edit } from "./editor.js";
+import { Editor, Replace } from "./editor.js";
 import {getContent, getEditableView, mark, unmark, clearContent, replace, narrowRange, getChildView, getArticleView} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
 	if (record && typeof record[0] == "object") record = record[0] as Record;
 	let view = getEditableView(range);
 	if (view?.$controller.model == "record") {
-		let cmd = new Edit(this.owner, commandName, view.id);
+		let cmd = new Replace(this.owner, commandName, view.id);
 		return doEdit(cmd, range, record);
 	} else {
 		console.error("Invalid range for edit.");
 	}
 }
 
-function doEdit(cmd: Edit, range: Range, record: Record): Range {
+function doEdit(cmd: Replace, range: Range, record: Record): Range {
 	narrowRange(range);
 	mark(range);
 	let content = getContent(range);
@@ -28,7 +28,7 @@ function doEdit(cmd: Edit, range: Range, record: Record): Range {
 	return range;
 }
 
-function mergeContent(cmd: Edit, range: Range, record: Record) {
+function mergeContent(cmd: Replace, range: Range, record: Record) {
 	let ctx = getContent(range);
 	let start = getChildView(ctx, range.startContainer);
 	let end = getChildView(ctx, range.endContainer);
