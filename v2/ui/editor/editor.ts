@@ -118,7 +118,7 @@ export abstract class ReplaceRange extends Replace {
 		return range;
 	}
 }
-export class StdReplace extends Replace {
+export class StdReplace extends ReplaceRange {
 	exec(range: Range, content: content): Range {
 		this.doBefore(range, content);
 		this.doStart(range, content);

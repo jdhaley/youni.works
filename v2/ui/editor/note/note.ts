@@ -1,5 +1,5 @@
 import {content} from "../../../base/model.js";
-import { Article, Replace, ReplaceRange } from "../editor.js";
+import { Article, Replace, ReplaceRange, StdReplace } from "../editor.js";
 
 import {Editable, Editor} from "../editor.js";
 import {getContent, getEditableView, mark, unmark, narrowRange} from "../util.js";
@@ -69,16 +69,28 @@ const COMMANDS = {
 function noop() {
 }
 
-class NoteEdit extends ReplaceRange {
-	exec(range: Range, content: content): Range {
+class NoteEdit extends StdReplace {
+	doBefore(range: Range, content: content): void {
 		narrowRange(range);
-
 		mark(range);
 		this.before = beforeImage(this, range);
-		this.after = afterImage(range, content);
+	}
+	doStart(range: Range, content: content): void {
+		let ctx = getContent(range);
+		this.after = handleStartContainer(ctx, range, content);
+	}
+	doMiddle(range: Range, content: content): void {
+		let view = getEditableView(range);
+		this.after += toMarkup(view.$controller, content);;
+	}
+	doEnd(range: Range, content: content): void {
+		let ctx = getContent(range);
+		this.after += handleEndContainer(ctx, range, content);
+
+	}
+	doAfter(range: Range, content: content): void {
 		replace(this.owner, range, this.after);
 		unmark(range);
-		return range;
 	}
 }
 
