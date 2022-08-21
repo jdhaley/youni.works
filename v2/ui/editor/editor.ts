@@ -121,19 +121,19 @@ export abstract class ReplaceRange extends Replace {
 export class StdReplace extends ReplaceRange {
 	exec(range: Range, content: content): Range {
 		this.doBefore(range, content);
-		this.doStart(range, content);
+		this.doStartContainer(range, content);
 		this.doMiddle(range, content);
-		this.doEnd(range, content);
+		this.doEndContainer(range, content);
 		this.doAfter(range, content);
 		return range;
 	}
 	doBefore(range: Range, content: content): void {
 	}
-	doStart(range: Range, content: content): void {
+	doStartContainer(range: Range, content: content): void {
 	}
 	doMiddle(range: Range, content: content): void {
 	}
-	doEnd(range: Range, content: content): void {
+	doEndContainer(range: Range, content: content): void {
 	}
 	doAfter(range: Range, content: content): void {
 	}
@@ -142,6 +142,7 @@ export class StdReplace extends ReplaceRange {
 function getView(owner: Article, id: string) {
 	let view = owner.getElementById(id) as Editable;
 	if (!view) throw new Error("Can't find view element.");
+	if (view.getAttribute("data-item")) return view;
 	if (!view.$controller) {
 		console.warn("view.type$ missing... binding...");
 		owner.bindView(view as any);

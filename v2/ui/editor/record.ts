@@ -33,8 +33,8 @@ function mergeContent(cmd: Replace, range: Range, record: Record) {
 	let ctx = getContent(range);
 	let start = getChildView(ctx, range.startContainer);
 	let end = getChildView(ctx, range.endContainer);
-	for (let member = start; member; member = member.nextElementSibling) {
-		let type = member.$controller;
+	for (let member = start || ctx.firstElementChild; member; member = member.nextElementSibling) {
+		let type: Editor = member["$controller"];
 		if (type.model == "text") {
 			let value = record[type["name"]];
 			if (value) {

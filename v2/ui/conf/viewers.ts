@@ -30,6 +30,7 @@ export default {
 	note(this: ElementType, view: Element, model: Record[]): void {
 		for (let part of model) {
 			let line = this.owner.createElement(part.type$);
+			line.setAttribute("data-item", part.type$);
 			line.id = "" + NEXT_LINE++;
 			if (part.level) line.setAttribute("aria-level", "" + part.level);
 			line.innerHTML = "" + part.content;

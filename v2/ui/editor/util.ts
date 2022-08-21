@@ -18,15 +18,14 @@ export function getContent(node: Node | Range): Editable {
 	return view?.$controller.getContentOf(view);
 }
 
-export function getChildView(ctx: Element, node: Node): Editable {
-	if (node == ctx) return null;
-	while (node?.parentElement != ctx) {
+export function getChildView(content: Element, node: Node): Element {
+	if (node == content) return null;
+	while (node?.parentElement != content) {
 		node = node.parentElement;
 	}
-	if (!node || !node["$controller"]) {
-		console.warn("", ctx);
-	}
-	return node as Editable;
+	//$controller is for list, "data-item" for note.
+	//TODO rationalize the test for an Item/View.
+	if (node instanceof Element && (node["$controller"] || node.getAttribute("data-item"))) return node;
 }
 
 export function getHeader(view: Element, node: Node) {
