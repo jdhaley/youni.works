@@ -69,19 +69,22 @@ const COMMANDS = {
 function noop() {
 }
 
+class NoteEdit extends ReplaceRange {
+	exec(range: Range, content: content): Range {
+		narrowRange(range);
+
+		mark(range);
+		this.before = beforeImage(this, range);
+		this.after = afterImage(range, content);
+		replace(this.owner, range, this.after);
+		unmark(range);
+		return range;
+	}
+}
+
 function doReplace(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
-
-	let cmd = new ReplaceRange(this.owner, commandName, view.id);
-
-	narrowRange(range);
-
-	mark(range);
-	cmd.before = beforeImage(cmd, range);
-	cmd.after = afterImage(range, content);
-	replace(cmd.owner, range, cmd.after);
-	unmark(range);
-	return range;
+	return new NoteEdit(this.owner, commandName, view.id).exec(range, content);
 }
 function replace(article: Article, range: Range, markup: string) {
 	let div = range.commonAncestorContainer.ownerDocument.createElement("div");

@@ -1,31 +1,32 @@
 import {Record} from "../../base/model.js";
 
 import { Editor, Replace } from "./editor.js";
-import {getContent, getEditableView, mark, unmark, clearContent, replace, narrowRange, getChildView, getArticleView} from "./util.js";
+import {getContent, getEditableView, mark, unmark, clearContent, narrowRange, getChildView} from "./util.js";
 
+class RecordEdit extends Replace {
+	exec(range: Range, record: Record): Range {
+		narrowRange(range);
+		mark(range);
+
+		let content = getContent(range);
+		this.before = content?.innerHTML || "";
+		clearContent(range);
+		if (record) mergeContent(this, range, record)
+		this.after = content?.innerHTML || "";
+	
+		unmark(range);
+		return range;
+	}
+	
+}
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
 	if (record && typeof record[0] == "object") record = record[0] as Record;
 	let view = getEditableView(range);
-	if (view?.$controller.model == "record") {
-		let cmd = new Replace(this.owner, commandName, view.id);
-		return doEdit(cmd, range, record);
-	} else {
+	if (view?.$controller.model != "record") {
 		console.error("Invalid range for edit.");
+		return;
 	}
-}
-
-function doEdit(cmd: Replace, range: Range, record: Record): Range {
-	narrowRange(range);
-	mark(range);
-	let content = getContent(range);
-	cmd.before = content?.innerHTML || "";
-	clearContent(range);
-	if (record) mergeContent(this, range, record)
-	cmd.after = content?.innerHTML || "";
-
-	unmark(range);
-	range.collapse();
-	return range;
+	return new RecordEdit(this.owner, commandName, view.id).exec(range, record);
 }
 
 function mergeContent(cmd: Replace, range: Range, record: Record) {

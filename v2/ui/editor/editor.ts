@@ -39,6 +39,7 @@ export abstract class Edit extends Command<Range> {
 	before: string;
 	after: string;
 
+	abstract exec(range: Range, content: content): Range;
 	undo() {
 		return this.do(this.before);
 	}
@@ -49,7 +50,26 @@ export abstract class Edit extends Command<Range> {
 	protected abstract do(markup: string): Range;
 }
 
-export class Replace extends Edit {
+/**
+ * NoEdit exists for two reasons:
+ * - To provide a concrete class to resolve typescript not allowing an abstract class for abstract construction.
+ * - To provide a dummy class when a command mapping isn't applicable or supported.
+ */
+export class NoEdit extends Edit {
+	exec(range: Range, content: content): Range {
+		//Before
+		//Start
+		//Middle
+		//End
+		//After
+		return;
+	}
+	protected do(markup: string): Range {
+		return;
+	}
+}
+
+export abstract class Replace extends Edit {
 	protected do(markup: string) {
 		let range = this.getDoRange();
 		let div = range.commonAncestorContainer.ownerDocument.createElement("div");
@@ -76,7 +96,7 @@ export class Replace extends Edit {
 	}
 }
 
-export class ReplaceRange extends Replace {
+export abstract class ReplaceRange extends Replace {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
@@ -96,6 +116,26 @@ export class ReplaceRange extends Replace {
 			range.setEndBefore(end);
 		}
 		return range;
+	}
+}
+export class StdReplace extends Replace {
+	exec(range: Range, content: content): Range {
+		this.doBefore(range, content);
+		this.doStart(range, content);
+		this.doMiddle(range, content);
+		this.doEnd(range, content);
+		this.doAfter(range, content);
+		return range;
+	}
+	doBefore(range: Range, content: content): void {
+	}
+	doStart(range: Range, content: content): void {
+	}
+	doMiddle(range: Range, content: content): void {
+	}
+	doEnd(range: Range, content: content): void {
+	}
+	doAfter(range: Range, content: content): void {
 	}
 }
 

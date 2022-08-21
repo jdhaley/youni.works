@@ -1,16 +1,79 @@
-import {CHAR} from "../../base/util.js";
+import { content } from "../base/model.js"; 
+import { bundle, CHAR } from "../base/util.js";
 
-import {Edit, Replace} from "./editor.js";
-import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "./util.js";
+import {Edit, Editor, NoEdit, Replace} from "../ui/editor/editor.js";
+import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "../ui/editor/util.js";
 
-export default function edit(commandName: string, range: Range, content: string) {
+
+export default function edit(this: Editor, commandName: string, range: Range, content: string) {
 	positionToText(range);
-	let cmd = COMMANDS[commandName];
-	if (!cmd) throw new Error("Unrecognized command");
-	return cmd.call(this, commandName, range, content);
+	let view = getEditableView(range);
+	if (view.$controller.model != "text") console.warn("View is not a text:", view);
+
+	let op = CMD_OPS[commandName];
+	if (!op) throw new Error("Unrecognized command");
+	return op(this, commandName, range, content);
 }
 
-class TextEdit extends Replace {
+type action = (editor: Editor, commandName: string, range: Range, content?: content) => Range;
+
+const CMD_OPS: bundle<action> = {
+	"Cut": replaceText,
+	"Paste": replaceText,
+	"Replace": replaceText,
+	"Entry": (editor: Editor, commandName: string, range: Range, content: string): Range =>  {
+		if (!range.collapsed) return replaceText(editor, commandName, range, content);
+		return editText(editor, commandName, range, content);
+	},
+	"Erase": (editor: Editor, commandName: string, range: Range, content: string): Range =>  {
+		if (!range.collapsed) return replaceText(editor, commandName, range, content);
+		if (!range.startOffset) return;
+		return editText(editor, commandName, range, content);
+	},
+	"Delete": (editor: Editor, commandName: string, range: Range, content: string): Range =>  {
+		if (!range.collapsed) return replaceText(editor, commandName, range, content);
+		let node = range.commonAncestorContainer;
+		if (node.nodeType == Node.TEXT_NODE && node.textContent.length == range.endOffset) return;
+		return editText(editor, commandName, range, content);
+	},
+	"Insert": noEdit,
+	"Promote": noEdit,
+	"Demote": noEdit,
+	"Split": noEdit,
+	"Join": noEdit,
+}
+
+function noEdit(editor: Editor, commandName: string, range: Range, content?: content): Range {
+	return;
+}
+function replaceText(editor: Editor, commandName: string, range: Range, content: string) {
+	lastEdit.node = null;
+	return new ReplaceText(editor.owner, commandName, getEditableView(range).id).exec(range, content);
+}
+
+let lastEdit = {
+	action: "",
+	node: null,
+	start: 0,
+	end: 0
+}
+
+function editText(editor: Editor, commandName: string, range: Range, content: string) {
+	if (!range.collapsed) throw new Error("edit text requires a collapsed range.");
+	let node = range.commonAncestorContainer;
+	let view = getEditableView(node);
+	let result: Range;
+	if (node == lastEdit.node) {
+		let cmd = editor.owner.commands.peek() as Edit;
+		if (cmd?.name == commandName && view?.id == cmd.viewId) {
+			result = doAgain(cmd, range, content);
+		}
+	}
+	lastEdit.node = node;
+	return result || replaceText(editor, commandName, range, content);
+}
+
+class ReplaceText extends Replace {
 	exec(range: Range, text: string): Range {
 		mark(range);
 		let content = getContent(range);
@@ -22,71 +85,10 @@ class TextEdit extends Replace {
 			range.insertNode(ins);
 		}
 		this.after = content.innerHTML;
-		return unmark(range);	
+		return unmark(range);
 	}
+	
 }
-
-const COMMANDS = {
-	"Cut": doit,
-	"Paste": doit,
-	"Replace": doit,
-	"Insert": noop,
-
-	"Entry": doit,
-	"Erase": doit,
-	"Delete": doit,
-	"Promote": noop,
-	"Demote": noop,
-	"Split": noop,
-	"Join": noop,
-}
-
-function noop() {
-}
-
-let lastEdit = {
-	action: "",
-	node: null,
-	start: 0,
-	end: 0
-}
-function doit(commandName: string, range: Range, text: string): Range {
-	let node = range.commonAncestorContainer;
-	let view = getEditableView(node);
-
-	if (view?.$controller.model != "text") {
-		console.error("Invalid range for edit.");
-	}
-	if (range.collapsed && commandName == "Erase") {
-		if (!range.startOffset) return range;
-	}
-
-	if (range.collapsed && node == lastEdit.node) {
-		let cmd = this.owner.commands.peek() as Edit;
-		if (cmd?.name == commandName && view?.id == cmd.viewId) {
-			let r = doAgain(cmd, range, text);
-			if (r) return r;		
-		}
-	}
-	if (range.collapsed) {
-		lastEdit.node = range.commonAncestorContainer
-
-		if (commandName == "Erase") {
-			//Extend the range over the character for the cmd.do()
-			range.setStart(lastEdit.node, range.startOffset - 1);
-		}
-		lastEdit.start = range.startOffset;
-		if (commandName == "Delete") {
-			range.setEnd(lastEdit.node, range.endOffset + 1);
-		}
-		lastEdit.end = commandName == "Entry" ? range.endOffset + 1 : range.endOffset;
-	} else {
-		lastEdit.node = null;
-	}
-
-	return new TextEdit(this.owner, commandName, view.id).exec(range, text);
-}
-
 
 function doAgain(cmd: Edit, range: Range, text: string) {
 	let currentOffset = range.startOffset; //start & end are the same.
@@ -183,7 +185,7 @@ function positionToText(range: Range) {
 			content.textContent = content.textContent;
 		}
 		if (range.commonAncestorContainer.nodeType != Node.TEXT_NODE) {
-			range.selectNodeContents(content?.lastChild || content);
+			range.selectNodeContents(content.lastChild);
 			range.collapse(inHeader ? true : false);	
 		}
 	}

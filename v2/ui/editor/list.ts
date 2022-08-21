@@ -2,23 +2,32 @@ import {content} from "../../base/model.js";
 
 import {Editable, Editor, ReplaceRange} from "./editor.js";
 import {getContent, getEditableView, getHeader, mark, clearContent, unmark, replace, narrowRange, getChildView, getArticleView} from "./util.js";
+
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 	if (view.$controller.model != "list") console.warn("View is not a list:", view);
 
-	let cmd = new ReplaceRange(this.owner, commandName, view.id);
-	let ctx = getContent(view);
-	let markup = toMarkup(this, content);
+	return new ListEdit(this.owner, commandName, view.id).exec(range, content);
+}
 
-	adjustRange(ctx, range);
+class ListEdit extends ReplaceRange {
+	exec(range: Range, content: content): Range {
+		let view = getEditableView(range);
+		let editor = view.$controller;
+		let ctx = editor.getContentOf(view);
 
-	mark(range);
-	startEdit(cmd, ctx, range);
-	doEdit(cmd, ctx, range, markup);
-	unmark(range);
-
-	range.collapse();
-	return range;
+		let markup = toMarkup(editor, content);
+	
+		adjustRange(ctx, range);
+	
+		mark(range);
+		startEdit(this, ctx, range);
+		doEdit(this, ctx, range, markup);
+		unmark(range);
+	
+		range.collapse();
+		return range;			
+	}
 }
 
 function doEdit(cmd: ReplaceRange, ctx: Element, range: Range, markup: string) {
@@ -85,8 +94,8 @@ function startEdit(cmd: ReplaceRange, ctx: Element, range: Range) {
 	//NB - the edit extent range is a different range from the
 	//passed range and should only be used within this method.
 	range = getEditExtent(ctx, range);
-	let view = getEditableView(ctx);
-	console.log("BEFORE:", JSON.stringify(view.$controller.toModel(view, range, true)));
+	// let view = getEditableView(ctx);
+	// console.log("BEFORE:", JSON.stringify(view.$controller.toModel(view, range, true)));
 	recordRange(cmd, ctx, range);
 	//Capture the before image for undo.
 	cmd.before = "";
