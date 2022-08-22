@@ -1,8 +1,8 @@
-import {content} from "../../../base/model.js";
-import { Article, Replace, ReplaceRange, StdReplace } from "../editor.js";
+import {content} from "../../base/model.js";
+import { Article, Replace, ReplaceRange, StdReplace } from "./editor.js";
 
-import {Editable, Editor} from "../editor.js";
-import {getContent, getEditableView, mark, unmark, narrowRange, getChildView} from "../util.js";
+import {Editable, Editor} from "./editor.js";
+import {getContent, getEditableView, mark, unmark, narrowRange, getChildView} from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {
 	let view = getEditableView(range);
@@ -53,7 +53,7 @@ function merge(item: Item, merge: Item, end: "before" | "after"): Item {
 }
 
 class NoteEdit extends StdReplace {
-	doBefore(range: Range, content: content): void {
+	execBefore(range: Range, content: content): void {
 		narrowRange(range);
 		mark(range);
 		let ctx = getContent(range);
@@ -112,36 +112,37 @@ class NoteEdit extends StdReplace {
 			}
 		}
 	}
-	doStartContainer(range: Range, content: content): void {
+	onStartContainer(range: Range, content: content): void {
 		let ctx = getContent(range);
 		let start = getChildView(ctx, range.startContainer);
 		if (start) {
 			let r = range.cloneRange();
 			r.setEnd(start, start.childNodes.length);
 			this._clearContent(r);
-			range.setStartBefore(start);
+			range.setStartAfter(start);
 			this.after = start.outerHTML;
 		} else {
 			this.after = "";
 		}
 	}
-	doMiddle(range: Range, content: content): void {
+	onWithinRange(range: Range, content: content): void {
+		range.deleteContents();
 		if (!content) return;
 		let editor = getEditableView(range).$controller;
 		this.after += editor.getContentOf(editor.toView(content)).innerHTML;
 	}
-	doEndContainer(range: Range, content: content): void {
+	onEndContainer(range: Range, content: content): void {
 		let ctx = getContent(range);
 		let end = getChildView(ctx, range.endContainer);
 		if (end) {
 			let r = range.cloneRange();
 			r.setStart(end, 0);
 			this._clearContent(r);
-			range.setEndAfter(end);
+			range.setEndBefore(end);
 			this.after += end.outerHTML;
 		}
 	}
-	doAfter(range: Range, content: content): void {
+	execAfter(range: Range, content: content): void {
 		//this._replace(this.owner, range, this.after);
 		unmark(range);
 	}

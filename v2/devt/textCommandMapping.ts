@@ -1,7 +1,7 @@
 import { content } from "../base/model.js"; 
 import { bundle, CHAR } from "../base/util.js";
 
-import {Edit, Editor, NoEdit, Replace} from "../ui/editor/editor.js";
+import {Edit, Editor, Replace} from "../ui/editor/editor.js";
 import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "../ui/editor/util.js";
 
 

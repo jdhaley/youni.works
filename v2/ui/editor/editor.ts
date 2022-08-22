@@ -23,7 +23,13 @@ export interface Article extends Receiver {
 	setRange(range: Range, collapse?: boolean): void;
 }
 
-export abstract class Edit extends Command<Range> {
+export class Edit extends Command<Range> {
+	undo(): Range {
+		return;
+	}
+	redo(): Range {
+		return;
+	}
 	constructor(owner: Article, name: string, viewId: string) {
 		super();
 		this.owner = owner;
@@ -38,40 +44,18 @@ export abstract class Edit extends Command<Range> {
 	viewId: string;
 	before: string;
 	after: string;
-
-	abstract exec(range: Range, content: content): Range;
-	undo() {
-		return this.do(this.before);
-	}
-	redo() {
-		return this.do(this.after);
-	}
-
-	protected abstract do(markup: string): Range;
 }
 
-/**
- * NoEdit exists for two reasons:
- * - To provide a concrete class to resolve typescript not allowing an abstract class for abstract construction.
- * - To provide a dummy class when a command mapping isn't applicable or supported.
- */
-export class NoEdit extends Edit {
-	exec(range: Range, content: content): Range {
-		//Before
-		//Start
-		//Middle
-		//End
-		//After
-		return;
-	}
-	protected do(markup: string): Range {
-		return;
-	}
-}
 
 export abstract class Replace extends Edit {
-	protected do(markup: string) {
-		let range = this.getDoRange();
+	undo() {
+		return this.replace(this.before);
+	}
+	redo() {
+		return this.replace(this.after);
+	}
+	protected replace(markup: string) {
+		let range = this.getReplaceRange();
 		let div = range.commonAncestorContainer.ownerDocument.createElement("div");
 		div.innerHTML = markup;
 		range.deleteContents();
@@ -86,8 +70,7 @@ export abstract class Replace extends Edit {
 		range = unmark(range);
 		return range;
 	}
-	
-	protected getDoRange(): Range {
+	protected getReplaceRange(): Range {
 		let view = getView(this.owner, this.viewId);
 		if (!view) throw new Error(`View "${this.viewId}" not found.`);
 		let range = view.ownerDocument.createRange();
@@ -103,8 +86,8 @@ export abstract class ReplaceRange extends Replace {
 	startId: string;
 	endId: string;
 	
-	protected getDoRange() {
-		let range = super.getDoRange();
+	protected getReplaceRange() {
+		let range = super.getReplaceRange();
 		if (this.startId) {
 			let start = getView(this.owner, this.startId);
 			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
@@ -120,22 +103,22 @@ export abstract class ReplaceRange extends Replace {
 }
 export class StdReplace extends ReplaceRange {
 	exec(range: Range, content: content): Range {
-		this.doBefore(range, content);
-		this.doStartContainer(range, content);
-		this.doMiddle(range, content);
-		this.doEndContainer(range, content);
-		this.doAfter(range, content);
+		this.execBefore(range, content);
+		this.onStartContainer(range, content);
+		this.onWithinRange(range, content);
+		this.onEndContainer(range, content);
+		this.execAfter(range, content);
 		return range;
 	}
-	doBefore(range: Range, content: content): void {
+	execBefore(range: Range, content: content): void {
 	}
-	doStartContainer(range: Range, content: content): void {
+	onStartContainer(range: Range, content: content): void {
 	}
-	doMiddle(range: Range, content: content): void {
+	onWithinRange(range: Range, content: content): void {
 	}
-	doEndContainer(range: Range, content: content): void {
+	onEndContainer(range: Range, content: content): void {
 	}
-	doAfter(range: Range, content: content): void {
+	execAfter(range: Range, content: content): void {
 	}
 }
 
