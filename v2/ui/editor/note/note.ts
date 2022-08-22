@@ -142,7 +142,7 @@ class NoteEdit extends StdReplace {
 		}
 	}
 	doAfter(range: Range, content: content): void {
-		this._replace(this.owner, range, this.after);
+		//this._replace(this.owner, range, this.after);
 		unmark(range);
 	}
 	_clearContent(range: Range) {
