@@ -9,8 +9,8 @@ import { Actions } from "../base/controller.js";
 
 export interface DisplayConf {
 	class: typeof DisplayType;
-	view: "text" | "record" | "list" | "note";
-	model: "text" | "record" | "list" | "note";
+	view: "text" | "record" | "list" | "markup";
+	model: "text" | "record" | "list" | "markup";
 	panel: boolean;
 	tagName: string;
 	actions: Actions;

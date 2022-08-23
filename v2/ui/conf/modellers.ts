@@ -53,7 +53,7 @@ export default {
 		if (id) model = view.id + ":" + model;
 		return model;
 	},
-	note(this: ElementType, view: Element, range?: Range, id?: true): Record[] {
+	markup(this: ElementType, view: Element, range?: Range, id?: true): Record[] {
 		let model: Record[] = [];
 		let content = getContentElement(view, range);
 		if (content) for (let part of content.children) {

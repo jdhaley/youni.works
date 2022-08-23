@@ -27,7 +27,7 @@ export default {
 		}
 		//if (!view.textContent) view.append(CHAR.ZWSP);
 	},
-	note(this: ElementType, view: Element, model: Record[]): void {
+	markup(this: ElementType, view: Element, model: Record[]): void {
 		for (let part of model) {
 			let line = this.owner.createElement(part.type$);
 			line.setAttribute("data-item", part.type$);

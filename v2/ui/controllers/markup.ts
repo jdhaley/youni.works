@@ -51,7 +51,7 @@ interface Editor {
 	level(name: "Promote" | "Demote", range: Range): Range;
 }
 
-interface Note /* Editor */ {
+interface Markup /* Editor */ {
 	owner: NoteOwner;
 	//transform: any;
 	toView(model: content): Element;
@@ -96,26 +96,26 @@ const tag = {
 }
 
 export default extend(baseController, {
-	cut(this: Note, event: UserEvent) {
+	cut(this: Markup, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) return;
 		setClipboard(this as any, range, event.clipboardData);
 		this.edit("Cut", range, "");
 	},
-	copy(this: Note, event: UserEvent) {
+	copy(this: Markup, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		setClipboard(this as any, range, event.clipboardData);
 	},
-	paste(this: Note, event: UserEvent) {
+	paste(this: Markup, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let data = getClipboard(event.clipboardData);
 		this.edit("Paste", range, data);
 		range.collapse();
 	},
-	charpress(this: Note, event: UserEvent) {
+	charpress(this: Markup, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
@@ -148,7 +148,7 @@ export default extend(baseController, {
 		text = text.substring(0, offset) + event.key + text.substring(offset);
 		this.editText("Enter-Text", range, text, offset + 1);
 	},
-	delete(this: Note, event: UserEvent) {
+	delete(this: Markup, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
@@ -172,7 +172,7 @@ export default extend(baseController, {
 		text = text.substring(0, offset) + text.substring(offset + 1);
 		this.editText("Delete-Text", range, text, offset);
 	},
-	erase(this: Note, event: UserEvent) {
+	erase(this: Markup, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
@@ -195,7 +195,7 @@ export default extend(baseController, {
 		text = text.substring(0, offset - 1) + text.substring(offset);
 		this.editText("Erase-Text", range, text, offset - 1);
 	},
-	enter(this: Note, event: UserEvent) {
+	enter(this: Markup, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) return console.warn("TODO: split when selection is a range.");
@@ -225,15 +225,15 @@ export default extend(baseController, {
 		range.collapse(true);
 
 	},
-	promote(this: Note, event: UserEvent) {
+	promote(this: Markup, event: UserEvent) {
 		event.subject = "";
 		this.level("Promote", event.range);
 	},
-	demote(this: Note, event: UserEvent) {
+	demote(this: Markup, event: UserEvent) {
 		event.subject = "";
 		this.level("Demote", event.range);
 	},
-	tag(this: Note, event: UserEvent) {
+	tag(this: Markup, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let tagName = tag[event.key] || "SPAN";

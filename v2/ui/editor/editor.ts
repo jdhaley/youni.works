@@ -79,7 +79,10 @@ export abstract class Replace extends Edit {
 	}
 }
 
-export abstract class ReplaceRange extends Replace {
+/**
+ * Replacement supporting replacement of start/end children in a view.
+ */
+export class ReplaceRange extends Replace {
 	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
@@ -100,8 +103,7 @@ export abstract class ReplaceRange extends Replace {
 		}
 		return range;
 	}
-}
-export class StdReplace extends ReplaceRange {
+
 	exec(range: Range, content: content): Range {
 		this.execBefore(range, content);
 		this.onStartContainer(range, content);

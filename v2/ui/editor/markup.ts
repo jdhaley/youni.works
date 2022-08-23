@@ -1,12 +1,12 @@
 import {content} from "../../base/model.js";
-import { Article, Replace, ReplaceRange, StdReplace } from "./editor.js";
+import { Article, ReplaceRange } from "./editor.js";
 
 import {Editable, Editor} from "./editor.js";
 import {getContent, getEditableView, mark, unmark, narrowRange, getChildView} from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {
 	let view = getEditableView(range);
-	if (view.$controller.model != "note") console.warn("View is not a note:", view);
+	if (view.$controller.model != "markup") console.warn("View is not markup:", view);
 	let cmd = COMMANDS[commandName];
 	if (!cmd) throw new Error("Unrecognized command");
 	return cmd.call(this, commandName, range, content);
@@ -31,7 +31,7 @@ function noop() {
 
 function replace(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
-	return new NoteEdit(this.owner, commandName, view.id).exec(range, content);
+	return new ReplaceMarkup(this.owner, commandName, view.id).exec(range, content);
 }
 
 interface Item {
@@ -52,7 +52,7 @@ function merge(item: Item, merge: Item, end: "before" | "after"): Item {
 	}
 }
 
-class NoteEdit extends StdReplace {
+class ReplaceMarkup extends ReplaceRange {
 	execBefore(range: Range, content: content): void {
 		narrowRange(range);
 		mark(range);
