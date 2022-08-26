@@ -112,6 +112,15 @@ class ReplaceMarkup extends ReplaceRange {
 			}
 		}
 	}
+	execReplace(range: Range, content: content): void {
+		this.onStartContainer(range, content);
+		this.onWithinRange(range, content);
+		this.onEndContainer(range, content);
+	}
+	execAfter(range: Range, content: content): void {
+	//	this._replace(this.owner, range, this.after);
+		unmark(range);
+	}
 	onStartContainer(range: Range, content: content): void {
 		let ctx = getContent(range);
 		let start = getChildView(ctx, range.startContainer);
@@ -141,10 +150,6 @@ class ReplaceMarkup extends ReplaceRange {
 			range.setEndBefore(end);
 			this.after += end.outerHTML;
 		}
-	}
-	execAfter(range: Range, content: content): void {
-		//this._replace(this.owner, range, this.after);
-		unmark(range);
 	}
 	_clearContent(range: Range) {
 		range.deleteContents();

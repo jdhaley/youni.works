@@ -24,12 +24,6 @@ export interface Article extends Receiver {
 }
 
 export class Edit extends Command<Range> {
-	undo(): Range {
-		return;
-	}
-	redo(): Range {
-		return;
-	}
 	constructor(owner: Article, name: string, viewId: string) {
 		super();
 		this.owner = owner;
@@ -44,6 +38,16 @@ export class Edit extends Command<Range> {
 	viewId: string;
 	before: string;
 	after: string;
+
+	undo(): Range {
+		return;
+	}
+	redo(): Range {
+		return;
+	}
+	exec(range: Range, content: content): Range {
+		return;
+	}
 }
 
 
@@ -88,7 +92,20 @@ export class ReplaceRange extends Replace {
 	}
 	startId: string;
 	endId: string;
-	
+
+	exec(range: Range, content: content): Range {
+		this.execBefore(range, content);
+		this.execReplace(range, content);
+		this.execAfter(range, content);
+		return range;
+	}
+
+	protected execBefore(range: Range, content: content): void {
+	}
+	protected execReplace(range: Range, content: content): void {
+	}
+	protected execAfter(range: Range, content: content): void {
+	}
 	protected getReplaceRange() {
 		let range = super.getReplaceRange();
 		if (this.startId) {
@@ -102,25 +119,6 @@ export class ReplaceRange extends Replace {
 			range.setEndBefore(end);
 		}
 		return range;
-	}
-
-	exec(range: Range, content: content): Range {
-		this.execBefore(range, content);
-		this.onStartContainer(range, content);
-		this.onWithinRange(range, content);
-		this.onEndContainer(range, content);
-		this.execAfter(range, content);
-		return range;
-	}
-	execBefore(range: Range, content: content): void {
-	}
-	onStartContainer(range: Range, content: content): void {
-	}
-	onWithinRange(range: Range, content: content): void {
-	}
-	onEndContainer(range: Range, content: content): void {
-	}
-	execAfter(range: Range, content: content): void {
 	}
 }
 
