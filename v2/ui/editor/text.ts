@@ -54,9 +54,9 @@ function doit(commandName: string, range: Range, text: string): Range {
 	let node = range.commonAncestorContainer;
 	let view = getEditableView(node);
 
-	if (view?.$controller.model != "text") {
-		console.error("Invalid range for edit.");
-	}
+	// if (view?.$controller.model != "text") {
+	// 	console.error("Invalid range for edit.");
+	// }
 	if (range.collapsed && commandName == "Erase") {
 		if (!range.startOffset) return range;
 	}

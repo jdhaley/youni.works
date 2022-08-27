@@ -45,6 +45,15 @@ const conf: bundle<DisplayConf> = {
 		tagName: "ui-markup",
 		actions: markup,
 		shortcuts: shortcuts
+	},
+	line: {
+		class: DisplayType,
+		panel: false,
+		view: "line",
+		model: "line",
+		tagName: "p",
+		actions: text,
+		shortcuts: shortcuts
 	}
 }
 export default conf;

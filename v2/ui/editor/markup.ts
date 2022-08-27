@@ -54,32 +54,34 @@ function merge(item: Item, merge: Item, end: "before" | "after"): Item {
 }
 
 class ReplaceMarkup extends ListReplace {
-	onStartContainer(range: Range, content: content): void {
-		let ctx = getContent(range);
-		let start = getChildView(ctx, range.startContainer);
-		if (start) {
-			let r = range.cloneRange();
-			r.setEnd(start, start.childNodes.length);
-			this._clearContent(r);
-			range.setStartAfter(start);
-		}
-	}
-	onEndContainer(range: Range, content: content): void {
-		let ctx = getContent(range);
-		let end = getChildView(ctx, range.endContainer);
-		if (end) {
-			let r = range.cloneRange();
-			r.setStart(end, 0);
-			this._clearContent(r);
-			range.setEndBefore(end);
-		}
-	}
-	execAfter(range: Range, content: content): void {
-		//	this._replace(this.owner, range, this.after);
-			unmark(range);
-	}
-		
-	_clearContent(range: Range) {
-		range.deleteContents();
-	}
 }
+// class ReplaceMarkup extends ListReplace {
+// 	onStartContainer(range: Range, content: content): void {
+// 		let ctx = getContent(range);
+// 		let start = getChildView(ctx, range.startContainer);
+// 		if (start) {
+// 			let r = range.cloneRange();
+// 			r.setEnd(start, start.childNodes.length);
+// 			this._clearContent(r);
+// 			range.setStartAfter(start);
+// 		}
+// 	}
+// 	onEndContainer(range: Range, content: content): void {
+// 		let ctx = getContent(range);
+// 		let end = getChildView(ctx, range.endContainer);
+// 		if (end) {
+// 			let r = range.cloneRange();
+// 			r.setStart(end, 0);
+// 			this._clearContent(r);
+// 			range.setEndBefore(end);
+// 		}
+// 	}
+// 	execAfter(range: Range, content: content): void {
+// 		//	this._replace(this.owner, range, this.after);
+// 			unmark(range);
+// 	}
+		
+// 	_clearContent(range: Range) {
+// 		range.deleteContents();
+// 	}
+// }

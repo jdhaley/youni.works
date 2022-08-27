@@ -2,6 +2,13 @@ import { content, List, Record } from "../../base/model.js";
 import { ElementType } from "../../base/dom.js";
 import { CHAR } from "../../base/util.js";
 
+interface Item {
+	type$: string,
+	content: string,
+	id?: string,
+	level?: number
+}
+
 export default {
 	record(this: ElementType, view: Element, range?: Range, id?: true): Record {
 		let model = recordContent(this, null, view, range, id);
@@ -11,66 +18,17 @@ export default {
 		}
 		return model;
 	},
-	list(this: ElementType, view: Element, range?: Range, id?: true): List {
-		let model: content[];
-		let content = getContentElement(view, range);
-		if (content) for (let part of content.children) {
-			let type = this.owner.getControlOf(part) as ElementType;
-			let value = type?.toModel(part, range, id);
-			if (value) {
-				if (!model) {
-					model = [];
-					if (id) model.push(view.id);
-					if (this.name) model["type$"] = this.name;
-				}
-				model.push(value);
-			}
+	list: listContent,
+	markup: listContent,
+	text: textContent,
+	line(this: ElementType, view: Element, range?: Range, id?: true): Item {
+		let content = textContent.call(this, view, range, id);
+		return {
+			type$: this.name,
+			content: content,
+			id: view.id,
+			level: Number.parseInt(view.getAttribute("aria-level"))		
 		}
-		return model;
-	},
-	text(this: ElementType, view: Element, range?: Range, id?: true): string {
-		let model = "";
-		let content = getContentElement(view, range);
-
-		// USING editable class should remove the need for this hack
-		// (editable is either on the view or the content element)
-		//
-		// //HACK TO HANDLE PANEL-LESS TEXT... (DIRECT TEXT IN VIEW)
-		// if (!view.children.length) content = view;
-
-		if (content) for (let node of content.childNodes) {
-			if (node == range?.startContainer) {
-				model += node.textContent.substring(range.startOffset);
-			} else if (node == range?.endContainer) {
-				model += node.textContent.substring(0, range.endOffset);
-			} else {
-				model += node.textContent;
-			}
-		}
-		model = model.replace(CHAR.ZWSP, "");
-		model = model.replace(CHAR.NBSP, " ");
-		model = model.trim();
-		if (id) model = view.id + ":" + model;
-		return model;
-	},
-	markup(this: ElementType, view: Element, range?: Range, id?: true): Record[] {
-		let model: Record[] = [];
-		let content = getContentElement(view, range);
-		if (content) for (let part of content.children) {
-			if (range && !range.intersectsNode(part)) break;
-
-			let type = part.tagName;
-			let level = part.getAttribute("aria-level") || "";
-			let item: Record = {
-				type$: type,
-				content: part.innerHTML
-			}
-			if (level) item.level = level;
-			model.push(item);
-			//let line = `<${type}${level} id='${part.id}'>${part.innerHTML}</${type}>\n`;
-			//model += line;
-		}
-		return model;
 	}
 }
 
@@ -102,4 +60,48 @@ function getContentElement(view: Element, range?: Range) {
 		child = getContentElement(child, range);
 		if (child) return child;
 	}
+}
+
+function listContent(this: ElementType, view: Element, range?: Range, id?: true): List {
+	let model: content[];
+	let content = getContentElement(view, range);
+	if (content) for (let part of content.children) {
+		let type = this.owner.getControlOf(part) as ElementType;
+		let value = type?.toModel(part, range, id);
+		if (value) {
+			if (!model) {
+				model = [];
+				if (id) model.push(view.id);
+				if (this.name) model["type$"] = this.name;
+			}
+			model.push(value);
+		}
+	}
+	return model;
+}
+
+function textContent(this: ElementType, view: Element, range?: Range, id?: true): string {
+	let model = "";
+	let content = getContentElement(view, range);
+
+	// USING editable class should remove the need for this hack
+	// (editable is either on the view or the content element)
+	//
+	// //HACK TO HANDLE PANEL-LESS TEXT... (DIRECT TEXT IN VIEW)
+	// if (!view.children.length) content = view;
+
+	if (content) for (let node of content.childNodes) {
+		if (node == range?.startContainer) {
+			model += node.textContent.substring(range.startOffset);
+		} else if (node == range?.endContainer) {
+			model += node.textContent.substring(0, range.endOffset);
+		} else {
+			model += node.textContent;
+		}
+	}
+	model = model.replace(CHAR.ZWSP, "");
+	model = model.replace(CHAR.NBSP, " ");
+	model = model.trim();
+	if (id) model = view.id + ":" + model;
+	return model;
 }

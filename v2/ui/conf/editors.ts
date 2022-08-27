@@ -7,5 +7,6 @@ export default {
 	text: text,
 	record: record,
 	list: list,
-	markup: markup
+	markup: markup,
+	line: text
 }
