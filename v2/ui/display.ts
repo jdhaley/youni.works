@@ -52,7 +52,7 @@ export class DisplayOwner extends ElementOwner {
 	bindView(view: Display): void {
 		let type = view.$controller;
 		if (!type) {
-			let name = view.getAttribute("data-name") || view.getAttribute("data-type");
+			let name = view.getAttribute("data-item");
 			let parent = getView(view.parentElement) as Display;
 			if (name && parent) {
 				type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;

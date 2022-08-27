@@ -38,14 +38,14 @@ export class ListReplace extends ReplaceRange {
 		function recordRange(cmd: ReplaceRange, ctx: Element, range: Range) {
 			for (let i = range.startOffset; i; i--) {
 				let node = ctx.childNodes[i - 1] as Editable;
-				if (node.getAttribute("data-type") || node.getAttribute("data-item")) {
+				if (node.getAttribute("data-item")) {
 					cmd.startId = node.id;
 					break;
 				}
 			}
 			for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
 				let node = ctx.childNodes[i] as Editable;
-				if (node.getAttribute("data-type") || node.getAttribute("data-item")) {
+				if (node.getAttribute("data-item")) {
 					cmd.endId = node.id;
 					break;
 				}
