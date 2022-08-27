@@ -1,7 +1,7 @@
 import { Command, CommandBuffer } from "../../base/command.js";
 import { content } from "../../base/model.js";
 import { Receiver } from "../../base/controller.js";
-import { unmark } from "./util.js";
+import { getChildView, unmark } from "./util.js";
 
 export interface Editable extends Element {
 	$controller?: Editor
@@ -75,7 +75,7 @@ export abstract class Replace extends Edit {
 		return range;
 	}
 	protected getReplaceRange(): Range {
-		let view = getView(this.owner, this.viewId);
+		let view = getViewById(this.owner, this.viewId);
 		if (!view) throw new Error(`View "${this.viewId}" not found.`);
 		let range = view.ownerDocument.createRange();
 		range.selectNodeContents(view.$controller.getContentOf(view));
@@ -109,20 +109,38 @@ export class ReplaceRange extends Replace {
 	protected getReplaceRange() {
 		let range = super.getReplaceRange();
 		if (this.startId) {
-			let start = getView(this.owner, this.startId);
+			let start = getViewById(this.owner, this.startId);
 			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
 			range.setStartAfter(start);
 		}
 		if (this.endId) {
-			let end = getView(this.owner, this.endId);
+			let end = getViewById(this.owner, this.endId);
 			if (!end) throw new Error(`End item.id '${this.endId}' not found.`);
 			range.setEndBefore(end);
 		}
 		return range;
 	}
+
+	/**
+	 * Returns a range of the direct descendent views of the list content.
+	 * @param ctx 
+	 * @param range 
+	 */
+	protected getOuterRange(ctx: Element, range: Range) {
+		range = range.cloneRange();
+		let start = getChildView(ctx, range.startContainer);
+		if (start) range.setStartBefore(start);
+		let end = getChildView(ctx, range.endContainer);
+		if (end) range.setEndAfter(end);
+
+		if (!(range.startContainer == ctx && range.endContainer == ctx)) {
+			throw new Error("Invalid range for edit.");
+		}
+		return range;
+	}
 }
 
-function getView(owner: Article, id: string) {
+function getViewById(owner: Article, id: string) {
 	let view = owner.getElementById(id) as Editable;
 	if (!view) throw new Error("Can't find view element.");
 	if (view.getAttribute("data-item")) return view;

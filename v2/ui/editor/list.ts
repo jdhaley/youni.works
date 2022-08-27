@@ -1,7 +1,7 @@
 import {content} from "../../base/model.js";
 
-import {Article, Editable, Editor, ReplaceRange} from "./editor.js";
-import {getContent, getEditableView, getHeader, mark, clearContent, unmark, replace, narrowRange, getChildView, getArticleView} from "./util.js";
+import {Editable, Editor, ReplaceRange} from "./editor.js";
+import {getContent, getEditableView, getChildView, narrowRange, mark, clearContent, unmark} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
@@ -10,7 +10,7 @@ export default function edit(this: Editor, commandName: string, range: Range, co
 	return new ListReplace(this.owner, commandName, view.id).exec(range, content);
 }
 
-class ListReplace extends ReplaceRange {
+export class ListReplace extends ReplaceRange {
 	execBefore(range: Range, content: content) {
 		narrowRange(range);
 		mark(range);
@@ -54,8 +54,6 @@ class ListReplace extends ReplaceRange {
 	}
 	execReplace(range: Range, content: content): void {
 		this.onStartContainer(range, content);
-		//Different order than markup - need to move the end to prior to the endcontainer
-		//*before* doing the within replacement.
 		this.onEndContainer(range, content);
 		this.onInnerRange(range, content);
 	}
@@ -70,9 +68,6 @@ class ListReplace extends ReplaceRange {
 			//r.setEnd(start, start.childNodes.length);
 			this._clearContent(r);
 			range.setStartAfter(start);
-			this.after = start.outerHTML;
-		} else {
-			this.after = "";
 		}
 	}
 	onInnerRange(range: Range, content: content): void {
@@ -98,7 +93,6 @@ class ListReplace extends ReplaceRange {
 			//r.setStart(end, 0);
 			this._clearContent(r);
 			range.setEndBefore(end);
-			this.after += end.outerHTML;
 		}
 	}
 	execAfter(range: Range, content: content): void {

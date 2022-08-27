@@ -2,6 +2,7 @@ import {content} from "../../base/model.js";
 import { Article, ReplaceRange } from "./editor.js";
 
 import {Editable, Editor} from "./editor.js";
+import { ListReplace } from "./list.js";
 import {getContent, getEditableView, mark, unmark, narrowRange, getChildView} from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {
@@ -52,75 +53,7 @@ function merge(item: Item, merge: Item, end: "before" | "after"): Item {
 	}
 }
 
-class ReplaceMarkup extends ReplaceRange {
-	execBefore(range: Range, content: content): void {
-		narrowRange(range);
-		mark(range);
-		let ctx = getContent(range);
-		//NB - the edit extent range is a different range from the
-		//passed range and should only be used within this method.
-		range = getEditExtent(ctx, range);
-		recordRange(this, ctx, range);
-	
-		//Capture the before image for undo.
-		let before = "";
-		for (let i = range.startOffset; i < range.endOffset; i++) {
-			let node = ctx.childNodes[i] as Element;
-			if (node.outerHTML) before += node.outerHTML;
-		}
-		this.before = before;
-
-		/**
-		 * Returns a range of the direct descendent views of the list content.
-		 * @param ctx 
-		 * @param range 
-		 */
-		function getEditExtent(ctx: Element, range: Range) {
-			range = range.cloneRange();
-			let start = getChildView(ctx, range.startContainer);
-			if (start) range.setStartBefore(start);
-			let end = getChildView(ctx, range.endContainer);
-			if (end) range.setEndAfter(end);
-
-			if (!(range.startContainer == ctx && range.endContainer == ctx)) {
-				throw new Error("Invalid range for edit.");
-			}
-			return range;
-		}
-		/**
-		 * Finds the views before the range start (if any) and after the range end (if any).
-		 * Record their ids in the command.
-		 * This is used to get the extent of the list to be replaced by undo & redo.
-		 * @param cmd 
-		 * @param ctx 
-		 * @param range 
-		 */
-		function recordRange(cmd: ReplaceRange, ctx: Element, range: Range) {
-			for (let i = range.startOffset; i; i--) {
-				let node = ctx.childNodes[i - 1] as Editable;
-				if (node.getAttribute("data-item")) {
-					cmd.startId = node.id;
-					break;
-				}
-			}
-			for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
-				let node = ctx.childNodes[i] as Editable;
-				if (node.getAttribute("data-item")) {
-					cmd.endId = node.id;
-					break;
-				}
-			}
-		}
-	}
-	execReplace(range: Range, content: content): void {
-		this.onStartContainer(range, content);
-		this.onWithinRange(range, content);
-		this.onEndContainer(range, content);
-	}
-	execAfter(range: Range, content: content): void {
-	//	this._replace(this.owner, range, this.after);
-		unmark(range);
-	}
+class ReplaceMarkup extends ListReplace {
 	onStartContainer(range: Range, content: content): void {
 		let ctx = getContent(range);
 		let start = getChildView(ctx, range.startContainer);
@@ -129,16 +62,7 @@ class ReplaceMarkup extends ReplaceRange {
 			r.setEnd(start, start.childNodes.length);
 			this._clearContent(r);
 			range.setStartAfter(start);
-			this.after = start.outerHTML;
-		} else {
-			this.after = "";
 		}
-	}
-	onWithinRange(range: Range, content: content): void {
-		range.deleteContents();
-		if (!content) return;
-		let editor = getEditableView(range).$controller;
-		this.after += editor.getContentOf(editor.toView(content)).innerHTML;
 	}
 	onEndContainer(range: Range, content: content): void {
 		let ctx = getContent(range);
@@ -148,23 +72,14 @@ class ReplaceMarkup extends ReplaceRange {
 			r.setStart(end, 0);
 			this._clearContent(r);
 			range.setEndBefore(end);
-			this.after += end.outerHTML;
 		}
 	}
+	execAfter(range: Range, content: content): void {
+		//	this._replace(this.owner, range, this.after);
+			unmark(range);
+	}
+		
 	_clearContent(range: Range) {
 		range.deleteContents();
-	}
-	_replace(article: Article, range: Range, markup: string) {
-		let div = range.commonAncestorContainer.ownerDocument.createElement("div");
-		div.innerHTML = markup;
-		range.deleteContents();
-		while (div.firstChild) {
-			let node = div.firstChild;
-			range.insertNode(node);
-			range.collapse();
-			if (node.nodeType == Node.ELEMENT_NODE) {
-				article.bindView(node as any);
-			}
-		}
 	}
 }
