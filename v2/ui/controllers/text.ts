@@ -1,7 +1,6 @@
 import {CHAR, extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
-import {getEditableView, getContent, getHeader, narrowRange} from "../editor/util.js";
 
 import editable from "./editable.js";
 import { setClipboard } from "../clipboard.js";

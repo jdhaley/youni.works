@@ -1,5 +1,4 @@
 import {content} from "../../base/model.js";
-import { Article, ReplaceRange } from "./editor.js";
 
 import {Editable, Editor} from "./editor.js";
 import { ListReplace } from "./list.js";

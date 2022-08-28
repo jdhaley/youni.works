@@ -25,7 +25,7 @@ export function getChildView(content: Element, node: Node): Element {
 	}
 	//$controller is for list, "data-item" for markup items.
 	//TODO rationalize the test for an Item/View.
-	if (node instanceof Element && (node["$controller"] || node.getAttribute("data-item"))) return node;
+	if (node instanceof Element && node["$controller"]) return node;
 }
 
 export function getHeader(view: Element, node: Node) {

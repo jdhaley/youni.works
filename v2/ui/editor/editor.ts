@@ -1,7 +1,7 @@
 import { Command, CommandBuffer } from "../../base/command.js";
 import { content } from "../../base/model.js";
 import { Receiver } from "../../base/controller.js";
-import { getChildView, unmark } from "./util.js";
+import {  unmark } from "./util.js";
 
 export interface Editable extends Element {
 	$controller?: Editor
@@ -50,7 +50,6 @@ export class Edit extends Command<Range> {
 	}
 }
 
-
 export abstract class Replace extends Edit {
 	undo() {
 		return this.replace(this.before);
@@ -83,64 +82,7 @@ export abstract class Replace extends Edit {
 	}
 }
 
-/**
- * Replacement supporting replacement of start/end children in a view.
- */
-export class ReplaceRange extends Replace {
-	constructor(owner: Article, name: string, viewId: string) {
-		super(owner, name, viewId);
-	}
-	startId: string;
-	endId: string;
-
-	exec(range: Range, content: content): Range {
-		this.execBefore(range, content);
-		this.execReplace(range, content);
-		this.execAfter(range, content);
-		return range;
-	}
-
-	protected execBefore(range: Range, content: content): void {
-	}
-	protected execReplace(range: Range, content: content): void {
-	}
-	protected execAfter(range: Range, content: content): void {
-	}
-	protected getReplaceRange() {
-		let range = super.getReplaceRange();
-		if (this.startId) {
-			let start = getViewById(this.owner, this.startId);
-			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
-			range.setStartAfter(start);
-		}
-		if (this.endId) {
-			let end = getViewById(this.owner, this.endId);
-			if (!end) throw new Error(`End item.id '${this.endId}' not found.`);
-			range.setEndBefore(end);
-		}
-		return range;
-	}
-
-	/**
-	 * Returns a range of the direct descendent views of the list content.
-	 * @param ctx 
-	 * @param range 
-	 */
-	protected getOuterRange(ctx: Element, range: Range) {
-		range = range.cloneRange();
-		let start = getChildView(ctx, range.startContainer);
-		if (start) range.setStartBefore(start);
-		let end = getChildView(ctx, range.endContainer);
-		if (end) range.setEndAfter(end);
-
-		if (!(range.startContainer == ctx && range.endContainer == ctx)) {
-			throw new Error("Invalid range for edit.");
-		}
-		return range;
-	}
-}
-
-function getViewById(owner: Article, id: string) {
+export function getViewById(owner: Article, id: string) {
 	let view = owner.getElementById(id) as Editable;
 	if (!view) throw new Error("Can't find view element.");
 	if (view.getAttribute("data-item")) return view;

@@ -1,6 +1,6 @@
 import {content} from "../../base/model.js";
 
-import {Editable, Editor, ReplaceRange} from "./editor.js";
+import {Article, Editable, Editor, getViewById, Replace} from "./editor.js";
 import {getContent, getEditableView, getChildView, narrowRange, mark, clearContent, unmark} from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
@@ -10,6 +10,63 @@ export default function edit(this: Editor, commandName: string, range: Range, co
 	return new ListReplace(this.owner, commandName, view.id).exec(range, content);
 }
 
+/**
+ * Replacement supporting replacement of start/end children in a view.
+ */
+ export class ReplaceRange extends Replace {
+	constructor(owner: Article, name: string, viewId: string) {
+		super(owner, name, viewId);
+	}
+	startId: string;
+	endId: string;
+
+	exec(range: Range, content: content): Range {
+		this.execBefore(range, content);
+		this.execReplace(range, content);
+		this.execAfter(range, content);
+		return range;
+	}
+
+	protected execBefore(range: Range, content: content): void {
+	}
+	protected execReplace(range: Range, content: content): void {
+	}
+	protected execAfter(range: Range, content: content): void {
+	}
+	protected getReplaceRange() {
+		let range = super.getReplaceRange();
+		if (this.startId) {
+			let start = getViewById(this.owner, this.startId);
+			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
+			range.setStartAfter(start);
+		}
+		if (this.endId) {
+			let end = getViewById(this.owner, this.endId);
+			if (!end) throw new Error(`End item.id '${this.endId}' not found.`);
+			range.setEndBefore(end);
+		}
+		return range;
+	}
+
+	/**
+	 * Returns a range of the direct descendent views of the list content.
+	 * @param ctx 
+	 * @param range 
+	 */
+	protected getOuterRange(ctx: Element, range: Range) {
+		range = range.cloneRange();
+		let start = getChildView(ctx, range.startContainer);
+		if (start) range.setStartBefore(start);
+		let end = getChildView(ctx, range.endContainer);
+		if (end) range.setEndAfter(end);
+
+		if (!(range.startContainer == ctx && range.endContainer == ctx)) {
+			throw new Error("Invalid range for edit.");
+		}
+		return range;
+	}
+}
+
 export class ListReplace extends ReplaceRange {
 	execBefore(range: Range, content: content) {
 		narrowRange(range);
@@ -17,7 +74,7 @@ export class ListReplace extends ReplaceRange {
 		let ctx = getContent(range);
 		//NB - the edit extent range is a different range from the
 		//passed range and should only be used within this method.
-		range = this.getOuterRange(ctx, range);
+		range = getOuterRange(ctx, range);
 		recordRange(this, ctx, range);
 	
 		//Capture the before image for undo.
@@ -27,30 +84,6 @@ export class ListReplace extends ReplaceRange {
 			if (node.outerHTML) before += node.outerHTML;
 		}
 		this.before = before;
-		/**
-		 * Finds the views before the range start (if any) and after the range end (if any).
-		 * Record their ids in the command.
-		 * This is used to get the extent of the list to be replaced by undo & redo.
-		 * @param cmd 
-		 * @param ctx 
-		 * @param range 
-		 */
-		function recordRange(cmd: ReplaceRange, ctx: Element, range: Range) {
-			for (let i = range.startOffset; i; i--) {
-				let node = ctx.childNodes[i - 1] as Editable;
-				if (node.getAttribute("data-item")) {
-					cmd.startId = node.id;
-					break;
-				}
-			}
-			for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
-				let node = ctx.childNodes[i] as Editable;
-				if (node.getAttribute("data-item")) {
-					cmd.endId = node.id;
-					break;
-				}
-			}
-		}
 	}
 	execReplace(range: Range, content: content): void {
 		this.onStartContainer(range, content);
@@ -109,21 +142,47 @@ export class ListReplace extends ReplaceRange {
 		//DIFF - for markup.
 		//range.deleteContents();
 	}
-	/**
-	 * Returns a range of the direct descendent views of the list content.
-	 * @param ctx 
-	 * @param range 
-	 */
-	getOuterRange(ctx: Element, range: Range) {
-		range = range.cloneRange();
-		let start = getChildView(ctx, range.startContainer);
-		if (start) range.setStartBefore(start);
-		let end = getChildView(ctx, range.endContainer);
-		if (end) range.setEndAfter(end);
+}
 
-		if (!(range.startContainer == ctx && range.endContainer == ctx)) {
-			throw new Error("Invalid range for edit.");
+/**
+ * Returns a range of the direct descendent views of the list content.
+ * @param ctx 
+ * @param range 
+ */
+function getOuterRange(ctx: Element, range: Range) {
+	range = range.cloneRange();
+	let start = getChildView(ctx, range.startContainer);
+	if (start) range.setStartBefore(start);
+	let end = getChildView(ctx, range.endContainer);
+	if (end) range.setEndAfter(end);
+
+	if (!(range.startContainer == ctx && range.endContainer == ctx)) {
+		throw new Error("Invalid range for edit.");
+	}
+	return range;
+}	
+
+/**
+ * Finds the views before the range start (if any) and after the range end (if any).
+ * Record their ids in the command.
+ * This is used to get the extent of the list to be replaced by undo & redo.
+ * @param cmd 
+ * @param ctx 
+ * @param range 
+ */
+function recordRange(cmd: ReplaceRange, ctx: Element, range: Range) {
+	for (let i = range.startOffset; i; i--) {
+		let node = ctx.childNodes[i - 1] as Editable;
+		if (node.getAttribute("data-item")) {
+			cmd.startId = node.id;
+			break;
 		}
-		return range;
-	}	
+	}
+	for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
+		let node = ctx.childNodes[i] as Editable;
+		if (node.getAttribute("data-item")) {
+			cmd.endId = node.id;
+			break;
+		}
+	}
 }

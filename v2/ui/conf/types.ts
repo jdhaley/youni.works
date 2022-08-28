@@ -3,7 +3,9 @@ import {bundle} from "../../base/util.js";
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
 import list from "../controllers/list.js";
-import markup from "../controllers/markup.js";
+
+//import markup from "../controllers/xxxmarkup.js";
+import line from "../controllers/line.js";
 
 import shortcuts from "./shortcuts.js";
 
@@ -43,7 +45,7 @@ const conf: bundle<DisplayConf> = {
 		view: "markup",
 		model: "markup",
 		tagName: "ui-list",
-		actions: markup,
+		actions: list,
 		shortcuts: shortcuts
 	},
 	line: {
@@ -52,7 +54,7 @@ const conf: bundle<DisplayConf> = {
 		view: "line",
 		model: "line",
 		tagName: "p",
-		actions: text,
+		actions: line,
 		shortcuts: shortcuts
 	}
 }
