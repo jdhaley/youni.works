@@ -42,7 +42,7 @@ const conf: bundle<DisplayConf> = {
 		panel: true,
 		view: "markup",
 		model: "markup",
-		tagName: "ui-markup",
+		tagName: "ui-list",
 		actions: markup,
 		shortcuts: shortcuts
 	},

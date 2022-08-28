@@ -34,14 +34,15 @@ export default {
 		//if (!view.textContent) view.append(CHAR.ZWSP);
 	},
 	markup(this: ElementType, view: Element, model: Item[]): void {
-		for (let item of model) {
+		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this["rowType"] || this.types[viewType(item)] || this.owner.unknownType;
 			let part = type.toView(item);
 			view.append(part);
 		}
+		view.append(this.types["para"].toView({}));
 	},
 	line(this: ElementType, view: Element, item: Item): void {
-		view.innerHTML = "" + item.content;
+		view.innerHTML = "" + (item.content || "");
 		if (item.level) view.setAttribute("aria-level", "" + item.level);
 		//view.id =  item.id || "";
 	}
