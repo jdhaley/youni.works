@@ -2,12 +2,14 @@ import { Command, CommandBuffer } from "../../base/command.js";
 import { content } from "../../base/model.js";
 import { Receiver } from "../../base/controller.js";
 import {  unmark } from "./util.js";
+import { bundle } from "../../base/util.js";
 
 export interface Editable extends Element {
 	$controller?: Editor
 }
 
 export interface Editor  {
+	readonly types: bundle<Editor>;
 	readonly model: string;
 	readonly owner: Article;
 	toModel(view: Element, range?: Range, id?: true): content;

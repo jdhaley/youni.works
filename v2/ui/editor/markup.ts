@@ -72,11 +72,11 @@ class MarkupReplace extends ListReplace {
 }
 
 function merge(cmd: MarkupReplace, view: Editable, range: Range, content: any, isStart: boolean) {
-	let listType = getViewById(cmd.owner, cmd.viewId).$controller as any as ElementType;
 	let item: Item = content?.length && content[isStart ? 0 : content.length - 1];
 	if (!item) return;
-	let type = listType["rowType"] || listType.types[viewType(item)] || listType.owner.unknownType;
-	if (item && type == view.$controller) {
+	let markupType = getViewById(cmd.owner, cmd.viewId).$controller;
+	let type = markupType.types[viewType(item)];
+	if (type == view.$controller) {
 		let node = 	view.ownerDocument.createTextNode(item.content);
 		range.insertNode(node);
 		if (isStart) {
