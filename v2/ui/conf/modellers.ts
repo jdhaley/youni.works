@@ -22,6 +22,7 @@ export default {
 	markup: listContent,
 	text: textContent,
 	line(this: ElementType, view: Element, range?: Range, id?: true): Item {
+		if (!range.intersectsNode(view)) return;
 		let content = textContent.call(this, view, range, id);
 		return {
 			type$: this.name,

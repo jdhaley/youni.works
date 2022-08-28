@@ -39,7 +39,7 @@ export default {
 			let part = type.toView(item);
 			view.append(part);
 		}
-		view.append(this.types["para"].toView({}));
+	//	view.append(this.types["para"].toView({}));
 	},
 	line(this: ElementType, view: Element, item: Item): void {
 		view.innerHTML = "" + (item.content || "");
