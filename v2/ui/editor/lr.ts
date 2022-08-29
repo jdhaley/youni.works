@@ -36,10 +36,10 @@ export class ListReplace extends Replace {
 	protected execBefore(range: Range, content: content) {
 		narrowRange(range);
 		mark(range);
-		let ctx = getContent(range);
-		//NB - the edit extent range is a different range from the
+		//NB - the outer range is a different range from the
 		//passed range and should only be used within this method.
-		range = getOuterRange(ctx, range);
+		range = getOuterRange(range);
+		let ctx = getContent(range);
 		recordRange(this, ctx, range);
 	
 		//Capture the before image for undo.
@@ -105,8 +105,15 @@ export class ListReplace extends Replace {
  * @param ctx 
  * @param range 
  */
-function getOuterRange(ctx: Element, range: Range) {
+function getOuterRange(range: Range) {
 	range = range.cloneRange();
+	let view = getEditableView(range);
+	if (view.$controller.model == "line") {
+		range.selectNode(view);
+		return range;
+	}
+
+	let ctx = getContent(range);
 	let start = getChildView(ctx, range.startContainer);
 	if (start) range.setStartBefore(start);
 	let end = getChildView(ctx, range.endContainer);
@@ -127,6 +134,7 @@ function getOuterRange(ctx: Element, range: Range) {
  * @param range 
  */
 function recordRange(cmd: ListReplace, ctx: Element, range: Range) {
+	console.log(ctx);
 	for (let i = range.startOffset; i; i--) {
 		let node = ctx.childNodes[i - 1] as Editable;
 		if (node.getAttribute("data-item")) {

@@ -4,7 +4,7 @@ import text from "../controllers/text.js";
 import record from "../controllers/record.js";
 import list from "../controllers/list.js";
 
-//import markup from "../controllers/xxxmarkup.js";
+import markup from "../controllers/markup.js";
 import line from "../controllers/line.js";
 
 import shortcuts from "./shortcuts.js";
@@ -45,7 +45,7 @@ const conf: bundle<DisplayConf> = {
 		view: "markup",
 		model: "markup",
 		tagName: "ui-list",
-		actions: list,
+		actions: markup,
 		shortcuts: shortcuts
 	},
 	line: {
