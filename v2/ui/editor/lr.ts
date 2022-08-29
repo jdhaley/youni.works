@@ -13,6 +13,7 @@ export class ListReplace extends Replace {
 	endId: string;
 
 	exec(range: Range, content: content): Range {
+		if (!content) content = [];
 		this.execBefore(range, content);
 		this.execReplace(range, content);
 		this.execAfter(range, content);

@@ -47,14 +47,19 @@ interface Item {
 class MarkupReplace extends ListReplace {
 	protected onStartContainer(range: Range, content: content): void {
 		let ctx = getContent(range);
-		let start = getChildView(ctx, range.startContainer);
+		let start = getChildView(ctx, range.startContainer) as Editable;
 		if (start) {
 			let r = range.cloneRange();
 			let ctx = getContent(start);
 			r.setEnd(ctx, ctx.childNodes.length);
-			clearContent(r);
-			merge(this, start, r, content, true)
-			range.setStartAfter(start);
+			r.deleteContents();
+			let items = content as Item[];
+			if (items[0]) {
+				items[0].content = start.innerHTML + items[0].content;
+			} else {
+				items.push(start.$controller.toModel(start) as any);
+			}
+			range.setStartBefore(start);
 		}
 	}
 	protected onEndContainer(range: Range, content: content): void {
@@ -65,7 +70,7 @@ class MarkupReplace extends ListReplace {
 			let ctx = getContent(end);
 			r.setStart(ctx, 0);
 			clearContent(r);
-			merge(this, end, r, content, true)
+			merge(this, end, r, content, false)
 			range.setEndBefore(end);
 		}
 	}
