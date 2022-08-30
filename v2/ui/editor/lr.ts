@@ -1,8 +1,6 @@
-import { ElementType } from "../../base/dom.js";
 import {content} from "../../base/model.js";
-import { viewType } from "../../base/view.js";
 
-import {Article, Editable, Editor, getViewById, Replace} from "./editor.js";
+import {Article, Editable, getViewById, Replace} from "./editor.js";
 import {getContent, getEditableView, getChildView, narrowRange, mark, clearContent, unmark} from "./util.js";
 
 export class ListReplace extends Replace {
