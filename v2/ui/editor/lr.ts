@@ -31,14 +31,31 @@ export class ListReplace extends Replace {
 		}
 		return range;
 	}
+	/**
+	 * Returns a range of the direct descendent views of the list content. 
+	 */
+	protected getOuterRange(range: Range) {
+		range = range.cloneRange();
+		let ctx = getContent(range);
+		let start = getChildView(ctx, range.startContainer);
+		if (start) range.setStartBefore(start);
+		let end = getChildView(ctx, range.endContainer);
+		if (end) range.setEndAfter(end);
+
+		if (!(range.startContainer == ctx && range.endContainer == ctx)) {
+			throw new Error("Invalid range for edit.");
+		}
+		return range;
+	}	
+
 	protected execBefore(range: Range, content: content) {
 		narrowRange(range);
 		mark(range);
 		//NB - the outer range is a different range from the
 		//passed range and should only be used within this method.
-		range = getOuterRange(range);
+		range = this.getOuterRange(range);
 		let ctx = getContent(range);
-		recordRange(this, ctx, range);
+		captureRange(this, ctx, range.startOffset, range.endOffset);
 	
 		//Capture the before image for undo.
 		let before = "";
@@ -49,9 +66,17 @@ export class ListReplace extends Replace {
 		this.before = before;
 	}
 	protected execReplace(range: Range, content: content): void {
-		this.onStartContainer(range, content);
-		this.onEndContainer(range, content);
-		this.onInnerRange(range, content);
+		let list = getViewById(this.owner, this.viewId);
+		let ctx = getContent(list);
+		let start = getChildView(ctx, range.startContainer) as Editable;
+		let end = getChildView(ctx, range.endContainer) as Editable;
+		if (start && start == end) {
+			this.onSingleContainer(range, content, start);
+		} else {
+			if (start) this.onStartContainer(range, content, start);
+			if (end) this.onEndContainer(range, content, end);
+			this.onInnerRange(range, content);
+		}
 	}
 	protected execAfter(range: Range, content: content): void {
 		range = this.getReplaceRange();
@@ -62,16 +87,21 @@ export class ListReplace extends Replace {
 		}
 		unmark(range);
 	}
-	protected onStartContainer(range: Range, content: content): void {
-		let ctx = getContent(range);
-		let start = getChildView(ctx, range.startContainer);
-		if (start) {
-			let r = range.cloneRange();
-			let ctx = getContent(start);
-			r.setEnd(ctx, ctx.childNodes.length);
-			clearContent(r);
-			range.setStartAfter(start);
-		}
+	protected onStartContainer(range: Range, content: content, start: Editable): void {
+		let r = range.cloneRange();
+		let ctx = getContent(start);
+		r.setEnd(ctx, ctx.childNodes.length);
+		clearContent(r);
+		range.setStartAfter(start);
+	}
+	protected onEndContainer(range: Range, content: content, end: Editable): void {
+		let r = range.cloneRange();
+		let ctx = getContent(end);
+		r.setStart(ctx, 0);
+		clearContent(r);
+		range.setEndBefore(end);
+	}
+	protected onSingleContainer(range: Range, content: content, container: Editable): void {
 	}
 	protected onInnerRange(range: Range, content: content): void {
 		range = range.cloneRange();
@@ -85,43 +115,7 @@ export class ListReplace extends Replace {
 			range.collapse();
 		}
 	}
-	protected onEndContainer(range: Range, content: content): void {
-		let ctx = getContent(range);
-		let end = getChildView(ctx, range.endContainer);
-		if (end) {
-			let r = range.cloneRange();
-			let ctx = getContent(end);
-			r.setStart(ctx, 0);
-			clearContent(r);
-			range.setEndBefore(end);
-		}
-	}
 }
-
-/**
- * Returns a range of the direct descendent views of the list content.
- * @param ctx 
- * @param range 
- */
-function getOuterRange(range: Range) {
-	range = range.cloneRange();
-	let view = getEditableView(range);
-	if (view.$controller.model == "line") {
-		range.selectNode(view);
-		return range;
-	}
-
-	let ctx = getContent(range);
-	let start = getChildView(ctx, range.startContainer);
-	if (start) range.setStartBefore(start);
-	let end = getChildView(ctx, range.endContainer);
-	if (end) range.setEndAfter(end);
-
-	if (!(range.startContainer == ctx && range.endContainer == ctx)) {
-		throw new Error("Invalid range for edit.");
-	}
-	return range;
-}	
 
 /**
  * Finds the views before the range start (if any) and after the range end (if any).
@@ -131,16 +125,16 @@ function getOuterRange(range: Range) {
  * @param ctx 
  * @param range 
  */
-function recordRange(cmd: ListReplace, ctx: Element, range: Range) {
+function captureRange(cmd: ListReplace, ctx: Element, start: number, end: number) {
 	console.log(ctx);
-	for (let i = range.startOffset; i; i--) {
+	for (let i = start; i; i--) {
 		let node = ctx.childNodes[i - 1] as Editable;
 		if (node.getAttribute("data-item")) {
 			cmd.startId = node.id;
 			break;
 		}
 	}
-	for (let i = range.endOffset; i < ctx.childNodes.length; i++) {
+	for (let i = end; i < ctx.childNodes.length; i++) {
 		let node = ctx.childNodes[i] as Editable;
 		if (node.getAttribute("data-item")) {
 			cmd.endId = node.id;

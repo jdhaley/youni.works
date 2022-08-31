@@ -47,25 +47,62 @@ interface Item {
 }
 
 class MarkupReplace extends ListReplace {
-	protected onStartContainer(range: Range, content: content): void {
-		let ctx = getContent(range);
-		let start = getChildView(ctx, range.startContainer) as Editable;
-		if (start) {
-			let r = range.cloneRange();
-			let ctx = getContent(start);
-			r.setEnd(ctx, ctx.childNodes.length);
-			r.deleteContents();
-			let items = content as Item[];
-			if (items[0]) {
-				items[0].content = start.innerHTML + items[0].content;
-			} else {
-				items.push(start.$controller.toModel(start) as any);
-			}
-			range.setStartBefore(start);
+	protected getOuterRange(range: Range) {
+		/*
+			For markup, the replace range may come from a single line
+			(due to merge & join of the start & end). In this case select
+			the entire view so that the outer range is like a multi-item range.
+		*/
+		let view = getEditableView(range);
+		if (view.$controller.model == "line") {
+			range = range.cloneRange();
+			range.selectNode(view);
+			return range;
 		}
+		return super.getOuterRange(range);
+	}	
+	protected onSingleContainer(range: Range, content: content, part: Editable): void {
+		range.deleteContents();
+		let r = range.cloneRange();
+		let ctx = getContent(part);
+		let items = content as Item[];
+		if (items[0]) {
+			items[0].content = part.innerHTML + items[0].content;
+		} else {
+			items.push(part.$controller.toModel(part) as any);
+		}
+		range.setStartBefore(part);
+		// 	let ctx = getContent(start);
+// 	let r = range.cloneRange();
+// 	r.setEnd(r.startContainer, r.startOffset - 1); //Exclude the start marker.
+// 	r.setStart(ctx, 0);
+// 	let item = start.$controller.toModel(start, r);
+// 	let items = content as Item[];
+// 	if (items[0]) {
+// 		items[0].content = start.innerHTML + items[0].content;
+// 	} else {
+// 		items.push(start.$controller.toModel(start) as any);
+// 	}
+// //		r.deleteContents();
+// 	range.setStartBefore(start);
+
+	}
+	protected onStartContainer(range: Range, content: content, start: Editable): void {
+		let r = range.cloneRange();
+		let ctx = getContent(start);
+		r.setEnd(ctx, ctx.childNodes.length);
+		r.deleteContents();
+		let items = content as Item[];
+		if (items[0]) {
+			items[0].content = start.innerHTML + items[0].content;
+		} else {
+			items.push(start.$controller.toModel(start) as any);
+		}
+		range.setStartBefore(start);
 	}
 	protected onEndContainer(range: Range, content: content): void {
-		let ctx = getContent(range);
+		let list = getViewById(this.owner, this.viewId);
+		let ctx = getContent(list);
 		let end = getChildView(ctx, range.endContainer);
 		if (end) {
 			let r = range.cloneRange();
