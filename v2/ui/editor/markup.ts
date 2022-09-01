@@ -3,7 +3,7 @@ import { viewType } from "../../base/view.js";
 
 import { Editable, Editor, getViewById } from "./editor.js";
 import { ListReplace } from "./lr.js";
-import { clearContent, getChildView, getContent, getEditableView } from "./util.js";
+import { clearContent, getChildView, getContent, getEditableView, unmark } from "./util.js";
 
 
 export default function edit(commandName: string, range: Range, content: string) {
@@ -62,30 +62,18 @@ class MarkupReplace extends ListReplace {
 		return super.getOuterRange(range);
 	}	
 	protected onSingleContainer(range: Range, content: content, part: Editable): void {
-		range.deleteContents();
-		let r = range.cloneRange();
+		unmark(range);
 		let ctx = getContent(part);
+		let r = range.cloneRange();
+		r.deleteContents();
+		r.setEnd(ctx, ctx.childNodes.length);
+		let item: Item = part.$controller.toModel(part, r) as any;
+		r.deleteContents();
 		let items = content as Item[];
-		if (items[0]) {
-			items[0].content = part.innerHTML + items[0].content;
-		} else {
-			items.push(part.$controller.toModel(part) as any);
-		}
-		range.setStartBefore(part);
-		// 	let ctx = getContent(start);
-// 	let r = range.cloneRange();
-// 	r.setEnd(r.startContainer, r.startOffset - 1); //Exclude the start marker.
-// 	r.setStart(ctx, 0);
-// 	let item = start.$controller.toModel(start, r);
-// 	let items = content as Item[];
-// 	if (items[0]) {
-// 		items[0].content = start.innerHTML + items[0].content;
-// 	} else {
-// 		items.push(start.$controller.toModel(start) as any);
-// 	}
-// //		r.deleteContents();
-// 	range.setStartBefore(start);
-
+		items.push(item);
+		this.merge(part, r, items, true);
+		range.setEndAfter(part);
+		range.collapse();
 	}
 	protected onStartContainer(range: Range, content: content, start: Editable): void {
 		let r = range.cloneRange();
@@ -100,33 +88,19 @@ class MarkupReplace extends ListReplace {
 		}
 		range.setStartBefore(start);
 	}
-	protected onEndContainer(range: Range, content: content): void {
-		let list = getViewById(this.owner, this.viewId);
-		let ctx = getContent(list);
-		let end = getChildView(ctx, range.endContainer);
-		if (end) {
-			let r = range.cloneRange();
-			let ctx = getContent(end);
-			r.setStart(ctx, 0);
-			clearContent(r);
-			merge(this, end, r, content, false);
-			range.setEndBefore(end);
-		}
-	}
-}
-
-function merge(cmd: MarkupReplace, view: Editable, range: Range, content: any, isStart: boolean) {
-	let item: Item = content?.length && content[isStart ? 0 : content.length - 1];
-	if (!item) return;
-	let listType = getViewById(cmd.owner, cmd.viewId).$controller;
-	let type = listType.types[viewType(item)];
-	if (type == view.$controller) {
-		let node = 	view.ownerDocument.createTextNode(item.content);
-		range.insertNode(node);
-		if (isStart) {
-			content.shift();
-		} else {
-			content.pop();
+	protected merge(view: Editable, range: Range, content: any, isStart: boolean) {
+		let item: Item = content?.length && content[isStart ? 0 : content.length - 1];
+		if (!item) return;
+		let listType = getViewById(this.owner, this.viewId).$controller;
+		let type = listType.types[viewType(item)];
+		if (type == view.$controller) {
+			let node = 	view.ownerDocument.createTextNode(item.content);
+			range.insertNode(node);
+			if (isStart) {
+				content.shift();
+			} else {
+				content.pop();
+			}
 		}
 	}
 }
