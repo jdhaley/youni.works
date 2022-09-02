@@ -25,6 +25,12 @@ export default extend(list, {
 			let range = this.edit("Insert", event.range, [model]);
 			goToTask(event.on, range);
 		}
+	},
+	split(this: Editor, event: UserEvent) {
+		event.subject = "";
+		let range = event.range;
+		range = this.edit("Split", range, "");
+		range && this.owner.setRange(range, true);
 	}
 });
 

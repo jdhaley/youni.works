@@ -29,6 +29,9 @@ export default extend(text, {
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;
 		range = this.edit("Delete", range, "");
 		range && this.owner.setRange(range, true);
+	},
+	split(this: Editor, event: UserEvent) {
+		return;
 	}
 });
 

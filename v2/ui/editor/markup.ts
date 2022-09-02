@@ -22,13 +22,24 @@ const COMMANDS = {
 	"Delete": noop,
 	"Promote": noop,
 	"Demote": noop,
-	"Split": noop,
+	"Split": split,
 	"Join": noop,
 }
 
 function noop() {
 }
 
+function split(this: Editor, commandName: string, range: Range, content?: content): Range {
+	let view = getEditableView(range);
+	if (view.$controller.model == "line") {
+		view = getEditableView(view.parentElement);
+	}
+	if (view.$controller.model != "markup") console.warn("View is not markup:", view);
+
+	let cmd = new MarkupReplace(this.owner, commandName, view.id);
+	cmd.isSplit = true;
+	return cmd.exec(range, content);
+}
 function replace(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 	if (view.$controller.model == "line") {
@@ -47,6 +58,7 @@ interface Item {
 }
 
 class MarkupReplace extends ListReplace {
+	isSplit: boolean;
 	protected getOuterRange(range: Range) {
 		/*
 			For markup, the replace range may come from a single line
@@ -80,7 +92,7 @@ class MarkupReplace extends ListReplace {
 		part.parentElement.insertBefore(x, part.nextElementSibling);
 		r.setEnd(x, 0);
 		r.collapse();
-		this.merge(x, r, content, false);
+		if (!this.isSplit) this.merge(x, r, content, false);
 		range.collapse();
 	}
 	protected onStartContainer(range: Range, content: content, start: Editable): void {
