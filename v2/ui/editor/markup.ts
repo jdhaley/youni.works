@@ -69,10 +69,18 @@ class MarkupReplace extends ListReplace {
 		r.setEnd(ctx, ctx.childNodes.length);
 		let item: Item = part.$controller.toModel(part, r) as any;
 		r.deleteContents();
-		let items = content as Item[];
-		items.push(item);
-		this.merge(part, r, items, true);
+		// let items = content as Item[];
+		// items.push(item);
+		this.merge(part, r, content, true);
 		range.setEndAfter(part);
+
+		let x: Editable = (part as Element).cloneNode() as Editable;
+		x.$controller = part.$controller;
+		x.innerHTML = item.content;
+		part.parentElement.insertBefore(x, part.nextElementSibling);
+		r.setEnd(x, 0);
+		r.collapse();
+		this.merge(x, r, content, false);
 		range.collapse();
 	}
 	protected onStartContainer(range: Range, content: content, start: Editable): void {
