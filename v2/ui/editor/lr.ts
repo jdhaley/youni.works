@@ -14,8 +14,7 @@ export class ListReplace extends Replace {
 		if (!content) content = [];
 		this.execBefore(range, content);
 		this.execReplace(range, content);
-		this.execAfter(range, content);
-		return range;
+		return this.execAfter(range, content);
 	}
 	protected getReplaceRange() {
 		let range = super.getReplaceRange();
@@ -78,14 +77,14 @@ export class ListReplace extends Replace {
 		}
 		this.onInnerRange(range, content);
 	}
-	protected execAfter(range: Range, content: content): void {
+	protected execAfter(range: Range, content: content): Range {
 		range = this.getReplaceRange();
 		let ctx = getContent(range);
 		this.after = "";		
 		for (let i = range.startOffset; i < range.endOffset; i++) {
 			this.after += ctx.children[i].outerHTML;
 		}
-		unmark(range);
+		return unmark(range);
 	}
 	protected onStartContainer(range: Range, content: content, start: Editable): void {
 		let r = range.cloneRange();

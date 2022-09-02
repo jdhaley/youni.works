@@ -18,28 +18,17 @@ const COMMANDS = {
 	"Insert": noop,
 
 	"Entry": noop,
-	"Erase": noop,
+	"Erase": replace,
 	"Delete": noop,
 	"Promote": noop,
 	"Demote": noop,
-	"Split": split,
-	"Join": noop,
+	"Split": replace,
+	"Join": replace,
 }
 
 function noop() {
 }
 
-function split(this: Editor, commandName: string, range: Range, content?: content): Range {
-	let view = getEditableView(range);
-	if (view.$controller.model == "line") {
-		view = getEditableView(view.parentElement);
-	}
-	if (view.$controller.model != "markup") console.warn("View is not markup:", view);
-
-	let cmd = new MarkupReplace(this.owner, commandName, view.id);
-	cmd.isSplit = true;
-	return cmd.exec(range, content);
-}
 function replace(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 	if (view.$controller.model == "line") {
@@ -58,7 +47,6 @@ interface Item {
 }
 
 class MarkupReplace extends ListReplace {
-	isSplit: boolean;
 	protected getOuterRange(range: Range) {
 		/*
 			For markup, the replace range may come from a single line
@@ -92,7 +80,7 @@ class MarkupReplace extends ListReplace {
 		part.parentElement.insertBefore(x, part.nextElementSibling);
 		r.setEnd(x, 0);
 		r.collapse();
-		if (!this.isSplit) this.merge(x, r, content, false);
+		if (!(this.name == "Split")) this.merge(x, r, content, false);
 		range.collapse();
 	}
 	protected onStartContainer(range: Range, content: content, start: Editable): void {
@@ -114,8 +102,10 @@ class MarkupReplace extends ListReplace {
 		let listType = getViewById(this.owner, this.viewId).$controller;
 		let type = listType.types[viewType(item)];
 		if (type == view.$controller) {
-			let node = 	view.ownerDocument.createTextNode(item.content);
-			range.insertNode(node);
+			if (item.content) {
+				let node = 	view.ownerDocument.createTextNode(item.content);
+				range.insertNode(node);	
+			}
 			if (isStart) {
 				content.shift();
 			} else {

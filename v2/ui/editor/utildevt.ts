@@ -18,7 +18,7 @@ export function clearContent(range: Range) {
 					node.textContent = node.textContent.substring(range.endOffset);
 					break;
 				case "INSIDE":
-					node.textContent = CHAR.ZWSP;
+					node.textContent = "";
 			}
 		}
 	}

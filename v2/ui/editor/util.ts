@@ -71,6 +71,7 @@ export function unmark(range: Range) {
 
 	function patchPoint(point: ChildNode) {
 		if (!point) return;
+		patchText(point);
 		let range = point.ownerDocument.createRange();
 		if (point.previousSibling && point.previousSibling.nodeType == Node.TEXT_NODE &&
 			point.nextSibling && point.nextSibling.nodeType == Node.TEXT_NODE
@@ -88,7 +89,15 @@ export function unmark(range: Range) {
 		return range;
 	}	
 }
+function patchText(marker: Node) {
+	for (let node of marker.parentElement.childNodes) {
+		if (node.nodeType == Node.TEXT_NODE && node.nextSibling?.nodeType == Node.TEXT_NODE) {
+			node.textContent += node.nextSibling.textContent;
+			node.nextSibling.remove();
+		}
+	}
 
+}
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
@@ -104,7 +113,7 @@ export function clearContent(range: Range) {
 				} else if (node == range.endContainer) {
 					node.textContent = node.textContent.substring(range.endOffset);
 				} else {
-					node.textContent = CHAR.ZWSP;
+					node.textContent = "";
 				}	
 			}
 		}

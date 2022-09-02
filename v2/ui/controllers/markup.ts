@@ -31,6 +31,12 @@ export default extend(list, {
 		let range = event.range;
 		range = this.edit("Split", range, "");
 		range && this.owner.setRange(range, true);
+	},
+	join(this: Editor, event: UserEvent) {
+		event.subject = "";
+		let range = event.range;
+		range = this.edit("Join", range, "");
+		range && this.owner.setRange(range, true);
 	}
 });
 

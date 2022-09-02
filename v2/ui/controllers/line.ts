@@ -19,18 +19,35 @@ export default extend(text, {
 	erase(this: Editor, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
-		if (range.collapsed && !range.startOffset) return;
-		range = this.edit("Erase", range, "");
-		range && this.owner.setRange(range, true);
+		if (range.collapsed && !range.startOffset) {
+			let prev = event.on.previousElementSibling;
+			if (prev) {
+				range.setStart(prev, prev.childNodes.length);
+				event.subject = "join";
+			}	
+		} else {
+			range = this.edit("Erase", range, "");
+			range && this.owner.setRange(range, true);	
+		}
 	},
 	delete(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;
-		range = this.edit("Delete", range, "");
-		range && this.owner.setRange(range, true);
+		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) {
+			let next = event.on.nextElementSibling;
+			if (next) {
+				range.setEnd(next, 0);
+				event.subject = "join";
+			}
+		} else {
+			range = this.edit("Delete", range, "");
+			range && this.owner.setRange(range, true);	
+		}
 	},
 	split(this: Editor, event: UserEvent) {
+		return;
+	},
+	join(this: Editor, event: UserEvent) {
 		return;
 	}
 });
