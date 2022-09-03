@@ -12,9 +12,9 @@ export class ListReplace extends Replace {
 
 	exec(range: Range, content: content): Range {
 		if (!content) content = [];
-		this.execBefore(range, content);
-		this.execReplace(range, content);
-		return this.execAfter(range, content);
+		this.execBefore(range);
+		range = this.execReplace(range, content);
+		return this.execAfter(range);
 	}
 	protected getReplaceRange() {
 		let range = super.getReplaceRange();
@@ -47,7 +47,7 @@ export class ListReplace extends Replace {
 		return range;
 	}	
 
-	protected execBefore(range: Range, content: content) {
+	protected execBefore(range: Range): Range {
 		narrowRange(range);
 		mark(range);
 		//NB - the outer range is a different range from the
@@ -63,8 +63,9 @@ export class ListReplace extends Replace {
 			if (node.outerHTML) before += node.outerHTML;
 		}
 		this.before = before;
+		return range;
 	}
-	protected execReplace(range: Range, content: content): void {
+	protected execReplace(range: Range, content: content): Range {
 		let list = getViewById(this.owner, this.viewId);
 		let ctx = getContent(list);
 		let start = getChildView(ctx, range.startContainer) as Editable;
@@ -76,8 +77,9 @@ export class ListReplace extends Replace {
 			if (end) this.onEndContainer(range, content, end);
 		}
 		this.onInnerRange(range, content);
+		return range;
 	}
-	protected execAfter(range: Range, content: content): Range {
+	protected execAfter(range: Range): Range {
 		range = this.getReplaceRange();
 		let ctx = getContent(range);
 		this.after = "";		

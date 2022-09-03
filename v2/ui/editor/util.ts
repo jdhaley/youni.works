@@ -82,8 +82,17 @@ export function unmark(range: Range) {
 			range.collapse(true);
 			point.nextSibling.remove();
 		} else {
-			range.setStartBefore(point);
-			range.collapse(true);
+			if (point.previousSibling) {
+				range.selectNodeContents(point.previousSibling);
+				range.collapse();
+			} else if (point.nextSibling) {
+				range.selectNodeContents(point.nextSibling);
+				range.collapse(true);
+				range.setStartAfter(point);
+			} else {
+				range.setEndBefore(point);
+				range.collapse();
+			}
 		}
 		point.remove();
 		return range;

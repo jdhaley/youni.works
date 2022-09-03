@@ -3,8 +3,7 @@ import { viewType } from "../../base/view.js";
 
 import { Editable, Editor, getViewById } from "./editor.js";
 import { ListReplace } from "./lr.js";
-import { clearContent, getChildView, getContent, getEditableView, unmark } from "./util.js";
-
+import { getContent, getEditableView, mark, unmark } from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {
 	let cmd = COMMANDS[commandName];
@@ -62,26 +61,23 @@ class MarkupReplace extends ListReplace {
 		return super.getOuterRange(range);
 	}	
 	protected onSingleContainer(range: Range, content: content, part: Editable): void {
-		unmark(range);
+		range = unmark(range);
+		
 		let ctx = getContent(part);
 		let r = range.cloneRange();
 		r.deleteContents();
 		r.setEnd(ctx, ctx.childNodes.length);
-		let item: Item = part.$controller.toModel(part, r) as any;
+		let splitted = part.$controller.toView(part.$controller.toModel(part, r));
 		r.deleteContents();
-		// let items = content as Item[];
-		// items.push(item);
 		this.merge(part, r, content, true);
-		range.setEndAfter(part);
 
-		let x: Editable = (part as Element).cloneNode() as Editable;
-		x.$controller = part.$controller;
-		x.innerHTML = item.content;
-		part.parentElement.insertBefore(x, part.nextElementSibling);
-		r.setEnd(x, 0);
-		r.collapse();
-		if (!(this.name == "Split")) this.merge(x, r, content, false);
-		range.collapse();
+		part.parentElement.insertBefore(splitted, part.nextElementSibling);
+		range.setEnd(splitted, 0);
+		mark(range);
+		r.setStart(splitted, 0);
+		r.collapse(true);
+		if (!(this.name == "Split")) this.merge(splitted, r, content, false);
+		//range.setStart(part, part.childNodes.length);
 	}
 	protected onStartContainer(range: Range, content: content, start: Editable): void {
 		let r = range.cloneRange();

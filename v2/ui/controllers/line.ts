@@ -1,9 +1,9 @@
-import {CHAR, extend} from "../../base/util.js";
-import {EditEvent, UserEvent} from "../ui.js";
+import {extend} from "../../base/util.js";
+import {UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
 
 import text from "./text.js";
-import { getClipboard, setClipboard } from "../clipboard.js";
+import { getClipboard } from "../clipboard.js";
 
 export default extend(text, {
 	paste(this: Editor, event: UserEvent) {
@@ -43,12 +43,6 @@ export default extend(text, {
 			range = this.edit("Delete", range, "");
 			range && this.owner.setRange(range, true);	
 		}
-	},
-	split(this: Editor, event: UserEvent) {
-		return;
-	},
-	join(this: Editor, event: UserEvent) {
-		return;
 	}
 });
 

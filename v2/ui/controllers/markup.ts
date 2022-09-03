@@ -30,6 +30,12 @@ export default extend(list, {
 		event.subject = "";
 		let range = event.range;
 		range = this.edit("Split", range, "");
+		//If split happened at the start of the paragraph
+		//leave the caret there (on the empty paragraph).
+		if (range && !range.startContainer.textContent) {
+			range.selectNodeContents(range.startContainer);
+			range.collapse();
+		}
 		range && this.owner.setRange(range, true);
 	},
 	join(this: Editor, event: UserEvent) {
