@@ -114,7 +114,7 @@ export class ListReplace extends Replace {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!content) return;
-		let editor = getEditableView(range).$controller;
+		let editor = getViewById(this.owner, this.viewId).$controller;
 		let add = editor.getContentOf(editor.toView(content));
 		while (add.firstChild) {
 			let node = add.firstChild;

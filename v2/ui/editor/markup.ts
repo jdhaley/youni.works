@@ -74,6 +74,8 @@ class MarkupReplace extends ListReplace {
 		part.parentElement.insertBefore(splitted, part.nextElementSibling);
 		range.setEnd(splitted, 0);
 		mark(range);
+		range.collapse();
+
 		r.setStart(splitted, 0);
 		r.collapse(true);
 		if (!(this.name == "Split")) this.merge(splitted, r, content, false);
