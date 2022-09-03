@@ -18,8 +18,7 @@ const EDIT_MAPPING = {
 }
 export default extend(display, {
 	beforeinput(event: EditEvent) {
-		event.subject = EDIT_MAPPING[event.inputType] || "";
-		console.log(event.subject || event.inputType);
+		event.subject = EDIT_MAPPING[event.inputType] || event.inputType;
 	},
 	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
@@ -58,12 +57,6 @@ export default extend(display, {
 			range = this.edit("Delete", range);
 			range && this.owner.setRange(range, true);
 		}
-	},
-	enter(event: UserEvent) {
-		event.subject = "";
-	},
-	charpress(event: UserEvent) {
-		event.subject = "";
 	},
 	input(event: UserEvent) {
 		/*

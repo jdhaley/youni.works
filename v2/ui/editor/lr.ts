@@ -1,7 +1,7 @@
 import {content} from "../../base/model.js";
 
 import {Article, Editable, getViewById, Replace} from "./editor.js";
-import {getContent, getEditableView, getChildView, narrowRange, mark, clearContent, unmark} from "./util.js";
+import {getContent, getChildView, narrowRange, mark, clearContent, unmark} from "./util.js";
 
 export class ListReplace extends Replace {
 	constructor(owner: Article, name: string, viewId: string) {
@@ -12,6 +12,11 @@ export class ListReplace extends Replace {
 
 	exec(range: Range, content: content): Range {
 		if (!content) content = [];
+		if (!(content instanceof Array)) content = [{
+			type$: "para", //TODO fix hard coded type.
+			content: "" + content
+		}];
+
 		this.execBefore(range);
 		range = this.execReplace(range, content);
 		return this.execAfter(range);
