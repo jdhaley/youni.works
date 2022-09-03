@@ -114,11 +114,15 @@ export class ListReplace extends Replace {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!content) return;
-		let editor = getViewById(this.owner, this.viewId).$controller;
-		let add = editor.getContentOf(editor.toView(content));
-		while (add.firstChild) {
-			let node = add.firstChild;
-			range.insertNode(node);
+		let list = getViewById(this.owner, this.viewId);
+		//Insertion range must be on the list container. If in a markup line, pop-up until it is.
+		while (range.commonAncestorContainer != list) {
+			range.setStartBefore(range.commonAncestorContainer);
+			range.collapse(true);
+		}
+		let views = list.$controller.getContentOf(list.$controller.toView(content));
+		while (views.firstChild) {
+			range.insertNode(views.firstChild);
 			range.collapse();
 		}
 	}
