@@ -43,6 +43,14 @@ export default extend(list, {
 		let range = event.range;
 		range = this.edit("Join", range, "");
 		range && this.owner.setRange(range, true);
+	},
+	promote(this: Editor, event: UserEvent) {
+		event.subject = "";
+		this.edit("Promote", event.range);
+	},
+	demote(this: Editor, event: UserEvent) {
+		event.subject = "";
+		this.edit("Demote", event.range);
 	}
 });
 

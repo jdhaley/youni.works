@@ -1,6 +1,6 @@
 import {CHAR} from "../../base/util.js";
 
-import {Edit, Replace} from "./editor.js";
+import {Replace} from "./replace.js";
 import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {
@@ -62,7 +62,7 @@ function doit(commandName: string, range: Range, text: string): Range {
 	}
 
 	if (range.collapsed && node == lastEdit.node) {
-		let cmd = this.owner.commands.peek() as Edit;
+		let cmd = this.owner.commands.peek() as Replace;
 		if (cmd?.name == commandName && view?.id == cmd.viewId) {
 			let r = doAgain(cmd, range, text);
 			if (r) return r;		
@@ -88,7 +88,7 @@ function doit(commandName: string, range: Range, text: string): Range {
 }
 
 
-function doAgain(cmd: Edit, range: Range, text: string) {
+function doAgain(cmd: Replace, range: Range, text: string) {
 	let currentOffset = range.startOffset; //start & end are the same.
 	switch (cmd.name) {
 		case "Entry":
@@ -109,7 +109,7 @@ function doAgain(cmd: Edit, range: Range, text: string) {
 	}
 }
 
-function editAgain(range: Range, cmd: Edit, char: string) {
+function editAgain(range: Range, cmd: Replace, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.end) + char + text.substring(lastEdit.end);
@@ -120,7 +120,7 @@ function editAgain(range: Range, cmd: Edit, char: string) {
 	return endagain(range, cmd);
 }
 
-function deleteAgain(range: Range, cmd: Edit, char: string) {
+function deleteAgain(range: Range, cmd: Replace, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.start) + text.substring(lastEdit.start + 1);
@@ -130,7 +130,7 @@ function deleteAgain(range: Range, cmd: Edit, char: string) {
 	return endagain(range, cmd);
 }
 
-function eraseAgain(range: Range, cmd: Edit) {
+function eraseAgain(range: Range, cmd: Replace) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.start - 1) + text.substring(lastEdit.start);
@@ -141,7 +141,7 @@ function eraseAgain(range: Range, cmd: Edit) {
 	return endagain(range, cmd);
 }
 
-function endagain(range: Range, cmd: Edit) {
+function endagain(range: Range, cmd: Replace) {
 	mark(range);
 	cmd.after = getContent(range).innerHTML || "";
 	unmark(range);

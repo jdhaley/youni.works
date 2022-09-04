@@ -1,5 +1,5 @@
-import { CHAR } from "../../base/util";
-import { getChildView, getEditableView, rangeIterator } from "./util";
+import { CHAR } from "../base/util";
+import { getChildView, getEditableView, rangeIterator } from "../ui/editor/util";
 
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);

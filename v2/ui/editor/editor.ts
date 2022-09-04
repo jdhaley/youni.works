@@ -9,6 +9,7 @@ export interface Editable extends Element {
 }
 
 export interface Editor  {
+	readonly name: string;
 	readonly types: bundle<Editor>;
 	readonly model: string;
 	readonly owner: Article;
@@ -25,7 +26,7 @@ export interface Article extends Receiver {
 	setRange(range: Range, collapse?: boolean): void;
 }
 
-export class Edit extends Command<Range> {
+export abstract class Edit extends Command<Range> {
 	constructor(owner: Article, name: string, viewId: string) {
 		super();
 		this.owner = owner;
@@ -38,52 +39,7 @@ export class Edit extends Command<Range> {
 	name: string;
 	timestamp: number;
 	viewId: string;
-	before: string;
-	after: string;
-
-	undo(): Range {
-		return;
-	}
-	redo(): Range {
-		return;
-	}
-	exec(range: Range, content: content): Range {
-		return;
-	}
 }
-
-export abstract class Replace extends Edit {
-	undo() {
-		return this.replace(this.before);
-	}
-	redo() {
-		return this.replace(this.after);
-	}
-	protected replace(markup: string) {
-		let range = this.getReplaceRange();
-		let div = range.commonAncestorContainer.ownerDocument.createElement("div");
-		div.innerHTML = markup;
-		range.deleteContents();
-		while (div.firstChild) {
-			let node = div.firstChild;
-			range.insertNode(node);
-			range.collapse();
-			if (node.nodeType == Node.ELEMENT_NODE) {
-				this.owner.bindView(node as any);
-			}
-		}
-		range = unmark(range);
-		return range;
-	}
-	protected getReplaceRange(): Range {
-		let view = getViewById(this.owner, this.viewId);
-		if (!view) throw new Error(`View "${this.viewId}" not found.`);
-		let range = view.ownerDocument.createRange();
-		range.selectNodeContents(view.$controller.getContentOf(view));
-		return range;
-	}
-}
-
 export function getViewById(owner: Article, id: string) {
 	let view = owner.getElementById(id) as Editable;
 	if (!view) throw new Error("Can't find view element.");

@@ -1,7 +1,7 @@
-import {CHAR} from "../../base/util.js";
+import {CHAR} from "../base/util.js";
 
-import {Editable} from "./editor.js";
-import {getEditableView} from "./util.js";
+import {Editable} from "../ui/editor/editor.js";
+import {getEditableView} from "../ui/editor/util.js";
 
 export class EditRange {
 	constructor(range: Range) {

@@ -1,6 +1,7 @@
 import {Record} from "../../base/model.js";
 
-import { Editor, Replace } from "./editor.js";
+import { Editor } from "./editor.js";
+import { Replace } from "./replace.js";
 import {getContent, getEditableView, mark, unmark, clearContent, narrowRange, getChildView} from "./util.js";
 
 class RecordEdit extends Replace {
@@ -17,7 +18,6 @@ class RecordEdit extends Replace {
 		unmark(range);
 		return range;
 	}
-	
 }
 export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
 	if (record && typeof record[0] == "object") record = record[0] as Record;

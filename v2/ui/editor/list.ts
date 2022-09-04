@@ -1,7 +1,7 @@
 import {content} from "../../base/model.js";
 
 import { Editor } from "./editor.js";
-import { ListReplace } from "./lr.js";
+import { ListReplace } from "./replace.js";
 import { getEditableView } from "./util.js";
 
 export default function edit(this: Editor, commandName: string, range: Range, content?: content): Range {
