@@ -111,4 +111,22 @@ class MarkupReplace extends ListReplace {
 			}
 		}
 	}
+	//Issue with the following logic breaking the record lists.
+	//TODO this is just copied.  Best to understand better & resolve.
+	protected onInnerRange(range: Range, content: content): void {
+		range = range.cloneRange();
+		range.deleteContents();
+		if (!content) return;
+		let list = getViewById(this.owner, this.viewId);
+		//Insertion range must be on the list container. If in a markup line, pop-up until it is.
+		while (range.commonAncestorContainer != list) {
+			range.setStartBefore(range.commonAncestorContainer);
+			range.collapse(true);
+		}
+		let views = list.$controller.getContentOf(list.$controller.toView(content));
+		while (views.firstChild) {
+			range.insertNode(views.firstChild);
+			range.collapse();
+		}
+	}
 }
