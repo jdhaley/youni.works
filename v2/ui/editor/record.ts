@@ -1,7 +1,7 @@
 import {Record} from "../../base/model.js";
 
 import { Editor } from "./editor.js";
-import { Replace } from "./replace.js";
+import { Replace } from "./commands/replace.js";
 import {getContent, getEditableView, mark, unmark, clearContent, narrowRange, getChildView} from "./util.js";
 
 class RecordEdit extends Replace {

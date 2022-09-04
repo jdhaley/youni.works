@@ -1,7 +1,6 @@
 import { Command, CommandBuffer } from "../../base/command.js";
 import { content } from "../../base/model.js";
 import { Receiver } from "../../base/controller.js";
-import {  unmark } from "./util.js";
 import { bundle } from "../../base/util.js";
 
 export interface Editable extends Element {

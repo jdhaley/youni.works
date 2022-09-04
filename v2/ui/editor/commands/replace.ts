@@ -1,8 +1,8 @@
-import {content} from "../../base/model.js";
-import { viewType } from "../../base/view.js";
+import {content} from "../../../base/model.js";
+import { viewType } from "../../../base/view.js";
 
-import {Article, Editable, getViewById, Edit} from "./editor.js";
-import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView} from "./util.js";
+import {Article, Editable, getViewById, Edit} from "../editor.js";
+import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView} from "../util.js";
 
 
 export abstract class Replace extends Edit {

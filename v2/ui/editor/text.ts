@@ -1,6 +1,6 @@
 import {CHAR} from "../../base/util.js";
 
-import {Replace} from "./replace.js";
+import {Replace} from "./commands/replace.js";
 import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {

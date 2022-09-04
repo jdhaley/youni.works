@@ -1,8 +1,8 @@
 import { content } from "../../base/model.js";
 
 import { Editable, Editor } from "./editor.js";
-import { LevelCommand } from "./level.js";
-import { MarkupReplace } from "./replace.js";
+import { LevelCommand } from "./commands/level.js";
+import { MarkupReplace } from "./commands/replace.js";
 import { getChildView, getEditableView } from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {

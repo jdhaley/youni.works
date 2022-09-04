@@ -1,5 +1,5 @@
-import {Edit, Editable, getViewById} from "./editor.js";
-import { getChildView, getEditableView } from "./util.js";
+import {Edit, Editable, getViewById} from "../editor.js";
+import { getChildView, getEditableView } from "../util.js";
 
 export class LevelCommand extends Edit {
 	startId: string;
