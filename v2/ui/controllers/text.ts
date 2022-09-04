@@ -51,6 +51,17 @@ export default extend(editable, {
 		range = this.edit("Entry", range, char);
 		range && this.owner.setRange(range, true);
 	},
+	deleteWordForward(event: EditEvent) {
+		let range = event.getTargetRanges()[0];
+		if (range) {
+			event.range.setStart(range.startContainer, range.startOffset);
+			event.range.setEnd(range.endContainer, range.endOffset);
+		}
+		event.subject = "delete";
+	},
+	deleteWordBackward(event: EditEvent) {
+		event.subject = "deleteWordForward";
+	},
 	erase(this: Editor, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;

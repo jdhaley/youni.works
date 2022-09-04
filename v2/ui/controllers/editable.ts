@@ -19,6 +19,7 @@ const EDIT_MAPPING = {
 export default extend(display, {
 	beforeinput(event: EditEvent) {
 		event.subject = EDIT_MAPPING[event.inputType] || event.inputType;
+		if (event.subject == event.inputType) console.log(event.subject);
 	},
 	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
