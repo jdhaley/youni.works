@@ -80,8 +80,7 @@ function level(item: Element, adjust: number) {
 
 const items = {
 	getSection(node: Node | Range): Element {
-		if (node instanceof Range) node = node.commonAncestorContainer;
-		let ele = getEditableView(node);
+		let ele = node && getEditableView(node);
 		while (ele) {
 			if (this.getRole(ele) == "heading") return ele;
 			ele = ele.previousElementSibling;

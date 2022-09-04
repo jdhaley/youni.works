@@ -43,6 +43,7 @@ export default {
 	},
 	line(this: ElementType, view: Element, item: Item): void {
 		view.innerHTML = "" + (item.content || "");
+		if (item.type$ == "heading") view.setAttribute("role", "heading");
 		if (item.level) view.setAttribute("aria-level", "" + item.level);
 		//view.id =  item.id || "";
 	}

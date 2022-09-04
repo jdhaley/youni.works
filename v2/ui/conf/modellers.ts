@@ -25,7 +25,7 @@ export default {
 		if (range && !range.intersectsNode(view)) return;
 		let content = textContent.call(this, view, range, id);
 		return {
-			type$: this.name,
+			type$: view.getAttribute("role") == "heading" ? "heading" : this.name,
 			content: content,
 			id: view.id,
 			level: Number.parseInt(view.getAttribute("aria-level"))		
