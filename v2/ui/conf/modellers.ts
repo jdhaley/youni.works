@@ -24,12 +24,13 @@ export default {
 	line(this: ElementType, view: Element, range?: Range, id?: true): Item {
 		if (range && !range.intersectsNode(view)) return;
 		let content = textContent.call(this, view, range, id);
-		return {
-			type$: view.getAttribute("role") == "heading" ? "heading" : this.name,
+		let item: Item = {
+			type$: view.getAttribute("data-item"),
 			content: content,
-			id: view.id,
-			level: Number.parseInt(view.getAttribute("aria-level"))		
 		}
+		let level = Number.parseInt(view.getAttribute("aria-level"));
+		if (level) item.level = level;
+		return item;
 	}
 }
 

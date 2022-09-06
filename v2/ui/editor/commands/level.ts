@@ -2,6 +2,7 @@ import {Edit, Editable, getViewById} from "../editor.js";
 import { getChildView, getEditableView } from "../util.js";
 
 export class LevelCommand extends Edit {
+	declare name: "Promote" | "Demote";
 	startId: string;
 	endId: string;
 	exec(range: Range): Range {
@@ -9,11 +10,11 @@ export class LevelCommand extends Edit {
 		let content = view.$controller.getContentOf(view);
 		this.startId = getChildView(content, range.startContainer).id;
 		this.endId = getChildView(content, range.endContainer).id;
-		this.do();
+		this.do(this.name);
+		console.log(this);
 		return range;
 	}
-	protected do(way?: "Promote" | "Demote") {
-		if (!way) way = this.name as any;
+	protected do(way: "Promote" | "Demote") {
 		let adjust = way == "Promote" ? -1 : 1;
 		let start = getViewById(this.owner, this.startId);
 		let end = getViewById(this.owner, this.endId);
@@ -33,10 +34,10 @@ export class LevelCommand extends Edit {
 		return range;
 	}
 	undo() {
-		return this.do(this.name == "Promte" ? "Demote" : "Promote");
+		return this.do(this.name == "Promote" ? "Demote" : "Promote");
 	}
 	redo() {
-		return this.do();
+		return this.do(this.name);
 	}
 }
 
