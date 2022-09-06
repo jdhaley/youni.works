@@ -23,7 +23,7 @@ export class LevelCommand extends Edit {
 		} else {
 			for (let item = start; item; ) {
 				let level = items.getLevel(item) + adjust;
-				if (level >= 0 && level <= 6) items.setItem(item, level ? "listitem" : "", level);
+				if (level >= 0 && level <= 6) items.setItem(item, level);
 				item = (item.id == this.endId ? null : item.nextElementSibling as HTMLElement)
 			}
 		}
@@ -49,12 +49,12 @@ function level(item: Element, adjust: number) {
 		if (items.getRole(item) == "heading") {
 			let section = items.getSection(item.previousSibling as Element);
 			if (level > items.getLevel(section) || level == 6) {
-				items.setItem(item, "", 0);
+				items.setItem(item, 0);
 			} else if (level < 6) {
-				items.setItem(item, "heading", ++level);
+				items.setItem(item, ++level, "heading");
 			}
 		} else if (level < 6) {
-			items.setItem(item, items.getRole(item) == "term" ? "term" : "listitem", ++level);
+			items.setItem(item, ++level, items.getRole(item));
 		}
 	}
 	
@@ -68,12 +68,12 @@ function level(item: Element, adjust: number) {
 				if (level > 0) {
 					item.ariaLevel = "" + level;
 				} else {
-					items.setItem(item, "", 0); //Normal para
+					items.setItem(item, 0); //Normal para
 				}
 			} else {
 				//Promote paragraph to heading.
 				let sectionLevel = items.getSection(item)?.ariaLevel as any * 1 + 1 || 1;
-				items.setItem(item, "heading", sectionLevel > 6 ? 6 : sectionLevel);
+				items.setItem(item, sectionLevel > 6 ? 6 : sectionLevel, "heading");
 			}
 		}
 	}	
@@ -87,16 +87,14 @@ const items = {
 			ele = ele.previousElementSibling;
 		}
 	},
-	setItem(item: Element, role: string, level: number) {
-		if (!role) {
-			item.removeAttribute("role");
-		} else {
-			item.setAttribute("role", role);
-		}
-		if (!level) {
-			item.removeAttribute("aria-level");
-		} else {
+	setItem(item: Element, level: number, role?: string) {
+		item.setAttribute("data-item", role == "heading" ? "heading" : "para");
+		if (level) {
 			item.setAttribute("aria-level", "" + level);
+			item.setAttribute("role", role || "listitem");
+		} else {
+			item.removeAttribute("aria-level");
+			item.removeAttribute("role");
 		}
 	},
 	getRole(item: Element) {
