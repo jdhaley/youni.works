@@ -277,8 +277,9 @@ export class MarkupReplace extends ListReplace {
 		range.deleteContents();
 		if (!content) return;
 		let list = getViewById(this.owner, this.viewId);
-		//Insertion range must be on the list container. If in a markup line, pop-up until it is.
-		while (range.commonAncestorContainer != list) {
+		//Insertion range must be on the list conent. If in a markup line, pop-up until it is.
+		let ctx = getContent(list);
+		while (range.commonAncestorContainer != ctx) {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
