@@ -2,7 +2,7 @@ import {content} from "../../../base/model.js";
 import { viewType } from "../../../base/view.js";
 
 import {Article, Editable, getViewById, Edit} from "../editor.js";
-import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView} from "../util.js";
+import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items} from "../util.js";
 
 
 export abstract class Replace extends Edit {
@@ -242,11 +242,13 @@ export class MarkupReplace extends ListReplace {
 		let ctx = getContent(start);
 		r.setEnd(ctx, ctx.childNodes.length);
 		r.deleteContents();
+		let startItem: Item = start.$controller.toModel(start) as any;
 		let items = content as Item[];
 		if (items[0]) {
-			items[0].content = start.innerHTML + items[0].content;
+			startItem.content += items[0].content;
+			items[0] = startItem;
 		} else {
-			items.push(start.$controller.toModel(start) as any);
+			items.push(startItem);
 		}
 		range.setStartBefore(start);
 	}
@@ -256,6 +258,7 @@ export class MarkupReplace extends ListReplace {
 		let listType = getViewById(this.owner, this.viewId).$controller;
 		let type = listType.types[viewType(item)];
 		if (type == view.$controller) {
+			if (!isStart) items.setItem(view, item.level, item.type$);
 			if (item.content) {
 				let node = 	view.ownerDocument.createTextNode(item.content);
 				range.insertNode(node);	

@@ -185,3 +185,31 @@ export function rangeIterator(range: Range) {
 		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
 	)
 }
+
+export const items = {
+	getSection(node: Node | Range): Element {
+		let ele = node && getEditableView(node);
+		while (ele) {
+			if (this.getRole(ele) == "heading") return ele;
+			ele = ele.previousElementSibling;
+		}
+	},
+	setItem(item: Element, level: number, role?: string) {
+		//TODO a lot of type/role specific logic here, look to generalize better.
+		item.setAttribute("data-item", role == "heading" ? "heading" : "para");
+		if (!role || role == "para") role = "listitem";
+		if (level) {
+			item.setAttribute("aria-level", "" + level);
+			item.setAttribute("role", role || "listitem");
+		} else {
+			item.removeAttribute("aria-level");
+			item.removeAttribute("role");
+		}
+	},
+	getRole(item: Element) {
+		return item?.getAttribute("role") || "";
+	},
+	getLevel(item: Element) {
+		return (item?.ariaLevel as any) * 1 || 0;
+	}
+}

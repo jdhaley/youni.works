@@ -1,5 +1,5 @@
-import {Edit, Editable, getViewById} from "../editor.js";
-import { getChildView, getEditableView } from "../util.js";
+import {Edit, getViewById} from "../editor.js";
+import { getChildView, items } from "../util.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
@@ -77,30 +77,4 @@ function level(item: Element, adjust: number) {
 			}
 		}
 	}	
-}
-
-const items = {
-	getSection(node: Node | Range): Element {
-		let ele = node && getEditableView(node);
-		while (ele) {
-			if (this.getRole(ele) == "heading") return ele;
-			ele = ele.previousElementSibling;
-		}
-	},
-	setItem(item: Element, level: number, role?: string) {
-		item.setAttribute("data-item", role == "heading" ? "heading" : "para");
-		if (level) {
-			item.setAttribute("aria-level", "" + level);
-			item.setAttribute("role", role || "listitem");
-		} else {
-			item.removeAttribute("aria-level");
-			item.removeAttribute("role");
-		}
-	},
-	getRole(item: Element) {
-		return item?.getAttribute("role") || "";
-	},
-	getLevel(item: Element) {
-		return (item?.ariaLevel as any) * 1 || 0;
-	}
 }
