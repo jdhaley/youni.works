@@ -4,6 +4,7 @@ import {Editor} from "../editor/editor.js";
 import {getContent, getFooter, getHeader, rangeIterator} from "../editor/util.js";
 import list from "./list.js";
 import { getClipboard } from "../clipboard.js";
+import { content } from "../../base/model.js";
 
 export default extend(list, {
 	paste(this: Editor, event: UserEvent) {
@@ -14,22 +15,29 @@ export default extend(list, {
 		range &&  this.owner.setRange(range, true);
 	},
 	insertText(this: Editor, event: EditEvent) {
-		if (getFooter(event.on, event.range.commonAncestorContainer)) {
-			event.subject = "";
-			let model = {
-				"type$": "para",
-				"content": event.data
-			}
-			event.range.selectNodeContents(getContent(event.on));
-			event.range.collapse();
-			let range = this.edit("Insert", event.range, [model]);
-			goToTask(event.on, range);
-		}
+		event.subject = "";
+		let model = {
+			"type$": "para",
+			"content": event.data
+		};
+		let range = this.edit("Entry", event.range, [model]);
+		range &&  this.owner.setRange(range, true);
 	},
 	split(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		range = this.edit("Split", range, "");
+		let model: content = "";
+		if (!range.collapsed) {
+			//This model will supress the merging of the first and last line.
+			model = [{
+				"type$": "para",
+				"content": ""
+			}, {
+				"type$": "para",
+				"content": ""
+			}];	
+		}
+		range = this.edit("Split", range, model);
 		//If split happened at the start of the paragraph
 		//leave the caret there (on the empty paragraph).
 		if (range && !range.startContainer.textContent) {

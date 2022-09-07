@@ -16,9 +16,9 @@ const COMMANDS = {
 	"Paste": replace,
 	"Insert": noop,
 
-	"Entry": noop,
+	"Entry": replace,
 	"Erase": replace,
-	"Delete": noop,
+	"Delete": replace,
 	"Promote": level,
 	"Demote": level,
 	"Split": replace,

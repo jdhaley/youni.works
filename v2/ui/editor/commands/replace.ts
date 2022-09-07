@@ -177,7 +177,6 @@ export class ListReplace extends Replace {
  * @param range 
  */
 function captureRange(cmd: ListReplace, ctx: Element, start: number, end: number) {
-	console.log(ctx);
 	for (let i = start; i; i--) {
 		let node = ctx.childNodes[i - 1] as Editable;
 		if (node.getAttribute("data-item")) {
