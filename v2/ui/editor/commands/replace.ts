@@ -154,15 +154,21 @@ export class ListReplace extends Replace {
 	protected onSingleContainer(range: Range, content: content, container: Editable): void {
 		//overridden for markup
 	}
+	//22-09-07 Same method for list & markup.
 	protected onInnerRange(range: Range, content: content): void {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!content) return;
-		let editor = getViewById(this.owner, this.viewId).$controller;
-		let add = editor.getContentOf(editor.toView(content));
-		while (add.firstChild) {
-			let node = add.firstChild;
-			range.insertNode(node);
+		let list = getViewById(this.owner, this.viewId);
+		let ctx = getContent(list);
+		//Ensure the range must be on the list conent. (It may be on a markup line).
+		while (range.commonAncestorContainer != ctx) {
+			range.setStartBefore(range.commonAncestorContainer);
+			range.collapse(true);
+		}
+		let views = list.$controller.getContentOf(list.$controller.toView(content));
+		while (views.firstChild) {
+			range.insertNode(views.firstChild);
 			range.collapse();
 		}
 	}
@@ -267,25 +273,6 @@ export class MarkupReplace extends ListReplace {
 			} else {
 				content.pop();
 			}
-		}
-	}
-	//Issue with the following logic breaking the record lists.
-	//TODO this is just copied.  Best to understand better & resolve.
-	protected onInnerRange(range: Range, content: content): void {
-		range = range.cloneRange();
-		range.deleteContents();
-		if (!content) return;
-		let list = getViewById(this.owner, this.viewId);
-		//Insertion range must be on the list conent. If in a markup line, pop-up until it is.
-		let ctx = getContent(list);
-		while (range.commonAncestorContainer != ctx) {
-			range.setStartBefore(range.commonAncestorContainer);
-			range.collapse(true);
-		}
-		let views = list.$controller.getContentOf(list.$controller.toView(content));
-		while (views.firstChild) {
-			range.insertNode(views.firstChild);
-			range.collapse();
 		}
 	}
 }
