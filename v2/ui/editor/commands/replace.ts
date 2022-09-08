@@ -1,4 +1,4 @@
-import {content} from "../../../base/model.js";
+import {content, Record} from "../../../base/model.js";
 import { viewType } from "../../../base/view.js";
 
 import {Article, Editable, getViewById, Edit} from "../editor.js";
@@ -120,7 +120,7 @@ export class ListReplace extends Replace {
 			if (start) this.onStartContainer(range, content, start);
 			if (end) this.onEndContainer(range, content, end);
 		}
-		this.onInnerRange(range, content);
+		this.onInsert(range, content);
 		return range;
 	}
 	protected execAfter(range: Range): Range {
@@ -155,7 +155,7 @@ export class ListReplace extends Replace {
 		//overridden for markup
 	}
 	//22-09-07 Same method for list & markup.
-	protected onInnerRange(range: Range, content: content): void {
+	protected onInsert(range: Range, content: content): void {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!content) return;
@@ -220,27 +220,41 @@ export class MarkupReplace extends ListReplace {
 			return range;
 		}
 		return super.getOuterRange(range);
-	}	
+	}
 	protected onSingleContainer(range: Range, content: content, part: Editable): void {
+		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
 		let ctx = getContent(part);
 		let r = range.cloneRange();
+		//Delete the range within the line.
 		r.deleteContents();
+		//Get the remainder of the line content.
 		r.setEnd(ctx, ctx.childNodes.length);
-		let splitted = part.$controller.toView(part.$controller.toModel(part, r));
+		//Capture it,.
+		let model: Item = part.$controller.toModel(part, r) as any;
+		//Clear the remainder of the line content.
 		r.deleteContents();
+		//Append any 'paste' content to the line.
 		this.merge(part, r, content, true);
 
-		part.parentElement.insertBefore(splitted, part.nextElementSibling);
-		range.setEnd(splitted, 0);
+		if (this.name == "Split" && model.type$ == "heading") {
+			//Headings split to a para, not another heading.
+			model.type$ = "para";
+			model.level = 0;
+		}
+		//Create the end line and add it after the command line.
+		let end: Editable = part.$controller.toView(model as any);
+		part.parentElement.insertBefore(end, part.nextElementSibling);
+		//We can now set the new range now that we have the end line.
+		range.setEnd(end, 0);
 		mark(range);
 		range.collapse();
-
-		r.setStart(splitted, 0);
+		//Prepend any 'paste' content to the start of the end line.
+		r.setStart(end, 0);
 		r.collapse(true);
-		if (!(this.name == "Split")) this.merge(splitted, r, content, false);
-		//range.setStart(part, part.childNodes.length);
+		if (!(this.name == "Split")) this.merge(end, r, content, false);
+		//note: onInsert() handles the remainder of the 'paste' content.
 	}
 	protected onStartContainer(range: Range, content: content, start: Editable): void {
 		let r = range.cloneRange();

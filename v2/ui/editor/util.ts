@@ -1,6 +1,4 @@
-import {CHAR} from "../../base/util.js";
-
-import {Article, Editable} from "./editor.js";
+import {Editable} from "./editor.js";
 
 export function getEditableView(node: Node | Range): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
@@ -98,6 +96,7 @@ export function unmark(range: Range) {
 		return range;
 	}	
 }
+
 function patchText(marker: Node) {
 	for (let node of marker.parentElement.childNodes) {
 		if (node.nodeType == Node.TEXT_NODE && node.nextSibling?.nodeType == Node.TEXT_NODE) {
@@ -107,6 +106,7 @@ function patchText(marker: Node) {
 	}
 
 }
+
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
@@ -148,19 +148,19 @@ function enclosedInRange(view: Element, range: Range) {
 	}
 }
 
-export function replace(article: Article, range: Range, markup: string) {
-	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
-	div.innerHTML = markup;
-	range.deleteContents();
-	while (div.firstChild) {
-		let node = div.firstChild;
-		range.insertNode(node);
-		range.collapse();
-		if (node.nodeType == Node.ELEMENT_NODE) {
-			article.bindView(node as any);
-		}
-	}
-}
+// export function replace(article: Article, range: Range, markup: string) {
+// 	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
+// 	div.innerHTML = markup;
+// 	range.deleteContents();
+// 	while (div.firstChild) {
+// 		let node = div.firstChild;
+// 		range.insertNode(node);
+// 		range.collapse();
+// 		if (node.nodeType == Node.ELEMENT_NODE) {
+// 			article.bindView(node as any);
+// 		}
+// 	}
+// }
 
 export function narrowRange(range: Range) {
 	let view = getEditableView(range);
