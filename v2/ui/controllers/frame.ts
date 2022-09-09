@@ -4,43 +4,35 @@ import {Frame, UserEvent} from "../ui.js";
 
 let TRACK: UserEvent = null;
 
-export function selection(range: Range) {
-    let doc = range.commonAncestorContainer.ownerDocument;
-    for (let ele of doc.getElementsByClassName("selected")) {
-        ele.classList.remove("selected");
-    }
-    let it = rangeIterator(range);
-	for (let node = it.nextNode(); node; node = it.nextNode()) {
-		if (node.nodeType == Node.TEXT_NODE) {
-            if (range.startContainer == node || range.endContainer == node) {
-                node.parentElement.classList.remove("selected");
-            }
-		} else if (node instanceof Element && node.classList.contains("view")) {
-            node.parentElement.classList.add("selected");
-        }
-	}
-}
-
+// export function selection(range: Range) {
+//     let doc = range.commonAncestorContainer.ownerDocument;
+//     for (let ele of doc.getElementsByClassName("selected")) {
+//         ele.classList.remove("selected");
+//     }
+//     let it = rangeIterator(range);
+// 	for (let node = it.nextNode(); node; node = it.nextNode()) {
+// 		if (node.nodeType == Node.TEXT_NODE) {
+//             if (range.startContainer == node || range.endContainer == node) {
+//                 node.parentElement.classList.remove("selected");
+//             }
+// 		} else if (node instanceof Element && node.classList.contains("view")) {
+//             node.parentElement.classList.add("selected");
+//         }
+// 	}
+// }
+let priorView: Element;
 export default {
     selectionchange(event: UserEvent) {
         let owner = ownerOf(event.target as Node);
         let range = owner.selectionRange;
-    //    selection(range);
-
-        // //selectionchange comes from the Document, not the Window.
-        // event.range = ownerOf(event.target as Node).selectionRange;
-        // event.source = viewOf(event.range.commonAncestorContainer);
-        // event.subject = "select";
-        // if (SELECTION) {
-        //     if (SELECTION.source != event.source) {
-        //         SELECTION.subject = "unselect";
-        //         SELECTION.range = event.range;
-        //         sense(SELECTION);    
-        //     }
-        //     if (SELECTION.source == event.source) event.subject = "selecting";
-        // }
-        // SELECTION = event;
-        // sense(event);
+        priorView?.classList.remove("active");
+        for (let ele = range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
+            if (ele.classList?.contains("view")) {
+                ele.classList.add("active");
+                priorView = ele;
+                return;
+            }
+        }
     },
     beforeinput: rangeEvent,
     input: sense,
