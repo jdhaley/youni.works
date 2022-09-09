@@ -12,8 +12,12 @@ export function getEditableView(node: Node | Range): Editable {
 }
 
 export function getContent(node: Node | Range): Editable {
-	let view = getEditableView(node);
-	return view?.$controller.getContentOf(view);
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
+	for (let ele = node as Editable; ele; ele = ele.parentElement) {
+		if (ele.classList.contains("content")) return ele;
+		if (ele.$controller?.isPanel)return ele.$controller.getContentOf(ele);
+	}
 }
 
 export function getChildView(content: Element, node: Node): Element {

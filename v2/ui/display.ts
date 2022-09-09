@@ -41,7 +41,7 @@ export class DisplayOwner extends ElementOwner {
 	declare editors: bundle<editor>;
 	readonly frame: Frame;
 	type: DisplayType;
-	view: HTMLElement;
+	view: Element;
 
 	createElement(tagName: string): HTMLElement {
 		return this.frame.createElement(tagName);
@@ -91,9 +91,6 @@ export class DisplayType extends ElementType {
 		return this.conf.shortcuts;
 	}
 
-	toView(model: content): Display {
-		return super.toView(model) as Display;
-	}
 	createView(): Display {
 		let view = super.createView() as Display;
 		view.id = "" + NEXT_ID++;
@@ -102,11 +99,9 @@ export class DisplayType extends ElementType {
 	viewContent(view: Display, model: content): void {
 		view.textContent = "";
 		if (this.isPanel) {
-			view.append(this.createHeader(view, model));
-			view.append(this.createContent(view, model));
-			if (this.model == "list") {
-				view.append(this.createFooter(view, model));
-			}
+			this.createHeader(view, model);
+			this.createContent(view, model);
+			this.createFooter(view, model)
 		} else {
 			view.classList.add("content");
 			view.$content = view;
@@ -116,23 +111,23 @@ export class DisplayType extends ElementType {
 	createHeader(view: Display, model?: content) {
 		let header = this.owner.createElement("header");
 		header.textContent = this.conf.title || "";
-		return header;
+		view.append(header);
 	}
 	createContent(view: Display, model?: content) {
 		view.$content = this.owner.createElement("div");
-		view.$content.classList.add("view");
 		view.$content.classList.add("content");
-		return view.$content;
+		view.append(view.$content);
 	}
 	createFooter(view: Display, model?: content) {
+		if (this.model != "list") return;
 		let footer = this.owner.createElement("footer");
-		return footer;
+		view.append(footer);
 	}
 	getContentOf(view: Display): HTMLElement {
 		let content: HTMLElement = view;
 		if (this.isPanel) {
 			content = view.children[1] as HTMLElement;
-			if (!(content && content.classList.contains("view"))) {
+			if (!(content && content.classList.contains("content"))) {
 				content = rebuildView(view);
 			}
 		}
@@ -157,10 +152,12 @@ function rebuildView(view: Display) {
 	}
 	view.textContent = "";
 	let type = view.$controller;
-	view.append(type.createHeader(view));
-	view.append(content || type.createContent(view));
-	if (type.model == "list") {
-		view.append(type.createFooter(view));
+	type.createHeader(view);
+	if (content) {
+		view.append(content)
+	} else {
+		type.createContent(view)
 	}
+	type.createFooter(view);
 	return view.$content;
 }
