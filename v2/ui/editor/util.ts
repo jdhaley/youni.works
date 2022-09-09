@@ -16,7 +16,7 @@ export function getContent(node: Node | Range): Editable {
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
 	for (let ele = node as Editable; ele; ele = ele.parentElement) {
 		if (ele.classList.contains("content")) return ele;
-		if (ele.$controller?.isPanel)return ele.$controller.getContentOf(ele);
+		if (ele.$controller?.isContainer)return ele.$controller.getContentOf(ele);
 	}
 }
 

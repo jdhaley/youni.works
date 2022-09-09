@@ -12,7 +12,7 @@ export interface Editor  {
 	readonly types: bundle<Editor>;
 	readonly model: string;
 	readonly owner: Article;
-	readonly isPanel: boolean;
+	readonly isContainer: boolean;
 	toModel(view: Element, range?: Range, id?: true): content;
 	toView(model: content): Element;
 	getContentOf(node: Node): Element;

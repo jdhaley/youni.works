@@ -16,7 +16,7 @@ const conf: bundle<DisplayConf> = {
 		class: DisplayType,
 		view: "text",
 		model: "text",
-		panel: true,
+		container: true,
 		tagName: "ui-text",
 		actions: text,
 		shortcuts: shortcuts
@@ -25,7 +25,7 @@ const conf: bundle<DisplayConf> = {
 		class: DisplayType,
 		view: "record",
 		model: "record",
-		panel: true,
+		container: true,
 		tagName: "ui-record",
 		actions: record,
 		shortcuts: shortcuts
@@ -34,14 +34,14 @@ const conf: bundle<DisplayConf> = {
 		class: DisplayType,
 		view: "list",
 		model: "list",
-		panel: true,
+		container: true,
 		tagName: "ui-list",
 		actions: list,
 		shortcuts: shortcuts
 	},
 	markup: {
 		class: DisplayType,
-		panel: true,
+		container: true,
 		view: "markup",
 		model: "markup",
 		tagName: "ui-list",
@@ -50,7 +50,7 @@ const conf: bundle<DisplayConf> = {
 	},
 	line: {
 		class: DisplayType,
-		panel: false,
+		container: false,
 		view: "line",
 		model: "line",
 		tagName: "p",

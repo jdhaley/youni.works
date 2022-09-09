@@ -11,7 +11,7 @@ export interface DisplayConf {
 	class: typeof DisplayType;
 	view: "text" | "record" | "list" | "markup" | "line";
 	model: "text" | "record" | "list" | "markup" | "line";
-	panel: boolean;
+	container: boolean;
 	tagName: string;
 	actions: Actions;
 	shortcuts: bundle<string>;
@@ -62,11 +62,7 @@ export class DisplayOwner extends ElementOwner {
 		}
 		if (!view.id) view.id = "" + NEXT_ID++;
 	
-		/*
-		Panels created from a range operation may be missing one or more of the
-		header, content, footer.
-		*/
-		let content = type.getContentOf(view); //ensures view isn't corrupted.
+		let content = type.getContentOf(view);
 		for (let child of content.children) {
 			this.bindView(child as Display);
 		}
@@ -84,8 +80,8 @@ export class DisplayOwner extends ElementOwner {
 export class DisplayType extends ElementType {
 	declare owner: DisplayOwner;
 	
-	get isPanel(): boolean {
-		return this.conf.panel;
+	get isContainer(): boolean {
+		return this.conf.container;
 	}
 	get shortcuts(): bundle<string> {
 		return this.conf.shortcuts;
@@ -98,7 +94,7 @@ export class DisplayType extends ElementType {
 	}
 	viewContent(view: Display, model: content): void {
 		view.textContent = "";
-		if (this.isPanel) {
+		if (this.isContainer) {
 			this.createHeader(view, model);
 			this.createContent(view, model);
 			this.createFooter(view, model)
@@ -125,7 +121,7 @@ export class DisplayType extends ElementType {
 	}
 	getContentOf(view: Display): HTMLElement {
 		let content: HTMLElement = view;
-		if (this.isPanel) {
+		if (this.isContainer) {
 			content = view.children[1] as HTMLElement;
 			if (!(content && content.classList.contains("content"))) {
 				content = rebuildView(view);
