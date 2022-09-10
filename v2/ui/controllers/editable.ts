@@ -2,7 +2,7 @@ import {extend} from "../../base/util.js";
 
 import {EditEvent, UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
-import {getEditableView} from "../editor/util.js";
+import {getContent, getEditableView, getFooter} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";
 
@@ -85,6 +85,14 @@ export default extend(display, {
 		event.subject = "";
 		this.owner.setRange(this.owner.commands.redo(), false);
 	},
+	next(event: UserEvent) {
+		event.subject = "";
+		let next = navigateForward(event.on);
+		if (next) {
+			event.range.selectNodeContents(next);
+			next.scrollIntoView({block: "center"});
+		}
+	}
 });
 
 /**
@@ -112,4 +120,45 @@ export function atStart(view: Element, node: Node, offset: number) {
 		node = node.parentNode;
 	}
 	return true;
+}
+
+function navigateForward(ele: Element) {
+	ele = getEditableView(ele);
+	while (ele) {
+		if (ele.nextElementSibling) {
+			let next = navigateInto(ele.nextElementSibling);
+			if (next) return next;
+		}
+		ele = getEditableView(ele.parentElement);
+		if (ele) ele.nextElementSibling;
+	}
+}
+function navigateInto(ele: Element, isBack?: boolean) {
+	let view = getEditableView(ele);
+	if (!view) return;
+	let content = view.$controller.getContentOf(view);
+	switch (view.$controller.model) {
+		case "text":
+		case "line":
+		case "markup":
+			break;
+		case "record":
+			view = isBack ? content.lastElementChild : content.firstElementChild;
+			if (view) content = navigateInto(view);
+			break;
+		case "list":
+			let item = isBack ? content.lastElementChild : content.firstElementChild;
+			if (item) {
+				content = navigateInto(item);
+			} else {
+				content = view.children[2]; // HARD assumption the footer is the 3rd element.
+			}
+			break;
+	}
+	return content;
+}
+
+function getNext(node: Node) {
+	if (node.nextSibling) return node.nextSibling;
+	return node.parentNode?.nextSibling;
 }

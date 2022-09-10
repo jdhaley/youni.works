@@ -17,8 +17,4 @@ export default extend(null, {
 		let range = event.range;
 		setClipboard(this, range.cloneRange(), event.clipboardData);
 	},
-	next(event: UserEvent) {
-		event.subject = "";
-		console.log(event);
-	}
 });
