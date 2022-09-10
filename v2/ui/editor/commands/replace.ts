@@ -1,9 +1,9 @@
-import {content, Record} from "../../../base/model.js";
+import {content} from "../../../base/model.js";
 import { viewType } from "../../../base/view.js";
+import { Item } from "../../item.js";
 
 import {Article, Editable, getViewById, Edit} from "../editor.js";
 import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items} from "../util.js";
-
 
 export abstract class Replace extends Edit {
 	before: string;
@@ -39,6 +39,22 @@ export abstract class Replace extends Edit {
 		let range = view.ownerDocument.createRange();
 		range.selectNodeContents(view.$controller.getContentOf(view));
 		return range;
+	}
+}
+
+export class TextReplace extends Replace {
+	exec(range: Range, text: string): Range {
+		mark(range);
+		let content = getContent(range);
+		if (!content) return;
+		this.before = content.innerHTML;	
+		range.deleteContents();
+		if (text) {
+			let ins = content.ownerDocument.createTextNode(text);
+			range.insertNode(ins);
+		}
+		this.after = content.innerHTML;
+		return unmark(range);	
 	}
 }
 
@@ -197,13 +213,6 @@ function captureRange(cmd: ListReplace, ctx: Element, start: number, end: number
 			break;
 		}
 	}
-}
-
-interface Item {
-	type$: string,
-	content: string,
-	id?: string,
-	level?: number
 }
 
 export class MarkupReplace extends ListReplace {

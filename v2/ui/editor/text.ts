@@ -1,6 +1,4 @@
-import {CHAR} from "../../base/util.js";
-
-import {Replace} from "./commands/replace.js";
+import {TextReplace} from "./commands/replace.js";
 import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "./util.js";
 
 export default function edit(commandName: string, range: Range, content: string) {
@@ -8,22 +6,6 @@ export default function edit(commandName: string, range: Range, content: string)
 	let cmd = COMMANDS[commandName];
 	if (!cmd) throw new Error("Unrecognized command");
 	return cmd.call(this, commandName, range, content);
-}
-
-class TextEdit extends Replace {
-	exec(range: Range, text: string): Range {
-		mark(range);
-		let content = getContent(range);
-		if (!content) return;
-		this.before = content.innerHTML;	
-		range.deleteContents();
-		if (text) {
-			let ins = content.ownerDocument.createTextNode(text);
-			range.insertNode(ins);
-		}
-		this.after = content.innerHTML;
-		return unmark(range);	
-	}
 }
 
 const COMMANDS = {
@@ -62,7 +44,7 @@ function doit(commandName: string, range: Range, text: string): Range {
 	}
 
 	if (range.collapsed && node == lastEdit.node) {
-		let cmd = this.owner.commands.peek() as Replace;
+		let cmd = this.owner.commands.peek() as TextReplace;
 		if (cmd?.name == commandName && view?.id == cmd.viewId) {
 			let r = doAgain(cmd, range, text);
 			if (r) return r;		
@@ -84,11 +66,11 @@ function doit(commandName: string, range: Range, text: string): Range {
 		lastEdit.node = null;
 	}
 
-	return new TextEdit(this.owner, commandName, view.id).exec(range, text);
+	return new TextReplace(this.owner, commandName, view.id).exec(range, text);
 }
 
 
-function doAgain(cmd: Replace, range: Range, text: string) {
+function doAgain(cmd: TextReplace, range: Range, text: string) {
 	let currentOffset = range.startOffset; //start & end are the same.
 	switch (cmd.name) {
 		case "Entry":
@@ -109,7 +91,7 @@ function doAgain(cmd: Replace, range: Range, text: string) {
 	}
 }
 
-function editAgain(range: Range, cmd: Replace, char: string) {
+function editAgain(range: Range, cmd: TextReplace, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.end) + char + text.substring(lastEdit.end);
@@ -120,7 +102,7 @@ function editAgain(range: Range, cmd: Replace, char: string) {
 	return endagain(range, cmd);
 }
 
-function deleteAgain(range: Range, cmd: Replace, char: string) {
+function deleteAgain(range: Range, cmd: TextReplace, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.start) + text.substring(lastEdit.start + 1);
@@ -130,7 +112,7 @@ function deleteAgain(range: Range, cmd: Replace, char: string) {
 	return endagain(range, cmd);
 }
 
-function eraseAgain(range: Range, cmd: Replace) {
+function eraseAgain(range: Range, cmd: TextReplace) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.start - 1) + text.substring(lastEdit.start);
@@ -141,7 +123,7 @@ function eraseAgain(range: Range, cmd: Replace) {
 	return endagain(range, cmd);
 }
 
-function endagain(range: Range, cmd: Replace) {
+function endagain(range: Range, cmd: TextReplace) {
 	mark(range);
 	cmd.after = getContent(range).innerHTML || "";
 	unmark(range);
@@ -149,29 +131,29 @@ function endagain(range: Range, cmd: Replace) {
 	return range;
 }
 
-function markText(range: Range) {
-	let node = range.commonAncestorContainer;
-	let text = node.textContent;
-	let out = text.substring(0, range.startOffset) + CHAR.STX;
-	out += text.substring(range.startOffset, range.endOffset);
-	out += CHAR.ETX + text.substring(range.endOffset);
-	node.textContent = out;
-	console.log("mark:", out, range)
-}
-function unmarkText(range: Range) {
-	let node = range.commonAncestorContainer;
-	let text = node.textContent;
-	let start = text.indexOf(CHAR.STX);
-	let end = text.indexOf(CHAR.ETX);
-	let out = text.substring(0, start);
-	out += text.substring(start + 1, end);
-	out += text.substring(end + 1);
-	node.textContent = out;
-	range.setStart(node, start);
-	range.setEnd(node, end);
+// function markText(range: Range) {
+// 	let node = range.commonAncestorContainer;
+// 	let text = node.textContent;
+// 	let out = text.substring(0, range.startOffset) + CHAR.STX;
+// 	out += text.substring(range.startOffset, range.endOffset);
+// 	out += CHAR.ETX + text.substring(range.endOffset);
+// 	node.textContent = out;
+// 	console.log("mark:", out, range)
+// }
+// function unmarkText(range: Range) {
+// 	let node = range.commonAncestorContainer;
+// 	let text = node.textContent;
+// 	let start = text.indexOf(CHAR.STX);
+// 	let end = text.indexOf(CHAR.ETX);
+// 	let out = text.substring(0, start);
+// 	out += text.substring(start + 1, end);
+// 	out += text.substring(end + 1);
+// 	node.textContent = out;
+// 	range.setStart(node, start);
+// 	range.setEnd(node, end);
 
-	console.log("unmark:", out, range)
-}
+// 	console.log("unmark:", out, range)
+// }
 
 function positionToText(range: Range) {
 	let inHeader = getHeader(getEditableView(range), range.startContainer);
