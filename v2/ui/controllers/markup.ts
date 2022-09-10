@@ -57,7 +57,7 @@ export default extend(list, {
 		if (event.altKey) {
 			nav(event);
 		} else {
-			this.edit("Promote", event.range);
+			this.edit("Demote", event.range);
 		}
 	},
 	previous(this: Editor, event: UserEvent) {
@@ -65,7 +65,7 @@ export default extend(list, {
 		if (event.altKey) {
 			nav(event, true);
 		} else {
-			this.edit("Demote", event.range);
+			this.edit("Promote", event.range);
 		}
 	}
 });

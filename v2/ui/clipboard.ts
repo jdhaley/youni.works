@@ -2,7 +2,7 @@ import { ElementType, getView } from "../base/dom.js";
 import { content } from "../base/model.js";
 import { CHAR } from "../base/util.js";
 import { viewType } from "../base/view.js";
-
+import { section } from "./transform/item.js";
 
 export function getClipboard(clipboard: DataTransfer): content {
 	let data = clipboard.getData("application/json");
@@ -21,9 +21,7 @@ export function setClipboard(type: ElementType, range: Range, clipboard: DataTra
 	if (type.model == "record") model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
 	console.log("clipboard:", model);
-	//let html = htmlify(view as HTMLElement);
-	//console.log(html);
-	//clipboard.setData("text/html", html.outerHTML);
+	if (type.model as any == "markup") console.log(section(model as any));
 	let data = "";
 	if (viewType(model) == "text") {
 		data = "" + model;

@@ -43,6 +43,12 @@ export default extend(text, {
 			range = this.edit("Delete", range, "");
 			range && this.owner.setRange(range, true);	
 		}
+	},
+	next(this: Editor, event: UserEvent) {
+		//propagate to the markup controller.
+	},
+	previous(this: Editor, event: UserEvent) {
+		//propagate to the markup controller.
 	}
 });
 
