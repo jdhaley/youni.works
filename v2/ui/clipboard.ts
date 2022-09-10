@@ -2,7 +2,7 @@ import { ElementType, getView } from "../base/dom.js";
 import { content } from "../base/model.js";
 import { CHAR } from "../base/util.js";
 import { viewType } from "../base/view.js";
-import { section } from "./transform/item.js";
+import { htmlify, section } from "./transform/item.js";
 
 export function getClipboard(clipboard: DataTransfer): content {
 	let data = clipboard.getData("application/json");
@@ -21,7 +21,13 @@ export function setClipboard(type: ElementType, range: Range, clipboard: DataTra
 	if (type.model == "record") model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
 	console.log("clipboard:", model);
-	if (type.model as any == "markup") console.log(section(model as any));
+	if (type.model as any == "markup") {
+		let item = section(model as any);
+		console.log(item);
+		let article = htmlify(item);
+		console.log(article);
+		clipboard.setData("text/html", article.outerHTML);
+	}
 	let data = "";
 	if (viewType(model) == "text") {
 		data = "" + model;
@@ -33,37 +39,37 @@ export function setClipboard(type: ElementType, range: Range, clipboard: DataTra
 	clipboard.setData("text/plain", data);
 }
 
-function htmlify(view: HTMLElement): HTMLElement {
-	let html: HTMLElement;
-	switch (view.tagName.toLowerCase()) {
-		case "ui-record":
-			html = view.ownerDocument.createElement("div");
-			html.innerHTML = "<strong style='color: gray'>" + view.dataset.type + ": </strong>";
-			html.className = "record";
-			for (let child of view.children) {
-				let prop = view.ownerDocument.createElement("div");
-				let caption = "<em style='color: gray'>" + (child as HTMLElement).dataset.name + ": </em>";
-				if (prop.tagName == "ui-text") {
-					prop.innerHTML = caption + (child.textContent == CHAR.ZWSP ? "" : child.innerHTML);
-				} else {
-					prop.innerHTML = caption + htmlify(child as HTMLElement).innerHTML;
-				}
-				html.append(prop);
-			}
-			return html;
-		case "ui-list":
-			html = view.ownerDocument.createElement("ol");
-			html.className = "list";
-			for (let child of view.children) {
-				let li = view.ownerDocument.createElement("li");
-				li.append(htmlify(child as HTMLElement));
-				html.append(li)
-			}
-			return html;
-		default:
-			html = view.ownerDocument.createElement("span");
-			html.className = "text";
-			html.innerHTML = view.innerHTML;
-			return html;
-	}
-}
+// function htmlify(view: HTMLElement): HTMLElement {
+// 	let html: HTMLElement;
+// 	switch (view.tagName.toLowerCase()) {
+// 		case "ui-record":
+// 			html = view.ownerDocument.createElement("div");
+// 			html.innerHTML = "<strong style='color: gray'>" + view.dataset.type + ": </strong>";
+// 			html.className = "record";
+// 			for (let child of view.children) {
+// 				let prop = view.ownerDocument.createElement("div");
+// 				let caption = "<em style='color: gray'>" + (child as HTMLElement).dataset.name + ": </em>";
+// 				if (prop.tagName == "ui-text") {
+// 					prop.innerHTML = caption + (child.textContent == CHAR.ZWSP ? "" : child.innerHTML);
+// 				} else {
+// 					prop.innerHTML = caption + htmlify(child as HTMLElement).innerHTML;
+// 				}
+// 				html.append(prop);
+// 			}
+// 			return html;
+// 		case "ui-list":
+// 			html = view.ownerDocument.createElement("ol");
+// 			html.className = "list";
+// 			for (let child of view.children) {
+// 				let li = view.ownerDocument.createElement("li");
+// 				li.append(htmlify(child as HTMLElement));
+// 				html.append(li)
+// 			}
+// 			return html;
+// 		default:
+// 			html = view.ownerDocument.createElement("span");
+// 			html.className = "text";
+// 			html.innerHTML = view.innerHTML;
+// 			return html;
+// 	}
+// }

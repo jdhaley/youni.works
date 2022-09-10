@@ -25,7 +25,7 @@ export function section(items: Item[]): Item {
 		}
 	}
 	let root: Item = {
-		type$: "note",
+		type$: "article",
 		sections: []
 	}
 	console.log("sections: ", sections);
@@ -61,21 +61,35 @@ function groupItems(item: Item, items: Item[], start: number): number {
 	}
 }
 
-// export function sectionx(items: Source[], start: number): Item {
-// 	let source = pass1(items);
-// 	let target: Source[] = [];
+export function htmlify(item: Item) {
+	let doc = document.implementation.createHTMLDocument();
+	let ele = doc.createElement("article");
+	htmlSection(ele, item);
+	return ele;
+}
+function toHtml(parent: Element, item: Item) {
+	let doc = parent.ownerDocument;
+	let ele: Element;
+	if (item.type$ == "heading") {
+		ele = doc.createElement("H" + item.level);
+		if (item.content) ele.innerHTML = item.content;
+		parent.append(ele);	
+		htmlSection(parent, item);
+		return;
+	} 
+	ele = doc.createElement(item.level ? "LI" : "P");
+	if (item.content) ele.innerHTML = item.content;
+	parent.append(ele);
+	if (item.items?.length) {
+		let list = doc.createElement("UL");
+		ele.append(list);
+		for (let li of item.items) {
+			toHtml(list, li);
+		}
+	}
+}
 
-// 	for (let i = 0; i < items.length; i++) {
-// 		let item = items[i];
-// 		if (current.level > )
-// 		if (current.type$ == "heading") {
-// 			current.items = [];
-// 			sections.push(current);
-// 		} else {
-// 			sections.at(-1).items.push(current);
-// 		}
-// 	}	
-// 	for (let i = 0; i < 7; i++) {
-// 	}
-// 	return target;
-// }
+function htmlSection(ele: Element, item: Item) {
+	if (item.items) for (let x of item.items) toHtml(ele, x);
+	if (item.sections) for (let x of item.sections) toHtml(ele, x);
+}
