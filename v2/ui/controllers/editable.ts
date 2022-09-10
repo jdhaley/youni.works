@@ -87,10 +87,18 @@ export default extend(display, {
 	},
 	next(event: UserEvent) {
 		event.subject = "";
-		let next = navigateForward(event.on);
+		let next = navigate(event.on);
 		if (next) {
 			event.range.selectNodeContents(next);
 			next.scrollIntoView({block: "center"});
+		}
+	},
+	previous(event: UserEvent) {
+		event.subject = "";
+		let prev = navigate(event.on, true);
+		if (prev) {
+			event.range.selectNodeContents(prev);
+			prev.scrollIntoView({block: "center"});
 		}
 	}
 });
@@ -122,15 +130,15 @@ export function atStart(view: Element, node: Node, offset: number) {
 	return true;
 }
 
-function navigateForward(ele: Element) {
+function navigate(ele: Element, isBack?: boolean) {
 	ele = getEditableView(ele);
 	while (ele) {
-		if (ele.nextElementSibling) {
-			let next = navigateInto(ele.nextElementSibling);
+		let toEle = isBack ? ele.previousElementSibling : ele.nextElementSibling;
+		if (toEle) {
+			let next = navigateInto(toEle, isBack);
 			if (next) return next;
 		}
 		ele = getEditableView(ele.parentElement);
-		if (ele) ele.nextElementSibling;
 	}
 }
 function navigateInto(ele: Element, isBack?: boolean) {
@@ -156,9 +164,4 @@ function navigateInto(ele: Element, isBack?: boolean) {
 			break;
 	}
 	return content;
-}
-
-function getNext(node: Node) {
-	if (node.nextSibling) return node.nextSibling;
-	return node.parentNode?.nextSibling;
 }
