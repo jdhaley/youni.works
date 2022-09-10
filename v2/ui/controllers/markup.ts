@@ -1,7 +1,7 @@
-import {CHAR, extend} from "../../base/util.js";
+import {extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
-import {getContent, getFooter, getHeader, rangeIterator} from "../editor/util.js";
+import {getContent, navigate} from "../editor/util.js";
 import list from "./list.js";
 import { getClipboard } from "../clipboard.js";
 import { content } from "../../base/model.js";
@@ -52,15 +52,31 @@ export default extend(list, {
 		range = this.edit("Join", range, "");
 		range && this.owner.setRange(range, true);
 	},
-	promote(this: Editor, event: UserEvent) {
+	next(this: Editor, event: UserEvent) {
 		event.subject = "";
-		this.edit("Promote", event.range);
+		if (event.altKey) {
+			nav(event);
+		} else {
+			this.edit("Promote", event.range);
+		}
 	},
-	demote(this: Editor, event: UserEvent) {
+	previous(this: Editor, event: UserEvent) {
 		event.subject = "";
-		this.edit("Demote", event.range);
+		if (event.altKey) {
+			nav(event, true);
+		} else {
+			this.edit("Demote", event.range);
+		}
 	}
 });
+
+function nav(event: UserEvent, isPrevious?: boolean) {
+	let item = navigate(event.on, isPrevious);
+	if (item) {
+		event.range.selectNodeContents(item);
+		item.scrollIntoView({block: "center"});
+	}
+}
 
 function goToTask(view: Element, range: Range) {
 	let go = getContent(view).lastElementChild;

@@ -217,3 +217,39 @@ export const items = {
 		return (item?.ariaLevel as any) * 1 || 0;
 	}
 }
+
+export function navigate(ele: Element, isBack?: boolean) {
+	ele = getEditableView(ele);
+	while (ele) {
+		let toEle = isBack ? ele.previousElementSibling : ele.nextElementSibling;
+		if (toEle) {
+			let next = navigateInto(toEle, isBack);
+			if (next) return next;
+		}
+		ele = getEditableView(ele.parentElement);
+	}
+}
+function navigateInto(ele: Element, isBack?: boolean) {
+	let view = getEditableView(ele);
+	if (!view) return;
+	let content = view.$controller.getContentOf(view);
+	switch (view.$controller.model) {
+		case "text":
+		case "line":
+		case "markup":
+			break;
+		case "record":
+			view = isBack ? content.lastElementChild : content.firstElementChild;
+			if (view) content = navigateInto(view);
+			break;
+		case "list":
+			let item = isBack ? content.lastElementChild : content.firstElementChild;
+			if (item) {
+				content = navigateInto(item);
+			} else {
+				content = view.children[2]; // HARD assumption the footer is the 3rd element.
+			}
+			break;
+	}
+	return content;
+}

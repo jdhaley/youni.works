@@ -48,6 +48,7 @@ function getThisView(editor: Editor, node: Range | Node): Editable {
 function level(this: Editor, name: "Promote" | "Demote", range: Range): Range {
 	let view = getThisView(this, range);
 	let content = this.getContentOf(view);
+	if (!content.firstElementChild) return;
 	let start: Editable = getChildView(content, range.startContainer);
 	let end: Editable = getChildView(content, range.endContainer);
 	//If a range of items, check that there are no headings

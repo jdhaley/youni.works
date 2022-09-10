@@ -2,7 +2,7 @@ import {extend} from "../../base/util.js";
 
 import {EditEvent, UserEvent} from "../ui.js";
 import {Editor} from "../editor/editor.js";
-import {getContent, getEditableView, getFooter} from "../editor/util.js";
+import {getEditableView, navigate} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";
 
@@ -130,38 +130,3 @@ export function atStart(view: Element, node: Node, offset: number) {
 	return true;
 }
 
-function navigate(ele: Element, isBack?: boolean) {
-	ele = getEditableView(ele);
-	while (ele) {
-		let toEle = isBack ? ele.previousElementSibling : ele.nextElementSibling;
-		if (toEle) {
-			let next = navigateInto(toEle, isBack);
-			if (next) return next;
-		}
-		ele = getEditableView(ele.parentElement);
-	}
-}
-function navigateInto(ele: Element, isBack?: boolean) {
-	let view = getEditableView(ele);
-	if (!view) return;
-	let content = view.$controller.getContentOf(view);
-	switch (view.$controller.model) {
-		case "text":
-		case "line":
-		case "markup":
-			break;
-		case "record":
-			view = isBack ? content.lastElementChild : content.firstElementChild;
-			if (view) content = navigateInto(view);
-			break;
-		case "list":
-			let item = isBack ? content.lastElementChild : content.firstElementChild;
-			if (item) {
-				content = navigateInto(item);
-			} else {
-				content = view.children[2]; // HARD assumption the footer is the 3rd element.
-			}
-			break;
-	}
-	return content;
-}

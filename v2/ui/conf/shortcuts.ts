@@ -1,8 +1,8 @@
 export default {
-	"Tab": "demote",
-	"Shift+Tab": "promote",
-	"Control+Enter": "next",
-	"Control+Shift+Enter": "previous",
+	"Tab": "next",
+	"Alt+Tab": "next",
+	"Shift+Tab": "previous",
+	"Alt+Shift+Tab": "previous",
 	"Control+z": "undo",
 	"Control+y": "redo",
 	"Control+a": "selectAll",
