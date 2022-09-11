@@ -6,10 +6,12 @@ export function toHtml(item: Item) {
 	htmlSection(ele, item);
 	return ele;
 }
+
 function htmlSection(ele: Element, item: Item) {
 	if (item.items) for (let x of item.items) transformItem(ele, x);
 	if (item.sections) for (let x of item.sections) transformItem(ele, x);
 }
+
 function transformItem(parent: Element, item: Item) {
 	let doc = parent.ownerDocument;
 	let ele: Element;

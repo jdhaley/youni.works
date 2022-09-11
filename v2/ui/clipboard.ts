@@ -2,11 +2,19 @@ import { ElementType, getView } from "../base/dom.js";
 import { content } from "../base/model.js";
 import { viewType } from "../base/view.js";
 import { section } from "./item.js";
+import { fromHtml } from "./transform/fromHtml.js";
 import { toHtml } from "./transform/toHtml.js";
 
 export function getClipboard(clipboard: DataTransfer): content {
 	let data = clipboard.getData("application/json");
 	if (data) return JSON.parse(data);
+	data = clipboard.getData("text/html");
+	if (data) {
+		let div = document.createElement("div");
+		div.innerHTML = data;
+		console.log("HTML: ", div);
+		return fromHtml(div) as any;
+	}
 	return clipboard.getData("text/plain");
 }
 
