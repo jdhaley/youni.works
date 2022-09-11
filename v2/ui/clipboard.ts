@@ -1,8 +1,8 @@
 import { ElementType, getView } from "../base/dom.js";
 import { content } from "../base/model.js";
-import { CHAR } from "../base/util.js";
 import { viewType } from "../base/view.js";
-import { htmlify, section } from "./transform/item.js";
+import { section } from "./item.js";
+import { toHtml } from "./transform/toHtml.js";
 
 export function getClipboard(clipboard: DataTransfer): content {
 	let data = clipboard.getData("application/json");
@@ -24,7 +24,7 @@ export function setClipboard(type: ElementType, range: Range, clipboard: DataTra
 	if (type.model as any == "markup") {
 		let item = section(model as any);
 		console.log(item);
-		let article = htmlify(item);
+		let article = toHtml(item);
 		console.log(article);
 		clipboard.setData("text/html", article.outerHTML);
 	}
