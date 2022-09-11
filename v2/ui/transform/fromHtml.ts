@@ -6,13 +6,13 @@ const methods = {
 	},
 	transform(source: Node, target: HTMLElement, level?: number) {
 		for (let node of source.childNodes) {
-			let type = this.types[node.nodeName] || this.types.default;
-			target = type.transform(node, target, level || 0);
+			let fn = tags[node.nodeName] || tags.default;
+			target = fn(node, target, level || 0);
 		}
 		return target;
 	},
 	list(source: Node, target: HTMLElement, level: number) {
-		return this.types.default.transform(source as HTMLElement, target, level + 1);
+		return this.transform(source, target, level + 1);
 	},
 	section(source: Node, target: HTMLElement, level: number) {
 		let context = target.parentElement;
@@ -81,7 +81,7 @@ const methods = {
 		let text = transformText(source);
 		if (!text) return target;
 	
-		let toName = this.to as string || source.nodeName;
+		let toName = toNames[source.nodeName] || source.nodeName;
 		if (target.lastChild?.nodeName == toName) {
 			//Merge adjacent nodes of the same name.
 			target.lastChild.textContent += text;
@@ -131,6 +131,11 @@ function transformText(source: Node) {
 	return out == " " ? "" : out;
 }
 
+const toNames = {
+	"SPAN": "",
+	"B": "STRONG",
+	"I": "EM"
+}
 const tags = {
 	//The following are the core model tags:
 	//"ARTICLE": "???"
@@ -155,19 +160,10 @@ const tags = {
 	"#comment": methods.strip,
 	"STYLE": methods.strip,
 	"SCRIPT": methods.strip,
-	"SPAN": {
-		type: methods.text,
-		to: "#text"
-	},
+	"SPAN": methods.text,
 	"A": methods.link,
-	"B": {
-		type: methods.text,
-		to: "STRONG"
-	},
-	"I": {
-		type: methods.text,
-		to: "EM"
-	},
+	"B": methods.text,
+	"I": methods.text
 	//BR, WBR, HR
 	// "strip": [
 	// 	//Document Metadata
