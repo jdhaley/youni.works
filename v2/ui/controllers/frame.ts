@@ -27,7 +27,7 @@ export default {
         let range = owner.selectionRange;
         priorView?.classList.remove("active");
         for (let ele = range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
-            if (ele.classList?.contains("view")) {
+            if (ele.classList?.contains("content")) {
                 ele.classList.add("active");
                 priorView = ele;
                 return;
