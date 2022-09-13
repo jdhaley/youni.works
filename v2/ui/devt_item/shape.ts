@@ -1,16 +1,14 @@
-export class View {
-	constructor(view: HTMLElement) {
-		this._view = view;
-		if (view["_control"]) console.warn("View control already set.");
-		view["_control"] = this;
+import { Actions, Control } from "../../base/controller.js";
+import { DisplayOwner } from "../display.js";
+
+export class View extends Control {
+	constructor(owner: DisplayOwner, actions: Actions) {
+		super();
+		this.owner = owner;
+		this.actions = actions;
 	}
-	protected _view: HTMLElement
-	get type() {
-		return this._view["$controller"];
-	}
-	get controller() {
-		return this.type?.controller || this["_controller"];
-	}
+	protected owner: DisplayOwner;
+	protected _view: HTMLElement;
 	get style() {
 		return this._view.style;
 	}
@@ -29,6 +27,13 @@ export class View {
 		let footer: View = this._view["_footer"];
 		//Check that there is a footer and the view isn't corrupted.
 		if (this._view.lastElementChild == footer?._view) return footer;
+	}
+	instance(view: HTMLElement): View {
+		if (view["$controller"]) console.warn("View controller already set.");
+		let inst: View = Object.create(this);
+		inst._view = view;
+		view["$controller"] = inst;
+		return inst;
 	}
 }
 
@@ -56,7 +61,7 @@ const DEFAULT_BORDER: Border = {
 
 export class Shape extends View {
 	get border() {
-		return this._view["_border"] || this.type["_border"] || DEFAULT_BORDER;
+		return this._view["_border"] || DEFAULT_BORDER;
 	}
 	size(width: number, height: number) {
 		this.style.width = Math.max(width, 16) + "px";
@@ -94,4 +99,11 @@ export class Shape extends View {
 		}
 		return edge as Edge;
 	}
+	instance(view: HTMLElement): Shape {
+		let inst = super.instance(view) as Shape;
+		inst.style.padding = "0";
+		inst.position(0, 0);
+		return inst;
+	}
+
 }

@@ -41,7 +41,7 @@ export class Frame extends Owner<HTMLElement> {
 		if (selection && selection.rangeCount) {
 			selection.removeAllRanges();
 		}
-		selection.addRange(range);
+		if (range) selection.addRange(range);
 	}
 
 	createElement(tagName: string): HTMLElement {
@@ -98,9 +98,7 @@ export interface UserEvent extends Signal, UIEvent {
     key: string;
 
 	//mouse support - to be reviewed.
-    track: HTMLElement;
+    track?: HTMLElement;
     x?: number;
     y?: number;
-	moveX?: number;
-	moveY?: number;
 }

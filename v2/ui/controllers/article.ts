@@ -1,9 +1,11 @@
 import {Response} from "../../base/message.js";
 import {extend} from "../../base/util.js";
+import { Shape } from "../devt_item/shape.js";
 import {DisplayOwner, DisplayType} from "../display.js";
 
 import {UserEvent} from "../ui.js";
 
+import shape from "./shape.js";
 
 export default extend(null, {
 	open(this: DisplayOwner, res: Response<string>) {
@@ -13,6 +15,8 @@ export default extend(null, {
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.view);
+
+		//shapetest.call(this);
 	},
 	save(this: DisplayOwner, signal: UserEvent | Response<string>) {
 		signal.subject = "";
@@ -27,6 +31,14 @@ export default extend(null, {
 		}
 	}
 });
+
+function shapetest(this: DisplayOwner) {
+	let ctl = new Shape(this, shape);
+	let e = document.createElement("div");
+	e.textContent = "HELLO THERE";
+	this.frame.view.append(e);
+	ctl.instance(e);
+}
 
 function getType(article: DisplayOwner, path: string, data: any): DisplayType {
 	path = path.substring(path.lastIndexOf("/") + 1);

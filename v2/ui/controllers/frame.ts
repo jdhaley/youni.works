@@ -2,10 +2,10 @@ import {Actions} from "../../base/controller.js";
 import {Frame, UserEvent} from "../ui.js";
 
 export default {
-    mousedown: sense,    
-    mousemove: sense,
-    mouseup: sense,
-    mouseout: sense,
+    mousedown: trackEvent,    
+    mousemove: trackEvent,
+    mouseup: trackEvent,
+    mouseout: trackEvent,
     click: sense,
     dblclick: sense,
     contextmenu:sense,
@@ -23,6 +23,14 @@ function rangeEvent(event: UserEvent) {
     sense(event);
 }
 
+let TRACK: HTMLElement;
+
+function trackEvent(event: UserEvent) {
+    event.track = TRACK;
+    sense(event);
+    TRACK = event.track;
+}
+
 function sense(event: UserEvent) {
     let source = viewOf(event.range ? event.range.commonAncestorContainer : event.target as Node);
     if (source) {
@@ -33,7 +41,7 @@ function sense(event: UserEvent) {
         if (!event.subject) event.subject = event.type;
  
         event.stopPropagation();
-        event.frame.sense(event, source);
+        event.frame.sense(event, event.track || source);
         if (!event.subject) event.preventDefault();    
     }
 }
