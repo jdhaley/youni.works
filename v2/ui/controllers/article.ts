@@ -16,7 +16,7 @@ export default extend(null, {
 		this.view.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.view);
 
-		//shapetest.call(this);
+		shapetest.call(this);
 	},
 	save(this: DisplayOwner, signal: UserEvent | Response<string>) {
 		signal.subject = "";
@@ -33,11 +33,9 @@ export default extend(null, {
 });
 
 function shapetest(this: DisplayOwner) {
-	let ctl = new Shape(this, shape);
-	let e = document.createElement("div");
-	e.textContent = "HELLO THERE";
-	this.frame.view.append(e);
-	ctl.instance(e);
+	let ctl = new Shape(this as any, shape).instance();
+	ctl.content.textContent = "HELLO THERE";
+	ctl.addTo(this.frame.view);
 }
 
 function getType(article: DisplayOwner, path: string, data: any): DisplayType {
