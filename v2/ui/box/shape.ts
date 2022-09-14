@@ -7,26 +7,47 @@ interface Styles extends Iterable<string> {
 	remove(name: string): void;
 }
 
-interface DisplayOwner {
+export interface Owner {
 	createElement(tag: string): Element;
-	view: Display,
-	types: bundle<Display> //Display prototypes.
 }
 
-interface Content {
+export interface Content {
 	readonly style: CSSStyleDeclaration;
 	readonly classList: Styles;
 	readonly children: Iterable<Content>;
 	textContent: string;
 }
 
+export interface Area {
+	x: number,
+	y: number,
+	width: number,
+	height: number
+}
+
+export interface Border {
+	top: number,
+	right: number,
+	bottom: number,
+	left: number
+}
+
+type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
+
+const DEFAULT_BORDER: Border = {
+	top: 3,
+	right: 5,
+	bottom: 3,
+	left: 5
+}
+
 class Box extends Control {
-	constructor(owner: DisplayOwner, actions: Actions) {
+	constructor(owner: Owner, actions: Actions) {
 		super();
 		this.owner = owner;
 		this.actions = actions;
 	}
-	readonly owner: DisplayOwner;
+	readonly owner: Owner;
 	declare protected _node: HTMLElement;
 	declare nodeName: string;
 	
@@ -93,59 +114,5 @@ export class Shape extends Box {
 			zone += "C";
 		}
 		return zone as Zone;
-	}
-}
-
-export interface Area {
-	x: number,
-	y: number,
-	width: number,
-	height: number
-}
-
-export interface Border {
-	top: number,
-	right: number,
-	bottom: number,
-	left: number
-}
-
-type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
-
-const DEFAULT_BORDER: Border = {
-	top: 3,
-	right: 5,
-	bottom: 3,
-	left: 5
-}
-
-interface Display extends Receiver {
-	readonly owner: DisplayOwner;
-	readonly area: Area;
-	readonly header?: Content;
-	readonly content: Content;
-	readonly footer?: Content;
-}
-
-class Container extends Shape implements Display {
-	get header(): Content {
-		let header: HTMLElement = this._node["$footer"];
-		//Check that there is a header and the view isn't corrupted.
-		if (header && this._node.lastElementChild) return header as Content;
-	}
-	get content(): Content {
-		let content: HTMLElement = this._node["$content"];
-		//Check that there is a content and the view isn't corrupted.
-		if (content) {
-			if (content == this._node.firstElementChild?.nextElementSibling) return content as Content;
-			//TODO dynamically find or create the content [as per existing Display approach]
-			return;
-		}
-		return this._node as Content;
-	}
-	get footer(): Content {
-		let footer: HTMLElement = this._node["$footer"];
-		//Check that there is a footer and the view isn't corrupted.
-		if (footer && this._node.lastElementChild) return footer as Content;
 	}
 }
