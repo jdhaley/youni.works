@@ -32,27 +32,13 @@ export default extend(null, {
 			return;
 		}
 		this.style.backgroundColor = "ghostwhite";
-		switch (this.zone(event.x, event.y)) {
-			case "TL":
-			case "BR":
-				this.style.cursor = "nwse-resize"; return;
-			case "TC":
-			case "BC":
-				this.style.cursor = "ns-resize"; return;
-			case "TR":
-			case "BL":
-				this.style.cursor = "nesw-resize"; return;
-			case "CL":
-			case "CR":
-				this.style.cursor = "ew-resize"; return;
-			case "CC":
-				this.style.cursor = "move"; return;
-		}
+		this._node.setAttribute("data-zone", this.zone(event.x, event.y));
 	},
     mouseout(event: UserEvent) {
 		event.subject = "";
 		if (event.track) return;
 		this.style.removeProperty("background-color");
+		this._node.removeAttribute("data-zone");
 	},
     // click(event: UserEvent) {
 	// },
