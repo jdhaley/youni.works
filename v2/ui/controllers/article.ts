@@ -34,7 +34,7 @@ export default extend(null, {
 
 function shapetest(this: DisplayOwner) {
 	let box = new Shape(this as any, shape).instance() as Shape;
-	box.style.padding = "0";
+	box.content.classList.add("shape");
 	box.position(0, 0);
 	box.content.textContent = "HELLO THERE";
 	box.addTo(this.frame.view);

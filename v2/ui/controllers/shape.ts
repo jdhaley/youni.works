@@ -12,19 +12,14 @@ let tracking = {
 export default extend(null, {
     mousedown(this: Shape, event: UserEvent) {
 		event.subject = "";
-		for (let view of (this.owner.view as any).children) view.contentEditable = "false";
 		let area = this.area;
 		tracking.x = event.x - area.x;
 		tracking.y = event.y - area.y;
 		tracking.type = this.zone(event.x, event.y) == "CC" ? "move" : "size";
-		// tracking.range = this.owner.frame.selectionRange;
-		// this.owner.frame.selectionRange = null;
 		event.track = this._node;
 	},
 	mouseup(event: UserEvent) {
 		event.subject = "";
-		for (let view of this.owner.view.children) view.contentEditable = "true";
-//		this.owner.selectionRange = tracking.range;
 		event.track = null;
 	},
     mousemove(this: Shape, event: UserEvent) {

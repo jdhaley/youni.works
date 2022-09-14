@@ -49,7 +49,7 @@ class Box extends Control {
 	}
 	instance(): Box {
 		let box: Box = Object.create(this);
-		box._node = this.owner.createElement(this.nodeName) as HTMLElement;
+		box._node = this.owner.createElement(this.nodeName || "div") as HTMLElement;
 		box._node["$controller"] = box;
 		return box;
 	}
@@ -114,9 +114,9 @@ type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
 
 const DEFAULT_BORDER: Border = {
 	top: 3,
-	right: 3,
+	right: 5,
 	bottom: 3,
-	left: 3
+	left: 5
 }
 
 interface Display extends Receiver {
