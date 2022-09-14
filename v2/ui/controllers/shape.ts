@@ -19,7 +19,7 @@ export default extend(null, {
 		tracking.type = this.zone(event.x, event.y) == "CC" ? "move" : "size";
 		// tracking.range = this.owner.frame.selectionRange;
 		// this.owner.frame.selectionRange = null;
-		event.track = this._view;
+		event.track = this._node;
 	},
 	mouseup(event: UserEvent) {
 		event.subject = "";

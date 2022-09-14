@@ -33,9 +33,11 @@ export default extend(null, {
 });
 
 function shapetest(this: DisplayOwner) {
-	let ctl = new Shape(this as any, shape).instance();
-	ctl.content.textContent = "HELLO THERE";
-	ctl.addTo(this.frame.view);
+	let box = new Shape(this as any, shape).instance() as Shape;
+	box.style.padding = "0";
+	box.position(0, 0);
+	box.content.textContent = "HELLO THERE";
+	box.addTo(this.frame.view);
 }
 
 function getType(article: DisplayOwner, path: string, data: any): DisplayType {
