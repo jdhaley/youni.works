@@ -49,24 +49,6 @@ export class DisplayOwner extends ElementOwner {
 	getElementById(id: string): Element {
 		return this.frame.getElementById(id);
 	}
-	bindView(view: Display): void {
-		let type = view.$controller;
-		if (!type) {
-			let name = view.getAttribute("data-item");
-			let parent = getView(view.parentElement) as Display;
-			if (name && parent) {
-				type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
-				view["$controller"] = type;	
-			}
-			if (!type) return;
-		}
-		if (!view.id) view.id = "" + NEXT_ID++;
-	
-		let content = type.getContentOf(view);
-		for (let child of content.children) {
-			this.bindView(child as Display);
-		}
-	}	
 	/* Supports the Article interface (which has no owner dependency) */
 	setRange(range: Range, collapse?: boolean): void {
 		if (range) {
@@ -74,8 +56,27 @@ export class DisplayOwner extends ElementOwner {
 			this.frame.selectionRange = range;
 		}
 	}
-
 }
+//NO Longer used method of DisplayOwner.
+//TODO delete this when confirm not needed.
+	// bindView(view: Display): void {
+	// 	let type = view.$controller;
+	// 	if (!type) {
+	// 		let name = view.getAttribute("data-item");
+	// 		let parent = getView(view.parentElement) as Display;
+	// 		if (name && parent) {
+	// 			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
+	// 			view["$controller"] = type;	
+	// 		}
+	// 		if (!type) return;
+	// 	}
+	// 	if (!view.id) view.id = "" + NEXT_ID++;
+	
+	// 	let content = type.getContentOf(view);
+	// 	for (let child of content.children) {
+	// 		this.bindView(child as Display);
+	// 	}
+	// }	
 
 export class DisplayType extends ElementType {
 	declare owner: DisplayOwner;
