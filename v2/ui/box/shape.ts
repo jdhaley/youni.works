@@ -1,22 +1,5 @@
-import { Actions, Control, Receiver } from "../../base/controller.js";
-import { bundle } from "../../base/util.js";
-
-interface Styles extends Iterable<string> {
-	contains(name: string): boolean;
-	add(name: string): void;
-	remove(name: string): void;
-}
-
-export interface Owner {
-	createElement(tag: string): Element;
-}
-
-export interface Content {
-	readonly style: CSSStyleDeclaration;
-	readonly classList: Styles;
-	readonly children: Iterable<Content>;
-	textContent: string;
-}
+import { Actions, Control } from "../../base/controller.js";
+import { Content } from "../../base/model.js";
 
 export interface Area {
 	x: number,
@@ -34,11 +17,16 @@ export interface Border {
 
 type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
 
+
 const DEFAULT_BORDER: Border = {
 	top: 3,
 	right: 5,
 	bottom: 3,
 	left: 5
+}
+
+interface Owner {
+	createElement(tag: string): Element;
 }
 
 class Box extends Control {
@@ -47,7 +35,9 @@ class Box extends Control {
 		this.owner = owner;
 		this.actions = actions;
 	}
-	readonly owner: Owner;
+	readonly owner: {
+		createElement(tag: string): Element;
+	}
 	declare protected _node: HTMLElement;
 	declare nodeName: string;
 	

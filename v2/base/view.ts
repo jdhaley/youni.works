@@ -1,10 +1,10 @@
-import {content, Type, typeOf} from "./model.js";
+import {content, typeOf} from "./model.js";
 import {Control, Controller} from "./controller.js";
-import {TypeOwner} from "./type.js";
+import {Type, TypeOwner} from "./type.js";
 import {bundle, EMPTY, extend} from "./util.js";
 
-type viewer = (this: ViewType<unknown>, view: unknown, model: content) => void;
-type modeller = (this: ViewType<unknown>, view: unknown) => content;
+type viewer = (this: any, view: unknown, model: content) => void;
+type modeller = (this: any, view: unknown) => content;
 
 export interface View {
 	$controller?: ViewType<unknown>;
@@ -18,8 +18,8 @@ export abstract class ViewType<V> extends Control implements Controller<content,
 	owner: ViewOwner<V>;
 	types: bundle<ViewType<V>> = EMPTY.object;
 
-	declare model: "record" | "list" | "text";
-	declare view: "record" | "list" | "text";
+	declare model: string; // "record" | "list" | "text";
+	declare view: string; //"record" | "list" | "text";
 	declare name: string;
 	declare isProperty: boolean;
 	declare conf: bundle<any>;

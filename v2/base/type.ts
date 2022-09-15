@@ -1,12 +1,14 @@
 import {Owner} from "./controller.js";
 import {bundle} from "./util.js";
 
-interface Type {
+export interface Type {
 	name: string;
 	types: bundle<Type>;
-	isProperty: boolean;
+	view: string;
 	model: string;
-	
+	isProperty: boolean;
+
+	generalizes(type: Type): boolean;
 	start(name: string, conf: bundle<any>): void;
 }
 

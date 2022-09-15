@@ -35,3 +35,15 @@ export function typeOf(value: any): string {
 	}
 	return "null";
 }
+
+interface Names extends Iterable<string> {
+	contains(name: string): boolean;
+	add(name: string): void;
+	remove(name: string): void;
+}
+
+export interface Content {
+	readonly classList: Names;
+	readonly children: Iterable<Content>;
+	textContent: string;
+}

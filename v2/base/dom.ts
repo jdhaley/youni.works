@@ -49,17 +49,17 @@ export function getView(node: Node | Range, context?: Element): Element {
 	}
 }
 
-let NEXT_ID = 1;
-function bindView(view: Element, context: Element): void {
-	let name = view.getAttribute("data-item");
-	let type = context["$controller"] as ElementType;
-	view["$controller"] = type.types[name] || type.owner.unknownType;
-	if (!view.id) view.id = "-" + NEXT_ID++;
-	let content = type.getContentOf(view); //ensures view isn't corrupted.
-	for (let child of content.children) {
-		this.bindView(child);
-	}
-}
+// let NEXT_ID = 1;
+// function bindView(view: Element, context: Element): void {
+// 	let name = view.getAttribute("data-item");
+// 	let type = context["$controller"] as ElementType;
+// 	view["$controller"] = type.types[name] || type.owner.unknownType;
+// 	if (!view.id) view.id = "-" + NEXT_ID++;
+// 	let content = type.getContentOf(view); //ensures view isn't corrupted.
+// 	for (let child of content.children) {
+// 		this.bindView(child);
+// 	}
+// }
 
 // interface ElementView extends Element {
 // 	$controller: ElementType;
