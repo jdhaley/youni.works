@@ -5,7 +5,7 @@ import {Frame} from "./ui.js";
 import { RemoteFileService } from "../base/remote.js";
 import { CommandBuffer } from "../base/command.js";
 import { Actions } from "../base/controller.js";
-import { View } from "./box/view.js";
+import { View, ViewType } from "./box/view.js";
 
 
 export interface DisplayConf {
@@ -61,7 +61,7 @@ export class DisplayOwner extends ElementOwner {
 
 export class DisplayType extends ElementType {
 	declare owner: DisplayOwner;
-	declare __prototype: any;
+	declare prototype: View;
 
 	get isContainer(): boolean {
 		return this.conf.container;
@@ -71,8 +71,8 @@ export class DisplayType extends ElementType {
 	}
 
 	createView(): Display {
-		let ctl = this.__prototype.instance();
-		let view = ctl._node;
+		let ctl = this.prototype.instance();
+		let view = (ctl as any)._node as Display;
 		view.id = "" + NEXT_ID++;
 		view.setAttribute("data-item", this.name);
 		if (this.isProperty) view.classList.add("field")
@@ -124,13 +124,19 @@ export class DisplayType extends ElementType {
 	}
 	start(name: string, conf: bundle<any>): void {
 		super.start(name, conf);
-		if (conf.proto) {
-			this.__prototype = extend(Object.create(this.__prototype || null), conf.proto);
+		
+		if (!this.prototype) {
+			this.prototype = new View(this.owner, null);
 		}
-		if (!this.__prototype) this.__prototype = new View(this.owner, this.conf.actions);
-		this.__prototype.type = this;
-		this.__prototype.nodeName = this.conf.tagName;
-		//this.__prototype.actions = this.conf.actions;
+		if (conf.proto) {
+			this.prototype = extend(this.prototype, conf.proto);
+		} else {
+			this.prototype = Object.create(this.prototype);
+		}
+		this.prototype.type = this as any as ViewType;
+		this.prototype.nodeName = this.conf.tagName;
+		//Need to alter the controller actions to accept the View and not the Type...
+		//this.prototype.actions = this.conf.actions;
 	}
 }
 
