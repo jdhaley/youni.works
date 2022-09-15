@@ -2,6 +2,7 @@ import { Command, CommandBuffer } from "../../base/command.js";
 import { content } from "../../base/model.js";
 import { Receiver } from "../../base/controller.js";
 import { bundle } from "../../base/util.js";
+import { bindView } from "./util.js";
 
 export interface Editable extends Element {
 	$controller?: Editor
@@ -22,7 +23,6 @@ export interface Editor  {
 export interface Article extends Receiver {
 	unknownType: Editor;
 	readonly commands: CommandBuffer<Range>;
-	bindView(element: Element): void;
 	getElementById(id: string): Element;
 	setRange(range: Range, collapse?: boolean): void;
 }
@@ -47,7 +47,7 @@ export function getViewById(owner: Article, id: string) {
 	if (view.getAttribute("data-item")) return view;
 	if (!view.$controller) {
 		console.warn("view.type$ missing... binding...");
-		owner.bindView(view as any);
+		bindView(view as any);
 		if (!view.$controller) throw new Error("unable to bind missing type$");
 	} else {
 		view.$controller.getContentOf(view); //checks the view isn't corrupted.

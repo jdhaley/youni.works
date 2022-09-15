@@ -1,4 +1,4 @@
-import {Editable} from "./editor.js";
+import {Editable, Editor} from "./editor.js";
 
 export function getEditableView(node: Node | Range): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
@@ -252,4 +252,24 @@ function navigateInto(ele: Element, isBack?: boolean) {
 			break;
 	}
 	return content;
+}
+
+let LAST_ID = 0;
+export function bindView(view: Editable): void {
+	let type = view.$controller;
+	if (!type) {
+		let name = view.getAttribute("data-item");
+		let parent = getEditableView(view.parentElement) as Editable;
+		if (name && parent) {
+			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as Editor;
+			view["$controller"] = type;	
+		}
+		if (!type) return;
+	}
+	if (!view.id) view.id = "" + --LAST_ID;
+
+	let content = type.getContentOf(view);
+	for (let child of content.children) {
+		bindView(child as Editable);
+	}
 }

@@ -3,7 +3,7 @@ import { viewType } from "../../../base/view.js";
 import { Item } from "../../item.js";
 
 import {Article, Editable, getViewById, Edit, Editor} from "../editor.js";
-import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items} from "../util.js";
+import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items, bindView} from "../util.js";
 
 export abstract class Replace extends Edit {
 	before: string;
@@ -215,26 +215,6 @@ function captureRange(cmd: ListReplace, ctx: Element, start: number, end: number
 	}
 }
 
-
-let LAST_ID = 0;
-export function bindView(view: Editable): void {
-	let type = view.$controller;
-	if (!type) {
-		let name = view.getAttribute("data-item");
-		let parent = getEditableView(view.parentElement) as Editable;
-		if (name && parent) {
-			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as Editor;
-			view["$controller"] = type;	
-		}
-		if (!type) return;
-	}
-	if (!view.id) view.id = "" + --LAST_ID;
-
-	let content = type.getContentOf(view);
-	for (let child of content.children) {
-		bindView(child as Editable);
-	}
-}
 
 export class MarkupReplace extends ListReplace {
 	protected getOuterRange(range: Range) {
