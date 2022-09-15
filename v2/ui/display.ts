@@ -5,7 +5,7 @@ import {Frame} from "./ui.js";
 import { RemoteFileService } from "../base/remote.js";
 import { CommandBuffer } from "../base/command.js";
 import { Actions } from "../base/controller.js";
-import { editor, Container, ViewOwner, ViewType, View } from "./box/view.js";
+import { editor, Display, ViewOwner, ViewType, View } from "./box/view.js";
 
 
 export interface DisplayConf {
@@ -20,7 +20,7 @@ export interface DisplayConf {
 
 let NEXT_ID = 1;
 
-class Display extends HTMLElement {
+class DisplayElement extends HTMLElement {
 	$controller?: DisplayType;
 	$content: HTMLElement;
 }
@@ -62,7 +62,7 @@ export class DisplayOwner extends ElementOwner implements ViewOwner {
 
 export class DisplayType extends ElementType implements ViewType {
 	declare owner: DisplayOwner;
-	declare prototype: Container;
+	declare prototype: Display;
 	declare types: bundle<ViewType>
 	get isContainer(): boolean {
 		return this.conf.container;
@@ -71,9 +71,9 @@ export class DisplayType extends ElementType implements ViewType {
 		return this.conf.shortcuts;
 	}
 
-	createView(): Display {
+	createView(): DisplayElement {
 		let ctl = this.prototype.instance();
-		let view = (ctl as any)._node as Display;
+		let view = (ctl as any)._node as DisplayElement;
 		view.id = "" + NEXT_ID++;
 		view.setAttribute("data-item", this.name);
 		if (this.isProperty) view.classList.add("field")
@@ -81,7 +81,7 @@ export class DisplayType extends ElementType implements ViewType {
 		view["$controller"] = this;
 		return view;
 	}
-	viewContent(view: Display, model: content): void {
+	viewContent(view: DisplayElement, model: content): void {
 		view.textContent = "";
 		if (this.isContainer) {
 			this.createHeader(view, model);
@@ -93,22 +93,22 @@ export class DisplayType extends ElementType implements ViewType {
 		}
 		super.viewContent(view.$content, model);
 	}
-	createHeader(view: Display, model?: content) {
+	createHeader(view: DisplayElement, model?: content) {
 		let header = this.owner.createElement("header");
 		header.textContent = this.conf.title || "";
 		view.append(header);
 	}
-	createContent(view: Display, model?: content) {
+	createContent(view: DisplayElement, model?: content) {
 		view.$content = this.owner.createElement("div");
 		view.$content.classList.add("content");
 		view.append(view.$content);
 	}
-	createFooter(view: Display, model?: content) {
+	createFooter(view: DisplayElement, model?: content) {
 		if (this.model != "list") return;
 		let footer = this.owner.createElement("footer");
 		view.append(footer);
 	}
-	getContentOf(view: Display): HTMLElement {
+	getContentOf(view: DisplayElement): HTMLElement {
 		let content: HTMLElement = view;
 		if (this.isContainer) {
 			content = view.children[1] as HTMLElement;
@@ -127,7 +127,7 @@ export class DisplayType extends ElementType implements ViewType {
 		super.start(name, conf);
 		
 		if (!this.prototype) {
-			this.prototype = new Container(this.owner, null);
+			this.prototype = new Display(this.owner, null);
 		}
 		if (conf.proto) {
 			this.prototype = extend(this.prototype, conf.proto);
@@ -141,51 +141,7 @@ export class DisplayType extends ElementType implements ViewType {
 	}
 }
 
-// export class ViewType implements Type {
-// 	constructor(owner: ViewOwner) {
-// 		this.owner = owner;
-// 	}
-// 	owner: ViewOwner;
-// 	types: bundle<ViewType> = EMPTY.object;
-// 	prototype: View;
-
-// 	declare model: "record" | "list" | "text";
-// 	declare view: "record" | "list" | "text";
-// 	declare name: string;
-// 	declare isProperty: boolean;
-// 	declare conf: bundle<any>;
-
-// 	generalizes(type: Type): boolean {
-// 		return type == this;
-// 	}
-// 	toView(model: content): View {
-// 		let view = this.prototype.instance();
-// 		view.view(model);
-// 		return view;
-// 	}
-// 	toModel(view: View): content {
-// 		if (this.model) return this.owner.modellers[this.model].call(this, view);
-// 	}
-// 	start(name: string, conf: bundle<any>): void {
-// 		this.name = name;
-// 		if (conf) {
-// 			this.conf = extend(this.conf || null, conf);
-// 			if (conf.proto) {
-// 				this.prototype = extend(Object.create(this.prototype || null), conf.proto);
-// 			}
-// 			//if (conf.actions) this.actions = conf.actions;
-// 			if (conf.view) this.view = conf.view;
-// 			if (conf.model) this.model = conf.model;	
-// 		}
-// 		if (!this.prototype) this.prototype = new View(this.owner, this.conf.actions);
-// 		this.prototype.type = this;
-// 	}
-// 	getContentOf(view: View) {
-// 		return view.content;
-// 	}
-// }
-
-function rebuildView(view: Display) {
+function rebuildView(view: DisplayElement) {
 	console.warn("REPORT: Rebuilding view.");
 	let content: Element;
 	for (let ele of view.children) {
