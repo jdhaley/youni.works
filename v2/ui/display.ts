@@ -71,8 +71,13 @@ export class DisplayType extends ElementType {
 	}
 
 	createView(): Display {
-		let view = super.createView() as Display;
+		let ctl = this.__prototype.instance();
+		let view = ctl._node;
 		view.id = "" + NEXT_ID++;
+		view.setAttribute("data-item", this.name);
+		if (this.isProperty) view.classList.add("field")
+		view["$control"] = ctl;
+		view["$controller"] = this;
 		return view;
 	}
 	viewContent(view: Display, model: content): void {
@@ -124,6 +129,8 @@ export class DisplayType extends ElementType {
 		}
 		if (!this.__prototype) this.__prototype = new View(this.owner, this.conf.actions);
 		this.__prototype.type = this;
+		this.__prototype.nodeName = this.conf.tagName;
+		//this.__prototype.actions = this.conf.actions;
 	}
 }
 
