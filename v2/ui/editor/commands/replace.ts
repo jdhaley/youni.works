@@ -284,9 +284,15 @@ export class MarkupReplace extends ListReplace {
 	protected merge(view: Editable, range: Range, content: any, isStart: boolean) {
 		let item: Item = content?.length && content[isStart ? 0 : content.length - 1];
 		if (!item) return;
-		let listType = getViewById(this.owner, this.viewId).$controller;
-		let type = listType.types[viewType(item)];
-		if (type == view.$controller) {
+
+		// 2022-09-15 COMMENTED OUT to handle joining Headings to Paragraphs, etc.
+		// TODO this may just be a quick hack. The whole paragraph vs. heading type is still
+		// kinda screwy. I think the best way forward is the add the check back in and make
+		// headings and paragraphs the same type.
+		
+		// let listType = getViewById(this.owner, this.viewId).$controller;
+		// let type = listType.types[viewType(item)];
+		// if (type == view.$controller) {
 			if (!isStart) items.setItem(view, item.level, item.type$);
 			if (item.content) {
 				let node = 	view.ownerDocument.createTextNode(item.content);
@@ -297,6 +303,7 @@ export class MarkupReplace extends ListReplace {
 			} else {
 				content.pop();
 			}
-		}
+		// COMMENTED OUT
+		// }
 	}
 }
