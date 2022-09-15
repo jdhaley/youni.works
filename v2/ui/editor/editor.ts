@@ -20,6 +20,7 @@ export interface Editor  {
 }
 
 export interface Article extends Receiver {
+	unknownType: Editor;
 	readonly commands: CommandBuffer<Range>;
 	bindView(element: Element): void;
 	getElementById(id: string): Element;

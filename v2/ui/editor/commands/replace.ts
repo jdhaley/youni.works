@@ -2,7 +2,7 @@ import {content} from "../../../base/model.js";
 import { viewType } from "../../../base/view.js";
 import { Item } from "../../item.js";
 
-import {Article, Editable, getViewById, Edit} from "../editor.js";
+import {Article, Editable, getViewById, Edit, Editor} from "../editor.js";
 import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items} from "../util.js";
 
 export abstract class Replace extends Edit {
@@ -27,7 +27,7 @@ export abstract class Replace extends Edit {
 			range.insertNode(node);
 			range.collapse();
 			if (node.nodeType == Node.ELEMENT_NODE) {
-				this.owner.bindView(node as any);
+				bindView(node as any);
 			}
 		}
 		range = unmark(range);
@@ -212,6 +212,27 @@ function captureRange(cmd: ListReplace, ctx: Element, start: number, end: number
 			cmd.endId = node.id;
 			break;
 		}
+	}
+}
+
+
+let LAST_ID = 0;
+export function bindView(view: Editable): void {
+	let type = view.$controller;
+	if (!type) {
+		let name = view.getAttribute("data-item");
+		let parent = getEditableView(view.parentElement) as Editable;
+		if (name && parent) {
+			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as Editor;
+			view["$controller"] = type;	
+		}
+		if (!type) return;
+	}
+	if (!view.id) view.id = "" + --LAST_ID;
+
+	let content = type.getContentOf(view);
+	for (let child of content.children) {
+		bindView(child as Editable);
 	}
 }
 
