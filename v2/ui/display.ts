@@ -1,10 +1,11 @@
 import {ElementOwner, ElementType, getView} from "../base/dom.js";
 import {content} from "../base/model.js";
-import {bundle, CHAR, EMPTY} from "../base/util.js";
+import {bundle, EMPTY, extend} from "../base/util.js";
 import {Frame} from "./ui.js";
 import { RemoteFileService } from "../base/remote.js";
 import { CommandBuffer } from "../base/command.js";
 import { Actions } from "../base/controller.js";
+import { View } from "./box/view.js";
 
 
 export interface DisplayConf {
@@ -57,30 +58,11 @@ export class DisplayOwner extends ElementOwner {
 		}
 	}
 }
-//NO Longer used method of DisplayOwner.
-//TODO delete this when confirm not needed.
-	// bindView(view: Display): void {
-	// 	let type = view.$controller;
-	// 	if (!type) {
-	// 		let name = view.getAttribute("data-item");
-	// 		let parent = getView(view.parentElement) as Display;
-	// 		if (name && parent) {
-	// 			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as DisplayType;
-	// 			view["$controller"] = type;	
-	// 		}
-	// 		if (!type) return;
-	// 	}
-	// 	if (!view.id) view.id = "" + NEXT_ID++;
-	
-	// 	let content = type.getContentOf(view);
-	// 	for (let child of content.children) {
-	// 		this.bindView(child as Display);
-	// 	}
-	// }	
 
 export class DisplayType extends ElementType {
 	declare owner: DisplayOwner;
-	
+	declare __prototype: any;
+
 	get isContainer(): boolean {
 		return this.conf.container;
 	}
@@ -134,6 +116,14 @@ export class DisplayType extends ElementType {
 	edit(commandName: string, range: Range, content?: content): Range {
 		let editor = this.owner.editors[this.model];
 		if (editor) return editor.call(this, commandName, range, content);
+	}
+	start(name: string, conf: bundle<any>): void {
+		super.start(name, conf);
+		if (conf.proto) {
+			this.__prototype = extend(Object.create(this.__prototype || null), conf.proto);
+		}
+		if (!this.__prototype) this.__prototype = new View(this.owner, this.conf.actions);
+		this.__prototype.type = this;
 	}
 }
 
