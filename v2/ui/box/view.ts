@@ -1,7 +1,7 @@
-import { content, Type } from "../../base/model";
-import { bundle, EMPTY, extend } from "../../base/util";
+import { content, Type } from "../../base/model.js";
+import { bundle, EMPTY, extend } from "../../base/util.js";
 
-import { Content, Shape } from "./shape";
+import { Content, Shape } from "./shape.js";
 
 type viewer = (this: View, model: content) => void;
 type modeller = (this: View) => content;
@@ -13,10 +13,10 @@ type editor = (this: View, commandName: string, range: Range, content?: content)
 // 	readonly content: Content;
 // }
 
-interface ViewOwner {
+export interface ViewOwner {
 	createElement(tag: string): Element;
 	view: View;
-	types: bundle<View>; //prototypes.
+	types: bundle<ViewType>; //prototypes.
 	viewers: bundle<viewer>;
 	modellers: bundle<modeller>;
 	editors: bundle<editor>;
@@ -60,6 +60,11 @@ export class ViewType implements Type {
 			if (conf.view) this.view = conf.view;
 			if (conf.model) this.model = conf.model;	
 		}
+		if (!this.prototype) this.prototype = new View(this.owner, this.conf.actions);
+		this.prototype.type = this;
+	}
+	getContentOf(view: View) {
+		return view.content;
 	}
 }
 
@@ -82,13 +87,13 @@ export class View extends Shape {
 		this._node.id = "" + NEXT_ID++;
 		this.owner.viewers[this.type.view].call(this, model);
 	}
-	model(): content {
+	model(range?: Range): content {
 		if (this.type.model) return this.owner.modellers[this.type.model].call(this);
 	}
 
 	edit(commandName: string, range: Range, content?: content): Range {
 		let editor = this.owner.editors[this.type.model];
-		if (editor) return editor.call(this, commandName, range, content);
+		if (editor) return editor.call(this.type, commandName, range, content);
 	}
 }
 
