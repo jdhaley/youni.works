@@ -1,7 +1,7 @@
 import {Response} from "../../base/message.js";
 import {extend} from "../../base/util.js";
-import { Shape } from "../box/shape.js";
-import {DisplayOwner, DisplayType} from "../box/display.js";
+import { Shape } from "../display/box.js";
+import {Display, DisplayOwner, DisplayType} from "../display/display.js";
 
 import {UserEvent} from "../ui.js";
 
@@ -33,7 +33,7 @@ export default extend(null, {
 });
 
 function shapetest(this: DisplayOwner) {
-	let box = new Shape(this as any, shape).instance() as Shape;
+	let box = new Display(this as any, shape).instance() as Shape;
 	box.content.classList.add("shape");
 	box.position(0, 0);
 	box.content.textContent = "HELLO THERE";

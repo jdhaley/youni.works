@@ -1,5 +1,5 @@
 import { extend } from "../../base/util.js";
-import { Shape } from "../box/shape.js";
+import { Shape } from "../display/box.js";
 import { UserEvent } from "../ui.js";
 
 let tracking = {
@@ -9,6 +9,10 @@ let tracking = {
 	y: 0
 }
 
+function getNode(shape: Shape) {
+	return (shape as any)._node;
+}
+
 export default extend(null, {
     mousedown(this: Shape, event: UserEvent) {
 		event.subject = "";
@@ -16,7 +20,7 @@ export default extend(null, {
 		tracking.x = event.x - area.x;
 		tracking.y = event.y - area.y;
 		tracking.type = this.zone(event.x, event.y) == "CC" ? "move" : "size";
-		event.track = this._node;
+		event.track = getNode(this);
 	},
 	mouseup(event: UserEvent) {
 		event.subject = "";
@@ -32,13 +36,13 @@ export default extend(null, {
 			return;
 		}
 		this.style.backgroundColor = "ghostwhite";
-		this._node.setAttribute("data-zone", this.zone(event.x, event.y));
+		getNode(this).setAttribute("data-zone", this.zone(event.x, event.y));
 	},
-    mouseout(event: UserEvent) {
+    mouseout(this: Shape, event: UserEvent) {
 		event.subject = "";
 		if (event.track) return;
 		this.style.removeProperty("background-color");
-		this._node.removeAttribute("data-zone");
+		getNode(this).removeAttribute("data-zone");
 	},
     // click(event: UserEvent) {
 	// },

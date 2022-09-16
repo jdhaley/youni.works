@@ -9,7 +9,7 @@ import line from "../controllers/line.js";
 
 import shortcuts from "./shortcuts.js";
 
-import {DisplayConf, DisplayType} from "../box/display.js";
+import {DisplayConf, DisplayType} from "../display/display.js";
 
 const conf: bundle<DisplayConf> = {
 	text: {

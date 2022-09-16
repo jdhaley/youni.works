@@ -1,7 +1,7 @@
 import { extend } from "../../base/util.js";
 
 import { UserEvent } from "../ui.js";
-import { DisplayType } from "../box/display.js";
+import { DisplayType } from "../display/display.js";
 import { setClipboard } from "../clipboard.js";
 
 export default extend(null, {
