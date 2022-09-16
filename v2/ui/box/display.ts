@@ -1,11 +1,11 @@
-import {ElementOwner, ElementType} from "../base/dom.js";
-import {content} from "../base/model.js";
-import {bundle, EMPTY, extend} from "../base/util.js";
-import {Frame} from "./ui.js";
-import { RemoteFileService } from "../base/remote.js";
-import { CommandBuffer } from "../base/command.js";
-import { Actions } from "../base/controller.js";
-import { editor, Display, ViewOwner, ViewType, View } from "./box/view.js";
+import {ElementOwner, ElementType} from "../../base/dom.js";
+import {content} from "../../base/model.js";
+import {bundle, EMPTY, extend} from "../../base/util.js";
+import {Frame} from "../ui.js";
+import { RemoteFileService } from "../../base/remote.js";
+import { CommandBuffer } from "../../base/command.js";
+import { Actions } from "../../base/controller.js";
+import { editor, Display, ViewOwner, ViewType, View } from "./view.js";
 
 
 export interface DisplayConf {
@@ -26,9 +26,6 @@ class DisplayElement extends HTMLElement {
 }
 
 export class DisplayOwner extends ElementOwner implements ViewOwner {
-	getControlOf(value: Element): DisplayType {
-		return super.getControlOf(value) as DisplayType;
-	}
 	constructor(frame: Frame, conf: bundle<any>) {
 		/*
 		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
@@ -47,6 +44,9 @@ export class DisplayOwner extends ElementOwner implements ViewOwner {
 
 	createElement(tagName: string): HTMLElement {
 		return this.frame.createElement(tagName);
+	}
+	getControlOf(value: Element): DisplayType {
+		return super.getControlOf(value) as DisplayType;
 	}
 	getElementById(id: string): Element {
 		return this.frame.getElementById(id);
@@ -73,7 +73,7 @@ export class DisplayType extends ElementType implements ViewType {
 
 	createView(): DisplayElement {
 		let ctl = this.prototype.instance();
-		let view = (ctl as any)._node as DisplayElement;
+		let view = ctl.view as DisplayElement;
 		view.id = "" + NEXT_ID++;
 		view.setAttribute("data-item", this.name);
 		if (this.isProperty) view.classList.add("field")
