@@ -21,7 +21,8 @@ let NEXT_ID = 1;
 
 class DisplayElement extends HTMLElement {
 	$controller?: DisplayType;
-	$content: HTMLElement;
+	$control?: Display;
+	$content?: HTMLElement;
 }
 
 export class DisplayOwner extends ElementOwner implements ViewOwner {
@@ -63,6 +64,7 @@ export class DisplayType extends ElementType implements ViewType {
 	declare owner: DisplayOwner;
 	declare prototype: Display;
 	declare types: bundle<ViewType>
+
 	get isContainer(): boolean {
 		return this.conf.container;
 	}
@@ -76,43 +78,20 @@ export class DisplayType extends ElementType implements ViewType {
 		view.id = "" + NEXT_ID++;
 		view.setAttribute("data-item", this.name);
 		if (this.isProperty) view.classList.add("field")
-		view["$control"] = ctl;
-		view["$controller"] = this;
+		view.$control = ctl as Display;
+		view.$controller = this;
 		return view;
 	}
 	viewContent(view: DisplayElement, model: content): void {
-		view.textContent = "";
-		if (this.isContainer) {
-			this.createHeader(view, model);
-			this.createContent(view, model);
-			this.createFooter(view, model)
-		} else {
-			view.classList.add("content");
-			view.$content = view;
-		}
-		super.viewContent(view.$content, model);
-	}
-	createHeader(view: DisplayElement, model?: content) {
-		let header = this.owner.createElement("header");
-		header.textContent = this.conf.title || "";
-		view.append(header);
-	}
-	createContent(view: DisplayElement, model?: content) {
-		view.$content = this.owner.createElement("div");
-		view.$content.classList.add("content");
-		view.append(view.$content);
-	}
-	createFooter(view: DisplayElement, model?: content) {
-		if (this.model != "list") return;
-		let footer = this.owner.createElement("footer");
-		view.append(footer);
+		view.$control.viewContent(model);
 	}
 	getContentOf(view: DisplayElement): HTMLElement {
 		let content: HTMLElement = view;
 		if (this.isContainer) {
 			content = view.children[1] as HTMLElement;
 			if (!(content && content.classList.contains("content"))) {
-				content = rebuildView(view);
+				review(view);
+				content = view.children[1] as HTMLElement;
 			}
 		}
 		if (!view.$content) view.$content = content;
@@ -139,29 +118,6 @@ export class DisplayType extends ElementType implements ViewType {
 		//this.prototype.actions = this.conf.actions;
 	}
 }
-
-function rebuildView(view: DisplayElement) {
-	console.warn("REPORT: Rebuilding view.");
-	let content: Element;
-	for (let ele of view.children) {
-		if (ele.classList.contains("view")) {
-			content = ele ;
-			view.$content = ele as HTMLElement;
-			break;
-		}
-	}
-	view.textContent = "";
-	let type = view.$controller;
-	type.createHeader(view);
-	if (content) {
-		view.append(content)
-	} else {
-		type.createContent(view)
-	}
-	type.createFooter(view);
-	return view.$content;
-}
-
 
 export class Display extends ViewBox {
 	viewContent(model: content): void {
@@ -227,3 +183,27 @@ function review(node: Element) {
 	if (node["$content"]) node.append(node["$content"]);
 	if (node["$footer"]) node.append(node["$footer"]);
 }
+
+
+// function rebuildView(view: DisplayElement) {
+// 	console.warn("REPORT: Rebuilding view.");
+// 	let content: Element;
+// 	for (let ele of view.children) {
+// 		if (ele.classList.contains("view")) {
+// 			content = ele ;
+// 			view.$content = ele as HTMLElement;
+// 			break;
+// 		}
+// 	}
+// 	view.textContent = "";
+// 	let type = view.$controller;
+// 	type.createHeader(view);
+// 	if (content) {
+// 		view.append(content)
+// 	} else {
+// 		type.createContent(view)
+// 	}
+// 	type.createFooter(view);
+// 	return view.$content;
+// }
+

@@ -106,13 +106,13 @@ export class ViewBox extends Box implements View {
 
 	viewContent(model: content): void {
 		this._node.id = "" + NEXT_ID++;
-		this.owner.viewers[this.type.view].call(this, model);
+		this.owner.viewers[this.type.view].call(this.type, this.content, model);
 	}
-	// model(range?: Range): content {
-	// 	if (this.type.model) return this.owner.modellers[this.type.model].call(this);
-	// }
-	// edit(commandName: string, range: Range, content?: content): Range {
-	// 	let editor = this.owner.editors[this.type.model];
-	// 	if (editor) return editor.call( this.type, commandName, range, content);
-	// }
+	model(range?: Range): content {
+		if (this.type.model) return this.owner.modellers[this.type.model].call(this.type, this.content, range);
+	}
+	edit(commandName: string, range: Range, content?: content): Range {
+		let editor = this.owner.editors[this.type.model];
+		if (editor) return editor.call(this.type, commandName, range, content);
+	}
 }
