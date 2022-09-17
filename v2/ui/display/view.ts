@@ -79,9 +79,6 @@ export interface ViewOwner extends _ControlTypeOwner<Element>, _EditorOwner {
 let NEXT_ID = 1;
 
 export class ViewBox extends Box implements View {
-	instance(): ViewBox {
-		return super.instance() as ViewBox;
-	}
 	declare owner: ViewOwner;
 
 	get view(): Content {

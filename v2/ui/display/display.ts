@@ -113,23 +113,22 @@ export class DisplayType extends Control implements Type {
 	bind(view: DisplayElement) {
 		let display: Display = Object.create(this.prototype);
 		(display as any)._node = view;
-		view["$controller"] = this;
-		view["$control"] = display;
+		view.$controller = this;
+		view.$control = display;
+		return display;
 	}
 	toView(model: content): DisplayElement {
-		let display = this.createDisplay();
+		let display = this.create();
 		display.viewContent(model);
 		return display.view as HTMLElement;
 	}
-	protected createDisplay(): Display {
-		let display = this.prototype.instance() as Display;
-		let view = display.view as DisplayElement;
-		view.id = "" + NEXT_ID++;
-		view.setAttribute("data-item", this.name);
-		if (this.isProperty) view.classList.add("field")
-		view.$control = display;
-		view.$controller = this;
-		return display;
+	create(element?: DisplayElement): Display {
+		let node = (element || this.owner.createElement(this.conf.tagName || "div")) as DisplayElement;
+		node.id = "" + NEXT_ID++;
+		node.setAttribute("data-item", this.name);
+		if (this.isProperty) node.classList.add("field");
+		node.$controller = this;
+		return this.bind(node);
 	}
 	getContentOf(view: DisplayElement): HTMLElement {
 		let content: HTMLElement = view;

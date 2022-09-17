@@ -75,13 +75,4 @@ export class Box extends Control implements Shape {
 		style.height = Math.max(height, 16) + "px";
 		style.minHeight = style.height;
 	}
-	addTo(parent: Element, beforeChild?: Element) {
-		parent.insertBefore(this._node, beforeChild);
-	}
-	instance(): Box {
-		let box: Box = Object.create(this);
-		box._node = this.owner.createElement(this.nodeName || "div") as HTMLElement;
-		box._node["$controller"] = box;
-		return box;
-	}
 }

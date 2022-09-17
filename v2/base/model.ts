@@ -16,8 +16,6 @@ export interface Type {
 export interface View extends Receiver {
 	readonly type: Type;
 	readonly content: Content;
-	
-	instance(): View;
 }
 
 export interface Shape extends View {

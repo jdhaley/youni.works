@@ -1,3 +1,4 @@
+import { KeywordStatement } from "../../../../lang/source/statement.js";
 import {Response} from "../../base/message.js";
 import { Shape } from "../../base/model.js";
 import { start } from "../../base/type.js";
@@ -35,11 +36,19 @@ export default extend(null, {
 });
 
 function shapetest(this: DisplayOwner) {
-	let box = new Display(this as any, shape).instance() as Shape;
-	box.content.classList.add("shape");
-	box.position(0, 0);
-	box.content.textContent = "HELLO THERE";
-	this.frame.view.append(box.content as any);
+	let type = new DisplayType(this);
+	type.start("shape", {
+		actions: shape,
+		prototype: new Display(this, null)
+	});
+	let inst = type.create();
+	inst.content.classList.add("shape");
+	inst.position(0, 0);
+	inst.content.textContent = "HELLO THERE";
+
+	inst.actions = type.actions;
+	(inst as any)._node.$controller = inst;
+	this.frame.view.append((inst as any)._node);
 }
 
 function getType(article: DisplayOwner, path: string, data: any): DisplayType {
