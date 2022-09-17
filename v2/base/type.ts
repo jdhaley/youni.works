@@ -7,7 +7,7 @@ export interface Type {
 	view: string;
 	model: string;
 	isProperty: boolean;
-
+	
 	generalizes(type: Type): boolean;
 	start(name: string, conf: bundle<any>): void;
 }
@@ -24,14 +24,19 @@ type source = bundle<string | source> | string;
 export abstract class TypeOwner<V> extends Owner<V> {
 	constructor(conf: bundle<any>) {
 		super();
-		let base = loadBaseTypes(this, conf.baseTypes);
+		this.conf = conf;
 		this.actions = conf.actions;
-		this.types = loadTypes(conf.viewTypes, base);
-		this.unknownType = this.types[conf.unknownType];
-		console.info("Types:", this.types, "uknown type:", this.unknownType);
 	}
+	conf: bundle<any>;
 	types: bundle<Type>;
 	unknownType: Type;
+}
+
+export function start(owner: TypeOwner<unknown>) {
+	let base = loadBaseTypes(owner, owner.conf.baseTypes);
+	owner.types = loadTypes(owner.conf.viewTypes, base);
+	owner.unknownType = owner.types[owner.conf.unknownType];
+	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
 }
 
 function loadBaseTypes(owner: TypeOwner<unknown>, baseTypes: bundle<any>): bundle<Type> {

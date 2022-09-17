@@ -1,4 +1,5 @@
 import {Response} from "../../base/message.js";
+import { start } from "../../base/type.js";
 import {extend} from "../../base/util.js";
 import { Shape } from "../display/box.js";
 import {Display, DisplayOwner, DisplayType} from "../display/display.js";
@@ -9,6 +10,7 @@ import shape from "./shape.js";
 
 export default extend(null, {
 	open(this: DisplayOwner, res: Response<string>) {
+		start(this);
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, model);
 		this.view = type.toView(model);

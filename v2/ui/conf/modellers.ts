@@ -1,6 +1,6 @@
 import { content, List, Record } from "../../base/model.js";
-import { ElementType } from "../../base/dom.js";
 import { CHAR } from "../../base/util.js";
+import { ViewType } from "../display/view.js";
 
 interface Item {
 	type$: string,
@@ -10,20 +10,19 @@ interface Item {
 }
 
 export default {
-	record(this: ElementType, view: Element, range?: Range, id?: true): Record {
-		let model = recordContent(this, null, view, range, id);
+	record(this: ViewType, view: Element, range?: Range): Record {
+		let model = recordContent(this, null, view, range);
 		if (model) {
 			model["type$"] = this.name;
-			if (id) model["id$"] = view.id;
 		}
 		return model;
 	},
 	list: listContent,
 	markup: listContent,
 	text: textContent,
-	line(this: ElementType, view: Element, range?: Range, id?: true): Item {
+	line(this: ViewType, view: Element, range?: Range): Item {
 		if (range && !range.intersectsNode(view)) return;
-		let content = textContent.call(this, view, range, id);
+		let content = textContent.call(this, view, range);
 		let item: Item = {
 			type$: view.getAttribute("data-item"),
 			content: content,
@@ -34,22 +33,22 @@ export default {
 	}
 }
 
-function recordContent(contextType: ElementType, model: Record, view: Element, range: Range, id?: true): Record {
+function recordContent(contextType: ViewType, model: Record, view: Element, range: Range): Record {
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {
-		let type = child["$controller"] as ElementType;
+		let type = child["$controller"] as ViewType;
 		if (type?.model) {
 			if (contextType.model == "record" && !(type.isProperty && contextType.types[type.name])) {
 				console.warn(`Found property "${type.name}" that is not part of the record type.`);
 			}
-			let value = type.toModel(child, range, id);
+			let value = type.toModel(child, range);
 			if (value) {
 				if (!model) model = Object.create(null);
 				model[type.name] = value;
 			}
 		} else {
-			model = recordContent(contextType, model, child, range, id);
+			model = recordContent(contextType, model, child, range);
 		}
 	}
 	return model;
@@ -64,16 +63,15 @@ function getContentElement(view: Element, range?: Range) {
 	}
 }
 
-function listContent(this: ElementType, view: Element, range?: Range, id?: true): List {
+function listContent(this: ViewType, view: Element, range?: Range): List {
 	let model: content[];
 	let content = getContentElement(view, range);
 	if (content) for (let part of content.children) {
-		let type = this.owner.getControlOf(part) as ElementType;
-		let value = type?.toModel(part, range, id);
+		let type = this.owner.getControlOf(part);
+		let value = type?.toModel(part, range);
 		if (value) {
 			if (!model) {
 				model = [];
-				if (id) model.push(view.id);
 				if (this.name) model["type$"] = this.name;
 			}
 			model.push(value);
@@ -82,15 +80,9 @@ function listContent(this: ElementType, view: Element, range?: Range, id?: true)
 	return model;
 }
 
-function textContent(this: ElementType, view: Element, range?: Range, id?: true): string {
+function textContent(this: ViewType, view: Element, range?: Range): string {
 	let model = "";
 	let content = getContentElement(view, range);
-
-	// USING editable class should remove the need for this hack
-	// (editable is either on the view or the content element)
-	//
-	// //HACK TO HANDLE PANEL-LESS TEXT... (DIRECT TEXT IN VIEW)
-	// if (!view.children.length) content = view;
 
 	if (content) for (let node of content.childNodes) {
 		if (node == range?.startContainer) {
@@ -104,6 +96,5 @@ function textContent(this: ElementType, view: Element, range?: Range, id?: true)
 	model = model.replace(CHAR.ZWSP, "");
 	model = model.replace(CHAR.NBSP, " ");
 	model = model.trim();
-	if (id) model = view.id + ":" + model;
 	return model;
 }

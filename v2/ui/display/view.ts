@@ -1,6 +1,6 @@
 import { CommandBuffer } from "../../base/command.js";
 import { Actions, Receiver, Signal } from "../../base/controller.js";
-import { Content, content } from "../../base/model.js";
+import { Content, content, typeOf } from "../../base/model.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { Type } from "../../base/type.js";
 import { bundle } from "../../base/util.js";
@@ -17,16 +17,29 @@ export interface View extends Receiver {
 	instance(): View;
 }
 
-export interface ViewType extends Type, Receiver {
-	types: bundle<ViewType>;
+export function viewType(value: any): string {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+		case "date":
+			return "text";
+		default:
+			return type;
+	}
+}
 
+export interface ViewType extends Type, Receiver {
 	owner: ViewOwner;
 	conf: bundle<any>;
+	types: bundle<ViewType>;
+
 	prototype?: View;
 
 	createView(): Element;
 	getContentOf(view: Element): Element;
-	toModel(view: Element): content;
+	toModel(view: Element, range?: Range): content;
 	toView(model: content): Element
 	viewContent(view: Element, model: content): void;
 	actions: Actions;
@@ -59,7 +72,6 @@ interface _EditorOwner {
 	getElementById(id: string): Element;
 	setRange(range: Range, collapse?: boolean): void;	
 }
-
 
 // type viewer = (this: View, model: content) => void;
 // type modeller = (this: View) => content;
@@ -96,9 +108,6 @@ export class ViewBox extends Box implements View {
 
 	get view(): Content {
 		return this._node;
-	}
-	get shortcuts(): bundle<string> {
-		return this.type.conf.shortcuts;
 	}
 
 	viewContent(model: content): void {

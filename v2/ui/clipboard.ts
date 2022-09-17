@@ -1,6 +1,6 @@
-import { ElementType, getView } from "../base/dom.js";
 import { content } from "../base/model.js";
-import { viewType } from "../base/view.js";
+import { DisplayType } from "./display/display.js";
+import { viewType } from "./display/view.js";
 import { section } from "./item.js";
 import { fromHtml } from "./transform/fromHtml.js";
 import { toHtml } from "./transform/toHtml.js";
@@ -18,7 +18,7 @@ export function getClipboard(clipboard: DataTransfer): content {
 	return clipboard.getData("text/plain");
 }
 
-export function setClipboard(type: ElementType, range: Range, clipboard: DataTransfer) {
+export function setClipboard(type: DisplayType, range: Range, clipboard: DataTransfer) {
 	let node = range.commonAncestorContainer;
 	if (node.nodeType == Node.TEXT_NODE) {
 		let data = node.textContent.substring(range.startOffset, range.endOffset);
@@ -45,6 +45,21 @@ export function setClipboard(type: ElementType, range: Range, clipboard: DataTra
 	}
 	// console.log("text/plain", data);
 	clipboard.setData("text/plain", data);
+}
+
+export function getView(node: Node | Range, context?: Element): Element {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node instanceof Element && node.getAttribute("data-item")) {
+			if (!node["$controller"]) {
+				// if (!(context && context["$controller"])) throw new Error("Unbound view.");
+				// bindView(node, context);
+				console.warn("Unbound view.");
+			}
+			return node;
+		}
+		node = node.parentElement;
+	}
 }
 
 // function htmlify(view: HTMLElement): HTMLElement {

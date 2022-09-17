@@ -1,5 +1,4 @@
 import {content} from "../../../base/model.js";
-import { viewType } from "../../../base/view.js";
 import { Item } from "../../item.js";
 
 import {Article, Editable, getViewById, Edit, Editor} from "../editor.js";

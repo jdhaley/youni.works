@@ -1,6 +1,5 @@
-import {List, Record} from "../../base/model.js";
-import {viewType} from "../../base/view.js";
-import {ElementType} from "../../base/dom.js";
+import {List, Record, typeOf} from "../../base/model.js";
+import { viewType, ViewType } from "../display/view.js";
 
 interface Item {
 	type$: string,
@@ -10,10 +9,10 @@ interface Item {
 }
 
 export default {
-	text(this: ElementType, view: Element, model: string): void {
+	text(this: ViewType, view: Element, model: string): void {
 		view.textContent =  model || "";
 	},
-	record(this: ElementType, view: Element, model: Record): void {
+	record(this: ViewType, view: Element, model: Record): void {
 		view["$at"] = Object.create(null);
 		for (let name in this.types) {
 			let type = this.types[name];
@@ -24,7 +23,7 @@ export default {
 		}
 		//if (!view.textContent) view.textContent = CHAR.ZWSP;
 	},
-	list(this: ElementType, view: Element, model: List): void {
+	list(this: ViewType, view: Element, model: List): void {
 		//view.textContent = "";
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this["rowType"] || this.types[viewType(item)] || this.owner.unknownType;
@@ -33,7 +32,7 @@ export default {
 		}
 		//if (!view.textContent) view.append(CHAR.ZWSP);
 	},
-	markup(this: ElementType, view: Element, model: Item[]): void {
+	markup(this: ViewType, view: Element, model: Item[]): void {
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this["rowType"] || this.types[viewType(item)] || this.owner.unknownType;
 			let part = type.toView(item);
@@ -41,7 +40,7 @@ export default {
 		}
 	//	view.append(this.types["para"].toView({}));
 	},
-	line(this: ElementType, view: Element, item: Item): void {
+	line(this: ViewType, view: Element, item: Item): void {
 		view.innerHTML = "" + (item.content || "");
 		if (item.type$ == "heading") {
 			view.setAttribute("role", "heading");

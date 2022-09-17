@@ -1,11 +1,11 @@
-import {ElementOwner, ElementType} from "../../base/dom.js";
 import {Content, content} from "../../base/model.js";
 import {bundle, EMPTY, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
-import { Actions } from "../../base/controller.js";
-import { editor, ViewOwner, ViewType, ViewBox } from "./view.js";
+import { Actions, Control, Receiver } from "../../base/controller.js";
+import { editor, ViewOwner, ViewType, ViewBox, viewer, modeller } from "./view.js";
+import { Type, TypeOwner } from "../../base/type.js";
 
 export interface DisplayConf {
 	class: typeof DisplayType;
@@ -25,7 +25,7 @@ class DisplayElement extends HTMLElement {
 	$content?: HTMLElement;
 }
 
-export class DisplayOwner extends ElementOwner implements ViewOwner {
+export class DisplayOwner extends TypeOwner<Element> implements ViewOwner, Receiver {
 	constructor(frame: Frame, conf: bundle<any>) {
 		/*
 		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
@@ -33,20 +33,25 @@ export class DisplayOwner extends ElementOwner implements ViewOwner {
 		super(conf);
 		this.frame = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
+		this.commands = new CommandBuffer()
+
+		this.viewers = conf.viewers;
+		this.modellers = conf.modellers;
 		this.editors = conf.editors || EMPTY.object;
 	}
-	readonly service: RemoteFileService;
-	readonly commands: CommandBuffer<Range> = new CommandBuffer();
-	declare editors: bundle<editor>;
+
 	readonly frame: Frame;
+	readonly service: RemoteFileService;
+	readonly commands: CommandBuffer<Range>;
+
+	viewers: bundle<viewer>
+	modellers: bundle<modeller>;
+	editors: bundle<editor>;
 	type: ViewType;
 	view: Element;
 
 	createElement(tagName: string): HTMLElement {
 		return this.frame.createElement(tagName);
-	}
-	getControlOf(value: Element): DisplayType {
-		return super.getControlOf(value) as DisplayType;
 	}
 	getElementById(id: string): Element {
 		return this.frame.getElementById(id);
@@ -58,14 +63,46 @@ export class DisplayOwner extends ElementOwner implements ViewOwner {
 			this.frame.selectionRange = range;
 		}
 	}
+	getPartOf(view: Element): Element {
+		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
+			if (parent["$controller"]) return parent;
+		}
+	}
+	getPartsOf(view: Element): Iterable<Element> {
+		return view.children as Iterable<Element>;
+	}
+	getControlOf(view: Element): ViewType {
+		let type = view["$controller"];
+		if (!type) {
+			console.log(view);
+		}
+		return type;
+	}
 }
 
-export class DisplayType extends ElementType implements ViewType {
-	declare owner: DisplayOwner;
+export class DisplayType extends Control implements Type {
+	constructor(owner: DisplayOwner) {
+		super();
+		this.owner = owner;
+	}
+	name: string;
+	owner: DisplayOwner;
+	conf: bundle<any>;
+	types: bundle<ViewType>
+
+	view: string;
+	model: string;
+	isProperty: boolean;
 	declare prototype: Display;
-	declare types: bundle<ViewType>
 	get shortcuts(): bundle<string> {
 		return this.conf.shortcuts;
+	}
+
+	generalizes(type: Type): boolean {
+		return type == this;
+	}
+	toModel(view: Element, range?: Range, id?: true): content {
+		if (this.model) return this.owner.modellers[this.model].call(this, view, range, id);
 	}
 
 	bind(view: DisplayElement) {
@@ -102,7 +139,13 @@ export class DisplayType extends ElementType implements ViewType {
 		return content;
 	}
 	start(name: string, conf: bundle<any>): void {
-		super.start(name, conf);
+		this.name = name;
+		if (conf) {
+			this.conf = extend(this.conf || null, conf);
+			if (conf.actions) this.actions = conf.actions;
+			if (conf.view) this.view = conf.view;
+			if (conf.model) this.model = conf.model;	
+		}
 		
 		if (!this.prototype) {
 			this.prototype = new Display(this.owner, null);
@@ -139,6 +182,9 @@ export class Display extends ViewBox {
 	get isContainer(): boolean {
 		return this.type.conf.container;
 	}
+	get shortcuts(): bundle<string> {
+		return this.type.conf.shortcuts;
+	}
 	get header(): Content {
 		let header: HTMLElement = this._node["$header"];
 		//Check that there is a header and the view isn't corrupted.
@@ -160,6 +206,7 @@ export class Display extends ViewBox {
 		if (footer && footer != this._node.lastElementChild) review(this._node);
 		return footer as Content;
 	}
+
 	protected createHeader(model?: content) {
 		let header = this.owner.createElement("header");
 		header.textContent = this.type.conf.title || "";
@@ -187,27 +234,3 @@ function review(node: Element) {
 	if (node["$content"]) node.append(node["$content"]);
 	if (node["$footer"]) node.append(node["$footer"]);
 }
-
-
-// function rebuildView(view: DisplayElement) {
-// 	console.warn("REPORT: Rebuilding view.");
-// 	let content: Element;
-// 	for (let ele of view.children) {
-// 		if (ele.classList.contains("view")) {
-// 			content = ele ;
-// 			view.$content = ele as HTMLElement;
-// 			break;
-// 		}
-// 	}
-// 	view.textContent = "";
-// 	let type = view.$controller;
-// 	type.createHeader(view);
-// 	if (content) {
-// 		view.append(content)
-// 	} else {
-// 		type.createContent(view)
-// 	}
-// 	type.createFooter(view);
-// 	return view.$content;
-// }
-
