@@ -3,9 +3,11 @@ import { content } from "../../base/model.js";
 import { Receiver } from "../../base/controller.js";
 import { bundle } from "../../base/util.js";
 import { bindView } from "./util.js";
+import { Display } from "../display/display.js";
 
 export interface Editable extends Element {
-	$controller?: Editor
+	$controller?: Editor;
+	$control?: Display;
 }
 
 export interface Editor  {
@@ -16,6 +18,7 @@ export interface Editor  {
 	readonly isContainer: boolean;
 	toModel(view: Element, range?: Range, id?: true): content;
 	toView(model: content): Element;
+	bind(view: Editable): void;
 	getContentOf(node: Node): Element;
 	edit(commandName: string, range: Range, content?: content): Range;
 }

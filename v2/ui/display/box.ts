@@ -30,9 +30,7 @@ interface Owner {
 }
 
 export interface Shape {
-	owner: Owner;
 	area: Area;
-	border: Edges;
 	content: Content;
 	style: CSSStyleDeclaration;
 
@@ -40,7 +38,6 @@ export interface Shape {
 	position(x: number, y: number): void;
 	zone(x: number, y: number): Zone;
 
-	addTo(parent: Element, beforeChild?: Element): void;
 	instance(): Shape;
 }
 

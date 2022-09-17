@@ -64,30 +64,34 @@ export class DisplayType extends ElementType implements ViewType {
 	declare owner: DisplayOwner;
 	declare prototype: Display;
 	declare types: bundle<ViewType>
-
-	get isContainer(): boolean {
-		return this.conf.container;
-	}
 	get shortcuts(): bundle<string> {
 		return this.conf.shortcuts;
 	}
 
-	createView(): DisplayElement {
-		let ctl = this.prototype.instance();
-		let view = ctl.view as DisplayElement;
+	bind(view: DisplayElement) {
+		let display: Display = Object.create(this.prototype);
+		(display as any)._node = view;
+		view["$controller"] = this;
+		view["$control"] = display;
+	}
+	toView(model: content): DisplayElement {
+		let display = this.createDisplay();
+		display.viewContent(model);
+		return display.view as HTMLElement;
+	}
+	protected createDisplay(): Display {
+		let display = this.prototype.instance() as Display;
+		let view = display.view as DisplayElement;
 		view.id = "" + NEXT_ID++;
 		view.setAttribute("data-item", this.name);
 		if (this.isProperty) view.classList.add("field")
-		view.$control = ctl as Display;
+		view.$control = display;
 		view.$controller = this;
-		return view;
-	}
-	viewContent(view: DisplayElement, model: content): void {
-		view.$control.viewContent(model);
+		return display;
 	}
 	getContentOf(view: DisplayElement): HTMLElement {
 		let content: HTMLElement = view;
-		if (this.isContainer) {
+		if (this.conf.container) {
 			content = view.children[1] as HTMLElement;
 			if (!(content && content.classList.contains("content"))) {
 				review(view);
@@ -96,10 +100,6 @@ export class DisplayType extends ElementType implements ViewType {
 		}
 		if (!view.$content) view.$content = content;
 		return content;
-	}
-	edit(commandName: string, range: Range, content?: content): Range {
-		let editor = this.owner.editors[this.model];
-		if (editor) return editor.call(this, commandName, range, content);
 	}
 	start(name: string, conf: bundle<any>): void {
 		super.start(name, conf);
@@ -116,6 +116,10 @@ export class DisplayType extends ElementType implements ViewType {
 		this.prototype.nodeName = this.conf.tagName;
 		//Need to alter the controller actions to accept the View and not the Type...
 		//this.prototype.actions = this.conf.actions;
+	}
+	edit(commandName: string, range: Range, content?: content): Range {
+		let editor = this.owner.editors[this.model];
+		if (editor) return editor.call(this, commandName, range, content);
 	}
 }
 

@@ -97,9 +97,6 @@ export class ViewBox extends Box implements View {
 	get view(): Content {
 		return this._node;
 	}
-	get isContainer(): boolean {
-		return false;
-	}
 	get shortcuts(): bundle<string> {
 		return this.type.conf.shortcuts;
 	}

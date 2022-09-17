@@ -37,7 +37,7 @@ function shapetest(this: DisplayOwner) {
 	box.content.classList.add("shape");
 	box.position(0, 0);
 	box.content.textContent = "HELLO THERE";
-	box.addTo(this.frame.view);
+	this.frame.view.append(box.content as any);
 }
 
 function getType(article: DisplayOwner, path: string, data: any): DisplayType {

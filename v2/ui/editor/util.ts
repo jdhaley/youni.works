@@ -16,7 +16,8 @@ export function getContent(node: Node | Range): Editable {
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
 	for (let ele = node as Editable; ele; ele = ele.parentElement) {
 		if (ele.classList.contains("content")) return ele;
-		if (ele.$controller?.isContainer)return ele.$controller.getContentOf(ele);
+		if (ele.$controller && !ele.$control) console.error("no $control");
+		if (ele.$control?.isContainer)return ele.$controller.getContentOf(ele);
 	}
 }
 
@@ -262,7 +263,7 @@ export function bindView(view: Editable): void {
 		let parent = getEditableView(view.parentElement) as Editable;
 		if (name && parent) {
 			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as Editor;
-			view["$controller"] = type;	
+			type.bind(view);
 		}
 		if (!type) return;
 	}
