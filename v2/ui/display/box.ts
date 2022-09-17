@@ -1,21 +1,5 @@
 import { Actions, Control } from "../../base/controller.js";
-import { Content } from "../../base/model.js";
-
-export interface Area {
-	x: number,
-	y: number,
-	width: number,
-	height: number
-}
-
-export interface Edges {
-	top: number,
-	right: number,
-	bottom: number,
-	left: number
-}
-
-type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
+import { Area, Content, Edges, Shape, Type, Zone } from "../../base/model.js";
 
 
 const DEFAULT_BORDER: Edges = {
@@ -29,18 +13,6 @@ interface Owner {
 	createElement(tag: string): Element;
 }
 
-export interface Shape {
-	area: Area;
-	content: Content;
-	style: CSSStyleDeclaration;
-
-	size(width: number, height: number): void;
-	position(x: number, y: number): void;
-	zone(x: number, y: number): Zone;
-
-	instance(): Shape;
-}
-
 export class Box extends Control implements Shape {
 	constructor(owner: Owner, actions: Actions) {
 		super();
@@ -48,6 +20,7 @@ export class Box extends Control implements Shape {
 		this.actions = actions;
 	}
 	readonly owner: Owner;
+	declare type: Type;
 	declare protected _node: HTMLElement;
 	declare nodeName: string;
 	

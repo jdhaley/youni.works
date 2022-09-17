@@ -1,9 +1,45 @@
-export interface Type {
-	name: string;
-	generalizes(type: Type): boolean;
-}
+import { Receiver } from "./controller";
+import { bundle } from "./util";
 
 export type content = string | number | boolean | Date | List | Record;
+
+export interface Type {
+	name: string;
+	types: bundle<Type>;
+	view: string;
+	model: string;
+
+	isProperty: boolean;
+	start(name: string, conf: bundle<any>): void;
+}
+
+export interface View extends Receiver {
+	readonly type: Type;
+	readonly content: Content;
+	
+	instance(): View;
+}
+
+export interface Shape extends View {
+	area: Area;
+	style: CSSStyleDeclaration;
+
+	size(width: number, height: number): void;
+	position(x: number, y: number): void;
+	zone(x: number, y: number): Zone;
+}
+
+export interface Content {
+	readonly classList: Names;
+	readonly children: Iterable<Content>;
+	textContent: string;
+}
+
+interface Names extends Iterable<string> {
+	contains(name: string): boolean;
+	add(name: string): void;
+	remove(name: string): void;
+}
 
 export interface List extends Iterable<content> {
 	type$?: string;
@@ -13,6 +49,35 @@ export interface List extends Iterable<content> {
 export interface Record {
 	type$?: string;
 	[key: string]: content;
+}
+
+export interface Area {
+	x: number,
+	y: number,
+	width: number,
+	height: number
+}
+
+export type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
+
+export interface Edges {
+	top: number,
+	right: number,
+	bottom: number,
+	left: number
+}
+
+export function viewType(value: any): string {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+		case "date":
+			return "text";
+		default:
+			return type;
+	}
 }
 
 export function typeOf(value: any): string {
@@ -36,14 +101,3 @@ export function typeOf(value: any): string {
 	return "null";
 }
 
-interface Names extends Iterable<string> {
-	contains(name: string): boolean;
-	add(name: string): void;
-	remove(name: string): void;
-}
-
-export interface Content {
-	readonly classList: Names;
-	readonly children: Iterable<Content>;
-	textContent: string;
-}

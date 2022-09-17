@@ -1,6 +1,5 @@
-import { content } from "../base/model.js";
+import { content, viewType } from "../base/model.js";
 import { DisplayType } from "./display/display.js";
-import { viewType } from "./display/view.js";
 import { section } from "./item.js";
 import { fromHtml } from "./transform/fromHtml.js";
 import { toHtml } from "./transform/toHtml.js";

@@ -1,11 +1,10 @@
-import {Content, content} from "../../base/model.js";
+import {Content, content, Type} from "../../base/model.js";
 import {bundle, EMPTY, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
-import { Actions, Control, Receiver } from "../../base/controller.js";
+import { Actions, Control, Owner, Receiver } from "../../base/controller.js";
 import { editor, ViewOwner, ViewType, ViewBox, viewer, modeller } from "./view.js";
-import { Type, TypeOwner } from "../../base/type.js";
 
 export interface DisplayConf {
 	class: typeof DisplayType;
@@ -25,12 +24,14 @@ class DisplayElement extends HTMLElement {
 	$content?: HTMLElement;
 }
 
-export class DisplayOwner extends TypeOwner<Element> implements ViewOwner, Receiver {
+export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver {
 	constructor(frame: Frame, conf: bundle<any>) {
 		/*
 		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
 		*/
-		super(conf);
+		super();
+		this.conf = conf;
+		this.actions = conf.actions;
 		this.frame = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
 		this.commands = new CommandBuffer()
@@ -39,6 +40,10 @@ export class DisplayOwner extends TypeOwner<Element> implements ViewOwner, Recei
 		this.modellers = conf.modellers;
 		this.editors = conf.editors || EMPTY.object;
 	}
+
+	conf: bundle<any>;
+	types: bundle<DisplayType>;
+	unknownType: DisplayType;
 
 	readonly frame: Frame;
 	readonly service: RemoteFileService;
@@ -167,17 +172,7 @@ export class DisplayType extends Control implements Type {
 }
 
 export class Display extends ViewBox {
-	viewContent(model: content): void {
-		this.content.textContent = "";
-		if (this.isContainer) {
-			this.createHeader(model);
-			this.createContent(model);
-			this.createFooter(model)
-		} else {
-			this.content.classList.add("content");
-		}
-		super.viewContent(model);
-	}
+	declare type: ViewType;
 
 	get isContainer(): boolean {
 		return this.type.conf.container;
@@ -207,6 +202,17 @@ export class Display extends ViewBox {
 		return footer as Content;
 	}
 
+	viewContent(model: content): void {
+		this.content.textContent = "";
+		if (this.isContainer) {
+			this.createHeader(model);
+			this.createContent(model);
+			this.createFooter(model)
+		} else {
+			this.content.classList.add("content");
+		}
+		super.viewContent(model);
+	}
 	protected createHeader(model?: content) {
 		let header = this.owner.createElement("header");
 		header.textContent = this.type.conf.title || "";

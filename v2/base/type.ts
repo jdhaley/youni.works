@@ -1,15 +1,20 @@
-import {Owner} from "./controller.js";
-import {bundle} from "./util.js";
+import { Type } from "./model.js";
+import { bundle } from "./util.js";
 
-export interface Type {
-	name: string;
+export function start(owner: TypeOwner) {
+	let base = loadBaseTypes(owner, owner.conf.baseTypes);
+	owner.types = loadTypes(owner.conf.viewTypes, base);
+	owner.unknownType = owner.types[owner.conf.unknownType];
+	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
+}
+
+type types = bundle<Type>;
+type source = bundle<string | source> | string;
+
+interface TypeOwner {
+	conf: bundle<any>;
 	types: bundle<Type>;
-	view: string;
-	model: string;
-	isProperty: boolean;
-	
-	generalizes(type: Type): boolean;
-	start(name: string, conf: bundle<any>): void;
+	unknownType: Type;
 }
 
 interface ViewConf {
@@ -18,28 +23,7 @@ interface ViewConf {
 	conf: bundle<any>;
 }
 
-type types = bundle<Type>;
-type source = bundle<string | source> | string;
-
-export abstract class TypeOwner<V> extends Owner<V> {
-	constructor(conf: bundle<any>) {
-		super();
-		this.conf = conf;
-		this.actions = conf.actions;
-	}
-	conf: bundle<any>;
-	types: bundle<Type>;
-	unknownType: Type;
-}
-
-export function start(owner: TypeOwner<unknown>) {
-	let base = loadBaseTypes(owner, owner.conf.baseTypes);
-	owner.types = loadTypes(owner.conf.viewTypes, base);
-	owner.unknownType = owner.types[owner.conf.unknownType];
-	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
-}
-
-function loadBaseTypes(owner: TypeOwner<unknown>, baseTypes: bundle<any>): bundle<Type> {
+function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];

@@ -1,7 +1,7 @@
 import {Response} from "../../base/message.js";
+import { Shape } from "../../base/model.js";
 import { start } from "../../base/type.js";
 import {extend} from "../../base/util.js";
-import { Shape } from "../display/box.js";
 import {Display, DisplayOwner, DisplayType} from "../display/display.js";
 
 import {UserEvent} from "../ui.js";
