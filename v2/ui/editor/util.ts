@@ -1,14 +1,14 @@
-import { Editable, EditableView, ViewOwner, ViewType } from "../../base/model";
+import { Editable, ViewOwner } from "../../base/model";
 
 
 export function getViewById(owner: ViewOwner, id: string) {
 	let view = owner.getElementById(id) as Editable;
 	if (!view) throw new Error("Can't find view element.");
-	if (view.getAttribute("data-item")) return view;
-	if (!view.$controller) {
-		console.warn("view.type$ missing... binding...");
+	//if (view.getAttribute("data-item")) return view;
+	if (!view.$control) {
+		console.warn("binding...");
 		bindView(view as any);
-		if (!view.$controller) throw new Error("unable to bind missing type$");
+		if (!view.$control) throw new Error("unable to bind missing control.");
 	} else {
 		view.$control.content; //checks the view isn't corrupted.
 	}
@@ -28,7 +28,6 @@ export function getContent(node: Node | Range): Element {
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
 	for (let ele = node as Editable; ele; ele = ele.parentElement) {
 		if (ele.classList.contains("content")) return ele;
-		if (ele.$controller && !ele.$control) console.error("no $control");
 		if (ele.$control?.isContainer) return ele.$control.content as Element;
 	}
 }
@@ -38,9 +37,7 @@ export function getChildView(content: Element, node: Node): Element {
 	while (node?.parentElement != content) {
 		node = node.parentElement;
 	}
-	//$controller is for list, "data-item" for markup items.
-	//TODO rationalize the test for an Item/View.
-	if (node instanceof Element && node["$controller"]) return node;
+	if (node instanceof Element && node["$control"]) return node;
 }
 
 export function getHeader(view: Element, node: Node) {
@@ -128,8 +125,8 @@ export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		let view = getEditableView(node);
-		if (view?.$controller.contentType == "record") {
-			if (getEditableView(view.parentElement)?.$controller.contentType == "list") {
+		if (view?.$control.type.contentType == "record") {
+			if (getEditableView(view.parentElement)?.$control.type.contentType == "list") {
 				if (enclosedInRange(view, range)) view.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
@@ -246,7 +243,7 @@ function navigateInto(ele: Element, isBack?: boolean) {
 	let view = getEditableView(ele);
 	if (!view) return;
 	let content = view.$control.content as Element;
-	switch (view.$controller.contentType) {
+	switch (view.$control.type.contentType) {
 		case "text":
 		case "line":
 		case "markup":
@@ -267,14 +264,13 @@ function navigateInto(ele: Element, isBack?: boolean) {
 	return content;
 }
 
-let LAST_ID = 0;
 export function bindView(view: Editable): void {
 	let control = view.$control;
 	if (!control) {
 		let name = view.getAttribute("data-item");
 		let parent = getEditableView(view.parentElement) as Editable;
 		if (name && parent) {
-			let type = (parent.$control.type.types[name] || parent.$control.type.owner.unknownType) as ViewType;
+			let type = parent.$control.type.types[name];
 			if (type) control = type.bind(view);
 		}
 	}

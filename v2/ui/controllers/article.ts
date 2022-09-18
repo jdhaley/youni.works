@@ -26,8 +26,8 @@ export default extend(null, {
 			console.log("Saved: ", signal);
 			return;
 		} else {
-			let controller = this.view["$controller"];
-			let model = controller?.toModel(this.view);
+			let control = this.view["$control"];
+			let model = control.type.toModel(this.view);
 			console.log("Save: ", model);
 			this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
 		}
@@ -40,12 +40,14 @@ function shapetest(this: DisplayOwner) {
 		prototype: new Display(shape),
 		actions: shape
 	});
-	let inst = type.create();
-	inst.content.classList.add("shape");
-	inst.position(0, 0);
-	inst.content.textContent = "HELLO THERE";
+	type.contentType = "text";
+	
+	let view = type.toView("HELLO THERE");
+	let control = view.$control;
+	control.content.classList.add("shape");
+	control.position(0, 0);
 
-	this.frame.view.append((inst as any)._node);
+	this.frame.view.append(view);
 }
 
 function getType(article: DisplayOwner, path: string, data: any): DisplayType {

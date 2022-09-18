@@ -180,7 +180,7 @@ export class ListReplace extends Replace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		let view = list.$controller.toView(content).$control;
+		let view = list.$control.type.toView(content).$control;
 		let views = view.content as Element;
 		while (views.firstChild) {
 			range.insertNode(views.firstChild);
@@ -223,7 +223,7 @@ export class MarkupReplace extends ListReplace {
 			the entire view so that the outer range is like a multi-item range.
 		*/
 		let view = getEditableView(range);
-		if (view.$controller.contentType == "line") {
+		if (view.$control.type.contentType == "line") {
 			range = range.cloneRange();
 			range.selectNode(view);
 			return range;
@@ -241,7 +241,7 @@ export class MarkupReplace extends ListReplace {
 		//Get the remainder of the line content.
 		r.setEnd(ctx, ctx.childNodes.length);
 		//Capture it,.
-		let model: Item = part.$controller.toModel(part, r) as any;
+		let model: Item = part.$control.type.toModel(part, r) as any;
 		//Clear the remainder of the line content.
 		r.deleteContents();
 		//Append any 'paste' content to the line.
@@ -253,7 +253,7 @@ export class MarkupReplace extends ListReplace {
 			model.level = 0;
 		}
 		//Create the end line and add it after the command line.
-		let end: Editable = part.$controller.toView(model as any);
+		let end: Editable = part.$control.type.toView(model as any);
 		part.parentElement.insertBefore(end, part.nextElementSibling);
 		//We can now set the new range now that we have the end line.
 		range.setEnd(end, 0);
@@ -270,7 +270,7 @@ export class MarkupReplace extends ListReplace {
 		let ctx = getContent(start);
 		r.setEnd(ctx, ctx.childNodes.length);
 		r.deleteContents();
-		let startItem: Item = start.$controller.toModel(start) as any;
+		let startItem: Item = start.$control.type.toModel(start) as any;
 		let items = content as Item[];
 		if (items[0]) {
 			startItem.content += items[0].content;
@@ -289,9 +289,9 @@ export class MarkupReplace extends ListReplace {
 		// kinda screwy. I think the best way forward is the add the check back in and make
 		// headings and paragraphs the same type.
 		
-		// let listType = getViewById(this.owner, this.viewId).$controller;
+		// let listType = getViewById(this.owner, this.viewId).$control.type;
 		// let type = listType.types[viewType(item)];
-		// if (type == view.$controller) {
+		// if (type == view.$control.type) {
 			if (!isStart) items.setItem(view, item.level, item.type$);
 			if (item.content) {
 				let node = 	view.ownerDocument.createTextNode(item.content);

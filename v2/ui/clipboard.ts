@@ -49,9 +49,7 @@ export function getView(node: Node | Range, context?: Element): Element {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
 		if (node instanceof Element && node.getAttribute("data-item")) {
-			if (!node["$controller"]) {
-				// if (!(context && context["$controller"])) throw new Error("Unbound view.");
-				// bindView(node, context);
+			if (!node["$control"]) {
 				console.warn("Unbound view.");
 			}
 			return node;

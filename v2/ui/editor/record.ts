@@ -21,7 +21,7 @@ class RecordEdit extends Replace {
 export default function edit(this: ViewType, commandName: string, range: Range, record: Record): Range {
 	if (record && typeof record[0] == "object") record = record[0] as Record;
 	let view = getEditableView(range);
-	if (view?.$controller.contentType != "record") {
+	if (view?.$control.type.contentType != "record") {
 		console.error("Invalid range for edit.");
 		return;
 	}
@@ -33,7 +33,7 @@ function mergeContent(cmd: Replace, range: Range, record: Record) {
 	let start = getChildView(ctx, range.startContainer);
 	let end = getChildView(ctx, range.endContainer);
 	for (let member = start || ctx.firstElementChild; member; member = member.nextElementSibling) {
-		let type: ViewType = member["$controller"];
+		let type: ViewType = member["$control"].type;
 		if (type.contentType == "text") {
 			let value = record[type["name"]];
 			if (value) {

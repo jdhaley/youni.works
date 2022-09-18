@@ -15,6 +15,7 @@ export class Box extends Control implements Shape {
 		this.actions = actions;
 	}
 	declare type: Type;
+	declare content: Content;
 	declare protected _node: HTMLElement;
 	
 	get isContainer(): boolean {
@@ -29,10 +30,6 @@ export class Box extends Control implements Shape {
 	get area(): Area {
 		return this._node.getBoundingClientRect();
 	}
-	get content(): Content {
-		return this._node as Content;
-	}
-
 	getStyle(name: string): string {
 		return this._node.style.getPropertyValue(name);
 	}

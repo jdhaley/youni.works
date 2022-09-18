@@ -34,10 +34,9 @@ export interface Shape extends View {
 export interface ViewType extends Type {
 	owner: ViewOwner;
 	types: bundle<ViewType>;
-	create(): View;
 	toModel(view: Element, range?: Range): content;
 	toView(model: content): Editable;
-	bind(view: Element): EditableView;
+	bind(element?: Element): EditableView;
 }
 
 /** View owner is the owner type for Editors. */
@@ -50,7 +49,6 @@ export interface ViewOwner  {
 }
 
 export interface Editable extends Element {
-	$controller?: ViewType;
 	$control?: EditableView;
 }
 

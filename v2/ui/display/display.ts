@@ -21,7 +21,6 @@ export interface DisplayConf {
 }
 
 class DisplayElement extends HTMLElement {
-	$controller?: DisplayType;
 	$control?: Display;
 }
 
@@ -71,7 +70,7 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 	}
 	getPartOf(view: Element): Element {
 		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
-			if (parent["$controller"]) return parent;
+			if (parent["$control"]) return parent;
 		}
 	}
 	getPartsOf(view: Element): Iterable<Element> {
@@ -106,25 +105,33 @@ export class DisplayType implements ViewType {
 	}
 
 	toView(model: content): DisplayElement {
-		let display = this.create();
+		let view = this.owner.createElement(this.conf.tagName || "div") as DisplayElement;
+		let display = this.bind(view);
 		display.viewContent(model);
-		return (display as any)._node;
+		return view;
 	}
 	toModel(view: Element, range?: Range, id?: true): content {
 		if (this.contentType) return this.owner.modellers[this.contentType].call(this, view, range, id);
 	}
-	create(element?: DisplayElement): Display {
-		let node = (element || this.owner.createElement(this.conf.tagName || "div")) as DisplayElement;
-		if (!node.id) node.id = "" + NEXT_ID++;
-		node.setAttribute("data-item", this.name);
-		return this.bind(node);
-	}
-	bind(view: DisplayElement): Display {
-		let display: Display = Object.create(this.prototype);
-		(display as any)._node = view;
-		view.$controller = this;
-		view.$control = display;
-		if (!view.id) view.id = "" + NEXT_ID++;
+	bind(element: DisplayElement): Display {
+		let display: Display = element.$control;
+		if (display) {
+			console.warn("Element is already bound to a control.");
+			return 
+		} else {
+			display = Object.create(this.prototype);
+			(display as any)._node = element;
+		}
+		element.$control = display;
+		element.setAttribute("data-item", this.name);
+		if (!element.id) element.id = "" + NEXT_ID++;
+
+		if (display.isContainer) {
+			bindContainer(element);
+		} else {
+			display.content = element;
+		}
+		//console.log(display);
 		return display;
 	}
 	start(name: string, conf: bundle<any>): void {
@@ -147,20 +154,9 @@ export class DisplayType implements ViewType {
 }
 
 export class Display extends Box {
-	// get view(): Content {
-	// 	return this._node;
-	// }
-	model(range?: Range): content {
-		if (this.type.contentType) return this.owner.modellers[this.type.contentType].call(this.type, this.content, range);
-	}
-	edit(commandName: string, range: Range, content?: content): Range {
-		let editor = this.owner.editors[this.type.contentType];
-		if (editor) return editor.call(this.type, commandName, range, content);
-	}
-
-	///////////////////////////////////////
-
 	declare type: DisplayType;
+	declare header: Content;
+	declare footer: Content;
 
 	get owner(): DisplayOwner {
 		return this.type.owner;
@@ -171,35 +167,44 @@ export class Display extends Box {
 	get shortcuts(): bundle<string> {
 		return this.type.conf.shortcuts;
 	}
-	get header(): Content {
-		let header: HTMLElement = this._node["$header"];
-		//Check that there is a header and the view isn't corrupted.
-		if (header && header != this._node.firstElementChild) review(this._node);
-		return header as Content;
-	}
-	get content(): Content {
-		let content: HTMLElement = this._node["$content"];
-		if (content) {
-			//Check that the node isn't corrupted.
-			if (content != this._node.firstElementChild?.nextElementSibling) review(this._node);
-			return content as Content;
-		}
-		return this._node as Content;
-	}
-	get footer(): Content {
-		let footer: HTMLElement = this._node["$footer"];
-		//Check that the node isn't corrupted.
-		if (footer && footer != this._node.lastElementChild) review(this._node);
-		return footer as Content;
-	}
+	// get header(): Content {
+	// 	let header: HTMLElement = this._node["$header"];
+	// 	//Check that there is a header and the view isn't corrupted.
+	// 	if (header && header != this._node.firstElementChild) review(this._node);
+	// 	return header as Content;
+	// }
+	// get content(): Content {
+	// 	let content: HTMLElement = this._node["$content"];
+	// 	if (content) {
+	// 		//Check that the node isn't corrupted.
+	// 		if (content != this._node.firstElementChild?.nextElementSibling) review(this._node);
+	// 		return content as Content;
+	// 	}
+	// 	return this._node as Content;
+	// }
+	// get footer(): Content {
+	// 	let footer: HTMLElement = this._node["$footer"];
+	// 	//Check that the node isn't corrupted.
+	// 	if (footer && footer != this._node.lastElementChild) review(this._node);
+	// 	return footer as Content;
+	// }
 
+	model(range?: Range): content {
+		if (this.type.contentType) return this.owner.modellers[this.type.contentType].call(this.type, this.content, range);
+	}
+	edit(commandName: string, range: Range, content?: content): Range {
+		let editor = this.owner.editors[this.type.contentType];
+		if (editor) return editor.call(this.type, commandName, range, content);
+	}
+	///////////////////////////////////////
 	viewContent(model: content): void {
-		this.content.textContent = "";
+		this._node.textContent = "";
 		if (this.isContainer) {
 			this.createHeader(model);
 			this.createContent(model);
 			this.createFooter(model)
 		} else {
+			(this as any).content = this._node;
 			this.content.classList.add("content");
 		}
 		this.owner.viewers[this.type.contentType].call(this.type, this.content, model);
@@ -208,26 +213,27 @@ export class Display extends Box {
 		let header = this.owner.createElement("header");
 		header.textContent = this.type.conf.title || "";
 		this._node.append(header);
-		this._node["$header"] = header;
+		this.header = header;
 	}
 	protected createContent(model?: content) {
 		let ele = this.owner.createElement("div");
 		ele.classList.add("content");
 		this._node.append(ele);
-		this._node["$content"] = ele;
+		this.content = ele;
 	}
 	protected createFooter(model?: content) {
 		if (this.type.contentType != "list") return;
 		let footer = this.owner.createElement("footer");
 		this._node.append(footer);
-		this._node["$footer"] = footer;
+		this.footer = footer;
 	}
 }
 
-function review(node: Element) {
-	console.warn("REPORT THIS WARNING: Rebuilding view.");
-	node.textContent = "";
-	if (node["$header"]) node.append(node["$header"]);
-	if (node["$content"]) node.append(node["$content"]);
-	if (node["$footer"]) node.append(node["$footer"]);
+function bindContainer(node: DisplayElement) {
+	let control = node.$control;
+	for (let child of node.children) {
+		if (child.nodeName == "header") control.header = child;
+		if (child.nodeName == "footer") control.footer = child;
+		if (child.classList.contains("content")) control.content = child;
+	}
 }

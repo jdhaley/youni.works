@@ -29,17 +29,17 @@ function noop() {
 
 function replace(this: ViewType, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
-	if (view.$controller.contentType == "line") {
+	if (view.$control.type.contentType == "line") {
 		view = getEditableView(view.parentElement);
 	}
-	if (view.$controller.contentType != "markup") console.warn("View is not markup:", view);
+	if (view.$control.type.contentType != "markup") console.warn("View is not markup:", view);
 
 	return new MarkupReplace(this.owner, commandName, view.id).exec(range, content);
 }
 
 function getThisView(editor: ViewType, node: Range | Node): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node && node["$controller"] != editor) {
+	while (node && node["$control"].type != editor) {
 		node = node.parentElement;
 	}
 	return node as Editable;
@@ -52,7 +52,7 @@ function level(this: ViewType, name: "Promote" | "Demote", range: Range): Range 
 	let end: Editable = getChildView(content, range.endContainer);
 	//If a range of items, check that there are no headings
 	if (start != end) for (let item = start; item; item = item.nextElementSibling) {
-		let role = item.$controller.name;
+		let role = item.$control.type.name;
 		if (role == "heading") {
 			console.warn("No range promote with headings");
 			return range;
