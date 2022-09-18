@@ -1,4 +1,4 @@
-import {Actions} from "../../base/controller.js";
+import {Actions} from "../../base/control.js";
 import {Frame, UserEvent} from "../ui.js";
 
 export default {

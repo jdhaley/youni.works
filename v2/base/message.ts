@@ -1,4 +1,4 @@
-import {Signal} from "./controller.js";
+import {Signal} from "./control.js";
 
 export class Message<T> implements Signal {
 	constructor(subject: string, from: any, to?: any, body?: T) {

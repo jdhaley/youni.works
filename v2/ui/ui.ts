@@ -1,4 +1,4 @@
-import {Signal, Actions, Control, Owner} from "../base/controller.js";
+import {Signal, Actions, Control, Owner} from "../base/control.js";
 
 export class Frame extends Owner<HTMLElement> {
 	constructor(window: Window, actions: Actions) {

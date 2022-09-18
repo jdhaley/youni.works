@@ -1,4 +1,4 @@
-import { Actions, Control } from "../../base/controller.js";
+import { Actions, Control } from "../../base/control.js";
 import { Area, Content, Edges, Shape, Type, Zone } from "../../base/model.js";
 
 

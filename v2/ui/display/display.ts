@@ -3,7 +3,7 @@ import {bundle, EMPTY, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
-import { Actions, Control, Owner, Receiver } from "../../base/controller.js";
+import { Actions, Owner, Receiver } from "../../base/control.js";
 import { Box } from "./box.js";
 
 export type viewer = (this: ViewType, view: unknown, model: content) => void;

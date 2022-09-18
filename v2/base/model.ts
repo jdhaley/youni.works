@@ -1,5 +1,5 @@
 import { CommandBuffer } from "./command";
-import { Receiver } from "./controller";
+import { Receiver } from "./control";
 import { bundle } from "./util";
 
 export type content = string | number | boolean | Date | List | Record;
