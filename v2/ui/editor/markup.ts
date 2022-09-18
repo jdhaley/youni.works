@@ -46,7 +46,7 @@ function getThisView(editor: ViewType, node: Range | Node): Editable {
 }
 function level(this: ViewType, name: "Promote" | "Demote", range: Range): Range {
 	let view = getThisView(this, range);
-	let content = this.getContentOf(view);
+	let content = view.$control.content as Element;
 	if (!content.firstElementChild) return;
 	let start: Editable = getChildView(content, range.startContainer);
 	let end: Editable = getChildView(content, range.endContainer);

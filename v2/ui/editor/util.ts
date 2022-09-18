@@ -1,4 +1,4 @@
-import { Editable, ViewOwner, ViewType } from "../../base/model";
+import { Editable, EditableView, ViewOwner, ViewType } from "../../base/model";
 
 
 export function getViewById(owner: ViewOwner, id: string) {
@@ -10,7 +10,7 @@ export function getViewById(owner: ViewOwner, id: string) {
 		bindView(view as any);
 		if (!view.$controller) throw new Error("unable to bind missing type$");
 	} else {
-		view.$controller.getContentOf(view); //checks the view isn't corrupted.
+		view.$control.content; //checks the view isn't corrupted.
 	}
 	return view;
 }
@@ -29,7 +29,7 @@ export function getContent(node: Node | Range): Element {
 	for (let ele = node as Editable; ele; ele = ele.parentElement) {
 		if (ele.classList.contains("content")) return ele;
 		if (ele.$controller && !ele.$control) console.error("no $control");
-		if (ele.$control?.isContainer) return ele.$controller.getContentOf(ele);
+		if (ele.$control?.isContainer) return ele.$control.content as Element;
 	}
 }
 
@@ -133,14 +133,14 @@ export function clearContent(range: Range) {
 				if (enclosedInRange(view, range)) view.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
-			if (view && node.parentElement == view.$controller.getContentOf(view)) {
+			if (view && node.parentElement == view.$control.content) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
 				} else if (node == range.endContainer) {
 					node.textContent = node.textContent.substring(range.endOffset);
 				} else {
 					node.textContent = "";
-				}	
+				}
 			}
 		}
 	}
@@ -245,7 +245,7 @@ export function navigate(ele: Element, isBack?: boolean) {
 function navigateInto(ele: Element, isBack?: boolean) {
 	let view = getEditableView(ele);
 	if (!view) return;
-	let content = view.$controller.getContentOf(view);
+	let content = view.$control.content as Element;
 	switch (view.$controller.contentType) {
 		case "text":
 		case "line":
@@ -269,20 +269,17 @@ function navigateInto(ele: Element, isBack?: boolean) {
 
 let LAST_ID = 0;
 export function bindView(view: Editable): void {
-	let type = view.$controller;
-	if (!type) {
+	let control = view.$control;
+	if (!control) {
 		let name = view.getAttribute("data-item");
 		let parent = getEditableView(view.parentElement) as Editable;
 		if (name && parent) {
-			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as ViewType;
-			type.bind(view);
+			let type = (parent.$control.type.types[name] || parent.$control.type.owner.unknownType) as ViewType;
+			if (type) control = type.bind(view);
 		}
-		if (!type) return;
 	}
-	if (!view.id) view.id = "" + --LAST_ID;
 
-	let content = type.getContentOf(view);
-	for (let child of content.children) {
+	if (control) for (let child of view.$control.content.children) {
 		bindView(child as Editable);
 	}
 }

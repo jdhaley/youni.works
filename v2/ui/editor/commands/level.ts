@@ -7,7 +7,7 @@ export class LevelCommand extends Edit {
 	endId: string;
 	exec(range: Range): Range {
 		let view = getViewById(this.owner, this.viewId);
-		let content = view.$controller.getContentOf(view);
+		let content = view.$control.content as Element;
 		this.startId = getChildView(content, range.startContainer).id;
 		this.endId = getChildView(content, range.endContainer).id;
 		this.do(this.name);

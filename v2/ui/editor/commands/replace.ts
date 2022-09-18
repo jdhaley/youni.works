@@ -35,7 +35,7 @@ export abstract class Replace extends Edit {
 		let view = getViewById(this.owner, this.viewId);
 		if (!view) throw new Error(`View "${this.viewId}" not found.`);
 		let range = view.ownerDocument.createRange();
-		range.selectNodeContents(view.$controller.getContentOf(view));
+		range.selectNodeContents(view.$control.content as Editable);
 		return range;
 	}
 }
@@ -180,7 +180,8 @@ export class ListReplace extends Replace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		let views = list.$controller.getContentOf(list.$controller.toView(content));
+		let view = list.$controller.toView(content).$control;
+		let views = view.content as Element;
 		while (views.firstChild) {
 			range.insertNode(views.firstChild);
 			range.collapse();

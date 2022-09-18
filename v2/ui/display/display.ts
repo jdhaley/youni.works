@@ -20,12 +20,9 @@ export interface DisplayConf {
 	shortcuts: bundle<string>;
 }
 
-let NEXT_ID = 1;
-
 class DisplayElement extends HTMLElement {
 	$controller?: DisplayType;
 	$control?: Display;
-	$content?: HTMLElement;
 }
 
 export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver {
@@ -89,6 +86,7 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 	}
 }
 
+let NEXT_ID = 1;
 export class DisplayType implements ViewType {
 	constructor(owner: DisplayOwner) {
 		this.owner = owner;
@@ -121,24 +119,13 @@ export class DisplayType implements ViewType {
 		node.setAttribute("data-item", this.name);
 		return this.bind(node);
 	}
-	bind(view: DisplayElement) {
+	bind(view: DisplayElement): Display {
 		let display: Display = Object.create(this.prototype);
 		(display as any)._node = view;
 		view.$controller = this;
 		view.$control = display;
+		if (!view.id) view.id = "" + NEXT_ID++;
 		return display;
-	}
-	getContentOf(view: DisplayElement): HTMLElement {
-		let content: HTMLElement = view;
-		if (this.conf.container) {
-			content = view.children[1] as HTMLElement;
-			if (!(content && content.classList.contains("content"))) {
-				review(view);
-				content = view.children[1] as HTMLElement;
-			}
-		}
-		if (!view.$content) view.$content = content;
-		return content;
 	}
 	start(name: string, conf: bundle<any>): void {
 		this.name = name;
