@@ -54,7 +54,7 @@ export class Frame extends Owner<HTMLElement> {
 		return this.#window.document.getElementById(id);
 	}
 	getControlOf(view: HTMLElement): Control {
-		return view["$controller"];
+		return view["$control"];
 	}
 	getPartOf(view: HTMLElement): HTMLElement {
 		return view.parentElement;

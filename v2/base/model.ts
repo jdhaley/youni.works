@@ -23,13 +23,14 @@ export interface View extends Receiver {
 export interface ViewType extends Type, Receiver {
 	owner: ViewOwner;
 	types: bundle<ViewType>;
+	create(): View;
 	toModel(view: Element, range?: Range): content;
 	toView(model: content): Element
 }
 
 /** View owner is the owner type for Editors. */
 export interface ViewOwner  {
-	getControlOf(value: Element): ViewType;
+	getControlOf(value: Element): View;
 	unknownType: Type;
 	commands: CommandBuffer<Range>;
 	getElementById(id: string): Element;

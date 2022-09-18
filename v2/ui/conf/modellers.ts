@@ -66,8 +66,8 @@ function listContent(this: ViewType, view: Element, range?: Range): List {
 	let model: content[];
 	let content = getContentElement(view, range);
 	if (content) for (let part of content.children) {
-		let type = this.owner.getControlOf(part);
-		let value = type?.toModel(part, range);
+		let view = this.owner.getControlOf(part);
+		let value = (view?.type as ViewType)?.toModel(part, range);
 		if (value) {
 			if (!model) {
 				model = [];

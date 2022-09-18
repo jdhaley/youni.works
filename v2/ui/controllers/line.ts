@@ -1,12 +1,12 @@
 import {extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
-import {Editor} from "../editor/editor.js";
+import {EditableView, Editor} from "../editor/editor.js";
 
 import text from "./text.js";
 import { getClipboard } from "../clipboard.js";
 
 export default extend(text, {
-	paste(this: Editor, event: UserEvent) {
+	paste(this: EditableView, event: UserEvent) {
 		let x = getClipboard(event.clipboardData);
 		if (x instanceof Array) return;
 		event.subject = "";
@@ -14,9 +14,9 @@ export default extend(text, {
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
 		range = this.edit("Paste", range, text);
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
-	erase(this: Editor, event: UserEvent) {
+	erase(this: EditableView, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) {
@@ -27,10 +27,10 @@ export default extend(text, {
 			}	
 		} else {
 			range = this.edit("Erase", range, "");
-			range && this.owner.setRange(range, true);	
+			range && this.type.owner.setRange(range, true);	
 		}
 	},
-	delete(this: Editor, event: UserEvent) {
+	delete(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) {
@@ -41,7 +41,7 @@ export default extend(text, {
 			}
 		} else {
 			range = this.edit("Delete", range, "");
-			range && this.owner.setRange(range, true);	
+			range && this.type.owner.setRange(range, true);	
 		}
 	},
 	next(this: Editor, event: UserEvent) {

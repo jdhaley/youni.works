@@ -1,5 +1,4 @@
-import { content, viewType } from "../base/model.js";
-import { DisplayType } from "./display/display.js";
+import { content, ViewType, viewType } from "../base/model.js";
 import { section } from "./item.js";
 import { fromHtml } from "./transform/fromHtml.js";
 import { toHtml } from "./transform/toHtml.js";
@@ -17,7 +16,7 @@ export function getClipboard(clipboard: DataTransfer): content {
 	return clipboard.getData("text/plain");
 }
 
-export function setClipboard(type: DisplayType, range: Range, clipboard: DataTransfer) {
+export function setClipboard(type: ViewType, range: Range, clipboard: DataTransfer) {
 	let node = range.commonAncestorContainer;
 	if (node.nodeType == Node.TEXT_NODE) {
 		let data = node.textContent.substring(range.startOffset, range.endOffset);

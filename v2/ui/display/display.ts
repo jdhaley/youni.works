@@ -80,8 +80,8 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 	getPartsOf(view: Element): Iterable<Element> {
 		return view.children as Iterable<Element>;
 	}
-	getControlOf(view: Element): ViewType {
-		let type = view["$controller"];
+	getControlOf(view: Element): Display {
+		let type = view["$control"];
 		if (!type) {
 			console.log(view);
 		}
@@ -89,7 +89,7 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 	}
 }
 
-export class DisplayType extends Control implements Type {
+export class DisplayType extends Control implements ViewType {
 	constructor(owner: DisplayOwner) {
 		super();
 		this.owner = owner;

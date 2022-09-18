@@ -1,10 +1,11 @@
 import {extend} from "../../base/util.js";
 
 import {EditEvent, UserEvent} from "../ui.js";
-import {Editor} from "../editor/editor.js";
+import {EditableView, Editor} from "../editor/editor.js";
 import {getEditableView, navigate} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";
+import { ViewType } from "../../base/model.js";
 
 let UNDONE = false;
 
@@ -22,27 +23,27 @@ export default extend(display, {
 		event.subject =  subject || event.inputType;
 		if (!subject) console.log(event.inputType);
 	},
-	cut(this: Editor, event: UserEvent) {
+	cut(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) {
 			return;
 		}
-		setClipboard(this as any, range.cloneRange(), event.clipboardData);
+		setClipboard(this.type as ViewType, range.cloneRange(), event.clipboardData);
 		range = this.edit("Cut", range);
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
-	paste(this: Editor, event: UserEvent) {
+	paste(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
-		let target = this;
+		let target = this.type;
 		if (range.collapsed && model instanceof Array) {
 			range = getInsertableRange(range);
 			if (range) target = getEditableView(range).$controller;
 		} 
 		range = target.edit("Paste", range, model);
-		range &&  this.owner.setRange(range, true);
+		range &&  this.type.owner.setRange(range, true);
 	},
 	delete(event: UserEvent) {
 		event.subject = "";
@@ -77,13 +78,13 @@ export default extend(display, {
 			document.execCommand("undo");
 		}
 	},
-	undo(this: Editor, event: UserEvent) {
+	undo(this: EditableView, event: UserEvent) {
 		event.subject = "";
-		this.owner.setRange(this.owner.commands.undo(), false);
+		this.type.owner.setRange(this.type.owner.commands.undo(), false);
 	},
-	redo(this: Editor, event: UserEvent) {
+	redo(this: EditableView, event: UserEvent) {
 		event.subject = "";
-		this.owner.setRange(this.owner.commands.redo(), false);
+		this.type.owner.setRange(this.type.owner.commands.redo(), false);
 	},
 	next(event: UserEvent) {
 		event.subject = "";

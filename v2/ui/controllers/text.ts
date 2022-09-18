@@ -1,36 +1,36 @@
 import {CHAR, extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
-import {Editor} from "../editor/editor.js";
+import {EditableView} from "../editor/editor.js";
 
 import editable from "./editable.js";
 import { setClipboard } from "../clipboard.js";
 
 export default extend(editable, {
-	cut(this: Editor, event: UserEvent) {
+	cut(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) return;
 		setClipboard(this as any, range.cloneRange(), event.clipboardData);
 		range = this.edit("Cut", range);
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
-	paste(this: Editor, event: UserEvent) {
+	paste(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let text = event.clipboardData.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
 		range = this.edit("Paste", range, text);
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
-	replaceText(this: Editor, event: EditEvent) {
+	replaceText(this: EditableView, event: EditEvent) {
 		event.subject = "";
 		let text = event.dataTransfer.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to replace.
 		let range = event.range;
 		range = this.edit("Replace", range, text);
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
-	insertText(this: Editor, event: EditEvent) {
+	insertText(this: EditableView, event: EditEvent) {
 		event.subject = "";
 		let char = event.data;
 		let range = event.range;
@@ -49,7 +49,7 @@ export default extend(editable, {
 			char = CHAR.NBSP;
 		}
 		range = this.edit("Entry", range, char);
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
 	deleteWordForward(event: EditEvent) {
 		let range = event.getTargetRanges()[0];
@@ -62,19 +62,19 @@ export default extend(editable, {
 	deleteWordBackward(event: EditEvent) {
 		event.subject = "deleteWordForward";
 	},
-	erase(this: Editor, event: UserEvent) {
+	erase(this: EditableView, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) return;
 		range = this.edit("Erase", range, "");
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
-	delete(this: Editor, event: UserEvent) {
+	delete(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;
 		range = this.edit("Delete", range, "");
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	}
 });
 

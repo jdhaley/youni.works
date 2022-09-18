@@ -1,11 +1,11 @@
 import {CHAR, extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
-import {Editor} from "../editor/editor.js";
+import {EditableView, Editor} from "../editor/editor.js";
 import {getContent, getFooter, getHeader, rangeIterator} from "../editor/util.js";
 import editable from "./editable.js";
 
 export default extend(editable, {
-	click(this: Editor, event: UserEvent) {
+	click(event: UserEvent) {
 		let view = event.on;
 		let header = getHeader(event.on, event.target as Node);
 		if (header) {
@@ -17,7 +17,7 @@ export default extend(editable, {
 			}
 		}
 	},
-	insertText(this: Editor, event: EditEvent) {
+	insertText(this: EditableView, event: EditEvent) {
 		if (getFooter(event.on, event.range.commonAncestorContainer)) {
 			event.subject = "";
 			let model = {

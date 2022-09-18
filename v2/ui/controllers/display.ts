@@ -1,24 +1,24 @@
 import { extend } from "../../base/util.js";
 
 import { UserEvent } from "../ui.js";
-import { DisplayType } from "../display/display.js";
+import { Display, DisplayType } from "../display/display.js";
 import { setClipboard } from "../clipboard.js";
 
 export default extend(null, {
-	keydown(this: DisplayType, event: UserEvent) {
+	keydown(this: Display, event: UserEvent) {
 		event.shortcut = getShortcut(event);
 		event.subject = this.shortcuts[event.shortcut] || "keydown";
 	},
-	save(this: DisplayType, event: UserEvent) {
+	save(this: Display, event: UserEvent) {
 		this.owner.receive(event);
 		event.subject = "";
 	},
-	copy(this: DisplayType, event: UserEvent) {
+	copy(this: Display, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		setClipboard(this, range.cloneRange(), event.clipboardData);
+		setClipboard(this.type, range.cloneRange(), event.clipboardData);
 	},
-	selectionchange(this: DisplayType, event: UserEvent) {
+	selectionchange(this: Display, event: UserEvent) {
 		PRIOR_VIEW?.classList.remove("active");
 		for (let ele = event.range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
 			if (ele.classList?.contains("content")) {

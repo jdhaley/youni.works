@@ -1,29 +1,29 @@
 import {extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
-import {Editor} from "../editor/editor.js";
+import {EditableView, Editor} from "../editor/editor.js";
 import {getContent, navigate} from "../editor/util.js";
 import list from "./list.js";
 import { getClipboard } from "../clipboard.js";
 import { content } from "../../base/model.js";
 
 export default extend(list, {
-	paste(this: Editor, event: UserEvent) {
+	paste(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
 		range = this.edit("Paste", range, model);
-		range &&  this.owner.setRange(range, true);
+		range &&  this.type.owner.setRange(range, true);
 	},
-	insertText(this: Editor, event: EditEvent) {
+	insertText(this: EditableView, event: EditEvent) {
 		event.subject = "";
 		let model = {
 			"type$": "para",
 			"content": event.data
 		};
 		let range = this.edit("Entry", event.range, [model]);
-		range &&  this.owner.setRange(range, true);
+		range &&  this.type.owner.setRange(range, true);
 	},
-	split(this: Editor, event: UserEvent) {
+	split(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model: content = "";
@@ -44,15 +44,15 @@ export default extend(list, {
 			range.selectNodeContents(range.startContainer);
 			range.collapse();
 		}
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
-	join(this: Editor, event: UserEvent) {
+	join(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		range = this.edit("Join", range, "");
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
-	next(this: Editor, event: UserEvent) {
+	next(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		if (event.altKey) {
 			nav(event);
@@ -60,7 +60,7 @@ export default extend(list, {
 			this.edit("Demote", event.range);
 		}
 	},
-	previous(this: Editor, event: UserEvent) {
+	previous(this: EditableView, event: UserEvent) {
 		event.subject = "";
 		if (event.altKey) {
 			nav(event, true);
