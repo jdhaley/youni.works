@@ -1,10 +1,4 @@
-export interface Item {
-	type$: string,
-	content?: string,
-	level?: number,
-	items?: Item[],
-	sections?: Item[]
-}
+import { Item } from "../base/model";
 
 export function section(items: Item[]): Item {
 	let sections = [];

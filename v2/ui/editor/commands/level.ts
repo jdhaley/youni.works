@@ -1,5 +1,5 @@
-import {Edit, getViewById} from "./edit.js";
-import { getChildView, items } from "../util.js";
+import {Edit} from "./edit.js";
+import { getChildView, getViewById, items } from "../util.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";

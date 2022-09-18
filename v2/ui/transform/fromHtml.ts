@@ -1,5 +1,5 @@
+import { Item } from "../../base/model";
 import { bundle } from "../../base/util";
-import { Item } from "../item";
 
 export function fromHtml(source: Node): Item[] {
 	let items = [];

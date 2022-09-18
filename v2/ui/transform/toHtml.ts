@@ -1,4 +1,4 @@
-import { Item } from "../item";
+import { Item } from "../../base/model";
 
 export function toHtml(item: Item) {
 	let doc = document.implementation.createHTMLDocument();

@@ -80,6 +80,14 @@ export interface Record {
 	[key: string]: content;
 }
 
+export interface Item {
+	type$: string,
+	content?: string,
+	level?: number,
+	items?: Item[],
+	sections?: Item[]
+}
+
 interface Properties {
 	getPropertyValue(name: string): string;
     setProperty(name: string, value: string): void;

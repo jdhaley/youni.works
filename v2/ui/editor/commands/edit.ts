@@ -16,16 +16,3 @@ export abstract class Edit extends Command<Range> {
 	timestamp: number;
 	viewId: string;
 }
-export function getViewById(owner: ViewOwner, id: string) {
-	let view = owner.getElementById(id) as Editable;
-	if (!view) throw new Error("Can't find view element.");
-	if (view.getAttribute("data-item")) return view;
-	if (!view.$controller) {
-		console.warn("view.type$ missing... binding...");
-		bindView(view as any);
-		if (!view.$controller) throw new Error("unable to bind missing type$");
-	} else {
-		view.$controller.getContentOf(view); //checks the view isn't corrupted.
-	}
-	return view;
-}
