@@ -37,10 +37,10 @@ export default extend(display, {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
-		let target = this.type;
+		let target = this;
 		if (range.collapsed && model instanceof Array) {
 			range = getInsertableRange(range);
-			if (range) target = getEditableView(range).$controller;
+			if (range) target = getEditableView(range).$control;
 		} 
 		range = target.edit("Paste", range, model);
 		range &&  this.type.owner.setRange(range, true);
@@ -111,7 +111,7 @@ function getInsertableRange(range: Range) {
 	range = range.cloneRange();
 	let view = getEditableView(range);
 	while (view) {
-		if (view?.$controller.model == "list") {
+		if (view?.$controller.contentType == "list") {
 			return range;
 		}
 		if (!atStart(view, range.startContainer, range.startOffset)) return;

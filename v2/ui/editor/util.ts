@@ -1,13 +1,11 @@
+import { View } from "../../base/model.js";
 import {Editable, Editor} from "./editor.js";
 
 export function getEditableView(node: Node | Range): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
 	for (let ele = node as Editable; ele; ele = ele.parentElement) {
-		if (ele.$controller?.model) {
-			ele.$controller.getContentOf(ele); //ensures view isn't corrupted.
-			return ele as any as Editable;
-		}
+		if (ele.$control?.type.contentType) return ele;
 	}
 }
 
@@ -116,8 +114,8 @@ export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		let view = getEditableView(node);
-		if (view?.$controller.model == "record") {
-			if (getEditableView(view.parentElement)?.$controller.model == "list") {
+		if (view?.$controller.contentType == "record") {
+			if (getEditableView(view.parentElement)?.$controller.contentType == "list") {
 				if (enclosedInRange(view, range)) view.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
@@ -234,7 +232,7 @@ function navigateInto(ele: Element, isBack?: boolean) {
 	let view = getEditableView(ele);
 	if (!view) return;
 	let content = view.$controller.getContentOf(view);
-	switch (view.$controller.model) {
+	switch (view.$controller.contentType) {
 		case "text":
 		case "line":
 		case "markup":

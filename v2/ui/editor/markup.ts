@@ -30,10 +30,10 @@ function noop() {
 
 function replace(this: Editor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
-	if (view.$controller.model == "line") {
+	if (view.$controller.contentType == "line") {
 		view = getEditableView(view.parentElement);
 	}
-	if (view.$controller.model != "markup") console.warn("View is not markup:", view);
+	if (view.$controller.contentType != "markup") console.warn("View is not markup:", view);
 
 	return new MarkupReplace(this.owner, commandName, view.id).exec(range, content);
 }

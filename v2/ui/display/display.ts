@@ -12,7 +12,7 @@ export type editor = (this: ViewType, commandName: string, range: Range, content
 
 export interface DisplayConf {
 	class: typeof DisplayType;
-	view: "text" | "record" | "list" | "markup" | "line";
+//	view: "text" | "record" | "list" | "markup" | "line";
 	model: "text" | "record" | "list" | "markup" | "line";
 	container: boolean;
 	tagName: string;
@@ -93,37 +93,27 @@ export class DisplayType implements ViewType {
 	constructor(owner: DisplayOwner) {
 		this.owner = owner;
 	}
-	name: string;
 	owner: DisplayOwner;
-	conf: bundle<any>;
+	name: string;
 	types: bundle<ViewType>
 
-	view: string;
-	model: string;
+	contentType: string;
 	isProperty: boolean;
+
+	conf: bundle<any>;
 	declare prototype: Display;
-	get shortcuts(): bundle<string> {
-		return this.conf.shortcuts;
-	}
 
 	generalizes(type: Type): boolean {
 		return type == this;
 	}
-	toModel(view: Element, range?: Range, id?: true): content {
-		if (this.model) return this.owner.modellers[this.model].call(this, view, range, id);
-	}
 
-	bind(view: DisplayElement) {
-		let display: Display = Object.create(this.prototype);
-		(display as any)._node = view;
-		view.$controller = this;
-		view.$control = display;
-		return display;
-	}
 	toView(model: content): DisplayElement {
 		let display = this.create();
 		display.viewContent(model);
 		return (display as any)._node;
+	}
+	toModel(view: Element, range?: Range, id?: true): content {
+		if (this.contentType) return this.owner.modellers[this.contentType].call(this, view, range, id);
 	}
 	create(element?: DisplayElement): Display {
 		let node = (element || this.owner.createElement(this.conf.tagName || "div")) as DisplayElement;
@@ -132,6 +122,13 @@ export class DisplayType implements ViewType {
 		if (this.isProperty) node.classList.add("field");
 		node.$controller = this;
 		return this.bind(node);
+	}
+	bind(view: DisplayElement) {
+		let display: Display = Object.create(this.prototype);
+		(display as any)._node = view;
+		view.$controller = this;
+		view.$control = display;
+		return display;
 	}
 	getContentOf(view: DisplayElement): HTMLElement {
 		let content: HTMLElement = view;
@@ -149,8 +146,7 @@ export class DisplayType implements ViewType {
 		this.name = name;
 		if (conf) {
 			this.conf = extend(this.conf || null, conf);
-			if (conf.view) this.view = conf.view;
-			if (conf.model) this.model = conf.model;	
+			if (conf.model) this.contentType = conf.model;	
 		}
 		
 		if (!this.prototype) {
@@ -163,10 +159,6 @@ export class DisplayType implements ViewType {
 		}
 		this.prototype.type = this;
 	}
-	edit(commandName: string, range: Range, content?: content): Range {
-		let editor = this.owner.editors[this.model];
-		if (editor) return editor.call(this, commandName, range, content);
-	}
 }
 
 export class Display extends Box {
@@ -174,10 +166,10 @@ export class Display extends Box {
 	// 	return this._node;
 	// }
 	model(range?: Range): content {
-		if (this.type.model) return this.owner.modellers[this.type.model].call(this.type, this.content, range);
+		if (this.type.contentType) return this.owner.modellers[this.type.contentType].call(this.type, this.content, range);
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
-		let editor = this.owner.editors[this.type.model];
+		let editor = this.owner.editors[this.type.contentType];
 		if (editor) return editor.call(this.type, commandName, range, content);
 	}
 
@@ -225,7 +217,7 @@ export class Display extends Box {
 		} else {
 			this.content.classList.add("content");
 		}
-		this.owner.viewers[this.type.view].call(this.type, this.content, model);
+		this.owner.viewers[this.type.contentType].call(this.type, this.content, model);
 	}
 	protected createHeader(model?: content) {
 		let header = this.owner.createElement("header");
@@ -240,7 +232,7 @@ export class Display extends Box {
 		this._node["$content"] = ele;
 	}
 	protected createFooter(model?: content) {
-		if (this.type.model != "list") return;
+		if (this.type.contentType != "list") return;
 		let footer = this.owner.createElement("footer");
 		this._node.append(footer);
 		this._node["$footer"] = footer;

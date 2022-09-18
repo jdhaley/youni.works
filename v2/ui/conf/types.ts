@@ -14,7 +14,6 @@ import {DisplayConf, DisplayType} from "../display/display.js";
 const conf: bundle<DisplayConf> = {
 	text: {
 		class: DisplayType,
-		view: "text",
 		model: "text",
 		container: true,
 		tagName: "ui-text",
@@ -23,7 +22,6 @@ const conf: bundle<DisplayConf> = {
 	},
 	record: {
 		class: DisplayType,
-		view: "record",
 		model: "record",
 		container: true,
 		tagName: "ui-record",
@@ -32,7 +30,6 @@ const conf: bundle<DisplayConf> = {
 	},
 	list: {
 		class: DisplayType,
-		view: "list",
 		model: "list",
 		container: true,
 		tagName: "ui-list",
@@ -42,7 +39,6 @@ const conf: bundle<DisplayConf> = {
 	markup: {
 		class: DisplayType,
 		container: true,
-		view: "markup",
 		model: "markup",
 		tagName: "ui-list",
 		actions: markup,
@@ -51,7 +47,6 @@ const conf: bundle<DisplayConf> = {
 	line: {
 		class: DisplayType,
 		container: false,
-		view: "line",
 		model: "line",
 		tagName: "p",
 		actions: line,

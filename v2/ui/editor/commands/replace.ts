@@ -223,7 +223,7 @@ export class MarkupReplace extends ListReplace {
 			the entire view so that the outer range is like a multi-item range.
 		*/
 		let view = getEditableView(range);
-		if (view.$controller.model == "line") {
+		if (view.$controller.contentType == "line") {
 			range = range.cloneRange();
 			range.selectNode(view);
 			return range;

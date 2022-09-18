@@ -37,15 +37,14 @@ export default extend(null, {
 function shapetest(this: DisplayOwner) {
 	let type = new DisplayType(this);
 	type.start("shape", {
-		prototype: new Display(shape)
+		prototype: new Display(shape),
+		actions: shape
 	});
 	let inst = type.create();
 	inst.content.classList.add("shape");
 	inst.position(0, 0);
 	inst.content.textContent = "HELLO THERE";
 
-	inst.actions = type.conf.actions;
-	(inst as any)._node.$controller = inst;
 	this.frame.view.append((inst as any)._node);
 }
 

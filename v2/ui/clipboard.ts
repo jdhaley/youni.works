@@ -24,10 +24,10 @@ export function setClipboard(type: ViewType, range: Range, clipboard: DataTransf
 		return;
 	}
 	let model = type.toModel(getView(range), range);
-	if (type.model == "record") model = [model];
+	if (type.contentType == "record") model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
 	console.log("clipboard:", model);
-	if (type.model as any == "markup") {
+	if (type.contentType as any == "markup") {
 		let item = section(model as any);
 		console.log(item);
 		let article = toHtml(item);

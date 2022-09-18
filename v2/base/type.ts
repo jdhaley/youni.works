@@ -84,7 +84,7 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 			member = Object.create(member);
 		}
 		member.name = name;
-		member.isProperty = type.model == "record" ? true : false;
+		member.isProperty = type.contentType == "record" ? true : false;
 		return member;
 	}
 }

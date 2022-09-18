@@ -7,8 +7,7 @@ export type content = string | number | boolean | Date | List | Record;
 export interface Type {
 	name: string;
 	types: bundle<Type>;
-	view: string;
-	model: string;
+	contentType: string;
 
 	isProperty: boolean;
 	start(name: string, conf: bundle<any>): void;
