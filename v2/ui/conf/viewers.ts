@@ -17,6 +17,7 @@ export default {
 			let type = this.types[name];
 			let value = model ? model[name] : null;
 			let member = type.toView(value);
+			member.classList.add("field");
 			view.append(member);
 			view["$at"][name] = member;
 		}

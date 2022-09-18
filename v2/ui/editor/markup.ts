@@ -1,6 +1,5 @@
-import { content } from "../../base/model.js";
+import { content, Editable, ViewType } from "../../base/model.js";
 
-import { Editable, Editor } from "./editor.js";
 import { LevelCommand } from "./commands/level.js";
 import { MarkupReplace } from "./commands/replace.js";
 import { getChildView, getEditableView } from "./util.js";
@@ -28,7 +27,7 @@ const COMMANDS = {
 function noop() {
 }
 
-function replace(this: Editor, commandName: string, range: Range, content?: content): Range {
+function replace(this: ViewType, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 	if (view.$controller.contentType == "line") {
 		view = getEditableView(view.parentElement);
@@ -38,14 +37,14 @@ function replace(this: Editor, commandName: string, range: Range, content?: cont
 	return new MarkupReplace(this.owner, commandName, view.id).exec(range, content);
 }
 
-function getThisView(editor: Editor, node: Range | Node): Editable {
+function getThisView(editor: ViewType, node: Range | Node): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node && node["$controller"] != editor) {
 		node = node.parentElement;
 	}
 	return node as Editable;
 }
-function level(this: Editor, name: "Promote" | "Demote", range: Range): Range {
+function level(this: ViewType, name: "Promote" | "Demote", range: Range): Range {
 	let view = getThisView(this, range);
 	let content = this.getContentOf(view);
 	if (!content.firstElementChild) return;

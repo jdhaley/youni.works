@@ -1,10 +1,9 @@
 import {extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
-import {EditableView, Editor} from "../editor/editor.js";
 import {getContent, navigate} from "../editor/util.js";
 import list from "./list.js";
 import { getClipboard } from "../clipboard.js";
-import { content } from "../../base/model.js";
+import { content, EditableView } from "../../base/model.js";
 
 export default extend(list, {
 	paste(this: EditableView, event: UserEvent) {

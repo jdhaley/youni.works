@@ -1,9 +1,9 @@
 import {extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
-import {EditableView, Editor} from "../editor/editor.js";
 
 import text from "./text.js";
 import { getClipboard } from "../clipboard.js";
+import { EditableView } from "../../base/model.js";
 
 export default extend(text, {
 	paste(this: EditableView, event: UserEvent) {
@@ -44,10 +44,10 @@ export default extend(text, {
 			range && this.type.owner.setRange(range, true);	
 		}
 	},
-	next(this: Editor, event: UserEvent) {
+	next() {
 		//propagate to the markup controller.
 	},
-	previous(this: Editor, event: UserEvent) {
+	previous() {
 		//propagate to the markup controller.
 	}
 });

@@ -36,9 +36,9 @@ function recordContent(contextType: ViewType, model: Record, view: Element, rang
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {
-		let type = child["$controller"] as ViewType;
-		if (type?.contentType) {
-			if (contextType.contentType == "record" && !(type.isProperty && contextType.types[type.name])) {
+		if (child.classList.contains("field")) {
+			let type = child["$control"]?.type as ViewType;
+			if (type && !contextType.types[type.name]) {
 				console.warn(`Found property "${type.name}" that is not part of the record type.`);
 			}
 			let value = type.toModel(child, range);

@@ -1,5 +1,4 @@
-import { View } from "../../base/model.js";
-import {Editable, Editor} from "./editor.js";
+import { Editable, ViewType } from "../../base/model";
 
 export function getEditableView(node: Node | Range): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
@@ -260,7 +259,7 @@ export function bindView(view: Editable): void {
 		let name = view.getAttribute("data-item");
 		let parent = getEditableView(view.parentElement) as Editable;
 		if (name && parent) {
-			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as Editor;
+			type = (parent.$controller.types[name] || parent.$controller.owner.unknownType) as ViewType;
 			type.bind(view);
 		}
 		if (!type) return;

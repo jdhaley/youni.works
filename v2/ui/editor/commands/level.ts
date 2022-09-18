@@ -1,4 +1,4 @@
-import {Edit, getViewById} from "../editor.js";
+import {Edit, getViewById} from "./edit.js";
 import { getChildView, items } from "../util.js";
 
 export class LevelCommand extends Edit {

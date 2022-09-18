@@ -117,10 +117,8 @@ export class DisplayType implements ViewType {
 	}
 	create(element?: DisplayElement): Display {
 		let node = (element || this.owner.createElement(this.conf.tagName || "div")) as DisplayElement;
-		node.id = "" + NEXT_ID++;
+		if (!node.id) node.id = "" + NEXT_ID++;
 		node.setAttribute("data-item", this.name);
-		if (this.isProperty) node.classList.add("field");
-		node.$controller = this;
 		return this.bind(node);
 	}
 	bind(view: DisplayElement) {

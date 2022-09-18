@@ -35,7 +35,7 @@ export default extend(null, {
 			if (tracking.type == "move") this.position(x, y);
 			return;
 		}
-		this.style.backgroundColor = "ghostwhite";
+		this.style.setProperty("background-color", "ghostwhite");
 		getNode(this).setAttribute("data-zone", this.zone(event.x, event.y));
 	},
     mouseout(this: Shape, event: UserEvent) {

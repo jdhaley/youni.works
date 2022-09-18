@@ -71,11 +71,12 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 	}
 	type.types = Object.create(supertype.types || null);
 	for (let name in conf.types) {
-		type.types[name] = getMember(name, conf.types[name]);
+		type.types[name] = getMember(type, name, conf.types[name]);
+
 	}
 	return type;
 
-	function getMember(name: string, part: source) {
+	function getMember(owner: Type, name: string, part: source) {
 		let member: Type;
 		if (typeof part == "object") {
 			member = createType("", part as any, types, source);
@@ -84,7 +85,7 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 			member = Object.create(member);
 		}
 		member.name = name;
-		member.isProperty = type.contentType == "record" ? true : false;
+		member.partOf = owner;
 		return member;
 	}
 }

@@ -1,6 +1,5 @@
-import {Record} from "../../base/model.js";
+import {Record, ViewType} from "../../base/model.js";
 
-import { Editor } from "./editor.js";
 import { Replace } from "./commands/replace.js";
 import {getContent, getEditableView, mark, unmark, clearContent, narrowRange, getChildView} from "./util.js";
 
@@ -19,7 +18,7 @@ class RecordEdit extends Replace {
 		return range;
 	}
 }
-export default function edit(this: Editor, commandName: string, range: Range, record: Record): Range {
+export default function edit(this: ViewType, commandName: string, range: Range, record: Record): Range {
 	if (record && typeof record[0] == "object") record = record[0] as Record;
 	let view = getEditableView(range);
 	if (view?.$controller.contentType != "record") {
@@ -34,7 +33,7 @@ function mergeContent(cmd: Replace, range: Range, record: Record) {
 	let start = getChildView(ctx, range.startContainer);
 	let end = getChildView(ctx, range.endContainer);
 	for (let member = start || ctx.firstElementChild; member; member = member.nextElementSibling) {
-		let type: Editor = member["$controller"];
+		let type: ViewType = member["$controller"];
 		if (type.contentType == "text") {
 			let value = record[type["name"]];
 			if (value) {

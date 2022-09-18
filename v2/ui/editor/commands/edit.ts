@@ -1,21 +1,6 @@
-import { Command } from "../../base/command.js";
-import { content, View, ViewOwner, ViewType } from "../../base/model.js";
-import { bindView } from "./util.js";
-
-
-export interface Editable extends Element {
-	$controller?: Editor;
-	$control?: EditableView;
-}
-export interface EditableView extends View {
-	type: Editor;
-	edit(commandName: string, range: Range, content?: content): Range;
-}
-export interface Editor extends ViewType {
-	bind(view: Editable): void;
-	getContentOf(node: Node): Element;
-	edit(commandName: string, range: Range, content?: content): Range;
-}
+import { Command } from "../../../base/command.js";
+import { Editable, ViewOwner } from "../../../base/model.js";
+import { bindView } from "../util.js";
 
 export abstract class Edit extends Command<Range> {
 	constructor(owner: ViewOwner, name: string, viewId: string) {

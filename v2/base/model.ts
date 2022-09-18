@@ -6,10 +6,10 @@ export type content = string | number | boolean | Date | List | Record;
 
 export interface Type {
 	name: string;
-	types: bundle<Type>;
 	contentType: string;
+	partOf?: Type;
+	types: bundle<Type>;
 
-	isProperty: boolean;
 	start(name: string, conf: bundle<any>): void;
 }
 
@@ -19,12 +19,24 @@ export interface View extends Receiver {
 	readonly isContainer: boolean;
 }
 
+export interface Shape extends View {
+	area: Area;
+	/** CSS named properties */
+	style: Properties;
+
+	size(width: number, height: number): void;
+	position(x: number, y: number): void;
+	zone(x: number, y: number): Zone;
+}
+
 export interface ViewType extends Type {
 	owner: ViewOwner;
 	types: bundle<ViewType>;
 	create(): View;
 	toModel(view: Element, range?: Range): content;
-	toView(model: content): Element
+	toView(model: content): Element;
+	bind(view: Element): void;
+	getContentOf(node: Node): Element;
 }
 
 /** View owner is the owner type for Editors. */
@@ -36,13 +48,14 @@ export interface ViewOwner  {
 	setRange(range: Range, collapse?: boolean): void;
 }
 
-export interface Shape extends View {
-	area: Area;
-	style: CSSStyleDeclaration;
 
-	size(width: number, height: number): void;
-	position(x: number, y: number): void;
-	zone(x: number, y: number): Zone;
+export interface Editable extends Element {
+	$controller?: ViewType;
+	$control?: EditableView;
+}
+export interface EditableView extends View {
+	type: ViewType;
+	edit(commandName: string, range: Range, content?: content): Range;
 }
 
 export interface Content {
@@ -65,6 +78,12 @@ export interface List extends Iterable<content> {
 export interface Record {
 	type$?: string;
 	[key: string]: content;
+}
+
+interface Properties {
+	getPropertyValue(name: string): string;
+    setProperty(name: string, value: string): void;
+    removeProperty(name: string): string;
 }
 
 export interface Area {

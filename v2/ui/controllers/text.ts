@@ -1,9 +1,9 @@
 import {CHAR, extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
-import {EditableView} from "../editor/editor.js";
 
 import editable from "./editable.js";
 import { setClipboard } from "../clipboard.js";
+import { EditableView } from "../../base/model.js";
 
 export default extend(editable, {
 	cut(this: EditableView, event: UserEvent) {

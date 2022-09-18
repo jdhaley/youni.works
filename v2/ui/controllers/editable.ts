@@ -1,11 +1,10 @@
 import {extend} from "../../base/util.js";
 
 import {EditEvent, UserEvent} from "../ui.js";
-import {EditableView, Editor} from "../editor/editor.js";
 import {getEditableView, navigate} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";
-import { ViewType } from "../../base/model.js";
+import { EditableView, ViewType } from "../../base/model.js";
 
 let UNDONE = false;
 
