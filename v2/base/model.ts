@@ -17,12 +17,14 @@ export interface View extends Receiver {
 	readonly type: Type;
 	readonly content: Content;
 	readonly isContainer: boolean;
+
+	getStyle(name: string): string;
+	/** Omitting the value removes the style. */
+	setStyle(name: string, value?: string): void;
 }
 
 export interface Shape extends View {
 	area: Area;
-	/** CSS named properties */
-	style: Properties;
 
 	size(width: number, height: number): void;
 	position(x: number, y: number): void;
@@ -87,12 +89,6 @@ export interface Item {
 	sections?: Item[]
 }
 
-interface Properties {
-	getPropertyValue(name: string): string;
-    setProperty(name: string, value: string): void;
-    removeProperty(name: string): string;
-}
-
 export interface Area {
 	x: number,
 	y: number,
@@ -100,14 +96,14 @@ export interface Area {
 	height: number
 }
 
-export type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
-
 export interface Edges {
 	top: number,
 	right: number,
 	bottom: number,
 	left: number
 }
+
+export type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
 
 export function viewType(value: any): string {
 	let type = typeOf(value);

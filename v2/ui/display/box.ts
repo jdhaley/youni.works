@@ -33,6 +33,17 @@ export class Box extends Control implements Shape {
 		return this._node as Content;
 	}
 
+	getStyle(name: string): string {
+		return this._node.style.getPropertyValue(name);
+	}
+	setStyle(name: string, value?: string): void {
+		if (value || value === "") {
+			this._node.style.setProperty(name, "" + value);
+		} else {
+			this._node.style.removeProperty(name);
+		}
+	}
+
 	position(x: number, y: number) {
 		let style = this._node.style;
 		style.position = "absolute";			

@@ -35,13 +35,13 @@ export default extend(null, {
 			if (tracking.type == "move") this.position(x, y);
 			return;
 		}
-		this.style.setProperty("background-color", "ghostwhite");
+		this.setStyle("background-color", "ghostwhite");
 		getNode(this).setAttribute("data-zone", this.zone(event.x, event.y));
 	},
     mouseout(this: Shape, event: UserEvent) {
 		event.subject = "";
 		if (event.track) return;
-		this.style.removeProperty("background-color");
+		this.setStyle("background-color");
 		getNode(this).removeAttribute("data-zone");
 	},
     // click(event: UserEvent) {
