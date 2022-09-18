@@ -1,3 +1,4 @@
+import { CommandBuffer } from "./command";
 import { Receiver } from "./controller";
 import { bundle } from "./util";
 
@@ -16,6 +17,23 @@ export interface Type {
 export interface View extends Receiver {
 	readonly type: Type;
 	readonly content: Content;
+	readonly isContainer: boolean;
+}
+
+export interface ViewType extends Type, Receiver {
+	owner: ViewOwner;
+	types: bundle<ViewType>;
+	toModel(view: Element, range?: Range): content;
+	toView(model: content): Element
+}
+
+/** View owner is the owner type for Editors. */
+export interface ViewOwner  {
+	getControlOf(value: Element): ViewType;
+	unknownType: Type;
+	commands: CommandBuffer<Range>;
+	getElementById(id: string): Element;
+	setRange(range: Range, collapse?: boolean): void;
 }
 
 export interface Shape extends View {

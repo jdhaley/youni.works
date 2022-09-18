@@ -1,6 +1,5 @@
-import { content, List, Record } from "../../base/model.js";
+import { content, List, Record, ViewType } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
-import { ViewType } from "../display/view.js";
 
 interface Item {
 	type$: string,

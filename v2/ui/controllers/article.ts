@@ -38,8 +38,7 @@ export default extend(null, {
 function shapetest(this: DisplayOwner) {
 	let type = new DisplayType(this);
 	type.start("shape", {
-		actions: shape,
-		prototype: new Display(this, null)
+		prototype: new Display(shape)
 	});
 	let inst = type.create();
 	inst.content.classList.add("shape");

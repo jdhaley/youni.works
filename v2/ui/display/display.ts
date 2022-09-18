@@ -1,10 +1,14 @@
-import {Content, content, Type} from "../../base/model.js";
+import {Content, content, Type, ViewOwner, ViewType} from "../../base/model.js";
 import {bundle, EMPTY, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
 import { Actions, Control, Owner, Receiver } from "../../base/controller.js";
-import { editor, ViewOwner, ViewType, ViewBox, viewer, modeller } from "./view.js";
+import { Box } from "./box.js";
+
+export type viewer = (this: ViewType, view: unknown, model: content) => void;
+export type modeller = (this: ViewType, view: unknown) => content;
+export type editor = (this: ViewType, commandName: string, range: Range, content?: content) => Range;
 
 export interface DisplayConf {
 	class: typeof DisplayType;
@@ -120,7 +124,7 @@ export class DisplayType extends Control implements Type {
 	toView(model: content): DisplayElement {
 		let display = this.create();
 		display.viewContent(model);
-		return display.view as HTMLElement;
+		return (display as any)._node;
 	}
 	create(element?: DisplayElement): Display {
 		let node = (element || this.owner.createElement(this.conf.tagName || "div")) as DisplayElement;
@@ -152,17 +156,14 @@ export class DisplayType extends Control implements Type {
 		}
 		
 		if (!this.prototype) {
-			this.prototype = new Display(this.owner, null);
+			this.prototype = new Display(this.conf.actions);
 		}
 		if (conf.proto) {
 			this.prototype = extend(this.prototype, conf.proto);
 		} else {
 			this.prototype = Object.create(this.prototype);
 		}
-		this.prototype.type = this as any as ViewType;
-		this.prototype.nodeName = this.conf.tagName;
-		//Need to alter the controller actions to accept the View and not the Type...
-		//this.prototype.actions = this.conf.actions;
+		this.prototype.type = this;
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
 		let editor = this.owner.editors[this.model];
@@ -170,9 +171,25 @@ export class DisplayType extends Control implements Type {
 	}
 }
 
-export class Display extends ViewBox {
-	declare type: ViewType;
+export class Display extends Box {
+	// get view(): Content {
+	// 	return this._node;
+	// }
+	model(range?: Range): content {
+		if (this.type.model) return this.owner.modellers[this.type.model].call(this.type, this.content, range);
+	}
+	edit(commandName: string, range: Range, content?: content): Range {
+		let editor = this.owner.editors[this.type.model];
+		if (editor) return editor.call(this.type, commandName, range, content);
+	}
 
+	///////////////////////////////////////
+
+	declare type: DisplayType;
+
+	get owner(): DisplayOwner {
+		return this.type.owner;
+	}
 	get isContainer(): boolean {
 		return this.type.conf.container;
 	}
@@ -210,7 +227,7 @@ export class Display extends ViewBox {
 		} else {
 			this.content.classList.add("content");
 		}
-		super.viewContent(model);
+		this.owner.viewers[this.type.view].call(this.type, this.content, model);
 	}
 	protected createHeader(model?: content) {
 		let header = this.owner.createElement("header");

@@ -1,7 +1,7 @@
-import {content} from "../../../base/model.js";
+import {content, ViewOwner} from "../../../base/model.js";
 import { Item } from "../../item.js";
 
-import {Article, Editable, getViewById, Edit, Editor} from "../editor.js";
+import {Editable, getViewById, Edit} from "../editor.js";
 import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items, bindView} from "../util.js";
 
 export abstract class Replace extends Edit {
@@ -58,7 +58,7 @@ export class TextReplace extends Replace {
 }
 
 export class ListReplace extends Replace {
-	constructor(owner: Article, name: string, viewId: string) {
+	constructor(owner: ViewOwner, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	startId: string;

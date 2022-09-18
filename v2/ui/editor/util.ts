@@ -11,13 +11,13 @@ export function getEditableView(node: Node | Range): Editable {
 	}
 }
 
-export function getContent(node: Node | Range): Editable {
+export function getContent(node: Node | Range): Element {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
 	for (let ele = node as Editable; ele; ele = ele.parentElement) {
 		if (ele.classList.contains("content")) return ele;
 		if (ele.$controller && !ele.$control) console.error("no $control");
-		if (ele.$control?.isContainer)return ele.$controller.getContentOf(ele);
+		if (ele.$control?.isContainer) return ele.$controller.getContentOf(ele);
 	}
 }
 

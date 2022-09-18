@@ -1,5 +1,4 @@
-import {List, Record, typeOf, viewType} from "../../base/model.js";
-import { ViewType } from "../display/view.js";
+import {List, Record, typeOf, ViewType, viewType} from "../../base/model.js";
 
 interface Item {
 	type$: string,

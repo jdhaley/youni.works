@@ -9,21 +9,17 @@ const DEFAULT_BORDER: Edges = {
 	left: 5
 }
 
-interface Owner {
-	createElement(tag: string): Element;
-}
-
 export class Box extends Control implements Shape {
-	constructor(owner: Owner, actions: Actions) {
+	constructor(actions: Actions) {
 		super();
-		this.owner = owner;
 		this.actions = actions;
 	}
-	readonly owner: Owner;
 	declare type: Type;
 	declare protected _node: HTMLElement;
-	declare nodeName: string;
 	
+	get isContainer(): boolean {
+		return false;
+	}
 	get border() {
 		return DEFAULT_BORDER;
 	}
