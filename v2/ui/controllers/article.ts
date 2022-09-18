@@ -44,7 +44,7 @@ function shapetest(this: DisplayOwner) {
 	inst.position(0, 0);
 	inst.content.textContent = "HELLO THERE";
 
-	inst.actions = type.actions;
+	inst.actions = type.conf.actions;
 	(inst as any)._node.$controller = inst;
 	this.frame.view.append((inst as any)._node);
 }

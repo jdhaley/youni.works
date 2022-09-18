@@ -89,9 +89,8 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 	}
 }
 
-export class DisplayType extends Control implements ViewType {
+export class DisplayType implements ViewType {
 	constructor(owner: DisplayOwner) {
-		super();
 		this.owner = owner;
 	}
 	name: string;
@@ -150,7 +149,6 @@ export class DisplayType extends Control implements ViewType {
 		this.name = name;
 		if (conf) {
 			this.conf = extend(this.conf || null, conf);
-			if (conf.actions) this.actions = conf.actions;
 			if (conf.view) this.view = conf.view;
 			if (conf.model) this.model = conf.model;	
 		}

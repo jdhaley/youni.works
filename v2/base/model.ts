@@ -20,7 +20,7 @@ export interface View extends Receiver {
 	readonly isContainer: boolean;
 }
 
-export interface ViewType extends Type, Receiver {
+export interface ViewType extends Type {
 	owner: ViewOwner;
 	types: bundle<ViewType>;
 	create(): View;
