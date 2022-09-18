@@ -25,7 +25,7 @@ export abstract class Replace extends Edit {
 			range.insertNode(node);
 			range.collapse();
 			if (node.nodeType == Node.ELEMENT_NODE) {
-				bindView(node as any);
+				bindView(node as Editable);
 			}
 		}
 		range = unmark(range);

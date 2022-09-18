@@ -39,7 +39,7 @@ function replace(this: ViewType, commandName: string, range: Range, content?: co
 
 function getThisView(editor: ViewType, node: Range | Node): Editable {
 	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node && node["$control"].type != editor) {
+	while (node && node["$control"]?.type != editor) {
 		node = node.parentElement;
 	}
 	return node as Editable;
