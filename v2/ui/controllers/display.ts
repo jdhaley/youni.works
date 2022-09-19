@@ -3,7 +3,8 @@ import { extend } from "../../base/util.js";
 import { UserEvent } from "../ui.js";
 import { Display, DisplayType } from "../display/display.js";
 import { setClipboard } from "../clipboard.js";
-import { Content, Editable } from "../../base/model.js";
+import { View } from "../../base/model.js";
+import { Editable } from "../../base/editor";
 
 export default extend(null, {
 	keydown(this: Display, event: UserEvent) {
@@ -32,7 +33,7 @@ export default extend(null, {
 	}
 });
 
-let PRIOR_VIEW: Content;
+let PRIOR_VIEW: View;
 
 function  getShortcut(event: UserEvent) {
     let mod = getModifiers(event);

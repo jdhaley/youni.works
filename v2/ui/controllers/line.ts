@@ -3,7 +3,7 @@ import {UserEvent} from "../ui.js";
 
 import text from "./text.js";
 import { getClipboard } from "../clipboard.js";
-import { EditableView } from "../../base/model.js";
+import { EditableView } from "../../base/editor";
 
 export default extend(text, {
 	paste(this: EditableView, event: UserEvent) {

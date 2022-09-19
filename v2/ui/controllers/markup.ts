@@ -3,7 +3,8 @@ import {EditEvent, UserEvent} from "../ui.js";
 import {getContent, navigate} from "../editor/util.js";
 import list from "./list.js";
 import { getClipboard } from "../clipboard.js";
-import { content, EditableView } from "../../base/model.js";
+import { content } from "../../base/model.js";
+import { EditableView } from "../../base/editor";
 
 export default extend(list, {
 	paste(this: EditableView, event: UserEvent) {

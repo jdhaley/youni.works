@@ -1,4 +1,5 @@
-import {Content, content, Type, ViewOwner, ViewType} from "../../base/model.js";
+import {View, content, Type} from "../../base/model.js";
+import { ViewOwner, ViewType } from "../../base/editor";
 import {bundle, EMPTY, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
@@ -155,8 +156,8 @@ export class DisplayType implements ViewType {
 
 export class Display extends Box {
 	declare type: DisplayType;
-	declare header: Content;
-	declare footer: Content;
+	declare header: View;
+	declare footer: View;
 
 	get owner(): DisplayOwner {
 		return this.type.owner;

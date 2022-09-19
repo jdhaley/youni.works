@@ -1,4 +1,5 @@
-import {Record, ViewType} from "../../base/model.js";
+import {Record} from "../../base/model.js";
+import { ViewType } from "../../base/editor";
 
 import { Replace } from "./commands/replace.js";
 import {getContent, getEditableView, mark, unmark, clearContent, narrowRange, getChildView} from "./util.js";

@@ -1,4 +1,5 @@
-import { content, Item, List, Record, ViewType } from "../../base/model.js";
+import { content, Item, List, Record } from "../../base/model.js";
+import { ViewType } from "../../base/editor";
 import { CHAR } from "../../base/util.js";
 
 export default {

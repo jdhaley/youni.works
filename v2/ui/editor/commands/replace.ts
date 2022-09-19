@@ -1,4 +1,5 @@
-import {content, Editable, Item, ViewOwner} from "../../../base/model.js";
+import {content, Item} from "../../../base/model.js";
+import { Editable, ViewOwner } from "../../../base/editor";
 
 import {Edit} from "./edit.js";
 import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items, bindView, getViewById} from "../util.js";

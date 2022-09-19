@@ -1,4 +1,5 @@
-import {content, ViewType} from "../../base/model.js";
+import {content} from "../../base/model.js";
+import { ViewType } from "../../base/editor";
 
 import { ListReplace } from "./commands/replace.js";
 import { getEditableView } from "./util.js";

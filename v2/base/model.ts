@@ -1,4 +1,3 @@
-import { CommandBuffer } from "./command";
 import { Receiver } from "./control";
 import { bundle } from "./util";
 
@@ -19,7 +18,6 @@ export interface Item {
 	level?: number,
 }
 
-
 export interface Type {
 	name: string;
 	contentType: string;
@@ -29,61 +27,33 @@ export interface Type {
 	start(name: string, conf: bundle<any>): void;
 }
 
-export interface View extends Receiver {
-	readonly type: Type;
-	readonly content: Content;
-	readonly isContainer: boolean;
-
-	getStyle(name: string): string;
-	/** Omitting the value removes the style. */
-	setStyle(name: string, value?: string): void;
-}
-
-export interface Shape extends View {
-	area: Area;
-
-	size(width: number, height: number): void;
-	position(x: number, y: number): void;
-	zone(x: number, y: number): Zone;
-}
-
-export interface ViewType extends Type {
-	owner: ViewOwner;
-	types: bundle<ViewType>;
-	toModel(view: Element, range?: Range): content;
-	toView(model: content): Editable;
-	bind(element?: Element): EditableView;
-}
-
-/** View owner is the owner type for Editors. */
-export interface ViewOwner  {
-	unknownType: Type;
-	commands: CommandBuffer<Range>;
-	getElementById(id: string): Element;
-	setRange(range: Range, collapse?: boolean): void;
-}
-
-export interface Editable extends Element {
-	$control?: EditableView;
-}
-
-export interface EditableView extends View {
-	type: ViewType;
-	edit(commandName: string, range: Range, content?: content): Range;
-}
-
-export interface Content {
-	readonly classList: Names;
-	readonly children: Iterable<Content>;
+export interface View {
+	readonly $control?: Viewer;
+	readonly classList: Bag<string>;
+	readonly children: Iterable<View>;
 	textContent: string;
 }
 
-interface Names extends Iterable<string> {
-	contains(name: string): boolean;
-	add(name: string): void;
-	remove(name: string): void;
+export interface Shape {
+	area: Area;
+	size(width: number, height: number): void;
+	position(x: number, y: number): void;
+	zone(x: number, y: number): Zone;
+	getStyle(name: string): string;
+	setStyle(name: string, value?: string): void; // Omitting the value removes the style.
 }
 
+export interface Viewer extends Receiver, Shape {
+	readonly type: Type;
+	readonly content: View;
+	readonly isContainer: boolean;
+}
+
+interface Bag<T> extends Iterable<T> {
+	contains(value: T): boolean;
+	add(value: T): void;
+	remove(value: T): void;
+}
 export interface Section extends Item {
 	items?: Section[],
 	sections?: Section[]

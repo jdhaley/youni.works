@@ -1,4 +1,4 @@
-import { Editable, ViewOwner } from "../../base/model";
+import { Editable, ViewOwner } from "../../base/editor";
 
 
 export function getViewById(owner: ViewOwner, id: string) {

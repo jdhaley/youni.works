@@ -1,5 +1,5 @@
 import { Actions, Control } from "../../base/control.js";
-import { Area, Content, Edges, Shape, Type, Zone } from "../../base/model.js";
+import { Area, View, Edges, Shape, Type, Zone } from "../../base/model.js";
 
 
 const DEFAULT_BORDER: Edges = {
@@ -15,7 +15,7 @@ export class Box extends Control implements Shape {
 		this.actions = actions;
 	}
 	declare type: Type;
-	declare content: Content;
+	declare content: View;
 	declare protected _node: HTMLElement;
 	
 	get isContainer(): boolean {

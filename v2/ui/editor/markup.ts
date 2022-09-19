@@ -1,4 +1,5 @@
-import { content, Editable, ViewType } from "../../base/model.js";
+import { content } from "../../base/model.js";
+import { Editable, ViewType } from "../../base/editor";
 
 import { LevelCommand } from "./commands/level.js";
 import { MarkupReplace } from "./commands/replace.js";

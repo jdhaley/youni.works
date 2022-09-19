@@ -1,4 +1,5 @@
-import { content, ViewType, viewType } from "../base/model.js";
+import { content, viewType } from "../base/model.js";
+import { ViewType } from "../base/editor";
 import { section } from "./transform/item.js";
 import { fromHtml } from "./transform/fromHtml.js";
 import { toHtml } from "./transform/toHtml.js";
