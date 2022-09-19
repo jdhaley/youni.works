@@ -3,6 +3,22 @@ import { Receiver } from "./control";
 import { bundle } from "./util";
 
 export type content = string | number | boolean | Date | List | Record;
+export interface List extends Iterable<content> {
+	type$?: string;
+	length?: number;
+}
+
+export interface Record {
+	type$?: string;
+	[key: string]: content;
+}
+
+export interface Item {
+	type$: string,
+	content?: content,
+	level?: number,
+}
+
 
 export interface Type {
 	name: string;
@@ -41,7 +57,6 @@ export interface ViewType extends Type {
 
 /** View owner is the owner type for Editors. */
 export interface ViewOwner  {
-	getControlOf(value: Element): View;
 	unknownType: Type;
 	commands: CommandBuffer<Range>;
 	getElementById(id: string): Element;
@@ -69,22 +84,9 @@ interface Names extends Iterable<string> {
 	remove(name: string): void;
 }
 
-export interface List extends Iterable<content> {
-	type$?: string;
-	length?: number;
-}
-
-export interface Record {
-	type$?: string;
-	[key: string]: content;
-}
-
-export interface Item {
-	type$: string,
-	content?: string,
-	level?: number,
-	items?: Item[],
-	sections?: Item[]
+export interface Section extends Item {
+	items?: Section[],
+	sections?: Section[]
 }
 
 export interface Area {

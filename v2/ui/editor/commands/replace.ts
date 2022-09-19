@@ -273,7 +273,7 @@ export class MarkupReplace extends ListReplace {
 		let startItem: Item = start.$control.type.toModel(start) as any;
 		let items = content as Item[];
 		if (items[0]) {
-			startItem.content += items[0].content;
+			startItem.content += "" + items[0].content;
 			items[0] = startItem;
 		} else {
 			items.push(startItem);
@@ -294,7 +294,7 @@ export class MarkupReplace extends ListReplace {
 		// if (type == view.$control.type) {
 			if (!isStart) items.setItem(view, item.level, item.type$);
 			if (item.content) {
-				let node = 	view.ownerDocument.createTextNode(item.content);
+				let node = 	view.ownerDocument.createTextNode("" + item.content);
 				range.insertNode(node);	
 			}
 			if (isStart) {

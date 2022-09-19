@@ -1,7 +1,7 @@
-import { Item } from "../../base/model";
+import { Section } from "../../base/model";
 import { bundle } from "../../base/util";
 
-export function fromHtml(source: Node): Item[] {
+export function fromHtml(source: Node): Section[] {
 	let items = [];
 	methods.transform(source, items);
 	let target = [];
@@ -10,21 +10,21 @@ export function fromHtml(source: Node): Item[] {
 	}
 	return target;
 }
-type transform = (source: Node, target: Item[], level?: number) => void;
+type transform = (source: Node, target: Section[], level?: number) => void;
 
 const methods: bundle<transform> = {
-	strip(source: Node, target: Item[], level?: number) {
+	strip(source: Node, target: Section[], level?: number) {
 	},
-	transform(source: Node, target: Item[], level?: number) {
+	transform(source: Node, target: Section[], level?: number) {
 		for (let node of source.childNodes) {
 			let fn = tags[node.nodeName] || tags.default;
 			fn(node, target, level || 0);
 		}
 	},
-	list(source: Node, target: Item[], level: number) {
+	list(source: Node, target: Section[], level: number) {
 		return methods.transform(source, target, (level || 0) + 1);
 	},
-	section(source: Node, target: Item[]) {
+	section(source: Node, target: Section[]) {
 		let item = {
 			type$: "heading",
 			level: Number.parseInt(source.nodeName.substring(1)),
@@ -32,7 +32,7 @@ const methods: bundle<transform> = {
 		}
 		target.push(item)
 	},
-	line(source: Node, target: Item[], level: number) {
+	line(source: Node, target: Section[], level: number) {
 		//HANDLE OFFICE
 		let className = (source as HTMLElement).className;
 		if (className.startsWith("MsoListParagraph")) {
@@ -64,7 +64,7 @@ const methods: bundle<transform> = {
 		target.push(item);
 		methods.transform(source, target, level);
 	},
-	text(source: Node, target: Item[]) {
+	text(source: Node, target: Section[]) {
 		//For some stupid reason google docs puts everything in a "b" tag (with an id)
 		if (source.nodeName == "B" && (source as Element).id) {
 			return methods.transform(source, target);
@@ -80,7 +80,7 @@ const methods: bundle<transform> = {
 		let item = target.at(-1);
 		append(item, text);
 	},
-	link(source: Element, target: Item[], level: number) {
+	link(source: Element, target: Section[], level: number) {
 		let text = source.innerHTML;
 		text = `<a href="${source.getAttribute("href")}">${source.innerHTML}</a>`
 		let item = target.at(-1);
@@ -88,13 +88,14 @@ const methods: bundle<transform> = {
 	}
 };
 
-function append(item: Item, text: string) {
+function append(item: Section, text: string) {
 	if (item) {
-		if (!item.content) item.content = "";
+		let content = "" + item.content || "";
 		let ch = text.at(0);
 		let needSpace = ch.toLowerCase() != ch.toUpperCase() || ch == "<";
-		if (needSpace && !item.content.endsWith(" ")) text = " " + text;
-		item.content += text;   
+		if (needSpace && !content.endsWith(" ")) text = " " + text;
+		content += text;
+		item.content = content;
 	}
 }
 function transformText(source: Node) {

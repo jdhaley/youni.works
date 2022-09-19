@@ -1,12 +1,5 @@
-import { content, List, Record, ViewType } from "../../base/model.js";
+import { content, Item, List, Record, ViewType } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
-
-interface Item {
-	type$: string,
-	content: string,
-	id?: string,
-	level?: number
-}
 
 export default {
 	record(this: ViewType, view: Element, range?: Range): Record {
@@ -66,7 +59,7 @@ function listContent(this: ViewType, view: Element, range?: Range): List {
 	let model: content[];
 	let content = getContentElement(view, range);
 	if (content) for (let part of content.children) {
-		let view = this.owner.getControlOf(part);
+		let view = part["$control"];
 		let value = (view?.type as ViewType)?.toModel(part, range);
 		if (value) {
 			if (!model) {

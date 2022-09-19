@@ -1,6 +1,6 @@
-import { Item } from "../../base/model";
+import { Section } from "../../base/model";
 
-export function section(items: Item[]): Item {
+export function section(items: Section[]): Section {
 	let sections = [];
 	if (items[0].type$ != "heading") {
 		sections.push({
@@ -19,7 +19,7 @@ export function section(items: Item[]): Item {
 			sections.at(-1).items.push(current);
 		}
 	}
-	let root: Item = {
+	let root: Section = {
 		type$: "article",
 		sections: []
 	}
@@ -28,7 +28,7 @@ export function section(items: Item[]): Item {
 	return root;
 }
 
-function groupSections(section: Item, sections: Item[], start: number): number {
+function groupSections(section: Section, sections: Section[], start: number): number {
 	let items = section.items;
 	section.items = [];
 	groupItems(section, items, 0);
@@ -42,7 +42,7 @@ function groupSections(section: Item, sections: Item[], start: number): number {
 		}
 	}
 }
-function groupItems(item: Item, items: Item[], start: number): number {
+function groupItems(item: Section, items: Section[], start: number): number {
 	if (!items) return start;
 	if (!item.items) item.items = [];
 	while (start < items.length) {
