@@ -11,6 +11,10 @@ export function start(owner: TypeOwner) {
 type types = bundle<Type>;
 type source = bundle<string | source> | string;
 
+interface ConfigurableType extends Type {
+	start(name: string, conf: bundle<any>): void;
+}
+
 interface TypeOwner {
 	conf: bundle<any>;
 	types: bundle<Type>;
@@ -27,7 +31,7 @@ function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
-		let type: Type = new conf.class(owner) as any;
+		let type = new conf.class(owner) as ConfigurableType;
 		types[name] = type;
 		type.start(name, conf);
 	}
@@ -62,7 +66,7 @@ function getType(name: string, types: types, source: source): Type {
 
 function createType(name: string, conf: ViewConf, types: types, source: source) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
-	let type = Object.create(supertype) as Type;
+	let type = Object.create(supertype) as ConfigurableType;
 	type.start(name, conf)
 
 	if (name) {

@@ -1,5 +1,5 @@
-import {content, Item} from "../../../base/model.js";
-import { Editable, ViewOwner } from "../../../base/editor";
+import {content, Content} from "../../../base/model.js";
+import { EditableView, ViewOwner } from "../../../base/editor";
 
 import {Edit} from "./edit.js";
 import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items, bindView, getViewById} from "../util.js";
@@ -26,7 +26,7 @@ export abstract class Replace extends Edit {
 			range.insertNode(node);
 			range.collapse();
 			if (node.nodeType == Node.ELEMENT_NODE) {
-				bindView(node as Editable);
+				bindView(node as EditableView);
 			}
 		}
 		range = unmark(range);
@@ -36,7 +36,7 @@ export abstract class Replace extends Edit {
 		let view = getViewById(this.owner, this.viewId);
 		if (!view) throw new Error(`View "${this.viewId}" not found.`);
 		let range = view.ownerDocument.createRange();
-		range.selectNodeContents(view.$control.content as Editable);
+		range.selectNodeContents(view.$control.content as EditableView);
 		return range;
 	}
 }
@@ -127,8 +127,8 @@ export class ListReplace extends Replace {
 	protected execReplace(range: Range, content: content): Range {
 		let list = getViewById(this.owner, this.viewId);
 		let ctx = getContent(list);
-		let start = getChildView(ctx, range.startContainer) as Editable;
-		let end = getChildView(ctx, range.endContainer) as Editable;
+		let start = getChildView(ctx, range.startContainer) as EditableView;
+		let end = getChildView(ctx, range.endContainer) as EditableView;
 		if (start && start == end) {
 			this.onSingleContainer(range, content, start);
 		} else {
@@ -147,7 +147,7 @@ export class ListReplace extends Replace {
 		}
 		return unmark(range);
 	}
-	protected onStartContainer(range: Range, content: content, start: Editable): void {
+	protected onStartContainer(range: Range, content: content, start: EditableView): void {
 		let r = range.cloneRange();
 		let ctx = getContent(start);
 		r.setEnd(ctx, ctx.childNodes.length);
@@ -155,7 +155,7 @@ export class ListReplace extends Replace {
 		this.merge(start, r, content, true);
 		range.setStartAfter(start);
 	}
-	protected onEndContainer(range: Range, content: content, end: Editable): void {
+	protected onEndContainer(range: Range, content: content, end: EditableView): void {
 		let r = range.cloneRange();
 		let ctx = getContent(end);
 		r.setStart(ctx, 0);
@@ -163,10 +163,10 @@ export class ListReplace extends Replace {
 		this.merge(end, r, content, false);
 		range.setEndBefore(end);
 	}
-	protected merge(view: Editable, range: Range, content: any, isStart: boolean) {
+	protected merge(view: EditableView, range: Range, content: any, isStart: boolean) {
 		//overridden for markup
 	}
-	protected onSingleContainer(range: Range, content: content, container: Editable): void {
+	protected onSingleContainer(range: Range, content: content, container: EditableView): void {
 		//overridden for markup
 	}
 	//22-09-07 Same method for list & markup.
@@ -200,14 +200,14 @@ export class ListReplace extends Replace {
  */
 function captureRange(cmd: ListReplace, ctx: Element, start: number, end: number) {
 	for (let i = start; i; i--) {
-		let node = ctx.childNodes[i - 1] as Editable;
+		let node = ctx.childNodes[i - 1] as EditableView;
 		if (node.getAttribute("data-item")) {
 			cmd.startId = node.id;
 			break;
 		}
 	}
 	for (let i = end; i < ctx.childNodes.length; i++) {
-		let node = ctx.childNodes[i] as Editable;
+		let node = ctx.childNodes[i] as EditableView;
 		if (node.getAttribute("data-item")) {
 			cmd.endId = node.id;
 			break;
@@ -231,7 +231,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		return super.getOuterRange(range);
 	}
-	protected onSingleContainer(range: Range, content: content, part: Editable): void {
+	protected onSingleContainer(range: Range, content: content, part: EditableView): void {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
@@ -242,7 +242,7 @@ export class MarkupReplace extends ListReplace {
 		//Get the remainder of the line content.
 		r.setEnd(ctx, ctx.childNodes.length);
 		//Capture it,.
-		let model: Item = part.$control.type.toModel(part, r) as any;
+		let model: Content = part.$control.type.toModel(part, r) as any;
 		//Clear the remainder of the line content.
 		r.deleteContents();
 		//Append any 'paste' content to the line.
@@ -254,7 +254,7 @@ export class MarkupReplace extends ListReplace {
 			model.level = 0;
 		}
 		//Create the end line and add it after the command line.
-		let end: Editable = part.$control.type.toView(model as any);
+		let end: EditableView = part.$control.type.toView(model as any);
 		part.parentElement.insertBefore(end, part.nextElementSibling);
 		//We can now set the new range now that we have the end line.
 		range.setEnd(end, 0);
@@ -266,13 +266,13 @@ export class MarkupReplace extends ListReplace {
 		if (!(this.name == "Split")) this.merge(end, r, content, false);
 		//note: onInsert() handles the remainder of the 'paste' content.
 	}
-	protected onStartContainer(range: Range, content: content, start: Editable): void {
+	protected onStartContainer(range: Range, content: content, start: EditableView): void {
 		let r = range.cloneRange();
 		let ctx = getContent(start);
 		r.setEnd(ctx, ctx.childNodes.length);
 		r.deleteContents();
-		let startItem: Item = start.$control.type.toModel(start) as any;
-		let items = content as Item[];
+		let startItem: Content = start.$control.type.toModel(start) as any;
+		let items = content as Content[];
 		if (items[0]) {
 			startItem.content += "" + items[0].content;
 			items[0] = startItem;
@@ -281,8 +281,8 @@ export class MarkupReplace extends ListReplace {
 		}
 		range.setStartBefore(start);
 	}
-	protected merge(view: Editable, range: Range, content: any, isStart: boolean) {
-		let item: Item = content?.length && content[isStart ? 0 : content.length - 1];
+	protected merge(view: EditableView, range: Range, content: any, isStart: boolean) {
+		let item: Content = content?.length && content[isStart ? 0 : content.length - 1];
 		if (!item) return;
 
 		// 2022-09-15 COMMENTED OUT to handle joining Headings to Paragraphs, etc.

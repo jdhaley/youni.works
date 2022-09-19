@@ -2,7 +2,7 @@ import {extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
 import {getContent, getFooter, getHeader, rangeIterator} from "../editor/util.js";
 import editable from "./editable.js";
-import { EditableView } from "../../base/editor";
+import { Editor } from "../../base/editor";
 
 export default extend(editable, {
 	click(event: UserEvent) {
@@ -17,7 +17,7 @@ export default extend(editable, {
 			}
 		}
 	},
-	insertText(this: EditableView, event: EditEvent) {
+	insertText(this: Editor, event: EditEvent) {
 		if (getFooter(event.on, event.range.commonAncestorContainer)) {
 			event.subject = "";
 			let model = {

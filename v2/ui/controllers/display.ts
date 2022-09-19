@@ -1,10 +1,9 @@
+import { View } from "../../base/model.js";
 import { extend } from "../../base/util.js";
 
 import { UserEvent } from "../ui.js";
-import { Display, DisplayType } from "../display/display.js";
+import { Display } from "../display/display.js";
 import { setClipboard } from "../clipboard.js";
-import { View } from "../../base/model.js";
-import { Editable } from "../../base/editor";
 
 export default extend(null, {
 	keydown(this: Display, event: UserEvent) {
@@ -22,8 +21,8 @@ export default extend(null, {
 	},
 	selectionchange(this: Display, event: UserEvent) {
 		PRIOR_VIEW?.classList.remove("active");
-		for (let ele: Editable = event.range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
-			let content = ele.$control?.content;
+		for (let ele = event.range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
+			let content = (ele as View).$control?.content;
 			if (content) {
 				content.classList.add("active");
 				PRIOR_VIEW = content;

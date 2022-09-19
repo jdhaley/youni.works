@@ -3,10 +3,10 @@ import {UserEvent} from "../ui.js";
 
 import text from "./text.js";
 import { getClipboard } from "../clipboard.js";
-import { EditableView } from "../../base/editor";
+import { Editor } from "../../base/editor";
 
 export default extend(text, {
-	paste(this: EditableView, event: UserEvent) {
+	paste(this: Editor, event: UserEvent) {
 		let x = getClipboard(event.clipboardData);
 		if (x instanceof Array) return;
 		event.subject = "";
@@ -16,7 +16,7 @@ export default extend(text, {
 		range = this.edit("Paste", range, text);
 		range && this.type.owner.setRange(range, true);
 	},
-	erase(this: EditableView, event: UserEvent) {
+	erase(this: Editor, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) {
@@ -30,7 +30,7 @@ export default extend(text, {
 			range && this.type.owner.setRange(range, true);	
 		}
 	},
-	delete(this: EditableView, event: UserEvent) {
+	delete(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) {

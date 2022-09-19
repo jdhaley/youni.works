@@ -10,6 +10,12 @@ export interface bundle<T> {
 	[key: string]: T
 }
 
+export interface Bag<T> extends Iterable<T> {
+	contains(value: T): boolean;
+	add(value: T): void;
+	remove(value: T): void;
+}
+
 export const EMPTY = Object.freeze({
 	object: Object.freeze(Object.create(null)),
 	array: Object.freeze([]) as any[],

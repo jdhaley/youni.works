@@ -4,7 +4,7 @@ import {EditEvent, UserEvent} from "../ui.js";
 import {getEditableView, navigate} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";
-import { EditableView, ViewType } from "../../base/editor";
+import { Editor, ViewType } from "../../base/editor";
 
 let UNDONE = false;
 
@@ -22,7 +22,7 @@ export default extend(display, {
 		event.subject =  subject || event.inputType;
 		if (!subject) console.log(event.inputType);
 	},
-	cut(this: EditableView, event: UserEvent) {
+	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) {
@@ -32,7 +32,7 @@ export default extend(display, {
 		range = this.edit("Cut", range);
 		range && this.type.owner.setRange(range, true);
 	},
-	paste(this: EditableView, event: UserEvent) {
+	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
@@ -81,11 +81,11 @@ export default extend(display, {
 			document.execCommand("undo");
 		}
 	},
-	undo(this: EditableView, event: UserEvent) {
+	undo(this: Editor, event: UserEvent) {
 		event.subject = "";
 		this.type.owner.setRange(this.type.owner.commands.undo(), false);
 	},
-	redo(this: EditableView, event: UserEvent) {
+	redo(this: Editor, event: UserEvent) {
 		event.subject = "";
 		this.type.owner.setRange(this.type.owner.commands.redo(), false);
 	},

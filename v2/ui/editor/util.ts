@@ -1,8 +1,8 @@
-import { Editable, ViewOwner } from "../../base/editor";
+import { EditableView, ViewOwner } from "../../base/editor";
 
 
 export function getViewById(owner: ViewOwner, id: string) {
-	let view = owner.getElementById(id) as Editable;
+	let view = owner.view.ownerDocument.getElementById(id) as EditableView;
 	if (!view) throw new Error("Can't find view element.");
 	//if (view.getAttribute("data-item")) return view;
 	if (!view.$control) {
@@ -15,10 +15,10 @@ export function getViewById(owner: ViewOwner, id: string) {
 	return view;
 }
 
-export function getEditableView(node: Node | Range): Editable {
+export function getEditableView(node: Node | Range): EditableView {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
-	for (let ele = node as Editable; ele; ele = ele.parentElement) {
+	for (let ele = node as EditableView; ele; ele = ele.parentElement) {
 		if (ele.$control?.type.contentType) return ele;
 	}
 }
@@ -26,9 +26,8 @@ export function getEditableView(node: Node | Range): Editable {
 export function getContent(node: Node | Range): Element {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
-	for (let ele = node as Editable; ele; ele = ele.parentElement) {
-		if (ele.classList.contains("content")) return ele;
-		if (ele.$control?.isContainer) return ele.$control.content as Element;
+	for (let ele = node as EditableView; ele; ele = ele.parentElement) {
+		if (ele.$control?.content) return ele.$control.content as Element;
 	}
 }
 
@@ -264,11 +263,11 @@ function navigateInto(ele: Element, isBack?: boolean) {
 	return content;
 }
 
-export function bindView(view: Editable): void {
+export function bindView(view: EditableView): void {
 	let control = view.$control;
 	if (!control) {
 		let name = view.getAttribute("data-item");
-		let parent = getEditableView(view.parentElement) as Editable;
+		let parent = getEditableView(view.parentElement) as EditableView;
 		if (name && parent) {
 			let type = parent.$control.type.types[name];
 			if (type) control = type.bind(view);
@@ -276,6 +275,6 @@ export function bindView(view: Editable): void {
 	}
 
 	if (control) for (let child of view.$control.content.children) {
-		bindView(child as Editable);
+		bindView(child as EditableView);
 	}
 }

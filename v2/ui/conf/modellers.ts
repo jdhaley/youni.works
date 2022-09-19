@@ -1,4 +1,4 @@
-import { content, Item, List, Record } from "../../base/model.js";
+import { content, Content, List, Record } from "../../base/model.js";
 import { ViewType } from "../../base/editor";
 import { CHAR } from "../../base/util.js";
 
@@ -13,10 +13,10 @@ export default {
 	list: listContent,
 	markup: listContent,
 	text: textContent,
-	line(this: ViewType, view: Element, range?: Range): Item {
+	line(this: ViewType, view: Element, range?: Range): Content {
 		if (range && !range.intersectsNode(view)) return;
 		let content = textContent.call(this, view, range);
-		let item: Item = {
+		let item: Content = {
 			type$: view.getAttribute("data-item"),
 			content: content,
 		}

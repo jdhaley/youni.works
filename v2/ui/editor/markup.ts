@@ -1,5 +1,5 @@
 import { content } from "../../base/model.js";
-import { Editable, ViewType } from "../../base/editor";
+import { EditableView, ViewType } from "../../base/editor";
 
 import { LevelCommand } from "./commands/level.js";
 import { MarkupReplace } from "./commands/replace.js";
@@ -38,19 +38,19 @@ function replace(this: ViewType, commandName: string, range: Range, content?: co
 	return new MarkupReplace(this.owner, commandName, view.id).exec(range, content);
 }
 
-function getThisView(editor: ViewType, node: Range | Node): Editable {
+function getThisView(editor: ViewType, node: Range | Node): EditableView {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node && node["$control"]?.type != editor) {
 		node = node.parentElement;
 	}
-	return node as Editable;
+	return node as EditableView;
 }
 function level(this: ViewType, name: "Promote" | "Demote", range: Range): Range {
 	let view = getThisView(this, range);
 	let content = view.$control.content as Element;
 	if (!content.firstElementChild) return;
-	let start: Editable = getChildView(content, range.startContainer);
-	let end: Editable = getChildView(content, range.endContainer);
+	let start: EditableView = getChildView(content, range.startContainer);
+	let end: EditableView = getChildView(content, range.endContainer);
 	//If a range of items, check that there are no headings
 	if (start != end) for (let item = start; item; item = item.nextElementSibling) {
 		let role = item.$control.type.name;
