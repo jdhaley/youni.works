@@ -3,6 +3,7 @@ import { extend } from "../../base/util.js";
 import { UserEvent } from "../ui.js";
 import { Display, DisplayType } from "../display/display.js";
 import { setClipboard } from "../clipboard.js";
+import { Content, Editable } from "../../base/model.js";
 
 export default extend(null, {
 	keydown(this: Display, event: UserEvent) {
@@ -20,17 +21,18 @@ export default extend(null, {
 	},
 	selectionchange(this: Display, event: UserEvent) {
 		PRIOR_VIEW?.classList.remove("active");
-		for (let ele = event.range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
-			if (ele.classList?.contains("content")) {
-				ele.classList.add("active");
-				PRIOR_VIEW = ele;
+		for (let ele: Editable = event.range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
+			let content = ele.$control?.content;
+			if (content) {
+				content.classList.add("active");
+				PRIOR_VIEW = content;
 				return;
 			}
 		}
 	}
 });
 
-let PRIOR_VIEW: Element;
+let PRIOR_VIEW: Content;
 
 function  getShortcut(event: UserEvent) {
     let mod = getModifiers(event);
