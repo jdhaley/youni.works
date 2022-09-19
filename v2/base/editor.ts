@@ -2,10 +2,22 @@ import { Type, content, Viewer } from "./model";
 import { CommandBuffer } from "./command";
 import { bundle } from "./util";
 
+interface Container {
+	textContent: string;
+}
+interface ViewRange {
+    readonly collapsed: boolean;
+	readonly startContainer: Container;
+    readonly startOffset: number;
+	readonly endContainer: Container;
+    readonly endOffset: number;
+	readonly commonAncestorContainer: Container;
+}
+
 export interface ViewType extends Type {
 	owner: ViewOwner;
 	types: bundle<ViewType>;
-	toModel(view: Element, range?: Range): content;
+	toModel(view: Element, extent?: ViewRange): content;
 	toView(model: content): EditableView;
 	bind(element?: Element): Editor;
 }
@@ -13,8 +25,8 @@ export interface ViewType extends Type {
 export interface ViewOwner {
 	view: EditableView;
 	unknownType: Type;
-	commands: CommandBuffer<Range>;
-	setRange(range: Range, collapse?: boolean): void;
+	commands: CommandBuffer<ViewRange>;
+	setRange(extent: ViewRange, collapse?: boolean): void;
 }
 
 export interface EditableView extends Element {
