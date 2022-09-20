@@ -17,7 +17,7 @@ export default extend(null, {
 	copy(this: Display, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		setClipboard(this.type, range.cloneRange(), event.clipboardData);
+		setClipboard(range.cloneRange(), event.clipboardData);
 	},
 	selectionchange(this: Display, event: UserEvent) {
 		PRIOR_VIEW?.classList.remove("active");

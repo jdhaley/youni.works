@@ -1,4 +1,4 @@
-import { content, Content, List, Record } from "../../base/model.js";
+import { content, Content, List, Record, Viewer } from "../../base/model.js";
 import { ViewType } from "../../base/editor";
 import { CHAR } from "../../base/util.js";
 
@@ -31,14 +31,11 @@ function recordContent(contextType: ViewType, model: Record, view: Element, rang
 	
 	for (let child of view.children) {
 		if (child.classList.contains("field")) {
-			let type = child["$control"]?.type as ViewType;
-			if (type && !contextType.types[type.name]) {
-				console.warn(`Found property "${type.name}" that is not part of the record type.`);
-			}
-			let value = type.toModel(child, range);
+			let viewer = child["$control"] as Viewer;
+			let value = viewer.getData(range);
 			if (value) {
 				if (!model) model = Object.create(null);
-				model[type.name] = value;
+				model[viewer.type.name] = value;
 			}
 		} else {
 			model = recordContent(contextType, model, child, range);
@@ -61,7 +58,7 @@ function listContent(this: ViewType, view: Element, range?: Range): List {
 	let content = getContentElement(view, range);
 	if (content) for (let part of content.children) {
 		let view = part["$control"];
-		let value = (view?.type as ViewType)?.toModel(part, range);
+		let value = view?.getData(range);
 		if (value) {
 			if (!model) {
 				model = [];

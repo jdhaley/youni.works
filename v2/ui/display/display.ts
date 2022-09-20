@@ -1,4 +1,4 @@
-import {View, content, Type} from "../../base/model.js";
+import {View, content, Type, Viewer} from "../../base/model.js";
 import { ViewOwner, ViewType } from "../../base/editor";
 import {bundle, EMPTY, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
@@ -111,9 +111,6 @@ export class DisplayType implements ViewType {
 		display.viewContent(model);
 		return view;
 	}
-	toModel(view: Element, range?: Range, id?: true): content {
-		if (this.contentType) return this.owner.modellers[this.contentType].call(this, view, range, id);
-	}
 	bind(element: DisplayElement): Display {
 		let display: Display = element.$control;
 		if (display) {
@@ -154,7 +151,7 @@ export class DisplayType implements ViewType {
 	}
 }
 
-export class Display extends Box {
+export class Display extends Box implements Viewer {
 	declare type: DisplayType;
 	declare header: View;
 	declare footer: View;
@@ -190,7 +187,7 @@ export class Display extends Box {
 	// 	return footer as Content;
 	// }
 
-	model(range?: Range): content {
+	getData(range?: Range): content {
 		if (this.type.contentType) return this.owner.modellers[this.type.contentType].call(this.type, this.content, range);
 	}
 	edit(commandName: string, range: Range, content?: content): Range {

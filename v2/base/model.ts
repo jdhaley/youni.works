@@ -30,11 +30,14 @@ export interface Type {
 	types: bundle<Type>;
 }
 
-export interface View {
+interface Container {
 	readonly $control?: Viewer;
+	textContent: string;
+}
+
+export interface View extends Container {
 	readonly classList: Bag<string>;
 	readonly children: Iterable<View>;
-	textContent: string;
 }
 
 export interface Viewer extends Receiver, Shape {
@@ -42,6 +45,16 @@ export interface Viewer extends Receiver, Shape {
 	readonly content: View;
 	readonly header?: View;
 	readonly footer?: View;
+	getData(range?: ViewRange): content;
+}
+
+export interface ViewRange {
+    readonly collapsed: boolean;
+	readonly startContainer: Container;
+    readonly startOffset: number;
+	readonly endContainer: Container;
+    readonly endOffset: number;
+	readonly commonAncestorContainer: Container;
 }
 
 export function viewType(value: any): string {

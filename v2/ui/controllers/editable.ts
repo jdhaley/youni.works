@@ -28,7 +28,7 @@ export default extend(display, {
 		if (range.collapsed) {
 			return;
 		}
-		setClipboard(this.type as ViewType, range.cloneRange(), event.clipboardData);
+		setClipboard(range.cloneRange(), event.clipboardData);
 		range = this.edit("Cut", range);
 		range && this.type.owner.setRange(range, true);
 	},

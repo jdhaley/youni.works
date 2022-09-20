@@ -242,7 +242,7 @@ export class MarkupReplace extends ListReplace {
 		//Get the remainder of the line content.
 		r.setEnd(ctx, ctx.childNodes.length);
 		//Capture it,.
-		let model: Content = part.$control.type.toModel(part, r) as any;
+		let model: Content = part.$control.getData(r) as any;
 		//Clear the remainder of the line content.
 		r.deleteContents();
 		//Append any 'paste' content to the line.
@@ -271,7 +271,7 @@ export class MarkupReplace extends ListReplace {
 		let ctx = getContent(start);
 		r.setEnd(ctx, ctx.childNodes.length);
 		r.deleteContents();
-		let startItem: Content = start.$control.type.toModel(start) as any;
+		let startItem: Content = start.$control.getData() as any;
 		let items = content as Content[];
 		if (items[0]) {
 			startItem.content += "" + items[0].content;

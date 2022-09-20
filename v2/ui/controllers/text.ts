@@ -10,7 +10,7 @@ export default extend(editable, {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) return;
-		setClipboard(this as any, range.cloneRange(), event.clipboardData);
+		setClipboard(range.cloneRange(), event.clipboardData);
 		range = this.edit("Cut", range);
 		range && this.type.owner.setRange(range, true);
 	},
