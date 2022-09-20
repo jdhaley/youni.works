@@ -1,5 +1,5 @@
-import {Content, List, Record, typeOf, View, Viewer, viewType} from "../../base/model.js";
-import { ViewType } from "../../base/editor";
+import { Content, List, Record, Viewer, viewType } from "../../base/model.js";
+import { ViewType } from "../../base/editor.js";
 
 export default {
 	text(this: Viewer, model: string): void {

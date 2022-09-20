@@ -1,14 +1,17 @@
 import { content } from "../../base/model.js";
-import { EditableView, ViewType } from "../../base/editor";
+import { EditableView, ViewType } from "../../base/editor.js";
 
 import { LevelCommand } from "./commands/level.js";
 import { MarkupReplace } from "./commands/replace.js";
 import { getChildView, getEditableView } from "./util.js";
+import { ListEditor } from "./list.js";
 
-export default function edit(commandName: string, range: Range, content: string) {
-	let cmd = COMMANDS[commandName];
-	if (!cmd) throw new Error("Unrecognized command");
-	return cmd.call(this, commandName, range, content);
+export class MarkupEditor extends ListEditor {
+	edit(commandName: string, range: Range, content: string) {
+		let cmd = COMMANDS[commandName];
+		if (!cmd) throw new Error("Unrecognized command");
+		return cmd.call(this, commandName, range, content);
+	}
 }
 
 const COMMANDS = {
@@ -28,7 +31,7 @@ const COMMANDS = {
 function noop() {
 }
 
-function replace(this: ViewType, commandName: string, range: Range, content?: content): Range {
+function replace(this: MarkupEditor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
 	if (view.$control.type.contentType == "line") {
 		view = getEditableView(view.parentElement);
@@ -38,16 +41,15 @@ function replace(this: ViewType, commandName: string, range: Range, content?: co
 	return new MarkupReplace(this.owner, commandName, view.id).exec(range, content);
 }
 
-function getThisView(editor: ViewType, node: Range | Node): EditableView {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node && node["$control"]?.type != editor) {
-		node = node.parentElement;
-	}
-	return node as EditableView;
-}
-function level(this: ViewType, name: "Promote" | "Demote", range: Range): Range {
-	let view = getThisView(this, range);
-	let content = view.$control.content as Element;
+// function getThisView(editor: ViewType, node: Range | Node): EditableView {
+// 	if (node instanceof Range) node = node.commonAncestorContainer;
+// 	while (node && node["$control"]?.type != editor) {
+// 		node = node.parentElement;
+// 	}
+// 	return node as EditableView;
+// }
+function level(this: MarkupEditor, name: "Promote" | "Demote", range: Range): Range {
+	let content = this.content as Element;
 	if (!content.firstElementChild) return;
 	let start: EditableView = getChildView(content, range.startContainer);
 	let end: EditableView = getChildView(content, range.endContainer);
@@ -60,5 +62,5 @@ function level(this: ViewType, name: "Promote" | "Demote", range: Range): Range 
 		}
 		if (item.id == end.id) break;
 	}
-	return new LevelCommand(this.owner, name, view.id).exec(range);
+	return new LevelCommand(this.owner, name, this._node.id).exec(range);
 }

@@ -7,6 +7,7 @@ import {extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 
 import shape from "./shape.js";
+import { Type, View } from "../../base/model.js";
 
 export default extend(null, {
 	open(this: DisplayOwner, res: Response<string>) {
@@ -43,7 +44,7 @@ function shapetest(this: DisplayOwner) {
 	type.contentType = "text";
 	
 	let view = type.view("HELLO THERE");
-	let control = view.$control;
+	let control = view["$control"];
 	control.content.classList.add("shape");
 	control.position(0, 0);
 

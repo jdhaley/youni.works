@@ -1,5 +1,5 @@
 import {View, content, Type, Viewer} from "../../base/model.js";
-import { ViewOwner, ViewType } from "../../base/editor";
+import { ViewOwner, ViewType } from "../../base/editor.js";
 import {bundle, EMPTY, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
@@ -93,7 +93,7 @@ export class DisplayType implements ViewType {
 	}
 	owner: DisplayOwner;
 	name: string;
-	types: bundle<ViewType>
+	types: bundle<DisplayType>
 
 	contentType: string;
 	isProperty: boolean;
@@ -105,7 +105,7 @@ export class DisplayType implements ViewType {
 		return type == this;
 	}
 
-	view(content?: content): View {
+	view(content?: content): Element {
 		let view = this.owner.createElement(this.conf.tagName || "div") as DisplayElement;
 		this.control(view).viewContent(content);
 		return view;
@@ -139,7 +139,7 @@ export class DisplayType implements ViewType {
 		}
 		if (conf.prototype) this.prototype = conf.prototype;
 		if (!this.prototype) this.prototype = new Display(this.conf.actions);
-		
+
 		if (conf.proto) {
 			this.prototype = extend(this.prototype, conf.proto);
 		} else {
@@ -151,8 +151,9 @@ export class DisplayType implements ViewType {
 
 export class Display extends Box implements Viewer {
 	declare type: DisplayType;
-	declare header: View;
-	declare footer: View;
+	declare header: Element;
+	declare content: View;
+	declare footer: Element;
 
 	get owner(): DisplayOwner {
 		return this.type.owner;
@@ -197,16 +198,18 @@ export class Display extends Box implements Viewer {
 	}
 	///////////////////////////////////////
 	viewContent(model: content): void {
+		this.draw();
+	}
+	protected draw() {
 		this._node.textContent = "";
 		if (this.isContainer) {
-			this.createHeader(model);
-			this.createContent(model);
-			this.createFooter(model)
+			this.createHeader();
+			this.createContent();
+			this.createFooter()
 		} else {
-			(this as any).content = this._node;
+			this.content = this._node;
 			this.content.classList.add("content");
 		}
-		this.owner.viewers[this.type.contentType].call(this, model);
 	}
 	protected createHeader(model?: content) {
 		let header = this.owner.createElement("header");

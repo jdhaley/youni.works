@@ -1,5 +1,5 @@
 import { Command } from "../../../base/command.js";
-import { ViewOwner } from "../../../base/editor";
+import { ViewOwner } from "../../../base/editor.js";
 
 export abstract class Edit extends Command<Range> {
 	constructor(owner: ViewOwner, name: string, viewId: string) {

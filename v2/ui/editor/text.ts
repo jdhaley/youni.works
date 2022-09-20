@@ -6,7 +6,7 @@ import { Display } from "../display/display.js";
 
 export class TextEditor extends Display {
 	viewContent(model: content): void {
-		super.viewContent(model);
+		this.draw();
 		this.content.textContent = "" + model;
 	}
 	contentOf(range?: Range): content {

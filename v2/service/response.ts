@@ -1,4 +1,4 @@
-import { bundle } from "../base/util";
+import { bundle } from "../base/util.js";
 
 //Modelled after Express
 export interface Request {

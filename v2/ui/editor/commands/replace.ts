@@ -1,5 +1,5 @@
-import {content, Content} from "../../../base/model.js";
-import { EditableView, ViewOwner } from "../../../base/editor";
+import {content, Content, Record} from "../../../base/model.js";
+import { EditableView, ViewOwner, ViewType } from "../../../base/editor.js";
 
 import {Edit} from "./edit.js";
 import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items, bindView, getViewById} from "../util.js";
@@ -54,6 +54,38 @@ export class TextReplace extends Replace {
 		}
 		this.after = content.innerHTML;
 		return unmark(range);	
+	}
+}
+
+export class RecordReplace extends Replace {
+	exec(range: Range, record: Record): Range {
+		narrowRange(range);
+		mark(range);
+
+		let content = getContent(range);
+		this.before = content?.innerHTML || "";
+		clearContent(range);
+		if (record) mergeContent(this, range, record)
+		this.after = content?.innerHTML || "";
+	
+		unmark(range);
+		return range;
+	}
+}
+
+function mergeContent(cmd: Replace, range: Range, record: Record) {
+	let ctx = getContent(range);
+	let start = getChildView(ctx, range.startContainer);
+	let end = getChildView(ctx, range.endContainer);
+	for (let member = start || ctx.firstElementChild; member; member = member.nextElementSibling) {
+		let type: ViewType = member["$control"].type;
+		if (type.contentType == "text") {
+			let value = record[type["name"]];
+			if (value) {
+				member.children[1].textContent += value;
+			}
+		}
+		if (member == end) break;
 	}
 }
 

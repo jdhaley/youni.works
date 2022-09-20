@@ -3,7 +3,7 @@ import {UserEvent} from "../ui.js";
 
 import text from "./text.js";
 import { getClipboard } from "../clipboard.js";
-import { Editor } from "../../base/editor";
+import { Editor } from "../../base/editor.js";
 
 export default extend(text, {
 	paste(this: Editor, event: UserEvent) {

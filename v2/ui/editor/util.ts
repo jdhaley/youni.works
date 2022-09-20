@@ -1,7 +1,6 @@
-import { EditableView, ViewOwner } from "../../base/editor";
-import { Viewer } from "../../base/model";
-import { DisplayType } from "../display/display";
-
+import { EditableView, ViewOwner } from "../../base/editor.js";
+import { Viewer } from "../../base/model.js";
+import { DisplayType } from "../display/display.js";
 
 export function getViewById(owner: ViewOwner, id: string) {
 	let view = owner.view.ownerDocument.getElementById(id) as EditableView;

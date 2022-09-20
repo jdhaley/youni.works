@@ -4,7 +4,7 @@ import {getContent, navigate} from "../editor/util.js";
 import list from "./list.js";
 import { getClipboard } from "../clipboard.js";
 import { content } from "../../base/model.js";
-import { Editor } from "../../base/editor";
+import { Editor } from "../../base/editor.js";
 
 export default extend(list, {
 	paste(this: Editor, event: UserEvent) {

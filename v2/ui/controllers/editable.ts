@@ -4,7 +4,7 @@ import {EditEvent, UserEvent} from "../ui.js";
 import {getEditableView, navigate} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";
-import { Editor, ViewType } from "../../base/editor";
+import { Editor } from "../../base/editor.js";
 
 let UNDONE = false;
 

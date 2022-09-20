@@ -10,7 +10,12 @@ import line from "../controllers/line.js";
 import shortcuts from "./shortcuts.js";
 
 import {DisplayConf, DisplayType} from "../display/display.js";
+
 import { TextEditor } from "../editor/text.js";
+import { RecordEditor } from "../editor/record.js";
+import { ListEditor } from "../editor/list.js";
+import { MarkupEditor } from "../editor/markup.js";
+import { LineEditor } from "../editor/line.js";
 
 const conf: bundle<DisplayConf> = {
 	text: {
@@ -24,6 +29,7 @@ const conf: bundle<DisplayConf> = {
 	},
 	record: {
 		class: DisplayType,
+		prototype: new RecordEditor(record),
 		model: "record",
 		container: true,
 		tagName: "ui-record",
@@ -32,6 +38,7 @@ const conf: bundle<DisplayConf> = {
 	},
 	list: {
 		class: DisplayType,
+		prototype: new ListEditor(list),
 		model: "list",
 		container: true,
 		tagName: "ui-list",
@@ -40,6 +47,7 @@ const conf: bundle<DisplayConf> = {
 	},
 	markup: {
 		class: DisplayType,
+		prototype: new MarkupEditor(markup),
 		container: true,
 		model: "markup",
 		tagName: "ui-list",
@@ -48,6 +56,7 @@ const conf: bundle<DisplayConf> = {
 	},
 	line: {
 		class: DisplayType,
+		prototype: new LineEditor(line),
 		container: false,
 		model: "line",
 		tagName: "p",

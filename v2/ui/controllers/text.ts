@@ -3,7 +3,7 @@ import {EditEvent, UserEvent} from "../ui.js";
 
 import editable from "./editable.js";
 import { setClipboard } from "../clipboard.js";
-import { Editor } from "../../base/editor";
+import { Editor } from "../../base/editor.js";
 
 export default extend(editable, {
 	cut(this: Editor, event: UserEvent) {
