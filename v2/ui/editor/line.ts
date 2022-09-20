@@ -16,7 +16,7 @@ export class LineEditor extends TextEditor {
 	}
 	contentOf(range?: Range): Content {
 		let line = this._node;
-		if (range && !this.intersectsRange(range)) return;
+		if (range && !range.intersectsNode(this.content)) return;
 		let content = super.contentOf(range);
 		let item: Content = {
 			type$: line.getAttribute("data-item"),

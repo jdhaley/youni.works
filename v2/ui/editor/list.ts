@@ -17,7 +17,7 @@ export class ListEditor extends Display {
 	}
 	contentOf(range?: Range): List {
 		let model: content[];
-		if (range && !this.intersectsRange(range)) return;
+		if (range && !range.intersectsNode(this.content)) return;
 		for (let part of this.content.children) {
 			let view = part.$control;
 			let value = view?.contentOf(range);

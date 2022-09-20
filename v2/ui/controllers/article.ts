@@ -7,7 +7,7 @@ import {extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 
 import shape from "./shape.js";
-import { Type, View } from "../../base/model.js";
+import { TextEditor } from "../editor/text.js";
 
 export default extend(null, {
 	open(this: DisplayOwner, res: Response<string>) {
@@ -38,7 +38,7 @@ export default extend(null, {
 function shapetest(this: DisplayOwner) {
 	let type = new DisplayType(this);
 	type.start("shape", {
-		prototype: new Display(shape),
+		prototype: new TextEditor(shape),
 		actions: shape
 	});
 	type.contentType = "text";

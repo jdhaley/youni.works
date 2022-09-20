@@ -11,7 +11,7 @@ export class TextEditor extends Display {
 	}
 	contentOf(range?: Range): content {
 		let model = "";
-		if (range && !this.intersectsRange(range)) return;
+		if (range && !range.intersectsNode(this.content)) return;
 		for (let node of (this.content as Element).childNodes) {
 			if (node == range?.startContainer) {
 				model += node.textContent.substring(range.startOffset);

@@ -1,15 +1,16 @@
-import {View, content, Type, Viewer} from "../../base/model.js";
+import {content, Type, Viewer} from "../../base/model.js";
 import { ViewOwner, ViewType } from "../../base/editor.js";
-import {bundle, EMPTY, extend} from "../../base/util.js";
+import {bundle, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
 import { Actions, Owner, Receiver } from "../../base/control.js";
 import { Box } from "./box.js";
 
-export type viewer = (this: Viewer, model: content) => void;
-export type modeller = (this: Viewer, range?: Range) => content;
-export type editor = (this: ViewType, commandName: string, range: Range, content?: content) => Range;
+interface DisplayElement extends Element {
+	$control?: Display;
+	children: HTMLCollectionOf<DisplayElement>
+}
 
 export interface DisplayConf {
 	class: typeof DisplayType;
@@ -21,9 +22,6 @@ export interface DisplayConf {
 	shortcuts: bundle<string>;
 }
 
-class DisplayElement extends HTMLElement {
-	$control?: Display;
-}
 
 export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -36,10 +34,6 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 		this.frame = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
 		this.commands = new CommandBuffer()
-
-		this.viewers = conf.viewers;
-		this.modellers = conf.modellers;
-		this.editors = conf.editors || EMPTY.object;
 	}
 
 	conf: bundle<any>;
@@ -50,13 +44,10 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range>;
 
-	viewers: bundle<viewer>
-	modellers: bundle<modeller>;
-	editors: bundle<editor>;
 	type: ViewType;
 	view: Element;
 
-	createElement(tagName: string): HTMLElement {
+	createElement(tagName: string): Element {
 		return this.frame.createElement(tagName);
 	}
 	getElementById(id: string): Element {
@@ -138,7 +129,7 @@ export class DisplayType implements ViewType {
 			if (conf.model) this.contentType = conf.model;	
 		}
 		if (conf.prototype) this.prototype = conf.prototype;
-		if (!this.prototype) this.prototype = new Display(this.conf.actions);
+		//if (!this.prototype) this.prototype = new Display(this.conf.actions);
 
 		if (conf.proto) {
 			this.prototype = extend(this.prototype, conf.proto);
@@ -149,10 +140,10 @@ export class DisplayType implements ViewType {
 	}
 }
 
-export class Display extends Box implements Viewer {
+export abstract class Display extends Box implements Viewer {
 	declare type: DisplayType;
 	declare header: Element;
-	declare content: View;
+	declare content: DisplayElement;
 	declare footer: Element;
 
 	get owner(): DisplayOwner {
@@ -164,42 +155,10 @@ export class Display extends Box implements Viewer {
 	get shortcuts(): bundle<string> {
 		return this.type.conf.shortcuts;
 	}
-	// get header(): Content {
-	// 	let header: HTMLElement = this._node["$header"];
-	// 	//Check that there is a header and the view isn't corrupted.
-	// 	if (header && header != this._node.firstElementChild) review(this._node);
-	// 	return header as Content;
-	// }
-	// get content(): Content {
-	// 	let content: HTMLElement = this._node["$content"];
-	// 	if (content) {
-	// 		//Check that the node isn't corrupted.
-	// 		if (content != this._node.firstElementChild?.nextElementSibling) review(this._node);
-	// 		return content as Content;
-	// 	}
-	// 	return this._node as Content;
-	// }
-	// get footer(): Content {
-	// 	let footer: HTMLElement = this._node["$footer"];
-	// 	//Check that the node isn't corrupted.
-	// 	if (footer && footer != this._node.lastElementChild) review(this._node);
-	// 	return footer as Content;
-	// }
+	abstract viewContent(model: content): void;
+	abstract contentOf(range?: Range): content;
+	abstract edit(commandName: string, range: Range, content?: content): Range;
 
-	contentOf(range?: Range): content {
-		if (this.type.contentType) return this.owner.modellers[this.type.contentType].call(this, range);
-	}
-	edit(commandName: string, range: Range, content?: content): Range {
-		let editor = this.owner.editors[this.type.contentType];
-		if (editor) return editor.call(this.type, commandName, range, content);
-	}
-	intersectsRange(range: Range): boolean {
-		return range.intersectsNode(this.content as Element);
-	}
-	///////////////////////////////////////
-	viewContent(model: content): void {
-		this.draw();
-	}
 	protected draw() {
 		this._node.textContent = "";
 		if (this.isContainer) {
