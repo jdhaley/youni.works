@@ -10,7 +10,7 @@ export interface ViewType extends Type {
 
 export interface ViewOwner {
 	view: EditableView;
-	unknownType: Type;
+	unknownType: ViewType;
 	commands: CommandBuffer<Range>;
 	setRange(extent: Range, collapse?: boolean): void;
 }

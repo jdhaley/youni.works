@@ -48,6 +48,7 @@ export interface Viewer extends Receiver, Shape {
 	readonly footer?: View;
 
 	contentOf(range?: Range): content;
+	intersectsRange(range: Range): boolean;
 }
 
 interface Range {

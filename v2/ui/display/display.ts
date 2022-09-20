@@ -7,8 +7,8 @@ import { CommandBuffer } from "../../base/command.js";
 import { Actions, Owner, Receiver } from "../../base/control.js";
 import { Box } from "./box.js";
 
-export type viewer = (this: ViewType, view: unknown, model: content) => void;
-export type modeller = (this: ViewType, view: unknown) => content;
+export type viewer = (this: Viewer, model: content) => void;
+export type modeller = (this: Viewer, range?: Range) => content;
 export type editor = (this: ViewType, commandName: string, range: Range, content?: content) => Range;
 
 export interface DisplayConf {
@@ -186,11 +186,14 @@ export class Display extends Box implements Viewer {
 	// }
 
 	contentOf(range?: Range): content {
-		if (this.type.contentType) return this.owner.modellers[this.type.contentType].call(this.type, this.content, range);
+		if (this.type.contentType) return this.owner.modellers[this.type.contentType].call(this, range);
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
 		let editor = this.owner.editors[this.type.contentType];
 		if (editor) return editor.call(this.type, commandName, range, content);
+	}
+	intersectsRange(range: Range): boolean {
+		return range.intersectsNode(this.content as Element);
 	}
 	///////////////////////////////////////
 	viewContent(model: content): void {
@@ -203,7 +206,7 @@ export class Display extends Box implements Viewer {
 			(this as any).content = this._node;
 			this.content.classList.add("content");
 		}
-		this.owner.viewers[this.type.contentType].call(this.type, this.content, model);
+		this.owner.viewers[this.type.contentType].call(this, model);
 	}
 	protected createHeader(model?: content) {
 		let header = this.owner.createElement("header");

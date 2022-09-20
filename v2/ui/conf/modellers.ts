@@ -1,32 +1,32 @@
-import { content, Content, List, Record, Viewer } from "../../base/model.js";
-import { ViewType } from "../../base/editor";
+import { content, Content, List, Record, View, Viewer } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
 
 export default {
-	record(this: ViewType, view: Element, range?: Range): Record {
-		let model = recordContent(this, null, view, range);
+	record(this: Viewer, range?: Range): Record {
+		let model = recordContent(null, this.content as Element, range);
 		if (model) {
-			model["type$"] = this.name;
+			model["type$"] = this.type.name;
 		}
 		return model;
 	},
 	list: listContent,
 	markup: listContent,
 	text: textContent,
-	line(this: ViewType, view: Element, range?: Range): Content {
-		if (range && !range.intersectsNode(view)) return;
-		let content = textContent.call(this, view, range);
+	line(this: Viewer, range?: Range): Content {
+		let line = this["_node"] as Element;
+		if (range && !range.intersectsNode(line)) return;
+		let content = textContent.call(this, range);
 		let item: Content = {
-			type$: view.getAttribute("data-item"),
+			type$: line.getAttribute("data-item"),
 			content: content,
 		}
-		let level = Number.parseInt(view.getAttribute("aria-level"));
+		let level = Number.parseInt(line.getAttribute("aria-level"));
 		if (level) item.level = level;
 		return item;
 	}
 }
 
-function recordContent(contextType: ViewType, model: Record, view: Element, range: Range): Record {
+function recordContent(model: Record, view: Element, range: Range): Record {
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {
@@ -38,31 +38,31 @@ function recordContent(contextType: ViewType, model: Record, view: Element, rang
 				model[viewer.type.name] = value;
 			}
 		} else {
-			model = recordContent(contextType, model, child, range);
+			model = recordContent(model, child, range);
 		}
 	}
 	return model;
 }
 
-function getContentElement(view: Element, range?: Range) {
-	if (range && !range.intersectsNode(view)) return;
-	if (view.classList.contains("content")) return view;
-	for (let child of view.children) {
-		child = getContentElement(child, range);
-		if (child) return child;
-	}
-}
+// function getContentElement(view: View, range?: Range) {
+// 	if (range && !range.intersectsNode(view as Element)) return;
+// 	if (view.classList.contains("content")) return view;
+// 	for (let child of view.children) {
+// 		child = getContentElement(child, range);
+// 		if (child) return child;
+// 	}
+// }
 
-function listContent(this: ViewType, view: Element, range?: Range): List {
+function listContent(this: Viewer, range?: Range): List {
 	let model: content[];
-	let content = getContentElement(view, range);
-	if (content) for (let part of content.children) {
-		let view = part["$control"] as Viewer;
+	if (range && !this.intersectsRange(range)) return;
+	for (let part of this.content.children) {
+		let view = part.$control;
 		let value = view?.contentOf(range);
 		if (value) {
 			if (!model) {
 				model = [];
-				if (this.name) model["type$"] = this.name;
+				if (this.type.name) model["type$"] = this.type.name;
 			}
 			model.push(value);
 		}
@@ -70,11 +70,10 @@ function listContent(this: ViewType, view: Element, range?: Range): List {
 	return model;
 }
 
-function textContent(this: ViewType, view: Element, range?: Range): string {
+function textContent(this: Viewer, range?: Range): string {
 	let model = "";
-	let content = getContentElement(view, range);
-
-	if (content) for (let node of content.childNodes) {
+	if (range && !this.intersectsRange(range)) return;
+	for (let node of (this.content as Element).childNodes) {
 		if (node == range?.startContainer) {
 			model += node.textContent.substring(range.startOffset);
 		} else if (node == range?.endContainer) {

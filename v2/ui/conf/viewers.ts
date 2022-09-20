@@ -1,37 +1,39 @@
-import {Content, List, Record, typeOf, View, viewType} from "../../base/model.js";
+import {Content, List, Record, typeOf, View, Viewer, viewType} from "../../base/model.js";
 import { ViewType } from "../../base/editor";
 
 export default {
-	text(this: ViewType, view: View, model: string): void {
-		view.textContent =  model || "";
+	text(this: Viewer, model: string): void {
+		this.content.textContent =  model || "";
 	},
-	record(this: ViewType, view: View, model: Record): void {
-		view["$at"] = Object.create(null);
-		for (let name in this.types) {
-			let type = this.types[name];
+	record(this: Viewer, model: Record): void {
+		//view["$at"] = Object.create(null);
+		for (let name in this.type.types) {
+			let type = this.type.types[name] as ViewType;
 			let value = model ? model[name] : null;
 			let member = type.view(value);
 			member.classList.add("field");
-			view.append(member);
-			view["$at"][name] = member;
+			this.content.append(member);
+			//view["$at"][name] = member;
 		}
 	},
-	list(this: ViewType, view: View, model: List): void {
+	list(this: Viewer, model: List): void {
 		if (model && model[Symbol.iterator]) for (let item of model) {
-			let type = this["rowType"] || this.types[viewType(item)] || this.owner.unknownType;
+			let type = this.type as ViewType;
+			type = type.types[viewType(item)] || type.owner.unknownType;
 			let part = type.view(item);
-			view.append(part);
+			this.content.append(part);
 		}
 	},
-	markup(this: ViewType, view: View, model: Content[]): void {
+	markup(this: Viewer, model: Content[]): void {
 		if (model && model[Symbol.iterator]) for (let item of model) {
-			let type = this["rowType"] || this.types[viewType(item)] || this.owner.unknownType;
+			let type = this.type as ViewType;
+			type = type.types[viewType(item)] || type.owner.unknownType;
 			let part = type.view(item);
-			view.append(part);
+			this.content.append(part);
 		}
 	},
-	line(this: ViewType, view: View, item: Content): void {
-		let impl = view as Element;
+	line(this: Viewer, item: Content): void {
+		let impl = this.content as Element;
 		impl.innerHTML = "" + (item.content || "");
 		if (item.type$ == "heading") {
 			impl.setAttribute("role", "heading");
