@@ -13,6 +13,7 @@ export type editor = (this: ViewType, commandName: string, range: Range, content
 
 export interface DisplayConf {
 	class: typeof DisplayType;
+	prototype?: Display,
 	model: "text" | "record" | "list" | "markup" | "line";
 	container: boolean;
 	tagName: string;
@@ -136,10 +137,9 @@ export class DisplayType implements ViewType {
 			this.conf = extend(this.conf || null, conf);
 			if (conf.model) this.contentType = conf.model;	
 		}
+		if (conf.prototype) this.prototype = conf.prototype;
+		if (!this.prototype) this.prototype = new Display(this.conf.actions);
 		
-		if (!this.prototype) {
-			this.prototype = new Display(this.conf.actions);
-		}
 		if (conf.proto) {
 			this.prototype = extend(this.prototype, conf.proto);
 		} else {

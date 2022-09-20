@@ -1,5 +1,5 @@
-import { Receiver } from "./control";
-import { Bag, bundle } from "./util";
+import { Receiver } from "./control.js";
+import { Bag, bundle } from "./util.js";
 
 export interface Content {
 	type$: string,

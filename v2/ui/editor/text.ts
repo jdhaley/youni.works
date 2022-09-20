@@ -1,6 +1,38 @@
 import {TextReplace} from "./commands/replace.js";
 import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "./util.js";
+import { content } from "../../base/model.js";
+import { CHAR } from "../../base/util.js";
+import { Display } from "../display/display.js";
 
+export class TextEditor extends Display {
+	viewContent(model: content): void {
+		super.viewContent(model);
+		this.content.textContent = "" + model;
+	}
+	contentOf(range?: Range): content {
+		let model = "";
+		if (range && !this.intersectsRange(range)) return;
+		for (let node of (this.content as Element).childNodes) {
+			if (node == range?.startContainer) {
+				model += node.textContent.substring(range.startOffset);
+			} else if (node == range?.endContainer) {
+				model += node.textContent.substring(0, range.endOffset);
+			} else {
+				model += node.textContent;
+			}
+		}
+		model = model.replace(CHAR.ZWSP, "");
+		model = model.replace(CHAR.NBSP, " ");
+		model = model.trim();
+		return model;			
+	}
+	edit(commandName: string, range: Range, content: string) {
+		positionToText(range);
+		let cmd = COMMANDS[commandName];
+		if (!cmd) throw new Error("Unrecognized command");
+		return cmd.call(this, commandName, range, content);
+	}
+}
 export default function edit(commandName: string, range: Range, content: string) {
 	positionToText(range);
 	let cmd = COMMANDS[commandName];

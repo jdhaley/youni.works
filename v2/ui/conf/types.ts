@@ -10,10 +10,12 @@ import line from "../controllers/line.js";
 import shortcuts from "./shortcuts.js";
 
 import {DisplayConf, DisplayType} from "../display/display.js";
+import { TextEditor } from "../editor/text.js";
 
 const conf: bundle<DisplayConf> = {
 	text: {
 		class: DisplayType,
+		prototype: new TextEditor(text),
 		model: "text",
 		container: true,
 		tagName: "ui-text",

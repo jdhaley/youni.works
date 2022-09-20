@@ -1,6 +1,6 @@
-import { Type, content, Viewer, View } from "./model";
-import { CommandBuffer } from "./command";
-import { bundle } from "./util";
+import { Type, content, Viewer, View } from "./model.js";
+import { CommandBuffer } from "./command.js";
+import { bundle } from "./util.js";
 
 export interface ViewType extends Type {
 	owner: ViewOwner;
