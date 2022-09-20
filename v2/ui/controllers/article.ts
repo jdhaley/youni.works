@@ -13,7 +13,7 @@ export default extend(null, {
 		start(this);
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, model);
-		this.view = type.toView(model);
+		this.view = type.view(model) as Element;
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.view);
@@ -42,12 +42,12 @@ function shapetest(this: DisplayOwner) {
 	});
 	type.contentType = "text";
 	
-	let view = type.toView("HELLO THERE");
+	let view = type.view("HELLO THERE");
 	let control = view.$control;
 	control.content.classList.add("shape");
 	control.position(0, 0);
 
-	this.frame.view.append(view);
+	this.frame.view.append(view as Element);
 }
 
 function getType(article: DisplayOwner, path: string, data: any): DisplayType {

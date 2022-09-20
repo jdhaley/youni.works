@@ -18,7 +18,7 @@ export function getClipboard(clipboard: DataTransfer): content {
 
 export function setClipboard(range: Range, clipboard: DataTransfer) {
 	let control = getViewer(range);
-	let model = control?.getData(range);
+	let model = control?.contentOf(range);
 	if (!model) return;
 	if (typeof model == "string") {
 		clipboard.setData("text/plain", model);

@@ -38,23 +38,23 @@ interface Container {
 export interface View extends Container {
 	readonly classList: Bag<string>;
 	readonly children: Iterable<View>;
+	append(view: any): void;
 }
 
 export interface Viewer extends Receiver, Shape {
 	readonly type: Type;
-	readonly content: View;
 	readonly header?: View;
+	readonly content: View;
 	readonly footer?: View;
-	getData(range?: ViewRange): content;
+
+	contentOf(range?: Range): content;
 }
 
-export interface ViewRange {
-    readonly collapsed: boolean;
-	readonly startContainer: Container;
-    readonly startOffset: number;
-	readonly endContainer: Container;
-    readonly endOffset: number;
-	readonly commonAncestorContainer: Container;
+interface Range {
+	startContainer: Container;
+    startOffset: number;
+	endContainer: Container;
+    endOffset: number;
 }
 
 export function viewType(value: any): string {

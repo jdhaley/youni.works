@@ -1,4 +1,6 @@
 import { EditableView, ViewOwner } from "../../base/editor";
+import { Viewer } from "../../base/model";
+import { DisplayType } from "../display/display";
 
 
 export function getViewById(owner: ViewOwner, id: string) {
@@ -8,11 +10,30 @@ export function getViewById(owner: ViewOwner, id: string) {
 	if (!view.$control) {
 		console.warn("binding...");
 		bindView(view as any);
-		if (!view.$control) throw new Error("unable to bind missing control.");
+		if (!view.$control) {
+			console.error("Unable to bind missing control. Please collect info / analyze.");
+			debugger;
+		}
 	} else {
 		view.$control.content; //checks the view isn't corrupted.
 	}
 	return view;
+}
+export function bindView(view: EditableView): void {
+	let control: Viewer = view.$control;
+	if (!control) {
+		let name = view.getAttribute("data-item");
+		let parent = getEditableView(view.parentElement) as EditableView;
+		if (name && parent) {
+			//TODO forcing to DisplayType because I don't want to expose .control()
+			let type = parent.$control.type.types[name] as DisplayType;
+			if (type) control = type.control(view as any);
+		}
+	}
+
+	if (control) for (let child of view.$control.content.children) {
+		bindView(child as EditableView);
+	}
 }
 
 export function getEditableView(node: Node | Range): EditableView {
@@ -261,20 +282,4 @@ function navigateInto(ele: Element, isBack?: boolean) {
 			break;
 	}
 	return content;
-}
-
-export function bindView(view: EditableView): void {
-	let control = view.$control;
-	if (!control) {
-		let name = view.getAttribute("data-item");
-		let parent = getEditableView(view.parentElement) as EditableView;
-		if (name && parent) {
-			let type = parent.$control.type.types[name];
-			if (type) control = type.bind(view);
-		}
-	}
-
-	if (control) for (let child of view.$control.content.children) {
-		bindView(child as EditableView);
-	}
 }

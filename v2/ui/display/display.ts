@@ -13,7 +13,6 @@ export type editor = (this: ViewType, commandName: string, range: Range, content
 
 export interface DisplayConf {
 	class: typeof DisplayType;
-//	view: "text" | "record" | "list" | "markup" | "line";
 	model: "text" | "record" | "list" | "markup" | "line";
 	container: boolean;
 	tagName: string;
@@ -105,13 +104,12 @@ export class DisplayType implements ViewType {
 		return type == this;
 	}
 
-	toView(model: content): DisplayElement {
+	view(content?: content): View {
 		let view = this.owner.createElement(this.conf.tagName || "div") as DisplayElement;
-		let display = this.bind(view);
-		display.viewContent(model);
+		this.control(view).viewContent(content);
 		return view;
 	}
-	bind(element: DisplayElement): Display {
+	control(element: DisplayElement): Display {
 		let display: Display = element.$control;
 		if (display) {
 			console.warn("Element is already bound to a control.");
@@ -187,7 +185,7 @@ export class Display extends Box implements Viewer {
 	// 	return footer as Content;
 	// }
 
-	getData(range?: Range): content {
+	contentOf(range?: Range): content {
 		if (this.type.contentType) return this.owner.modellers[this.type.contentType].call(this.type, this.content, range);
 	}
 	edit(commandName: string, range: Range, content?: content): Range {

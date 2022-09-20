@@ -32,7 +32,7 @@ function recordContent(contextType: ViewType, model: Record, view: Element, rang
 	for (let child of view.children) {
 		if (child.classList.contains("field")) {
 			let viewer = child["$control"] as Viewer;
-			let value = viewer.getData(range);
+			let value = viewer.contentOf(range);
 			if (value) {
 				if (!model) model = Object.create(null);
 				model[viewer.type.name] = value;
@@ -57,8 +57,8 @@ function listContent(this: ViewType, view: Element, range?: Range): List {
 	let model: content[];
 	let content = getContentElement(view, range);
 	if (content) for (let part of content.children) {
-		let view = part["$control"];
-		let value = view?.getData(range);
+		let view = part["$control"] as Viewer;
+		let value = view?.contentOf(range);
 		if (value) {
 			if (!model) {
 				model = [];

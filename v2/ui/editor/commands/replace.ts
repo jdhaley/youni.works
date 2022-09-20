@@ -181,7 +181,7 @@ export class ListReplace extends Replace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		let view = list.$control.type.toView(content).$control;
+		let view = list.$control.type.view(content).$control;
 		let views = view.content as Element;
 		while (views.firstChild) {
 			range.insertNode(views.firstChild);
@@ -242,7 +242,7 @@ export class MarkupReplace extends ListReplace {
 		//Get the remainder of the line content.
 		r.setEnd(ctx, ctx.childNodes.length);
 		//Capture it,.
-		let model: Content = part.$control.getData(r) as any;
+		let model: Content = part.$control.contentOf(r) as any;
 		//Clear the remainder of the line content.
 		r.deleteContents();
 		//Append any 'paste' content to the line.
@@ -254,7 +254,7 @@ export class MarkupReplace extends ListReplace {
 			model.level = 0;
 		}
 		//Create the end line and add it after the command line.
-		let end: EditableView = part.$control.type.toView(model as any);
+		let end: Element = part.$control.type.view(model as any) as Element;
 		part.parentElement.insertBefore(end, part.nextElementSibling);
 		//We can now set the new range now that we have the end line.
 		range.setEnd(end, 0);
@@ -271,7 +271,7 @@ export class MarkupReplace extends ListReplace {
 		let ctx = getContent(start);
 		r.setEnd(ctx, ctx.childNodes.length);
 		r.deleteContents();
-		let startItem: Content = start.$control.getData() as any;
+		let startItem: Content = start.$control.contentOf() as any;
 		let items = content as Content[];
 		if (items[0]) {
 			startItem.content += "" + items[0].content;
