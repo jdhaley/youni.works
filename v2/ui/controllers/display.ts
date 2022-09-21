@@ -1,9 +1,9 @@
-import { View } from "../../base/model.js";
 import { extend } from "../../base/util.js";
 
 import { UserEvent } from "../ui.js";
 import { Display } from "../display/display.js";
 import { setClipboard } from "../clipboard.js";
+import { View } from "../../base/editor.js";
 
 export default extend(null, {
 	keydown(this: Display, event: UserEvent) {

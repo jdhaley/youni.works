@@ -1,5 +1,5 @@
 import { content } from "../../../base/model.js";
-import { EditableView, ViewType } from "../../../base/editor.js";
+import { View, ViewType } from "../../../base/editor.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/replace.js";
@@ -45,8 +45,8 @@ function replace(this: MarkupEditor, commandName: string, range: Range, content?
 function level(this: MarkupEditor, name: "Promote" | "Demote", range: Range): Range {
 	let content = this.content as Element;
 	if (!content.firstElementChild) return;
-	let start: EditableView = getChildView(content, range.startContainer);
-	let end: EditableView = getChildView(content, range.endContainer);
+	let start: View = getChildView(content, range.startContainer);
+	let end: View = getChildView(content, range.endContainer);
 	//If a range of items, check that there are no headings
 	if (start != end) for (let item = start; item; item = item.nextElementSibling) {
 		let role = item.$control.type.name;

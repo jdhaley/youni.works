@@ -1,8 +1,9 @@
-import {content, Record, Viewer} from "../../../base/model.js";
+import {content, Record} from "../../../base/model.js";
 
 import { RecordReplace } from "../commands/replace.js";
 import { getEditableView } from "../util.js";
 import { Display } from "../../display/display.js";
+import { Viewer } from "../../../base/editor.js";
 
 export class RecordEditor extends Display {
 	contentType = "record";

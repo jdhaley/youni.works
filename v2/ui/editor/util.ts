@@ -1,9 +1,20 @@
-import { EditableView, ViewOwner } from "../../base/editor.js";
-import { Viewer } from "../../base/model.js";
+import { View, Viewer, ViewOwner } from "../../base/editor.js";
 import { DisplayType } from "../display/display.js";
 
+export function getViewer(node: Node | Range): Viewer {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node instanceof Element && node.getAttribute("data-item")) {
+			if (node["$control"]) return node["$control"];
+			console.warn("Unbound view.");
+			return;
+		}
+		node = node.parentElement;
+	}
+}
+
 export function getViewById(owner: ViewOwner, id: string) {
-	let view = owner.view.ownerDocument.getElementById(id) as EditableView;
+	let view = owner.view.ownerDocument.getElementById(id) as View;
 	if (!view) throw new Error("Can't find view element.");
 	//if (view.getAttribute("data-item")) return view;
 	if (!view.$control) {
@@ -18,11 +29,11 @@ export function getViewById(owner: ViewOwner, id: string) {
 	}
 	return view;
 }
-export function bindView(view: EditableView): void {
+export function bindView(view: View): void {
 	let control: Viewer = view.$control;
 	if (!control) {
 		let name = view.getAttribute("data-item");
-		let parent = getEditableView(view.parentElement) as EditableView;
+		let parent = getEditableView(view.parentElement) as View;
 		if (name && parent) {
 			//TODO forcing to DisplayType because I don't want to expose .control()
 			let type = parent.$control.type.types[name] as DisplayType;
@@ -31,14 +42,14 @@ export function bindView(view: EditableView): void {
 	}
 
 	if (control) for (let child of view.$control.content.children) {
-		bindView(child as EditableView);
+		bindView(child as View);
 	}
 }
 
-export function getEditableView(node: Node | Range): EditableView {
+export function getEditableView(node: Node | Range): View {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
-	for (let ele = node as EditableView; ele; ele = ele.parentElement) {
+	for (let ele = node as View; ele; ele = ele.parentElement) {
 		if (ele.$control?.contentType) return ele;
 	}
 }
@@ -46,7 +57,7 @@ export function getEditableView(node: Node | Range): EditableView {
 export function getContent(node: Node | Range): Element {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
-	for (let ele = node as EditableView; ele; ele = ele.parentElement) {
+	for (let ele = node as View; ele; ele = ele.parentElement) {
 		if (ele.$control?.content) return ele.$control.content as Element;
 	}
 }

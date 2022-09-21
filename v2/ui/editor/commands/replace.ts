@@ -1,6 +1,5 @@
-import {content, Content, Record, Viewer} from "../../../base/model.js";
-import { EditableView, ViewOwner } from "../../../base/editor.js";
-
+import {content, Content, Record} from "../../../base/model.js";
+import { ViewOwner, View, Viewer} from "../../../base/editor.js";
 import {Edit} from "./edit.js";
 import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items, bindView, getViewById} from "../util.js";
 
@@ -26,7 +25,7 @@ export abstract class Replace extends Edit {
 			range.insertNode(node);
 			range.collapse();
 			if (node.nodeType == Node.ELEMENT_NODE) {
-				bindView(node as EditableView);
+				bindView(node as View);
 			}
 		}
 		range = unmark(range);
@@ -36,7 +35,7 @@ export abstract class Replace extends Edit {
 		let view = getViewById(this.owner, this.viewId);
 		if (!view) throw new Error(`View "${this.viewId}" not found.`);
 		let range = view.ownerDocument.createRange();
-		range.selectNodeContents(view.$control.content as EditableView);
+		range.selectNodeContents(view.$control.content as View);
 		return range;
 	}
 }
@@ -159,8 +158,8 @@ export class ListReplace extends Replace {
 	protected execReplace(range: Range, content: content): Range {
 		let list = getViewById(this.owner, this.viewId);
 		let ctx = getContent(list);
-		let start = getChildView(ctx, range.startContainer) as EditableView;
-		let end = getChildView(ctx, range.endContainer) as EditableView;
+		let start = getChildView(ctx, range.startContainer) as View;
+		let end = getChildView(ctx, range.endContainer) as View;
 		if (start && start == end) {
 			this.onSingleContainer(range, content, start);
 		} else {
@@ -179,7 +178,7 @@ export class ListReplace extends Replace {
 		}
 		return unmark(range);
 	}
-	protected onStartContainer(range: Range, content: content, start: EditableView): void {
+	protected onStartContainer(range: Range, content: content, start: View): void {
 		let r = range.cloneRange();
 		let ctx = getContent(start);
 		r.setEnd(ctx, ctx.childNodes.length);
@@ -187,7 +186,7 @@ export class ListReplace extends Replace {
 		this.merge(start, r, content, true);
 		range.setStartAfter(start);
 	}
-	protected onEndContainer(range: Range, content: content, end: EditableView): void {
+	protected onEndContainer(range: Range, content: content, end: View): void {
 		let r = range.cloneRange();
 		let ctx = getContent(end);
 		r.setStart(ctx, 0);
@@ -195,10 +194,10 @@ export class ListReplace extends Replace {
 		this.merge(end, r, content, false);
 		range.setEndBefore(end);
 	}
-	protected merge(view: EditableView, range: Range, content: any, isStart: boolean) {
+	protected merge(view: View, range: Range, content: any, isStart: boolean) {
 		//overridden for markup
 	}
-	protected onSingleContainer(range: Range, content: content, container: EditableView): void {
+	protected onSingleContainer(range: Range, content: content, container: View): void {
 		//overridden for markup
 	}
 	//22-09-07 Same method for list & markup.
@@ -232,14 +231,14 @@ export class ListReplace extends Replace {
  */
 function captureRange(cmd: ListReplace, ctx: Element, start: number, end: number) {
 	for (let i = start; i; i--) {
-		let node = ctx.childNodes[i - 1] as EditableView;
+		let node = ctx.childNodes[i - 1] as View;
 		if (node.getAttribute("data-item")) {
 			cmd.startId = node.id;
 			break;
 		}
 	}
 	for (let i = end; i < ctx.childNodes.length; i++) {
-		let node = ctx.childNodes[i] as EditableView;
+		let node = ctx.childNodes[i] as View;
 		if (node.getAttribute("data-item")) {
 			cmd.endId = node.id;
 			break;
@@ -263,7 +262,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		return super.getOuterRange(range);
 	}
-	protected onSingleContainer(range: Range, content: content, part: EditableView): void {
+	protected onSingleContainer(range: Range, content: content, part: View): void {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
@@ -298,7 +297,7 @@ export class MarkupReplace extends ListReplace {
 		if (!(this.name == "Split")) this.merge(end, r, content, false);
 		//note: onInsert() handles the remainder of the 'paste' content.
 	}
-	protected onStartContainer(range: Range, content: content, start: EditableView): void {
+	protected onStartContainer(range: Range, content: content, start: View): void {
 		let r = range.cloneRange();
 		let ctx = getContent(start);
 		r.setEnd(ctx, ctx.childNodes.length);
@@ -313,7 +312,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		range.setStartBefore(start);
 	}
-	protected merge(view: EditableView, range: Range, content: any, isStart: boolean) {
+	protected merge(view: View, range: Range, content: any, isStart: boolean) {
 		let item: Content = content?.length && content[isStart ? 0 : content.length - 1];
 		if (!item) return;
 

@@ -1,5 +1,6 @@
 import { Actions, Control } from "../../base/control.js";
-import { Area, View, Edges, Shape, Type, Zone } from "../../base/model.js";
+import { View } from "../../base/editor.js";
+import { Area, Edges, Shape, Type, Zone } from "../../base/model.js";
 
 
 const DEFAULT_BORDER: Edges = {

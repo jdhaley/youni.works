@@ -30,47 +30,6 @@ export interface Type {
 	types: bundle<Type>;
 }
 
-interface Container {
-	readonly $control?: Viewer;
-	textContent: string;
-}
-
-export interface View extends Container {
-	readonly classList: Bag<string>;
-	readonly children: Iterable<View>;
-	append(view: any): void;
-}
-
-export interface Viewer extends Receiver, Shape {
-	readonly type: Type;
-	readonly contentType: string;
-	readonly header?: View;
-	readonly content: View;
-	readonly footer?: View;
-
-	contentOf(range?: Range): content;
-}
-
-interface Range {
-	startContainer: Container;
-    startOffset: number;
-	endContainer: Container;
-    endOffset: number;
-}
-
-export function viewType(value: any): string {
-	let type = typeOf(value);
-	switch (type) {
-		case "string":
-		case "number":
-		case "boolean":
-		case "date":
-			return "text";
-		default:
-			return type;
-	}
-}
-
 export function typeOf(value: any): string {
 	if (value?.valueOf) value = value.valueOf(value);
 	let type = typeof value;

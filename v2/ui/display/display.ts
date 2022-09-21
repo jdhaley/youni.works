@@ -1,5 +1,5 @@
-import {content, Type, View, Viewer} from "../../base/model.js";
-import { ViewOwner, ViewType } from "../../base/editor.js";
+import {content, Type} from "../../base/model.js";
+import { Viewer, ViewOwner, ViewType } from "../../base/editor.js";
 import {bundle, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
@@ -7,7 +7,7 @@ import { CommandBuffer } from "../../base/command.js";
 import { Owner, Receiver } from "../../base/control.js";
 import { Box } from "./box.js";
 
-interface DisplayElement extends Element{
+interface DisplayElement extends Element {
 	$control?: Display;
 	children: HTMLCollectionOf<DisplayElement>
 }

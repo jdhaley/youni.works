@@ -1,16 +1,16 @@
-import {content, List, viewType} from "../../../base/model.js";
-import { ViewType } from "../../../base/editor.js";
+import {content, List} from "../../../base/model.js";
 
 import { ListReplace } from "../commands/replace.js";
 import { getEditableView } from "../util.js";
 import { Display } from "../../display/display.js";
+import { viewType } from "../../../base/editor.js";
 
 export class ListEditor extends Display {
 	contentType = "list";
 	viewContent(model: List): void {
 		this.draw();
 		if (model && model[Symbol.iterator]) for (let item of model) {
-			let type = this.type as ViewType;
+			let type = this.type;
 			type = type.types[viewType(item)] || type.owner.unknownType;
 			let part = type.view(item) as Element;
 			this.content.append(part);
