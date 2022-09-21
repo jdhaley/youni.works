@@ -1,5 +1,5 @@
-import {content, Content, Record} from "../../../base/model.js";
-import { EditableView, ViewOwner, ViewType } from "../../../base/editor.js";
+import {content, Content, Record, Viewer} from "../../../base/model.js";
+import { EditableView, ViewOwner } from "../../../base/editor.js";
 
 import {Edit} from "./edit.js";
 import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items, bindView, getViewById} from "../util.js";
@@ -78,9 +78,9 @@ function mergeContent(cmd: Replace, range: Range, record: Record) {
 	let start = getChildView(ctx, range.startContainer);
 	let end = getChildView(ctx, range.endContainer);
 	for (let member = start || ctx.firstElementChild; member; member = member.nextElementSibling) {
-		let type: ViewType = member["$control"].type;
-		if (type.contentType == "text") {
-			let value = record[type["name"]];
+		let control = member["$control"] as Viewer;
+		if (control?.contentType == "text") {
+			let value = record[control.type.name];
 			if (value) {
 				member.children[1].textContent += value;
 			}
@@ -256,7 +256,7 @@ export class MarkupReplace extends ListReplace {
 			the entire view so that the outer range is like a multi-item range.
 		*/
 		let view = getEditableView(range);
-		if (view.$control.type.contentType == "line") {
+		if (view.$control.contentType == "line") {
 			range = range.cloneRange();
 			range.selectNode(view);
 			return range;

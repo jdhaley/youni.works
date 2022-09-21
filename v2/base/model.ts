@@ -25,7 +25,7 @@ export interface Record {
 
 export interface Type {
 	name: string;
-	contentType: string;
+	//contentType: string;
 	partOf?: Type;
 	types: bundle<Type>;
 }
@@ -43,6 +43,7 @@ export interface View extends Container {
 
 export interface Viewer extends Receiver, Shape {
 	readonly type: Type;
+	readonly contentType: string;
 	readonly header?: View;
 	readonly content: View;
 	readonly footer?: View;

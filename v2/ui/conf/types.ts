@@ -21,46 +21,36 @@ const conf: bundle<DisplayConf> = {
 	text: {
 		class: DisplayType,
 		prototype: new TextEditor(text),
-		model: "text",
 		container: true,
 		tagName: "ui-text",
-		actions: text,
 		shortcuts: shortcuts
 	},
 	record: {
 		class: DisplayType,
 		prototype: new RecordEditor(record),
-		model: "record",
 		container: true,
 		tagName: "ui-record",
-		actions: record,
 		shortcuts: shortcuts
 	},
 	list: {
 		class: DisplayType,
 		prototype: new ListEditor(list),
-		model: "list",
 		container: true,
 		tagName: "ui-list",
-		actions: list,
 		shortcuts: shortcuts
 	},
 	markup: {
 		class: DisplayType,
 		prototype: new MarkupEditor(markup),
 		container: true,
-		model: "markup",
 		tagName: "ui-list",
-		actions: markup,
 		shortcuts: shortcuts
 	},
 	line: {
 		class: DisplayType,
 		prototype: new LineEditor(line),
 		container: false,
-		model: "line",
 		tagName: "p",
-		actions: line,
 		shortcuts: shortcuts
 	}
 }

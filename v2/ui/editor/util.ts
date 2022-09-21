@@ -39,7 +39,7 @@ export function getEditableView(node: Node | Range): EditableView {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
 	for (let ele = node as EditableView; ele; ele = ele.parentElement) {
-		if (ele.$control?.type.contentType) return ele;
+		if (ele.$control?.contentType) return ele;
 	}
 }
 
@@ -154,8 +154,8 @@ export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		let view = getEditableView(node);
-		if (view?.$control.type.contentType == "record") {
-			if (getEditableView(view.parentElement)?.$control.type.contentType == "list") {
+		if (view?.$control.contentType == "record") {
+			if (getEditableView(view.parentElement)?.$control.contentType == "list") {
 				if (enclosedInRange(view, range)) view.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
@@ -272,7 +272,7 @@ function navigateInto(ele: Element, isBack?: boolean) {
 	let view = getEditableView(ele);
 	if (!view) return;
 	let content = view.$control.content as Element;
-	switch (view.$control.type.contentType) {
+	switch (view.$control.contentType) {
 		case "text":
 		case "line":
 		case "markup":

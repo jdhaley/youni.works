@@ -41,7 +41,6 @@ function shapetest(this: DisplayOwner) {
 		prototype: new TextEditor(shape),
 		actions: shape
 	});
-	type.contentType = "text";
 	
 	let view = type.view("HELLO THERE");
 	let control = view["$control"];

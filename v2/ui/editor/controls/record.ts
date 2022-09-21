@@ -5,6 +5,7 @@ import { getEditableView } from "../util.js";
 import { Display } from "../../display/display.js";
 
 export class RecordEditor extends Display {
+	contentType = "record";
 	viewContent(model: content): void {
 		this.draw();
 		//view["$at"] = Object.create(null);
@@ -27,7 +28,7 @@ export class RecordEditor extends Display {
 	edit(commandName: string, range: Range, record: Record) {
 		if (record && typeof record[0] == "object") record = record[0] as Record;
 		let view = getEditableView(range);
-		if (view?.$control.type.contentType != "record") {
+		if (view?.$control.contentType != "record") {
 			console.error("Invalid range for edit.");
 			return;
 		}

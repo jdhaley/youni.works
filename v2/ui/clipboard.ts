@@ -24,7 +24,7 @@ export function setClipboard(range: Range, clipboard: DataTransfer) {
 		clipboard.setData("text/plain", model);
 		return;
 	}
-	if (control.type.contentType == "markup") {
+	if (control.contentType == "markup") {
 		let item = section(model as Section[]);
 		let article = toHtml(item);
 		clipboard.setData("text/html", article.outerHTML);

@@ -21,5 +21,6 @@ export interface EditableView extends Element {
 
 export interface Editor extends Viewer {
 	type: ViewType;
+	contentType: string;
 	edit(commandName: string, range: Range, content?: content): Range;
 }

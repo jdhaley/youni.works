@@ -1,13 +1,13 @@
-import {content, Type, Viewer} from "../../base/model.js";
+import {content, Type, View, Viewer} from "../../base/model.js";
 import { ViewOwner, ViewType } from "../../base/editor.js";
 import {bundle, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
-import { Actions, Owner, Receiver } from "../../base/control.js";
+import { Owner, Receiver } from "../../base/control.js";
 import { Box } from "./box.js";
 
-interface DisplayElement extends Element {
+interface DisplayElement extends Element{
 	$control?: Display;
 	children: HTMLCollectionOf<DisplayElement>
 }
@@ -15,13 +15,11 @@ interface DisplayElement extends Element {
 export interface DisplayConf {
 	class: typeof DisplayType;
 	prototype?: Display,
-	model: "text" | "record" | "list" | "markup" | "line";
+
 	container: boolean;
 	tagName: string;
-	actions: Actions;
 	shortcuts: bundle<string>;
 }
-
 
 export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -83,14 +81,12 @@ export class DisplayType implements ViewType {
 		this.owner = owner;
 	}
 	owner: DisplayOwner;
-	name: string;
-	types: bundle<DisplayType>
-
-	contentType: string;
-	isProperty: boolean;
+	declare name: string;
+	declare types: bundle<DisplayType>
+	declare prototype: Display;
 
 	conf: bundle<any>;
-	declare prototype: Display;
+	isProperty: boolean;
 
 	generalizes(type: Type): boolean {
 		return type == this;
@@ -126,7 +122,6 @@ export class DisplayType implements ViewType {
 		this.name = name;
 		if (conf) {
 			this.conf = extend(this.conf || null, conf);
-			if (conf.model) this.contentType = conf.model;	
 		}
 		if (conf.prototype) this.prototype = conf.prototype;
 		//if (!this.prototype) this.prototype = new Display(this.conf.actions);
@@ -142,6 +137,7 @@ export class DisplayType implements ViewType {
 
 export abstract class Display extends Box implements Viewer {
 	declare type: DisplayType;
+	declare contentType: string;
 	declare header: Element;
 	declare content: DisplayElement;
 	declare footer: Element;
@@ -183,7 +179,7 @@ export abstract class Display extends Box implements Viewer {
 		this.content = ele;
 	}
 	protected createFooter(model?: content) {
-		if (this.type.contentType != "list") return;
+		if (this.contentType != "list") return;
 		let footer = this.owner.createElement("footer");
 		this._node.append(footer);
 		this.footer = footer;

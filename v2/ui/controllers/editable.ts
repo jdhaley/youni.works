@@ -114,7 +114,7 @@ function getInsertableRange(range: Range) {
 	range = range.cloneRange();
 	let view = getEditableView(range);
 	while (view) {
-		if (view?.$control.type.contentType == "list") {
+		if (view?.$control.contentType == "list") {
 			return range;
 		}
 		if (!atStart(view, range.startContainer, range.startOffset)) {

@@ -6,6 +6,7 @@ import { getEditableView } from "../util.js";
 import { Display } from "../../display/display.js";
 
 export class ListEditor extends Display {
+	contentType = "list";
 	viewContent(model: List): void {
 		this.draw();
 		if (model && model[Symbol.iterator]) for (let item of model) {
@@ -33,7 +34,7 @@ export class ListEditor extends Display {
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
 		let view = getEditableView(range);
-		if (view.$control.type.contentType != "list") console.warn("View is not a list:", view);
+		if (view.$control.contentType != "list") console.warn("View is not a list:", view);
 	
 		return new ListReplace(this.owner, commandName, view.id).exec(range, content);
 	}

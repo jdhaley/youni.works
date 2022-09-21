@@ -2,6 +2,7 @@ import { Content } from "../../../base/model.js";
 import { TextEditor } from "./text.js";
 
 export class LineEditor extends TextEditor {
+	contentType = "line";
 	viewContent(content: Content): void {
 		this.draw();
 		let impl = this.content as Element;

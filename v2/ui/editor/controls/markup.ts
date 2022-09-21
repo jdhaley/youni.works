@@ -7,6 +7,7 @@ import { getChildView, getEditableView } from "../util.js";
 import { ListEditor } from "./list.js";
 
 export class MarkupEditor extends ListEditor {
+	contentType = "markup";
 	edit(commandName: string, range: Range, content: string) {
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
@@ -33,10 +34,10 @@ function noop() {
 
 function replace(this: MarkupEditor, commandName: string, range: Range, content?: content): Range {
 	let view = getEditableView(range);
-	if (view.$control.type.contentType == "line") {
+	if (view.$control.contentType == "line") {
 		view = getEditableView(view.parentElement);
 	}
-	if (view.$control.type.contentType != "markup") console.warn("View is not markup:", view);
+	if (view.$control.contentType != "markup") console.warn("View is not markup:", view);
 
 	return new MarkupReplace(this.owner, commandName, view.id).exec(range, content);
 }

@@ -5,6 +5,7 @@ import { CHAR } from "../../../base/util.js";
 import { Display } from "../../display/display.js";
 
 export class TextEditor extends Display {
+	contentType = "text";
 	viewContent(model: content): void {
 		this.draw();
 		this.content.textContent = "" + model;
