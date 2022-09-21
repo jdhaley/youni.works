@@ -1,4 +1,4 @@
-import { Content } from "../../base/model.js";
+import { Content } from "../../../base/model.js";
 import { TextEditor } from "./text.js";
 
 export class LineEditor extends TextEditor {

@@ -1,5 +1,5 @@
 import {Response} from "../../base/message.js";
-import {Display, DisplayOwner, DisplayType} from "../display/display.js";
+import {DisplayOwner, DisplayType} from "../display/display.js";
 
 import {start} from "../../base/type.js";
 import {extend} from "../../base/util.js";
@@ -7,7 +7,7 @@ import {extend} from "../../base/util.js";
 import {UserEvent} from "../ui.js";
 
 import shape from "./shape.js";
-import { TextEditor } from "../editor/text.js";
+import { TextEditor } from "../editor/controls/text.js";
 
 export default extend(null, {
 	open(this: DisplayOwner, res: Response<string>) {

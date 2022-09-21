@@ -1,9 +1,9 @@
-import {content, List, viewType} from "../../base/model.js";
-import { ViewType } from "../../base/editor.js";
+import {content, List, viewType} from "../../../base/model.js";
+import { ViewType } from "../../../base/editor.js";
 
-import { ListReplace } from "./commands/replace.js";
-import { getEditableView } from "./util.js";
-import { Display } from "../display/display.js";
+import { ListReplace } from "../commands/replace.js";
+import { getEditableView } from "../util.js";
+import { Display } from "../../display/display.js";
 
 export class ListEditor extends Display {
 	viewContent(model: List): void {
@@ -38,14 +38,3 @@ export class ListEditor extends Display {
 		return new ListReplace(this.owner, commandName, view.id).exec(range, content);
 	}
 }
-
-
-// function getContentElement(view: View, range?: Range) {
-// 	if (range && !range.intersectsNode(view as Element)) return;
-// 	if (view.classList.contains("content")) return view;
-// 	for (let child of view.children) {
-// 		child = getContentElement(child, range);
-// 		if (child) return child;
-// 	}
-// }
-

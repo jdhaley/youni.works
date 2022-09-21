@@ -1,9 +1,9 @@
-import { content } from "../../base/model.js";
-import { EditableView, ViewType } from "../../base/editor.js";
+import { content } from "../../../base/model.js";
+import { EditableView, ViewType } from "../../../base/editor.js";
 
-import { LevelCommand } from "./commands/level.js";
-import { MarkupReplace } from "./commands/replace.js";
-import { getChildView, getEditableView } from "./util.js";
+import { LevelCommand } from "../commands/level.js";
+import { MarkupReplace } from "../commands/replace.js";
+import { getChildView, getEditableView } from "../util.js";
 import { ListEditor } from "./list.js";
 
 export class MarkupEditor extends ListEditor {
@@ -41,13 +41,6 @@ function replace(this: MarkupEditor, commandName: string, range: Range, content?
 	return new MarkupReplace(this.owner, commandName, view.id).exec(range, content);
 }
 
-// function getThisView(editor: ViewType, node: Range | Node): EditableView {
-// 	if (node instanceof Range) node = node.commonAncestorContainer;
-// 	while (node && node["$control"]?.type != editor) {
-// 		node = node.parentElement;
-// 	}
-// 	return node as EditableView;
-// }
 function level(this: MarkupEditor, name: "Promote" | "Demote", range: Range): Range {
 	let content = this.content as Element;
 	if (!content.firstElementChild) return;

@@ -11,11 +11,11 @@ import shortcuts from "./shortcuts.js";
 
 import {DisplayConf, DisplayType} from "../display/display.js";
 
-import { TextEditor } from "../editor/text.js";
-import { RecordEditor } from "../editor/record.js";
-import { ListEditor } from "../editor/list.js";
-import { MarkupEditor } from "../editor/markup.js";
-import { LineEditor } from "../editor/line.js";
+import { TextEditor } from "../editor/controls/text.js";
+import { RecordEditor } from "../editor/controls/record.js";
+import { ListEditor } from "../editor/controls/list.js";
+import { MarkupEditor } from "../editor/controls/markup.js";
+import { LineEditor } from "../editor/controls/line.js";
 
 const conf: bundle<DisplayConf> = {
 	text: {

@@ -51,6 +51,16 @@ export function getContent(node: Node | Range): Element {
 	}
 }
 
+// TO DRIVE DEEP INTO A VIEW (e.g. for 'templated' records)
+// function getContentElement(view: View, range?: Range) {
+// 	if (range && !range.intersectsNode(view as Element)) return;
+// 	if (view.classList.contains("content")) return view;
+// 	for (let child of view.children) {
+// 		child = getContentElement(child, range);
+// 		if (child) return child;
+// 	}
+// }
+
 export function getChildView(content: Element, node: Node): Element {
 	if (node == content) return null;
 	while (node?.parentElement != content) {

@@ -1,8 +1,8 @@
-import {TextReplace} from "./commands/replace.js";
-import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "./util.js";
-import { content } from "../../base/model.js";
-import { CHAR } from "../../base/util.js";
-import { Display } from "../display/display.js";
+import {TextReplace} from "../commands/replace.js";
+import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "../util.js";
+import { content } from "../../../base/model.js";
+import { CHAR } from "../../../base/util.js";
+import { Display } from "../../display/display.js";
 
 export class TextEditor extends Display {
 	viewContent(model: content): void {
@@ -32,12 +32,6 @@ export class TextEditor extends Display {
 		if (!cmd) throw new Error("Unrecognized command");
 		return cmd.call(this, commandName, range, content);
 	}
-}
-export default function edit(commandName: string, range: Range, content: string) {
-	positionToText(range);
-	let cmd = COMMANDS[commandName];
-	if (!cmd) throw new Error("Unrecognized command");
-	return cmd.call(this, commandName, range, content);
 }
 
 const COMMANDS = {
