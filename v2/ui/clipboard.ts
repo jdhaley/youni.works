@@ -2,7 +2,7 @@ import { content, Section } from "../base/model.js";
 import { section } from "./transform/item.js";
 import { fromHtml } from "./transform/fromHtml.js";
 import { toHtml } from "./transform/toHtml.js";
-import { getViewer } from "./editor/util.js";
+import { getViewer } from "./display/display.js";
 
 export function getClipboard(clipboard: DataTransfer): content {
 	let data = clipboard.getData("application/json");

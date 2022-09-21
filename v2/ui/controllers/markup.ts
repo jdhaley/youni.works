@@ -1,6 +1,6 @@
 import {extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
-import {getContent, navigate} from "../editor/util.js";
+import {navigate} from "../editor/util.js";
 import list from "./list.js";
 import { getClipboard } from "../clipboard.js";
 import { content } from "../../base/model.js";
@@ -76,12 +76,4 @@ function nav(event: UserEvent, isPrevious?: boolean) {
 		event.range.selectNodeContents(item);
 		item.scrollIntoView({block: "center"});
 	}
-}
-
-function goToTask(view: Element, range: Range) {
-	let go = getContent(view).lastElementChild;
-	go = getContent(go).firstElementChild;
-	go = getContent(go);
-	range.setStart(go.firstChild, go.firstChild.textContent.length);
-	range.collapse(true);
 }

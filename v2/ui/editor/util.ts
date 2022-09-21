@@ -1,66 +1,12 @@
-import { View, Viewer, ViewOwner } from "../../base/editor.js";
-import { DisplayType } from "../display/display.js";
+import { getView, getViewer } from "../display/display.js";
 
-export function getViewer(node: Node | Range): Viewer {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node instanceof Element && node.getAttribute("data-item")) {
-			if (node["$control"]) return node["$control"];
-			console.warn("Unbound view.");
-			return;
-		}
-		node = node.parentElement;
-	}
-}
-
-export function getViewById(owner: ViewOwner, id: string) {
-	let view = owner.view.ownerDocument.getElementById(id) as View;
-	if (!view) throw new Error("Can't find view element.");
-	//if (view.getAttribute("data-item")) return view;
-	if (!view.$control) {
-		console.warn("binding...");
-		bindView(view as any);
-		if (!view.$control) {
-			console.error("Unable to bind missing control. Please collect info / analyze.");
-			debugger;
-		}
-	} else {
-		view.$control.content; //checks the view isn't corrupted.
-	}
-	return view;
-}
-export function bindView(view: View): void {
-	let control: Viewer = view.$control;
-	if (!control) {
-		let name = view.getAttribute("data-item");
-		let parent = getEditableView(view.parentElement) as View;
-		if (name && parent) {
-			//TODO forcing to DisplayType because I don't want to expose .control()
-			let type = parent.$control.type.types[name] as DisplayType;
-			if (type) control = type.control(view as any);
-		}
-	}
-
-	if (control) for (let child of view.$control.content.children) {
-		bindView(child as View);
-	}
-}
-
-export function getEditableView(node: Node | Range): View {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
-	for (let ele = node as View; ele; ele = ele.parentElement) {
-		if (ele.$control?.contentType) return ele;
-	}
-}
-
-export function getContent(node: Node | Range): Element {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
-	for (let ele = node as View; ele; ele = ele.parentElement) {
-		if (ele.$control?.content) return ele.$control.content as Element;
-	}
-}
+// export function getContent(node: Node | Range): Element {
+// 	if (node instanceof Range) node = node.commonAncestorContainer;
+// 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
+// 	for (let ele = node as View; ele; ele = ele.parentElement) {
+// 		if (ele.$control?.content) return ele.$control.content as Element;
+// 	}
+// }
 
 // TO DRIVE DEEP INTO A VIEW (e.g. for 'templated' records)
 // function getContentElement(view: View, range?: Range) {
@@ -158,15 +104,14 @@ function patchText(marker: Node) {
 			node.nextSibling.remove();
 		}
 	}
-
 }
 
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
-		let view = getEditableView(node);
+		let view = getView(node);
 		if (view?.$control.contentType == "record") {
-			if (getEditableView(view.parentElement)?.$control.contentType == "list") {
+			if (getView(view.parentElement)?.$control.contentType == "list") {
 				if (enclosedInRange(view, range)) view.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
@@ -217,12 +162,12 @@ function enclosedInRange(view: Element, range: Range) {
 // }
 
 export function narrowRange(range: Range) {
-	let view = getEditableView(range);
+	let view = getView(range);
 	if (!view) return;
 
 	let start = range.startContainer;
 	let end = range.endContainer;
-	let content = getContent(range)
+	let content = getViewer(range).content;
 	if (getHeader(view, start)) {;
 		range.setStart(content, 0);
 	}
@@ -242,7 +187,7 @@ export function rangeIterator(range: Range) {
 
 export const items = {
 	getSection(node: Node | Range): Element {
-		let ele = node && getEditableView(node);
+		let ele = node && getView(node);
 		while (ele) {
 			if (this.getRole(ele) == "heading") return ele;
 			ele = ele.previousElementSibling;
@@ -269,18 +214,18 @@ export const items = {
 }
 
 export function navigate(ele: Element, isBack?: boolean) {
-	ele = getEditableView(ele);
+	ele = getView(ele);
 	while (ele) {
 		let toEle = isBack ? ele.previousElementSibling : ele.nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next;
 		}
-		ele = getEditableView(ele.parentElement);
+		ele = getView(ele.parentElement);
 	}
 }
 function navigateInto(ele: Element, isBack?: boolean) {
-	let view = getEditableView(ele);
+	let view = getView(ele);
 	if (!view) return;
 	let content = view.$control.content as Element;
 	switch (view.$control.contentType) {

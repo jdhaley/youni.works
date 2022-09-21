@@ -1,12 +1,12 @@
 import {Edit} from "./edit.js";
-import { getChildView, getViewById, items } from "../util.js";
+import { getChildView, items } from "../util.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
 	startId: string;
 	endId: string;
 	exec(range: Range): Range {
-		let view = getViewById(this.owner, this.viewId);
+		let view = this.owner.getView(this.viewId);
 		let content = view.$control.content as Element;
 		this.startId = getChildView(content, range.startContainer).id;
 		this.endId = getChildView(content, range.endContainer).id;
@@ -16,8 +16,8 @@ export class LevelCommand extends Edit {
 	}
 	protected do(way: "Promote" | "Demote") {
 		let adjust = way == "Promote" ? -1 : 1;
-		let start = getViewById(this.owner, this.startId);
-		let end = getViewById(this.owner, this.endId);
+		let start = this.owner.getView(this.startId);
+		let end = this.owner.getView(this.endId);
 		if (start == end) {
 			level(start, adjust);
 		} else {

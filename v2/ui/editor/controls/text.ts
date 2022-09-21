@@ -1,8 +1,8 @@
 import {TextReplace} from "../commands/replace.js";
-import {getContent, getEditableView, getHeader, mark, narrowRange, unmark} from "../util.js";
+import {getHeader, mark, narrowRange, unmark} from "../util.js";
 import { content } from "../../../base/model.js";
 import { CHAR } from "../../../base/util.js";
-import { Display } from "../../display/display.js";
+import { Display, getView, getViewer } from "../../display/display.js";
 
 export class TextEditor extends Display {
 	contentType = "text";
@@ -28,6 +28,7 @@ export class TextEditor extends Display {
 		return model;			
 	}
 	edit(commandName: string, range: Range, content: string) {
+		if (getViewer(range) != this) console.warn("Invalid edit range");
 		positionToText(range);
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
@@ -61,7 +62,7 @@ let lastEdit = {
 }
 function doit(commandName: string, range: Range, text: string): Range {
 	let node = range.commonAncestorContainer;
-	let view = getEditableView(node);
+	let view = getView(node);
 
 	if (range.collapsed && commandName == "Erase") {
 		if (!range.startOffset) return range;
@@ -149,7 +150,7 @@ function eraseAgain(range: Range, cmd: TextReplace) {
 
 function endagain(range: Range, cmd: TextReplace) {
 	mark(range);
-	cmd.after = getContent(range).innerHTML || "";
+	cmd.after = getViewer(range).content.innerHTML || "";
 	unmark(range);
 	range.collapse();
 	return range;
@@ -180,10 +181,10 @@ function endagain(range: Range, cmd: TextReplace) {
 // }
 
 function positionToText(range: Range) {
-	let inHeader = getHeader(getEditableView(range), range.startContainer);
+	let inHeader = getHeader(getView(range), range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
-		let content = getContent(range);
+		let content = getViewer(range).content;
 		if (content.childNodes.length != 1) {
 			//force single text node...
 			content.textContent = content.textContent;

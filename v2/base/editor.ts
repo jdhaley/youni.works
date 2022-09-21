@@ -3,26 +3,17 @@ import { CommandBuffer } from "./command.js";
 import { Bag, bundle } from "./util.js";
 import { Receiver } from "./control.js";
 
-interface Container {
-	readonly $control?: Viewer;
-	textContent: string;
-}
-
-interface View0 extends Container {
-	readonly classList: Bag<string>;
-	readonly children: Iterable<View>;
-	append(view: any): void;
-}
 export interface View extends Element {
 	readonly $control?: Viewer;
+	children: HTMLCollectionOf<View>
 }
 
 export interface Viewer extends Receiver, Shape {
 	readonly type: ViewType;
 	readonly contentType: string;
-	readonly header?: View;
+	//readonly header?: View;
 	readonly content: View;
-	readonly footer?: View;
+	//readonly footer?: View;
 
 	contentOf(range?: Range): content;
 	edit(commandName: string, range: Range, content?: content): Range;
@@ -34,12 +25,30 @@ export interface ViewType extends Type {
 	view(content: content): View;
 }
 
+export interface ViewOwner {
+	view: View;
+	unknownType: ViewType;
+	commands: CommandBuffer<Range>;
+	setRange(extent: Range, collapse?: boolean): void;
+	getView(id: string): View;
+}
+
 
 // interface Range {
 // 	startContainer: Container;
 //     startOffset: number;
 // 	endContainer: Container;
 //     endOffset: number;
+// }
+// interface Container {
+// 	readonly $control?: Viewer;
+// 	textContent: string;
+// }
+
+// interface View0 extends Container {
+// 	readonly classList: Bag<string>;
+// 	readonly children: Iterable<View>;
+// 	append(view: any): void;
 // }
 
 export function viewType(value: any): string {
@@ -54,11 +63,3 @@ export function viewType(value: any): string {
 			return type;
 	}
 }
-
-export interface ViewOwner {
-	view: View;
-	unknownType: ViewType;
-	commands: CommandBuffer<Range>;
-	setRange(extent: Range, collapse?: boolean): void;
-}
-

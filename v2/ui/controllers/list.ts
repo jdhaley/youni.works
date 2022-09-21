@@ -1,6 +1,6 @@
 import {extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
-import {getContent, getFooter, getHeader, rangeIterator} from "../editor/util.js";
+import {getFooter, getHeader} from "../editor/util.js";
 import editable from "./editable.js";
 import { Viewer } from "../../base/editor.js";
 
@@ -24,7 +24,7 @@ export default extend(editable, {
 				"title": event.data,
 				"type$": "task"
 			}
-			event.range.selectNodeContents(getContent(event.on));
+			event.range.selectNodeContents(this.content);
 			event.range.collapse();
 			let range = this.edit("Insert", event.range, [model]);
 			goToTask(event.on, range);
@@ -33,9 +33,9 @@ export default extend(editable, {
 });
 
 function goToTask(view: Element, range: Range) {
-	let go = getContent(view).lastElementChild;
-	go = getContent(go).firstElementChild;
-	go = getContent(go);
-	range.setStart(go.firstChild, go.firstChild.textContent.length);
-	range.collapse(true);
+	// let go = getContent(view).lastElementChild;
+	// go = getContent(go).firstElementChild;
+	// go = getContent(go);
+	// range.setStart(go.firstChild, go.firstChild.textContent.length);
+	// range.collapse(true);
 }

@@ -1,8 +1,7 @@
 import {content, Record} from "../../../base/model.js";
 
 import { RecordReplace } from "../commands/replace.js";
-import { getEditableView } from "../util.js";
-import { Display } from "../../display/display.js";
+import { Display, getViewer } from "../../display/display.js";
 import { Viewer } from "../../../base/editor.js";
 
 export class RecordEditor extends Display {
@@ -27,13 +26,9 @@ export class RecordEditor extends Display {
 		return model;
 	}
 	edit(commandName: string, range: Range, record: Record) {
+		if (getViewer(range) != this) console.warn("Invalid edit range");
 		if (record && typeof record[0] == "object") record = record[0] as Record;
-		let view = getEditableView(range);
-		if (view?.$control.contentType != "record") {
-			console.error("Invalid range for edit.");
-			return;
-		}
-		return new RecordReplace(this.owner, commandName, view.id).exec(range, record);
+		return new RecordReplace(this.owner, commandName, this._node.id).exec(range, record);
 	}
 }
 

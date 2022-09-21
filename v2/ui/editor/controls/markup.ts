@@ -3,12 +3,14 @@ import { View, ViewType } from "../../../base/editor.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/replace.js";
-import { getChildView, getEditableView } from "../util.js";
+import { getChildView } from "../util.js";
 import { ListEditor } from "./list.js";
+import { getView, getViewer } from "../../display/display.js";
 
 export class MarkupEditor extends ListEditor {
 	contentType = "markup";
 	edit(commandName: string, range: Range, content: string) {
+		if (getViewer(range) != this) console.warn("Invalid edit range");
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
 		return cmd.call(this, commandName, range, content);
@@ -33,9 +35,9 @@ function noop() {
 }
 
 function replace(this: MarkupEditor, commandName: string, range: Range, content?: content): Range {
-	let view = getEditableView(range);
+	let view = getView(range);
 	if (view.$control.contentType == "line") {
-		view = getEditableView(view.parentElement);
+		view = getView(view.parentElement);
 	}
 	if (view.$control.contentType != "markup") console.warn("View is not markup:", view);
 

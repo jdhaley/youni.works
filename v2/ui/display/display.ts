@@ -1,16 +1,11 @@
 import {content, Type} from "../../base/model.js";
-import { Viewer, ViewOwner, ViewType } from "../../base/editor.js";
+import { View, Viewer, ViewOwner, ViewType } from "../../base/editor.js";
 import {bundle, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
 import { Owner, Receiver } from "../../base/control.js";
 import { Box } from "./box.js";
-
-interface DisplayElement extends Element {
-	$control?: Display;
-	children: HTMLCollectionOf<DisplayElement>
-}
 
 export interface DisplayConf {
 	class: typeof DisplayType;
@@ -73,7 +68,59 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 		}
 		return type;
 	}
+	getView(id: string) {
+		let view = this.view.ownerDocument.getElementById(id) as View;
+		if (!view) throw new Error("Can't find view element.");
+		//if (view.getAttribute("data-item")) return view;
+		if (!view.$control) {
+			console.warn("binding...");
+			bindView(view as any);
+			if (!view.$control) {
+				console.error("Unable to bind missing control. Please collect info / analyze.");
+				debugger;
+			}
+		} else {
+			view.$control.content; //checks the view isn't corrupted.
+		}
+		return view;
+	}	
 }
+
+export function getViewer(node: Node | Range): Viewer {
+	return getView(node).$control;
+}
+
+export function getView(node: Node | Range): View {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node instanceof Element && node.getAttribute("data-item")) {
+			if (!node["$control"]) {
+				console.warn("Unbound view.");
+				bindView(node);
+			}
+			return node;
+		}
+		node = node.parentElement;
+	}
+}
+
+export function bindView(view: View): void {
+	let control: Viewer = view.$control;
+	if (!control) {
+		let name = view.getAttribute("data-item");
+		let parent = getView(view.parentElement) as View;
+		if (name && parent) {
+			//TODO forcing to DisplayType because I don't want to expose .control()
+			let type = parent.$control.type.types[name] as DisplayType;
+			if (type) control = type.control(view as any);
+		}
+	}
+
+	if (control) for (let child of view.$control.content.children) {
+		bindView(child as View);
+	}
+}
+
 
 let NEXT_ID = 1;
 export class DisplayType implements ViewType {
@@ -93,12 +140,12 @@ export class DisplayType implements ViewType {
 	}
 
 	view(content?: content): Element {
-		let view = this.owner.createElement(this.conf.tagName || "div") as DisplayElement;
+		let view = this.owner.createElement(this.conf.tagName || "div") as View;
 		this.control(view).viewContent(content);
 		return view;
 	}
-	control(element: DisplayElement): Display {
-		let display: Display = element.$control;
+	control(element: View): Display {
+		let display = element.$control as Display;
 		if (display) {
 			console.warn("Element is already bound to a control.");
 			return 
@@ -106,7 +153,7 @@ export class DisplayType implements ViewType {
 			display = Object.create(this.prototype);
 			(display as any)._node = element;
 		}
-		element.$control = display;
+		(element as any).$control = display;
 		element.setAttribute("data-item", this.name);
 		if (!element.id) element.id = "" + NEXT_ID++;
 
@@ -139,7 +186,7 @@ export abstract class Display extends Box implements Viewer {
 	declare type: DisplayType;
 	declare contentType: string;
 	declare header: Element;
-	declare content: DisplayElement;
+	declare content: View;
 	declare footer: Element;
 
 	get owner(): DisplayOwner {
@@ -186,8 +233,8 @@ export abstract class Display extends Box implements Viewer {
 	}
 }
 
-function bindContainer(node: DisplayElement) {
-	let control = node.$control;
+function bindContainer(node: View) {
+	let control = node.$control as Display;
 	for (let child of node.children) {
 		if (child.nodeName == "header") control.header = child;
 		if (child.nodeName == "footer") control.footer = child;

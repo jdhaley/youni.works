@@ -1,8 +1,12 @@
-import {content, Content, Record} from "../../../base/model.js";
+import { content, Content, Record } from "../../../base/model.js";
 import { ViewOwner, View, Viewer} from "../../../base/editor.js";
-import {Edit} from "./edit.js";
-import {getContent, getChildView, narrowRange, mark, clearContent, unmark, getEditableView, items, bindView, getViewById} from "../util.js";
+import { Edit } from "./edit.js";
+import { getChildView, narrowRange, mark, clearContent, unmark, items } from "../util.js";
+import { bindView, getView, getViewer } from "../../display/display.js";
 
+function getContent(node: Node | Range): Element {
+	return getViewer(node).content;
+}
 export abstract class Replace extends Edit {
 	before: string;
 	after: string;
@@ -32,7 +36,7 @@ export abstract class Replace extends Edit {
 		return range;
 	}
 	protected getReplaceRange(): Range {
-		let view = getViewById(this.owner, this.viewId);
+		let view = this.owner.getView(this.viewId);
 		if (!view) throw new Error(`View "${this.viewId}" not found.`);
 		let range = view.ownerDocument.createRange();
 		range.selectNodeContents(view.$control.content as View);
@@ -43,7 +47,7 @@ export abstract class Replace extends Edit {
 export class TextReplace extends Replace {
 	exec(range: Range, text: string): Range {
 		mark(range);
-		let content = getContent(range);
+		let content = getViewer(range).content;
 		if (!content) return;
 		this.before = content.innerHTML;	
 		range.deleteContents();
@@ -61,7 +65,7 @@ export class RecordReplace extends Replace {
 		narrowRange(range);
 		mark(range);
 
-		let content = getContent(range);
+		let content = getViewer(range).content;
 		this.before = content?.innerHTML || "";
 		clearContent(range);
 		if (record) mergeContent(this, range, record)
@@ -73,7 +77,7 @@ export class RecordReplace extends Replace {
 }
 
 function mergeContent(cmd: Replace, range: Range, record: Record) {
-	let ctx = getContent(range);
+	let ctx = getViewer(range).content;
 	let start = getChildView(ctx, range.startContainer);
 	let end = getChildView(ctx, range.endContainer);
 	for (let member = start || ctx.firstElementChild; member; member = member.nextElementSibling) {
@@ -109,12 +113,12 @@ export class ListReplace extends Replace {
 	protected getReplaceRange() {
 		let range = super.getReplaceRange();
 		if (this.startId) {
-			let start = getViewById(this.owner, this.startId);
+			let start = this.owner.getView(this.startId);
 			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
 			range.setStartAfter(start);
 		}
 		if (this.endId) {
-			let end = getViewById(this.owner, this.endId);
+			let end = this.owner.getView(this.endId);
 			if (!end) throw new Error(`End item.id '${this.endId}' not found.`);
 			range.setEndBefore(end);
 		}
@@ -156,7 +160,7 @@ export class ListReplace extends Replace {
 		return range;
 	}
 	protected execReplace(range: Range, content: content): Range {
-		let list = getViewById(this.owner, this.viewId);
+		let list = this.owner.getView(this.viewId);
 		let ctx = getContent(list);
 		let start = getChildView(ctx, range.startContainer) as View;
 		let end = getChildView(ctx, range.endContainer) as View;
@@ -205,7 +209,7 @@ export class ListReplace extends Replace {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!content) return;
-		let list = getViewById(this.owner, this.viewId);
+		let list = this.owner.getView(this.viewId);
 		let ctx = getContent(list);
 		//Ensure the range must be on the list conent. (It may be on a markup line).
 		while (range.commonAncestorContainer != ctx) {
@@ -254,7 +258,7 @@ export class MarkupReplace extends ListReplace {
 			(due to merge & join of the start & end). In this case select
 			the entire view so that the outer range is like a multi-item range.
 		*/
-		let view = getEditableView(range);
+		let view = getView(range);
 		if (view.$control.contentType == "line") {
 			range = range.cloneRange();
 			range.selectNode(view);

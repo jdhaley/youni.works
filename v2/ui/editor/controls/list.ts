@@ -1,8 +1,7 @@
 import {content, List} from "../../../base/model.js";
 
 import { ListReplace } from "../commands/replace.js";
-import { getEditableView } from "../util.js";
-import { Display } from "../../display/display.js";
+import { Display, getViewer } from "../../display/display.js";
 import { viewType } from "../../../base/editor.js";
 
 export class ListEditor extends Display {
@@ -33,9 +32,7 @@ export class ListEditor extends Display {
 		return model;
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
-		let view = getEditableView(range);
-		if (view.$control.contentType != "list") console.warn("View is not a list:", view);
-	
-		return new ListReplace(this.owner, commandName, view.id).exec(range, content);
+		if (getViewer(range) != this) console.warn("Invalid edit range");
+		return new ListReplace(this.owner, commandName, this._node.id).exec(range, content);
 	}
 }
