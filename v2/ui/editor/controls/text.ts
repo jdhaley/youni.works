@@ -1,8 +1,8 @@
-import {TextReplace} from "../commands/replace.js";
 import {getHeader, mark, narrowRange, unmark} from "../util.js";
 import { content } from "../../../base/model.js";
 import { CHAR } from "../../../base/util.js";
 import { BaseEditor, getEditor } from "./editor.js";
+import { Replace } from "../commands/replace.js";
 
 export class TextEditor extends BaseEditor {
 	contentType = "text";
@@ -33,6 +33,22 @@ export class TextEditor extends BaseEditor {
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
 		return cmd.call(this, commandName, range, content);
+	}
+}
+
+export class TextReplace extends Replace {
+	exec(range: Range, text: string): Range {
+		mark(range);
+		let content = getEditor(range).content;
+		if (!content) return;
+		this.before = content.innerHTML;	
+		range.deleteContents();
+		if (text) {
+			let ins = content.ownerDocument.createTextNode(text);
+			range.insertNode(ins);
+		}
+		this.after = content.innerHTML;
+		return unmark(range);	
 	}
 }
 

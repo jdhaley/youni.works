@@ -15,5 +15,13 @@ export abstract class BaseEditor extends Display implements Editor {
 }
 
 export function getEditor(node: Node | Range): Editor {
-	return getView(node)?.$control;
+	return getView(node)?.$control as Editor;
+}
+
+export function getChildEditor(editor: Editor, node: Node): Editor {
+	if (node == editor.content) return null;
+	while (node?.parentElement != editor.content) {
+		node = node.parentElement;
+	}
+	if (node instanceof Element && node["$control"]) return node["$control"] as Editor;
 }

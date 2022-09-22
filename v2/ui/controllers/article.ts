@@ -14,7 +14,7 @@ export default extend(null, {
 		start(this);
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, model);
-		this.view = type.view(model) as Element;
+		this.view = (type.view(model) as any).node;
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.view);
@@ -28,7 +28,7 @@ export default extend(null, {
 			return;
 		} else {
 			let control = this.view["$control"];
-			let model = control.type.toModel(this.view);
+			let model = control.contentOf();
 			console.log("Save: ", model);
 			this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
 		}
@@ -42,12 +42,11 @@ function shapetest(this: DisplayOwner) {
 		actions: shape
 	});
 	
-	let view = type.view("HELLO THERE");
-	let control = view["$control"];
-	control.content.classList.add("shape");
-	control.position(0, 0);
+	let viewer = type.view("HELLO THERE");
+	viewer.content.classList.add("shape");
+	viewer.position(0, 0);
 
-	this.frame.view.append(view as Element);
+	this.frame.view.append(viewer.node as Element);
 }
 
 function getType(article: DisplayOwner, path: string, data: any): DisplayType {

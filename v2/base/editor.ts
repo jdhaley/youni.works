@@ -1,43 +1,42 @@
 import { Type, Shape, content, typeOf } from "./model.js";
 import { CommandBuffer } from "./command.js";
-import { Bag, bundle } from "./util.js";
+import { bundle } from "./util.js";
 import { Receiver } from "./control.js";
 
 export interface View extends Element {
-	readonly $control?: Editor;
-	children: HTMLCollectionOf<View>
+	$control?: Viewer;
 }
 
 export interface Viewer extends Receiver, Shape {
 	readonly type: Type;
 	readonly contentType: string;
+	readonly node: unknown;
 
 	readonly header?: Element;
 	readonly content: Element;
 	readonly footer?: Element;
+	contentOf(range?: Range): content;
 }
 
 export interface Editor extends Viewer {
 	readonly type: ViewType;
 	readonly node: Element;
 	edit(commandName: string, range: Range, content?: content): Range;
-	contentOf(range?: Range): content;
 }
 
 export interface ViewType extends Type {
 	owner: ViewOwner;
 	types: bundle<ViewType>;
-	view(content: content): View;
+	view(content: content): Viewer;
 }
 
 export interface ViewOwner {
-	view: View;
+	view: Element;
 	unknownType: ViewType;
 	commands: CommandBuffer<Range>;
 	setRange(extent: Range, collapse?: boolean): void;
-	getView(id: string): View;
+	getEditor(id: string): Editor;
 }
-
 
 // interface Range {
 // 	startContainer: Container;

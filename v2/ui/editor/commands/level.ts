@@ -1,23 +1,23 @@
 import {Edit} from "./edit.js";
-import { getChildView, items } from "../util.js";
+import { items } from "../util.js";
+import { getChildEditor } from "../controls/editor.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
 	startId: string;
 	endId: string;
 	exec(range: Range): Range {
-		let view = this.owner.getView(this.viewId);
-		let content = view.$control.content as Element;
-		this.startId = getChildView(content, range.startContainer).id;
-		this.endId = getChildView(content, range.endContainer).id;
+		let editor = this.owner.getEditor(this.viewId);
+		this.startId = getChildEditor(editor, range.startContainer)?.node.id;
+		this.endId = getChildEditor(editor, range.endContainer)?.node.id;
 		this.do(this.name);
 		console.log(this);
 		return range;
 	}
 	protected do(way: "Promote" | "Demote") {
 		let adjust = way == "Promote" ? -1 : 1;
-		let start = this.owner.getView(this.startId);
-		let end = this.owner.getView(this.endId);
+		let start = this.owner.getEditor(this.startId).node;
+		let end = this.owner.getEditor(this.endId).node;
 		if (start == end) {
 			level(start, adjust);
 		} else {

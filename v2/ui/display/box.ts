@@ -1,5 +1,4 @@
 import { Actions, Control } from "../../base/control.js";
-import { View } from "../../base/editor.js";
 import { Area, Edges, Shape, Type, Zone } from "../../base/model.js";
 
 
@@ -16,7 +15,7 @@ export class Box extends Control implements Shape {
 		this.actions = actions;
 	}
 	declare type: Type;
-	declare content: View;
+	declare content: Element;
 	declare protected node: HTMLElement;
 	
 	get area(): Area {

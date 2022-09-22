@@ -1,11 +1,21 @@
 import { getEditor } from "./controls/editor.js";
 
-export function getChildView(content: Element, node: Node): Element {
-	if (node == content) return null;
-	while (node?.parentElement != content) {
-		node = node.parentElement;
+export function narrowRange(range: Range) {
+	let editor = getEditor(range);
+	if (!editor) return;
+
+	let start = range.startContainer;
+	let end = range.endContainer;
+	let content = getEditor(range).content;
+	if (getHeader(editor.node, start)) {;
+		range.setStart(content, 0);
 	}
-	if (node instanceof Element && node["$control"]) return node;
+	if (getFooter(editor.node, start)) {
+		range.setStart(content, content.childNodes.length);
+	}
+	if (getFooter(editor.node, end)) {
+		range.setEnd(content, content.childNodes.length);
+	}
 }
 
 export function getHeader(view: Element, node: Node) {
@@ -126,24 +136,6 @@ function enclosedInRange(view: Element, range: Range) {
 	if (range.compareBoundaryPoints(Range.START_TO_START, r) != 1
 		&& range.compareBoundaryPoints(Range.END_TO_END, r) != -1) {
 		return true;
-	}
-}
-
-export function narrowRange(range: Range) {
-	let editor = getEditor(range);
-	if (!editor) return;
-
-	let start = range.startContainer;
-	let end = range.endContainer;
-	let content = getEditor(range).content;
-	if (getHeader(editor.node, start)) {;
-		range.setStart(content, 0);
-	}
-	if (getFooter(editor.node, start)) {
-		range.setStart(content, content.childNodes.length);
-	}
-	if (getFooter(editor.node, end)) {
-		range.setEnd(content, content.childNodes.length);
 	}
 }
 

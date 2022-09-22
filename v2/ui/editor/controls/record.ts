@@ -1,8 +1,9 @@
-import {content, Record} from "../../../base/model.js";
+import { content, Record } from "../../../base/model.js";
 
-import { RecordReplace } from "../commands/replace.js";
+import { Replace } from "../commands/replace.js";
 import { Editor } from "../../../base/editor.js";
-import { BaseEditor, getEditor } from "./editor.js";
+import { BaseEditor, getChildEditor, getEditor } from "./editor.js";
+import { clearContent, mark, narrowRange, unmark } from "../util.js";
 
 export class RecordEditor extends BaseEditor {
 	contentType = "record";
@@ -12,7 +13,7 @@ export class RecordEditor extends BaseEditor {
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
 			let value = model ? model[name] : null;
-			let member = type.view(value);
+			let member = type.view(value).node as Element;
 			member.classList.add("field");
 			this.content.append(member);
 			//view["$at"][name] = member;
@@ -29,6 +30,38 @@ export class RecordEditor extends BaseEditor {
 		if (getEditor(range) != this) console.warn("Invalid edit range");
 		if (record && typeof record[0] == "object") record = record[0] as Record;
 		return new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
+	}
+}
+
+class RecordReplace extends Replace {
+	exec(range: Range, record: Record): Range {
+		narrowRange(range);
+		mark(range);
+
+		let content = getEditor(range).content;
+		this.before = content?.innerHTML || "";
+		clearContent(range);
+		if (record) mergeContent(this, range, record)
+		this.after = content?.innerHTML || "";
+	
+		unmark(range);
+		return range;
+	}
+}
+
+function mergeContent(cmd: Replace, range: Range, record: Record) {
+	let editor = getEditor(range);
+	let start = getChildEditor(editor, range.startContainer);
+	let end = getChildEditor(editor, range.endContainer);
+	for (let member = start.node || editor.node.firstElementChild; member; member = member.nextElementSibling) {
+		let control = member["$control"] as Editor;
+		if (control?.contentType == "text") {
+			let value = record[control.type.name];
+			if (value) {
+				member.children[1].textContent += value;
+			}
+		}
+		if (member == end.node) break;
 	}
 }
 
