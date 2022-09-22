@@ -1,10 +1,10 @@
 import {content, List} from "../../../base/model.js";
 
 import { ListReplace } from "../commands/replace.js";
-import { Display, getViewer } from "../../display/display.js";
 import { viewType } from "../../../base/editor.js";
+import { BaseEditor, getViewer } from "./editor.js";
 
-export class ListEditor extends Display {
+export class ListEditor extends BaseEditor {
 	contentType = "list";
 	viewContent(model: List): void {
 		this.draw();
@@ -33,6 +33,6 @@ export class ListEditor extends Display {
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
 		if (getViewer(range) != this) console.warn("Invalid edit range");
-		return new ListReplace(this.owner, commandName, this._node.id).exec(range, content);
+		return new ListReplace(this.owner, commandName, this.node.id).exec(range, content);
 	}
 }

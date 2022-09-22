@@ -1,10 +1,10 @@
 import {content, Record} from "../../../base/model.js";
 
 import { RecordReplace } from "../commands/replace.js";
-import { Display, getViewer } from "../../display/display.js";
-import { Viewer } from "../../../base/editor.js";
+import { Editor } from "../../../base/editor.js";
+import { BaseEditor, getViewer } from "./editor.js";
 
-export class RecordEditor extends Display {
+export class RecordEditor extends BaseEditor {
 	contentType = "record";
 	viewContent(model: content): void {
 		this.draw();
@@ -28,7 +28,7 @@ export class RecordEditor extends Display {
 	edit(commandName: string, range: Range, record: Record) {
 		if (getViewer(range) != this) console.warn("Invalid edit range");
 		if (record && typeof record[0] == "object") record = record[0] as Record;
-		return new RecordReplace(this.owner, commandName, this._node.id).exec(range, record);
+		return new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
 	}
 }
 
@@ -37,7 +37,7 @@ function recordContent(model: Record, view: Element, range: Range): Record {
 	
 	for (let child of view.children) {
 		if (child.classList.contains("field")) {
-			let viewer = child["$control"] as Viewer;
+			let viewer = child["$control"] as Editor;
 			let value = viewer.contentOf(range);
 			if (value) {
 				if (!model) model = Object.create(null);

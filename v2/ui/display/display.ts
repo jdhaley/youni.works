@@ -1,5 +1,5 @@
 import {content, Type} from "../../base/model.js";
-import { View, Viewer, ViewOwner, ViewType } from "../../base/editor.js";
+import { Editor, View, Viewer, ViewOwner, ViewType } from "../../base/editor.js";
 import {bundle, extend} from "../../base/util.js";
 import {Frame} from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
@@ -86,10 +86,6 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 	}	
 }
 
-export function getViewer(node: Node | Range): Viewer {
-	return getView(node).$control;
-}
-
 export function getView(node: Node | Range): View {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
@@ -145,13 +141,13 @@ export class DisplayType implements ViewType {
 		return view;
 	}
 	control(element: View): Display {
-		let display = element.$control as Display;
+		let display: Display = element.$control as any;
 		if (display) {
 			console.warn("Element is already bound to a control.");
 			return 
 		} else {
 			display = Object.create(this.prototype);
-			(display as any)._node = element;
+			(display as any).node = element;
 		}
 		(element as any).$control = display;
 		element.setAttribute("data-item", this.name);
@@ -203,38 +199,38 @@ export abstract class Display extends Box implements Viewer {
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 
 	protected draw() {
-		this._node.textContent = "";
+		this.node.textContent = "";
 		if (this.isContainer) {
 			this.createHeader();
 			this.createContent();
 			this.createFooter()
 		} else {
-			this.content = this._node;
+			this.content = this.node;
 			this.content.classList.add("content");
 		}
 	}
 	protected createHeader(model?: content) {
 		let header = this.owner.createElement("header");
 		header.textContent = this.type.conf.title || "";
-		this._node.append(header);
+		this.node.append(header);
 		this.header = header;
 	}
 	protected createContent(model?: content) {
 		let ele = this.owner.createElement("div");
 		ele.classList.add("content");
-		this._node.append(ele);
+		this.node.append(ele);
 		this.content = ele;
 	}
 	protected createFooter(model?: content) {
 		if (this.contentType != "list") return;
 		let footer = this.owner.createElement("footer");
-		this._node.append(footer);
+		this.node.append(footer);
 		this.footer = footer;
 	}
 }
 
 function bindContainer(node: View) {
-	let control = node.$control as Display;
+	let control: Display = node.$control as any;
 	for (let child of node.children) {
 		if (child.nodeName == "header") control.header = child;
 		if (child.nodeName == "footer") control.footer = child;

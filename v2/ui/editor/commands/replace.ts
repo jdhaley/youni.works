@@ -2,7 +2,8 @@ import { content, Content, Record } from "../../../base/model.js";
 import { ViewOwner, View, Viewer} from "../../../base/editor.js";
 import { Edit } from "./edit.js";
 import { getChildView, narrowRange, mark, clearContent, unmark, items } from "../util.js";
-import { bindView, getView, getViewer } from "../../display/display.js";
+import { bindView, getView } from "../../display/display.js";
+import { getViewer } from "../controls/editor.js";
 
 function getContent(node: Node | Range): Element {
 	return getViewer(node).content;

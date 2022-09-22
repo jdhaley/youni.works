@@ -17,8 +17,11 @@ export class Box extends Control implements Shape {
 	}
 	declare type: Type;
 	declare content: View;
-	declare protected _node: HTMLElement;
+	declare protected node: HTMLElement;
 	
+	get area(): Area {
+		return this.node.getBoundingClientRect();
+	}
 	get isContainer(): boolean {
 		return false;
 	}
@@ -26,24 +29,21 @@ export class Box extends Control implements Shape {
 		return DEFAULT_BORDER;
 	}
 	get style() {
-		return this._node.style;
-	}
-	get area(): Area {
-		return this._node.getBoundingClientRect();
+		return this.node.style;
 	}
 	getStyle(name: string): string {
-		return this._node.style.getPropertyValue(name);
+		return this.node.style.getPropertyValue(name);
 	}
 	setStyle(name: string, value?: string): void {
 		if (value || value === "") {
-			this._node.style.setProperty(name, "" + value);
+			this.node.style.setProperty(name, "" + value);
 		} else {
-			this._node.style.removeProperty(name);
+			this.node.style.removeProperty(name);
 		}
 	}
 
 	position(x: number, y: number) {
-		let style = this._node.style;
+		let style = this.node.style;
 		style.position = "absolute";			
 		style.left = x + "px";
 		style.top = y + "px";
@@ -74,7 +74,7 @@ export class Box extends Control implements Shape {
 		return zone as Zone;
 	}
 	size(width: number, height: number) {
-		let style = this._node.style;
+		let style = this.node.style;
 		style.width = Math.max(width, 16) + "px";
 		style.minWidth = style.width;
 		style.height = Math.max(height, 16) + "px";

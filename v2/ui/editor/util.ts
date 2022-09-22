@@ -1,22 +1,5 @@
-import { getView, getViewer } from "../display/display.js";
-
-// export function getContent(node: Node | Range): Element {
-// 	if (node instanceof Range) node = node.commonAncestorContainer;
-// 	if (node.nodeType != Node.ELEMENT_NODE) node = node.parentElement;
-// 	for (let ele = node as View; ele; ele = ele.parentElement) {
-// 		if (ele.$control?.content) return ele.$control.content as Element;
-// 	}
-// }
-
-// TO DRIVE DEEP INTO A VIEW (e.g. for 'templated' records)
-// function getContentElement(view: View, range?: Range) {
-// 	if (range && !range.intersectsNode(view as Element)) return;
-// 	if (view.classList.contains("content")) return view;
-// 	for (let child of view.children) {
-// 		child = getContentElement(child, range);
-// 		if (child) return child;
-// 	}
-// }
+import { getView } from "../display/display.js";
+import { getViewer } from "./controls/editor.js";
 
 export function getChildView(content: Element, node: Node): Element {
 	if (node == content) return null;
@@ -146,20 +129,6 @@ function enclosedInRange(view: Element, range: Range) {
 		return true;
 	}
 }
-
-// export function replace(article: Article, range: Range, markup: string) {
-// 	let div = range.commonAncestorContainer.ownerDocument.createElement("div");
-// 	div.innerHTML = markup;
-// 	range.deleteContents();
-// 	while (div.firstChild) {
-// 		let node = div.firstChild;
-// 		range.insertNode(node);
-// 		range.collapse();
-// 		if (node.nodeType == Node.ELEMENT_NODE) {
-// 			article.bindView(node as any);
-// 		}
-// 	}
-// }
 
 export function narrowRange(range: Range) {
 	let view = getView(range);

@@ -4,17 +4,17 @@ import {navigate} from "../editor/util.js";
 import list from "./list.js";
 import { getClipboard } from "../clipboard.js";
 import { content } from "../../base/model.js";
-import { Viewer } from "../../base/editor.js";
+import { Editor } from "../../base/editor.js";
 
 export default extend(list, {
-	paste(this: Viewer, event: UserEvent) {
+	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
 		range = this.edit("Paste", range, model);
 		range &&  this.type.owner.setRange(range, true);
 	},
-	insertText(this: Viewer, event: EditEvent) {
+	insertText(this: Editor, event: EditEvent) {
 		event.subject = "";
 		let model = {
 			"type$": "para",
@@ -23,7 +23,7 @@ export default extend(list, {
 		let range = this.edit("Entry", event.range, [model]);
 		range &&  this.type.owner.setRange(range, true);
 	},
-	split(this: Viewer, event: UserEvent) {
+	split(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model: content = "";
@@ -46,13 +46,13 @@ export default extend(list, {
 		}
 		range && this.type.owner.setRange(range, true);
 	},
-	join(this: Viewer, event: UserEvent) {
+	join(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		range = this.edit("Join", range, "");
 		range && this.type.owner.setRange(range, true);
 	},
-	next(this: Viewer, event: UserEvent) {
+	next(this: Editor, event: UserEvent) {
 		event.subject = "";
 		if (event.altKey) {
 			nav(event);
@@ -60,7 +60,7 @@ export default extend(list, {
 			this.edit("Demote", event.range);
 		}
 	},
-	previous(this: Viewer, event: UserEvent) {
+	previous(this: Editor, event: UserEvent) {
 		event.subject = "";
 		if (event.altKey) {
 			nav(event, true);

@@ -4,19 +4,23 @@ import { Bag, bundle } from "./util.js";
 import { Receiver } from "./control.js";
 
 export interface View extends Element {
-	readonly $control?: Viewer;
+	readonly $control?: Editor;
 	children: HTMLCollectionOf<View>
 }
 
 export interface Viewer extends Receiver, Shape {
-	readonly type: ViewType;
+	readonly type: Type;
 	readonly contentType: string;
 	//readonly header?: View;
-	readonly content: View;
+	readonly content: Element;
 	//readonly footer?: View;
+}
 
-	contentOf(range?: Range): content;
+export interface Editor extends Viewer {
+	readonly type: ViewType;
+	readonly node: Element;
 	edit(commandName: string, range: Range, content?: content): Range;
+	contentOf(range?: Range): content;
 }
 
 export interface ViewType extends Type {

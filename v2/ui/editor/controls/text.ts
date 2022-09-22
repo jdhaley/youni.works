@@ -2,13 +2,14 @@ import {TextReplace} from "../commands/replace.js";
 import {getHeader, mark, narrowRange, unmark} from "../util.js";
 import { content } from "../../../base/model.js";
 import { CHAR } from "../../../base/util.js";
-import { Display, getView, getViewer } from "../../display/display.js";
+import { getView } from "../../display/display.js";
+import { BaseEditor, getViewer } from "./editor.js";
 
-export class TextEditor extends Display {
+export class TextEditor extends BaseEditor {
 	contentType = "text";
 	viewContent(model: content): void {
 		this.draw();
-		this.content.textContent = "" + model;
+		this.content.textContent = model ? "" + model : "";
 	}
 	contentOf(range?: Range): content {
 		let model = "";
@@ -27,7 +28,7 @@ export class TextEditor extends Display {
 		model = model.trim();
 		return model;			
 	}
-	edit(commandName: string, range: Range, content: string) {
+	edit(commandName: string, range: Range, content: string): Range {
 		if (getViewer(range) != this) console.warn("Invalid edit range");
 		positionToText(range);
 		let cmd = COMMANDS[commandName];

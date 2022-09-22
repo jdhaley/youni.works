@@ -5,12 +5,13 @@ import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/replace.js";
 import { getChildView } from "../util.js";
 import { ListEditor } from "./list.js";
-import { getView, getViewer } from "../../display/display.js";
+import { getView } from "../../display/display.js";
+import { getViewer } from "./editor.js";
 
 export class MarkupEditor extends ListEditor {
 	contentType = "markup";
 	edit(commandName: string, range: Range, content: string) {
-		if (getViewer(range) != this) console.warn("Invalid edit range");
+		if (getViewer(range) != this) console.warn("fix this check"); //"Invalid edit range"
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
 		return cmd.call(this, commandName, range, content);
@@ -58,5 +59,5 @@ function level(this: MarkupEditor, name: "Promote" | "Demote", range: Range): Ra
 		}
 		if (item.id == end.id) break;
 	}
-	return new LevelCommand(this.owner, name, this._node.id).exec(range);
+	return new LevelCommand(this.owner, name, this.node.id).exec(range);
 }
