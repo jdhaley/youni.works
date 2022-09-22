@@ -2,12 +2,8 @@ import { content, Content, Record } from "../../../base/model.js";
 import { ViewOwner, View, Viewer} from "../../../base/editor.js";
 import { Edit } from "./edit.js";
 import { getChildView, narrowRange, mark, clearContent, unmark, items } from "../util.js";
-import { bindView } from "../../display/display.js";
-import { getEditor } from "../controls/editor.js";
+import { getEditor, bindView } from "../controls/editor.js";
 
-function getContent(node: Node | Range): Element {
-	return getEditor(node).content;
-}
 export abstract class Replace extends Edit {
 	before: string;
 	after: string;
@@ -130,7 +126,7 @@ export class ListReplace extends Replace {
 	 */
 	protected getOuterRange(range: Range) {
 		range = range.cloneRange();
-		let ctx = getContent(range);
+		let ctx = getEditor(range).content;
 		let start = getChildView(ctx, range.startContainer);
 		if (start) range.setStartBefore(start);
 		let end = getChildView(ctx, range.endContainer);
@@ -148,7 +144,7 @@ export class ListReplace extends Replace {
 		//NB - the outer range is a different range from the
 		//passed range and should only be used within this method.
 		range = this.getOuterRange(range);
-		let ctx = getContent(range);
+		let ctx = getEditor(range).content;
 		captureRange(this, ctx, range.startOffset, range.endOffset);
 	
 		//Capture the before image for undo.
@@ -162,7 +158,7 @@ export class ListReplace extends Replace {
 	}
 	protected execReplace(range: Range, content: content): Range {
 		let list = this.owner.getView(this.viewId);
-		let ctx = getContent(list);
+		let ctx = getEditor(list).content;
 		let start = getChildView(ctx, range.startContainer) as View;
 		let end = getChildView(ctx, range.endContainer) as View;
 		if (start && start == end) {
@@ -176,7 +172,7 @@ export class ListReplace extends Replace {
 	}
 	protected execAfter(range: Range): Range {
 		range = this.getReplaceRange();
-		let ctx = getContent(range);
+		let ctx = getEditor(range).content;
 		this.after = "";		
 		for (let i = range.startOffset; i < range.endOffset; i++) {
 			this.after += ctx.children[i].outerHTML;
@@ -185,7 +181,7 @@ export class ListReplace extends Replace {
 	}
 	protected onStartContainer(range: Range, content: content, start: View): void {
 		let r = range.cloneRange();
-		let ctx = getContent(start);
+		let ctx = getEditor(start).content;
 		r.setEnd(ctx, ctx.childNodes.length);
 		clearContent(r);
 		this.merge(start, r, content, true);
@@ -193,7 +189,7 @@ export class ListReplace extends Replace {
 	}
 	protected onEndContainer(range: Range, content: content, end: View): void {
 		let r = range.cloneRange();
-		let ctx = getContent(end);
+		let ctx = getEditor(end).content;
 		r.setStart(ctx, 0);
 		clearContent(r);
 		this.merge(end, r, content, false);
@@ -211,7 +207,7 @@ export class ListReplace extends Replace {
 		range.deleteContents();
 		if (!content) return;
 		let list = this.owner.getView(this.viewId);
-		let ctx = getContent(list);
+		let ctx = getEditor(list).content;
 		//Ensure the range must be on the list conent. (It may be on a markup line).
 		while (range.commonAncestorContainer != ctx) {
 			range.setStartBefore(range.commonAncestorContainer);
@@ -271,7 +267,7 @@ export class MarkupReplace extends ListReplace {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
-		let ctx = getContent(part);
+		let ctx = getEditor(part).content;
 		let r = range.cloneRange();
 		//Delete the range within the line.
 		r.deleteContents();
@@ -304,7 +300,7 @@ export class MarkupReplace extends ListReplace {
 	}
 	protected onStartContainer(range: Range, content: content, start: View): void {
 		let r = range.cloneRange();
-		let ctx = getContent(start);
+		let ctx = getEditor(start).content;
 		r.setEnd(ctx, ctx.childNodes.length);
 		r.deleteContents();
 		let startItem: Content = start.$control.contentOf() as any;
