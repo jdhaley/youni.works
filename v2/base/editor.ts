@@ -11,9 +11,10 @@ export interface View extends Element {
 export interface Viewer extends Receiver, Shape {
 	readonly type: Type;
 	readonly contentType: string;
-	//readonly header?: View;
+
+	readonly header?: Element;
 	readonly content: Element;
-	//readonly footer?: View;
+	readonly footer?: Element;
 }
 
 export interface Editor extends Viewer {

@@ -12,6 +12,6 @@ export abstract class BaseEditor extends Display implements Editor {
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 }
 
-export function getViewer(node: Node | Range): Editor {
-	return getView(node).$control;
+export function getEditor(node: Node | Range): Editor {
+	return getView(node)?.$control;
 }

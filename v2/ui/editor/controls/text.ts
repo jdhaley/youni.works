@@ -2,8 +2,7 @@ import {TextReplace} from "../commands/replace.js";
 import {getHeader, mark, narrowRange, unmark} from "../util.js";
 import { content } from "../../../base/model.js";
 import { CHAR } from "../../../base/util.js";
-import { getView } from "../../display/display.js";
-import { BaseEditor, getViewer } from "./editor.js";
+import { BaseEditor, getEditor } from "./editor.js";
 
 export class TextEditor extends BaseEditor {
 	contentType = "text";
@@ -29,7 +28,7 @@ export class TextEditor extends BaseEditor {
 		return model;			
 	}
 	edit(commandName: string, range: Range, content: string): Range {
-		if (getViewer(range) != this) console.warn("Invalid edit range");
+		if (getEditor(range) != this) console.warn("Invalid edit range");
 		positionToText(range);
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
@@ -63,7 +62,7 @@ let lastEdit = {
 }
 function doit(commandName: string, range: Range, text: string): Range {
 	let node = range.commonAncestorContainer;
-	let view = getView(node);
+	let editor = getEditor(node);
 
 	if (range.collapsed && commandName == "Erase") {
 		if (!range.startOffset) return range;
@@ -71,7 +70,7 @@ function doit(commandName: string, range: Range, text: string): Range {
 
 	if (range.collapsed && node == lastEdit.node) {
 		let cmd = this.owner.commands.peek() as TextReplace;
-		if (cmd?.name == commandName && view?.id == cmd.viewId) {
+		if (cmd?.name == commandName && editor?.node.id == cmd.viewId) {
 			let r = doAgain(cmd, range, text);
 			if (r) return r;		
 		}
@@ -92,7 +91,7 @@ function doit(commandName: string, range: Range, text: string): Range {
 		lastEdit.node = null;
 	}
 
-	return new TextReplace(this.owner, commandName, view.id).exec(range, text);
+	return new TextReplace(this.owner, commandName, editor.node.id).exec(range, text);
 }
 
 
@@ -151,7 +150,7 @@ function eraseAgain(range: Range, cmd: TextReplace) {
 
 function endagain(range: Range, cmd: TextReplace) {
 	mark(range);
-	cmd.after = getViewer(range).content.innerHTML || "";
+	cmd.after = getEditor(range).content.innerHTML || "";
 	unmark(range);
 	range.collapse();
 	return range;
@@ -182,10 +181,10 @@ function endagain(range: Range, cmd: TextReplace) {
 // }
 
 function positionToText(range: Range) {
-	let inHeader = getHeader(getView(range), range.startContainer);
+	let inHeader = getHeader(getEditor(range).node, range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
-		let content = getViewer(range).content;
+		let content = getEditor(range).content;
 		if (content.childNodes.length != 1) {
 			//force single text node...
 			content.textContent = content.textContent;

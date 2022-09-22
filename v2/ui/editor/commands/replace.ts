@@ -2,11 +2,11 @@ import { content, Content, Record } from "../../../base/model.js";
 import { ViewOwner, View, Viewer} from "../../../base/editor.js";
 import { Edit } from "./edit.js";
 import { getChildView, narrowRange, mark, clearContent, unmark, items } from "../util.js";
-import { bindView, getView } from "../../display/display.js";
-import { getViewer } from "../controls/editor.js";
+import { bindView } from "../../display/display.js";
+import { getEditor } from "../controls/editor.js";
 
 function getContent(node: Node | Range): Element {
-	return getViewer(node).content;
+	return getEditor(node).content;
 }
 export abstract class Replace extends Edit {
 	before: string;
@@ -48,7 +48,7 @@ export abstract class Replace extends Edit {
 export class TextReplace extends Replace {
 	exec(range: Range, text: string): Range {
 		mark(range);
-		let content = getViewer(range).content;
+		let content = getEditor(range).content;
 		if (!content) return;
 		this.before = content.innerHTML;	
 		range.deleteContents();
@@ -66,7 +66,7 @@ export class RecordReplace extends Replace {
 		narrowRange(range);
 		mark(range);
 
-		let content = getViewer(range).content;
+		let content = getEditor(range).content;
 		this.before = content?.innerHTML || "";
 		clearContent(range);
 		if (record) mergeContent(this, range, record)
@@ -78,7 +78,7 @@ export class RecordReplace extends Replace {
 }
 
 function mergeContent(cmd: Replace, range: Range, record: Record) {
-	let ctx = getViewer(range).content;
+	let ctx = getEditor(range).content;
 	let start = getChildView(ctx, range.startContainer);
 	let end = getChildView(ctx, range.endContainer);
 	for (let member = start || ctx.firstElementChild; member; member = member.nextElementSibling) {
@@ -259,10 +259,10 @@ export class MarkupReplace extends ListReplace {
 			(due to merge & join of the start & end). In this case select
 			the entire view so that the outer range is like a multi-item range.
 		*/
-		let view = getView(range);
-		if (view.$control.contentType == "line") {
+		let editor = getEditor(range);
+		if (editor.contentType == "line") {
 			range = range.cloneRange();
-			range.selectNode(view);
+			range.selectNode(editor.node);
 			return range;
 		}
 		return super.getOuterRange(range);

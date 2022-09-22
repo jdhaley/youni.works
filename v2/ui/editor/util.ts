@@ -1,5 +1,4 @@
-import { getView } from "../display/display.js";
-import { getViewer } from "./controls/editor.js";
+import { getEditor } from "./controls/editor.js";
 
 export function getChildView(content: Element, node: Node): Element {
 	if (node == content) return null;
@@ -92,13 +91,13 @@ function patchText(marker: Node) {
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
-		let view = getView(node);
-		if (view?.$control.contentType == "record") {
-			if (getView(view.parentElement)?.$control.contentType == "list") {
-				if (enclosedInRange(view, range)) view.remove();	
+		let editor = getEditor(node);
+		if (editor?.contentType == "record") {
+			if (getEditor(editor.node.parentElement)?.contentType == "list") {
+				if (enclosedInRange(editor.node, range)) editor.node.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
-			if (view && node.parentElement == view.$control.content) {
+			if (editor && node.parentElement == editor.content) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
 				} else if (node == range.endContainer) {
@@ -131,19 +130,19 @@ function enclosedInRange(view: Element, range: Range) {
 }
 
 export function narrowRange(range: Range) {
-	let view = getView(range);
-	if (!view) return;
+	let editor = getEditor(range);
+	if (!editor) return;
 
 	let start = range.startContainer;
 	let end = range.endContainer;
-	let content = getViewer(range).content;
-	if (getHeader(view, start)) {;
+	let content = getEditor(range).content;
+	if (getHeader(editor.node, start)) {;
 		range.setStart(content, 0);
 	}
-	if (getFooter(view, start)) {
+	if (getFooter(editor.node, start)) {
 		range.setStart(content, content.childNodes.length);
 	}
-	if (getFooter(view, end)) {
+	if (getFooter(editor.node, end)) {
 		range.setEnd(content, content.childNodes.length);
 	}
 }
@@ -156,10 +155,10 @@ export function rangeIterator(range: Range) {
 
 export const items = {
 	getSection(node: Node | Range): Element {
-		let ele = node && getView(node);
-		while (ele) {
-			if (this.getRole(ele) == "heading") return ele;
-			ele = ele.previousElementSibling;
+		let editor = node && getEditor(node);
+		while (editor) {
+			if (this.getRole(editor.node) == "heading") return editor.node;
+			editor = getEditor(editor.node.previousElementSibling);
 		}
 	},
 	setItem(item: Element, level: number, role?: string) {
@@ -182,36 +181,36 @@ export const items = {
 	}
 }
 
-export function navigate(ele: Element, isBack?: boolean) {
-	ele = getView(ele);
-	while (ele) {
-		let toEle = isBack ? ele.previousElementSibling : ele.nextElementSibling;
+export function navigate(start: Element, isBack?: boolean) {
+	let editor = getEditor(start);
+	while (editor) {
+		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next;
 		}
-		ele = getView(ele.parentElement);
+		editor = getEditor(editor.node.parentElement);
 	}
 }
 function navigateInto(ele: Element, isBack?: boolean) {
-	let view = getView(ele);
-	if (!view) return;
-	let content = view.$control.content as Element;
-	switch (view.$control.contentType) {
+	let editor = getEditor(ele);
+	if (!editor) return;
+	let content = editor.content as Element;
+	switch (editor.contentType) {
 		case "text":
 		case "line":
 		case "markup":
 			break;
 		case "record":
-			view = isBack ? content.lastElementChild : content.firstElementChild;
-			if (view) content = navigateInto(view);
+			ele = isBack ? content.lastElementChild : content.firstElementChild;
+			if (ele) content = navigateInto(ele);
 			break;
 		case "list":
 			let item = isBack ? content.lastElementChild : content.firstElementChild;
 			if (item) {
 				content = navigateInto(item);
 			} else {
-				content = view.children[2]; // HARD assumption the footer is the 3rd element.
+				content = editor.footer; // HARD assumption the footer is the 3rd element.
 			}
 			break;
 	}

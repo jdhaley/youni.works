@@ -2,7 +2,7 @@ import {content, List} from "../../../base/model.js";
 
 import { ListReplace } from "../commands/replace.js";
 import { viewType } from "../../../base/editor.js";
-import { BaseEditor, getViewer } from "./editor.js";
+import { BaseEditor, getEditor } from "./editor.js";
 
 export class ListEditor extends BaseEditor {
 	contentType = "list";
@@ -32,7 +32,7 @@ export class ListEditor extends BaseEditor {
 		return model;
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
-		if (getViewer(range) != this) console.warn("Invalid edit range");
+		if (getEditor(range) != this) console.warn("Invalid edit range");
 		return new ListReplace(this.owner, commandName, this.node.id).exec(range, content);
 	}
 }

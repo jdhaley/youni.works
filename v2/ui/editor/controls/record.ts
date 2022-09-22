@@ -2,7 +2,7 @@ import {content, Record} from "../../../base/model.js";
 
 import { RecordReplace } from "../commands/replace.js";
 import { Editor } from "../../../base/editor.js";
-import { BaseEditor, getViewer } from "./editor.js";
+import { BaseEditor, getEditor } from "./editor.js";
 
 export class RecordEditor extends BaseEditor {
 	contentType = "record";
@@ -26,7 +26,7 @@ export class RecordEditor extends BaseEditor {
 		return model;
 	}
 	edit(commandName: string, range: Range, record: Record) {
-		if (getViewer(range) != this) console.warn("Invalid edit range");
+		if (getEditor(range) != this) console.warn("Invalid edit range");
 		if (record && typeof record[0] == "object") record = record[0] as Record;
 		return new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
 	}

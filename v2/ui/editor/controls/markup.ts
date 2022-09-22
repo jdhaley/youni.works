@@ -5,13 +5,12 @@ import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/replace.js";
 import { getChildView } from "../util.js";
 import { ListEditor } from "./list.js";
-import { getView } from "../../display/display.js";
-import { getViewer } from "./editor.js";
+import { getEditor } from "./editor.js";
 
 export class MarkupEditor extends ListEditor {
 	contentType = "markup";
 	edit(commandName: string, range: Range, content: string) {
-		if (getViewer(range) != this) console.warn("fix this check"); //"Invalid edit range"
+		if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
 		return cmd.call(this, commandName, range, content);
@@ -36,13 +35,13 @@ function noop() {
 }
 
 function replace(this: MarkupEditor, commandName: string, range: Range, content?: content): Range {
-	let view = getView(range);
-	if (view.$control.contentType == "line") {
-		view = getView(view.parentElement);
+	let editor = getEditor(range);
+	if (editor.contentType == "line") {
+		editor = getEditor(editor.node.parentElement);
 	}
-	if (view.$control.contentType != "markup") console.warn("View is not markup:", view);
+	if (editor.contentType != "markup") console.warn("View is not markup:", editor);
 
-	return new MarkupReplace(this.owner, commandName, view.id).exec(range, content);
+	return new MarkupReplace(this.owner, commandName, editor.node.id).exec(range, content);
 }
 
 function level(this: MarkupEditor, name: "Promote" | "Demote", range: Range): Range {
