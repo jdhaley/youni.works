@@ -1,26 +1,26 @@
 import { extend } from "../../base/util.js";
 
 import { UserEvent } from "../ui.js";
-import { Display } from "../display/display.js";
+import { ViewBox } from "../display/display.js";
 import { setClipboard } from "../clipboard.js";
 import { getEditor } from "../editor/controls/editor.js";
 import { Editor } from "../../base/editor.js";
 
 export default extend(null, {
-	keydown(this: Display, event: UserEvent) {
+	keydown(this: ViewBox, event: UserEvent) {
 		event.shortcut = getShortcut(event);
 		event.subject = this.shortcuts[event.shortcut] || "keydown";
 	},
-	save(this: Display, event: UserEvent) {
+	save(this: ViewBox, event: UserEvent) {
 		this.owner.receive(event);
 		event.subject = "";
 	},
-	copy(this: Display, event: UserEvent) {
+	copy(this: ViewBox, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		setClipboard(range.cloneRange(), event.clipboardData);
 	},
-	selectionchange(this: Display, event: UserEvent) {
+	selectionchange(this: ViewBox, event: UserEvent) {
 		PRIOR_EDITOR?.content.classList.remove("active");
 		for (let ele = event.range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
 			let editor = getEditor(ele);

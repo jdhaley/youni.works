@@ -55,17 +55,14 @@ export function typeOf(value: any): string {
 	return "null";
 }
 
-/* View */
-export interface Viewer extends Receiver, Shape {
+/* Views */
+
+export interface View {
 	readonly type: Type;
 	readonly contentType: string;
-
-	readonly header?: Element;
-	readonly content: Element;
-	readonly footer?: Element;
+	readonly content: unknown;
 }
 
-/* Shape */
 export interface Shape {
 	area: Area;
 	size(width: number, height: number): void;
@@ -73,6 +70,9 @@ export interface Shape {
 	zone(x: number, y: number): Zone;
 	getStyle(name: string): string;
 	setStyle(name: string, value?: string): void; // Omitting the value removes the style.
+}
+
+export interface Display extends View, Shape, Receiver {
 }
 
 export interface Area {

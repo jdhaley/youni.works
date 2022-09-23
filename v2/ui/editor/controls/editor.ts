@@ -1,12 +1,11 @@
 import {content } from "../../../base/model.js";
 
-import { Display, getView, bindView } from "../../display/display.js";
+import { ViewBox, getView, bindView } from "../../display/display.js";
 import { Editor } from "../../../base/editor.js";
 
 export {bindView};
 
-export abstract class BaseEditor extends Display implements Editor {
-	declare node: HTMLElement;
+export abstract class BaseEditor extends ViewBox implements Editor {
 	declare contentType: string;
 
 	abstract viewContent(model: content): void;

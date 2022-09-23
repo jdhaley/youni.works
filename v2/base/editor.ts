@@ -1,22 +1,25 @@
-import { Type, content, typeOf, Viewer } from "./model.js";
+import { Type, content, typeOf, View } from "./model.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
 
-export interface Editor extends Viewer {
-	readonly type: ViewType;
+export interface Editor extends View {
+	readonly type: ArticleType;
 	readonly node: Element;
+	readonly header?: Element;
+	readonly content: Element;
+	readonly footer?: Element;
 	edit(commandName: string, range: Range, content?: content): Range;
 	contentOf(range?: Range): content;
 }
 
-export interface ViewType extends Type {
+export interface ArticleType extends Type {
 	owner: Article;
-	types: bundle<ViewType>;
-	view(content: content): Viewer;
+	types: bundle<ArticleType>;
+	view(content: content): Editor;
 }
 
 export interface Article {
-	view: Element;
+	node: Element;
 	commands: CommandBuffer<Range>;
 	setRange(extent: Range, collapse?: boolean): void;
 	getControl(id: string): Editor;

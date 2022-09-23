@@ -1,20 +1,19 @@
-import { content, Type, Viewer } from "../../base/model.js";
-import { Editor, Article, ViewType } from "../../base/editor.js";
+import { content, Type, View } from "../../base/model.js";
 import { bundle, extend } from "../../base/util.js";
 import { Frame } from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
 import { Owner, Receiver } from "../../base/control.js";
-import { Box } from "./box.js";
+import { DisplayBox } from "./box.js";
+import { Editor } from "../../base/editor.js";
 
-export interface View extends Element {
-	$control?: Viewer;
+interface ViewElement extends Element {
+	$control?: View;
 }
 
-export abstract class Display extends Box implements Viewer {
+export abstract class ViewBox extends DisplayBox implements View {
 	declare type: DisplayType;
 	declare contentType: string;
-	declare node: HTMLElement;
 	declare header: Element;
 	declare content: Element;
 	declare footer: Element;
@@ -61,18 +60,34 @@ export abstract class Display extends Box implements Viewer {
 		this.node.append(footer);
 		this.footer = footer;
 	}
+	box(element: ViewElement) {
+		super.box(element);
+		element.setAttribute("data-item", this.type.name);
+		if (!element.id) element.id = "" + NEXT_ID++;
+
+		if (this.isContainer) {
+			bindContainer(element);
+		} else {
+			this.content = element;
+		}
+	}
+	unbox(element: Element): void {
+		super.unbox(element);
+		element.removeAttribute("data-item");
+		element.id = "";
+	}
 }
 
 
 let NEXT_ID = 1;
-export class DisplayType implements ViewType {
+export class DisplayType {
 	constructor(owner: DisplayOwner) {
 		this.owner = owner;
 	}
 	owner: DisplayOwner;
 	declare name: string;
 	declare types: bundle<DisplayType>
-	declare prototype: Display;
+	declare prototype: ViewBox;
 
 	conf: bundle<any>;
 	isProperty: boolean;
@@ -81,31 +96,11 @@ export class DisplayType implements ViewType {
 		return type == this;
 	}
 
-	view(content?: content): Display {
+	view(content?: content): ViewBox {
+		let display = Object.create(this.prototype);
 		let view = this.owner.createElement(this.conf.tagName || "div");
-		let display = this.control(view);
+		display.box(view);
 		display.viewContent(content);
-		return display;
-	}
-	control(element: View): Display {
-		let display: Display = element.$control as any;
-		if (display) {
-			console.warn("Element is already bound to a control.");
-			return 
-		} else {
-			display = Object.create(this.prototype);
-			(display as any).node = element;
-		}
-		(element as any).$control = display;
-		element.setAttribute("data-item", this.name);
-		if (!element.id) element.id = "" + NEXT_ID++;
-
-		if (display.isContainer) {
-			bindContainer(element);
-		} else {
-			display.content = element;
-		}
-		//console.log(display);
 		return display;
 	}
 	start(name: string, conf: bundle<any>): void {
@@ -127,14 +122,14 @@ export class DisplayType implements ViewType {
 
 export interface DisplayConf {
 	class: typeof DisplayType;
-	prototype?: Display,
+	prototype?: ViewBox,
 
 	container: boolean;
 	tagName: string;
 	shortcuts: bundle<string>;
 }
 
-export class DisplayOwner extends Owner<Element> implements Article, Receiver {
+export class DisplayOwner extends Owner<Element> implements Receiver {
 	constructor(frame: Frame, conf: bundle<any>) {
 		/*
 		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
@@ -155,8 +150,8 @@ export class DisplayOwner extends Owner<Element> implements Article, Receiver {
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range>;
 
-	type: ViewType;
-	view: View;
+	type: DisplayType;
+	node: ViewElement;
 
 	createElement(tagName: string): Element {
 		return this.frame.createElement(tagName);
@@ -179,7 +174,7 @@ export class DisplayOwner extends Owner<Element> implements Article, Receiver {
 	getPartsOf(view: Element): Iterable<Element> {
 		return view.children as Iterable<Element>;
 	}
-	getControlOf(view: Element): Display {
+	getControlOf(view: Element): ViewBox {
 		let type = view["$control"];
 		if (!type) {
 			console.log(view);
@@ -187,7 +182,7 @@ export class DisplayOwner extends Owner<Element> implements Article, Receiver {
 		return type;
 	}
 	getControl(id: string): Editor {
-		let view = this.view.ownerDocument.getElementById(id) as View;
+		let view = this.node.ownerDocument.getElementById(id) as ViewElement;
 		if (!view) throw new Error("Can't find view element.");
 		//if (view.getAttribute("data-item")) return view;
 		if (!view.$control) {
@@ -204,7 +199,7 @@ export class DisplayOwner extends Owner<Element> implements Article, Receiver {
 	}
 }
 
-export function getView(node: Node | Range): View {
+export function getView(node: Node | Range): ViewElement {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
 		if (node instanceof Element && node.getAttribute("data-item")) {
@@ -219,24 +214,27 @@ export function getView(node: Node | Range): View {
 }
 
 export function bindView(view: Element): void {
-	let control: Viewer = view["$control"];
+	let control: ViewBox = view["$control"];
 	if (!control) {
 		let name = view.getAttribute("data-item");
-		let parent = getView(view.parentElement) as View;
+		let parent = getView(view.parentElement) as ViewElement;
 		if (name && parent) {
 			//TODO forcing to DisplayType because I don't want to expose .control()
 			let type = parent.$control.type.types[name] as DisplayType;
-			if (type) control = type.control(view as any);
+			if (type) {
+				control = Object.create(type.prototype);
+				control.box(view as any);
+			}
 		}
 	}
 
 	if (control) for (let child of view["$control"].content.children) {
-		bindView(child as View);
+		bindView(child as ViewElement);
 	}
 }
 
-function bindContainer(node: View) {
-	let control: Display = node.$control as any;
+function bindContainer(node: ViewElement) {
+	let control: ViewBox = node.$control as any;
 	for (let child of node.children) {
 		if (child.nodeName == "header") control.header = child;
 		if (child.nodeName == "footer") control.footer = child;

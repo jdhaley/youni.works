@@ -11,10 +11,10 @@ export default extend(null, {
 		start(this);
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, model);
-		this.view = (type.view(model) as any).node;
-		this.view.setAttribute("data-file", res.req.to);
-		this.view.setAttribute("contentEditable", "true");	
-		this.frame.view.append(this.view);
+		this.node = (type.view(model) as any).node;
+		this.node.setAttribute("data-file", res.req.to);
+		this.node.setAttribute("contentEditable", "true");	
+		this.frame.view.append(this.node);
 
 		shapetest.call(this);
 	},
@@ -24,9 +24,9 @@ export default extend(null, {
 			console.log("Saved: ", signal);
 			return;
 		} else {
-			let model = (this.view["$control"] as any).contentOf();
+			let model = (this.node["$control"] as any).contentOf();
 			console.log("Save: ", model);
-			this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
+			this.service.save(this.node.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
 		}
 	}
 });
@@ -54,5 +54,5 @@ function shapetest(this: DisplayOwner) {
 	viewer.content.classList.add("shape");
 	viewer.position(0, 0);
 
-	this.frame.view.append(viewer.node as Element);
+	this.frame.view.append(viewer.node);
 }

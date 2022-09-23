@@ -1,6 +1,30 @@
 import { Actions, Control } from "../../base/control.js";
-import { Area, Edges, Shape, Type, Zone } from "../../base/model.js";
+import { Area, Edges, Shape, Zone } from "../../base/model.js";
 
+
+export class Box extends Control {
+	constructor(actions: Actions) {
+		super();
+		this.actions = actions;
+	}
+	private _node: Element;
+	
+	get node(): Element {
+		return this._node;
+	}
+	
+	protected box(element: Element) {
+		if (element["$control"]) {
+			this.unbox(element);
+		}
+		this._node = element;
+		element["$control"] = this;
+	}
+	protected unbox(element: Element) {
+		console.warn("Element is already bound to a control.");
+		element["$control"] = null; //keep the property to indicate it was bound,
+	}
+}
 
 const DEFAULT_BORDER: Edges = {
 	top: 3,
@@ -9,15 +33,7 @@ const DEFAULT_BORDER: Edges = {
 	left: 5
 }
 
-export class Box extends Control implements Shape {
-	constructor(actions: Actions) {
-		super();
-		this.actions = actions;
-	}
-	declare type: Type;
-	declare content: Element;
-	declare protected node: HTMLElement;
-	
+export class DisplayBox extends Box implements Shape {
 	get area(): Area {
 		return this.node.getBoundingClientRect();
 	}
@@ -27,22 +43,26 @@ export class Box extends Control implements Shape {
 	get border() {
 		return DEFAULT_BORDER;
 	}
-	get style() {
-		return this.node.style;
+	get style(): CSSStyleDeclaration {
+		return this.node["style"]
 	}
 	getStyle(name: string): string {
-		return this.node.style.getPropertyValue(name);
+		return this.style?.getPropertyValue(name);
 	}
-	setStyle(name: string, value?: string): void {
-		if (value || value === "") {
-			this.node.style.setProperty(name, "" + value);
-		} else {
-			this.node.style.removeProperty(name);
+	setStyle(name: string, value?: string): boolean {
+		if (this.style) {
+			if (value || value === "") {
+				this.style.setProperty(name, "" + value);
+			} else {
+				this.style.removeProperty(name);
+			}
+			return true;
 		}
+		return false;
 	}
 
 	position(x: number, y: number) {
-		let style = this.node.style;
+		let style = this.style;
 		style.position = "absolute";			
 		style.left = x + "px";
 		style.top = y + "px";
@@ -73,7 +93,7 @@ export class Box extends Control implements Shape {
 		return zone as Zone;
 	}
 	size(width: number, height: number) {
-		let style = this.node.style;
+		let style = this.style;
 		style.width = Math.max(width, 16) + "px";
 		style.minWidth = style.width;
 		style.height = Math.max(height, 16) + "px";
