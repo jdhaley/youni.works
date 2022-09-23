@@ -1,14 +1,9 @@
 import { content, View, Type } from "../../base/model.js";
 import { bundle, extend } from "../../base/util.js";
-import { Receiver } from "../../base/control.js";
-import { ElementBox } from "./box.js";
+import { ElementBox, ElementOwner } from "./box.js";
 
 interface ViewElement extends Element {
 	$control?: View;
-}
-
-interface ElementOwner extends Receiver {
-	createElement(tag: string): Element;
 }
 
 export abstract class ViewBox extends ElementBox implements View {

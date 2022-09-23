@@ -11,9 +11,10 @@ import { RecordEditor } from "../editor/controls/record.js";
 import { ListEditor } from "../editor/controls/list.js";
 import { MarkupEditor } from "../editor/controls/markup.js";
 import { LineEditor } from "../editor/controls/line.js";
-import { TypeConf, EditorType } from "../display/editor.js";
+import { EditorType } from "../display/editor.js";
 
 import shortcuts from "./shortcuts.js";
+import { TypeConf } from "../display/article.js";
 
 const conf: bundle<TypeConf> = {
 	text: {

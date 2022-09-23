@@ -1,4 +1,4 @@
-import { Controller } from "../../base/control.js";
+import { Controller, Owner, Receiver } from "../../base/control.js";
 import { Area, Edges, Shape, Zone } from "../../base/model.js";
 
 const DEFAULT_BORDER: Edges = {
@@ -73,5 +73,24 @@ export class ElementBox extends Controller<Element> implements Shape {
 		style.minWidth = style.width;
 		style.height = Math.max(height, 16) + "px";
 		style.minHeight = style.height;
+	}
+}
+
+export abstract class ElementOwner extends Owner<Element> {
+	abstract createElement(tag: string): Element;
+	getPartOf(view: Element): Element {
+		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
+			if (parent["$control"]) return parent;
+		}
+	}
+	getPartsOf(view: Element): Iterable<Element> {
+		return view.children as Iterable<Element>;
+	}
+	getControlOf(view: Element): Receiver {
+		let type = view["$control"];
+		if (!type) {
+			console.log(view);
+		}
+		return type;
 	}
 }

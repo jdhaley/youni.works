@@ -43,7 +43,8 @@ function getType(article: Article, path: string, data: any): ViewType {
 
 import shape from "./shape.js";
 import { TextEditor } from "../editor/controls/text.js";
-import { Article, EditorType } from "../display/editor.js";
+import { EditorType } from "../display/editor.js";
+import { Article } from "../display/article.js";
 function shapetest(this: Article) {
 	let type = new EditorType(this);
 	type.start("shape", {

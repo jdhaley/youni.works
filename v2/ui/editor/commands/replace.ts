@@ -1,6 +1,6 @@
 import { content } from "../../../base/model.js";
+import { bindView } from "../../display/article.js";
 import { unmark } from "../util.js";
-import { bindView } from "../../display/editor.js";
 
 import { Edit } from "./edit.js";
 
