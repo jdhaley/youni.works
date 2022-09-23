@@ -1,5 +1,5 @@
 import { Receiver } from "./control.js";
-import { Bag, bundle } from "./util.js";
+import { bundle } from "./util.js";
 
 interface Part {
 	type: Type;
@@ -30,7 +30,6 @@ export interface Record {
 
 export interface Type {
 	name: string;
-	//contentType: string;
 	partOf?: Type;
 	types: bundle<Type>;
 }
@@ -54,6 +53,16 @@ export function typeOf(value: any): string {
 			return "record";
 	}
 	return "null";
+}
+
+/* View */
+export interface Viewer extends Receiver, Shape {
+	readonly type: Type;
+	readonly contentType: string;
+
+	readonly header?: Element;
+	readonly content: Element;
+	readonly footer?: Element;
 }
 
 /* Shape */

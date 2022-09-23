@@ -21,6 +21,7 @@ export function section(items: Section[]): Section {
 	}
 	let root: Section = {
 		type$: "article",
+		content: "",
 		sections: []
 	}
 	console.log("sections: ", sections);

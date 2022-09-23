@@ -1,16 +1,6 @@
-import { Type, Shape, content, typeOf } from "./model.js";
+import { Type, content, typeOf, Viewer } from "./model.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
-import { Receiver } from "./control.js";
-
-export interface Viewer extends Receiver, Shape {
-	readonly type: Type;
-	readonly contentType: string;
-
-	readonly header?: Element;
-	readonly content: Element;
-	readonly footer?: Element;
-}
 
 export interface Editor extends Viewer {
 	readonly type: ViewType;

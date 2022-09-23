@@ -1,5 +1,5 @@
-import { content, Type } from "../../base/model.js";
-import { Editor, Viewer, Article, ViewType } from "../../base/editor.js";
+import { content, Type, Viewer } from "../../base/model.js";
+import { Editor, Article, ViewType } from "../../base/editor.js";
 import { bundle, extend } from "../../base/util.js";
 import { Frame } from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
