@@ -2,7 +2,7 @@ import { content, Record } from "../../../base/model.js";
 
 import { Replace } from "../commands/replace.js";
 import { Editor } from "../../../base/editor.js";
-import { BaseEditor, getChildEditor, getEditor } from "./editor.js";
+import { BaseEditor, getChildEditor, getEditor } from "../../display/editor.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
 
 export class RecordEditor extends BaseEditor {

@@ -1,7 +1,7 @@
 import {content, List} from "../../../base/model.js";
 
 import { Editor, Article, viewType } from "../../../base/editor.js";
-import { BaseEditor, getChildEditor, getEditor } from "./editor.js";
+import { BaseEditor, getChildEditor, getEditor } from "../../display/editor.js";
 import { Replace } from "../commands/replace.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
 

@@ -5,7 +5,7 @@ import {navigate} from "../editor/util.js";
 import display from "./display.js";
 import { getClipboard, setClipboard } from "../clipboard.js";
 import { Editor } from "../../base/editor.js";
-import { getEditor } from "../editor/controls/editor.js";
+import { getEditor } from "../display/editor.js";
 
 let UNDONE = false;
 

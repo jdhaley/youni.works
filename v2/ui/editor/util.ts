@@ -1,4 +1,4 @@
-import { getEditor } from "./controls/editor.js";
+import { getEditor } from "../display/editor.js";
 
 export function narrowRange(range: Range) {
 	let editor = getEditor(range);
