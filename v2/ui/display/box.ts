@@ -1,4 +1,4 @@
-import { Box } from "../../base/control.js";
+import { Controller } from "../../base/control.js";
 import { Area, Edges, Shape, Zone } from "../../base/model.js";
 
 const DEFAULT_BORDER: Edges = {
@@ -8,7 +8,7 @@ const DEFAULT_BORDER: Edges = {
 	left: 5
 }
 
-export class ElementBox extends Box<Element> implements Shape {
+export class ElementBox extends Controller<Element> implements Shape {
 	get area(): Area {
 		return this.node.getBoundingClientRect();
 	}

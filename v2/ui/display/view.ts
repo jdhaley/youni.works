@@ -60,8 +60,8 @@ export abstract class ViewBox extends ElementBox implements View {
 		this.node.append(footer);
 		this.footer = footer;
 	}
-	box(element: ViewElement) {
-		super.box(element);
+	control(element: ViewElement) {
+		super.control(element);
 		element.setAttribute("data-item", this.type.name);
 		if (!element.id) element.id = "" + NEXT_ID++;
 
@@ -71,8 +71,8 @@ export abstract class ViewBox extends ElementBox implements View {
 			this.content = element;
 		}
 	}
-	unbox(element: Element): void {
-		super.unbox(element);
+	uncontrol(element: Element): void {
+		super.uncontrol(element);
 		element.removeAttribute("data-item");
 		element.id = "";
 	}
@@ -97,9 +97,9 @@ export class DisplayType {
 	}
 
 	view(content?: content): ViewBox {
-		let display = Object.create(this.prototype);
+		let display: ViewBox = Object.create(this.prototype);
 		let view = this.owner.createElement(this.conf.tagName || "div");
-		display.box(view);
+		display.control(view);
 		display.viewContent(content);
 		return display;
 	}
@@ -222,7 +222,7 @@ export function bindView(view: Element): void {
 			let type = parent.$control.type.types[name] as DisplayType;
 			if (type) {
 				control = Object.create(type.prototype);
-				control.box(view as any);
+				control.control(view as any);
 			}
 		}
 	}
