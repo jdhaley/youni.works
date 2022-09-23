@@ -1,11 +1,15 @@
 import { content, Type } from "../../base/model.js";
-import { Editor, View, Viewer, ViewOwner, ViewType } from "../../base/editor.js";
+import { Editor, Viewer, Article, ViewType } from "../../base/editor.js";
 import { bundle, extend } from "../../base/util.js";
 import { Frame } from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
 import { Owner, Receiver } from "../../base/control.js";
 import { Box } from "./box.js";
+
+export interface View extends Element {
+	$control?: Viewer;
+}
 
 export abstract class Display extends Box implements Viewer {
 	declare type: DisplayType;
@@ -77,7 +81,7 @@ export class DisplayType implements ViewType {
 		return type == this;
 	}
 
-	view(content?: content): Viewer {
+	view(content?: content): Display {
 		let view = this.owner.createElement(this.conf.tagName || "div");
 		let display = this.control(view);
 		display.viewContent(content);
@@ -130,7 +134,7 @@ export interface DisplayConf {
 	shortcuts: bundle<string>;
 }
 
-export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver {
+export class DisplayOwner extends Owner<Element> implements Article, Receiver {
 	constructor(frame: Frame, conf: bundle<any>) {
 		/*
 		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
@@ -182,7 +186,7 @@ export class DisplayOwner extends Owner<Element> implements ViewOwner, Receiver 
 		}
 		return type;
 	}
-	getEditor(id: string): Editor {
+	getControl(id: string): Editor {
 		let view = this.view.ownerDocument.getElementById(id) as View;
 		if (!view) throw new Error("Can't find view element.");
 		//if (view.getAttribute("data-item")) return view;

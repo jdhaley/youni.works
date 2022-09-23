@@ -54,16 +54,16 @@ export class MarkupReplace extends ListReplace {
 			model.level = 0;
 		}
 		//Create the end line and add it after the command line.
-		let end: Element = editor.type.view(model as any).node as Element;
-		editor.node.parentElement.insertBefore(end, editor.node.nextElementSibling);
+		let end = editor.type.view(model as any) as Editor;
+		editor.node.parentElement.insertBefore(end.node, editor.node.nextElementSibling);
 		//We can now set the new range now that we have the end line.
-		range.setEnd(end, 0);
+		range.setEnd(end.node, 0);
 		mark(range);
 		range.collapse();
 		//Prepend any 'paste' content to the start of the end line.
-		r.setStart(end, 0);
+		r.setStart(end.node, 0);
 		r.collapse(true);
-		if (!(this.name == "Split")) this.merge(end, r, content, false);
+		if (!(this.name == "Split")) this.merge(end.node, r, content, false);
 		//note: onInsert() handles the remainder of the 'paste' content.
 	}
 	protected onStartContainer(range: Range, content: content, start: Editor): void {

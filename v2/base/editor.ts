@@ -3,39 +3,33 @@ import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
 import { Receiver } from "./control.js";
 
-export interface View extends Element {
-	$control?: Viewer;
-}
-
 export interface Viewer extends Receiver, Shape {
 	readonly type: Type;
 	readonly contentType: string;
-	readonly node: unknown;
 
 	readonly header?: Element;
 	readonly content: Element;
 	readonly footer?: Element;
-	contentOf(range?: Range): content;
 }
 
 export interface Editor extends Viewer {
 	readonly type: ViewType;
 	readonly node: Element;
 	edit(commandName: string, range: Range, content?: content): Range;
+	contentOf(range?: Range): content;
 }
 
 export interface ViewType extends Type {
-	owner: ViewOwner;
+	owner: Article;
 	types: bundle<ViewType>;
 	view(content: content): Viewer;
 }
 
-export interface ViewOwner {
+export interface Article {
 	view: Element;
-	unknownType: ViewType;
 	commands: CommandBuffer<Range>;
 	setRange(extent: Range, collapse?: boolean): void;
-	getEditor(id: string): Editor;
+	getControl(id: string): Editor;
 }
 
 // interface Range {

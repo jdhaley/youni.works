@@ -6,9 +6,6 @@ import {extend} from "../../base/util.js";
 
 import {UserEvent} from "../ui.js";
 
-import shape from "./shape.js";
-import { TextEditor } from "../editor/controls/text.js";
-
 export default extend(null, {
 	open(this: DisplayOwner, res: Response<string>) {
 		start(this);
@@ -27,14 +24,25 @@ export default extend(null, {
 			console.log("Saved: ", signal);
 			return;
 		} else {
-			let control = this.view["$control"];
-			let model = control.contentOf();
+			let model = (this.view["$control"] as any).contentOf();
 			console.log("Save: ", model);
 			this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
 		}
 	}
 });
 
+function getType(article: DisplayOwner, path: string, data: any): DisplayType {
+	path = path.substring(path.lastIndexOf("/") + 1);
+	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
+	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";
+	if (!typeName && data && typeof data == "object" && data.type$) {
+		typeName = data.type$;
+	}
+	return article.types[typeName] as any || article.type;
+}
+
+import shape from "./shape.js";
+import { TextEditor } from "../editor/controls/text.js";
 function shapetest(this: DisplayOwner) {
 	let type = new DisplayType(this);
 	type.start("shape", {
@@ -47,14 +55,4 @@ function shapetest(this: DisplayOwner) {
 	viewer.position(0, 0);
 
 	this.frame.view.append(viewer.node as Element);
-}
-
-function getType(article: DisplayOwner, path: string, data: any): DisplayType {
-	path = path.substring(path.lastIndexOf("/") + 1);
-	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
-	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";
-	if (!typeName && data && typeof data == "object" && data.type$) {
-		typeName = data.type$;
-	}
-	return article.types[typeName] as any || article.type;
 }

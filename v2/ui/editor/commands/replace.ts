@@ -33,7 +33,7 @@ export abstract class Replace extends Edit {
 		return range;
 	}
 	protected getReplaceRange(): Range {
-		let editor = this.owner.getEditor(this.viewId);
+		let editor = this.owner.getControl(this.viewId);
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 		let range = editor.node.ownerDocument.createRange();
 		range.selectNodeContents(editor.content);

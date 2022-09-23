@@ -1,9 +1,14 @@
 import { Receiver } from "./control.js";
 import { Bag, bundle } from "./util.js";
 
+interface Part {
+	type: Type;
+	content: content;
+	parts: Iterable<Part>
+}
 export interface Content {
 	type$: string,
-	content?: content,
+	content: content,
 	level?: number,
 }
 

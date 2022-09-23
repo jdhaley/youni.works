@@ -1,6 +1,6 @@
 import {content, List} from "../../../base/model.js";
 
-import { Editor, ViewOwner, viewType } from "../../../base/editor.js";
+import { Editor, Article, viewType } from "../../../base/editor.js";
 import { BaseEditor, getChildEditor, getEditor } from "./editor.js";
 import { Replace } from "../commands/replace.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
@@ -40,7 +40,7 @@ export class ListEditor extends BaseEditor {
 
 
 export class ListReplace extends Replace {
-	constructor(owner: ViewOwner, name: string, viewId: string) {
+	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	startId: string;
@@ -60,12 +60,12 @@ export class ListReplace extends Replace {
 	protected getReplaceRange() {
 		let range = super.getReplaceRange();
 		if (this.startId) {
-			let start = this.owner.getEditor(this.startId);
+			let start = this.owner.getControl(this.startId);
 			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
 			range.setStartAfter(start.node);
 		}
 		if (this.endId) {
-			let end = this.owner.getEditor(this.endId);
+			let end = this.owner.getControl(this.endId);
 			if (!end) throw new Error(`End item.id '${this.endId}' not found.`);
 			range.setEndBefore(end.node);
 		}
@@ -108,7 +108,7 @@ export class ListReplace extends Replace {
 		return range;
 	}
 	protected execReplace(range: Range, content: content): Range {
-		let editor = this.owner.getEditor(this.viewId);
+		let editor = this.owner.getControl(this.viewId);
 		let start = getChildEditor(editor, range.startContainer);
 		let end = getChildEditor(editor, range.endContainer);
 		if (start && start == end) {
@@ -154,7 +154,7 @@ export class ListReplace extends Replace {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!content) return;
-		let editor = this.owner.getEditor(this.viewId);
+		let editor = this.owner.getControl(this.viewId);
 		let ctx = editor.content;
 		//Ensure the range must be on the list conent. (It may be on a markup line).
 		while (range.commonAncestorContainer != ctx) {
