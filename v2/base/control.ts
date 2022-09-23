@@ -15,7 +15,7 @@ export interface Actions {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
-export class Control implements Receiver {
+export class Controller implements Receiver {
 	declare actions: Actions;
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
@@ -31,7 +31,31 @@ export class Control implements Receiver {
 	}
 }
 
-export abstract class Owner<V> extends Control {
+export class Box<T> extends Controller {
+	constructor(actions: Actions) {
+		super();
+		this.actions = actions;
+	}
+	private _node: T;
+	
+	get node(): T {
+		return this._node;
+	}
+	
+	protected box(node: T) {
+		if (node["$control"]) {
+			this.unbox(node);
+		}
+		this._node = node;
+		node["$control"] = this;
+	}
+	protected unbox(node: T) {
+		console.warn("Element is already bound to a control.");
+		node["$control"] = null; //keep the property to indicate it was bound,
+	}
+}
+
+export abstract class Owner<V> extends Controller {
 	abstract getControlOf(value: V): Receiver;
 	abstract getPartOf(value: V): V;
 	abstract getPartsOf(value: V): Iterable<V>;

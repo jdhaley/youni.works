@@ -1,5 +1,5 @@
 import {Response} from "../../base/message.js";
-import {DisplayOwner, DisplayType} from "../display/display.js";
+import {DisplayOwner, DisplayType} from "../display/view.js";
 
 import {start} from "../../base/type.js";
 import {extend} from "../../base/util.js";
@@ -11,7 +11,7 @@ export default extend(null, {
 		start(this);
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, model);
-		this.node = (type.view(model) as any).node;
+		this.node = type.view(model).node;
 		this.node.setAttribute("data-file", res.req.to);
 		this.node.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.node);

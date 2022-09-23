@@ -1,30 +1,5 @@
-import { Actions, Control } from "../../base/control.js";
+import { Box } from "../../base/control.js";
 import { Area, Edges, Shape, Zone } from "../../base/model.js";
-
-
-export class Box extends Control {
-	constructor(actions: Actions) {
-		super();
-		this.actions = actions;
-	}
-	private _node: Element;
-	
-	get node(): Element {
-		return this._node;
-	}
-	
-	protected box(element: Element) {
-		if (element["$control"]) {
-			this.unbox(element);
-		}
-		this._node = element;
-		element["$control"] = this;
-	}
-	protected unbox(element: Element) {
-		console.warn("Element is already bound to a control.");
-		element["$control"] = null; //keep the property to indicate it was bound,
-	}
-}
 
 const DEFAULT_BORDER: Edges = {
 	top: 3,
@@ -33,7 +8,7 @@ const DEFAULT_BORDER: Edges = {
 	left: 5
 }
 
-export class DisplayBox extends Box implements Shape {
+export class ElementBox extends Box<Element> implements Shape {
 	get area(): Area {
 		return this.node.getBoundingClientRect();
 	}

@@ -4,14 +4,14 @@ import { Frame } from "../ui.js";
 import { RemoteFileService } from "../../base/remote.js";
 import { CommandBuffer } from "../../base/command.js";
 import { Owner, Receiver } from "../../base/control.js";
-import { DisplayBox } from "./box.js";
+import { ElementBox } from "./box.js";
 import { Editor } from "../../base/editor.js";
 
 interface ViewElement extends Element {
 	$control?: View;
 }
 
-export abstract class ViewBox extends DisplayBox implements View {
+export abstract class ViewBox extends ElementBox implements View {
 	declare type: DisplayType;
 	declare contentType: string;
 	declare header: Element;
@@ -129,19 +129,19 @@ export interface DisplayConf {
 	shortcuts: bundle<string>;
 }
 
-export class DisplayOwner extends Owner<Element> implements Receiver {
+export class DisplayOwner extends Owner<Element> {
 	constructor(frame: Frame, conf: bundle<any>) {
+		super();
 		/*
 		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
 		*/
-		super();
-		this.conf = conf;
 		this.actions = conf.actions;
+		this.conf = conf;
 		this.frame = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
 		this.commands = new CommandBuffer()
 	}
-
+	node: Element;
 	conf: bundle<any>;
 	types: bundle<DisplayType>;
 	unknownType: DisplayType;
@@ -151,7 +151,6 @@ export class DisplayOwner extends Owner<Element> implements Receiver {
 	readonly commands: CommandBuffer<Range>;
 
 	type: DisplayType;
-	node: ViewElement;
 
 	createElement(tagName: string): Element {
 		return this.frame.createElement(tagName);

@@ -9,7 +9,7 @@ import line from "../controllers/line.js";
 
 import shortcuts from "./shortcuts.js";
 
-import {DisplayConf, DisplayType} from "../display/display.js";
+import {DisplayConf, DisplayType} from "../display/view.js";
 
 import { TextEditor } from "../editor/controls/text.js";
 import { RecordEditor } from "../editor/controls/record.js";

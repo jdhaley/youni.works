@@ -1,6 +1,6 @@
 import {content } from "../../../base/model.js";
 
-import { ViewBox, getView, bindView } from "../../display/display.js";
+import { ViewBox, getView, bindView } from "../../display/view.js";
 import { Editor } from "../../../base/editor.js";
 
 export {bindView};
