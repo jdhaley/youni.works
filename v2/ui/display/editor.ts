@@ -1,9 +1,10 @@
 import {content } from "../../base/model.js";
 
-import { ViewBox, ViewType } from "./view.js";
-import { ArticleType, Editor } from "../../base/editor.js";
+import { ViewBox, ViewType, getView, bindView } from "./view.js";
+import { Article, ArticleType, Editor } from "../../base/editor.js";
 import { bundle } from "../../base/util.js";
-import { Article, getView } from "./article.js";
+
+export { getView, bindView }
 
 export class EditorType extends ViewType implements ArticleType {
 	declare owner: Article;
@@ -11,8 +12,8 @@ export class EditorType extends ViewType implements ArticleType {
 	view(content?: content): Editor {
 		return super.view(content) as Editor;
 	}
-
 }
+
 export abstract class BaseEditor extends ViewBox implements Editor {
 	get owner(): Article {
 		return this.type.owner;

@@ -5,6 +5,14 @@ import { ElementBox, ElementOwner } from "./box.js";
 interface ViewElement extends Element {
 	$control?: View;
 }
+export interface TypeConf {
+	class: typeof ViewType;
+	prototype?: ViewBox,
+
+	container: boolean;
+	tagName: string;
+	shortcuts: bundle<string>;
+}
 
 export abstract class ViewBox extends ElementBox implements View {
 	declare type: ViewType;
@@ -121,5 +129,78 @@ function bindContainer(node: ViewElement) {
 		if (child.nodeName == "header") control.header = child;
 		if (child.nodeName == "footer") control.footer = child;
 		if (child.classList.contains("content")) control.content = child;
+	}
+}
+
+export class ViewOwner extends ElementOwner {
+	constructor(conf: bundle<any>) {
+		super();
+		/*
+		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
+		*/
+		this.conf = conf;
+		this.actions = conf.actions;
+	}
+	node: Element;
+	conf: bundle<any>;
+	types: bundle<Type>;
+	unknownType: Type;
+	type: ViewType;
+
+	createElement(tagName: string): Element {
+		return this.node.ownerDocument.createElement(tagName);
+	}
+	getElementById(id: string): Element {
+		return this.node.ownerDocument.getElementById(id);
+	}
+	getControl(id: string): View {
+		let view = this.node.ownerDocument.getElementById(id) as ViewElement;
+		if (!view) throw new Error("Can't find view element.");
+		//if (view.getAttribute("data-item")) return view;
+		if (!view.$control) {
+			console.warn("binding...");
+			bindView(view as any);
+			if (!view.$control) {
+				console.error("Unable to bind missing control. Please collect info / analyze.");
+				debugger;
+			}
+		} else {
+			view.$control.content; //checks the view isn't corrupted.
+		}
+		return view.$control;
+	}
+}
+
+export function bindView(view: Element): void {
+	let control: ViewBox = view["$control"];
+	if (!control) {
+		let name = view.getAttribute("data-item");
+		let parent = getView(view.parentElement) as ViewElement;
+		if (name && parent) {
+			//TODO forcing to DisplayType because I don't want to expose .control()
+			let type = parent.$control.type.types[name] as ViewType;
+			if (type) {
+				control = Object.create(type.prototype);
+				control.control(view as any);
+			}
+		}
+	}
+
+	if (control) for (let child of view["$control"].content.children) {
+		bindView(child as ViewElement);
+	}
+}
+
+export function getView(node: Node | Range): ViewElement {
+	if (node instanceof Range) node = node.commonAncestorContainer;
+	while (node) {
+		if (node instanceof Element && node.getAttribute("data-item")) {
+			if (!node["$control"]) {
+				console.warn("Unbound view.");
+				bindView(node);
+			}
+			return node;
+		}
+		node = node.parentElement;
 	}
 }

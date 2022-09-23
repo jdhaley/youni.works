@@ -1,6 +1,6 @@
-import {content, List} from "../../../base/model.js";
+import {content, List, viewType} from "../../../base/model.js";
 
-import { Editor, ArticleI, viewType } from "../../../base/editor.js";
+import { Editor, Article } from "../../../base/editor.js";
 import { BaseEditor, EditorType, getChildEditor, getEditor } from "../../display/editor.js";
 import { Replace } from "../commands/replace.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
@@ -40,7 +40,7 @@ export class ListEditor extends BaseEditor {
 
 
 export class ListReplace extends Replace {
-	constructor(owner: ArticleI, name: string, viewId: string) {
+	constructor(owner: Article, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	startId: string;

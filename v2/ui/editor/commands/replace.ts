@@ -1,9 +1,8 @@
 import { content } from "../../../base/model.js";
-import { bindView } from "../../display/article.js";
+import { bindView } from "../../display/editor.js"
 import { unmark } from "../util.js";
 
 import { Edit } from "./edit.js";
-
 export abstract class Replace extends Edit {
 	before: string;
 	after: string;

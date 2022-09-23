@@ -1,4 +1,5 @@
 import {bundle} from "../../base/util.js";
+import { TypeConf } from "../display/view.js";
 
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
@@ -14,7 +15,6 @@ import { LineEditor } from "../editor/controls/line.js";
 import { EditorType } from "../display/editor.js";
 
 import shortcuts from "./shortcuts.js";
-import { TypeConf } from "../display/article.js";
 
 const conf: bundle<TypeConf> = {
 	text: {

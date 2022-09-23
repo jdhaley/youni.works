@@ -1,7 +1,7 @@
 import { Type, content, typeOf, View } from "./model.js";
 import { CommandBuffer } from "./command.js";
+import { Owner } from "./control.js";
 import { bundle } from "./util.js";
-import { Receiver } from "./control.js";
 
 export interface Editor extends View {
 	readonly type: ArticleType;
@@ -14,12 +14,12 @@ export interface Editor extends View {
 }
 
 export interface ArticleType extends Type {
-	owner: ArticleI;
+	owner: Article;
 	types: bundle<ArticleType>;
 	view(content: content): Editor;
 }
 
-export interface ArticleI extends Receiver {
+export interface Article extends Owner<Element> {
 	node: Element;
 	commands: CommandBuffer<Range>;
 	setRange(extent: Range, collapse?: boolean): void;
@@ -44,16 +44,3 @@ export interface ArticleI extends Receiver {
 // 	readonly children: Iterable<View>;
 // 	append(view: any): void;
 // }
-
-export function viewType(value: any): string {
-	let type = typeOf(value);
-	switch (type) {
-		case "string":
-		case "number":
-		case "boolean":
-		case "date":
-			return "text";
-		default:
-			return type;
-	}
-}

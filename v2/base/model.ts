@@ -71,6 +71,19 @@ export interface View {
 	readonly content: unknown;
 }
 
+export function viewType(value: any): string {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+		case "date":
+			return "text";
+		default:
+			return type;
+	}
+}
+
 export interface Area {
 	x: number,
 	y: number,
