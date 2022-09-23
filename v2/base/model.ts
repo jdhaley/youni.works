@@ -1,6 +1,3 @@
-import { Receiver } from "./control.js";
-import { bundle } from "./util.js";
-
 interface Part {
 	type: Type;
 	content: content;
@@ -31,7 +28,9 @@ export interface Record {
 export interface Type {
 	name: string;
 	partOf?: Type;
-	types: bundle<Type>;
+	types: {
+		[key: string]: Type;
+	}
 }
 
 export function typeOf(value: any): string {
@@ -57,12 +56,6 @@ export function typeOf(value: any): string {
 
 /* Views */
 
-export interface View {
-	readonly type: Type;
-	readonly contentType: string;
-	readonly content: unknown;
-}
-
 export interface Shape {
 	area: Area;
 	size(width: number, height: number): void;
@@ -72,7 +65,10 @@ export interface Shape {
 	setStyle(name: string, value?: string): void; // Omitting the value removes the style.
 }
 
-export interface Display extends View, Shape, Receiver {
+export interface View {
+	readonly type: Type;
+	readonly contentType: string;
+	readonly content: unknown;
 }
 
 export interface Area {

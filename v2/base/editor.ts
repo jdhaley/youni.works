@@ -1,6 +1,7 @@
 import { Type, content, typeOf, View } from "./model.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
+import { Receiver } from "./control.js";
 
 export interface Editor extends View {
 	readonly type: ArticleType;
@@ -13,16 +14,18 @@ export interface Editor extends View {
 }
 
 export interface ArticleType extends Type {
-	owner: Article;
+	owner: ArticleI;
 	types: bundle<ArticleType>;
 	view(content: content): Editor;
 }
 
-export interface Article {
+export interface ArticleI extends Receiver {
 	node: Element;
 	commands: CommandBuffer<Range>;
 	setRange(extent: Range, collapse?: boolean): void;
 	getControl(id: string): Editor;
+	createElement(tag: string): Element;
+	unknownType: Type;
 }
 
 // interface Range {

@@ -1,7 +1,7 @@
 import {content, List} from "../../../base/model.js";
 
-import { Editor, Article, viewType } from "../../../base/editor.js";
-import { BaseEditor, getChildEditor, getEditor } from "../../display/editor.js";
+import { Editor, ArticleI, viewType } from "../../../base/editor.js";
+import { BaseEditor, EditorType, getChildEditor, getEditor } from "../../display/editor.js";
 import { Replace } from "../commands/replace.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
 
@@ -11,7 +11,7 @@ export class ListEditor extends BaseEditor {
 		this.draw();
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type;
-			type = type.types[viewType(item)] || type.owner.unknownType;
+			type = type.types[viewType(item)] || (type.owner.unknownType as EditorType);
 			let part = type.view(item).node as Element;
 			this.content.append(part);
 		}
@@ -40,7 +40,7 @@ export class ListEditor extends BaseEditor {
 
 
 export class ListReplace extends Replace {
-	constructor(owner: Article, name: string, viewId: string) {
+	constructor(owner: ArticleI, name: string, viewId: string) {
 		super(owner, name, viewId);
 	}
 	startId: string;

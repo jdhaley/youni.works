@@ -1,8 +1,8 @@
 import { Command } from "../../../base/command.js";
-import { Article } from "../../../base/editor.js";
+import { ArticleI } from "../../../base/editor.js";
 
 export abstract class Edit extends Command<Range> {
-	constructor(owner: Article, name: string, viewId: string) {
+	constructor(owner: ArticleI, name: string, viewId: string) {
 		super();
 		this.owner = owner;
 		this.name = name;
@@ -10,7 +10,7 @@ export abstract class Edit extends Command<Range> {
 		this.viewId = viewId;
 		owner.commands.add(this);
 	}
-	owner: Article;
+	owner: ArticleI;
 	name: string;
 	timestamp: number;
 	viewId: string;

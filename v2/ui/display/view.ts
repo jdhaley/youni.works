@@ -1,24 +1,24 @@
-import { content, Type, View } from "../../base/model.js";
+import { content, View, Type } from "../../base/model.js";
 import { bundle, extend } from "../../base/util.js";
-import { Frame } from "../ui.js";
-import { RemoteFileService } from "../../base/remote.js";
-import { CommandBuffer } from "../../base/command.js";
-import { Owner, Receiver } from "../../base/control.js";
+import { Receiver } from "../../base/control.js";
 import { ElementBox } from "./box.js";
-import { Editor } from "../../base/editor.js";
 
 interface ViewElement extends Element {
 	$control?: View;
 }
 
+interface ElementOwner extends Receiver {
+	createElement(tag: string): Element;
+}
+
 export abstract class ViewBox extends ElementBox implements View {
-	declare type: DisplayType;
+	declare type: ViewType;
 	declare contentType: string;
 	declare header: Element;
 	declare content: Element;
 	declare footer: Element;
 
-	get owner(): DisplayOwner {
+	get owner(): ElementOwner {
 		return this.type.owner;
 	}
 	get isContainer(): boolean {
@@ -80,13 +80,13 @@ export abstract class ViewBox extends ElementBox implements View {
 
 
 let NEXT_ID = 1;
-export class DisplayType {
-	constructor(owner: DisplayOwner) {
+export class ViewType implements Type {
+	constructor(owner: ElementOwner) {
 		this.owner = owner;
 	}
-	owner: DisplayOwner;
+	declare owner: ElementOwner;
 	declare name: string;
-	declare types: bundle<DisplayType>
+	declare types: bundle<ViewType>
 	declare prototype: ViewBox;
 
 	conf: bundle<any>;
@@ -96,7 +96,7 @@ export class DisplayType {
 		return type == this;
 	}
 
-	view(content?: content): ViewBox {
+	view(content?: content): View {
 		let display: ViewBox = Object.create(this.prototype);
 		let view = this.owner.createElement(this.conf.tagName || "div");
 		display.control(view);
@@ -117,118 +117,6 @@ export class DisplayType {
 			this.prototype = Object.create(this.prototype);
 		}
 		this.prototype.type = this;
-	}
-}
-
-export interface DisplayConf {
-	class: typeof DisplayType;
-	prototype?: ViewBox,
-
-	container: boolean;
-	tagName: string;
-	shortcuts: bundle<string>;
-}
-
-export class DisplayOwner extends Owner<Element> {
-	constructor(frame: Frame, conf: bundle<any>) {
-		super();
-		/*
-		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
-		*/
-		this.actions = conf.actions;
-		this.conf = conf;
-		this.frame = frame;
-		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		this.commands = new CommandBuffer()
-	}
-	node: Element;
-	conf: bundle<any>;
-	types: bundle<DisplayType>;
-	unknownType: DisplayType;
-
-	readonly frame: Frame;
-	readonly service: RemoteFileService;
-	readonly commands: CommandBuffer<Range>;
-
-	type: DisplayType;
-
-	createElement(tagName: string): Element {
-		return this.frame.createElement(tagName);
-	}
-	getElementById(id: string): Element {
-		return this.frame.getElementById(id);
-	}
-	/* Supports the Article interface (which has no owner dependency) */
-	setRange(range: Range, collapse?: boolean): void {
-		if (range) {
-			if (collapse) range.collapse();
-			this.frame.selectionRange = range;
-		}
-	}
-	getPartOf(view: Element): Element {
-		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
-			if (parent["$control"]) return parent;
-		}
-	}
-	getPartsOf(view: Element): Iterable<Element> {
-		return view.children as Iterable<Element>;
-	}
-	getControlOf(view: Element): ViewBox {
-		let type = view["$control"];
-		if (!type) {
-			console.log(view);
-		}
-		return type;
-	}
-	getControl(id: string): Editor {
-		let view = this.node.ownerDocument.getElementById(id) as ViewElement;
-		if (!view) throw new Error("Can't find view element.");
-		//if (view.getAttribute("data-item")) return view;
-		if (!view.$control) {
-			console.warn("binding...");
-			bindView(view as any);
-			if (!view.$control) {
-				console.error("Unable to bind missing control. Please collect info / analyze.");
-				debugger;
-			}
-		} else {
-			view.$control.content; //checks the view isn't corrupted.
-		}
-		return view.$control as Editor;
-	}
-}
-
-export function getView(node: Node | Range): ViewElement {
-	if (node instanceof Range) node = node.commonAncestorContainer;
-	while (node) {
-		if (node instanceof Element && node.getAttribute("data-item")) {
-			if (!node["$control"]) {
-				console.warn("Unbound view.");
-				bindView(node);
-			}
-			return node;
-		}
-		node = node.parentElement;
-	}
-}
-
-export function bindView(view: Element): void {
-	let control: ViewBox = view["$control"];
-	if (!control) {
-		let name = view.getAttribute("data-item");
-		let parent = getView(view.parentElement) as ViewElement;
-		if (name && parent) {
-			//TODO forcing to DisplayType because I don't want to expose .control()
-			let type = parent.$control.type.types[name] as DisplayType;
-			if (type) {
-				control = Object.create(type.prototype);
-				control.control(view as any);
-			}
-		}
-	}
-
-	if (control) for (let child of view["$control"].content.children) {
-		bindView(child as ViewElement);
 	}
 }
 
