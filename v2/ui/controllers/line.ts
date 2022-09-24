@@ -1,9 +1,9 @@
-import {extend} from "../../base/util.js";
-import {UserEvent} from "../ui.js";
+import { extend } from "../../base/util.js";
+import { Editor } from "../../base/editor.js";
+
+import { UserEvent, getClipboard } from "../ui.js";
 
 import text from "./text.js";
-import { getClipboard } from "../clipboard.js";
-import { Editor } from "../../base/editor.js";
 
 export default extend(text, {
 	paste(this: Editor, event: UserEvent) {

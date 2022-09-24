@@ -1,4 +1,4 @@
-import { Section } from "../../base/model.js";
+import { Section } from "../base/model.js";
 
 export function section(items: Section[]): Section {
 	let sections = [];

@@ -1,4 +1,4 @@
-import { Section } from "../../base/model.js";
+import { Section } from "../base/model.js";
 
 export function toHtml(item: Section) {
 	let doc = document.implementation.createHTMLDocument();

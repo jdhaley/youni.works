@@ -1,5 +1,5 @@
-import { content, View, Type } from "../../base/model.js";
-import { bundle, extend } from "../../base/util.js";
+import { content, View, Type } from "../base/model.js";
+import { bundle, extend } from "../base/util.js";
 import { ElementBox, ElementOwner } from "./box.js";
 
 interface ViewNode extends Element {
@@ -202,4 +202,9 @@ export function getViewNode(node: Node | Range): ViewNode {
 		}
 		node = node.parentElement;
 	}
+}
+
+export function getView(node: Node | Range): ViewBox {
+	let view = getViewNode(node)?.$control;
+	if (view instanceof ViewBox) return view;
 }

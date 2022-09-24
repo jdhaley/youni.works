@@ -1,4 +1,5 @@
 export default {
+	"Control+s": "save",
 	"Tab": "next",
 	"Alt+Tab": "next",
 	"Shift+Tab": "previous",
@@ -10,6 +11,5 @@ export default {
 	// "Control+i": "tag",
 	// "Control+u": "tag",
 	// "Control+q": "tag",
-	"Control+s": "save",
 	// "Control+/": "test"
 }

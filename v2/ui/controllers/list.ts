@@ -1,7 +1,7 @@
 import {extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../ui.js";
-import {getFooter, getHeader} from "../editor/util.js";
-import editable from "./editable.js";
+import {getFooter, getHeader} from "../../editor/util.js";
+import editable from "./editor.js";
 import { Editor } from "../../base/editor.js";
 
 export default extend(editable, {

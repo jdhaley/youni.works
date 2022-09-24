@@ -1,16 +1,24 @@
+import { content, Section } from "../base/model.js";
 import { CommandBuffer } from "../base/command.js";
+import { Article, Editor } from "../base/editor.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
 import { RemoteFileService } from "../base/remote.js";
-import { ViewOwner } from "./display/view.js";
+import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
-import { Article, Editor } from "../base/editor.js";
+
+import { section } from "../transform/item.js";
+import { fromHtml } from "../transform/fromHtml.js";
+import { toHtml } from "../transform/toHtml.js";
+
+import { ViewOwner, getView } from "../box/view.js";
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
 		this.frame = frame;
 		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		this.commands = new CommandBuffer()
+		this.commands = new CommandBuffer();
+		start(this);
 	}
 	readonly frame: Frame;
 	readonly service: RemoteFileService;
@@ -133,4 +141,34 @@ export interface UserEvent extends Signal, UIEvent {
     track?: HTMLElement;
     x?: number;
     y?: number;
+}
+
+export function getClipboard(clipboard: DataTransfer): content {
+	let data = clipboard.getData("application/json");
+	if (data) return JSON.parse(data);
+	data = clipboard.getData("text/html");
+	if (data) {
+		let div = document.createElement("div");
+		div.innerHTML = data;
+		console.log("HTML: ", div);
+		return fromHtml(div) as any;
+	}
+	return clipboard.getData("text/plain");
+}
+
+export function setClipboard(range: Range, clipboard: DataTransfer) {
+	let control = getView(range);
+	let model = control?.contentOf(range);
+	if (!model) return;
+	if (typeof model == "string") {
+		clipboard.setData("text/plain", model);
+		return;
+	}
+	if (control.contentType == "markup") {
+		let item = section(model as Section[]);
+		let article = toHtml(item);
+		clipboard.setData("text/html", article.outerHTML);
+	}
+	if (!(model instanceof Array)) model = [model];
+	clipboard.setData("application/json", JSON.stringify(model || null));
 }

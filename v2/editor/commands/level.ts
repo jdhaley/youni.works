@@ -1,6 +1,6 @@
 import { Edit } from "./edit.js";
 import { items } from "../util.js";
-import { getChildEditor } from "../../display/editor.js";
+import { getChildEditor } from "../../box/editor.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";

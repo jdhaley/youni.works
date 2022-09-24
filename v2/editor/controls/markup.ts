@@ -1,10 +1,10 @@
-import { Content, content } from "../../../base/model.js";
+import { Content, content } from "../../base/model.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { ListEditor, ListReplace } from "./list.js";
-import { getChildEditor, getEditor } from "../../display/editor.js";
+import { getChildEditor, getEditor } from "../../box/editor.js";
 import { items, mark, unmark } from "../util.js";
-import { Editor } from "../../../base/editor.js";
+import { Editor } from "../../base/editor.js";
 
 export class MarkupEditor extends ListEditor {
 	contentType = "markup";

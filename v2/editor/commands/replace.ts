@@ -1,5 +1,5 @@
-import { content } from "../../../base/model.js";
-import { bindView } from "../../display/editor.js"
+import { content } from "../../base/model.js";
+import { bindViewNode } from "../../box/editor.js"
 import { unmark } from "../util.js";
 
 import { Edit } from "./edit.js";
@@ -25,7 +25,7 @@ export abstract class Replace extends Edit {
 			range.insertNode(node);
 			range.collapse();
 			if (node.nodeType == Node.ELEMENT_NODE) {
-				bindView(node as Element);
+				bindViewNode(node as Element);
 			}
 		}
 		range = unmark(range);

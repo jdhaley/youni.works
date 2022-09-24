@@ -1,11 +1,13 @@
-import {extend} from "../../base/util.js";
-
-import {EditEvent, UserEvent} from "../ui.js";
-import {navigate} from "../editor/util.js";
-import display from "./display.js";
-import { getClipboard, setClipboard } from "../clipboard.js";
 import { Editor } from "../../base/editor.js";
-import { getEditor } from "../display/editor.js";
+import { extend } from "../../base/util.js";
+
+import { getEditor } from "../../box/editor.js";
+
+import {navigate} from "../../editor/util.js";
+import {EditEvent, UserEvent, getClipboard, setClipboard} from "../ui.js";
+
+import view from "./view.js";
+
 
 let UNDONE = false;
 
@@ -17,7 +19,7 @@ const EDIT_MAPPING = {
 	"deleteContentForward": "delete",
 	"deleteContentBackward": "erase",
 }
-export default extend(display, {
+export default extend(view, {
 	beforeinput(event: EditEvent) {
 		let subject = EDIT_MAPPING[event.inputType];
 		event.subject =  subject || event.inputType;

@@ -1,5 +1,5 @@
-import { Section } from "../../base/model.js";
-import { bundle } from "../../base/util.js";
+import { Section } from "../base/model.js";
+import { bundle } from "../base/util.js";
 
 export function fromHtml(source: Node): Section[] {
 	let items = [];

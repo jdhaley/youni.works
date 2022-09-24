@@ -1,5 +1,5 @@
-import { Controller, Owner, Receiver } from "../../base/control.js";
-import { Area, Edges, Shape, Zone } from "../../base/model.js";
+import { Controller, Owner, Receiver } from "../base/control.js";
+import { Area, Edges, Shape, Zone } from "../base/model.js";
 
 const DEFAULT_BORDER: Edges = {
 	top: 3,

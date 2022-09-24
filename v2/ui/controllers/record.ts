@@ -1,7 +1,7 @@
 import { extend } from "../../base/util.js";
-import { getHeader } from "../editor/util.js";
+import { getHeader } from "../../editor/util.js";
 import { UserEvent } from "../ui.js";
-import editable from "./editable.js";
+import editable from "./editor.js";
 
 export default extend(editable, {
 	dblclick(event: UserEvent) {

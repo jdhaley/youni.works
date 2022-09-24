@@ -9,8 +9,8 @@ export interface Editor extends View {
 	readonly header?: Element;
 	readonly content: Element;
 	readonly footer?: Element;
-	edit(commandName: string, range: Range, content?: content): Range;
 	contentOf(range?: Range): content;
+	edit(commandName: string, range: Range, content?: content): Range;
 }
 
 export interface ArticleType extends Type {

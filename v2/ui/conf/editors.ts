@@ -1,5 +1,5 @@
 import {bundle} from "../../base/util.js";
-import { TypeConf } from "../display/view.js";
+import { TypeConf } from "../../box/view.js";
 
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
@@ -7,12 +7,12 @@ import list from "../controllers/list.js";
 import markup from "../controllers/markup.js";
 import line from "../controllers/line.js";
 
-import { TextEditor } from "../editor/controls/text.js";
-import { RecordEditor } from "../editor/controls/record.js";
-import { ListEditor } from "../editor/controls/list.js";
-import { MarkupEditor } from "../editor/controls/markup.js";
-import { LineEditor } from "../editor/controls/line.js";
-import { EditorType } from "../display/editor.js";
+import { TextEditor } from "../../editor/controls/text.js";
+import { RecordEditor } from "../../editor/controls/record.js";
+import { ListEditor } from "../../editor/controls/list.js";
+import { MarkupEditor } from "../../editor/controls/markup.js";
+import { LineEditor } from "../../editor/controls/line.js";
+import { EditorType } from "../../box/editor.js";
 
 import shortcuts from "./shortcuts.js";
 

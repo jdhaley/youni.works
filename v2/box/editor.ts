@@ -1,10 +1,10 @@
-import {content } from "../../base/model.js";
+import {content } from "../base/model.js";
+import { Article, ArticleType, Editor } from "../base/editor.js";
+import { bundle } from "../base/util.js";
 
-import { ViewBox, ViewType, getViewNode, bindViewNode } from "./view.js";
-import { Article, ArticleType, Editor } from "../../base/editor.js";
-import { bundle } from "../../base/util.js";
+import { ViewBox, ViewType, getViewNode, bindViewNode, getView } from "./view.js";
 
-export { getViewNode, bindViewNode as bindView }
+export { getViewNode, bindViewNode }
 
 export class EditorType extends ViewType implements ArticleType {
 	declare owner: Article;
@@ -27,7 +27,8 @@ export abstract class BaseEditor extends ViewBox implements Editor {
 }
 
 export function getEditor(node: Node | Range): Editor {
-	return getViewNode(node)?.$control as Editor;
+	let view = getView(node);
+	if (view instanceof BaseEditor) return view;
 }
 
 export function getChildEditor(editor: Editor, node: Node): Editor {
