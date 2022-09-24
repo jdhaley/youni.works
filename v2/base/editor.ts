@@ -15,6 +15,7 @@ export interface Editor extends View {
 
 export interface ArticleType extends Type {
 	owner: Article;
+	conf: bundle<any>;
 	types: bundle<ArticleType>;
 	view(content: content): Editor;
 }

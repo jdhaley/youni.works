@@ -4,19 +4,26 @@ import { Replace } from "../commands/replace.js";
 import { Editor } from "../../base/editor.js";
 import { BaseEditor, getChildEditor, getEditor } from "../../box/editor.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
+import { bundle } from "../../base/util.js";
 
 export class RecordEditor extends BaseEditor {
 	contentType = "record";
+	at: bundle<Editor>;
+
+	get title(): string {
+		return this.at.title?.content.textContent;
+	}
+
 	viewContent(model: content): void {
 		this.draw();
-		//view["$at"] = Object.create(null);
+		this.at = Object.create(null);
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
 			let value = model ? model[name] : null;
-			let member = type.view(value).node as Element;
-			member.classList.add("field");
-			this.content.append(member);
-			//view["$at"][name] = member;
+			let member = type.view(value);
+			this.at[name] = member;
+			member.node.classList.add("field");
+			this.content.append(member.node);
 		}
 	}
 	contentOf(range?: Range): content {

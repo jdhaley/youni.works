@@ -1,12 +1,26 @@
 import { extend } from "../../base/util.js";
+import { RecordEditor } from "../../editor/controls/record.js";
 import { getHeader } from "../../editor/util.js";
 import { UserEvent } from "../ui.js";
 import editable from "./editor.js";
 
 export default extend(editable, {
-	dblclick(event: UserEvent) {
+	dblclick(this: RecordEditor, event: UserEvent) {
 		event.subject = "";
-		if (getHeader(event.on, event.target as Node)) {
+		if (event.target == this.header) {
+			event.subject = "";
+			if (this.node.classList.contains("collapsed")) {
+				this.header.textContent = "";
+				this.node.classList.remove("collapsed");
+			} else {
+				this.header.textContent = " " +this.at.title.content.textContent || "";
+				this.node.classList.add("collapsed");
+			}
+		}
+	},
+	click(event: UserEvent) {
+		event.subject = "";
+		if (event.altKey && getHeader(event.on, event.target as Node)) {
 			let range = event.on.ownerDocument.createRange();
 			range.selectNode(event.on);
 			event.frame.selectionRange = range;
