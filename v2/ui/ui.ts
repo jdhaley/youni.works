@@ -1,14 +1,9 @@
 import { CommandBuffer } from "../base/command.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
 import { RemoteFileService } from "../base/remote.js";
-import { ViewOwner, bindView } from "./display/view.js";
+import { ViewOwner } from "./display/view.js";
 import { bundle } from "../base/util.js";
 import { Article, Editor } from "../base/editor.js";
-import { View } from "../base/model.js";
-
-interface ViewElement extends Element {
-	$control?: View;
-}
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -21,30 +16,20 @@ export class Display extends ViewOwner implements Article {
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<Range>;
 
-		/* Supports the Article interface (which has no owner dependency) */
-		setRange(range: Range, collapse?: boolean): void {
-			if (range) {
-				if (collapse) range.collapse();
-				this.frame.selectionRange = range;
-			}
+	/* Supports the Article interface (which has no owner dependency) */
+	setRange(range: Range, collapse?: boolean): void {
+		if (range) {
+			if (collapse) range.collapse();
+			this.frame.selectionRange = range;
 		}
+	}
 
-		getControl(id: string): Editor {
-			let view = this.node.ownerDocument.getElementById(id) as ViewElement;
-			if (!view) throw new Error("Can't find view element.");
-			//if (view.getAttribute("data-item")) return view;
-			if (!view.$control) {
-				console.warn("binding...");
-				bindView(view as any);
-				if (!view.$control) {
-					console.error("Unable to bind missing control. Please collect info / analyze.");
-					debugger;
-				}
-			} else {
-				view.$control.content; //checks the view isn't corrupted.
-			}
-			return view.$control as Editor;
-		}	
+	getControl(id: string): Editor {
+		return super.getControl(id) as Editor;
+	}
+	createElement(tagName: string): Element {
+		return this.frame.createElement(tagName);
+	}
 }
 
 export class Frame extends Owner<HTMLElement> {

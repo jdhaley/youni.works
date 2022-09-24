@@ -2,7 +2,7 @@ import { content, View, Type } from "../../base/model.js";
 import { bundle, extend } from "../../base/util.js";
 import { ElementBox, ElementOwner } from "./box.js";
 
-interface ViewElement extends Element {
+interface ViewNode extends Element {
 	$control?: View;
 }
 export interface TypeConf {
@@ -63,7 +63,7 @@ export abstract class ViewBox extends ElementBox implements View {
 		this.node.append(footer);
 		this.footer = footer;
 	}
-	control(element: ViewElement) {
+	control(element: ViewNode) {
 		super.control(element);
 		element.setAttribute("data-item", this.type.name);
 		if (!element.id) element.id = "" + NEXT_ID++;
@@ -123,7 +123,7 @@ export class ViewType implements Type {
 	}
 }
 
-function bindContainer(node: ViewElement) {
+function bindContainer(node: ViewNode) {
 	let control: ViewBox = node.$control as any;
 	for (let child of node.children) {
 		if (child.nodeName == "header") control.header = child;
@@ -132,7 +132,7 @@ function bindContainer(node: ViewElement) {
 	}
 }
 
-export class ViewOwner extends ElementOwner {
+export abstract class ViewOwner extends ElementOwner {
 	constructor(conf: bundle<any>) {
 		super();
 		/*
@@ -147,19 +147,18 @@ export class ViewOwner extends ElementOwner {
 	unknownType: Type;
 	type: ViewType;
 
-	createElement(tagName: string): Element {
-		return this.node.ownerDocument.createElement(tagName);
-	}
+	abstract createElement(tagName: string): Element;
+	
 	getElementById(id: string): Element {
 		return this.node.ownerDocument.getElementById(id);
 	}
 	getControl(id: string): View {
-		let view = this.node.ownerDocument.getElementById(id) as ViewElement;
+		let view = this.node.ownerDocument.getElementById(id) as ViewNode;
 		if (!view) throw new Error("Can't find view element.");
 		//if (view.getAttribute("data-item")) return view;
 		if (!view.$control) {
 			console.warn("binding...");
-			bindView(view as any);
+			bindViewNode(view as any);
 			if (!view.$control) {
 				console.error("Unable to bind missing control. Please collect info / analyze.");
 				debugger;
@@ -171,11 +170,11 @@ export class ViewOwner extends ElementOwner {
 	}
 }
 
-export function bindView(view: Element): void {
+export function bindViewNode(view: Element): void {
 	let control: ViewBox = view["$control"];
 	if (!control) {
 		let name = view.getAttribute("data-item");
-		let parent = getView(view.parentElement) as ViewElement;
+		let parent = getViewNode(view.parentElement) as ViewNode;
 		if (name && parent) {
 			//TODO forcing to DisplayType because I don't want to expose .control()
 			let type = parent.$control.type.types[name] as ViewType;
@@ -187,17 +186,17 @@ export function bindView(view: Element): void {
 	}
 
 	if (control) for (let child of view["$control"].content.children) {
-		bindView(child as ViewElement);
+		bindViewNode(child as ViewNode);
 	}
 }
 
-export function getView(node: Node | Range): ViewElement {
+export function getViewNode(node: Node | Range): ViewNode {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
 		if (node instanceof Element && node.getAttribute("data-item")) {
 			if (!node["$control"]) {
 				console.warn("Unbound view.");
-				bindView(node);
+				bindViewNode(node);
 			}
 			return node;
 		}

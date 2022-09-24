@@ -18,7 +18,7 @@ export class ElementBox extends Controller<Element> implements Shape {
 	get border() {
 		return DEFAULT_BORDER;
 	}
-	get style(): CSSStyleDeclaration {
+	protected get style(): CSSStyleDeclaration {
 		return this.node["style"]
 	}
 	getStyle(name: string): string {

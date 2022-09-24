@@ -21,11 +21,12 @@ export interface ArticleType extends Type {
 
 export interface Article extends Owner<Element> {
 	node: Element;
-	commands: CommandBuffer<Range>;
-	setRange(extent: Range, collapse?: boolean): void;
-	getControl(id: string): Editor;
-	createElement(tag: string): Element;
 	unknownType: Type;
+	commands: CommandBuffer<Range>;
+
+	getControl(id: string): Editor;
+	setRange(extent: Range, collapse?: boolean): void;
+	createElement(tag: string): Element;
 }
 
 // interface Range {
