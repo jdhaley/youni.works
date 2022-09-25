@@ -2,7 +2,7 @@ import { content, Record } from "../../base/model.js";
 
 import { Replace } from "../commands/replace.js";
 import { Editor } from "../../base/editor.js";
-import { BaseEditor, getChildEditor, getEditor } from "../../box/editor.js";
+import { BaseEditor, Change, getChildEditor, getEditor } from "../../box/editor.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
 import { bundle } from "../../base/util.js";
 
@@ -36,7 +36,9 @@ export class RecordEditor extends BaseEditor {
 	edit(commandName: string, range: Range, record: Record) {
 		if (getEditor(range) != this) console.warn("Invalid edit range");
 		if (record && typeof record[0] == "object") record = record[0] as Record;
-		return new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
+		range = new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
+		this.owner.sense(new Change(commandName, this), this.node);
+		return range;
 	}
 }
 

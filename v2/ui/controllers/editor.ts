@@ -1,7 +1,7 @@
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
-import { getEditor } from "../../box/editor.js";
+import { Change, getEditor } from "../../box/editor.js";
 
 import {navigate} from "../../editor/util.js";
 import {EditEvent, UserEvent, getClipboard, setClipboard} from "../ui.js";
@@ -67,6 +67,32 @@ export default extend(view, {
 			range && this.owner.setRange(range, true);
 		}
 	},
+	next(event: UserEvent) {
+		event.subject = "";
+		let next = navigate(event.on);
+		if (next) {
+			event.range.selectNodeContents(next);
+			next.scrollIntoView({block: "center"});
+		}
+	},
+	previous(event: UserEvent) {
+		event.subject = "";
+		let prev = navigate(event.on, true);
+		if (prev) {
+			event.range.selectNodeContents(prev);
+			prev.scrollIntoView({block: "center"});
+		}
+	},
+	change(this: Editor, signal: Change) {
+		if (signal.direction == "up") {
+			//console.log(signal.direction, this.type.name, signal.commandName);
+			if (this.node == this.type.owner.node) {
+				this.type.owner.receive(signal);
+			}
+		} else {
+			//console.log("down");
+		}
+	},
 	input(event: UserEvent) {
 		/*
 		Input events should always be undone because the editor maintains its own
@@ -82,30 +108,6 @@ export default extend(view, {
 			UNDONE = true;
 			console.debug("undo input");	
 			document.execCommand("undo");
-		}
-	},
-	undo(this: Editor, event: UserEvent) {
-		event.subject = "";
-		this.type.owner.setRange(this.type.owner.commands.undo(), false);
-	},
-	redo(this: Editor, event: UserEvent) {
-		event.subject = "";
-		this.type.owner.setRange(this.type.owner.commands.redo(), false);
-	},
-	next(event: UserEvent) {
-		event.subject = "";
-		let next = navigate(event.on);
-		if (next) {
-			event.range.selectNodeContents(next);
-			next.scrollIntoView({block: "center"});
-		}
-	},
-	previous(event: UserEvent) {
-		event.subject = "";
-		let prev = navigate(event.on, true);
-		if (prev) {
-			event.range.selectNodeContents(prev);
-			prev.scrollIntoView({block: "center"});
 		}
 	}
 });

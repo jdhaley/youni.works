@@ -4,7 +4,7 @@ import { Article, Editor } from "../base/editor.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
 import { RemoteFileService } from "../base/remote.js";
 import { start } from "../base/type.js";
-import { bundle } from "../base/util.js";
+import { bundle, EMPTY } from "../base/util.js";
 
 import { section } from "../transform/item.js";
 import { fromHtml } from "../transform/fromHtml.js";
@@ -46,6 +46,7 @@ export class Frame extends Owner<HTMLElement> {
 		window.document.body.textContent = "";
 		window.document["$owner"] = this;
 		this.#window = window;
+		this.actions = EMPTY.object;
 		for (let name in actions) {
 			let listener = actions[name];
 			let target = name == "selectionchange" ? window.document : this.#window;

@@ -2,7 +2,7 @@ import { Content, content } from "../../base/model.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { ListEditor, ListReplace } from "./list.js";
-import { getChildEditor, getEditor } from "../../box/editor.js";
+import { Change, getChildEditor, getEditor } from "../../box/editor.js";
 import { items, mark, unmark } from "../util.js";
 import { Editor } from "../../base/editor.js";
 
@@ -12,7 +12,9 @@ export class MarkupEditor extends ListEditor {
 		if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
-		return cmd.call(this, commandName, range, content);
+		range = cmd.call(this, commandName, range, content);
+		this.owner.sense(new Change(commandName, this), this.node);
+		return range;
 	}
 }
 

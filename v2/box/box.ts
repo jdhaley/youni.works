@@ -87,10 +87,6 @@ export abstract class ElementOwner extends Owner<Element> {
 		return view.children as Iterable<Element>;
 	}
 	getControlOf(view: Element): Receiver {
-		let type = view["$control"];
-		if (!type) {
-			console.log(view);
-		}
-		return type;
+		return view["$control"];
 	}
 }

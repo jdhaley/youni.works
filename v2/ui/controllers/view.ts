@@ -1,10 +1,11 @@
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
-import { ViewBox } from "../../box/view.js";
-import { getEditor } from "../../box/editor.js";
+import { ViewBox, ViewOwner } from "../../box/view.js";
+import { Change, getEditor } from "../../box/editor.js";
 
 import { UserEvent, setClipboard } from "../ui.js";
+import { Signal } from "../../base/control.js";
 
 export default extend(null, {
 	keydown(this: ViewBox, event: UserEvent) {
@@ -34,9 +35,25 @@ export default extend(null, {
 				editor.content.classList.add("active");
 			}
 		}
+	},
+	change(this: Editor, signal: Change) {
+		notifyOwner(this, signal);
+	},
+	undo(this: Editor, event: UserEvent) {
+		event.subject = "";
+		this.type.owner.setRange(this.type.owner.commands.undo(), false);
+		this.type.owner.receive(new Change("undo"));
+	},
+	redo(this: Editor, event: UserEvent) {
+		this.type.owner.receive(new Change("redo"));
 	}
 });
 
+function notifyOwner(editor: Editor, signal: Signal) {
+	if (signal.direction == "up" && editor.node == (editor.type.owner).node) {
+		editor.type.owner.receive(signal);
+	}
+}
 function  getShortcut(event: UserEvent) {
     let mod = getModifiers(event);
     let key = event.key;

@@ -1,7 +1,7 @@
 import {content, List, viewType} from "../../base/model.js";
 
 import { Editor, Article } from "../../base/editor.js";
-import { BaseEditor, EditorType, getChildEditor, getEditor } from "../../box/editor.js";
+import { BaseEditor, Change, EditorType, getChildEditor, getEditor } from "../../box/editor.js";
 import { Replace } from "../commands/replace.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
 
@@ -34,7 +34,9 @@ export class ListEditor extends BaseEditor {
 	}
 	edit(commandName: string, range: Range, content?: content): Range {
 		if (getEditor(range) != this) console.warn("Invalid edit range");
-		return new ListReplace(this.owner, commandName, this.node.id).exec(range, content);
+		range = new ListReplace(this.owner, commandName, this.node.id).exec(range, content);
+		this.owner.sense(new Change(commandName, this), this.node);
+		return range;
 	}
 }
 

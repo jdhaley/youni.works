@@ -1,7 +1,7 @@
 import {getHeader, mark, narrowRange, unmark} from "../util.js";
 import { content } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
-import { BaseEditor, getEditor } from "../../box/editor.js";
+import { BaseEditor, Change, getEditor } from "../../box/editor.js";
 import { Replace } from "../commands/replace.js";
 
 export class TextEditor extends BaseEditor {
@@ -32,7 +32,9 @@ export class TextEditor extends BaseEditor {
 		positionToText(range);
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
-		return cmd.call(this, commandName, range, content);
+		range = cmd.call(this, commandName, range, content);
+		this.owner.sense(new Change(commandName, this), this.node);
+		return range;
 	}
 }
 

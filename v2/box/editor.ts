@@ -3,6 +3,7 @@ import { Article, ArticleType, Editor } from "../base/editor.js";
 import { bundle } from "../base/util.js";
 
 import { ViewBox, ViewType, getViewNode, bindViewNode, getView } from "./view.js";
+import { Signal } from "../base/control.js";
 
 export { getViewNode, bindViewNode }
 
@@ -24,6 +25,19 @@ export abstract class BaseEditor extends ViewBox implements Editor {
 	abstract viewContent(model: content): void;
 	abstract contentOf(range?: Range): content;
 	abstract edit(commandName: string, range: Range, content?: content): Range;
+}
+
+export class Change implements Signal {
+	constructor(command: string, editor?: Editor) {
+		this.direction = editor ? "up" : "down";
+		this.subject = "change";
+		this.source = editor;
+		this.commandName = command;
+	}
+	direction: "up" | "down";
+	subject: string;
+	source: Editor;
+	commandName: string;
 }
 
 export function getEditor(node: Node | Range): Editor {

@@ -27,6 +27,32 @@ export default extend(null, {
 			console.log("Save: ", model);
 			this.service.save(this.node.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
 		}
+	},
+	undo(this: Display, event: UserEvent) {
+		event.subject = "";
+		let range = this.commands.redo();
+		if (range) {
+			this.setRange(range, false);
+			let signal = new Change("undo");
+			this.send(signal, this.node);
+			this.frame.receive(signal);	
+		}
+	},
+	redo(this: Display, event: UserEvent) {
+		event.subject = "";
+		let range = this.commands.redo();
+		if (range) {
+			this.setRange(range, false);
+			let signal = new Change("undo");
+			this.send(signal, this.node);
+			this.frame.receive(signal);	
+		}
+	},
+	change(this: Display, signal: Change) {
+		console.log("article changed, sending message.");
+		signal.direction = "down";
+		this.send(signal, this.node);
+		this.frame.receive(signal);
 	}
 });
 
@@ -42,7 +68,7 @@ function getType(article: Display, path: string, data: any): ViewType {
 
 import shape from "./shape.js";
 import { TextEditor } from "../../editor/controls/text.js";
-import { EditorType } from "../../box/editor.js";
+import { Change, EditorType } from "../../box/editor.js";
 
 function shapetest(this: Display) {
 	let type = new EditorType(this);
