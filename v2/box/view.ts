@@ -181,6 +181,8 @@ export function bindViewNode(view: Element): void {
 			if (type) {
 				control = Object.create(type.prototype);
 				control.control(view as any);
+			} else {
+				console.warn(`Bind failed: Type "${name}" not found in "${parent.getAttribute("data-item")}"`)
 			}
 		}
 	}

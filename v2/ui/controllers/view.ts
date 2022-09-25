@@ -21,19 +21,21 @@ export default extend(null, {
 		setClipboard(range.cloneRange(), event.clipboardData);
 	},
 	selectionchange(this: ViewBox, event: UserEvent) {
-		PRIOR_EDITOR?.content.classList.remove("active");
-		for (let ele = event.range.commonAncestorContainer as Element; ele; ele = ele.parentElement) {
-			let editor = getEditor(ele);
-			if (editor) {
+		event.subject = "";
+		let eles = [];
+		for (let ele of this.node.ownerDocument.getElementsByClassName("active")) {
+			eles.push(ele);
+		}
+	 	for (let ele of eles) ele.classList.remove("active");
+		let range = event.range;
+		for (let node of this.content.childNodes) {
+			let editor = getEditor(node);
+			if (range.intersectsNode(editor.content)) {
 				editor.content.classList.add("active");
-				PRIOR_EDITOR = editor;
-				return;
 			}
 		}
 	}
 });
-
-let PRIOR_EDITOR: Editor;
 
 function  getShortcut(event: UserEvent) {
     let mod = getModifiers(event);

@@ -173,7 +173,7 @@ export const items = {
 	}
 }
 
-export function navigate(start: Element, isBack?: boolean) {
+export function navigate(start: Node | Range, isBack?: boolean) {
 	let editor = getEditor(start);
 	while (editor) {
 		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;
@@ -191,14 +191,14 @@ function navigateInto(ele: Element, isBack?: boolean) {
 	switch (editor.contentType) {
 		case "text":
 		case "line":
-		case "markup":
 			break;
 		case "record":
 			ele = isBack ? content.lastElementChild : content.firstElementChild;
 			if (ele) content = navigateInto(ele);
 			break;
 		case "list":
-			let item = isBack ? content.lastElementChild : content.firstElementChild;
+		case "markup":
+				let item = isBack ? content.lastElementChild : content.firstElementChild;
 			if (item) {
 				content = navigateInto(item);
 			} else {

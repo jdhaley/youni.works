@@ -71,7 +71,7 @@ export default extend(list, {
 });
 
 function nav(event: UserEvent, isPrevious?: boolean) {
-	let item = navigate(event.on, isPrevious);
+	let item = navigate(event.range, isPrevious);
 	if (item) {
 		event.range.selectNodeContents(item);
 		item.scrollIntoView({block: "center"});
