@@ -10,10 +10,11 @@ export default extend(editable, {
 		if (event.target == this.header) {
 			event.subject = "";
 			if (this.node.classList.contains("collapsed")) {
-				this.header.textContent = "";
+				this.header.textContent = this.type.conf.title;
 				this.node.classList.remove("collapsed");
 			} else {
-				this.header.textContent = " " +this.at.title.content.textContent || "";
+				let title = this.at.title.content.textContent || "";
+				this.header.innerHTML += ": " + `<b>${title}</b>`;
 				this.node.classList.add("collapsed");
 			}
 		}

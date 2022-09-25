@@ -5,7 +5,7 @@ import editable from "./editor.js";
 import { Editor } from "../../base/editor.js";
 
 export default extend(editable, {
-	click(event: UserEvent) {
+	dblclick(event: UserEvent) {
 		let view = event.on;
 		let header = getHeader(event.on, event.target as Node);
 		if (header) {

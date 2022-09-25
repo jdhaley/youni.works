@@ -53,7 +53,7 @@ function shapetest(this: Display) {
 	
 	let viewer = type.view("HELLO THERE") as unknown as ViewBox;
 	viewer.content.classList.add("shape");
-	viewer.position(0, 0);
+	viewer.position(300, 0);
 
 	this.frame.view.append(viewer.node);
 }
