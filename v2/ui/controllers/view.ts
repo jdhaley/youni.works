@@ -1,11 +1,8 @@
-import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
-import { ViewBox, ViewOwner } from "../../box/view.js";
-import { Change, getEditor } from "../../box/editor.js";
+import { ViewBox } from "../../box/view.js";
 
 import { UserEvent, setClipboard } from "../ui.js";
-import { Signal } from "../../base/control.js";
 
 export default extend(null, {
 	keydown(this: ViewBox, event: UserEvent) {
@@ -20,40 +17,9 @@ export default extend(null, {
 		event.subject = "";
 		let range = event.range;
 		setClipboard(range.cloneRange(), event.clipboardData);
-	},
-	selectionchange(this: ViewBox, event: UserEvent) {
-		event.subject = "";
-		let eles = [];
-		for (let ele of this.node.ownerDocument.getElementsByClassName("active")) {
-			eles.push(ele);
-		}
-	 	for (let ele of eles) ele.classList.remove("active");
-		let range = event.range;
-		for (let node of this.content.childNodes) {
-			let editor = getEditor(node);
-			if (range.intersectsNode(editor.content)) {
-				editor.content.classList.add("active");
-			}
-		}
-	},
-	change(this: Editor, signal: Change) {
-		notifyOwner(this, signal);
-	},
-	undo(this: Editor, event: UserEvent) {
-		event.subject = "";
-		this.owner.setRange(this.owner.commands.undo(), false);
-		this.owner.receive(new Change("undo"));
-	},
-	redo(this: Editor, event: UserEvent) {
-		this.owner.receive(new Change("redo"));
 	}
 });
 
-function notifyOwner(editor: Editor, signal: Signal) {
-	if (signal.direction == "up" && editor.node == (editor.owner).node) {
-		editor.owner.receive(signal);
-	}
-}
 function  getShortcut(event: UserEvent) {
     let mod = getModifiers(event);
     let key = event.key;

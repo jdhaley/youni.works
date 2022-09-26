@@ -93,6 +93,31 @@ export default extend(view, {
 			//console.log("down");
 		}
 	},
+	undo(this: Editor, event: UserEvent) {
+		event.subject = "";
+		this.owner.setRange(this.owner.commands.undo(), false);
+		this.owner.receive(new Change("undo"));
+	},
+	redo(this: Editor, event: UserEvent) {
+		event.subject = "";
+		this.owner.setRange(this.owner.commands.redo(), false);
+		this.owner.receive(new Change("redo"));
+	},
+	selectionchange(this: Editor, event: UserEvent) {
+		event.subject = "";
+		let eles = [];
+		for (let ele of this.node.ownerDocument.getElementsByClassName("active")) {
+			eles.push(ele);
+		}
+	 	for (let ele of eles) ele.classList.remove("active");
+		let range = event.range;
+		for (let node of this.content.childNodes) {
+			let editor = getEditor(node);
+			if (range.intersectsNode(editor.content)) {
+				editor.content.classList.add("active");
+			}
+		}
+	},
 	input(event: UserEvent) {
 		/*
 		Input events should always be undone because the editor maintains its own
