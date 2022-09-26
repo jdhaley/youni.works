@@ -1,6 +1,5 @@
 import { content, Section } from "../base/model.js";
 import { CommandBuffer } from "../base/command.js";
-import { Article, Editor } from "../base/editor.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
 import { RemoteFileService } from "../base/remote.js";
 import { start } from "../base/type.js";
@@ -11,6 +10,7 @@ import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
 import { ViewOwner, getView } from "../box/view.js";
+import { Article, Editor } from "../box/editor.js";
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {

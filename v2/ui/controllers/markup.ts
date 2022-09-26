@@ -1,5 +1,5 @@
 import { content } from "../../base/model.js";
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../box/editor.js";
 import { extend } from "../../base/util.js";
 
 import { navigate } from "../../editor/util.js";

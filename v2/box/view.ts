@@ -1,22 +1,23 @@
-import { Article } from "../base/editor.js";
-import { content, Type } from "../base/model.js";
+import { content } from "../base/model.js";
 import { View, ViewType } from "../base/view.js";
-import { bundle, extend } from "../base/util.js";
-import { ElementBox, ElementOwner } from "./box.js";
 import { BaseType } from "../base/type.js";
+import { bundle } from "../base/util.js";
+
+import { Article, Editor } from "./editor.js";
+import { ElementBox, ElementOwner } from "./box.js";
 
 interface ViewNode extends Element {
 	$control?: View;
 }
 
-export abstract class ViewBox extends ElementBox implements View {
+export abstract class ViewBox extends ElementBox implements Editor {
 	declare type: ViewBoxType;
 	declare contentType: string;
 	declare header: Element;
 	declare content: Element;
 	declare footer: Element;
 
-	get owner(): ElementOwner {
+	get owner(): Article {
 		return this.type.owner;
 	}
 	get isContainer(): boolean {
@@ -178,7 +179,7 @@ function getViewNode(node: Node | Range): ViewNode {
 	}
 }
 
-export function getView(node: Node | Range): ViewBox {
+export function getView(node: Node | Range): Editor {
 	let view = getViewNode(node)?.$control;
 	if (view instanceof ViewBox) return view;
 }

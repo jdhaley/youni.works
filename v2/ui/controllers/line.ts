@@ -1,5 +1,5 @@
 import { extend } from "../../base/util.js";
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../box/editor.js";
 
 import { UserEvent, getClipboard } from "../ui.js";
 

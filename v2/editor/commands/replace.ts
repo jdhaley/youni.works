@@ -1,12 +1,11 @@
-import { content } from "../../base/model.js";
-import { bindViewNode } from "../../box/editor.js"
-import { unmark } from "../util.js";
+import { unmark, bindViewNode } from "../util.js";
 
 import { Edit } from "./edit.js";
+
 export abstract class Replace extends Edit {
 	before: string;
 	after: string;
-	exec(range: Range, content: content): Range {
+	exec(range: Range, content: any): Range {
 		return;
 	}
 	undo() {

@@ -1,15 +1,27 @@
-import { Article, Editor } from "../base/editor.js";
+import { content } from "../base/model.js";
+import { View, ViewType } from "../base/view.js";
+import { CommandBuffer } from "../base/command.js";
+import { Owner, Signal } from "../base/control.js";
 
-import { ViewBox, bindViewNode, getView } from "./view.js";
-import { Signal } from "../base/control.js";
+export interface Editor extends View {
+	readonly owner: Article;
+	readonly type: ViewType;
+	readonly node: Element;
+	readonly header?: Element;
+	readonly content: Element;
+	readonly footer?: Element;
+	contentOf(range?: Range): content;
+	edit(commandName: string, range: Range, content?: content): Range;
+}
 
-export { bindViewNode }
+export interface Article extends Owner<Element> {
+	node: Element;
+	unknownType: ViewType;
+	commands: CommandBuffer<Range>;
 
-
-export abstract class BaseEditor extends ViewBox implements Editor {
-	get owner(): Article {
-		return this.type.owner;
-	}
+	getControl(id: string): Editor;
+	setRange(extent: Range, collapse?: boolean): void;
+	createElement(tag: string): Element;
 }
 
 export class Change implements Signal {
@@ -24,3 +36,20 @@ export class Change implements Signal {
 	source: Editor;
 	commandName: string;
 }
+
+// interface Range {
+// 	startContainer: Container;
+//     startOffset: number;
+// 	endContainer: Container;
+//     endOffset: number;
+// }
+// interface Container {
+// 	readonly $control?: Viewer;
+// 	textContent: string;
+// }
+
+// interface View0 extends Container {
+// 	readonly classList: Bag<string>;
+// 	readonly children: Iterable<View>;
+// 	append(view: any): void;
+// }

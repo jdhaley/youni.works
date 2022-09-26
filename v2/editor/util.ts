@@ -1,11 +1,7 @@
-import { Editor } from "../base/editor";
-import { BaseEditor } from "../box/editor.js";
-import { getView } from "../box/view.js";
+import { Editor } from "../box/editor";
+import { getView, bindViewNode, ViewBox } from "../box/view.js";
 
-export function getEditor(node: Node | Range): Editor {
-	let view = getView(node);
-	if (view instanceof BaseEditor) return view;
-}
+export { ViewBox as BaseEditor, getView, bindViewNode }
 
 export function getChildEditor(editor: Editor, node: Node): Editor {
 	if (node == editor.content) return null;
@@ -16,12 +12,12 @@ export function getChildEditor(editor: Editor, node: Node): Editor {
 }
 
 export function narrowRange(range: Range) {
-	let editor = getEditor(range);
+	let editor = getView(range);
 	if (!editor) return;
 
 	let start = range.startContainer;
 	let end = range.endContainer;
-	let content = getEditor(range).content;
+	let content = getView(range).content;
 	if (getHeader(editor.node, start)) {;
 		range.setStart(content, 0);
 	}
@@ -116,9 +112,9 @@ function patchText(marker: Node) {
 export function clearContent(range: Range) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
-		let editor = getEditor(node);
+		let editor = getView(node);
 		if (editor?.contentType == "record") {
-			if (getEditor(editor.node.parentElement)?.contentType == "list") {
+			if (getView(editor.node.parentElement)?.contentType == "list") {
 				if (enclosedInRange(editor.node, range)) editor.node.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
@@ -162,10 +158,10 @@ export function rangeIterator(range: Range) {
 
 export const items = {
 	getSection(node: Node | Range): Element {
-		let editor = node && getEditor(node);
+		let editor = node && getView(node);
 		while (editor) {
 			if (this.getRole(editor.node) == "heading") return editor.node;
-			editor = getEditor(editor.node.previousElementSibling);
+			editor = getView(editor.node.previousElementSibling);
 		}
 	},
 	setItem(item: Element, level: number, role?: string) {
@@ -189,18 +185,18 @@ export const items = {
 }
 
 export function navigate(start: Node | Range, isBack?: boolean) {
-	let editor = getEditor(start);
+	let editor = getView(start);
 	while (editor) {
 		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next;
 		}
-		editor = getEditor(editor.node.parentElement);
+		editor = getView(editor.node.parentElement);
 	}
 }
 function navigateInto(ele: Element, isBack?: boolean) {
-	let editor = getEditor(ele);
+	let editor = getView(ele);
 	if (!editor) return;
 	let content = editor.content as Element;
 	switch (editor.contentType) {

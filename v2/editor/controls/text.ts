@@ -1,7 +1,7 @@
-import { getEditor, getHeader, mark, narrowRange, unmark} from "../util.js";
+import { getView, getHeader, mark, narrowRange, unmark, BaseEditor} from "../util.js";
 import { content } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
-import { BaseEditor, Change } from "../../box/editor.js";
+import { Change } from "../../box/editor.js";
 import { Replace } from "../commands/replace.js";
 
 export class TextEditor extends BaseEditor {
@@ -28,7 +28,7 @@ export class TextEditor extends BaseEditor {
 		return model;			
 	}
 	edit(commandName: string, range: Range, content: string): Range {
-		if (getEditor(range) != this) console.warn("Invalid edit range");
+		if (getView(range) != this) console.warn("Invalid edit range");
 		positionToText(range);
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
@@ -41,7 +41,7 @@ export class TextEditor extends BaseEditor {
 export class TextReplace extends Replace {
 	exec(range: Range, text: string): Range {
 		mark(range);
-		let content = getEditor(range).content;
+		let content = getView(range).content;
 		if (!content) return;
 		this.before = content.innerHTML;	
 		range.deleteContents();
@@ -80,7 +80,7 @@ let lastEdit = {
 }
 function doit(commandName: string, range: Range, text: string): Range {
 	let node = range.commonAncestorContainer;
-	let editor = getEditor(node);
+	let editor = getView(node);
 
 	if (range.collapsed && commandName == "Erase") {
 		if (!range.startOffset) return range;
@@ -168,7 +168,7 @@ function eraseAgain(range: Range, cmd: TextReplace) {
 
 function endagain(range: Range, cmd: TextReplace) {
 	mark(range);
-	cmd.after = getEditor(range).content.innerHTML || "";
+	cmd.after = getView(range).content.innerHTML || "";
 	unmark(range);
 	range.collapse();
 	return range;
@@ -199,10 +199,10 @@ function endagain(range: Range, cmd: TextReplace) {
 // }
 
 function positionToText(range: Range) {
-	let inHeader = getHeader(getEditor(range).node, range.startContainer);
+	let inHeader = getHeader(getView(range).node, range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
-		let content = getEditor(range).content;
+		let content = getView(range).content;
 		if (content.childNodes.length != 1) {
 			//force single text node...
 			content.textContent = content.textContent;

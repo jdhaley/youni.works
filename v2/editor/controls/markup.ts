@@ -3,13 +3,13 @@ import { Content, content } from "../../base/model.js";
 import { LevelCommand } from "../commands/level.js";
 import { ListEditor, ListReplace } from "./list.js";
 import { Change } from "../../box/editor.js";
-import { getChildEditor, getEditor, items, mark, unmark } from "../util.js";
-import { Editor } from "../../base/editor.js";
+import { getChildEditor, getView, items, mark, unmark } from "../util.js";
+import { Editor } from "../../box/editor.js";
 
 export class MarkupEditor extends ListEditor {
 	contentType = "markup";
 	edit(commandName: string, range: Range, content: string) {
-		if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
+		if (getView(range) != this) console.warn("fix this check"); //"Invalid edit range"
 		let cmd = COMMANDS[commandName];
 		if (!cmd) throw new Error("Unrecognized command");
 		range = cmd.call(this, commandName, range, content);
@@ -25,7 +25,7 @@ export class MarkupReplace extends ListReplace {
 			(due to merge & join of the start & end). In this case select
 			the entire view so that the outer range is like a multi-item range.
 		*/
-		let editor = getEditor(range);
+		let editor = getView(range);
 		if (editor.contentType == "line") {
 			range = range.cloneRange();
 			range.selectNode(editor.node);
@@ -127,9 +127,9 @@ function noop() {
 }
 
 function replace(this: MarkupEditor, commandName: string, range: Range, content?: content): Range {
-	let editor = getEditor(range);
+	let editor = getView(range);
 	if (editor.contentType == "line") {
-		editor = getEditor(editor.node.parentElement);
+		editor = getView(editor.node.parentElement);
 	}
 	if (editor.contentType != "markup") console.warn("View is not markup:", editor);
 
@@ -142,7 +142,7 @@ function level(this: MarkupEditor, name: "Promote" | "Demote", range: Range): Ra
 	let end = getChildEditor(this, range.endContainer);
 	//If a range of items, check that there are no headings
 	if (start != end) for (let item = start.node; item; item = item.nextElementSibling) {
-		let role = getEditor(item).type.name;
+		let role = getView(item).type.name;
 		if (role == "heading") {
 			console.warn("No range promote with headings");
 			return range;

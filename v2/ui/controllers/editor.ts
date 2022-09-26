@@ -1,8 +1,8 @@
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../box/editor.js";
 import { extend } from "../../base/util.js";
 
 import { Change } from "../../box/editor.js";
-import { getEditor, navigate } from "../../editor/util.js";
+import { getView, navigate } from "../../editor/util.js";
 
 import { EditEvent, UserEvent, getClipboard, setClipboard } from "../ui.js";
 
@@ -45,7 +45,7 @@ export default extend(view, {
 				console.warn("Not insertable range");
 				return;
 			}
-			target = getEditor(range);
+			target = getView(range);
 		} 
 		range = target.edit("Paste", range, model);
 		range &&  this.owner.setRange(range, true);
@@ -111,7 +111,7 @@ export default extend(view, {
 	 	for (let ele of eles) ele.classList.remove("active");
 		let range = event.range;
 		for (let node of this.content.childNodes) {
-			let editor = getEditor(node);
+			let editor = getView(node);
 			if (range.intersectsNode(editor.content)) {
 				editor.content.classList.add("active");
 			}
@@ -141,7 +141,7 @@ export default extend(view, {
  */
 function getInsertableRange(range: Range) {
 	range = range.cloneRange();
-	let view = getEditor(range);
+	let view = getView(range);
 	while (view) {
 		if (view?.contentType == "list") {
 			return range;
@@ -152,7 +152,7 @@ function getInsertableRange(range: Range) {
 
 		range.setStartBefore(view.node);
 		range.collapse(true);
-		view = getEditor(range);
+		view = getView(range);
 	}
 }
 

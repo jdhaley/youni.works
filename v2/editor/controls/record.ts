@@ -1,9 +1,9 @@
 import { content, Record } from "../../base/model.js";
 
 import { Replace } from "../commands/replace.js";
-import { Editor } from "../../base/editor.js";
-import { BaseEditor, Change } from "../../box/editor.js";
-import { getChildEditor, getEditor, clearContent, mark, narrowRange, unmark } from "../util.js";
+import { Editor } from "../../box/editor.js";
+import { Change } from "../../box/editor.js";
+import { getChildEditor, getView, clearContent, mark, narrowRange, unmark, BaseEditor } from "../util.js";
 import { bundle } from "../../base/util.js";
 import { ViewType } from "../../base/view.js";
 
@@ -35,7 +35,7 @@ export class RecordEditor extends BaseEditor {
 		return model;
 	}
 	edit(commandName: string, range: Range, record: Record) {
-		if (getEditor(range) != this) console.warn("Invalid edit range");
+		if (getView(range) != this) console.warn("Invalid edit range");
 		if (record && typeof record[0] == "object") record = record[0] as Record;
 		range = new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
 		this.owner.sense(new Change(commandName, this), this.node);
@@ -48,7 +48,7 @@ class RecordReplace extends Replace {
 		narrowRange(range);
 		mark(range);
 
-		let content = getEditor(range).content;
+		let content = getView(range).content;
 		this.before = content?.innerHTML || "";
 		clearContent(range);
 		if (record) mergeContent(this, range, record)
@@ -60,7 +60,7 @@ class RecordReplace extends Replace {
 }
 
 function mergeContent(cmd: Replace, range: Range, record: Record) {
-	let editor = getEditor(range);
+	let editor = getView(range);
 	let start = getChildEditor(editor, range.startContainer);
 	let end = getChildEditor(editor, range.endContainer);
 	for (let member = start.node || editor.node.firstElementChild; member; member = member.nextElementSibling) {
