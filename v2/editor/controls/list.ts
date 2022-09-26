@@ -1,9 +1,10 @@
 import {content, List, viewType} from "../../base/model.js";
 
 import { Editor, Article } from "../../base/editor.js";
-import { BaseEditor, Change, EditorType, getChildEditor, getEditor } from "../../box/editor.js";
+import { BaseEditor, Change, getChildEditor, getEditor } from "../../box/editor.js";
 import { Replace } from "../commands/replace.js";
 import { clearContent, mark, narrowRange, unmark } from "../util.js";
+import { ViewType } from "../../box/view.js";
 
 export class ListEditor extends BaseEditor {
 	contentType = "list";
@@ -11,7 +12,7 @@ export class ListEditor extends BaseEditor {
 		this.draw();
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type;
-			type = type.types[viewType(item)] || (type.owner.unknownType as EditorType);
+			type = type.types[viewType(item)] || (type.owner.unknownType as ViewType);
 			let part = type.view(item).node as Element;
 			this.content.append(part);
 		}

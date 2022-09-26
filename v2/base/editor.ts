@@ -1,22 +1,16 @@
-import { Type, content, typeOf, View } from "./model.js";
+import { Type, View, content } from "./model.js";
 import { CommandBuffer } from "./command.js";
 import { Owner } from "./control.js";
-import { bundle } from "./util.js";
 
 export interface Editor extends View {
 	readonly owner: Article;
-	readonly type: ArticleType;
+	readonly type: Type;
 	readonly node: Element;
 	readonly header?: Element;
 	readonly content: Element;
 	readonly footer?: Element;
 	contentOf(range?: Range): content;
 	edit(commandName: string, range: Range, content?: content): Range;
-}
-
-export interface ArticleType extends Type {
-	types: bundle<ArticleType>;
-	view(content: content): View;
 }
 
 export interface Article extends Owner<Element> {

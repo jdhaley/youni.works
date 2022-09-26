@@ -68,10 +68,10 @@ function getType(article: Display, path: string, data: any): ViewType {
 
 import shape from "./shape.js";
 import { TextEditor } from "../../editor/controls/text.js";
-import { Change, EditorType } from "../../box/editor.js";
+import { Change } from "../../box/editor.js";
 
 function shapetest(this: Display) {
-	let type = new EditorType(this);
+	let type = new ViewType(this);
 	type.start("shape", {
 		prototype: new TextEditor(shape),
 		actions: shape

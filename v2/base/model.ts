@@ -31,27 +31,7 @@ export interface Type {
 	types: {
 		[key: string]: Type;
 	}
-}
-
-export function typeOf(value: any): string {
-	if (value?.valueOf) value = value.valueOf(value);
-	let type = typeof value;
-	switch (type) {
-		case "string":
-		case "number":
-		case "boolean":
-			return type;
-		case "object":
-			if (value == null) break;
-			if (value["type$"]) {
-				let type = value["type$"];
-				return type.name || "" + type;
-			}
-			if (value instanceof Date) return "date";
-			if (value[Symbol.iterator]) return "list";
-			return "record";
-	}
-	return "null";
+	view(content: content): View;
 }
 
 /* Views */
@@ -83,6 +63,27 @@ export function viewType(value: any): string {
 			return type;
 	}
 }
+export function typeOf(value: any): string {
+	if (value?.valueOf) value = value.valueOf(value);
+	let type = typeof value;
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+			return type;
+		case "object":
+			if (value == null) break;
+			if (value["type$"]) {
+				let type = value["type$"];
+				return type.name || "" + type;
+			}
+			if (value instanceof Date) return "date";
+			if (value[Symbol.iterator]) return "list";
+			return "record";
+	}
+	return "null";
+}
+
 
 export interface Area {
 	x: number,

@@ -1,26 +1,18 @@
 import {content } from "../base/model.js";
-import { Article, ArticleType, Editor } from "../base/editor.js";
-import { bundle } from "../base/util.js";
+import { Article, Editor } from "../base/editor.js";
 
 import { ViewBox, ViewType, getViewNode, bindViewNode, getView } from "./view.js";
 import { Signal } from "../base/control.js";
 
 export { getViewNode, bindViewNode }
 
-export class EditorType extends ViewType {
-	declare owner: Article;
-	declare types: bundle<EditorType>;
-	view(content?: content): Editor {
-		return super.view(content) as Editor;
-	}
-}
 
 export abstract class BaseEditor extends ViewBox implements Editor {
 	get owner(): Article {
 		return this.type.owner;
 	}
 	declare contentType: string;
-	declare type: EditorType;
+	declare type: ViewType;
 
 	abstract viewContent(model: content): void;
 	abstract contentOf(range?: Range): content;

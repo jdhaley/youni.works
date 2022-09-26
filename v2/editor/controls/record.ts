@@ -20,7 +20,7 @@ export class RecordEditor extends BaseEditor {
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
 			let value = model ? model[name] : null;
-			let member = type.view(value);
+			let member: Editor = type.view(value) as any;
 			this.at[name] = member;
 			member.node.classList.add("field");
 			this.content.append(member.node);

@@ -1,3 +1,4 @@
+import { Article } from "../base/editor.js";
 import { content, View, Type } from "../base/model.js";
 import { bundle, extend } from "../base/util.js";
 import { ElementBox, ElementOwner } from "./box.js";
@@ -84,10 +85,10 @@ export abstract class ViewBox extends ElementBox implements View {
 
 let NEXT_ID = 1;
 export class ViewType implements Type {
-	constructor(owner: ElementOwner) {
+	constructor(owner: Article) {
 		this.owner = owner;
 	}
-	declare owner: ElementOwner;
+	declare owner: Article;
 	declare name: string;
 	declare types: bundle<ViewType>
 	declare prototype: ViewBox;
@@ -99,7 +100,7 @@ export class ViewType implements Type {
 		return type == this;
 	}
 
-	view(content?: content): View {
+	view(content?: content): ViewBox {
 		let display: ViewBox = Object.create(this.prototype);
 		let view = this.owner.createElement(this.conf.tagName || "div");
 		display.control(view);
