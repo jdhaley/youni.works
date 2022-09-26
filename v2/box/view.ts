@@ -1,5 +1,5 @@
 import { content } from "../base/model.js";
-import { View, ViewType } from "../base/view.js";
+import { ViewType } from "../base/view.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
@@ -7,7 +7,7 @@ import { Article, Editor } from "./editor.js";
 import { ElementBox, ElementOwner } from "./box.js";
 
 interface ViewNode extends Element {
-	$control?: View;
+	$control?: Editor;
 }
 
 export abstract class ViewBox extends ElementBox implements Editor {
@@ -125,7 +125,7 @@ export abstract class ViewOwner extends ElementOwner {
 	getElementById(id: string): Element {
 		return this.node.ownerDocument.getElementById(id);
 	}
-	getControl(id: string): View {
+	getControl(id: string): Editor {
 		let view = this.node.ownerDocument.getElementById(id) as ViewNode;
 		if (!view) throw new Error("Can't find view element.");
 		//if (view.getAttribute("data-item")) return view;

@@ -3,13 +3,13 @@ import { bundle } from "./util";
 
 export interface ViewType extends Type {
 	types: bundle<ViewType>;
-	view(content: content): View;
+	view(content: content): View<unknown>;
 }
 
-export interface View {
+export interface View<T> {
 	readonly type: ViewType;
 	readonly contentType: string;
-	readonly content: unknown;
+	readonly content: T;
 }
 
 export function viewType(value: any): string {

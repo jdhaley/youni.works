@@ -3,12 +3,10 @@ import { View, ViewType } from "../base/view.js";
 import { CommandBuffer } from "../base/command.js";
 import { Owner, Signal } from "../base/control.js";
 
-export interface Editor extends View {
+export interface Editor extends View<Element> {
 	readonly owner: Article;
-	readonly type: ViewType;
 	readonly node: Element;
 	readonly header?: Element;
-	readonly content: Element;
 	readonly footer?: Element;
 	contentOf(range?: Range): content;
 	edit(commandName: string, range: Range, content?: content): Range;

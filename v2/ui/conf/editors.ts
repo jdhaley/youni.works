@@ -15,11 +15,11 @@ import { MarkupEditor } from "../../editor/controls/markup.js";
 import { LineEditor } from "../../editor/controls/line.js";
 
 import shortcuts from "./shortcuts.js";
-import { View } from "../../base/view.js";
+import { Editor } from "../../box/editor.js";
 
 export interface TypeConf {
 	class: typeof ViewBoxType;
-	prototype?: View,
+	prototype?: Editor,
 
 	container: boolean;
 	tagName: string;
