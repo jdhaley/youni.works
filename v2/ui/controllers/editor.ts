@@ -33,7 +33,7 @@ export default extend(view, {
 		}
 		setClipboard(range.cloneRange(), event.clipboardData);
 		range = this.edit("Cut", range);
-		range && this.type.owner.setRange(range, true);
+		range && this.owner.setRange(range, true);
 	},
 	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
@@ -49,7 +49,7 @@ export default extend(view, {
 			target = getEditor(range);
 		} 
 		range = target.edit("Paste", range, model);
-		range &&  this.type.owner.setRange(range, true);
+		range &&  this.owner.setRange(range, true);
 	},
 	delete(event: UserEvent) {
 		event.subject = "";
@@ -86,8 +86,8 @@ export default extend(view, {
 	change(this: Editor, signal: Change) {
 		if (signal.direction == "up") {
 			//console.log(signal.direction, this.type.name, signal.commandName);
-			if (this.node == this.type.owner.node) {
-				this.type.owner.receive(signal);
+			if (this.node == this.owner.node) {
+				this.owner.receive(signal);
 			}
 		} else {
 			//console.log("down");

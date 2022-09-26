@@ -11,7 +11,7 @@ export default extend(editable, {
 		if (range.collapsed) return;
 		setClipboard(range.cloneRange(), event.clipboardData);
 		range = this.edit("Cut", range);
-		range && this.type.owner.setRange(range, true);
+		range && this.owner.setRange(range, true);
 	},
 	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
@@ -19,7 +19,7 @@ export default extend(editable, {
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
 		range = this.edit("Paste", range, text);
-		range && this.type.owner.setRange(range, true);
+		range && this.owner.setRange(range, true);
 	},
 	replaceText(this: Editor, event: EditEvent) {
 		event.subject = "";
@@ -27,7 +27,7 @@ export default extend(editable, {
 		if (!text) return; //Don't proceed & clear the range when there is nothing to replace.
 		let range = event.range;
 		range = this.edit("Replace", range, text);
-		range && this.type.owner.setRange(range, true);
+		range && this.owner.setRange(range, true);
 	},
 	insertText(this: Editor, event: EditEvent) {
 		event.subject = "";
@@ -48,7 +48,7 @@ export default extend(editable, {
 			char = CHAR.NBSP;
 		}
 		range = this.edit("Entry", range, char);
-		range && this.type.owner.setRange(range, true);
+		range && this.owner.setRange(range, true);
 	},
 	deleteWordForward(event: EditEvent) {
 		let range = event.getTargetRanges()[0];
@@ -66,14 +66,14 @@ export default extend(editable, {
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) return;
 		range = this.edit("Erase", range, "");
-		range && this.type.owner.setRange(range, true);
+		range && this.owner.setRange(range, true);
 	},
 	delete(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;
 		range = this.edit("Delete", range, "");
-		range && this.type.owner.setRange(range, true);
+		range && this.owner.setRange(range, true);
 	}
 });
 

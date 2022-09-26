@@ -163,7 +163,7 @@ export class ListReplace extends Replace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		let views = editor.type.view(content).content;
+		let views = editor.type.view(content).content as Element;
 		while (views.firstChild) {
 			range.insertNode(views.firstChild);
 			range.collapse();

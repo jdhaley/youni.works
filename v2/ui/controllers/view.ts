@@ -41,17 +41,17 @@ export default extend(null, {
 	},
 	undo(this: Editor, event: UserEvent) {
 		event.subject = "";
-		this.type.owner.setRange(this.type.owner.commands.undo(), false);
-		this.type.owner.receive(new Change("undo"));
+		this.owner.setRange(this.owner.commands.undo(), false);
+		this.owner.receive(new Change("undo"));
 	},
 	redo(this: Editor, event: UserEvent) {
-		this.type.owner.receive(new Change("redo"));
+		this.owner.receive(new Change("redo"));
 	}
 });
 
 function notifyOwner(editor: Editor, signal: Signal) {
-	if (signal.direction == "up" && editor.node == (editor.type.owner).node) {
-		editor.type.owner.receive(signal);
+	if (signal.direction == "up" && editor.node == (editor.owner).node) {
+		editor.owner.receive(signal);
 	}
 }
 function  getShortcut(event: UserEvent) {

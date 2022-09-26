@@ -4,6 +4,7 @@ import { Owner } from "./control.js";
 import { bundle } from "./util.js";
 
 export interface Editor extends View {
+	readonly owner: Article;
 	readonly type: ArticleType;
 	readonly node: Element;
 	readonly header?: Element;
@@ -14,10 +15,8 @@ export interface Editor extends View {
 }
 
 export interface ArticleType extends Type {
-	owner: Article;
-	conf: bundle<any>;
 	types: bundle<ArticleType>;
-	view(content: content): Editor;
+	view(content: content): View;
 }
 
 export interface Article extends Owner<Element> {

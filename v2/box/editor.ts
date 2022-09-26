@@ -7,7 +7,7 @@ import { Signal } from "../base/control.js";
 
 export { getViewNode, bindViewNode }
 
-export class EditorType extends ViewType implements ArticleType {
+export class EditorType extends ViewType {
 	declare owner: Article;
 	declare types: bundle<EditorType>;
 	view(content?: content): Editor {
