@@ -1,10 +1,11 @@
-import { Type, View, content } from "./model.js";
+import { content } from "./model.js";
+import { View, ViewType } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { Owner } from "./control.js";
 
 export interface Editor extends View {
 	readonly owner: Article;
-	readonly type: Type;
+	readonly type: ViewType;
 	readonly node: Element;
 	readonly header?: Element;
 	readonly content: Element;
@@ -15,7 +16,7 @@ export interface Editor extends View {
 
 export interface Article extends Owner<Element> {
 	node: Element;
-	unknownType: Type;
+	unknownType: ViewType;
 	commands: CommandBuffer<Range>;
 
 	getControl(id: string): Editor;

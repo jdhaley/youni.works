@@ -1,5 +1,5 @@
 import { Type } from "./model.js";
-import { bundle } from "./util.js";
+import { bundle, extend } from "./util.js";
 
 export function start(owner: TypeOwner) {
 	let base = loadBaseTypes(owner, owner.conf.baseTypes);
@@ -11,8 +11,32 @@ export function start(owner: TypeOwner) {
 type types = bundle<Type>;
 type source = bundle<string | source> | string;
 
-interface ConfigurableType extends Type {
-	start(name: string, conf: bundle<any>): void;
+export class BaseType implements Type {
+	declare name: string;
+	declare types: bundle<Type>
+	declare prototype: object;
+
+	conf: bundle<any>;
+	isProperty: boolean;
+
+	generalizes(type: Type): boolean {
+		return type == this;
+	}
+	start(name: string, conf: bundle<any>): void {
+		this.name = name;
+		if (conf) {
+			this.conf = extend(this.conf || null, conf);
+		}
+		if (conf.prototype) this.prototype = conf.prototype;
+		//if (!this.prototype) this.prototype = new Display(this.conf.actions);
+
+		if (conf.proto) {
+			this.prototype = extend(this.prototype, conf.proto);
+		} else {
+			this.prototype = Object.create(this.prototype);
+		}
+		this.prototype["type"] = this;
+	}
 }
 
 interface TypeOwner {
@@ -31,7 +55,7 @@ function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
-		let type = new conf.class(owner) as ConfigurableType;
+		let type = new conf.class(owner) as BaseType;
 		types[name] = type;
 		type.start(name, conf);
 	}
@@ -66,7 +90,7 @@ function getType(name: string, types: types, source: source): Type {
 
 function createType(name: string, conf: ViewConf, types: types, source: source) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
-	let type = Object.create(supertype) as ConfigurableType;
+	let type = Object.create(supertype) as BaseType;
 	type.start(name, conf)
 
 	if (name) {

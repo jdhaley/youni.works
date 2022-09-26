@@ -1,13 +1,12 @@
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
-import { Change, getEditor } from "../../box/editor.js";
+import { Change } from "../../box/editor.js";
+import { getEditor, navigate } from "../../editor/util.js";
 
-import {navigate} from "../../editor/util.js";
-import {EditEvent, UserEvent, getClipboard, setClipboard} from "../ui.js";
+import { EditEvent, UserEvent, getClipboard, setClipboard } from "../ui.js";
 
 import view from "./view.js";
-
 
 let UNDONE = false;
 

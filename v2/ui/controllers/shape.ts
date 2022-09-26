@@ -1,4 +1,4 @@
-import { Shape } from "../../base/model.js";
+import { Shape } from "../../base/shape.js";
 import { extend } from "../../base/util.js";
 import { UserEvent } from "../ui.js";
 

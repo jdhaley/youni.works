@@ -1,20 +1,20 @@
-import {content, List, viewType} from "../../base/model.js";
+import { content, List } from "../../base/model.js";
 
 import { Editor, Article } from "../../base/editor.js";
-import { BaseEditor, Change, getChildEditor, getEditor } from "../../box/editor.js";
+import { BaseEditor, Change } from "../../box/editor.js";
 import { Replace } from "../commands/replace.js";
-import { clearContent, mark, narrowRange, unmark } from "../util.js";
-import { ViewType } from "../../box/view.js";
+import { getEditor, getChildEditor, clearContent, mark, narrowRange, unmark } from "../util.js";
+import { ViewType, viewType } from "../../base/view.js";
 
 export class ListEditor extends BaseEditor {
 	contentType = "list";
 	viewContent(model: List): void {
 		this.draw();
 		if (model && model[Symbol.iterator]) for (let item of model) {
-			let type = this.type;
-			type = type.types[viewType(item)] || (type.owner.unknownType as ViewType);
-			let part = type.view(item).node as Element;
-			this.content.append(part);
+			let type = this.type as ViewType;
+			type = type.types[viewType(item)] || this.owner.unknownType;
+			let part = type.view(item) as Editor;
+			this.content.append(part.node);
 		}
 	}
 	contentOf(range?: Range): List {
@@ -40,7 +40,6 @@ export class ListEditor extends BaseEditor {
 		return range;
 	}
 }
-
 
 export class ListReplace extends Replace {
 	constructor(owner: Article, name: string, viewId: string) {

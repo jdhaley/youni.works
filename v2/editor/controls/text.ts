@@ -1,7 +1,7 @@
-import {getHeader, mark, narrowRange, unmark} from "../util.js";
+import { getEditor, getHeader, mark, narrowRange, unmark} from "../util.js";
 import { content } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
-import { BaseEditor, Change, getEditor } from "../../box/editor.js";
+import { BaseEditor, Change } from "../../box/editor.js";
 import { Replace } from "../commands/replace.js";
 
 export class TextEditor extends BaseEditor {

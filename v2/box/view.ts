@@ -1,22 +1,16 @@
 import { Article } from "../base/editor.js";
-import { content, View, Type } from "../base/model.js";
+import { content, Type } from "../base/model.js";
+import { View, ViewType } from "../base/view.js";
 import { bundle, extend } from "../base/util.js";
 import { ElementBox, ElementOwner } from "./box.js";
+import { BaseType } from "../base/type.js";
 
 interface ViewNode extends Element {
 	$control?: View;
 }
-export interface TypeConf {
-	class: typeof ViewType;
-	prototype?: ViewBox,
-
-	container: boolean;
-	tagName: string;
-	shortcuts: bundle<string>;
-}
 
 export abstract class ViewBox extends ElementBox implements View {
-	declare type: ViewType;
+	declare type: ViewBoxType;
 	declare contentType: string;
 	declare header: Element;
 	declare content: Element;
@@ -82,23 +76,13 @@ export abstract class ViewBox extends ElementBox implements View {
 	}
 }
 
-
-let NEXT_ID = 1;
-export class ViewType implements Type {
+export class ViewBoxType extends BaseType {
 	constructor(owner: Article) {
+		super();
 		this.owner = owner;
 	}
 	declare owner: Article;
-	declare name: string;
 	declare types: bundle<ViewType>
-	declare prototype: ViewBox;
-
-	conf: bundle<any>;
-	isProperty: boolean;
-
-	generalizes(type: Type): boolean {
-		return type == this;
-	}
 
 	view(content?: content): ViewBox {
 		let display: ViewBox = Object.create(this.prototype);
@@ -107,22 +91,9 @@ export class ViewType implements Type {
 		display.viewContent(content);
 		return display;
 	}
-	start(name: string, conf: bundle<any>): void {
-		this.name = name;
-		if (conf) {
-			this.conf = extend(this.conf || null, conf);
-		}
-		if (conf.prototype) this.prototype = conf.prototype;
-		//if (!this.prototype) this.prototype = new Display(this.conf.actions);
-
-		if (conf.proto) {
-			this.prototype = extend(this.prototype, conf.proto);
-		} else {
-			this.prototype = Object.create(this.prototype);
-		}
-		this.prototype.type = this;
-	}
 }
+
+let NEXT_ID = 1;
 
 function bindContainer(node: ViewNode) {
 	let control: ViewBox = node.$control as any;
@@ -144,9 +115,9 @@ export abstract class ViewOwner extends ElementOwner {
 	}
 	node: Element;
 	conf: bundle<any>;
-	types: bundle<Type>;
-	unknownType: Type;
-	type: ViewType;
+	types: bundle<ViewBoxType>;
+	unknownType: ViewBoxType;
+	type: ViewBoxType;
 
 	abstract createElement(tagName: string): Element;
 	
@@ -178,7 +149,7 @@ export function bindViewNode(view: Element): void {
 		let parent = getViewNode(view.parentElement) as ViewNode;
 		if (name && parent) {
 			//TODO forcing to DisplayType because I don't want to expose .control()
-			let type = parent.$control.type.types[name] as ViewType;
+			let type = parent.$control.type.types[name] as ViewBoxType;
 			if (type) {
 				control = Object.create(type.prototype);
 				control.control(view as any);
@@ -193,7 +164,7 @@ export function bindViewNode(view: Element): void {
 	}
 }
 
-export function getViewNode(node: Node | Range): ViewNode {
+function getViewNode(node: Node | Range): ViewNode {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
 		if (node instanceof Element && node.getAttribute("data-item")) {

@@ -2,9 +2,10 @@ import { content, Record } from "../../base/model.js";
 
 import { Replace } from "../commands/replace.js";
 import { Editor } from "../../base/editor.js";
-import { BaseEditor, Change, getChildEditor, getEditor } from "../../box/editor.js";
-import { clearContent, mark, narrowRange, unmark } from "../util.js";
+import { BaseEditor, Change } from "../../box/editor.js";
+import { getChildEditor, getEditor, clearContent, mark, narrowRange, unmark } from "../util.js";
 import { bundle } from "../../base/util.js";
+import { ViewType } from "../../base/view.js";
 
 export class RecordEditor extends BaseEditor {
 	contentType = "record";
@@ -18,7 +19,7 @@ export class RecordEditor extends BaseEditor {
 		this.draw();
 		this.at = Object.create(null);
 		for (let name in this.type.types) {
-			let type = this.type.types[name];
+			let type = this.type.types[name] as ViewType;
 			let value = model ? model[name] : null;
 			let member: Editor = type.view(value) as any;
 			this.at[name] = member;
