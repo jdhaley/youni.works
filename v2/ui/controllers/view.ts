@@ -8,6 +8,7 @@ export default extend(null, {
 	keydown(this: ViewBox, event: UserEvent) {
 		event.shortcut = getShortcut(event);
 		event.subject = this.shortcuts[event.shortcut] || "keydown";
+       // console.log(event.shortcut, event.subject);
 	},
 	save(this: ViewBox, event: UserEvent) {
 		this.owner.receive(event);
@@ -15,8 +16,7 @@ export default extend(null, {
 	},
 	copy(this: ViewBox, event: UserEvent) {
 		event.subject = "";
-		let range = event.range;
-		setClipboard(range.cloneRange(), event.clipboardData);
+		setClipboard(event.range, event.clipboardData);
 	}
 });
 

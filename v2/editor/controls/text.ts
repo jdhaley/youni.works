@@ -14,7 +14,9 @@ export class TextEditor extends BaseEditor {
 		let model = "";
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let node of (this.content as Element).childNodes) {
-			if (node == range?.startContainer) {
+			if (node == range?.startContainer && node == range?.endContainer) {
+				model += node.textContent.substring(range.startOffset, range.endOffset);
+			} else if (node == range?.startContainer) {
 				model += node.textContent.substring(range.startOffset);
 			} else if (node == range?.endContainer) {
 				model += node.textContent.substring(0, range.endOffset);
