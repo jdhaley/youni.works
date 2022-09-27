@@ -4,6 +4,8 @@ export default {
 	"Alt+Tab": "next",
 	"Shift+Tab": "previous",
 	"Alt+Shift+Tab": "previous",
+	"Control+,": "previous",
+	"Control+.": "next",
 	"Control+z": "undo",
 	"Control+y": "redo",
 	"Control+a": "selectAll",
