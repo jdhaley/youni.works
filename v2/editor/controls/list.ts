@@ -136,17 +136,17 @@ export class ListReplace extends Replace {
 		let r = range.cloneRange();
 		r.setEnd(start.content, start.content.childNodes.length);
 		clearContent(r);
-		this.merge(start.content, r, content, true);
+		this.merge(start, r, content, true);
 		range.setStartAfter(start.node);
 	}
 	protected onEndContainer(range: Range, content: content, end: Editor): void {
 		let r = range.cloneRange();
 		r.setStart(end.content, 0);
 		clearContent(r);
-		this.merge(end.content, r, content, false);
+		this.merge(end, r, content, false);
 		range.setEndBefore(end.node);
 	}
-	protected merge(view: Element, range: Range, content: any, isStart: boolean) {
+	protected merge(view: Editor, range: Range, content: any, isStart: boolean) {
 		//overridden for markup
 	}
 	protected onSingleContainer(range: Range, content: content, container: Editor): void {

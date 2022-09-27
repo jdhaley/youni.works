@@ -2,9 +2,8 @@ import { Content, content } from "../../base/model.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { ListEditor, ListReplace } from "./list.js";
-import { Change } from "../../box/editor.js";
+import { Editor, Change } from "../../box/editor.js";
 import { getChildEditor, getView, items, mark, unmark } from "../util.js";
-import { Editor } from "../../box/editor.js";
 
 export class MarkupEditor extends ListEditor {
 	contentType = "markup";
@@ -48,7 +47,7 @@ export class MarkupReplace extends ListReplace {
 		//Clear the remainder of the line content.
 		r.deleteContents();
 		//Append any 'paste' content to the line.
-		this.merge(editor.node, r, content, true);
+		this.merge(editor, r, content, true);
 
 		if (this.name == "Split" && model.type$ == "heading") {
 			//Headings split to a para, not another heading.
@@ -65,7 +64,7 @@ export class MarkupReplace extends ListReplace {
 		//Prepend any 'paste' content to the start of the end line.
 		r.setStart(end.node, 0);
 		r.collapse(true);
-		if (!(this.name == "Split")) this.merge(end.node, r, content, false);
+		if (!(this.name == "Split")) this.merge(end, r, content, false);
 		//note: onInsert() handles the remainder of the 'paste' content.
 	}
 	protected onStartContainer(range: Range, content: content, start: Editor): void {
@@ -82,7 +81,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		range.setStartBefore(start.node);
 	}
-	protected merge(view: Element, range: Range, content: any, isStart: boolean) {
+	protected merge(view: Editor, range: Range, content: any, isStart: boolean) {
 		let item: Content = content?.length && content[isStart ? 0 : content.length - 1];
 		if (!item) return;
 
@@ -91,12 +90,12 @@ export class MarkupReplace extends ListReplace {
 		// kinda screwy. I think the best way forward is the add the check back in and make
 		// headings and paragraphs the same type.
 		
-		// let listType = getViewById(this.owner, this.viewId).$control.type;
+		// let listType = this.owner.getControl(this.viewId).type;
 		// let type = listType.types[viewType(item)];
-		// if (type == view.$control.type) {
-			if (!isStart) items.setItem(view, item.level, item.type$);
+		// if (type == view.type) {
+			if (!isStart) items.setItem(view.node, item.level, item.type$);
 			if (item.content) {
-				let node = 	view.ownerDocument.createTextNode("" + item.content);
+				let node = 	view.node.ownerDocument.createTextNode("" + item.content);
 				range.insertNode(node);	
 			}
 			if (isStart) {
@@ -105,7 +104,7 @@ export class MarkupReplace extends ListReplace {
 				content.pop();
 			}
 		// COMMENTED OUT
-		// }
+		//}
 	}
 }
 
