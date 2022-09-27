@@ -1,5 +1,6 @@
 import { Edit } from "./edit.js";
-import { items, getChildEditor } from "../util.js";
+import { getChildEditor, getView } from "../util.js";
+import { LineEditor } from "../controls/line.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
@@ -14,22 +15,21 @@ export class LevelCommand extends Edit {
 		return range;
 	}
 	protected do(way: "Promote" | "Demote") {
-		let adjust = way == "Promote" ? -1 : 1;
-		let start = this.owner.getControl(this.startId).node;
-		let end = this.owner.getControl(this.endId).node;
+		let start = this.owner.getControl(this.startId) as LineEditor;
+		let end = this.owner.getControl(this.endId) as LineEditor;
 		if (start == end) {
-			level(start, adjust);
+			way == "Promote" ? start.promote() : start.demote();
 		} else {
-			for (let item = start; item; ) {
-				let level = items.getLevel(item) + adjust;
-				if (level >= 0 && level <= 6) items.setItem(item, level);
-				item = (item.id == this.endId ? null : item.nextElementSibling as HTMLElement)
+			while (start) {
+				way == "Promote" ? start.promote() : start.demote();
+				if (start == end) break;
+				start = getView(start.node.nextElementSibling) as LineEditor;
 			}
 		}
 
-		let range = start.ownerDocument.createRange();
-		range.setStartBefore(start);
-		range.setEndAfter(end);
+		let range = start.node.ownerDocument.createRange();
+		range.setStartBefore(start.node);
+		range.setEndAfter(end.node);
 		return range;
 	}
 	undo() {
@@ -38,42 +38,4 @@ export class LevelCommand extends Edit {
 	redo() {
 		return this.do(this.name);
 	}
-}
-
-function level(item: Element, adjust: number) {
-	return adjust < 0 ? promote(item) : demote(item);
-
-	function demote(item: Element) {
-		let level = items.getLevel(item);
-		if (items.getRole(item) == "heading") {
-			let section = items.getSection(item.previousSibling as Element);
-			if (level > items.getLevel(section) || level == 6) {
-				items.setItem(item, 0);
-			} else if (level < 6) {
-				items.setItem(item, ++level, "heading");
-			}
-		} else if (level < 6) {
-			items.setItem(item, ++level, items.getRole(item));
-		}
-	}
-	
-	function promote(item: Element) {
-		let level = (item.ariaLevel as any) * 1 || 0;
-		if (items.getRole(item) == "heading") {
-			item.ariaLevel = "" + (level - 1 || 1);
-		} else {
-			if (items.getRole(item) == "listitem" || items.getRole(item) == "term") {
-				let level = item.ariaLevel as any * 1 - 1 || 0;
-				if (level > 0) {
-					item.ariaLevel = "" + level;
-				} else {
-					items.setItem(item, 0); //Normal para
-				}
-			} else {
-				//Promote paragraph to heading.
-				let sectionLevel = items.getSection(item)?.ariaLevel as any * 1 + 1 || 1;
-				items.setItem(item, sectionLevel > 6 ? 6 : sectionLevel, "heading");
-			}
-		}
-	}	
 }

@@ -4,6 +4,7 @@ import { LevelCommand } from "../commands/level.js";
 import { ListEditor, ListReplace } from "./list.js";
 import { Editor, Change } from "../../box/editor.js";
 import { getChildEditor, getView, items, mark, unmark } from "../util.js";
+import { LineEditor } from "./line.js";
 
 export class MarkupEditor extends ListEditor {
 	contentType = "markup";
@@ -93,7 +94,10 @@ export class MarkupReplace extends ListReplace {
 		// let listType = this.owner.getControl(this.viewId).type;
 		// let type = listType.types[viewType(item)];
 		// if (type == view.type) {
-			if (!isStart) items.setItem(view.node, item.level, item.type$);
+			if (!isStart && view instanceof LineEditor) {
+				view.convert(item.type$);
+				view.level = item.level;
+			}
 			if (item.content) {
 				let node = 	view.node.ownerDocument.createTextNode("" + item.content);
 				range.insertNode(node);	

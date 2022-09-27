@@ -83,7 +83,8 @@ export class ViewBoxType extends BaseType {
 		this.owner = owner;
 	}
 	declare owner: Article;
-	declare types: bundle<ViewType>
+	declare types: bundle<ViewBoxType>;
+	declare partOf: ViewBoxType;
 
 	view(content?: content): ViewBox {
 		let display: ViewBox = Object.create(this.prototype);
