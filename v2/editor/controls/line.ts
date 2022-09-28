@@ -13,8 +13,8 @@ export class LineEditor extends TextEditor {
 		level = level || 0;
 		if (level < 1) {
 			this.node.removeAttribute("aria-level");
-		} else if (level <= 6) {
-			this.node.ariaLevel = "" + level;
+		} else {
+			this.node.setAttribute("aria-level", "" + (level <= 6 ? level : 6));
 		}
 	}
 

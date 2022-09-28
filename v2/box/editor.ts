@@ -2,6 +2,7 @@ import { content } from "../base/model.js";
 import { View, ViewType } from "../base/view.js";
 import { CommandBuffer } from "../base/command.js";
 import { Owner, Signal } from "../base/control.js";
+import { bundle } from "../base/util.js";
 
 export interface Editor extends View<Element> {
 	readonly owner: Article;
@@ -14,6 +15,7 @@ export interface Editor extends View<Element> {
 
 export interface Article extends Owner<Element> {
 	node: Element;
+	types: bundle<ViewType>;
 	unknownType: ViewType;
 	commands: CommandBuffer<Range>;
 
