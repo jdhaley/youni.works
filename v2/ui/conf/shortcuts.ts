@@ -9,6 +9,7 @@ export default {
 	"Control+z": "undo",
 	"Control+y": "redo",
 	"Control+a": "selectAll",
+	"Control+;": "insertColumn"
 	// "Control+b": "tag",
 	// "Control+i": "tag",
 	// "Control+u": "tag",
