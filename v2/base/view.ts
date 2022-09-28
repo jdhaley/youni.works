@@ -3,6 +3,7 @@ import { bundle } from "./util";
 
 export interface ViewType extends Type {
 	types: bundle<ViewType>;
+	partOf: ViewType;
 	view(content: content): View<unknown>;
 }
 

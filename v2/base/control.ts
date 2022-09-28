@@ -36,17 +36,13 @@ export class Controller<T> extends Control {
 		super();
 		this.actions = actions;
 	}
-	private _node: T;
-	
-	get node(): T {
-		return this._node;
-	}
+	node: T;
 	
 	protected control(node: T) {
 		if (node["$control"]) {
 			this.uncontrol(node);
 		}
-		this._node = node;
+		this.node = node;
 		node["$control"] = this;
 	}
 	protected uncontrol(node: T) {
