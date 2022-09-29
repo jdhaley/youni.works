@@ -1,4 +1,4 @@
-import { Section } from "../base/model.js";
+import { Record, Section } from "../base/model.js";
 
 export function toHtml(item: Section) {
 	let doc = document.implementation.createHTMLDocument();
@@ -21,7 +21,28 @@ function transformItem(parent: Element, item: Section) {
 		parent.append(ele);	
 		htmlSection(parent, item);
 		return;
-	} 
+	} else if (item.type$ == "table") {
+		ele = doc.createElement("TABLE");
+		parent.append(ele);
+		let cols = (item["columns"] as string).split(" ");
+		let thead = doc.createElement("thead");
+		ele.append(thead);
+		for (let name of cols) {
+			let col = doc.createElement("td");
+			thead.append(col);
+			col.textContent = name;
+		}
+		for (let row of item.content as Record[]) {
+			let trow = doc.createElement("tr");
+			ele.append(trow);
+			for (let name in row.content as object) {
+				let cell = doc.createElement("td");
+				cell.textContent = row.content[name] as string;
+				trow.append(cell);
+			}
+		}
+		return;
+	}
 	ele = doc.createElement(item.level ? "LI" : "P");
 	if (item.content) ele.innerHTML = "" + item.content;
 	parent.append(ele);

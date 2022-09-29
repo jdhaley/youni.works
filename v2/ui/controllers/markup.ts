@@ -68,7 +68,7 @@ export default extend(list, {
 			this.edit("Promote", event.range);
 		}
 	},
-	insertRow(this: Editor, event: UserEvent) {
+	insert(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) return;

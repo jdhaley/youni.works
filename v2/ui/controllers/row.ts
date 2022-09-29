@@ -2,9 +2,10 @@ import { extend } from "../../base/util.js";
 import { Change, Editor } from "../../box/editor.js";
 import { RecordEditor } from "../../editor/controls/record.js";
 import { RowEditor } from "../../editor/controls/row.js";
-import { getHeader } from "../../editor/util.js";
+import { getHeader, getView } from "../../editor/util.js";
 import { UserEvent } from "../ui.js";
 import editable from "./editor.js";
+import view from "./view.js";
 
 export default extend(editable, {
 	dblclick(this: RecordEditor, event: UserEvent) {
@@ -29,27 +30,43 @@ export default extend(editable, {
 			event.frame.selectionRange = range;
 		}
 	},
-	insertColumn(this: Editor, event: UserEvent) {
-		console.log(event.source);
-		// event.subject = "";
-		// let rowType = this.owner.types["row"];
-		// let view = rowType.view({
-		// 	type$: "row",
-		// 	content: {
-		// 		A: this.content.textContent,
-		// 		B: ""
-		// 	}
-		// }) as Editor;
-		// this.node.parentElement.insertBefore(view.node, this.node);
-
-	},
 	change(this: RowEditor, event: Change) {
 		/* Clears the rowType on change of the header */
 
 		let header = this.rowHeader;
 		if (header == this) {
-			this["_type"] = null;
-			console.log(this.rowType);
+			delete this["_type"];
+			console.log(this.type);
+		}
+	},
+	insert(this: Editor, event: UserEvent) {
+		let range = event.range;
+		if (!range.collapsed) return;
+		if (this instanceof RowEditor && this == this.rowHeader) {
+				event.subject = "";
+				addCol(this, getView(range));
 		}
 	}
 });
+
+function addCol(editor: RowEditor, col: Editor) {
+	if (col.type.name == "column") {
+		let content = editor.content.children;
+		for (let i = 0; i < content.length; i++) {
+			if (content[i] == col.node) {
+				addColumn(editor, i);
+				for (let row = editor.node.nextElementSibling; row; row = row.nextElementSibling) {
+					let type = getView(row);
+					if (type instanceof RowEditor) {
+						addColumn(type, i);
+					}
+				}			
+			}
+		}
+	}
+}
+function addColumn(row: RowEditor, index: number) {
+	let column = getView(row.content.children[index]);
+	let newcol = column.type.view("") as Editor;
+	row.content.insertBefore(newcol.node, column.node.nextElementSibling);
+}
