@@ -28,12 +28,15 @@ export class Change implements Signal {
 	constructor(command: string, editor?: Editor) {
 		this.direction = editor ? "up" : "down";
 		this.subject = "change";
+		this.from = editor;
 		this.source = editor;
 		this.commandName = command;
 	}
 	direction: "up" | "down";
-	subject: string;
 	source: Editor;
+	from: Editor;
+	on: Editor;
+	subject: string;
 	commandName: string;
 }
 

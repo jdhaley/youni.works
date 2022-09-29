@@ -1,5 +1,4 @@
 import { content } from "../base/model.js";
-import { ViewType } from "../base/view.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
