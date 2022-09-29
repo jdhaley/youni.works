@@ -1,5 +1,5 @@
 import { Type } from "./model.js";
-import { bundle, extend } from "./util.js";
+import { bundle, EMPTY, extend } from "./util.js";
 
 export function start(owner: TypeOwner) {
 	let base = loadBaseTypes(owner, owner.conf.baseTypes);
@@ -13,9 +13,9 @@ type source = bundle<string | source> | string;
 
 export class BaseType implements Type {
 	declare name: string;
-	declare types: bundle<Type>
 	declare prototype: object;
 
+	types: bundle<Type> = EMPTY.object;
 	conf: bundle<any>;
 	isProperty: boolean;
 
@@ -35,7 +35,7 @@ export class BaseType implements Type {
 		} else {
 			this.prototype = Object.create(this.prototype);
 		}
-		this.prototype["type"] = this;
+		this.prototype["_type"] = this;
 	}
 }
 

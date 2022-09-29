@@ -49,7 +49,7 @@ export class LineEditor extends TextEditor {
 	convert(name: string) {
 		let toType = this.type.partOf?.types[name];
 		if (toType) {
-			this.type = toType;
+			this["_type"] = toType;
 			this.node.setAttribute("data-item", toType.name);
 		}
 	}

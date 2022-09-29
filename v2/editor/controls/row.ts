@@ -1,6 +1,7 @@
 import { Content, content, Record } from "../../base/model.js";
 import { ViewType } from "../../base/view.js";
 import { Editor } from "../../box/editor.js";
+import { ViewBoxType, ViewOwner } from "../../box/view.js";
 import { getView } from "../util.js";
 import { RecordEditor } from "./record.js";
 
@@ -8,15 +9,17 @@ export class RowEditor extends RecordEditor {
 	get rowHeader(): RowEditor {
 		for (let ele = this.node; ele; ele = ele.previousElementSibling) {
 			if (ele.previousElementSibling?.tagName != "UI-ROW") {
-				return getView(ele) as RowEditor;
+				return ele["$control"] as RowEditor;
 			}
 		}
 	}
-	get rowType(): ViewType {
+	get type(): ViewBoxType {
 		let header = this.rowHeader;
-		let rowType = header == this ? this["_type"] : header.rowType;
+		if (!header) return this["_type"];
+		let rowType = header == this ? this["_type"] : header.type;
 		if (!rowType) {
-			let column = this.owner.types.column;
+			let owner: ViewOwner = this["_type"].owner;
+			let column = owner.types.column;
 			rowType = Object.create(this.type);
 			rowType.types = Object.create(null);
 			for (let col of header.node.children) {
@@ -28,15 +31,14 @@ export class RowEditor extends RecordEditor {
 		}
 		return rowType;
 	}
-	
+
 	viewContent(item: Content): void {
 		this.draw();
 		let colType = this.owner.types["column"];
 		if (item) for (let name in (item.content as object)) {
 			let value = item?.content[name] || null;
-			let member: Editor = colType.view(value) as any;
+			let member: Editor = colType.view(value, this) as any;
 			member.node.setAttribute("data-name", name);
-			this.content.append(member.node);
 		}
 		// rowType = Object.create(rowType);
 		// rowType.types = Object.create(null);

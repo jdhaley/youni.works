@@ -14,8 +14,7 @@ export class ListEditor extends BaseEditor {
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type as ViewType;
 			type = type.types[viewType(item)] || this.owner.unknownType;
-			let part = type.view(item) as Editor;
-			this.content.append(part.node);
+			let part = type.view(item, this) as Editor;
 		}
 	}
 	contentOf(range?: Range): List {

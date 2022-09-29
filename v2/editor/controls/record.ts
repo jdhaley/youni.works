@@ -21,10 +21,9 @@ export class RecordEditor extends BaseEditor {
 		for (let name in this.type.types) {
 			let type = this.type.types[name] as ViewType;
 			let value = model ? model[name] : null;
-			let member: Editor = type.view(value) as any;
+			let member: Editor = type.view(value, this) as any;
 			this.at[name] = member;
 			member.node.classList.add("field");
-			this.content.append(member.node);
 		}
 	}
 	contentOf(range?: Range): content {

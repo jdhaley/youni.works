@@ -10,14 +10,16 @@ interface ViewNode extends Element {
 }
 
 export abstract class ViewBox extends ElementBox implements Editor {
-	declare type: ViewBoxType;
 	declare contentType: string;
 	declare header: Element;
 	declare content: Element;
 	declare footer: Element;
 
+	get type(): ViewBoxType {
+		return this["_type"];
+	}
 	get owner(): Article {
-		return this.type.owner;
+		return this["_type"].owner;
 	}
 	get isContainer(): boolean {
 		return this.type.conf.container;
@@ -85,9 +87,10 @@ export class ViewBoxType extends BaseType {
 	declare types: bundle<ViewBoxType>;
 	declare partOf: ViewBoxType;
 
-	view(content?: content): ViewBox {
+	view(content: content, parent?: ViewBox): ViewBox {
 		let display: ViewBox = Object.create(this.prototype);
 		let view = this.owner.createElement(this.conf.tagName || "div");
+		if (parent) parent.content.append(view);
 		display.control(view);
 		display.viewContent(content);
 		return display;
