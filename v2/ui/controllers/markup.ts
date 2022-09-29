@@ -2,7 +2,7 @@ import { content } from "../../base/model.js";
 import { Editor } from "../../box/editor.js";
 import { extend } from "../../base/util.js";
 
-import { navigate } from "../../editor/util.js";
+import { getView, navigate } from "../../editor/util.js";
 import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 import list from "./list.js";
 
@@ -67,6 +67,23 @@ export default extend(list, {
 		} else {
 			this.edit("Promote", event.range);
 		}
+	},
+	insertRow(this: Editor, event: UserEvent) {
+		event.subject = "";
+		let range = event.range;
+		if (!range.collapsed) return;
+		let current = getView(range);
+		if (current != this) {
+			range.setStartBefore(current.node);
+			range.collapse(true);
+		}
+		this.edit("Insert", event.range, [{
+			type$: "row",
+			content: {
+				"A": "A",
+				"B": "B"
+			}
+		}]);
 	}
 });
 

@@ -115,7 +115,7 @@ export class MarkupReplace extends ListReplace {
 const COMMANDS = {
 	"Cut": replace,
 	"Paste": replace,
-	"Insert": noop,
+	"Insert": replace,
 
 	"Entry": replace,
 	"Erase": replace,

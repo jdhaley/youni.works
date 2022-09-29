@@ -1,8 +1,34 @@
 import { Content, content, Record } from "../../base/model.js";
+import { ViewType } from "../../base/view.js";
 import { Editor } from "../../box/editor.js";
+import { getView } from "../util.js";
 import { RecordEditor } from "./record.js";
 
 export class RowEditor extends RecordEditor {
+	get rowHeader(): RowEditor {
+		for (let ele = this.node; ele; ele = ele.previousElementSibling) {
+			if (ele.previousElementSibling?.tagName != "UI-ROW") {
+				return getView(ele) as RowEditor;
+			}
+		}
+	}
+	get rowType(): ViewType {
+		let header = this.rowHeader;
+		let rowType = header == this ? this["_type"] : header.rowType;
+		if (!rowType) {
+			let column = this.owner.types.column;
+			rowType = Object.create(this.type);
+			rowType.types = Object.create(null);
+			for (let col of header.node.children) {
+				let colType = Object.create(column);
+				colType.name = col.textContent;
+				rowType.types[colType.name] = colType;
+			}
+			header["_type"] = rowType;
+		}
+		return rowType;
+	}
+	
 	viewContent(item: Content): void {
 		this.draw();
 		let colType = this.owner.types["column"];

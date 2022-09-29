@@ -50,18 +50,5 @@ export default extend(text, {
 	previous() {
 		//propagate to the markup controller.
 	},
-	insertColumn(this: Editor, event: UserEvent) {
-		event.subject = "";
-		let rowType = this.owner.types["row"];
-		let view = rowType.view({
-			type$: "row",
-			content: {
-				A: this.content.textContent,
-				B: ""
-			}
-		}) as Editor;
-		this.node.parentElement.insertBefore(view.node, this.node);
-
-	}
 });
 
