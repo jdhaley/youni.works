@@ -33,6 +33,10 @@ export interface Content {
 	level?: number,
 }
 
+export interface Row extends Content {
+	columns?: string[]
+}
+
 export interface Section extends Content {
 	items?: Section[],
 	sections?: Section[]
