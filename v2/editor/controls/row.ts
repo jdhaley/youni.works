@@ -1,35 +1,27 @@
 import { Content, content, Record } from "../../base/model.js";
-import { ViewType } from "../../base/view.js";
 import { Editor } from "../../box/editor.js";
-import { ViewBoxType, ViewOwner } from "../../box/view.js";
-import { getView } from "../util.js";
+import { getView, ViewBoxType, ViewOwner } from "../../box/view.js";
 import { RecordEditor } from "./record.js";
 
 export class RowEditor extends RecordEditor {
 	get rowHeader(): RowEditor {
 		for (let ele = this.node; ele; ele = ele.previousElementSibling) {
 			if (ele.previousElementSibling?.tagName != "UI-ROW") {
-				return ele["$control"] as RowEditor;
+				let editor = ele["$control"];
+				return editor instanceof RowEditor ? editor : undefined;
 			}
 		}
 	}
 	get type(): ViewBoxType {
 		let header = this.rowHeader;
-		if (!header) return this["_type"];
-		let rowType = header == this ? this["_type"] : header.type;
-		if (!rowType) {
-			let owner: ViewOwner = this["_type"].owner;
-			let column = owner.types.column;
-			rowType = Object.create(this.type);
-			rowType.types = Object.create(null);
+		if (this == header && !Object.hasOwn(this, "_type")) {
+			let columns: string[] = [];
 			for (let col of header.node.children) {
-				let colType = Object.create(column);
-				colType.name = col.textContent;
-				rowType.types[colType.name] = colType;
+				columns.push(col.textContent);
 			}
-			header["_type"] = rowType;
+			this["_type"] = createType(this["_type"], columns);
 		}
-		return rowType;
+		if (header) return header["_type"];
 	}
 
 	viewContent(item: Content): void {
@@ -40,15 +32,6 @@ export class RowEditor extends RecordEditor {
 			let member: Editor = colType.view(value, this) as any;
 			member.node.setAttribute("data-name", name);
 		}
-		// rowType = Object.create(rowType);
-		// rowType.types = Object.create(null);
-		// rowType.types.A = Object.create(colType);
-		// rowType.types.B = Object.create(colType);
-		// let view = rowType.view({
-		// 	A: this.content.textContent,
-		// 	B: ""
-		// }) as Editor;
-		// this.node.parentElement.insertBefore(view.node, this.node);
 	}
 	contentOf(range?: Range): content {
 		return {
@@ -58,6 +41,20 @@ export class RowEditor extends RecordEditor {
 	}
 }
 
+function createType(type: ViewBoxType, columns: string[]): ViewBoxType {
+	type.types = Object.create(null);
+	let column = type.owner.types.column;
+	for (let col of columns) {
+		let colType = Object.create(column);
+		colType.name = col;
+		colType.prototype = Object.create(colType.prototype);
+		colType.prototype._type = colType;
+		type.types[col] = colType;
+	}
+	type.prototype = Object.create(type.prototype);
+	type.prototype["_type"] = type;
+	return type;
+}
 
 function rowContent(model: Record, view: Element, range: Range): Record {
 	if (range && !range.intersectsNode(view)) return model;
