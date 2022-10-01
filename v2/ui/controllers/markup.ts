@@ -1,10 +1,11 @@
-import { content } from "../../base/model.js";
+import { content, Row } from "../../base/model.js";
 import { Editor } from "../../box/editor.js";
 import { extend } from "../../base/util.js";
 
-import { getView, navigate } from "../../editor/util.js";
+import { getChildEditor, getView, navigate } from "../../editor/util.js";
 import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 import list from "./list.js";
+import { RowEditor } from "../../editor/controls/row.js";
 
 export default extend(list, {
 	paste(this: Editor, event: UserEvent) {
@@ -72,20 +73,41 @@ export default extend(list, {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) return;
-		let current = getView(range);
-		if (current != this) {
-			range.setStartBefore(current.node);
-			range.collapse(true);
-		}
-		this.edit("Insert", event.range, [{
-			type$: "row",
-			content: {
-				"A": "A",
-				"B": "B"
-			}
-		}]);
+		let current = getChildEditor(this, range.commonAncestorContainer);
+		if (!current) return;
+		let item = createItem(current);
+		range.setStartBefore(current.node);
+		range.collapse(true);
+		this.edit("Insert", range, [item]);
 	}
 });
+
+function createItem(refNode: Editor): Row {
+	let item: Row;
+	if (!(refNode instanceof RowEditor)) {
+		refNode = getView(refNode.node.previousElementSibling);
+	}
+	if (refNode instanceof RowEditor) {
+		item = {
+			type$: "row",
+			columns: refNode.columns,
+			content: {}
+		};
+		for (let name in refNode.type.types) {
+			item.content[name] = "";
+		}
+	} else {
+		item = {
+			type$: "row",
+			content: {
+				"Key": "Key",
+				"Value": "Value"
+			},
+			columns: ["Key", "Value"]
+		}
+	}
+	return item;
+}
 
 function nav(event: UserEvent, isPrevious?: boolean) {
 	let item = navigate(event.range, isPrevious);

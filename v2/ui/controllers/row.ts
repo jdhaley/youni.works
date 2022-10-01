@@ -50,18 +50,17 @@ export default extend(editable, {
 });
 
 function addCol(editor: RowEditor, col: Editor) {
-	if (col.type.name == "column") {
-		let content = editor.content.children;
-		for (let i = 0; i < content.length; i++) {
-			if (content[i] == col.node) {
-				addColumn(editor, i);
-				for (let row = editor.node.nextElementSibling; row; row = row.nextElementSibling) {
-					let type = getView(row);
-					if (type instanceof RowEditor) {
-						addColumn(type, i);
-					}
-				}			
-			}
+	let content = editor.content.children;
+	for (let i = 0; i < content.length; i++) {
+		if (content[i] == col.node) {
+			addColumn(editor, i);
+			editor.type; //trigger the new type.
+			for (let row = editor.node.nextElementSibling; row; row = row.nextElementSibling) {
+				let type = getView(row);
+				if (type instanceof RowEditor) {
+					addColumn(type, i);
+				}
+			}			
 		}
 	}
 }

@@ -27,13 +27,13 @@ interface Part {
 	append?(part: Part): void;
 }
 
-export interface Content {
-	type$: string,
-	content: content,
+export interface Content extends Record {
+	content?: content,
 	level?: number,
 }
 
 export interface Row extends Content {
+	type$: "row"
 	columns?: string[]
 }
 
