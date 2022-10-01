@@ -76,6 +76,23 @@ export abstract class ViewBox extends ElementBox implements Editor {
 		element.removeAttribute("data-item");
 		element.id = "";
 	}
+	getContent(range?: Range) {
+		//if (range && getView(range) != this) throw new Error("Invalid Range");
+		if (range && !range.intersectsNode(this.node)) return;
+		let out = document.implementation.createDocument("cml", this.type.name).documentElement as Element;
+		viewContent(this, range, out);
+		return out;
+		// export function toVml(range: Range): Element {
+		// 	let out = document.implementation.createDocument("vml", "view").documentElement as Element;
+		// 	let ctx = range.commonAncestorContainer;
+		// 	for (let i = range.startOffset; i < range.endOffset; i++) {
+		// 		let view = getView(ctx.childNodes[i]);
+		// 		if (!view) continue;
+		// 		viewContent(view, range, out);
+		// 	}
+		// 	return out;
+		// }
+	}
 }
 
 export class ViewBoxType extends BaseType {
@@ -186,3 +203,43 @@ export function getView(node: Node | Range): Editor {
 	let view = getViewNode(node)?.$control;
 	if (view instanceof ViewBox) return view;
 }
+
+function viewContent(view: Editor, range: Range, out: Element) {
+	if (range && !range.intersectsNode(view.node)) return;
+	let item = out.ownerDocument.createElement(view.type.name);
+	out.append(item);
+	if (view.node.id) item.id = view.node.id;
+	let level = view.node.getAttribute("aria-level");
+	if (level) item.setAttribute("level", level);
+	for (let node of view.content.childNodes) {
+		if (range && !range.intersectsNode(node)) continue;
+		let childView = getView(node);
+		if (childView != view) {
+			viewContent(childView, range, item);
+		} else if (node instanceof Element) {
+			// debugger;
+			// let x = item.ownerDocument.createElement(child.tagName);
+			// x.innerHTML = child.innerHTML;
+			item.append(node.cloneNode(true));
+			console.log(node.parentElement.nodeName);
+		} else {
+			let text = node.textContent;
+			if (range) {
+				if (node == range?.startContainer && node == range?.endContainer) {
+					text = node.textContent.substring(range.startOffset, range.endOffset);
+				} else if (node == range?.startContainer) {
+					text = node.textContent.substring(range.startOffset);
+				} else if (node == range?.endContainer) {
+					text = node.textContent.substring(0, range.endOffset);
+				} 
+			}
+			item.append(text);
+		}
+	}
+}
+
+// for (let i = range.startOffset; i < range.endOffset; i++) {
+// 	let view = getView(ctx.childNodes[i]);
+// 	if (!view) continue;
+// 	ev(view, out);
+// }

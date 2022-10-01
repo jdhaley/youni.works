@@ -18,6 +18,8 @@ export class ListEditor extends BaseEditor {
 		}
 	}
 	contentOf(range?: Range): List {
+		console.log(this.getContent(range));
+
 		let model: content[];
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let part of this.content.children) {
