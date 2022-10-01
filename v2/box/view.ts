@@ -194,7 +194,7 @@ function viewContent(view: Editor, range: Range, out?: Element) {
 	if (range && !range.intersectsNode(view.content)) return;
 	let item: Element;
 	if (!out) {
-		item = document.implementation.createDocument("cml", view.type.name).documentElement as Element;
+		item = document.implementation.createDocument("", view.type.name).documentElement as Element;
 	} else {
 		item = out.ownerDocument.createElement(view.type.name);
 		out.append(item);

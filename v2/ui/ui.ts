@@ -172,5 +172,16 @@ export function setClipboard(range: Range, clipboard: DataTransfer) {
 	}
 	if (!(model instanceof Array)) model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
-	console.log(control.getContent(range).ownerDocument);
+	let article = getArticle(range);
+	console.log(article.getContent(range).ownerDocument);
+}
+
+function getArticle(range: Range) {
+	let view = getView(range);
+	while (view) {
+		if (!view.type.partOf) return view;
+		let parent = getView(view.node.parentElement);
+		if (!parent) return view;
+		view = parent;
+	}
 }

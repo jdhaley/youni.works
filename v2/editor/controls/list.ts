@@ -97,13 +97,14 @@ export class ListReplace extends Replace {
 		//NB - the outer range is a different range from the
 		//passed range and should only be used within this method.
 		range = this.getOuterRange(range);
-		let ctx = getView(range).content;
-		captureRange(this, ctx, range.startOffset, range.endOffset);
+		let view = getView(range);
+		this.b = view.getContent(range).outerHTML;
+		captureRange(this, view.content, range.startOffset, range.endOffset);
 	
 		//Capture the before image for undo.
 		let before = "";
 		for (let i = range.startOffset; i < range.endOffset; i++) {
-			let node = ctx.childNodes[i] as Element;
+			let node = view.content.childNodes[i] as Element;
 			if (node.outerHTML) before += node.outerHTML;
 		}
 		this.before = before;
@@ -124,10 +125,12 @@ export class ListReplace extends Replace {
 	}
 	protected execAfter(range: Range): Range {
 		range = this.getReplaceRange();
-		let ctx = getView(range).content;
+		let view = getView(range);
+		this.a = view.getContent(range).outerHTML;
+		console.log(this);
 		this.after = "";		
 		for (let i = range.startOffset; i < range.endOffset; i++) {
-			this.after += ctx.children[i].outerHTML;
+			this.after += view.content.children[i].outerHTML;
 		}
 		return unmark(range);
 	}

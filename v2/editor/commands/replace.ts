@@ -4,7 +4,9 @@ import { Edit } from "./edit.js";
 
 export abstract class Replace extends Edit {
 	before: string;
+	b: string;
 	after: string;
+	a: string;
 	exec(range: Range, content: any): Range {
 		return;
 	}
