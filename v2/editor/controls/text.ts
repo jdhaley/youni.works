@@ -54,6 +54,20 @@ export class TextReplace extends Replace {
 		this.after = content.innerHTML;
 		return unmark(range);	
 	}
+	protected execBefore(range: Range): void {
+		throw new Error("Method not implemented.");		
+	}
+	protected execReplace(range: Range, content: content): Range {
+		throw new Error("Method not implemented.");
+	}
+	protected execAfter(range: Range): Range {
+		throw new Error("Method not implemented.");		
+	}
+	protected getOuterRange(range: Range): Range {
+		range = range.cloneRange();
+		range.selectNodeContents(getView(range).content);
+		return range;
+	}
 }
 
 const COMMANDS = {
