@@ -11,6 +11,7 @@ export interface Editor extends View<Element> {
 	readonly footer?: Element;
 	contentOf(range?: Range): content;
 	edit(commandName: string, range: Range, content?: content): Range;
+	getContent(range?: Range): Element;
 }
 
 export interface Article extends Owner<Element> {

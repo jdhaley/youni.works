@@ -158,7 +158,7 @@ export function getClipboard(clipboard: DataTransfer): content {
 }
 
 export function setClipboard(range: Range, clipboard: DataTransfer) {
-	let control = getView(range);
+	let control = getView(range) as Editor;
 	let model = control?.contentOf(range);
 	if (!model) return;
 	if (typeof model == "string") {
@@ -172,4 +172,5 @@ export function setClipboard(range: Range, clipboard: DataTransfer) {
 	}
 	if (!(model instanceof Array)) model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
+	console.log(control.getContent(range).ownerDocument);
 }

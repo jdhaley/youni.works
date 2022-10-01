@@ -27,8 +27,6 @@ export class RecordEditor extends BaseEditor {
 		}
 	}
 	contentOf(range?: Range): content {
-		console.log(this.getContent(range));
-
 		let model = recordContent(null, this.content as Element, range);
 		if (model) {
 			model["type$"] = this.type.name;

@@ -36,8 +36,6 @@ export class RowEditor extends RecordEditor {
 		}
 	}
 	contentOf(range?: Range): content {
-		console.log(this.getContent(range));
-
 		let row: Row = {
 			type$: "row",
 			content: rowContent(null, this.content as Element, range)

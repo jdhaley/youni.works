@@ -59,7 +59,6 @@ export class LineEditor extends TextEditor {
 		this.level = content.level;
 	}
 	contentOf(range?: Range): Content {
-		console.log(this.getContent(range));
 		let line = this.node;
 		if (range && !range.intersectsNode(this.content)) return;
 		let content = super.contentOf(range);

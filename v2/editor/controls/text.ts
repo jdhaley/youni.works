@@ -11,7 +11,6 @@ export class TextEditor extends BaseEditor {
 		this.content.textContent = model ? "" + model : "";
 	}
 	contentOf(range?: Range): content {
-		console.log(this.getContent(range));
 		let model = "";
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let node of (this.content as Element).childNodes) {

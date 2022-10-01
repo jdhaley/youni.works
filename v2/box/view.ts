@@ -77,21 +77,7 @@ export abstract class ViewBox extends ElementBox implements Editor {
 		element.id = "";
 	}
 	getContent(range?: Range) {
-		//if (range && getView(range) != this) throw new Error("Invalid Range");
-		if (range && !range.intersectsNode(this.node)) return;
-		let out = document.implementation.createDocument("cml", this.type.name).documentElement as Element;
-		viewContent(this, range, out);
-		return out;
-		// export function toVml(range: Range): Element {
-		// 	let out = document.implementation.createDocument("vml", "view").documentElement as Element;
-		// 	let ctx = range.commonAncestorContainer;
-		// 	for (let i = range.startOffset; i < range.endOffset; i++) {
-		// 		let view = getView(ctx.childNodes[i]);
-		// 		if (!view) continue;
-		// 		viewContent(view, range, out);
-		// 	}
-		// 	return out;
-		// }
+		return viewContent(this, range);
 	}
 }
 
@@ -204,24 +190,31 @@ export function getView(node: Node | Range): Editor {
 	if (view instanceof ViewBox) return view;
 }
 
-function viewContent(view: Editor, range: Range, out: Element) {
-	if (range && !range.intersectsNode(view.node)) return;
-	let item = out.ownerDocument.createElement(view.type.name);
-	out.append(item);
+function viewContent(view: Editor, range: Range, out?: Element) {
+	if (range && !range.intersectsNode(view.content)) return;
+	let item: Element;
+	if (!out) {
+		item = document.implementation.createDocument("cml", view.type.name).documentElement as Element;
+	} else {
+		item = out.ownerDocument.createElement(view.type.name);
+		out.append(item);
+	}
 	if (view.node.id) item.id = view.node.id;
 	let level = view.node.getAttribute("aria-level");
 	if (level) item.setAttribute("level", level);
+	content(view, range, item);
+	return item;
+}
+
+function content(view: Editor, range: Range, out: Element) {
 	for (let node of view.content.childNodes) {
-		if (range && !range.intersectsNode(node)) continue;
+		if (range && !range.intersectsNode(node))
+			continue;
 		let childView = getView(node);
 		if (childView != view) {
-			viewContent(childView, range, item);
+			viewContent(childView, range, out);
 		} else if (node instanceof Element) {
-			// debugger;
-			// let x = item.ownerDocument.createElement(child.tagName);
-			// x.innerHTML = child.innerHTML;
-			item.append(node.cloneNode(true));
-			console.log(node.parentElement.nodeName);
+			out.append(node.cloneNode(true));
 		} else {
 			let text = node.textContent;
 			if (range) {
@@ -231,15 +224,9 @@ function viewContent(view: Editor, range: Range, out: Element) {
 					text = node.textContent.substring(range.startOffset);
 				} else if (node == range?.endContainer) {
 					text = node.textContent.substring(0, range.endOffset);
-				} 
+				}
 			}
-			item.append(text);
+			out.append(text);
 		}
 	}
 }
-
-// for (let i = range.startOffset; i < range.endOffset; i++) {
-// 	let view = getView(ctx.childNodes[i]);
-// 	if (!view) continue;
-// 	ev(view, out);
-// }
