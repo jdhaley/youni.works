@@ -43,34 +43,26 @@ export class RecordEditor extends BaseEditor {
 }
 
 class RecordReplace extends Replace {
-	exec(range: Range, record: Record): Range {
-		narrowRange(range);
-		mark(range);
-
+	protected execBefore(range: Range): void {
+		super.execBefore(range);
 		let content = getView(range).content;
 		this.before = content?.innerHTML || "";
+	}
+	protected execReplace(range: Range, record: Record): Range {
 		clearContent(range);
-		if (record) mergeContent(this, range, record)
-		this.after = content?.innerHTML || "";
-	
-		unmark(range);
+		if (record) mergeContent(this, range, record);
 		return range;
 	}
-	protected execBefore(range: Range): void {
-		throw new Error("Method not implemented.");		
-	}
-	protected execReplace(range: Range, content: content): Range {
-		throw new Error("Method not implemented.");
-	}
 	protected execAfter(range: Range): Range {
-		throw new Error("Method not implemented.");		
+		let content = getView(range).content;	
+		this.after = content?.innerHTML || "";
+		return super.execAfter(range);
 	}
 	protected getOuterRange(range: Range): Range {
 		range = range.cloneRange();
 		range.selectNodeContents(getView(range).content);
 		return range;
 	}
-
 }
 
 function mergeContent(cmd: Replace, range: Range, record: Record) {

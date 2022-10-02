@@ -31,7 +31,19 @@ export abstract class ViewBox extends ElementBox implements Editor {
 	abstract contentOf(range?: Range): content;
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 
-	protected draw() {
+	viewContent2(content: Element) {
+		for (let child of content.children) {
+			let childType = this.type.types[child.tagName];
+			if (childType) {
+				createView(this, childType, child);
+				// let childView = createView(childType, view, content);
+				// childView.viewContent2(child);
+			} else {
+				console.warn("Unknown type: ", child.tagName);
+			}
+		}	
+	}
+	draw() {
 		this.node.textContent = "";
 		if (this.isContainer) {
 			this.createHeader();
@@ -78,6 +90,13 @@ export abstract class ViewBox extends ElementBox implements Editor {
 	}
 	getContent(range?: Range) {
 		return viewContent(this, range);
+	}
+	setContent(markup: string) {
+		let node = document.implementation.createDocument("", "div").documentElement as Element;
+		node.innerHTML = markup;
+		node = node.firstElementChild;
+		console.log(node);
+
 	}
 }
 
@@ -229,4 +248,14 @@ function content(view: Editor, range: Range, out: Element) {
 			out.append(text);
 		}
 	}
+}
+
+export function createView(parent: ViewBox, type: ViewBoxType, content: Element): ViewBox {
+	let view: ViewBox = Object.create(type.prototype);
+	let node = this.owner.createElement(type.conf.tagName || "div");
+	if (parent) parent.content.append(node);
+	view.control(node);
+	view.draw();
+	view.viewContent2(content);
+	return view;
 }

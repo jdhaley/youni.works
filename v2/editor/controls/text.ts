@@ -10,6 +10,9 @@ export class TextEditor extends BaseEditor {
 		this.draw();
 		this.content.textContent = model ? "" + model : "";
 	}
+	viewContent2(content: Element): void {
+		this.content.innerHTML = content.innerHTML;
+	}
 	contentOf(range?: Range): content {
 		let model = "";
 		if (range && !range.intersectsNode(this.content)) return;
