@@ -7,7 +7,6 @@ import { Replace } from "../commands/replace.js";
 export class TextEditor extends BaseEditor {
 	contentType = "text";
 	viewContent(model: content): void {
-		this.draw();
 		this.content.textContent = model ? "" + model : "";
 	}
 	viewContent2(content: Element): void {

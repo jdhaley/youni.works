@@ -36,13 +36,13 @@ export abstract class ViewBox extends ElementBox implements Editor {
 		for (let child of content.children) {
 			let childType = this.type.types[child.tagName];
 			if (childType) {
-				childType.createView(child, this);
+				childType.view(child, this);
 			} else {
 				console.warn("Unknown type: ", child.tagName);
 			}
 		}
 	}
-	draw() {
+	draw(content: unknown) {
 		this.node.textContent = "";
 		if (this.isContainer) {
 			this.createHeader();
@@ -51,6 +51,11 @@ export abstract class ViewBox extends ElementBox implements Editor {
 		} else {
 			this.content = this.node;
 			this.content.classList.add("content");
+		}
+		if (content instanceof Element) {
+			this.viewContent2(content);
+		} else {
+			this.viewContent(content as content);
 		}
 	}
 	protected createHeader(model?: content) {
@@ -109,23 +114,14 @@ export class ViewBoxType extends BaseType {
 	declare partOf: ViewBoxType;
 
 	view(content: content | Element, parent?: ViewBox): ViewBox {
-		if (content instanceof Element) return this.createView(content, parent);
-		let display: ViewBox = Object.create(this.prototype);
-		let view = this.owner.createElement(this.conf.tagName || "div");
-		if (parent) parent.content.append(view);
-		display.control(view);
-		display.viewContent(content);
-		return display;
-	}
-	createView(content?: Element, parent?: ViewBox): ViewBox {
 		let view: ViewBox = Object.create(this.prototype);
 		let node = this.owner.createElement(this.conf.tagName || "div");
 		if (parent) parent.content.append(node);
+
 		view.control(node);
-		view.draw();
-		view.viewContent2(content);
+		view.draw(content);
 		return view;
-	}	
+	}
 }
 
 let NEXT_ID = 1;

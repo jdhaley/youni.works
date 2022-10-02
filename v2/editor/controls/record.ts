@@ -16,7 +16,6 @@ export class RecordEditor extends BaseEditor {
 	}
 
 	viewContent(model: content): void {
-		this.draw();
 		this.at = Object.create(null);
 		for (let name in this.type.types) {
 			let type = this.type.types[name] as ViewType;
@@ -34,7 +33,7 @@ export class RecordEditor extends BaseEditor {
 		}
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
-			let child = type.createView(idx[name], this);
+			let child = type.view(idx[name], this);
 			this.at[name] = child;
 			child.node.classList.add("field");
 		}

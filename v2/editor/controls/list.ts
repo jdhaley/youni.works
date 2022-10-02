@@ -10,7 +10,6 @@ import { getView, getChildEditor, clearContent, mark, narrowRange, unmark, BaseE
 export class ListEditor extends BaseEditor {
 	contentType = "list";
 	viewContent(model: List): void {
-		this.draw();
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type as ViewType;
 			type = type.types[viewType(item)] || this.owner.unknownType;

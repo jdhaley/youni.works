@@ -54,7 +54,6 @@ export class LineEditor extends TextEditor {
 		}
 	}
 	viewContent(content: Content): void {
-		this.draw();
 		this.content.innerHTML = "" + (content.content || "");
 		this.level = content.level;
 	}

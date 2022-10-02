@@ -22,7 +22,6 @@ export class RowEditor extends RecordEditor {
 	}
 
 	viewContent(item: Row): void {
-		this.draw();
 		if (!item) return;
 		if (this == this.rowHeader) {
 			if (!item.columns) item.columns = getColumns(item);

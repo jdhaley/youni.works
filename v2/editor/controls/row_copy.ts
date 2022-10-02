@@ -20,7 +20,6 @@ export class RowEditor extends RecordEditor {
 		if (item?.columns) {
 			this["_type"] = createRowType(this.owner.types.row as ViewBoxType, item.columns);
 		}
-		this.draw();
 		for (let name in this.type.types) {
 			let type = this.type.types[name] as ViewType;
 			let value = item ? item[name] : null;
