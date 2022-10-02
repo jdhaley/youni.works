@@ -9,7 +9,7 @@ import { section } from "../transform/item.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { ViewOwner, getView } from "../box/view.js";
+import { ViewBox, ViewBoxType, ViewOwner, getView } from "../box/view.js";
 import { Article, Editor } from "../box/editor.js";
 
 export class Display extends ViewOwner implements Article {
@@ -173,7 +173,8 @@ export function setClipboard(range: Range, clipboard: DataTransfer) {
 	if (!(model instanceof Array)) model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
 	let article = getArticle(range);
-	console.log(article.getContent(range).ownerDocument);
+	let content = article.getContent(range);
+	control.type.view(content as any, article as ViewBox);
 }
 
 function getArticle(range: Range) {

@@ -26,6 +26,20 @@ export class RecordEditor extends BaseEditor {
 			member.node.classList.add("field");
 		}
 	}
+	viewContent2(content: Element): void {
+		this.at = Object.create(null);
+		let idx = {};
+		for (let child of content.children) {
+			idx[child.tagName] = child;
+		}
+		for (let name in this.type.types) {
+			let type = this.type.types[name];
+			let child = type.createView(idx[name], this);
+			this.at[name] = child;
+			child.node.classList.add("field");
+		}
+	}
+
 	contentOf(range?: Range): content {
 		let model = recordContent(null, this.content as Element, range);
 		if (model) {

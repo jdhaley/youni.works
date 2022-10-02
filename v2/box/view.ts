@@ -32,16 +32,15 @@ export abstract class ViewBox extends ElementBox implements Editor {
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 
 	viewContent2(content: Element) {
+		if (!content) return;
 		for (let child of content.children) {
 			let childType = this.type.types[child.tagName];
 			if (childType) {
-				createView(this, childType, child);
-				// let childView = createView(childType, view, content);
-				// childView.viewContent2(child);
+				childType.createView(child, this);
 			} else {
 				console.warn("Unknown type: ", child.tagName);
 			}
-		}	
+		}
 	}
 	draw() {
 		this.node.textContent = "";
@@ -109,7 +108,8 @@ export class ViewBoxType extends BaseType {
 	declare types: bundle<ViewBoxType>;
 	declare partOf: ViewBoxType;
 
-	view(content: content, parent?: ViewBox): ViewBox {
+	view(content: content | Element, parent?: ViewBox): ViewBox {
+		if (content instanceof Element) return this.createView(content, parent);
 		let display: ViewBox = Object.create(this.prototype);
 		let view = this.owner.createElement(this.conf.tagName || "div");
 		if (parent) parent.content.append(view);
@@ -117,6 +117,15 @@ export class ViewBoxType extends BaseType {
 		display.viewContent(content);
 		return display;
 	}
+	createView(content?: Element, parent?: ViewBox): ViewBox {
+		let view: ViewBox = Object.create(this.prototype);
+		let node = this.owner.createElement(this.conf.tagName || "div");
+		if (parent) parent.content.append(node);
+		view.control(node);
+		view.draw();
+		view.viewContent2(content);
+		return view;
+	}	
 }
 
 let NEXT_ID = 1;
@@ -250,12 +259,3 @@ function content(view: Editor, range: Range, out: Element) {
 	}
 }
 
-export function createView(parent: ViewBox, type: ViewBoxType, content: Element): ViewBox {
-	let view: ViewBox = Object.create(type.prototype);
-	let node = this.owner.createElement(type.conf.tagName || "div");
-	if (parent) parent.content.append(node);
-	view.control(node);
-	view.draw();
-	view.viewContent2(content);
-	return view;
-}
