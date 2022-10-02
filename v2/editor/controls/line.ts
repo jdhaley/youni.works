@@ -54,8 +54,13 @@ export class LineEditor extends TextEditor {
 		}
 	}
 	viewContent(content: Content): void {
-		this.content.innerHTML = "" + (content.content || "");
-		this.level = content.level;
+		if (content instanceof Element) {
+			this.content.innerHTML = content.innerHTML;
+			this.level = Number.parseInt(content.getAttribute("level"));
+		} else {
+			this.content.innerHTML = (content ? "" + content : "");
+			this.level = content.level;	
+		}
 	}
 	contentOf(range?: Range): Content {
 		let line = this.node;

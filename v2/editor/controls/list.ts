@@ -10,10 +10,22 @@ import { getView, getChildEditor, clearContent, mark, narrowRange, unmark, BaseE
 export class ListEditor extends BaseEditor {
 	contentType = "list";
 	viewContent(model: List): void {
+		if (model instanceof Element) return this.viewElement(model);
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type as ViewType;
 			type = type.types[viewType(item)] || this.owner.unknownType;
 			let part = type.view(item, this) as Editor;
+		}
+	}
+	viewElement(content: Element) {
+		if (!content) return;
+		for (let child of content.children) {
+			let childType = this.type.types[child.tagName];
+			if (childType) {
+				childType.view(child, this);
+			} else {
+				console.warn("Unknown type: ", child.tagName);
+			}
 		}
 	}
 	contentOf(range?: Range): List {

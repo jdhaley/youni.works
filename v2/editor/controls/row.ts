@@ -21,17 +21,32 @@ export class RowEditor extends RecordEditor {
 		if (header) return header["_type"];
 	}
 
-	viewContent(item: Row): void {
-		if (!item) return;
+	viewContent(model: content | Element): void {
+		if (model instanceof Element) return this.viewElement(model);
+		if (!model) return;
+		let row = model as Row;
 		if (this == this.rowHeader) {
-			if (!item.columns) item.columns = getColumns(item);
-			this["_type"] = createType(this["_type"], item.columns);
+			if (!row.columns) row.columns = getColumns(row);
+			this["_type"] = createType(this["_type"], row.columns);
 		}
 		let types = this.type.types;
-		let content = item.content || EMPTY.object;
+		let content = row.content || EMPTY.object;
 		for (let name in types) {
 			let value = content[name];
 			types[name].view(value, this);
+		}
+	}
+	protected viewElement(content: Element): void {
+		this.at = Object.create(null);
+		let idx = {};
+		for (let child of content.children) {
+			idx[child.tagName] = child;
+		}
+		for (let name in this.type.types) {
+			let type = this.type.types[name];
+			let child = type.view(idx[name], this);
+			this.at[name] = child;
+			child.node.classList.add("field");
 		}
 	}
 	contentOf(range?: Range): content {

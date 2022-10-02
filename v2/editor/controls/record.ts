@@ -15,7 +15,8 @@ export class RecordEditor extends BaseEditor {
 		return this.at.title?.content.textContent;
 	}
 
-	viewContent(model: content): void {
+	viewContent(model: content | Element): void {
+		if (model instanceof Element) return this.viewElement(model);
 		this.at = Object.create(null);
 		for (let name in this.type.types) {
 			let type = this.type.types[name] as ViewType;
@@ -25,7 +26,7 @@ export class RecordEditor extends BaseEditor {
 			member.node.classList.add("field");
 		}
 	}
-	viewContent2(content: Element): void {
+	protected viewElement(content: Element): void {
 		this.at = Object.create(null);
 		let idx = {};
 		for (let child of content.children) {

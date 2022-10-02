@@ -27,21 +27,10 @@ export abstract class ViewBox extends ElementBox implements Editor {
 	get shortcuts(): bundle<string> {
 		return this.type.conf.shortcuts;
 	}
-	abstract viewContent(model: content): void;
+	protected abstract viewContent(model: content): void;
 	abstract contentOf(range?: Range): content;
 	abstract edit(commandName: string, range: Range, content?: content): Range;
 
-	viewContent2(content: Element) {
-		if (!content) return;
-		for (let child of content.children) {
-			let childType = this.type.types[child.tagName];
-			if (childType) {
-				childType.view(child, this);
-			} else {
-				console.warn("Unknown type: ", child.tagName);
-			}
-		}
-	}
 	draw(content: unknown) {
 		this.node.textContent = "";
 		if (this.isContainer) {
@@ -52,11 +41,7 @@ export abstract class ViewBox extends ElementBox implements Editor {
 			this.content = this.node;
 			this.content.classList.add("content");
 		}
-		if (content instanceof Element) {
-			this.viewContent2(content);
-		} else {
-			this.viewContent(content as content);
-		}
+		this.viewContent(content as content);
 	}
 	protected createHeader(model?: content) {
 		let header = this.owner.createElement("header");

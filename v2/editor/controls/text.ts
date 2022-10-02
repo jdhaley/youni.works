@@ -7,10 +7,11 @@ import { Replace } from "../commands/replace.js";
 export class TextEditor extends BaseEditor {
 	contentType = "text";
 	viewContent(model: content): void {
-		this.content.textContent = model ? "" + model : "";
-	}
-	viewContent2(content: Element): void {
-		this.content.innerHTML = content.innerHTML;
+		if (model instanceof Element) {
+			this.content.textContent = model.textContent;
+		} else {
+			this.content.textContent = model ? "" + model : "";
+		}
 	}
 	contentOf(range?: Range): content {
 		let model = "";

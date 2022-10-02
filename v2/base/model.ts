@@ -1,6 +1,6 @@
 import { bundle } from "./util";
 
-export type content = string | number | boolean | Date | List | Record | Content;
+export type content = string | number | boolean | Date | List | Record | Content | Element;
 
 export interface List extends Iterable<content> {
 	length?: number;
