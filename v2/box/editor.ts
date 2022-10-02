@@ -4,9 +4,10 @@ import { CommandBuffer } from "../base/command.js";
 import { Owner, Signal } from "../base/control.js";
 import { bundle } from "../base/util.js";
 
-export interface Editor extends View<Element> {
+export interface Editor extends View {
 	readonly owner: Article;
 	readonly node: Element;
+	readonly content: Element;
 	readonly header?: Element;
 	readonly footer?: Element;
 	contentOf(range?: Range): content;

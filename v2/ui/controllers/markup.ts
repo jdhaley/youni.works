@@ -1,11 +1,10 @@
-import { content, Row } from "../../base/model.js";
 import { Editor } from "../../box/editor.js";
 import { extend } from "../../base/util.js";
 
 import { getChildEditor, getView, navigate } from "../../editor/util.js";
 import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 import list from "./list.js";
-import { RowEditor } from "../../editor/controls/row.js";
+import { Row, RowEditor } from "../../editor/controls/row.js";
 
 export default extend(list, {
 	paste(this: Editor, event: UserEvent) {
@@ -27,7 +26,7 @@ export default extend(list, {
 	split(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		let model: content = "";
+		let model = null;
 		if (!range.collapsed) {
 			//This model will supress the merging of the first and last line.
 			model = [{

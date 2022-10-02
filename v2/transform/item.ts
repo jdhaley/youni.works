@@ -1,6 +1,22 @@
-import { Section } from "../base/model.js";
+export interface Part  {
+	type$: string,
+	content?: unknown,
+	level?: number,
+	items?: Part[],
+	sections?: Part[]
+}
 
-export function section(items: Section[]): Section {
+// interface Part {
+// 	type: Type;
+// 	content: content;
+// 	parts: Iterable<Part>;
+// 	partOf?: Part;
+// 	///////////////////////
+// 	at?: bundle<Part>
+// 	append?(part: Part): void;
+// }
+
+export function section(items: Part[]): Part {
 	let sections = [];
 	if (items[0].type$ != "heading") {
 		sections.push({
@@ -19,7 +35,7 @@ export function section(items: Section[]): Section {
 			sections.at(-1).items.push(current);
 		}
 	}
-	let root: Section = {
+	let root: Part = {
 		type$: "article",
 		content: "",
 		sections: []
@@ -29,7 +45,7 @@ export function section(items: Section[]): Section {
 	return root;
 }
 
-function groupSections(section: Section, sections: Section[], start: number): number {
+function groupSections(section: Part, sections: Part[], start: number): number {
 	let items = section.items;
 	section.items = [];
 	groupItems(section, items, 0);
@@ -43,7 +59,7 @@ function groupSections(section: Section, sections: Section[], start: number): nu
 		}
 	}
 }
-function groupItems(item: Section, items: Section[], start: number): number {
+function groupItems(item: Part, items: Part[], start: number): number {
 	if (!items) return start;
 	if (!item.items) item.items = [];
 	while (start < items.length) {
@@ -58,7 +74,7 @@ function groupItems(item: Section, items: Section[], start: number): number {
 		}
 	}
 }
-function groupParas(item: Section, items: Section[], start: number): number {
+function groupParas(item: Part, items: Part[], start: number): number {
 	let p = items[start];
 	if (p?.type$ != "para") return start;
 	while (start < items.length) {
@@ -71,7 +87,7 @@ function groupParas(item: Section, items: Section[], start: number): number {
 		}
 	}
 }
-function groupRows(item: Section, items: Section[], start: number): number {
+function groupRows(item: Part, items: Part[], start: number): number {
 	let header = items[start++];
 	let columns = "";
 	for (let name in header.content as object) {

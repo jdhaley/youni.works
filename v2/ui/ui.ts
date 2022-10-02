@@ -1,4 +1,3 @@
-import { content, Section } from "../base/model.js";
 import { CommandBuffer } from "../base/command.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
 import { RemoteFileService } from "../base/remote.js";
@@ -9,7 +8,7 @@ import { section } from "../transform/item.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { ViewBox, ViewBoxType, ViewOwner, getView } from "../box/view.js";
+import { ViewBox, ViewOwner, getView } from "../box/view.js";
 import { Article, Editor } from "../box/editor.js";
 
 export class Display extends ViewOwner implements Article {
@@ -144,7 +143,7 @@ export interface UserEvent extends Signal, UIEvent {
     y?: number;
 }
 
-export function getClipboard(clipboard: DataTransfer): content {
+export function getClipboard(clipboard: DataTransfer) {
 	let data = clipboard.getData("application/json");
 	if (data) return JSON.parse(data);
 	data = clipboard.getData("text/html");
@@ -166,7 +165,7 @@ export function setClipboard(range: Range, clipboard: DataTransfer) {
 		return;
 	}
 	if (control.contentType == "markup") {
-		let item = section(model as Section[]);
+		let item = section(model as any);
 		let article = toHtml(item);
 		clipboard.setData("text/html", article.outerHTML);
 	}

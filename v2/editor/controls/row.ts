@@ -1,8 +1,15 @@
-import { content, Record, Row } from "../../base/model.js";
+import { content, Record } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 import { Editor } from "../../box/editor.js";
 import { ViewBoxType } from "../../box/view.js";
 import { RecordEditor } from "./record.js";
+
+export interface Row extends Record {
+	type$: "row"
+	content?: content,
+	level?: number,
+	columns?: string[]
+}
 
 export class RowEditor extends RecordEditor {
 	get rowHeader(): RowEditor {

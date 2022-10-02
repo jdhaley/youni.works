@@ -1,18 +1,19 @@
-import { Record, Section } from "../base/model.js";
+import { Record } from "../base/model.js";
+import { Part } from "./item.js";
 
-export function toHtml(item: Section) {
+export function toHtml(item: Part) {
 	let doc = document.implementation.createHTMLDocument();
 	let ele = doc.createElement("article");
 	htmlSection(ele, item);
 	return ele;
 }
 
-function htmlSection(ele: Element, item: Section) {
+function htmlSection(ele: Element, item: Part) {
 	if (item.items) for (let x of item.items) transformItem(ele, x);
 	if (item.sections) for (let x of item.sections) transformItem(ele, x);
 }
 
-function transformItem(parent: Element, item: Section) {
+function transformItem(parent: Element, item: Part) {
 	let doc = parent.ownerDocument;
 	let ele: Element;
 	if (item.type$ == "heading") {

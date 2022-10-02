@@ -1,7 +1,11 @@
-import { Content } from "../../base/model.js";
-
+import { content, Record } from "../../base/model.js";
 import { getView } from "../util.js";
 import { TextEditor } from "./text.js";
+
+export interface Line extends Record {
+	content?: content,
+	level?: number,
+}
 
 export class LineEditor extends TextEditor {
 	contentType = "line";
@@ -53,20 +57,20 @@ export class LineEditor extends TextEditor {
 			this.node.setAttribute("data-item", toType.name);
 		}
 	}
-	viewContent(content: Content): void {
+	viewContent(content: Line): void {
 		if (content instanceof Element) {
 			this.content.innerHTML = content.innerHTML;
 			this.level = Number.parseInt(content.getAttribute("level"));
 		} else {
-			this.content.innerHTML = (content ? "" + content : "");
+			this.content.innerHTML = (content ? "" + content.content : "");
 			this.level = content.level;	
 		}
 	}
-	contentOf(range?: Range): Content {
+	contentOf(range?: Range): Line {
 		let line = this.node;
 		if (range && !range.intersectsNode(this.content)) return;
 		let content = super.contentOf(range);
-		let item: Content = {
+		let item: Line = {
 			type$: line.getAttribute("data-item"),
 			content: content,
 		}
