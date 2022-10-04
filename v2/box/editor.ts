@@ -4,12 +4,21 @@ import { CommandBuffer } from "../base/command.js";
 import { Owner, Signal } from "../base/control.js";
 import { bundle } from "../base/util.js";
 
-export interface Editor extends View {
+interface Control<T> {
+	readonly header?: T;
+	readonly content: T;
+	readonly footer?: T;
+}
+interface DEVT_ELEMENT_VIEW<T> extends View {
+	readonly type: ViewType;
+	readonly contentType: string;
+	readonly node: T;
+	readonly content: T;
+	// readonly header?: T;
+	// readonly footer?: T;
+}
+export interface Editor extends DEVT_ELEMENT_VIEW<Element> {
 	readonly owner: Article;
-	readonly node: Element;
-	readonly content: Element;
-	readonly header?: Element;
-	readonly footer?: Element;
 	contentOf(range?: Range): content;
 	edit(commandName: string, range: Range, content?: content): Range;
 	getContent(range?: Range): Element;

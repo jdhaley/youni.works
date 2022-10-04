@@ -188,7 +188,7 @@ function navigateInto(ele: Element, isBack?: boolean) {
 			if (item) {
 				content = navigateInto(item);
 			} else {
-				content = editor.footer; // HARD assumption the footer is the 3rd element.
+				content = editor["footer"];
 			}
 			break;
 	}

@@ -4,6 +4,7 @@ import { bundle } from "../base/util.js";
 
 import { Article, Editor } from "./editor.js";
 import { ElementBox, ElementOwner } from "./box.js";
+import { ViewType } from "../base/view.js";
 
 interface ViewNode extends Element {
 	$control?: Editor;
@@ -75,21 +76,20 @@ export abstract class ViewBox extends ElementBox implements Editor {
 	uncontrol(element: Element): void {
 		super.uncontrol(element);
 		element.removeAttribute("data-item");
-		element.id = "";
+		delete element.id;
 	}
-	getContent(range?: Range) {
+	getContent(range?: Range): Element {
 		return viewContent(this, range);
 	}
-	setContent(markup: string) {
-		let node = document.implementation.createDocument("", "div").documentElement as Element;
-		node.innerHTML = markup;
-		node = node.firstElementChild;
-		console.log(node);
-
-	}
+	// setContent(markup: string) {
+	// 	let node = document.implementation.createDocument("", "div").documentElement as Element;
+	// 	node.innerHTML = markup;
+	// 	node = node.firstElementChild;
+	// 	console.log(node);
+	// }
 }
 
-export class ViewBoxType extends BaseType {
+export class ViewBoxType extends BaseType implements ViewType {
 	constructor(owner: Article) {
 		super();
 		this.owner = owner;

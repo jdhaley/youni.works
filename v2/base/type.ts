@@ -17,7 +17,7 @@ export class BaseType implements Type {
 
 	types: bundle<Type> = EMPTY.object;
 	conf: bundle<any>;
-	isProperty: boolean;
+//	isProperty: boolean;
 
 	generalizes(type: Type): boolean {
 		return type == this;
@@ -28,7 +28,6 @@ export class BaseType implements Type {
 			this.conf = extend(this.conf || null, conf);
 		}
 		if (conf.prototype) this.prototype = conf.prototype;
-		//if (!this.prototype) this.prototype = new Display(this.conf.actions);
 
 		if (conf.proto) {
 			this.prototype = extend(this.prototype, conf.proto);

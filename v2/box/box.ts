@@ -21,6 +21,7 @@ export class ElementBox extends Controller<Element> implements Shape {
 	protected get style(): CSSStyleDeclaration {
 		return this.node["style"]
 	}
+
 	getStyle(name: string): string {
 		return this.style?.getPropertyValue(name);
 	}
@@ -78,15 +79,15 @@ export class ElementBox extends Controller<Element> implements Shape {
 
 export abstract class ElementOwner extends Owner<Element> {
 	abstract createElement(tag: string): Element;
-	getPartOf(view: Element): Element {
-		for (let parent = view.parentElement; parent; parent = parent.parentElement) {
+	getPartOf(node: Element): Element {
+		for (let parent = node.parentElement; parent; parent = parent.parentElement) {
 			if (parent["$control"]) return parent;
 		}
 	}
-	getPartsOf(view: Element): Iterable<Element> {
-		return view.children as Iterable<Element>;
+	getPartsOf(node: Element): Iterable<Element> {
+		return node.children as Iterable<Element>;
 	}
-	getControlOf(view: Element): Receiver {
-		return view["$control"];
+	getControlOf(node: Element): Receiver {
+		return node["$control"];
 	}
 }
