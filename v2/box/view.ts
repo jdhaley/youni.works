@@ -1,21 +1,25 @@
-import { content } from "../base/model.js";
+import { value } from "../base/model.js";
 import { BaseType } from "../base/type.js";
-import { bundle } from "../base/util.js";
+import { Arc, ViewType } from "../base/view.js";
+
+import { bundle, EMPTY } from "../base/util.js";
 
 import { Article, Editor } from "./editor.js";
-import { ElementBox, ElementOwner } from "./box.js";
-import { ViewType } from "../base/view.js";
+import { ElementShape, ElementGraph } from "./shape.js";
 
 interface ViewNode extends Element {
 	$control?: Editor;
 }
 
-export abstract class ViewBox extends ElementBox implements Editor {
+export abstract class ViewBox extends ElementShape implements Editor {
 	declare contentType: string;
 	declare header: Element;
 	declare content: Element;
 	declare footer: Element;
 
+	get arcs(): Iterable<Arc<Element>> {
+		return EMPTY.array;
+	}
 	get type(): ViewBoxType {
 		return this["_type"];
 	}
@@ -28,9 +32,9 @@ export abstract class ViewBox extends ElementBox implements Editor {
 	get shortcuts(): bundle<string> {
 		return this.type.conf.shortcuts;
 	}
-	protected abstract viewContent(model: content): void;
-	abstract contentOf(range?: Range): content;
-	abstract edit(commandName: string, range: Range, content?: content): Range;
+	protected abstract viewContent(model: value): void;
+	abstract valueOf(range?: Range): value;
+	abstract edit(commandName: string, range: Range, content?: value): Range;
 
 	draw(content: unknown) {
 		this.node.textContent = "";
@@ -42,21 +46,21 @@ export abstract class ViewBox extends ElementBox implements Editor {
 			this.content = this.node;
 			this.content.classList.add("content");
 		}
-		this.viewContent(content as content);
+		this.viewContent(content as value);
 	}
-	protected createHeader(model?: content) {
+	protected createHeader(model?: value) {
 		let header = this.owner.createElement("header");
 		header.textContent = this.type.conf.title || "";
 		this.node.append(header);
 		this.header = header;
 	}
-	protected createContent(model?: content) {
+	protected createContent(model?: value) {
 		let ele = this.owner.createElement("div");
 		ele.classList.add("content");
 		this.node.append(ele);
 		this.content = ele;
 	}
-	protected createFooter(model?: content) {
+	protected createFooter(model?: value) {
 		if (this.contentType != "list") return;
 		let footer = this.owner.createElement("footer");
 		this.node.append(footer);
@@ -89,7 +93,7 @@ export abstract class ViewBox extends ElementBox implements Editor {
 	// }
 }
 
-export class ViewBoxType extends BaseType implements ViewType {
+export class ViewBoxType extends BaseType implements ViewType<Element> {
 	constructor(owner: Article) {
 		super();
 		this.owner = owner;
@@ -98,7 +102,7 @@ export class ViewBoxType extends BaseType implements ViewType {
 	declare types: bundle<ViewBoxType>;
 	declare partOf: ViewBoxType;
 
-	view(content: content | Element, parent?: ViewBox): ViewBox {
+	view(content: value | Element, parent?: ViewBox): ViewBox {
 		let view: ViewBox = Object.create(this.prototype);
 		let node = this.owner.createElement(this.conf.tagName || "div");
 		if (parent) parent.content.append(node);
@@ -120,7 +124,7 @@ function bindContainer(node: ViewNode) {
 	}
 }
 
-export abstract class ViewOwner extends ElementOwner {
+export abstract class ViewOwner extends ElementGraph {
 	constructor(conf: bundle<any>) {
 		super();
 		/*

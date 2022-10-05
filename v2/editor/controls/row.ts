@@ -1,12 +1,12 @@
-import { content, Record } from "../../base/model.js";
+import { value, record } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 import { Editor } from "../../box/editor.js";
 import { ViewBoxType } from "../../box/view.js";
 import { RecordEditor } from "./record.js";
 
-export interface Row extends Record {
+export interface Row extends record {
 	type$: "row"
-	content?: content,
+	content?: value,
 	level?: number,
 	columns?: string[]
 }
@@ -28,7 +28,7 @@ export class RowEditor extends RecordEditor {
 		if (header) return header["_type"];
 	}
 
-	viewContent(model: content | Element): void {
+	viewContent(model: value | Element): void {
 		if (model instanceof Element) return this.viewElement(model);
 		if (!model) return;
 		let row = model as Row;
@@ -56,7 +56,7 @@ export class RowEditor extends RecordEditor {
 			child.node.classList.add("field");
 		}
 	}
-	contentOf(range?: Range): content {
+	valueOf(range?: Range): value {
 		let row: Row = {
 			type$: "row",
 			content: rowContent(null, this.content as Element, range)
@@ -77,7 +77,7 @@ export class RowEditor extends RecordEditor {
 }
 function getColumns(row: Row) {
 	let columns: string[] = [];
-	for (let col in row.content as Record) {
+	for (let col in row.content as record) {
 		columns.push(col);
 	}
 	return columns;
@@ -97,13 +97,13 @@ function createType(type: ViewBoxType, columns: string[]): ViewBoxType {
 	return type;
 }
 
-function rowContent(model: Record, view: Element, range: Range): Record {
+function rowContent(model: record, view: Element, range: Range): record {
 	if (range && !range.intersectsNode(view)) return model;
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {
 		let viewer = child["$control"] as Editor;
-		let value = viewer.contentOf(range);
+		let value = viewer.valueOf(range);
 		if (value) {
 			if (!model) model = Object.create(null);
 			model[viewer.type.name] = value;

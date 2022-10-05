@@ -8,7 +8,7 @@ const DEFAULT_BORDER: Edges = {
 	left: 5
 }
 
-export class ElementBox extends Controller<Element> implements Shape {
+export class ElementShape extends Controller<Element> implements Shape {
 	get area(): Area {
 		return this.node.getBoundingClientRect();
 	}
@@ -18,6 +18,7 @@ export class ElementBox extends Controller<Element> implements Shape {
 	get border() {
 		return DEFAULT_BORDER;
 	}
+
 	protected get style(): CSSStyleDeclaration {
 		return this.node["style"]
 	}
@@ -77,17 +78,17 @@ export class ElementBox extends Controller<Element> implements Shape {
 	}
 }
 
-export abstract class ElementOwner extends Owner<Element> {
+export abstract class ElementGraph extends Owner<Element> {
 	abstract createElement(tag: string): Element;
-	getPartOf(node: Element): Element {
+	getControlOf(node: Element): Receiver {
+		return node["$control"];
+	}
+	getContainerOf(node: Element): Element {
 		for (let parent = node.parentElement; parent; parent = parent.parentElement) {
 			if (parent["$control"]) return parent;
 		}
 	}
 	getPartsOf(node: Element): Iterable<Element> {
 		return node.children as Iterable<Element>;
-	}
-	getControlOf(node: Element): Receiver {
-		return node["$control"];
 	}
 }

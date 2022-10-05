@@ -177,6 +177,7 @@ function navigateInto(ele: Element, isBack?: boolean) {
 	switch (editor.contentType) {
 		case "text":
 		case "line":
+		case "scalar":
 			break;
 		case "record":
 			ele = isBack ? content.lastElementChild : content.firstElementChild;

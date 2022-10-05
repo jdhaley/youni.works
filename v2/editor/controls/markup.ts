@@ -1,4 +1,4 @@
-import { content } from "../../base/model.js";
+import { value } from "../../base/model.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { ListEditor, ListReplace } from "./list.js";
@@ -33,7 +33,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		return super.getOuterRange(range);
 	}
-	protected onSingleContainer(range: Range, content: content, editor: Editor): void {
+	protected onSingleContainer(range: Range, content: value, editor: Editor): void {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
@@ -44,7 +44,7 @@ export class MarkupReplace extends ListReplace {
 		//Get the remainder of the line content.
 		r.setEnd(ctx, ctx.childNodes.length);
 		//Capture it,.
-		let model: Line = editor.contentOf(r) as Line;
+		let model: Line = editor.valueOf(r) as Line;
 		//Clear the remainder of the line content.
 		r.deleteContents();
 		//Append any 'paste' content to the line.
@@ -68,11 +68,11 @@ export class MarkupReplace extends ListReplace {
 		if (!(this.name == "Split")) this.merge(end, r, content, false);
 		//note: onInsert() handles the remainder of the 'paste' content.
 	}
-	protected onStartContainer(range: Range, content: content, start: Editor): void {
+	protected onStartContainer(range: Range, content: value, start: Editor): void {
 		let r = range.cloneRange();
 		r.setEnd(start.content, start.content.childNodes.length);
 		r.deleteContents();
-		let startItem: Line = start.contentOf() as any;
+		let startItem: Line = start.valueOf() as any;
 		let items = content as Line[];
 		if (items[0]) {
 			startItem.content += "" + items[0].content;
@@ -129,7 +129,7 @@ const COMMANDS = {
 function noop() {
 }
 
-function replace(this: MarkupEditor, commandName: string, range: Range, content?: content): Range {
+function replace(this: MarkupEditor, commandName: string, range: Range, content?: value): Range {
 	let editor = getView(range);
 	if (editor.contentType == "line") {
 		editor = getView(editor.node.parentElement);

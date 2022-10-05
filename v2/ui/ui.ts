@@ -96,7 +96,7 @@ export class Frame extends Owner<HTMLElement> {
 	getControlOf(view: HTMLElement): Control {
 		return view["$control"];
 	}
-	getPartOf(view: HTMLElement): HTMLElement {
+	getContainerOf(view: HTMLElement): HTMLElement {
 		return view.parentElement;
 	}
 	getPartsOf(view: HTMLElement): Iterable<HTMLElement> {
@@ -158,7 +158,7 @@ export function getClipboard(clipboard: DataTransfer) {
 
 export function setClipboard(range: Range, clipboard: DataTransfer) {
 	let control = getView(range) as Editor;
-	let model = control?.contentOf(range);
+	let model = control?.valueOf(range);
 	if (!model) return;
 	if (typeof model == "string") {
 		clipboard.setData("text/plain", model);
@@ -171,9 +171,10 @@ export function setClipboard(range: Range, clipboard: DataTransfer) {
 	}
 	if (!(model instanceof Array)) model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
-	let article = getArticle(range);
-	let content = article.getContent(range);
-	control.type.view(content as any, article as ViewBox);
+	// TODO remove - tests the XML format...
+	// let article = getArticle(range);
+	// let content = article.getContent(range);
+	// control.type.view(content as any, article as ViewBox);
 }
 
 function getArticle(range: Range) {

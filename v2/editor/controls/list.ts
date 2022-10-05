@@ -1,5 +1,5 @@
-import { content, List } from "../../base/model.js";
-import { ViewType, viewType } from "../../base/view.js";
+import { value, list } from "../../base/model.js";
+import { ViewType, viewTypeOf } from "../../base/view.js";
 import { Editor, Article } from "../../box/editor.js";
 
 import { Change } from "../../box/editor.js";
@@ -9,11 +9,11 @@ import { getView, getChildEditor, clearContent, mark, narrowRange, unmark, BaseE
 
 export class ListEditor extends BaseEditor {
 	contentType = "list";
-	viewContent(model: List): void {
+	viewContent(model: list): void {
 		if (model instanceof Element) return this.viewElement(model);
 		if (model && model[Symbol.iterator]) for (let item of model) {
-			let type = this.type as ViewType;
-			type = type.types[viewType(item)] || this.owner.unknownType;
+			let type = this.type as ViewType<Element>;
+			type = type.types[viewTypeOf(item)] as ViewType<Element> || this.owner.unknownType;
 			let part = type.view(item, this) as Editor;
 		}
 	}
@@ -28,12 +28,12 @@ export class ListEditor extends BaseEditor {
 			}
 		}
 	}
-	contentOf(range?: Range): List {
-		let model: content[];
+	valueOf(range?: Range): list {
+		let model: value[];
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let part of this.content.children) {
 			let editor = getView(part);
-			let value = editor?.contentOf(range);
+			let value = editor?.valueOf(range);
 			if (value) {
 				if (!model) {
 					model = [];
@@ -44,7 +44,7 @@ export class ListEditor extends BaseEditor {
 		}
 		return model;
 	}
-	edit(commandName: string, range: Range, content?: content): Range {
+	edit(commandName: string, range: Range, content?: value): Range {
 		if (getView(range) != this) console.warn("Invalid edit range");
 		range = new ListReplace(this.owner, commandName, this.node.id).exec(range, content);
 		this.owner.sense(new Change(commandName, this), this.node);
@@ -59,7 +59,7 @@ export class ListReplace extends Replace {
 	startId: string;
 	endId: string;
 
-	exec(range: Range, content: content): Range {
+	exec(range: Range, content: value): Range {
 		if (!content) content = [];
 		if (!(content instanceof Array)) content = [{
 			type$: "para", //TODO fix hard coded type.
@@ -121,7 +121,7 @@ export class ListReplace extends Replace {
 		this.before = before;
 		return range;
 	}
-	protected execReplace(range: Range, content: content): Range {
+	protected execReplace(range: Range, content: value): Range {
 		let editor = this.owner.getControl(this.viewId);
 		let start = getChildEditor(editor, range.startContainer);
 		let end = getChildEditor(editor, range.endContainer);
@@ -145,14 +145,14 @@ export class ListReplace extends Replace {
 		}
 		return unmark(range);
 	}
-	protected onStartContainer(range: Range, content: content, start: Editor): void {
+	protected onStartContainer(range: Range, content: value, start: Editor): void {
 		let r = range.cloneRange();
 		r.setEnd(start.content, start.content.childNodes.length);
 		clearContent(r);
 		this.merge(start, r, content, true);
 		range.setStartAfter(start.node);
 	}
-	protected onEndContainer(range: Range, content: content, end: Editor): void {
+	protected onEndContainer(range: Range, content: value, end: Editor): void {
 		let r = range.cloneRange();
 		r.setStart(end.content, 0);
 		clearContent(r);
@@ -162,11 +162,11 @@ export class ListReplace extends Replace {
 	protected merge(view: Editor, range: Range, content: any, isStart: boolean) {
 		//overridden for markup
 	}
-	protected onSingleContainer(range: Range, content: content, container: Editor): void {
+	protected onSingleContainer(range: Range, content: value, container: Editor): void {
 		//overridden for markup
 	}
 	//22-09-07 Same method for list & markup.
-	protected onInsert(range: Range, content: content): void {
+	protected onInsert(range: Range, content: value): void {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!content) return;

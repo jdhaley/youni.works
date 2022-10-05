@@ -15,6 +15,12 @@ export interface Actions {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
+export interface Graph<T> {
+	getControlOf(node: T): Receiver;
+	getContainerOf(node: T): T;
+	getPartsOf(node: T): Iterable<T>;
+}
+
 export class Control implements Receiver {
 	declare actions: Actions;
 	receive(signal: Signal)  {
@@ -50,12 +56,12 @@ export class Controller<T> extends Control {
 	}
 }
 
-export abstract class Owner<V> extends Control {
-	abstract getControlOf(value: V): Receiver;
-	abstract getPartOf(value: V): V;
-	abstract getPartsOf(value: V): Iterable<V>;
+export abstract class Owner<T> extends Control implements Graph<T> {
+	abstract getControlOf(node: T): Receiver;
+	abstract getContainerOf(node: T): T;
+	abstract getPartsOf(node: T): Iterable<T>;
 	
-	send(msg: Signal | string, to: V) {
+	send(msg: Signal | string, to: T) {
 		msg = signal("down", msg);
 		if (!msg.subject) return;
 		msg.on = to;
@@ -67,14 +73,14 @@ export abstract class Owner<V> extends Control {
 			this.send(msg, part);
 		}
 	}
-	sense(evt: Signal | string, on: V) {
+	sense(evt: Signal | string, on: T) {
 		evt = signal("up", evt);
 		while (on) {
 			evt.on = on;
 			let control = this.getControlOf(on);
 			control?.receive(evt);
 			evt.from = on;
-			on = this.getPartOf(on);
+			on = this.getContainerOf(on);
 		}
 	}
 }

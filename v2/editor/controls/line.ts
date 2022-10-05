@@ -1,9 +1,9 @@
-import { content, Record } from "../../base/model.js";
+import { value, record } from "../../base/model.js";
 import { getView } from "../util.js";
 import { TextEditor } from "./text.js";
 
-export interface Line extends Record {
-	content?: content,
+export interface Line extends record {
+	content?: value,
 	level?: number,
 }
 
@@ -66,10 +66,10 @@ export class LineEditor extends TextEditor {
 			this.level = content.level;	
 		}
 	}
-	contentOf(range?: Range): Line {
+	valueOf(range?: Range): Line {
 		let line = this.node;
 		if (range && !range.intersectsNode(this.content)) return;
-		let content = super.contentOf(range);
+		let content = super.valueOf(range);
 		let item: Line = {
 			type$: line.getAttribute("data-item"),
 			content: content,

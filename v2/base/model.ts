@@ -1,14 +1,17 @@
 import { bundle } from "./util";
 
-export type content = string | number | boolean | Date | List | Record | Element;
+export type value = null | string | number | boolean | date | list | record | unknown;
 
-export interface List extends Iterable<content> {
+export interface list extends Iterable<value> {
 	length?: number;
 }
 
-export interface Record {
-	type$?: string;
-	[key: string]: content;
+export interface record {
+	type$: string;
+	[key: string]: value;
+}
+
+export interface date {
 }
 
 export interface Type {

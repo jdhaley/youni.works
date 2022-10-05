@@ -1,19 +1,19 @@
 import { getView, getHeader, mark, narrowRange, unmark, BaseEditor} from "../util.js";
-import { content } from "../../base/model.js";
+import { value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
 import { Change } from "../../box/editor.js";
 import { Replace } from "../commands/replace.js";
 
 export class TextEditor extends BaseEditor {
 	contentType = "text";
-	viewContent(model: content): void {
+	viewContent(model: value): void {
 		if (model instanceof Element) {
 			this.content.textContent = model.textContent;
 		} else {
 			this.content.textContent = model ? "" + model : "";
 		}
 	}
-	contentOf(range?: Range): content {
+	valueOf(range?: Range): value {
 		let model = "";
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let node of (this.content as Element).childNodes) {
@@ -60,7 +60,7 @@ export class TextReplace extends Replace {
 	protected execBefore(range: Range): void {
 		throw new Error("Method not implemented.");		
 	}
-	protected execReplace(range: Range, content: content): Range {
+	protected execReplace(range: Range, content: value): Range {
 		throw new Error("Method not implemented.");
 	}
 	protected execAfter(range: Range): Range {

@@ -7,9 +7,12 @@ export interface Shape {
 	setStyle(name: string, value?: string): void; // Omitting the value removes the style.
 }
 
-export interface Area {
+export interface Point {
 	x: number,
 	y: number,
+}
+
+export interface Area extends Point {
 	width: number,
 	height: number
 }

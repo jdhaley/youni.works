@@ -1,7 +1,6 @@
 import {Response} from "../../base/message.js";
 import {ViewBoxType, ViewBox} from "../../box/view.js";
 
-import {start} from "../../base/type.js";
 import {extend} from "../../base/util.js";
 
 import {Display, UserEvent} from "../ui.js";
@@ -10,12 +9,12 @@ export default extend(null, {
 	open(this: Display, res: Response<string>) {
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, model);
-		this.node = (type.view(model) as ViewBox).node;
+		this.node = type.view(model).node;
 		this.node.setAttribute("data-file", res.req.to);
 		this.node.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.node);
 
-		shapetest.call(this);
+		//shapetest.call(this);
 	},
 	save(this: Display, signal: UserEvent | Response<string>) {
 		signal.subject = "";
@@ -23,7 +22,7 @@ export default extend(null, {
 			console.log("Saved: ", signal);
 			return;
 		} else {
-			let model = (this.node["$control"] as any).contentOf();
+			let model = (this.node["$control"] as any).valueOf();
 			console.log("Save: ", model);
 			this.service.save(this.node.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
 		}
