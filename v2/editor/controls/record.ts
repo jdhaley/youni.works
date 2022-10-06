@@ -46,13 +46,14 @@ export class RecordEditor extends BaseEditor {
 		}
 		return model;
 	}
-	edit(commandName: string, range: Range, record: record) {
-		if (getView(range) != this) console.warn("Invalid edit range");
-		if (record && typeof record[0] == "object") record = record[0] as record;
-		range = new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
-		this.owner.sense(new Change(commandName, this), this.node);
-		return range;
-	}
+}
+
+export function edit(commandName: string, range: Range, record: record) {
+	if (getView(range) != this) console.warn("Invalid edit range");
+	if (record && typeof record[0] == "object") record = record[0] as record;
+	range = new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
+	this.owner.sense(new Change(commandName, this), this.node);
+	return range;
 }
 
 class RecordReplace extends Replace {

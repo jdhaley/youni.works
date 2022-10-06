@@ -9,14 +9,15 @@ import { Line, LineEditor } from "./line.js";
 
 export class MarkupEditor extends ListEditor {
 	contentType = "markup";
-	edit(commandName: string, range: Range, content: string) {
-		if (getView(range) != this) console.warn("fix this check"); //"Invalid edit range"
-		let cmd = COMMANDS[commandName];
-		if (!cmd) throw new Error("Unrecognized command");
-		range = cmd.call(this, commandName, range, content);
-		this.owner.sense(new Change(commandName, this), this.node);
-		return range;
-	}
+}
+
+export function edit(commandName: string, range: Range, content: string) {
+	if (getView(range) != this) console.warn("fix this check"); //"Invalid edit range"
+	let cmd = COMMANDS[commandName];
+	if (!cmd) throw new Error("Unrecognized command");
+	range = cmd.call(this, commandName, range, content);
+	this.owner.sense(new Change(commandName, this), this.node);
+	return range;
 }
 
 export class MarkupReplace extends ListReplace {

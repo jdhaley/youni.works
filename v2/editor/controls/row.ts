@@ -1,6 +1,5 @@
 import { value, record } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
-import { ViewType } from "../../base/view.js";
 
 import { Editor } from "../../base/editor.js";
 import { ViewBoxType } from "../../box/box.js";

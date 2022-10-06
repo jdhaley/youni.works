@@ -72,7 +72,7 @@ import { Change } from "../../base/view.js";
 function shapetest(this: Display) {
 	let type = new ViewBoxType(this);
 	type.start("shape", {
-		prototype: new TextEditor(shape),
+		prototype: new TextEditor(shape, null),
 		actions: shape
 	});
 	

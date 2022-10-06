@@ -6,12 +6,19 @@ import { bundle, EMPTY } from "../base/util.js";
 
 import { Article, Editor } from "../base/editor.js";
 import { ElementShape, ElementGraph } from "./shape.js";
+import { Actions } from "../base/control.js";
 
 interface ViewNode extends Element {
 	$control?: Editor;
 }
 
+type editor = (this: Editor, commandName: string, range: Range, content?: value) => Range;
+
 export abstract class ViewBox extends ElementShape implements Editor {
+	constructor(actions: Actions, editor: editor) {
+		super(actions);
+		if (editor) this["edit"] = editor;
+	}
 	declare contentType: string;
 	declare header: Element;
 	declare content: Element;
@@ -34,8 +41,11 @@ export abstract class ViewBox extends ElementShape implements Editor {
 	}
 	protected abstract viewContent(model: value): void;
 	abstract valueOf(range?: Range): value;
-	abstract edit(commandName: string, range: Range, content?: value): Range;
 
+	edit(commandName: string, range: Range, content?: value): Range {
+		console.warn("edit() has not been configured.")
+		return null;
+	}
 	draw(content: unknown) {
 		this.node.textContent = "";
 		if (this.isContainer) {

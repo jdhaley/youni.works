@@ -42,12 +42,13 @@ export class ListEditor extends BaseEditor {
 		}
 		return model;
 	}
-	edit(commandName: string, range: Range, content?: value): Range {
-		if (getView(range) != this) console.warn("Invalid edit range");
-		range = new ListReplace(this.owner, commandName, this.node.id).exec(range, content);
-		this.owner.sense(new Change(commandName, this), this.node);
-		return range;
-	}
+}
+
+export function edit(commandName: string, range: Range, content?: value): Range {
+	if (getView(range) != this) console.warn("Invalid edit range");
+	range = new ListReplace(this.owner, commandName, this.node.id).exec(range, content);
+	this.owner.sense(new Change(commandName, this), this.node);
+	return range;
 }
 
 export class ListReplace extends Replace {

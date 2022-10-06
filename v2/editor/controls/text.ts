@@ -4,6 +4,7 @@ import { CHAR } from "../../base/util.js";
 
 import { Replace } from "../commands/replace.js";
 import { getView, getHeader, mark, narrowRange, unmark, BaseEditor} from "../util.js";
+import { Editor } from "../../base/editor.js";
 
 export class TextEditor extends BaseEditor {
 	contentType = "text";
@@ -33,15 +34,16 @@ export class TextEditor extends BaseEditor {
 		model = model.trim();
 		return model;			
 	}
-	edit(commandName: string, range: Range, content: string): Range {
-		if (getView(range) != this) console.warn("Invalid edit range");
-		positionToText(range);
-		let cmd = COMMANDS[commandName];
-		if (!cmd) throw new Error("Unrecognized command");
-		range = cmd.call(this, commandName, range, content);
-		this.owner.sense(new Change(commandName, this), this.node);
-		return range;
-	}
+}
+
+export function	edit(this: Editor, commandName: string, range: Range, content: string): Range {
+	if (getView(range) != this) console.warn("Invalid edit range");
+	positionToText(range);
+	let cmd = COMMANDS[commandName];
+	if (!cmd) throw new Error("Unrecognized command");
+	range = cmd.call(this, commandName, range, content);
+	this.owner.sense(new Change(commandName, this), this.node);
+	return range;
 }
 
 export class TextReplace extends Replace {
