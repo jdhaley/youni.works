@@ -1,15 +1,13 @@
 import { value } from "../../base/model.js";
 import { Change } from "../../base/view.js";
+import { Editor, ItemEditor, Line } from "../../base/editor.js";
 
 import { LevelCommand } from "../commands/level.js";
+import { getChildEditor, getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./list.js";
-import { Editor } from "../../base/editor.js";
-import { getChildEditor, getView, mark, unmark } from "../util.js";
-import { Line, LineBox } from "../../box/controls/line.js";
-import { MarkupBox } from "../../box/controls/markup.js";
 
-export default function edit(commandName: string, range: Range, content: string) {
-	if (getView(range) != this) console.warn("fix this check"); //"Invalid edit range"
+export default function edit(this: Editor, commandName: string, range: Range, content: string) {
+	if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
 	let cmd = COMMANDS[commandName];
 	if (!cmd) throw new Error("Unrecognized command");
 	range = cmd.call(this, commandName, range, content);
@@ -24,7 +22,7 @@ export class MarkupReplace extends ListReplace {
 			(due to merge & join of the start & end). In this case select
 			the entire view so that the outer range is like a multi-item range.
 		*/
-		let editor = getView(range);
+		let editor = getEditor(range);
 		if (editor.contentType == "line") {
 			range = range.cloneRange();
 			range.selectNode(editor.node);
@@ -32,7 +30,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		return super.getOuterRange(range);
 	}
-	protected onSingleContainer(range: Range, content: value, editor: Editor): void {
+	protected onSingleContainer(range: Range, content: value, editor: ItemEditor): void {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
@@ -55,7 +53,7 @@ export class MarkupReplace extends ListReplace {
 			model.level = 0;
 		}
 		//Create the end line and add it after the command line.
-		let end = editor.type.view(model as any) as Editor;
+		let end = editor.type.view(model as any) as ItemEditor;
 		editor.node.parentElement.insertBefore(end.node, editor.node.nextElementSibling);
 		//We can now set the new range now that we have the end line.
 		range.setEnd(end.node, 0);
@@ -81,7 +79,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		range.setStartBefore(start.node);
 	}
-	protected merge(view: Editor, range: Range, content: any, isStart: boolean) {
+	protected merge(view: ItemEditor, range: Range, content: any, isStart: boolean) {
 		let item: Line = content?.length && content[isStart ? 0 : content.length - 1];
 		if (!item) return;
 
@@ -93,7 +91,7 @@ export class MarkupReplace extends ListReplace {
 		// let listType = this.owner.getControl(this.viewId).type;
 		// let type = listType.types[viewType(item)];
 		// if (type == view.type) {
-			if (!isStart && view instanceof LineBox) {
+			if (!isStart && view.convert && view.level) {
 				view.convert(item.type$);
 				view.level = item.level;
 			}
@@ -128,23 +126,23 @@ const COMMANDS = {
 function noop() {
 }
 
-function replace(this: MarkupBox, commandName: string, range: Range, content?: value): Range {
-	let editor = getView(range);
+function replace(this: Editor, commandName: string, range: Range, content?: value): Range {
+	let editor = getEditor(range);
 	if (editor.contentType == "line") {
-		editor = getView(editor.node.parentElement);
+		editor = getEditor(editor.node.parentElement);
 	}
 	if (editor.contentType != "markup") console.warn("View is not markup:", editor);
 
 	return new MarkupReplace(this.owner, commandName, editor.node.id).exec(range, content);
 }
 
-function level(this: MarkupBox, name: "Promote" | "Demote", range: Range): Range {
+function level(this: Editor, name: "Promote" | "Demote", range: Range): Range {
 	if (!this.content.firstElementChild) return;
 	let start = getChildEditor(this, range.startContainer);
 	let end = getChildEditor(this, range.endContainer);
 	//If a range of items, check that there are no headings
 	if (start != end) for (let item = start.node; item; item = item.nextElementSibling) {
-		let role = getView(item).type.name;
+		let role = getEditor(item).type.name;
 		if (role == "heading") {
 			console.warn("No range promote with headings");
 			return range;

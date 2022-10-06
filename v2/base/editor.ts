@@ -1,8 +1,9 @@
-import { value } from "./model.js";
-import { Box, View, ViewType } from "./view.js";
+import { record, value } from "./model.js";
+import { Box, ViewType } from "./view.js";
 import { CommandBuffer } from "./command.js";
-import { Owner, Signal } from "./control.js";
 import { bundle } from "./util.js";
+import { Graph } from "./control.js";
+import { Receiver } from "../../../noted/v2/base/control.js";
 
 export interface Editor extends Box<Element> {
 	readonly owner: Article;
@@ -10,7 +11,19 @@ export interface Editor extends Box<Element> {
 	getContent(filter?: unknown): Element;
 }
 
-export interface Article extends Owner<Element> {
+export interface Line extends record {
+	content?: value,
+	level?: number,
+}
+
+export interface ItemEditor extends Editor {
+	level: number;
+	demote(): void;
+	promote(): void;
+	convert(type: string): void;
+}
+
+export interface Article extends Graph<Element>, Receiver {
 	node: Element;
 	types: bundle<ViewType<Element>>;
 	unknownType: ViewType<Element>;

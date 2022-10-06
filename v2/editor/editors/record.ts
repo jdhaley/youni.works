@@ -1,12 +1,12 @@
 import { record } from "../../base/model.js";
 import { Change } from "../../base/view.js";
-
 import { Editor } from "../../base/editor.js";
-import { Replace } from "../commands/replace.js";
-import { getChildEditor, getView, clearContent } from "../util.js";
 
-export default function edit(commandName: string, range: Range, record: record) {
-	if (getView(range) != this) console.warn("Invalid edit range");
+import { Replace } from "../commands/replace.js";
+import { getChildEditor, getEditor, clearContent } from "../util.js";
+
+export default function edit(this: Editor, commandName: string, range: Range, record: record) {
+	if (getEditor(range) != this) console.warn("Invalid edit range");
 	if (record && typeof record[0] == "object") record = record[0] as record;
 	range = new RecordReplace(this.owner, commandName, this.node.id).exec(range, record);
 	this.owner.sense(new Change(commandName, this), this.node);
@@ -16,7 +16,7 @@ export default function edit(commandName: string, range: Range, record: record) 
 class RecordReplace extends Replace {
 	protected execBefore(range: Range): void {
 		super.execBefore(range);
-		let content = getView(range).content;
+		let content = getEditor(range).content;
 		this.before = content?.innerHTML || "";
 	}
 	protected execReplace(range: Range, record: record): Range {
@@ -25,19 +25,19 @@ class RecordReplace extends Replace {
 		return range;
 	}
 	protected execAfter(range: Range): Range {
-		let content = getView(range).content;	
+		let content = getEditor(range).content;	
 		this.after = content?.innerHTML || "";
 		return super.execAfter(range);
 	}
 	protected getOuterRange(range: Range): Range {
 		range = range.cloneRange();
-		range.selectNodeContents(getView(range).content);
+		range.selectNodeContents(getEditor(range).content);
 		return range;
 	}
 }
 
 function mergeContent(cmd: Replace, range: Range, record: record) {
-	let editor = getView(range);
+	let editor = getEditor(range);
 	let start = getChildEditor(editor, range.startContainer);
 	let end = getChildEditor(editor, range.endContainer);
 	for (let member = start.node || editor.node.firstElementChild; member; member = member.nextElementSibling) {

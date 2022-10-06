@@ -1,11 +1,12 @@
 import { Article, Editor } from "../../base/editor.js";
 import { value } from "../../base/model.js";
 import { Change } from "../../base/view.js";
-import { Replace } from "../commands/replace.js";
-import { clearContent, getChildEditor, getView, mark, narrowRange, unmark } from "../util.js";
 
-export default function edit(commandName: string, range: Range, content?: value): Range {
-	if (getView(range) != this) console.warn("Invalid edit range");
+import { Replace } from "../commands/replace.js";
+import { clearContent, getChildEditor, getEditor, mark, narrowRange, unmark } from "../util.js";
+
+export default function edit(this: Editor, commandName: string, range: Range, content?: value): Range {
+	if (getEditor(range) != this) console.warn("Invalid edit range");
 	range = new ListReplace(this.owner, commandName, this.node.id).exec(range, content);
 	this.owner.sense(new Change(commandName, this), this.node);
 	return range;
@@ -48,7 +49,7 @@ export class ListReplace extends Replace {
 	 */
 	protected getOuterRange(range: Range) {
 		range = range.cloneRange();
-		let editor = getView(range);
+		let editor = getEditor(range);
 		let start = getChildEditor(editor, range.startContainer);
 		if (start) range.setStartBefore(start.node);
 		let end = getChildEditor(editor, range.endContainer);
@@ -67,7 +68,7 @@ export class ListReplace extends Replace {
 		//NB - the outer range is a different range from the
 		//passed range and should only be used within this method.
 		range = this.getOuterRange(range);
-		let view = getView(range);
+		let view = getEditor(range);
 		this.b = view.getContent(range).outerHTML;
 		captureRange(this, view.content, range.startOffset, range.endOffset);
 	
@@ -95,7 +96,7 @@ export class ListReplace extends Replace {
 	}
 	protected execAfter(range: Range): Range {
 		range = this.getReplaceRange();
-		let view = getView(range);
+		let view = getEditor(range);
 		this.a = view.getContent(range).outerHTML;
 		console.log(this);
 		this.after = "";		

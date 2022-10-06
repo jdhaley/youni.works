@@ -11,14 +11,16 @@ export interface Receiver {
 	receive(signal: Signal): void;
 }
 
-export interface Actions {
-	[key: string]: (this: Receiver, signal: Signal) => void;
-}
-
 export interface Graph<T> {
 	getControlOf(node: T): Receiver;
 	getContainerOf(node: T): T;
 	getPartsOf(node: T): Iterable<T>;
+	send(msg: Signal | string, to: T): void;
+	sense(evt: Signal | string, on: T): void;
+}
+
+export interface Actions {
+	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
 export class Control implements Receiver {

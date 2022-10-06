@@ -1,6 +1,6 @@
 import { value } from "../../base/model.js";
-import { unmark, bindViewNode, narrowRange, mark, getView } from "../util.js";
 
+import { unmark, bindViewNode, narrowRange, mark, getEditor } from "../util.js";
 import { Edit } from "./edit.js";
 
 export abstract class Replace extends Edit {
@@ -25,13 +25,13 @@ export abstract class Replace extends Edit {
 		//NB - the outer range is a different range from the
 		//passed range and should only be used within this method.
 		range = this.getOuterRange(range);
-		let view = getView(range);
+		let view = getEditor(range);
 		this.b = view.getContent(range).outerHTML;
 	}
 	protected abstract execReplace(range: Range, content: value): Range;
 	protected execAfter(range: Range): Range {
 		range = this.getReplaceRange();
-		let view = getView(range);
+		let view = getEditor(range);
 		this.a = view.getContent(range).outerHTML;
 		
 		console.log(this);

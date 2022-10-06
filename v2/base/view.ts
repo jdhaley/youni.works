@@ -35,7 +35,7 @@ export interface Arc<T> {
 }
 
 export class Change implements Signal {
-	constructor(command: string, view?: View<any>) {
+	constructor(command: string, view?: Box<any>) {
 		this.direction = view ? "up" : "down";
 		this.subject = "change";
 		this.from = view;
@@ -43,9 +43,9 @@ export class Change implements Signal {
 		this.commandName = command;
 	}
 	direction: "up" | "down";
-	source: View<any>;
-	from: View<any>;
-	on: View<any>;
+	source: Box<any>;
+	from: Box<any>;
+	on: Box<any>;
 	subject: string;
 	commandName: string;
 }

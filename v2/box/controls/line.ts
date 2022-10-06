@@ -1,11 +1,6 @@
-import { value, record } from "../../base/model.js";
+import { Line } from "../../base/editor.js";
 import { getView } from "../box.js";
 import { TextBox } from "./text.js";
-
-export interface Line extends record {
-	content?: value,
-	level?: number,
-}
 
 export class LineBox extends TextBox {
 	contentType = "line";
