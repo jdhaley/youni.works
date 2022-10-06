@@ -1,13 +1,13 @@
 import { value, record } from "../../base/model.js";
-import { getView } from "../util.js";
-import { TextEditor } from "./text.js";
+import { getView } from "../../editor/util.js";
+import { TextBox } from "./text.js";
 
 export interface Line extends record {
 	content?: value,
 	level?: number,
 }
 
-export class LineEditor extends TextEditor {
+export class LineBox extends TextBox {
 	contentType = "line";
 
 	get level(): number {
@@ -78,11 +78,11 @@ export class LineEditor extends TextEditor {
 		if (level) item.level = level;
 		return item;
 	}
-	getSection(): LineEditor {
+	getSection(): LineBox {
 		let node = this.node.previousElementSibling;
 		while (node) {
 			let editor = getView(node);
-			if (editor.type.name == "heading") return editor as LineEditor;
+			if (editor.type.name == "heading") return editor as LineBox;
 			node = node.previousElementSibling;
 		}
 	}

@@ -2,7 +2,7 @@ import { value } from "../../base/model.js";
 import { Change } from "../../base/view.js";
 
 import { Replace } from "../commands/replace.js";
-import { getView, getHeader, mark, narrowRange, unmark, BaseEditor} from "../util.js";
+import { getView, getHeader, mark, narrowRange, unmark } from "../util.js";
 import { Editor } from "../../base/editor.js";
 
 export default function	edit(this: Editor, commandName: string, range: Range, content: string): Range {

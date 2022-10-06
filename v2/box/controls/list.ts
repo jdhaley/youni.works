@@ -2,9 +2,10 @@ import { value, list } from "../../base/model.js";
 import { ViewType, viewTypeOf } from "../../base/view.js";
 import { Editor } from "../../base/editor.js";
 
-import { getView, BaseEditor } from "../util.js";
+import { getView } from "../../editor/util.js";
+import { ViewBox } from "../box.js";
 
-export class ListEditor extends BaseEditor {
+export class ListBox extends ViewBox {
 	contentType = "list";
 	viewContent(model: list): void {
 		if (model instanceof Element) return this.viewElement(model);

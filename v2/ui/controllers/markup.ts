@@ -2,7 +2,7 @@ import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
 import { getChildEditor, getView, navigate } from "../../editor/util.js";
-import { Row, RowEditor } from "../../editor/controls/row.js";
+import { Row, RowBox } from "../../box/controls/row.js";
 
 import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 
@@ -85,10 +85,10 @@ export default extend(list, {
 
 function createItem(refNode: Editor): Row {
 	let item: Row;
-	if (!(refNode instanceof RowEditor)) {
+	if (!(refNode instanceof RowBox)) {
 		refNode = getView(refNode.node.previousElementSibling);
 	}
-	if (refNode instanceof RowEditor) {
+	if (refNode instanceof RowBox) {
 		item = {
 			type$: "row",
 			columns: refNode.columns,

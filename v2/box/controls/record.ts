@@ -1,11 +1,11 @@
 import { value, record } from "../../base/model.js";
-import { bundle } from "../../base/util.js";
 import { ViewType } from "../../base/view.js";
-
 import { Editor } from "../../base/editor.js";
-import { BaseEditor } from "../util.js";
 
-export class RecordEditor extends BaseEditor {
+import { bundle } from "../../base/util.js";
+import { ViewBox } from "../box.js";
+
+export class RecordBox extends ViewBox {
 	contentType = "record";
 	at: bundle<Editor>;
 

@@ -3,12 +3,12 @@ import { bundle } from "../../base/util.js";
 
 import { ViewBoxType } from "../../box/box.js";
 
-import { TextEditor } from "../../editor/controls/text.js";
-import { RecordEditor } from "../../editor/controls/record.js";
-import { ListEditor } from "../../editor/controls/list.js";
-import { MarkupEditor } from "../../editor/controls/markup.js";
-import { LineEditor } from "../../editor/controls/line.js";
-import { RowEditor } from "../../editor/controls/row.js";
+import { TextBox } from "../../box/controls/text.js";
+import { RecordBox } from "../../box/controls/record.js";
+import { ListBox } from "../../box/controls/list.js";
+import { MarkupBox } from "../../box/controls/markup.js";
+import { LineBox } from "../../box/controls/line.js";
+import { RowBox } from "../../box/controls/row.js";
 
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
@@ -35,42 +35,42 @@ export interface TypeConf {
 const conf: bundle<TypeConf> = {
 	text: {
 		class: ViewBoxType,
-		prototype: new TextEditor(text, textEd),
+		prototype: new TextBox(text, textEd),
 		container: true,
 		tagName: "ui-text",
 		shortcuts: shortcuts
 	},
 	record: {
 		class: ViewBoxType,
-		prototype: new RecordEditor(record, recordEd),
+		prototype: new RecordBox(record, recordEd),
 		container: true,
 		tagName: "ui-record",
 		shortcuts: shortcuts
 	},
 	list: {
 		class: ViewBoxType,
-		prototype: new ListEditor(list, listEd),
+		prototype: new ListBox(list, listEd),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	markup: {
 		class: ViewBoxType,
-		prototype: new MarkupEditor(markup, markupEd),
+		prototype: new MarkupBox(markup, markupEd),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	line: {
 		class: ViewBoxType,
-		prototype: new LineEditor(line, textEd),
+		prototype: new LineBox(line, textEd),
 		container: false,
 		tagName: "p",
 		shortcuts: shortcuts
 	},
 	row: {
 		class: ViewBoxType,
-		prototype: new RowEditor(row, recordEd),
+		prototype: new RowBox(row, recordEd),
 		container: false,
 		tagName: "ui-row",
 		shortcuts: shortcuts

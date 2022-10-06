@@ -5,8 +5,8 @@ import { LevelCommand } from "../commands/level.js";
 import { ListReplace } from "./list.js";
 import { Editor } from "../../base/editor.js";
 import { getChildEditor, getView, mark, unmark } from "../util.js";
-import { Line, LineEditor } from "../controls/line.js";
-import { MarkupEditor } from "../controls/markup.js";
+import { Line, LineBox } from "../../box/controls/line.js";
+import { MarkupBox } from "../../box/controls/markup.js";
 
 export default function edit(commandName: string, range: Range, content: string) {
 	if (getView(range) != this) console.warn("fix this check"); //"Invalid edit range"
@@ -93,7 +93,7 @@ export class MarkupReplace extends ListReplace {
 		// let listType = this.owner.getControl(this.viewId).type;
 		// let type = listType.types[viewType(item)];
 		// if (type == view.type) {
-			if (!isStart && view instanceof LineEditor) {
+			if (!isStart && view instanceof LineBox) {
 				view.convert(item.type$);
 				view.level = item.level;
 			}
@@ -128,7 +128,7 @@ const COMMANDS = {
 function noop() {
 }
 
-function replace(this: MarkupEditor, commandName: string, range: Range, content?: value): Range {
+function replace(this: MarkupBox, commandName: string, range: Range, content?: value): Range {
 	let editor = getView(range);
 	if (editor.contentType == "line") {
 		editor = getView(editor.node.parentElement);
@@ -138,7 +138,7 @@ function replace(this: MarkupEditor, commandName: string, range: Range, content?
 	return new MarkupReplace(this.owner, commandName, editor.node.id).exec(range, content);
 }
 
-function level(this: MarkupEditor, name: "Promote" | "Demote", range: Range): Range {
+function level(this: MarkupBox, name: "Promote" | "Demote", range: Range): Range {
 	if (!this.content.firstElementChild) return;
 	let start = getChildEditor(this, range.startContainer);
 	let end = getChildEditor(this, range.endContainer);

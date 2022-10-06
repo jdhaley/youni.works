@@ -1,7 +1,7 @@
 import { Editor } from "../base/editor";
-import { getView, bindViewNode, ViewBox } from "../box/box.js";
+import { getView, bindViewNode } from "../box/box.js";
 
-export { ViewBox as BaseEditor, getView, bindViewNode }
+export { getView, bindViewNode }
 
 export function getChildEditor(editor: Editor, node: Node): Editor {
 	if (node == editor.content) return null;

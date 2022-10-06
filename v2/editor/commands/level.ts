@@ -1,6 +1,6 @@
 import { Edit } from "./edit.js";
 import { getChildEditor, getView } from "../util.js";
-import { LineEditor } from "../controls/line.js";
+import { LineBox } from "../../box/controls/line.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
@@ -15,15 +15,15 @@ export class LevelCommand extends Edit {
 		return range;
 	}
 	protected do(way: "Promote" | "Demote") {
-		let start = this.owner.getControl(this.startId) as LineEditor;
-		let end = this.owner.getControl(this.endId) as LineEditor;
+		let start = this.owner.getControl(this.startId) as LineBox;
+		let end = this.owner.getControl(this.endId) as LineBox;
 		if (start == end) {
 			way == "Promote" ? start.promote() : start.demote();
 		} else {
 			while (start) {
 				way == "Promote" ? start.promote() : start.demote();
 				if (start == end) break;
-				start = getView(start.node.nextElementSibling) as LineEditor;
+				start = getView(start.node.nextElementSibling) as LineBox;
 			}
 		}
 

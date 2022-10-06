@@ -2,9 +2,9 @@ import { value, record } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
 import { Editor } from "../../base/editor.js";
-import { ViewBoxType } from "../../box/box.js";
+import { ViewBoxType } from "../box.js";
 
-import { RecordEditor } from "./record.js";
+import { RecordBox } from "./record.js";
 
 export interface Row extends record {
 	type$: "row"
@@ -13,12 +13,12 @@ export interface Row extends record {
 	columns?: string[]
 }
 
-export class RowEditor extends RecordEditor {
-	get rowHeader(): RowEditor {
+export class RowBox extends RecordBox {
+	get rowHeader(): RowBox {
 		for (let ele = this.node; ele; ele = ele.previousElementSibling) {
 			if (ele.previousElementSibling?.tagName != "UI-ROW") {
 				let editor = ele["$control"];
-				return editor instanceof RowEditor ? editor : undefined;
+				return editor instanceof RowBox ? editor : undefined;
 			}
 		}
 	}

@@ -1,11 +1,11 @@
 import { extend } from "../../base/util.js";
-import { RecordEditor } from "../../editor/controls/record.js";
+import { RecordBox } from "../../box/controls/record.js";
 import { getHeader } from "../../editor/util.js";
 import { UserEvent } from "../ui.js";
 import editable from "./editor.js";
 
 export default extend(editable, {
-	dblclick(this: RecordEditor, event: UserEvent) {
+	dblclick(this: RecordBox, event: UserEvent) {
 		event.subject = "";
 		if (event.target == this.header) {
 			event.subject = "";

@@ -1,9 +1,9 @@
 import { value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
 
-import { BaseEditor} from "../util.js";
+import { ViewBox } from "../box.js";
 
-export class TextEditor extends BaseEditor {
+export class TextBox extends ViewBox {
 	contentType = "text";
 	viewContent(model: value): void {
 		if (model instanceof Element) {
