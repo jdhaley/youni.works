@@ -1,5 +1,5 @@
 import {Response} from "../../base/message.js";
-import {ViewBoxType, ViewBox} from "../../box/view.js";
+import {ViewBoxType, ViewBox} from "../../box/box.js";
 
 import {extend} from "../../base/util.js";
 
@@ -67,7 +67,7 @@ function getType(article: Display, path: string, data: any): ViewBoxType {
 
 import shape from "./shape.js";
 import { TextEditor } from "../../editor/controls/text.js";
-import { Change } from "../../box/editor.js";
+import { Change } from "../../base/view.js";
 
 function shapetest(this: Display) {
 	let type = new ViewBoxType(this);

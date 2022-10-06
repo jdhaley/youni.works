@@ -8,8 +8,8 @@ import { section } from "../transform/item.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { ViewBox, ViewOwner, getView } from "../box/view.js";
-import { Article, Editor } from "../box/editor.js";
+import { ViewBox, ViewOwner, getView } from "../box/box.js";
+import { Article, Editor } from "../base/editor.js";
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {

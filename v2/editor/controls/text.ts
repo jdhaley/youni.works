@@ -1,8 +1,9 @@
-import { getView, getHeader, mark, narrowRange, unmark, BaseEditor} from "../util.js";
 import { value } from "../../base/model.js";
+import { Change } from "../../base/view.js";
 import { CHAR } from "../../base/util.js";
-import { Change } from "../../box/editor.js";
+
 import { Replace } from "../commands/replace.js";
+import { getView, getHeader, mark, narrowRange, unmark, BaseEditor} from "../util.js";
 
 export class TextEditor extends BaseEditor {
 	contentType = "text";

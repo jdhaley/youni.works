@@ -1,7 +1,10 @@
 import { value, record } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
-import { Editor } from "../../box/editor.js";
-import { ViewBoxType } from "../../box/view.js";
+import { ViewType } from "../../base/view.js";
+
+import { Editor } from "../../base/editor.js";
+import { ViewBoxType } from "../../box/box.js";
+
 import { RecordEditor } from "./record.js";
 
 export interface Row extends record {

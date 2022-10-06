@@ -1,6 +1,6 @@
 import { bundle } from "../../base/util.js";
 
-import { ViewBoxType } from "../../box/view.js";
+import { ViewBoxType } from "../../box/box.js";
 
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
@@ -16,7 +16,7 @@ import { MarkupEditor } from "../../editor/controls/markup.js";
 import { LineEditor } from "../../editor/controls/line.js";
 
 import shortcuts from "./shortcuts.js";
-import { Editor } from "../../box/editor.js";
+import { Editor } from "../../base/editor.js";
 import { RowEditor } from "../../editor/controls/row.js";
 
 export interface TypeConf {

@@ -4,7 +4,7 @@ import { Arc, ViewType } from "../base/view.js";
 
 import { bundle, EMPTY } from "../base/util.js";
 
-import { Article, Editor } from "./editor.js";
+import { Article, Editor } from "../base/editor.js";
 import { ElementShape, ElementGraph } from "./shape.js";
 
 interface ViewNode extends Element {
@@ -85,12 +85,6 @@ export abstract class ViewBox extends ElementShape implements Editor {
 	getContent(range?: Range): Element {
 		return viewContent(this, range);
 	}
-	// setContent(markup: string) {
-	// 	let node = document.implementation.createDocument("", "div").documentElement as Element;
-	// 	node.innerHTML = markup;
-	// 	node = node.firstElementChild;
-	// 	console.log(node);
-	// }
 }
 
 export class ViewBoxType extends BaseType implements ViewType<Element> {

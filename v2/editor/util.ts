@@ -1,5 +1,5 @@
-import { Editor } from "../box/editor";
-import { getView, bindViewNode, ViewBox } from "../box/view.js";
+import { Editor } from "../base/editor";
+import { getView, bindViewNode, ViewBox } from "../box/box.js";
 
 export { ViewBox as BaseEditor, getView, bindViewNode }
 

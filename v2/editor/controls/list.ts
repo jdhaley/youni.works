@@ -1,8 +1,6 @@
 import { value, list } from "../../base/model.js";
-import { ViewType, viewTypeOf } from "../../base/view.js";
-import { Editor, Article } from "../../box/editor.js";
-
-import { Change } from "../../box/editor.js";
+import { ViewType, Change, viewTypeOf } from "../../base/view.js";
+import { Editor, Article } from "../../base/editor.js";
 
 import { Replace } from "../commands/replace.js";
 import { getView, getChildEditor, clearContent, mark, narrowRange, unmark, BaseEditor } from "../util.js";

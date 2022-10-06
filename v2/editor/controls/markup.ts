@@ -1,8 +1,9 @@
 import { value } from "../../base/model.js";
+import { Change } from "../../base/view.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { ListEditor, ListReplace } from "./list.js";
-import { Editor, Change } from "../../box/editor.js";
+import { Editor } from "../../base/editor.js";
 import { getChildEditor, getView, mark, unmark } from "../util.js";
 import { Line, LineEditor } from "./line.js";
 

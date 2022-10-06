@@ -1,12 +1,12 @@
-import { Graph, Owner, Receiver } from "./control";
+import { Graph, Receiver, Signal } from "./control";
 import { value, Type } from "./model";
-import { Area } from "./shape";
+import { Shape } from "./shape";
+import { bundle } from "./util";
 
 export interface ViewType<T> extends Type {
+	conf: bundle<any>;
 	view(content: value, parent?: View<T>): View<T>;
 }
-
-export type contentType = "scalar" | "list" | "record";
 
 export interface View<T> {
 	readonly type: ViewType<T>;
@@ -15,14 +15,12 @@ export interface View<T> {
 	valueOf(filter?: unknown): value;
 }
 
-export interface Box<T> extends View<T>, Receiver {
+export interface Box<T> extends View<T>, Receiver, Shape {
 	owner: Graph<T>;
 	node: T;
 	header?: T;
-	area: Area;
+	footer?: T;
 	arcs: Iterable<Arc<T>>;
-	getStyle(name: string): string;
-	setStyle(name: string, value?: string): void; // Omitting the value removes the style.
 }
 
 export interface Arc<T> {
@@ -34,6 +32,22 @@ export interface Arc<T> {
 	//arcType: undirected, reference/dependency, flow, extension, composite, agreggate, ...
 	//arcStyle: arc, line, ortho, spline, paths
 	//arcPath: array of points.
+}
+
+export class Change implements Signal {
+	constructor(command: string, view?: View<any>) {
+		this.direction = view ? "up" : "down";
+		this.subject = "change";
+		this.from = view;
+		this.source = view;
+		this.commandName = command;
+	}
+	direction: "up" | "down";
+	source: View<any>;
+	from: View<any>;
+	on: View<any>;
+	subject: string;
+	commandName: string;
 }
 
 export function viewTypeOf(value: any): string {
@@ -50,7 +64,9 @@ export function viewTypeOf(value: any): string {
 	return type; //"list" or value.type$
 }
 
-function contentTypeOf(value: any): string {
+type contentType = "scalar" | "list" | "record";
+
+function contentTypeOf(value: any): contentType {
 	let type = typeOf(value);
 	switch (type) {
 		case "string":
@@ -66,7 +82,7 @@ function contentTypeOf(value: any): string {
 	return "record";
 }
 
-export function typeOf(value: any): string {
+function typeOf(value: any): string {
 	if (value?.valueOf) value = value.valueOf(value);
 	let type = typeof value;
 	switch (type) {

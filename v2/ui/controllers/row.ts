@@ -1,11 +1,11 @@
+import { Change } from "../../base/view.js";
 import { extend } from "../../base/util.js";
-import { Change, Editor } from "../../box/editor.js";
+import { Editor } from "../../base/editor.js";
 import { RecordEditor } from "../../editor/controls/record.js";
 import { RowEditor } from "../../editor/controls/row.js";
 import { getHeader, getView } from "../../editor/util.js";
 import { UserEvent } from "../ui.js";
 import editable from "./editor.js";
-import view from "./view.js";
 
 export default extend(editable, {
 	dblclick(this: RecordEditor, event: UserEvent) {

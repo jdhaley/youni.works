@@ -1,11 +1,10 @@
 import { value, record } from "../../base/model.js";
-
-import { Replace } from "../commands/replace.js";
-import { Editor } from "../../box/editor.js";
-import { Change } from "../../box/editor.js";
-import { getChildEditor, getView, clearContent, mark, narrowRange, unmark, BaseEditor } from "../util.js";
 import { bundle } from "../../base/util.js";
-import { ViewType } from "../../base/view.js";
+import { ViewType, Change } from "../../base/view.js";
+
+import { Editor } from "../../base/editor.js";
+import { Replace } from "../commands/replace.js";
+import { getChildEditor, getView, clearContent, BaseEditor } from "../util.js";
 
 export class RecordEditor extends BaseEditor {
 	contentType = "record";
