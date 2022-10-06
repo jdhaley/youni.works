@@ -3,6 +3,13 @@ import { bundle } from "../../base/util.js";
 
 import { ViewBoxType } from "../../box/box.js";
 
+import { TextEditor } from "../../editor/controls/text.js";
+import { RecordEditor } from "../../editor/controls/record.js";
+import { ListEditor } from "../../editor/controls/list.js";
+import { MarkupEditor } from "../../editor/controls/markup.js";
+import { LineEditor } from "../../editor/controls/line.js";
+import { RowEditor } from "../../editor/controls/row.js";
+
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
 import list from "../controllers/list.js";
@@ -10,12 +17,10 @@ import markup from "../controllers/markup.js";
 import line from "../controllers/line.js";
 import row from "../controllers/row.js";
 
-import { TextEditor, edit as textEd } from "../../editor/controls/text.js";
-import { RecordEditor, edit as rcdEd } from "../../editor/controls/record.js";
-import { ListEditor, edit as listEd } from "../../editor/controls/list.js";
-import { MarkupEditor, edit as mkEd } from "../../editor/controls/markup.js";
-import { LineEditor } from "../../editor/controls/line.js";
-import { RowEditor } from "../../editor/controls/row.js";
+import textEd from "../../editor/editors/text.js";
+import recordEd from "../../editor/editors/markup.js";
+import listEd from "../../editor/editors/list.js";
+import markupEd from "../../editor/editors/markup.js";
 
 import shortcuts from "./shortcuts.js";
 
@@ -37,7 +42,7 @@ const conf: bundle<TypeConf> = {
 	},
 	record: {
 		class: ViewBoxType,
-		prototype: new RecordEditor(record, rcdEd),
+		prototype: new RecordEditor(record, recordEd),
 		container: true,
 		tagName: "ui-record",
 		shortcuts: shortcuts
@@ -51,7 +56,7 @@ const conf: bundle<TypeConf> = {
 	},
 	markup: {
 		class: ViewBoxType,
-		prototype: new MarkupEditor(markup, mkEd),
+		prototype: new MarkupEditor(markup, markupEd),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -65,7 +70,7 @@ const conf: bundle<TypeConf> = {
 	},
 	row: {
 		class: ViewBoxType,
-		prototype: new RowEditor(row, rcdEd),
+		prototype: new RowEditor(row, recordEd),
 		container: false,
 		tagName: "ui-row",
 		shortcuts: shortcuts
