@@ -1,6 +1,6 @@
 import { value } from "../base/model.js";
 import { BaseType } from "../base/type.js";
-import { Arc, ViewType } from "../base/view.js";
+import { Arc, Box, ViewType } from "../base/view.js";
 
 import { bundle, EMPTY } from "../base/util.js";
 
@@ -207,7 +207,7 @@ export function getView(node: Node | Range): Editor {
 	if (view instanceof ViewBox) return view;
 }
 
-function viewContent(view: Editor, range: Range, out?: Element) {
+function viewContent(view: Box<Element>, range: Range, out?: Element) {
 	if (range && !range.intersectsNode(view.content)) return;
 	let item: Element;
 	if (!out) {
@@ -223,7 +223,7 @@ function viewContent(view: Editor, range: Range, out?: Element) {
 	return item;
 }
 
-function content(view: Editor, range: Range, out: Element) {
+function content(view: Box<Element>, range: Range, out: Element) {
 	for (let node of view.content.childNodes) {
 		if (range && !range.intersectsNode(node))
 			continue;
@@ -248,3 +248,40 @@ function content(view: Editor, range: Range, out: Element) {
 	}
 }
 
+
+export function navigate(start: Node | Range, isBack?: boolean) {
+	let editor = getView(start);
+	while (editor) {
+		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;
+		if (toEle) {
+			let next = navigateInto(toEle, isBack);
+			if (next) return next;
+		}
+		editor = getView(editor.node.parentElement);
+	}
+}
+function navigateInto(ele: Element, isBack?: boolean) {
+	let editor = getView(ele);
+	if (!editor) return;
+	let content = editor.content as Element;
+	switch (editor.contentType) {
+		case "text":
+		case "line":
+		case "scalar":
+			break;
+		case "record":
+			ele = isBack ? content.lastElementChild : content.firstElementChild;
+			if (ele) content = navigateInto(ele);
+			break;
+		case "list":
+		case "markup":
+			let item = isBack ? content.lastElementChild : content.firstElementChild;
+			if (item) {
+				content = navigateInto(item);
+			} else {
+				content = editor["footer"];
+			}
+			break;
+	}
+	return content;
+}

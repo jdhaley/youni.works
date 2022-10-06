@@ -1,12 +1,14 @@
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
-import { getChildEditor, getView, navigate } from "../../editor/util.js";
+import { getView, navigate } from "../../box/box.js";
 import { Row, RowBox } from "../../box/controls/row.js";
 
 import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 
 import list from "./list.js";
+
+import { getChildEditor } from "../../editor/util.js";
 
 export default extend(list, {
 	paste(this: Editor, event: UserEvent) {

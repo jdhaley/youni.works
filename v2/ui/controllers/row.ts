@@ -3,10 +3,10 @@ import { extend } from "../../base/util.js";
 import { Editor } from "../../base/editor.js";
 import { RecordBox } from "../../box/controls/record.js";
 import { RowBox } from "../../box/controls/row.js";
-import { getHeader, getView } from "../../editor/util.js";
+import { getHeader } from "../../editor/util.js";
 import { UserEvent } from "../ui.js";
 import editable from "./editor.js";
-
+import { getView } from "../../box/box.js";
 export default extend(editable, {
 	dblclick(this: RecordBox, event: UserEvent) {
 		event.subject = "";

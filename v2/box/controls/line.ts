@@ -1,5 +1,5 @@
 import { value, record } from "../../base/model.js";
-import { getView } from "../../editor/util.js";
+import { getView } from "../box.js";
 import { TextBox } from "./text.js";
 
 export interface Line extends record {
