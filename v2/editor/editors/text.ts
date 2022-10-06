@@ -1,9 +1,8 @@
-import { value } from "../../base/model.js";
 import { Change } from "../../base/view.js";
 import { Editor } from "../../base/editor.js";
 
-import { Replace } from "../commands/replace.js";
 import { getEditor, getHeader, mark, narrowRange, unmark } from "../util.js";
+import { TextReplace } from "../commands/textReplace.js";
 
 export default function	edit(this: Editor, commandName: string, range: Range, content: string): Range {
 	if (getEditor(range) != this) console.warn("Invalid edit range");
@@ -13,36 +12,6 @@ export default function	edit(this: Editor, commandName: string, range: Range, co
 	range = cmd.call(this, commandName, range, content);
 	this.owner.sense(new Change(commandName, this), this.node);
 	return range;
-}
-
-export class TextReplace extends Replace {
-	exec(range: Range, text: string): Range {
-		mark(range);
-		let content = getEditor(range).content;
-		if (!content) return;
-		this.before = content.innerHTML;	
-		range.deleteContents();
-		if (text) {
-			let ins = content.ownerDocument.createTextNode(text);
-			range.insertNode(ins);
-		}
-		this.after = content.innerHTML;
-		return unmark(range);	
-	}
-	protected execBefore(range: Range): void {
-		throw new Error("Method not implemented.");		
-	}
-	protected execReplace(range: Range, content: value): Range {
-		throw new Error("Method not implemented.");
-	}
-	protected execAfter(range: Range): Range {
-		throw new Error("Method not implemented.");		
-	}
-	protected getOuterRange(range: Range): Range {
-		range = range.cloneRange();
-		range.selectNodeContents(getEditor(range).content);
-		return range;
-	}
 }
 
 const COMMANDS = {

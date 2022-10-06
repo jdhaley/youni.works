@@ -155,6 +155,3 @@ export function rangeIterator(range: Range) {
 		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
 	)
 }
-
-export const items = {
-}
