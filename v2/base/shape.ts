@@ -1,6 +1,6 @@
 export interface Shape {
 	area: Area;
-	arcs: Iterable<Arc<Shape>>;
+//	arcs: Iterable<Arc<Shape>>;
 
 	size(width: number, height: number): void;
 	position(x: number, y: number): void;

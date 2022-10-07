@@ -2,12 +2,11 @@ import { value } from "../base/model.js";
 import { BaseType } from "../base/type.js";
 import { Box, ViewType } from "../base/view.js";
 
-import { bundle, EMPTY } from "../base/util.js";
+import { bundle } from "../base/util.js";
 
 import { Article, Editor } from "../base/editor.js";
 import { ElementShape, ElementGraph } from "./shape.js";
 import { Actions } from "../base/control.js";
-import { Arc } from "../base/shape.js";
 
 interface ViewNode extends Element {
 	$control?: Editor;

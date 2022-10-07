@@ -10,9 +10,9 @@ const DEFAULT_BORDER: Edges = {
 }
 
 export class ElementShape extends Controller<Element> implements Shape {
-	get arcs(): Iterable<Arc<Shape>> {
-		return EMPTY.array;
-	}
+	// get arcs(): Iterable<Arc<Shape>> {
+	// 	return EMPTY.array;
+	// }
 
 	get area(): Area {
 		return this.node.getBoundingClientRect();
