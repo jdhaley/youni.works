@@ -1,14 +1,14 @@
 import { value } from "./model.js";
-import { Box, ViewType } from "./view.js";
+import { View, ViewType } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
 import { Graph } from "./control.js";
 import { Receiver } from "../../../noted/v2/base/control.js";
 
-export interface Editor extends Box<Element> {
+export interface Editor extends View<Element> {
 	readonly owner: Article;
 	edit(commandName: string, range: Range, content?: value): Range;
-	getContent(filter?: unknown): Element;
+	getContent(range?: Range): Element;
 }
 
 export interface ItemEditor extends Editor {
@@ -39,7 +39,7 @@ interface EditRange<T> {
 }
 
 interface TNode<T> {
-	readonly $control?: Box<T>;
+	readonly $control?: View<T>;
 	textContent: string;
 }
 

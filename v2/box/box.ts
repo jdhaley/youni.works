@@ -1,11 +1,11 @@
 import { value } from "../base/model.js";
 import { BaseType } from "../base/type.js";
-import { Box, ViewType } from "../base/view.js";
+import { View, ViewType } from "../base/view.js";
 
 import { bundle } from "../base/util.js";
 
 import { Article, Editor } from "../base/editor.js";
-import { ElementShape, ElementGraph } from "./shape.js";
+import { ElementBox, ElementOwner } from "./shape.js";
 import { Actions } from "../base/control.js";
 
 interface ViewNode extends Element {
@@ -14,7 +14,7 @@ interface ViewNode extends Element {
 
 type editor = (this: Editor, commandName: string, range: Range, content?: value) => Range;
 
-export abstract class ViewBox extends ElementShape implements Editor {
+export abstract class ViewBox extends ElementBox implements Editor {
 	constructor(actions: Actions, editor: editor) {
 		super(actions);
 		if (editor) this["edit"] = editor;
@@ -36,6 +36,7 @@ export abstract class ViewBox extends ElementShape implements Editor {
 	get shortcuts(): bundle<string> {
 		return this.type.conf.shortcuts;
 	}
+	
 	protected abstract viewContent(model: value): void;
 	abstract valueOf(range?: Range): value;
 
@@ -125,7 +126,7 @@ function bindContainer(node: ViewNode) {
 	}
 }
 
-export abstract class ViewOwner extends ElementGraph {
+export abstract class ViewOwner extends ElementOwner {
 	constructor(conf: bundle<any>) {
 		super();
 		/*
@@ -204,7 +205,7 @@ export function getView(node: Node | Range): Editor {
 	if (view instanceof ViewBox) return view;
 }
 
-function viewContent(view: Box<Element>, range: Range, out?: Element) {
+function viewContent(view: View<Element>, range: Range, out?: Element) {
 	if (range && !range.intersectsNode(view.content)) return;
 	let item: Element;
 	if (!out) {
@@ -220,7 +221,7 @@ function viewContent(view: Box<Element>, range: Range, out?: Element) {
 	return item;
 }
 
-function content(view: Box<Element>, range: Range, out: Element) {
+function content(view: View<Element>, range: Range, out: Element) {
 	for (let node of view.content.childNodes) {
 		if (range && !range.intersectsNode(node))
 			continue;

@@ -1,27 +1,19 @@
-import { Controller, Owner, Receiver } from "../base/control.js";
-import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
+import { Controller, Graph, Owner, Receiver } from "../base/control.js";
+import { Arc, Area, Box, Edges, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
 
-const DEFAULT_BORDER: Edges = {
-	top: 3,
-	right: 5,
-	bottom: 3,
-	left: 5
-}
-
-export class ElementShape extends Controller<Element> implements Shape {
-	// get arcs(): Iterable<Arc<Shape>> {
-	// 	return EMPTY.array;
-	// }
-
+export class ElementBox extends Controller<Element> implements Box<Element> {
+	get owner(): Graph<Element> {
+		return ELEMENT_OWNER;
+	}
 	get area(): Area {
 		return this.node.getBoundingClientRect();
 	}
-	get isContainer(): boolean {
-		return false;
-	}
 	get border() {
 		return DEFAULT_BORDER;
+	}
+	get arcs(): Iterable<Arc<Element>> {
+		return EMPTY.array;
 	}
 
 	protected get style(): CSSStyleDeclaration {
@@ -83,8 +75,7 @@ export class ElementShape extends Controller<Element> implements Shape {
 	}
 }
 
-export abstract class ElementGraph extends Owner<Element> {
-	abstract createElement(tag: string): Element;
+export class ElementOwner extends Owner<Element> {
 	getControlOf(node: Element): Receiver {
 		return node["$control"];
 	}
@@ -96,4 +87,13 @@ export abstract class ElementGraph extends Owner<Element> {
 	getPartsOf(node: Element): Iterable<Element> {
 		return node.children as Iterable<Element>;
 	}
+}
+
+const ELEMENT_OWNER = new ElementOwner();
+
+const DEFAULT_BORDER: Edges = {
+	top: 3,
+	right: 5,
+	bottom: 3,
+	left: 5
 }

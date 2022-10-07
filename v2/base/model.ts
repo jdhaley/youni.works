@@ -1,6 +1,7 @@
 import { bundle } from "./util";
 
 export type value =  unit | list | record ;
+export type contentType = "unit" | "list" | "record";
 
 type unit = string | number | boolean | date | null | unknown;
 
@@ -27,8 +28,6 @@ export interface Type {
 	types: bundle<Type>;
 	conf: bundle<any>;
 }
-
-type contentType = "unit" | "list" | "record";
 
 function contentTypeOf(value: any): contentType {
 	let type = typeOf(value);
