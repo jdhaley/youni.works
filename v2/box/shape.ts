@@ -1,5 +1,6 @@
 import { Controller, Owner, Receiver } from "../base/control.js";
-import { Area, Edges, Shape, Zone } from "../base/shape.js";
+import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
+import { EMPTY } from "../base/util.js";
 
 const DEFAULT_BORDER: Edges = {
 	top: 3,
@@ -9,6 +10,10 @@ const DEFAULT_BORDER: Edges = {
 }
 
 export class ElementShape extends Controller<Element> implements Shape {
+	get arcs(): Iterable<Arc<Shape>> {
+		return EMPTY.array;
+	}
+
 	get area(): Area {
 		return this.node.getBoundingClientRect();
 	}

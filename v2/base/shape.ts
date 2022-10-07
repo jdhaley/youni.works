@@ -1,5 +1,7 @@
 export interface Shape {
 	area: Area;
+	arcs: Iterable<Arc<Shape>>;
+
 	size(width: number, height: number): void;
 	position(x: number, y: number): void;
 	zone(x: number, y: number): Zone;
@@ -25,3 +27,15 @@ export interface Edges {
 }
 
 export type Zone = "TL" | "TC" | "TR" | "CL" | "CC" | "CR" | "BL" | "BC" | "BR";
+
+export interface Arc<T extends Shape> {
+	from: T;
+	to: T;
+	//type$: string; "arc" (or possibly one of the arcTypes below.)
+	//fromPoint: number; //connection point. 0 = center.
+	//toPoint: number: //connection point. 0 = center.
+	//arcType: undirected, reference/dependency, flow, extension, composite, agreggate, ...
+	//arcStyle: arc, line, ortho, spline, paths
+	//arcPath: array of points.
+}
+

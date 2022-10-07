@@ -27,3 +27,41 @@ export interface Type {
 	types: bundle<Type>;
 	conf: bundle<any>;
 }
+
+type contentType = "unit" | "list" | "record";
+
+function contentTypeOf(value: any): contentType {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+		case "date":
+		case "null":
+		case "unknown":
+			return "unit";
+		case "list":
+			return "list";
+	}
+	return "record";
+}
+
+export function typeOf(value: any): string {
+	if (value?.valueOf) value = value.valueOf(value);
+	let type = typeof value;
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+			return type;
+		case "object":
+			if (value == null) return "null";
+			if (value["type$"]) {
+				let type = value["type$"];
+				return type.name || "" + type;
+			}
+			if (value instanceof Date) return "date";
+			if (value[Symbol.iterator]) return "list";
+	}
+	return "unknown";
+}
