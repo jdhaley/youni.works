@@ -1,6 +1,8 @@
 import { bundle } from "./util";
 
-export type value = null | string | number | boolean | date | list | record | unknown;
+export type value =  unit | list | record ;
+
+type unit = string | number | boolean | date | null | unknown;
 
 export interface list extends Iterable<value> {
 	length?: number;
@@ -11,6 +13,11 @@ export interface record {
 	[key: string]: value;
 }
 
+export interface item extends record {
+	content?: value,
+	level?: number,
+}
+
 export interface date {
 }
 
@@ -19,9 +26,4 @@ export interface Type {
 	partOf?: Type;
 	types: bundle<Type>;
 	conf: bundle<any>;
-}
-
-export interface item extends record {
-	content?: value,
-	level?: number,
 }

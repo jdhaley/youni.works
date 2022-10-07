@@ -3,23 +3,22 @@ import { value, Type } from "./model";
 import { Shape } from "./shape";
 
 export interface ViewType<T> extends Type {
-	view(content: value, parent?: View<T>): View<T>;
+	view(content: value, container?: View<T>): View<T>;
 }
 
 export interface View<T> extends Receiver {
-	readonly owner: Graph<T>;
 	readonly type: ViewType<T>;
 	readonly contentType: string;
-	readonly content: T;
 	valueOf(filter?: Filter): value;
-	edit(commandName: string, filter: Filter, content?: value): unknown;
 }
 
 export interface Box<T> extends View<T>, Shape {
-	node: T;
-	header?: T;
-	footer?: T;
-	arcs: Iterable<Arc<T>>;
+	readonly owner: Graph<T>;
+	readonly node: T;
+	readonly header?: T;
+	readonly content: T;
+	readonly footer?: T;
+	readonly arcs: Iterable<Arc<T>>;
 }
 
 export interface Arc<T> {
