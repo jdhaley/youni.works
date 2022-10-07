@@ -18,4 +18,10 @@ export interface Type {
 	name: string;
 	partOf?: Type;
 	types: bundle<Type>;
+	conf: bundle<any>;
+}
+
+export interface item extends record {
+	content?: value,
+	level?: number,
 }

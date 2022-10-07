@@ -1,9 +1,7 @@
-import { value } from "../../base/model.js";
-import { Change } from "../../base/view.js";
-import { Editor, ItemEditor, Line } from "../../base/editor.js";
+import { value, item } from "../../base/model.js";
+import { Editor, ItemEditor } from "../../base/editor.js";
 
-import { LevelCommand } from "./level.js";
-import { getChildEditor, getEditor, mark, unmark } from "../util.js";
+import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
 
 export class MarkupReplace extends ListReplace {
@@ -32,7 +30,7 @@ export class MarkupReplace extends ListReplace {
 		//Get the remainder of the line content.
 		r.setEnd(ctx, ctx.childNodes.length);
 		//Capture it,.
-		let model: Line = editor.valueOf(r) as Line;
+		let model: item = editor.valueOf(r) as item;
 		//Clear the remainder of the line content.
 		r.deleteContents();
 		//Append any 'paste' content to the line.
@@ -60,8 +58,8 @@ export class MarkupReplace extends ListReplace {
 		let r = range.cloneRange();
 		r.setEnd(start.content, start.content.childNodes.length);
 		r.deleteContents();
-		let startItem: Line = start.valueOf() as any;
-		let items = content as Line[];
+		let startItem: item = start.valueOf() as any;
+		let items = content as item[];
 		if (items[0]) {
 			startItem.content += "" + items[0].content;
 			items[0] = startItem;
@@ -71,7 +69,7 @@ export class MarkupReplace extends ListReplace {
 		range.setStartBefore(start.node);
 	}
 	protected merge(view: ItemEditor, range: Range, content: any, isStart: boolean) {
-		let item: Line = content?.length && content[isStart ? 0 : content.length - 1];
+		let item: item = content?.length && content[isStart ? 0 : content.length - 1];
 		if (!item) return;
 
 		// 2022-09-15 COMMENTED OUT to handle joining Headings to Paragraphs, etc.

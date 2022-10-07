@@ -1,22 +1,21 @@
 import { Graph, Receiver, Signal } from "./control";
 import { value, Type } from "./model";
 import { Shape } from "./shape";
-import { bundle } from "./util";
 
 export interface ViewType<T> extends Type {
-	conf: bundle<any>;
 	view(content: value, parent?: View<T>): View<T>;
 }
 
-export interface View<T> {
+export interface View<T> extends Receiver {
+	readonly owner: Graph<T>;
 	readonly type: ViewType<T>;
 	readonly contentType: string;
 	readonly content: T;
-	valueOf(filter?: unknown): value;
+	valueOf(filter?: Filter): value;
+	edit(commandName: string, filter: Filter, content?: value): unknown;
 }
 
-export interface Box<T> extends View<T>, Receiver, Shape {
-	owner: Graph<T>;
+export interface Box<T> extends View<T>, Shape {
 	node: T;
 	header?: T;
 	footer?: T;
@@ -32,6 +31,9 @@ export interface Arc<T> {
 	//arcType: undirected, reference/dependency, flow, extension, composite, agreggate, ...
 	//arcStyle: arc, line, ortho, spline, paths
 	//arcPath: array of points.
+}
+
+interface Filter {
 }
 
 export class Change implements Signal {

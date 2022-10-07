@@ -1,4 +1,4 @@
-import { record, value } from "./model.js";
+import { value } from "./model.js";
 import { Box, ViewType } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
@@ -9,11 +9,6 @@ export interface Editor extends Box<Element> {
 	readonly owner: Article;
 	edit(commandName: string, range: Range, content?: value): Range;
 	getContent(filter?: unknown): Element;
-}
-
-export interface Line extends record {
-	content?: value,
-	level?: number,
 }
 
 export interface ItemEditor extends Editor {

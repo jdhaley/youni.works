@@ -1,4 +1,4 @@
-import { Line } from "../../base/editor.js";
+import { item } from "../../base/model.js";
 import { getView } from "../box.js";
 import { TextBox } from "./text.js";
 
@@ -52,7 +52,7 @@ export class LineBox extends TextBox {
 			this.node.setAttribute("data-item", toType.name);
 		}
 	}
-	viewContent(content: Line): void {
+	viewContent(content: item): void {
 		if (content instanceof Element) {
 			this.content.innerHTML = content.innerHTML;
 			this.level = Number.parseInt(content.getAttribute("level"));
@@ -61,11 +61,11 @@ export class LineBox extends TextBox {
 			this.level = content.level;	
 		}
 	}
-	valueOf(range?: Range): Line {
+	valueOf(range?: Range): item {
 		let line = this.node;
 		if (range && !range.intersectsNode(this.content)) return;
 		let content = super.valueOf(range);
-		let item: Line = {
+		let item: item = {
 			type$: line.getAttribute("data-item"),
 			content: content,
 		}
