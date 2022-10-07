@@ -2,8 +2,7 @@ import { value } from "./model.js";
 import { View, ViewType } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
-import { Graph } from "./control.js";
-import { Receiver } from "../../../noted/v2/base/control.js";
+import { Receiver, Graph } from "./control.js";
 
 export interface Editor extends View<Element> {
 	readonly owner: Article;
