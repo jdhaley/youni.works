@@ -1,8 +1,8 @@
-import { Controller, Graph, Owner, Receiver } from "../base/control.js";
-import { Arc, Area, Box, Edges, Zone } from "../base/shape.js";
+import { BaseController, Graph, Owner, Receiver } from "../base/control.js";
+import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
 
-export class ElementBox extends Controller<Element> implements Box<Element> {
+export class ElementController extends BaseController<Element> implements Shape {
 	get owner(): Graph<Element> {
 		return ELEMENT_OWNER;
 	}
@@ -12,7 +12,7 @@ export class ElementBox extends Controller<Element> implements Box<Element> {
 	get border() {
 		return DEFAULT_BORDER;
 	}
-	get arcs(): Iterable<Arc<Element>> {
+	get arcs(): Iterable<Arc> {
 		return EMPTY.array;
 	}
 

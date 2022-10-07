@@ -93,7 +93,7 @@ export class Frame extends Owner<HTMLElement> {
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);
 	}
-	getControlOf(view: HTMLElement): Control {
+	getControlOf(view: HTMLElement): Control<HTMLElement> {
 		return view["$control"];
 	}
 	getContainerOf(view: HTMLElement): HTMLElement {

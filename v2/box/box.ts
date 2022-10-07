@@ -1,11 +1,11 @@
 import { value } from "../base/model.js";
 import { BaseType } from "../base/type.js";
-import { View, ViewType } from "../base/view.js";
+import { Box, View, ViewType } from "../base/view.js";
 
 import { bundle } from "../base/util.js";
 
 import { Article, Editor } from "../base/editor.js";
-import { ElementBox, ElementOwner } from "./shape.js";
+import { ElementController, ElementOwner } from "./shape.js";
 import { Actions } from "../base/control.js";
 
 interface ViewNode extends Element {
@@ -14,7 +14,7 @@ interface ViewNode extends Element {
 
 type editor = (this: Editor, commandName: string, range: Range, content?: value) => Range;
 
-export abstract class ViewBox extends ElementBox implements Editor {
+export abstract class ViewBox extends ElementController implements Box<Element>, Editor {
 	constructor(actions: Actions, editor: editor) {
 		super(actions);
 		if (editor) this["edit"] = editor;

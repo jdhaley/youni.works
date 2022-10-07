@@ -11,6 +11,11 @@ export interface Receiver {
 	receive(signal: Signal): void;
 }
 
+export interface Control<T> extends Receiver {
+	readonly owner: Graph<T>;
+	readonly node: T;
+}
+
 export interface Graph<T> {
 	getControlOf(node: T): Receiver;
 	getContainerOf(node: T): T;
@@ -23,7 +28,7 @@ export interface Actions {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
 
-export class Control implements Receiver {
+export class BaseReceiver implements Receiver {
 	declare actions: Actions;
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
@@ -39,13 +44,17 @@ export class Control implements Receiver {
 	}
 }
 
-export class Controller<T> extends Control {
+export class BaseController<T> extends BaseReceiver implements Control<T> {
 	constructor(actions: Actions) {
 		super();
 		this.actions = actions;
 	}
 	node: T;
 	
+	get owner(): Graph<T> {
+		return undefined;
+	}
+
 	protected control(node: T) {
 		if (node["$control"]) {
 			this.uncontrol(node);
@@ -58,7 +67,7 @@ export class Controller<T> extends Control {
 	}
 }
 
-export abstract class Owner<T> extends Control implements Graph<T> {
+export abstract class Owner<T> extends BaseReceiver implements Graph<T> {
 	abstract getControlOf(node: T): Receiver;
 	abstract getContainerOf(node: T): T;
 	abstract getPartsOf(node: T): Iterable<T>;

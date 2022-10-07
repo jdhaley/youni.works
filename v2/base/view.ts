@@ -1,12 +1,12 @@
-import { Signal } from "./control.js";
+import { Control, Signal } from "./control.js";
 import { value, Type, typeOf } from "./model.js";
-import { Box } from "./shape.js";
+import { Shape } from "./shape.js";
 
 export interface ViewType<T> extends Type {
 	view(content: value, container?: View<T>): View<T>;
 }
 
-export interface View<T> extends Box<T> {
+export interface View<T> extends Control<T> {
 	readonly type: ViewType<T>;
 	readonly contentType: string;
 	readonly header?: T;
@@ -14,6 +14,9 @@ export interface View<T> extends Box<T> {
 	readonly footer?: T;
 
 	valueOf(filter?: Filter): value;
+}
+
+export interface Box<T> extends Shape, View<T> {
 }
 
 interface Filter {
