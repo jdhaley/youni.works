@@ -18,7 +18,7 @@ import line from "../controllers/line.js";
 import row from "../controllers/row.js";
 
 import textEd from "../../editor/editors/text.js";
-import recordEd from "../../editor/editors/markup.js";
+import recordEd from "../../editor/editors/record.js";
 import listEd from "../../editor/editors/list.js";
 import markupEd from "../../editor/editors/markup.js";
 
