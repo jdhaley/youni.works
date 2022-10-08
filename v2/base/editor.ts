@@ -6,6 +6,7 @@ import { Receiver, Graph } from "./control.js";
 
 export interface Editor extends View<Element> {
 	readonly owner: Article;
+	readonly node: Element;
 	edit(commandName: string, range: Range, content?: value): Range;
 	getContent(range?: Range): Element;
 }
@@ -38,7 +39,7 @@ interface EditRange<T> {
 }
 
 interface TNode<T> {
-	readonly $control?: View<T>;
+	readonly $control?: Editor; //View<T>;
 	textContent: string;
 }
 

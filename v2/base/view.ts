@@ -6,20 +6,21 @@ export interface ViewType<T> extends Type {
 	view(content: value, container?: View<T>): View<T>;
 }
 
-export interface View<T> extends Control<T> {
+export interface View<T> {
 	readonly type: ViewType<T>;
 	readonly contentType: string;
-	readonly header?: T;
 	readonly content: T;
-	readonly footer?: T;
 
+	edit(commandName: string, filter?: Filter, content?: value): unknown;
 	valueOf(filter?: Filter): value;
 }
 
-export interface Box<T> extends Shape, View<T> {
+interface Filter {
 }
 
-interface Filter {
+export interface Box<T> extends View<T>, Control<T>, Shape {
+	readonly header?: T;
+	readonly footer?: T;
 }
 
 export class Change implements Signal {

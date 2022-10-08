@@ -14,6 +14,7 @@ export abstract class Replace extends Edit {
 		return this.execAfter(range);
 	}
 	undo() {
+	//	return this.r2(this.b);
 		return this.replace(this.before);
 	}
 	redo() {
@@ -44,6 +45,26 @@ export abstract class Replace extends Edit {
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 		let range = editor.node.ownerDocument.createRange();
 		range.selectNodeContents(editor.content);
+		return range;
+	}
+	private r2(markup: string) {
+		console.log(markup);
+		let element = document.implementation.createDocument("", "root").documentElement as Element;
+		element.innerHTML = markup;
+		console.log(element);
+		let view = this.owner.getControl(this.viewId);
+		let res = view.type.view(element);
+		console.log(res);
+		let range = this.getReplaceRange();
+		range.deleteContents();
+		while (res.content.firstChild) {
+			let node = res.content.firstChild;
+			range.insertNode(node);
+			range.collapse();
+			if (node.nodeType == Node.ELEMENT_NODE) {
+				bindViewNode(node as Element);
+			}
+		}
 		return range;
 	}
 	private replace(markup: string) {

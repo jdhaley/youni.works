@@ -1,12 +1,11 @@
 import { value } from "../base/model.js";
+import { Box, ViewType } from "../base/view.js";
+import { Article, Editor } from "../base/editor.js";
+import { Actions } from "../base/control.js";
 import { BaseType } from "../base/type.js";
-import { Box, View, ViewType } from "../base/view.js";
-
 import { bundle } from "../base/util.js";
 
-import { Article, Editor } from "../base/editor.js";
 import { ElementController, ElementOwner } from "./shape.js";
-import { Actions } from "../base/control.js";
 
 interface ViewNode extends Element {
 	$control?: Editor;
@@ -200,12 +199,12 @@ function getViewNode(node: Node | Range): ViewNode {
 	}
 }
 
-export function getView(node: Node | Range): Editor {
+export function getView(node: Node | Range): ViewBox {
 	let view = getViewNode(node)?.$control;
 	if (view instanceof ViewBox) return view;
 }
 
-function viewContent(view: View<Element>, range: Range, out?: Element) {
+function viewContent(view: ViewBox, range: Range, out?: Element) {
 	if (range && !range.intersectsNode(view.content)) return;
 	let item: Element;
 	if (!out) {
@@ -221,7 +220,7 @@ function viewContent(view: View<Element>, range: Range, out?: Element) {
 	return item;
 }
 
-function content(view: View<Element>, range: Range, out: Element) {
+function content(view: ViewBox, range: Range, out: Element) {
 	for (let node of view.content.childNodes) {
 		if (range && !range.intersectsNode(node))
 			continue;

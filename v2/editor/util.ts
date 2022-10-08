@@ -1,7 +1,11 @@
 import { Editor } from "../base/editor";
 import { getView, bindViewNode } from "../box/box.js";
 
-export { getView as getEditor, bindViewNode }
+
+export { getEditor, bindViewNode }
+
+//Hide the ViewBox return type so the implementation doesn't leak
+const getEditor = getView as (node: Node | Range) => Editor ;
 
 export function getChildEditor(editor: Editor, node: Node): Editor {
 	if (node == editor.content) return null;
