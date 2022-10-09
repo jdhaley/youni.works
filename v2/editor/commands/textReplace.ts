@@ -1,9 +1,10 @@
-import { value } from "../../base/model.js";
-
-import { Replace } from "./replace.js";
 import { getEditor, mark, unmark } from "../util.js";
+import { Edit } from "./edit.js";
 
-export class TextReplace extends Replace {
+export class TextReplace extends Edit {
+	before: string;
+	after: string;
+
 	exec(range: Range, text: string): Range {
 		mark(range);
 		let content = getEditor(range).content;
@@ -17,18 +18,20 @@ export class TextReplace extends Replace {
 		this.after = content.innerHTML;
 		return unmark(range);	
 	}
-	protected execBefore(range: Range): void {
-		throw new Error("Method not implemented.");		
+	undo() {
+		return this.replace(this.before);
 	}
-	protected execReplace(range: Range, content: value): Range {
-		throw new Error("Method not implemented.");
+	redo() {
+		return this.replace(this.after);
 	}
-	protected execAfter(range: Range): Range {
-		throw new Error("Method not implemented.");		
-	}
-	protected getOuterRange(range: Range): Range {
-		range = range.cloneRange();
-		range.selectNodeContents(getEditor(range).content);
-		return range;
+	private replace(markup: string) {
+		let editor = this.owner.getControl(this.viewId);
+		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
+
+		editor.content.innerHTML = markup;
+
+		let range = editor.node.ownerDocument.createRange();
+		range.selectNode(editor.content);
+		return unmark(range);
 	}
 }
