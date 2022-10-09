@@ -108,6 +108,7 @@ export class ViewBoxType extends BaseType implements ViewType<Element> {
 		let node = this.owner.createElement(this.conf.tagName || "div");
 		if (parent) parent.content.append(node);
 
+		if (content instanceof Element && content.id) node.id = content.id;
 		view.control(node);
 		view.draw(content);
 		return view;
@@ -169,7 +170,7 @@ export function bindViewNode(view: Element): void {
 		let name = view.getAttribute("data-item");
 		let parent = getViewNode(view.parentElement) as ViewNode;
 		if (name && parent) {
-			//TODO forcing to DisplayType because I don't want to expose .control()
+			console.log("binding.");
 			let type = parent.$control.type.types[name] as ViewBoxType;
 			if (type) {
 				control = Object.create(type.prototype);

@@ -48,9 +48,9 @@ export default extend(null, {
 		}
 	},
 	change(this: Display, signal: Change) {
-		console.log("article changed, sending message.");
-		signal.direction = "down";
-		this.send(signal, this.node);
+		// console.log("Article changed:", this.commands.peek());
+		// signal.direction = "down";
+		// this.send(signal, this.node);
 		this.frame.receive(signal);
 	}
 });

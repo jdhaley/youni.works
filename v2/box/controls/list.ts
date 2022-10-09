@@ -20,7 +20,7 @@ export class ListBox extends ViewBox {
 			let childType = this.type.types[child.tagName];
 			if (childType) {
 				childType.view(child, this);
-			} else {
+			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.tagName);
 			}
 		}

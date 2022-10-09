@@ -7,7 +7,8 @@ export class TextBox extends ViewBox {
 	contentType = "text";
 	viewContent(model: value): void {
 		if (model instanceof Element) {
-			this.content.textContent = model.textContent;
+			//even with plain text, always use HTML so that the marker is transferred to the view.
+			this.content.innerHTML = model.innerHTML;
 		} else {
 			this.content.textContent = model ? "" + model : "";
 		}
