@@ -1,13 +1,13 @@
 import { getEditor, mark, unmark } from "../util.js";
 import { Edit } from "./edit.js";
 
-export class TextReplace extends Edit {
+export class Replace extends Edit {
 	before: string;
 	after: string;
 
 	exec(range: Range, text: string): Range {
 		mark(range);
-		let content = getEditor(range).content;
+		let content = getEditor(range)?.content;
 		if (!content) return;
 		this.before = content.innerHTML;	
 		range.deleteContents();
@@ -24,7 +24,8 @@ export class TextReplace extends Edit {
 	redo() {
 		return this.replace(this.after);
 	}
-	private replace(markup: string) {
+
+	protected replace(markup: string) {
 		let editor = this.owner.getControl(this.viewId);
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 

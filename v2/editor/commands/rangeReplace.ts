@@ -1,11 +1,9 @@
 import { value } from "../../base/model.js";
 
 import { unmark, bindViewNode, narrowRange, mark, getEditor, getChildEditor } from "../util.js";
-import { Edit } from "./edit.js";
+import { Replace } from "./replace.js";
 
-export abstract class RangeReplace extends Edit {
-	before: string;
-	after: string;
+export abstract class RangeReplace extends Replace {
 	startId: string;
 	endId: string;
 
@@ -13,12 +11,6 @@ export abstract class RangeReplace extends Edit {
 		this.execBefore(range);
 		range = this.execReplace(range, content);
 		return this.execAfter(range);
-	}
-	undo() {
-		return this.replace(this.before);
-	}
-	redo() {
-		return this.replace(this.after);
 	}
 
 	protected abstract execReplace(range: Range, content: value): Range;
@@ -70,7 +62,7 @@ export abstract class RangeReplace extends Edit {
 		}
 		return range;
 	}
-	private replace(markup: string) {
+	protected replace(markup: string) {
 		let element = document.implementation.createDocument(null, "root").documentElement as Element;
 		element.innerHTML = markup;
 		let view = this.owner.getControl(this.viewId);
