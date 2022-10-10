@@ -5,6 +5,9 @@ import { Editor } from "../../base/editor.js";
 import { ViewBoxType } from "../box.js";
 
 import { RecordBox } from "./record.js";
+import { ele, ELE } from "../../base/view.js";
+
+
 export class RowBox extends RecordBox {
 	memberType = "cell";
 	declare isHeader: boolean;
@@ -36,8 +39,8 @@ export class RowBox extends RecordBox {
 		if (content.isHeader) this.isHeader = true;
 		super.draw(content);
 	}
-	viewContent(model: value | Element): void {
-		if (model instanceof Element) return this.viewElement(model);
+	viewContent(model: value | ELE): void {
+		if (ele(model)) return this.viewElement(ele(model));
 		if (!model) return;
 		let row = model as item;
 		let types = this.type.types;
@@ -47,7 +50,7 @@ export class RowBox extends RecordBox {
 			types[name].view(value, this);
 		}
 	}
-	protected viewElement(content: Element): void {
+	protected viewElement(content: ELE): void {
 		let idx = {};
 		for (let child of content.children) {
 			idx[child.tagName] = child;
@@ -62,7 +65,7 @@ export class RowBox extends RecordBox {
 		if (this.isHeader) return;
 		let row: item = {
 			type$: this.type.name,
-			content: rowContent(null, this.content as Element, range)
+			content: rowContent(null, this.content as ELE, range)
 		}
 		return row;
 	}
@@ -99,7 +102,7 @@ function createType(type: ViewBoxType, columns: string[]): ViewBoxType {
 	return type;
 }
 
-function rowContent(model: record, view: Element, range: Range): record {
+function rowContent(model: record, view: ELE, range: Range): record {
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {

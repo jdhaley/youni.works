@@ -1,4 +1,5 @@
 import { value } from "../../base/model.js";
+import { ELE } from "../../base/view.js";
 
 import { unmark, bindViewNode, narrowRange, mark, getEditor, getChildEditor } from "../util.js";
 import { Replace } from "./replace.js";
@@ -63,7 +64,7 @@ export abstract class RangeReplace extends Replace {
 		return range;
 	}
 	protected replace(markup: string) {
-		let element = document.implementation.createDocument(null, "root").documentElement as Element;
+		let element = document.implementation.createDocument(null, "root").documentElement as ELE;
 		element.innerHTML = markup;
 		let view = this.owner.getControl(this.viewId);
 		let content = view.type.view(element).content;
@@ -74,7 +75,7 @@ export abstract class RangeReplace extends Replace {
 			range.insertNode(node);
 			range.collapse();
 			if (node.nodeType == Node.ELEMENT_NODE) {
-				bindViewNode(node as Element);
+				bindViewNode(node as ELE);
 			}
 		}
 		return unmark(range);
@@ -90,16 +91,16 @@ export abstract class RangeReplace extends Replace {
  * @param ctx 
  * @param range 
  */
- function captureRange(cmd: RangeReplace, ctx: Element, start: number, end: number) {
+ function captureRange(cmd: RangeReplace, ctx: ELE, start: number, end: number) {
 	for (let i = start; i; i--) {
-		let node = ctx.childNodes[i - 1] as Element;
+		let node = ctx.childNodes[i - 1] as ELE;
 		if (node.getAttribute("data-item")) {
 			cmd.startId = node.id;
 			break;
 		}
 	}
 	for (let i = end; i < ctx.childNodes.length; i++) {
-		let node = ctx.childNodes[i] as Element;
+		let node = ctx.childNodes[i] as ELE;
 		if (node.getAttribute("data-item")) {
 			cmd.endId = node.id;
 			break;

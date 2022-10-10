@@ -3,6 +3,7 @@ import { Editor } from "../../base/editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { clearContent, getChildEditor } from "../util.js";
+import { ELE } from "../../base/view.js";
 
 export class ListReplace extends RangeReplace {
 	exec(range: Range, content: value): Range {
@@ -54,7 +55,7 @@ export class ListReplace extends RangeReplace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		let views = (editor.type.view(content) as Editor).content as Element;
+		let views = (editor.type.view(content) as Editor).content as ELE;
 		while (views.firstChild) {
 			range.insertNode(views.firstChild);
 			range.collapse();

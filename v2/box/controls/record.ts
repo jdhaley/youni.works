@@ -2,6 +2,7 @@ import { value, record } from "../../base/model.js";
 import { Editor } from "../../base/editor.js";
 
 import { getView, ViewBox } from "../box.js";
+import { ele, ELE } from "../../base/view.js";
 
 export class RecordBox extends ViewBox {
 	contentType = "record";
@@ -18,13 +19,13 @@ export class RecordBox extends ViewBox {
 		return this.at("title").content.textContent;
 	}
 
-	viewContent(model: value | Element): void {
-		if (model instanceof Element) return this.viewElement(model);
+	viewContent(model: value | ELE): void {
+		if (ele(model)) return this.viewElement(ele(model));
 		for (let name in this.type.types) {
 			this.viewMember(name, model ? model[name] : undefined);
 		}
 	}
-	protected viewElement(content: Element): void {
+	protected viewElement(content: ELE): void {
 		let idx = {};
 		for (let member of content.children) {
 			idx[member.tagName] = member;
@@ -41,7 +42,7 @@ export class RecordBox extends ViewBox {
 	}
 
 	valueOf(range?: Range): value {
-		let model = recordContent(null, this.content as Element, range);
+		let model = recordContent(null, this.content as ELE, range);
 		if (model) {
 			model["type$"] = this.type.name;
 		}
@@ -49,7 +50,7 @@ export class RecordBox extends ViewBox {
 	}
 }
 
-function recordContent(model: record, view: Element, range: Range): record {
+function recordContent(model: record, view: ELE, range: Range): record {
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {

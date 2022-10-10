@@ -1,9 +1,10 @@
 import { BaseController, Graph, Owner, Receiver } from "../base/control.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
+import { ELE } from "../base/view.js";
 
-export class ElementController extends BaseController<Element> implements Shape {
-	get owner(): Graph<Element> {
+export class ElementController extends BaseController<ELE> implements Shape {
+	get owner(): Graph<ELE> {
 		return ELEMENT_OWNER;
 	}
 	get area(): Area {
@@ -75,17 +76,17 @@ export class ElementController extends BaseController<Element> implements Shape 
 	}
 }
 
-export class ElementOwner extends Owner<Element> {
-	getControlOf(node: Element): Receiver {
+export class ElementOwner extends Owner<ELE> {
+	getControlOf(node: ELE): Receiver {
 		return node["$control"];
 	}
-	getContainerOf(node: Element): Element {
+	getContainerOf(node: ELE): ELE {
 		for (let parent = node.parentElement; parent; parent = parent.parentElement) {
 			if (parent["$control"]) return parent;
 		}
 	}
-	getPartsOf(node: Element): Iterable<Element> {
-		return node.children as Iterable<Element>;
+	getPartsOf(node: ELE): Iterable<ELE> {
+		return node.children as Iterable<ELE>;
 	}
 }
 

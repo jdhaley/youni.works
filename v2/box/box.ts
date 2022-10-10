@@ -1,5 +1,5 @@
 import { value } from "../base/model.js";
-import { Box, ViewType } from "../base/view.js";
+import { Box, ELE, ele, ViewType } from "../base/view.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -7,21 +7,21 @@ import { bundle } from "../base/util.js";
 
 import { ElementController, ElementOwner } from "./shape.js";
 
-interface ViewNode extends Element {
+interface ViewNode extends ELE {
 	$control?: Editor;
 }
 
 type editor = (this: Editor, commandName: string, range: Range, content?: value) => Range;
 
-export abstract class ViewBox extends ElementController implements Box<Element>, Editor {
+export abstract class ViewBox extends ElementController implements Box<ELE>, Editor {
 	constructor(actions: Actions, editor: editor) {
 		super(actions);
 		if (editor) this["edit"] = editor;
 	}
 	declare contentType: string;
-	declare header: Element;
-	declare content: Element;
-	declare footer: Element;
+	declare header: ELE;
+	declare content: ELE;
+	declare footer: ELE;
 
 	get type(): ViewBoxType {
 		return this["_type"];
@@ -84,17 +84,17 @@ export abstract class ViewBox extends ElementController implements Box<Element>,
 			this.content = element;
 		}
 	}
-	uncontrol(element: Element): void {
+	uncontrol(element: ELE): void {
 		super.uncontrol(element);
 		element.removeAttribute("data-item");
 		delete element.id;
 	}
-	getContent(range?: Range): Element {
+	getContent(range?: Range): ELE {
 		return viewContent(this, range);
 	}
 }
 
-export class ViewBoxType extends BaseType implements ViewType<Element> {
+export class ViewBoxType extends BaseType implements ViewType<ELE> {
 	constructor(owner: Article) {
 		super();
 		this.owner = owner;
@@ -103,12 +103,12 @@ export class ViewBoxType extends BaseType implements ViewType<Element> {
 	declare types: bundle<ViewBoxType>;
 	declare partOf: ViewBoxType;
 
-	view(content: value | Element, parent?: ViewBox): ViewBox {
+	view(content: value | ELE, parent?: ViewBox): ViewBox {
 		let view: ViewBox = Object.create(this.prototype);
 		let node = this.owner.createElement(this.conf.tagName || "div");
 		if (parent) parent.content.append(node);
-
-		if (content instanceof Element && content.id) node.id = content.id;
+		let id = ele(content)?.id;
+		if (id) node.id = id;
 		view.control(node);
 		view.draw(content);
 		return view;
@@ -135,15 +135,15 @@ export abstract class ViewOwner extends ElementOwner {
 		this.conf = conf;
 		this.actions = conf.actions;
 	}
-	node: Element;
+	node: ELE;
 	conf: bundle<any>;
 	types: bundle<ViewBoxType>;
 	unknownType: ViewBoxType;
 	type: ViewBoxType;
 
-	abstract createElement(tagName: string): Element;
+	abstract createElement(tagName: string): ELE;
 	
-	getElementById(id: string): Element {
+	getElementById(id: string): ELE {
 		return this.node.ownerDocument.getElementById(id);
 	}
 	getControl(id: string): Editor {
@@ -164,7 +164,7 @@ export abstract class ViewOwner extends ElementOwner {
 	}
 }
 
-export function bindViewNode(view: Element): void {
+export function bindViewNode(view: ELE): void {
 	let control: ViewBox = view["$control"];
 	if (!control) {
 		let name = view.getAttribute("data-item");
@@ -189,12 +189,13 @@ export function bindViewNode(view: Element): void {
 function getViewNode(node: Node | Range): ViewNode {
 	if (node instanceof Range) node = node.commonAncestorContainer;
 	while (node) {
-		if (node instanceof Element && node.getAttribute("data-item")) {
+		let e = ele(node);
+		if (e?.getAttribute("data-item")) {
 			if (!node["$control"]) {
 				console.warn("Unbound view.");
-				bindViewNode(node);
+				bindViewNode(e);
 			}
-			return node;
+			return e;
 		}
 		node = node.parentElement;
 	}
@@ -205,11 +206,11 @@ export function getView(node: Node | Range): ViewBox {
 	if (view instanceof ViewBox) return view;
 }
 
-function viewContent(view: ViewBox, range: Range, out?: Element) {
+function viewContent(view: ViewBox, range: Range, out?: ELE) {
 	if (range && !range.intersectsNode(view.content)) return;
-	let item: Element;
+	let item: ELE;
 	if (!out) {
-		item = document.implementation.createDocument("", view.type.name).documentElement as Element;
+		item = document.implementation.createDocument("", view.type.name).documentElement as ELE;
 	} else {
 		item = out.ownerDocument.createElement(view.type.name);
 		out.append(item);
@@ -221,14 +222,14 @@ function viewContent(view: ViewBox, range: Range, out?: Element) {
 	return item;
 }
 
-function content(view: ViewBox, range: Range, out: Element) {
+function content(view: ViewBox, range: Range, out: ELE) {
 	for (let node of view.content.childNodes) {
 		if (range && !range.intersectsNode(node))
 			continue;
 		let childView = getView(node);
 		if (childView != view) {
 			viewContent(childView, range, out);
-		} else if (node instanceof Element) {
+		} else if (ele(node)) {
 			out.append(node.cloneNode(true));
 		} else {
 			let text = node.textContent;
@@ -258,10 +259,10 @@ export function navigate(start: Node | Range, isBack?: boolean) {
 		editor = getView(editor.node.parentElement);
 	}
 }
-function navigateInto(ele: Element, isBack?: boolean) {
+function navigateInto(ele: ELE, isBack?: boolean) {
 	let editor = getView(ele);
 	if (!editor) return;
-	let content = editor.content as Element;
+	let content = editor.content as ELE;
 	switch (editor.contentType) {
 		case "text":
 		case "line":

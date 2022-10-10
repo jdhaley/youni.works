@@ -10,6 +10,7 @@ import { toHtml } from "../transform/toHtml.js";
 
 import { ViewBox, ViewOwner, getView } from "../box/box.js";
 import { Article, Editor } from "../base/editor.js";
+import { ELE } from "../base/view.js";
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -34,7 +35,7 @@ export class Display extends ViewOwner implements Article {
 	getControl(id: string): Editor {
 		return super.getControl(id) as Editor;
 	}
-	createElement(tagName: string): Element {
+	createElement(tagName: string): ELE {
 		return this.frame.createElement(tagName);
 	}
 }

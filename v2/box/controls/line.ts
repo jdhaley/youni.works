@@ -1,4 +1,5 @@
 import { item } from "../../base/model.js";
+import { ele } from "../../base/view.js";
 import { getView } from "../box.js";
 import { TextBox } from "./text.js";
 
@@ -61,9 +62,10 @@ export class LineBox extends TextBox {
 		}
 	}
 	viewContent(content: item): void {
-		if (content instanceof Element) {
-			this.content.innerHTML = content.innerHTML;
-			this.level = Number.parseInt(content.getAttribute("level"));
+		let e = ele(content);
+		if (e) {
+			this.content.innerHTML = e.innerHTML;
+			this.level = Number.parseInt(e.getAttribute("level"));
 		} else {
 			this.content.innerHTML = (content ? "" + content.content : "");
 			this.level = content.level;	

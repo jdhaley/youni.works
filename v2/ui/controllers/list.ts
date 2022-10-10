@@ -3,6 +3,7 @@ import {EditEvent, UserEvent} from "../ui.js";
 import {getFooter, getHeader} from "../../editor/util.js";
 import editable from "./editor.js";
 import { Editor } from "../../base/editor.js";
+import { ELE } from "../../base/view.js";
 
 export default extend(editable, {
 	dblclick(event: UserEvent) {
@@ -32,7 +33,7 @@ export default extend(editable, {
 	}
 });
 
-function goToTask(view: Element, range: Range) {
+function goToTask(view: ELE, range: Range) {
 	// let go = getContent(view).lastElementChild;
 	// go = getContent(go).firstElementChild;
 	// go = getContent(go);

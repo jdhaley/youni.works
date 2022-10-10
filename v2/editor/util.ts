@@ -1,4 +1,5 @@
 import { Editor } from "../base/editor";
+import { ele, ELE } from "../base/view";
 import { getView, bindViewNode } from "../box/box.js";
 
 
@@ -12,7 +13,7 @@ export function getChildEditor(editor: Editor, node: Node): Editor {
 	while (node?.parentElement != editor.content) {
 		node = node.parentElement;
 	}
-	if (node instanceof Element && node["$control"]) return node["$control"] as Editor;
+	if (ele(node) && node["$control"]) return node["$control"] as Editor;
 }
 
 export function narrowRange(range: Range) {
@@ -33,16 +34,16 @@ export function narrowRange(range: Range) {
 	}
 }
 
-export function getHeader(view: Element, node: Node) {
+export function getHeader(view: ELE, node: Node) {
 	while (node && node != view) {
-		if (node.nodeName == "HEADER" && node.parentElement == view) return node as Element;
+		if (node.nodeName == "HEADER" && node.parentElement == view) return node as ELE;
 		node = node.parentElement;
 	}
 }
 
-export function getFooter(view: Element, node: Node) {
+export function getFooter(view: ELE, node: Node) {
 	while (node && node != view) {
-		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as Element;
+		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as ELE;
 		node = node.parentElement;
 	}
 }
@@ -142,7 +143,7 @@ compareToRange(node, range):
 - INSIDE	The Node is enclosed by the range.
 - END		The Node intersects the end of the range.
 */
-function enclosedInRange(view: Element, range: Range) {
+function enclosedInRange(view: ELE, range: Range) {
 	let r = view.ownerDocument.createRange();
 	r.selectNode(view);
 	// before −1.

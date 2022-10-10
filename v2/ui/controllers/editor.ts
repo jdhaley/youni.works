@@ -1,4 +1,4 @@
-import { Change } from "../../base/view.js";
+import { Change, ELE } from "../../base/view.js";
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
@@ -156,7 +156,7 @@ function getInsertableRange(range: Range) {
 	}
 }
 
-export function atStart(view: Element, node: Node, offset: number) {
+export function atStart(view: ELE, node: Node, offset: number) {
 	if (offset != 0) return false;
 	while (node && node != view) {
 		if (node.previousSibling && node.previousSibling.nodeName != "HEADER") return false;

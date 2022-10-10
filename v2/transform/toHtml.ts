@@ -1,4 +1,5 @@
 import { record } from "../base/model.js";
+import { ELE } from "../base/view.js";
 import { Part } from "./item.js";
 
 export function toHtml(item: Part) {
@@ -8,14 +9,14 @@ export function toHtml(item: Part) {
 	return ele;
 }
 
-function htmlSection(ele: Element, item: Part) {
+function htmlSection(ele: ELE, item: Part) {
 	if (item.items) for (let x of item.items) transformItem(ele, x);
 	if (item.sections) for (let x of item.sections) transformItem(ele, x);
 }
 
-function transformItem(parent: Element, item: Part) {
+function transformItem(parent: ELE, item: Part) {
 	let doc = parent.ownerDocument;
-	let ele: Element;
+	let ele: ELE;
 	if (item.type$ == "heading") {
 		ele = doc.createElement("H" + item.level);
 		if (item.content) ele.innerHTML = "" + item.content;

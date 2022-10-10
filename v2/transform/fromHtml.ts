@@ -1,4 +1,5 @@
 import { bundle } from "../base/util.js";
+import { ELE } from "../base/view.js";
 import { Part } from "./item.js";
 
 export function fromHtml(source: Node): Part[] {
@@ -66,7 +67,7 @@ const methods: bundle<transform> = {
 	},
 	text(source: Node, target: Part[]) {
 		//For some stupid reason google docs puts everything in a "b" tag (with an id)
-		if (source.nodeName == "B" && (source as Element).id) {
+		if (source.nodeName == "B" && (source as ELE).id) {
 			return methods.transform(source, target);
 		}
 		let text = transformText(source);
@@ -80,7 +81,7 @@ const methods: bundle<transform> = {
 		let item = target.at(-1);
 		append(item, text);
 	},
-	link(source: Element, target: Part[], level: number) {
+	link(source: ELE, target: Part[], level: number) {
 		let text = source.innerHTML;
 		text = `<a href="${source.getAttribute("href")}">${source.innerHTML}</a>`
 		let item = target.at(-1);
