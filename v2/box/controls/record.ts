@@ -1,41 +1,43 @@
 import { value, record } from "../../base/model.js";
-import { ViewType } from "../../base/view.js";
 import { Editor } from "../../base/editor.js";
 
-import { bundle } from "../../base/util.js";
-import { ViewBox } from "../box.js";
+import { getView, ViewBox } from "../box.js";
 
 export class RecordBox extends ViewBox {
 	contentType = "record";
-	at: bundle<Editor>;
+	memberType = "field";
+
+	at(name: string): Editor {
+		for (let node of this.content.children) {
+			let view = getView(node);
+			if (name == view?.type.name) return view;
+		}
+	}
 
 	get title(): string {
-		return this.at.title?.content.textContent;
+		return this.at("title").content.textContent;
 	}
 
 	viewContent(model: value | Element): void {
 		if (model instanceof Element) return this.viewElement(model);
-		this.at = Object.create(null);
 		for (let name in this.type.types) {
-			let type = this.type.types[name] as ViewType<Element>;
-			let value = model ? model[name] : null;
-			let member: Editor = type.view(value, this) as any;
-			this.at[name] = member;
-			member.node.classList.add("field");
+			this.viewMember(name, model ? model[name] : undefined);
 		}
 	}
 	protected viewElement(content: Element): void {
-		this.at = Object.create(null);
 		let idx = {};
-		for (let child of content.children) {
-			idx[child.tagName] = child;
+		for (let member of content.children) {
+			idx[member.tagName] = member;
 		}
 		for (let name in this.type.types) {
-			let type = this.type.types[name];
-			let child = type.view(idx[name], this);
-			this.at[name] = child;
-			child.node.classList.add("field");
+			this.viewMember(name, idx[name]);
 		}
+	}
+	protected viewMember(name: string, value: any): ViewBox {
+		let type = this.type.types[name];
+		let member = type.view(value, this);
+		member.node.classList.add(this.memberType);
+		return member;
 	}
 
 	valueOf(range?: Range): value {

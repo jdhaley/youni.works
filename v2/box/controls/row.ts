@@ -5,8 +5,8 @@ import { Editor } from "../../base/editor.js";
 import { ViewBoxType } from "../box.js";
 
 import { RecordBox } from "./record.js";
-
 export class RowBox extends RecordBox {
+	memberType = "cell";
 	declare isHeader: boolean;
 	get rowHeader(): RowBox {
 		for (let ele = this.node; ele; ele = ele.previousElementSibling) {
@@ -48,7 +48,6 @@ export class RowBox extends RecordBox {
 		}
 	}
 	protected viewElement(content: Element): void {
-		this.at = Object.create(null);
 		let idx = {};
 		for (let child of content.children) {
 			idx[child.tagName] = child;
@@ -56,7 +55,6 @@ export class RowBox extends RecordBox {
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
 			let child = type.view(idx[name], this);
-			this.at[name] = child;
 			child.node.classList.add("field");
 		}
 	}
