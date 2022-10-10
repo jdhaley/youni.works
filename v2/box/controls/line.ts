@@ -45,6 +45,14 @@ export class LineBox extends TextBox {
 		}
 		--this.level;
 	}
+	getSection(): LineBox {
+		let node = this.node.previousElementSibling;
+		while (node) {
+			let editor = getView(node);
+			if (editor.type.name == "heading") return editor as LineBox;
+			node = node.previousElementSibling;
+		}
+	}
 	convert(name: string) {
 		let toType = this.type.partOf?.types[name];
 		if (toType) {
@@ -72,13 +80,5 @@ export class LineBox extends TextBox {
 		let level = Number.parseInt(line.getAttribute("aria-level"));
 		if (level) item.level = level;
 		return item;
-	}
-	getSection(): LineBox {
-		let node = this.node.previousElementSibling;
-		while (node) {
-			let editor = getView(node);
-			if (editor.type.name == "heading") return editor as LineBox;
-			node = node.previousElementSibling;
-		}
 	}
 }

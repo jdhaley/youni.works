@@ -10,8 +10,12 @@ export class ListBox extends ViewBox {
 		if (model instanceof Element) return this.viewElement(model);
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type as ViewType<Element>;
-			type = type.types[viewTypeOf(item)] as ViewType<Element> || this.owner.unknownType;
-			let part = type.view(item, this) as Editor;
+			type = type.types[viewTypeOf(item)] as ViewType<Element>;
+			if (!type) {
+				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
+				type =  this.owner.unknownType;
+			}
+			type.view(item, this);
 		}
 	}
 	viewElement(content: Element) {

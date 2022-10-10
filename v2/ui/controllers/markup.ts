@@ -1,8 +1,7 @@
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
-import { getView, navigate } from "../../box/box.js";
-import { Row, RowBox } from "../../box/controls/row.js";
+import { navigate } from "../../box/box.js";
 
 import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 
@@ -78,39 +77,42 @@ export default extend(list, {
 		if (!range.collapsed) return;
 		let current = getChildEditor(this, range.commonAncestorContainer);
 		if (!current) return;
-		let item = createItem(current);
+		//let item = createItem(current);
+		let item = {
+			type$: "worktask"
+		}
 		range.setStartBefore(current.node);
 		range.collapse(true);
 		this.edit("Insert", range, [item]);
 	}
 });
 
-function createItem(refNode: Editor): Row {
-	let item: Row;
-	if (!(refNode instanceof RowBox)) {
-		refNode = getView(refNode.node.previousElementSibling);
-	}
-	if (refNode instanceof RowBox) {
-		item = {
-			type$: "row",
-			columns: refNode.columns,
-			content: {}
-		};
-		for (let name in refNode.type.types) {
-			item.content[name] = "";
-		}
-	} else {
-		item = {
-			type$: "row",
-			content: {
-				"Key": "Key",
-				"Value": "Value"
-			},
-			columns: ["Key", "Value"]
-		}
-	}
-	return item;
-}
+// function createItem(refNode: Editor): item {
+// 	let item: item;
+// 	if (!(refNode instanceof RowBox)) {
+// 		refNode = getView(refNode.node.previousElementSibling);
+// 	}
+// 	if (refNode instanceof RowBox) {
+// 		item = {
+// 			type$: "row",
+// 			columns: refNode.columns,
+// 			content: {}
+// 		};
+// 		for (let name in refNode.type.types) {
+// 			item.content[name] = "";
+// 		}
+// 	} else {
+// 		item = {
+// 			type$: "row",
+// 			content: {
+// 				"Key": "Key",
+// 				"Value": "Value"
+// 			},
+// 			columns: ["Key", "Value"]
+// 		}
+// 	}
+// 	return item;
+// }
 
 function nav(event: UserEvent, isPrevious?: boolean) {
 	let item = navigate(event.range, isPrevious);

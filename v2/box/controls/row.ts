@@ -1,4 +1,4 @@
-import { value, record } from "../../base/model.js";
+import { value, record, item } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
 import { Editor } from "../../base/editor.js";
@@ -6,38 +6,40 @@ import { ViewBoxType } from "../box.js";
 
 import { RecordBox } from "./record.js";
 
-export interface Row extends record {
-	type$: "row"
-	content?: value,
-	level?: number,
-	columns?: string[]
-}
-
 export class RowBox extends RecordBox {
+	declare isHeader: boolean;
 	get rowHeader(): RowBox {
 		for (let ele = this.node; ele; ele = ele.previousElementSibling) {
 			if (ele.previousElementSibling?.tagName != "UI-ROW") {
 				let editor = ele["$control"];
-				return editor instanceof RowBox ? editor : undefined;
+				return editor instanceof RowBox && editor.isHeader ? editor : undefined;
 			}
 		}
 	}
-	get type(): ViewBoxType {
-		let header = this.rowHeader;
-		if (this == header && !Object.hasOwn(this, "_type")) {
-			this["_type"] = createType(this["_type"], this.columns);
-		}
-		if (header) return header["_type"];
-	}
+	// get type(): ViewBoxType {
+	// 	let header = this.rowHeader;
+	// 	if (this == header && !Object.hasOwn(this, "_type")) {
+	// 		this["_type"] = createType(this["_type"], this.columns);
+	// 	}
+	// 	if (header) return header["_type"];
+	// }
 
+	draw(content: item): void {
+		if (!this.rowHeader && !content.header) {
+			let item = createHeaderItem(this.type);
+			let hdr = this.type.view(item) as RowBox;
+			this.node.parentNode.insertBefore(hdr.node, this.node);
+		} else if (content.header) {
+			this.isHeader = true;
+		}
+
+		if (content.isHeader) this.isHeader = true;
+		super.draw(content);
+	}
 	viewContent(model: value | Element): void {
 		if (model instanceof Element) return this.viewElement(model);
 		if (!model) return;
-		let row = model as Row;
-		if (this == this.rowHeader) {
-			if (!row.columns) row.columns = getColumns(row);
-			this["_type"] = createType(this["_type"], row.columns);
-		}
+		let row = model as item;
 		let types = this.type.types;
 		let content = row.content || EMPTY.object;
 		for (let name in types) {
@@ -59,25 +61,25 @@ export class RowBox extends RecordBox {
 		}
 	}
 	valueOf(range?: Range): value {
-		let row: Row = {
-			type$: "row",
+		if (this.isHeader) return;
+		let row: item = {
+			type$: this.type.name,
 			content: rowContent(null, this.content as Element, range)
 		}
-		if (this == this.rowHeader) row.columns = this.columns;
 		return row;
 	}
-	get columns() {
-		let header = this.rowHeader;
-		if (header) {
-			let columns: string[] = [];
-			for (let col of header.node.children) {
-				columns.push(col.textContent);
-			}
-			return columns;
-		}
-	}
+	// get columns() {
+	// 	let header = this.rowHeader;
+	// 	if (header) {
+	// 		let columns: string[] = [];
+	// 		for (let col of header.node.children) {
+	// 			columns.push(col.textContent);
+	// 		}
+	// 		return columns;
+	// 	}
+	// }
 }
-function getColumns(row: Row) {
+function getColumns(row: item) {
 	let columns: string[] = [];
 	for (let col in row.content as record) {
 		columns.push(col);
@@ -101,7 +103,6 @@ function createType(type: ViewBoxType, columns: string[]): ViewBoxType {
 
 function rowContent(model: record, view: Element, range: Range): record {
 	if (range && !range.intersectsNode(view)) return model;
-	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {
 		let viewer = child["$control"] as Editor;
@@ -112,4 +113,18 @@ function rowContent(model: record, view: Element, range: Range): record {
 		}
 	}
 	return model;
+}
+
+function createHeaderItem(type: ViewBoxType): item {
+	let item = {
+		type$: type.name,
+		header: true, 
+		content: {
+		}
+	}
+	for (let name in type.types) {
+		let title = type.types[name].conf.title;
+		item.content[name] = title;
+	}
+	return item;
 }
