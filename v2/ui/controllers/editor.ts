@@ -1,4 +1,5 @@
-import { Change, ELE } from "../../base/view.js";
+import { Change } from "../../base/view.js";
+import { ELE } from "../../base/ele";
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 

@@ -1,7 +1,7 @@
 import { BaseController, Graph, Owner, Receiver } from "../base/control.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
-import { ELE } from "../base/view.js";
+import { ELE } from "../base/ele.js";
 
 export class ElementController extends BaseController<ELE> implements Shape {
 	get owner(): Graph<ELE> {

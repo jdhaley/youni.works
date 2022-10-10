@@ -10,7 +10,7 @@ import { toHtml } from "../transform/toHtml.js";
 
 import { ViewBox, ViewOwner, getView } from "../box/box.js";
 import { Article, Editor } from "../base/editor.js";
-import { ELE } from "../base/view.js";
+import { ELE } from "../base/ele";
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {

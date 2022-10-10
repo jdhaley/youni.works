@@ -1,5 +1,5 @@
 import { bundle } from "../base/util.js";
-import { ELE } from "../base/view.js";
+import { ELE } from "../base/ele.js";
 import { Part } from "./item.js";
 
 export function fromHtml(source: Node): Part[] {

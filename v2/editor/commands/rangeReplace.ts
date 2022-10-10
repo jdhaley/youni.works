@@ -1,5 +1,5 @@
 import { value } from "../../base/model.js";
-import { ELE } from "../../base/view.js";
+import { ELE } from "../../base/ele.js";
 
 import { unmark, bindViewNode, narrowRange, mark, getEditor, getChildEditor } from "../util.js";
 import { Replace } from "./replace.js";

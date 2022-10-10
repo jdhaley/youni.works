@@ -2,7 +2,7 @@ import { value, record } from "../../base/model.js";
 import { Editor } from "../../base/editor.js";
 
 import { getView, ViewBox } from "../box.js";
-import { ele, ELE } from "../../base/view.js";
+import { ele, ELE } from "../../base/ele.js";
 
 export class RecordBox extends ViewBox {
 	contentType = "record";

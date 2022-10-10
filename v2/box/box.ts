@@ -1,5 +1,6 @@
 import { value } from "../base/model.js";
-import { Box, ELE, ele, ViewType } from "../base/view.js";
+import { Box, ViewType } from "../base/view.js";
+import { ELE, ele } from "../base/ele.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions } from "../base/control.js";
 import { BaseType } from "../base/type.js";

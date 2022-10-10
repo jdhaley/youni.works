@@ -5,7 +5,7 @@ import { Editor } from "../../base/editor.js";
 import { ViewBoxType } from "../box.js";
 
 import { RecordBox } from "./record.js";
-import { ele, ELE } from "../../base/view.js";
+import { ele, ELE } from "../../base/ele.js";
 
 
 export class RowBox extends RecordBox {

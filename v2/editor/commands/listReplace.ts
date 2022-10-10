@@ -3,7 +3,7 @@ import { Editor } from "../../base/editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { clearContent, getChildEditor } from "../util.js";
-import { ELE } from "../../base/view.js";
+import { ELE } from "../../base/ele.js";
 
 export class ListReplace extends RangeReplace {
 	exec(range: Range, content: value): Range {

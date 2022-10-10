@@ -1,5 +1,5 @@
 import { item } from "../../base/model.js";
-import { ele } from "../../base/view.js";
+import { ele } from "../../base/ele.js";
 import { getView } from "../box.js";
 import { TextBox } from "./text.js";
 

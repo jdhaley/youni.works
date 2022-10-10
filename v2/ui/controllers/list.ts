@@ -3,7 +3,7 @@ import {EditEvent, UserEvent} from "../ui.js";
 import {getFooter, getHeader} from "../../editor/util.js";
 import editable from "./editor.js";
 import { Editor } from "../../base/editor.js";
-import { ELE } from "../../base/view.js";
+import { ELE } from "../../base/ele";
 
 export default extend(editable, {
 	dblclick(event: UserEvent) {

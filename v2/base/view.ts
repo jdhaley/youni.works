@@ -18,11 +18,6 @@ export interface View<T> {
 interface Filter {
 }
 
-export interface ELE extends Element {
-}
-export function ele(value: any): Element {
-	return value instanceof Element ? value : null;
-}
 export interface Box<T> extends View<T>, Control<T>, Shape {
 	readonly header?: T;
 	readonly footer?: T;
