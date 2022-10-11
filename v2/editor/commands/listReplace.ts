@@ -3,10 +3,9 @@ import { Editor } from "../../base/editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { clearContent, getChildEditor } from "../util.js";
-import { ELE } from "../../base/ele.js";
-
+import { ELE, RANGE } from "../../base/ele.js";
 export class ListReplace extends RangeReplace {
-	exec(range: Range, content: value): Range {
+	exec(range: RANGE, content: value): RANGE {
 		if (!content) content = [];
 		if (!(content instanceof Array)) content = [{
 			type$: "para", //TODO fix hard coded type.
@@ -14,7 +13,7 @@ export class ListReplace extends RangeReplace {
 		}];
 		return super.exec(range, content);
 	}
-	protected execReplace(range: Range, content: value): Range {
+	protected execReplace(range: RANGE, content: value): RANGE {
 		let editor = this.owner.getControl(this.viewId);
 		let start = getChildEditor(editor, range.startContainer);
 		let end = getChildEditor(editor, range.endContainer);
@@ -27,24 +26,24 @@ export class ListReplace extends RangeReplace {
 		this.onInsert(range, content);
 		return range;
 	}
-	protected onSingleContainer(range: Range, content: value, container: Editor): void {
+	protected onSingleContainer(range: RANGE, content: value, container: Editor): void {
 		//overridden for markup
 	}
-	protected onStartContainer(range: Range, content: value, start: Editor): void {
+	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
 		r.setEnd(start.content, start.content.childNodes.length);
 		clearContent(r);
 		this.merge(start, r, content, true);
 		range.setStartAfter(start.node);
 	}
-	protected onEndContainer(range: Range, content: value, end: Editor): void {
+	protected onEndContainer(range: RANGE, content: value, end: Editor): void {
 		let r = range.cloneRange();
 		r.setStart(end.content, 0);
 		clearContent(r);
 		this.merge(end, r, content, false);
 		range.setEndBefore(end.node);
 	}
-	protected onInsert(range: Range, content: value): void {
+	protected onInsert(range: RANGE, content: value): void {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!content) return;
@@ -61,7 +60,7 @@ export class ListReplace extends RangeReplace {
 			range.collapse();
 		}
 	}
-	protected merge(view: Editor, range: Range, content: any, isStart: boolean) {
+	protected merge(view: Editor, range: RANGE, content: any, isStart: boolean) {
 		//overridden for markup
 	}
 }

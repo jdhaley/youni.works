@@ -1,6 +1,6 @@
 import { value } from "./model.js";
 import { View, ViewType } from "./view.js";
-import { ELE } from "./ele.js";
+import { ELE, RANGE } from "./ele.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
 import { Receiver, Graph } from "./control.js";
@@ -8,8 +8,8 @@ import { Receiver, Graph } from "./control.js";
 export interface Editor extends View<ELE> {
 	readonly owner: Article;
 	readonly node: ELE;
-	edit(commandName: string, range: Range, content?: value): Range;
-	getContent(range?: Range): ELE;
+	edit(commandName: string, range: RANGE, content?: value): RANGE;
+	getContent(range?: RANGE): ELE;
 }
 
 export interface ItemEditor extends Editor {
@@ -23,29 +23,9 @@ export interface Article extends Graph<ELE>, Receiver {
 	node: ELE;
 	types: bundle<ViewType<ELE>>;
 	unknownType: ViewType<ELE>;
-	commands: CommandBuffer<Range>;
+	commands: CommandBuffer<RANGE>;
 
 	getControl(id: string): Editor;
-	setRange(extent: Range, collapse?: boolean): void;
+	setRange(extent: RANGE, collapse?: boolean): void;
 	createElement(tag: string): ELE;
-}
-
-/* DEVT */
-
-interface EditRange<T> {
-	startContainer: T;
-    startOffset: number;
-	endContainer: T;
-    endOffset: number;
-}
-
-interface TNode<T> {
-	readonly $control?: Editor; //View<T>;
-	textContent: string;
-}
-
-interface TEle<T> extends TNode<T> {
-	readonly children?: Iterable<T>;
-	readonly classList: bundle<string>;
-	append(view: any): void;
 }

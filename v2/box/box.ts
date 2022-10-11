@@ -1,18 +1,18 @@
 import { value } from "../base/model.js";
 import { Box, ViewType } from "../base/view.js";
-import { ELE, ele } from "../base/ele.js";
+import { ELE, ele, LOC, RANGE } from "../base/ele.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions } from "../base/control.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
-
+import { nodeOf } from "../base/ele.js";
 import { ElementController, ElementOwner } from "./shape.js";
 
 interface ViewNode extends ELE {
 	$control?: Editor;
 }
 
-type editor = (this: Editor, commandName: string, range: Range, content?: value) => Range;
+type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
 
 export abstract class ViewBox extends ElementController implements Box<ELE>, Editor {
 	constructor(actions: Actions, editor: editor) {
@@ -38,9 +38,9 @@ export abstract class ViewBox extends ElementController implements Box<ELE>, Edi
 	}
 	
 	protected abstract viewContent(model: value): void;
-	abstract valueOf(range?: Range): value;
+	abstract valueOf(range?: RANGE): value;
 
-	edit(commandName: string, range: Range, content?: value): Range {
+	edit(commandName: string, range: RANGE, content?: value): RANGE {
 		console.warn("edit() has not been configured.")
 		return null;
 	}
@@ -90,7 +90,7 @@ export abstract class ViewBox extends ElementController implements Box<ELE>, Edi
 		element.removeAttribute("data-item");
 		delete element.id;
 	}
-	getContent(range?: Range): ELE {
+	getContent(range?: RANGE): ELE {
 		return viewContent(this, range);
 	}
 }
@@ -187,8 +187,8 @@ export function bindViewNode(view: ELE): void {
 	}
 }
 
-function getViewNode(node: Node | Range): ViewNode {
-	if (node instanceof Range) node = node.commonAncestorContainer;
+function getViewNode(loc: LOC): ViewNode {
+	let node = nodeOf(loc);
 	while (node) {
 		let e = ele(node);
 		if (e?.getAttribute("data-item")) {
@@ -196,22 +196,22 @@ function getViewNode(node: Node | Range): ViewNode {
 				console.warn("Unbound view.");
 				bindViewNode(e);
 			}
-			return e;
+			return e as ViewNode;
 		}
 		node = node.parentElement;
 	}
 }
 
-export function getView(node: Node | Range): ViewBox {
+export function getView(node: LOC): ViewBox {
 	let view = getViewNode(node)?.$control;
 	if (view instanceof ViewBox) return view;
 }
 
-function viewContent(view: ViewBox, range: Range, out?: ELE) {
-	if (range && !range.intersectsNode(view.content)) return;
+function viewContent(view: ViewBox, range: RANGE, out?: ELE) {
+	if (range && !range.intersectsNode(view.content as any)) return;
 	let item: ELE;
 	if (!out) {
-		item = document.implementation.createDocument("", view.type.name).documentElement as ELE;
+		item = document.implementation.createDocument("", view.type.name).documentElement as unknown as ELE;
 	} else {
 		item = out.ownerDocument.createElement(view.type.name);
 		out.append(item);
@@ -223,7 +223,7 @@ function viewContent(view: ViewBox, range: Range, out?: ELE) {
 	return item;
 }
 
-function content(view: ViewBox, range: Range, out: ELE) {
+function content(view: ViewBox, range: RANGE, out: ELE) {
 	for (let node of view.content.childNodes) {
 		if (range && !range.intersectsNode(node))
 			continue;
@@ -249,7 +249,7 @@ function content(view: ViewBox, range: Range, out: ELE) {
 }
 
 
-export function navigate(start: Node | Range, isBack?: boolean) {
+export function navigate(start: LOC, isBack?: boolean) {
 	let editor = getView(start);
 	while (editor) {
 		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;

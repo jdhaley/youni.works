@@ -1,6 +1,6 @@
 import { value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
-import { ele, ELE } from "../../base/ele.js";
+import { ele, ELE, RANGE } from "../../base/ele.js";
 
 import { ViewBox } from "../box.js";
 
@@ -14,7 +14,7 @@ export class TextBox extends ViewBox {
 			this.content.textContent = model ? "" + model : "";
 		}
 	}
-	valueOf(range?: Range): value {
+	valueOf(range?: RANGE): value {
 		let model = "";
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let node of (this.content as ELE).childNodes) {

@@ -5,8 +5,7 @@ import { Editor } from "../../base/editor.js";
 import { ViewBoxType } from "../box.js";
 
 import { RecordBox } from "./record.js";
-import { ele, ELE } from "../../base/ele.js";
-
+import { ele, ELE, RANGE } from "../../base/ele.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
@@ -31,7 +30,7 @@ export class RowBox extends RecordBox {
 		if (!this.rowHeader && !content.header) {
 			let item = createHeaderItem(this.type);
 			let hdr = this.type.view(item) as RowBox;
-			this.node.parentNode.insertBefore(hdr.node, this.node);
+			this.node.parentElement.insertBefore(hdr.node, this.node);
 		} else if (content.header) {
 			this.isHeader = true;
 		}
@@ -61,7 +60,7 @@ export class RowBox extends RecordBox {
 			child.node.classList.add("field");
 		}
 	}
-	valueOf(range?: Range): value {
+	valueOf(range?: RANGE): value {
 		if (this.isHeader) return;
 		let row: item = {
 			type$: this.type.name,
@@ -102,7 +101,7 @@ function createType(type: ViewBoxType, columns: string[]): ViewBoxType {
 	return type;
 }
 
-function rowContent(model: record, view: ELE, range: Range): record {
+function rowContent(model: record, view: ELE, range: RANGE): record {
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {

@@ -3,9 +3,10 @@ import { Editor, ItemEditor } from "../../base/editor.js";
 
 import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
+import { RANGE } from "../../base/ele.js";
 
 export class MarkupReplace extends ListReplace {
-	protected getOuterRange(range: Range) {
+	protected getOuterRange(range: RANGE) {
 		/*
 			For markup, the replace range may come from a single line
 			(due to merge & join of the start & end). In this case select
@@ -19,7 +20,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		return super.getOuterRange(range);
 	}
-	protected onSingleContainer(range: Range, content: value, editor: ItemEditor): void {
+	protected onSingleContainer(range: RANGE, content: value, editor: ItemEditor): void {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
@@ -54,7 +55,7 @@ export class MarkupReplace extends ListReplace {
 		if (!(this.name == "Split")) this.merge(end, r, content, false);
 		//note: onInsert() handles the remainder of the 'paste' content.
 	}
-	protected onStartContainer(range: Range, content: value, start: Editor): void {
+	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
 		r.setEnd(start.content, start.content.childNodes.length);
 		r.deleteContents();
@@ -68,7 +69,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		range.setStartBefore(start.node);
 	}
-	protected merge(view: ItemEditor, range: Range, content: any, isStart: boolean) {
+	protected merge(view: ItemEditor, range: RANGE, content: any, isStart: boolean) {
 		let item: item = content?.length && content[isStart ? 0 : content.length - 1];
 		if (!item) return;
 

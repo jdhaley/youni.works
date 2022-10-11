@@ -8,9 +8,9 @@ import { section } from "../transform/item.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { ViewBox, ViewOwner, getView } from "../box/box.js";
+import { ViewOwner, getView } from "../box/box.js";
 import { Article, Editor } from "../base/editor.js";
-import { ELE } from "../base/ele";
+import { ELE, RANGE } from "../base/ele";
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -22,10 +22,10 @@ export class Display extends ViewOwner implements Article {
 	}
 	readonly frame: Frame;
 	readonly service: RemoteFileService;
-	readonly commands: CommandBuffer<Range>;
+	readonly commands: CommandBuffer<RANGE>;
 
 	/* Supports the Article interface (which has no owner dependency) */
-	setRange(range: Range, collapse?: boolean): void {
+	setRange(range: RANGE, collapse?: boolean): void {
 		if (range) {
 			if (collapse) range.collapse();
 			this.frame.selectionRange = range;
@@ -40,7 +40,7 @@ export class Display extends ViewOwner implements Article {
 	}
 }
 
-export class Frame extends Owner<HTMLElement> {
+export class Frame extends Owner<ELE> {
 	constructor(window: Window, actions: Actions) {
 		super();
 		window.document.body.textContent = "";
@@ -55,7 +55,7 @@ export class Frame extends Owner<HTMLElement> {
 	}
 	#window: Window;
 
-	get view(): HTMLElement {
+	get view(): ELE {
 		return this.#window.document.body;
 	}
 	get location() {
@@ -68,7 +68,7 @@ export class Frame extends Owner<HTMLElement> {
 		return this.#window.getSelection();
 	}
 	get selectionRange() {
-		let range: Range;
+		let range: RANGE;
 		let selection = this.selection;
 		if (selection && selection.rangeCount) {
 			range = selection.getRangeAt(0);
@@ -77,18 +77,18 @@ export class Frame extends Owner<HTMLElement> {
 		}
 		return range;
 	}
-	set selectionRange(range: Range) {
+	set selectionRange(range: RANGE) {
 		let selection = this.selection;
 		if (selection && selection.rangeCount) {
 			selection.removeAllRanges();
 		}
-		if (range) selection.addRange(range);
+		if (range) selection.addRange(range as Range);
 	}
 
 	createElement(tagName: string): HTMLElement {
 		return this.#window.document.createElement(tagName) as HTMLElement;
 	}
-	createRange(): Range {
+	createRange(): RANGE {
 		return this.#window.document.createRange();
 	}
 	getElementById(id: string) {
@@ -107,23 +107,23 @@ export class Frame extends Owner<HTMLElement> {
 
 export interface EditEvent extends Signal, InputEvent {
 	frame: Frame;
-	source: HTMLElement;
-	on: HTMLElement;
+	source: ELE;
+	on: ELE;
 	//all user events
 	direction: "up";
 
 	//selection events (selection, keyboard, clipboard)
-	range: Range;
+	range: RANGE;
 }
 export interface UserEvent extends Signal, UIEvent {
 	frame: Frame;
-	source: HTMLElement;
-	on: HTMLElement;
+	source: ELE;
+	on: ELE;
 	//all user events
 	direction: "up";
 
 	//selection events (selection, keyboard, clipboard)
-	range: Range;
+	range: RANGE;
 
 	//clipboard events
 	clipboardData?: DataTransfer;
@@ -139,9 +139,11 @@ export interface UserEvent extends Signal, UIEvent {
     key: string;
 
 	//mouse support - to be reviewed.
-    track?: HTMLElement;
+    track?: ELE;
     x?: number;
     y?: number;
+
+	target: any;
 }
 
 export function getClipboard(clipboard: DataTransfer) {
@@ -157,7 +159,7 @@ export function getClipboard(clipboard: DataTransfer) {
 	return clipboard.getData("text/plain");
 }
 
-export function setClipboard(range: Range, clipboard: DataTransfer) {
+export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 	let control = getView(range) as Editor;
 	let model = control?.valueOf(range);
 	if (!model) return;
@@ -178,7 +180,7 @@ export function setClipboard(range: Range, clipboard: DataTransfer) {
 	// control.type.view(content as any, article as ViewBox);
 }
 
-function getArticle(range: Range) {
+function getArticle(range: RANGE) {
 	let view = getView(range);
 	while (view) {
 		if (!view.type.partOf) return view;

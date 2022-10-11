@@ -1,6 +1,6 @@
 import { value, list } from "../../base/model.js";
 import { ViewType, viewTypeOf } from "../../base/view.js";
-import { ele, ELE } from "../../base/ele.js";
+import { ele, ELE, RANGE } from "../../base/ele.js";
 
 import { getView, ViewBox } from "../box.js";
 
@@ -29,7 +29,7 @@ export class ListBox extends ViewBox {
 			}
 		}
 	}
-	valueOf(range?: Range): list {
+	valueOf(range?: RANGE): list {
 		let model: value[];
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let part of this.content.children) {

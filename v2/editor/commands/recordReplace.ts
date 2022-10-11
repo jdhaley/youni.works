@@ -3,26 +3,17 @@ import { Editor } from "../../base/editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { getChildEditor, getEditor, clearContent } from "../util.js";
+import { RANGE } from "../../base/ele.js";
 
 export class RecordReplace extends RangeReplace {
-	// protected execBefore(range: Range): void {
-	// 	super.execBefore(range);
-	// 	let content = getEditor(range).content;
-	// 	this.before = content?.innerHTML || "";
-	// }
-	protected execReplace(range: Range, record: record): Range {
+	protected execReplace(range: RANGE, record: record): RANGE {
 		clearContent(range);
 		if (record) mergeContent(this, range, record);
 		return range;
 	}
-	// protected execAfter(range: Range): Range {
-	// 	let content = getEditor(range).content;	
-	// 	this.after = content?.innerHTML || "";
-	// 	return super.execAfter(range);
-	// }
 }
 
-function mergeContent(cmd: RangeReplace, range: Range, record: record) {
+function mergeContent(cmd: RangeReplace, range: RANGE, record: record) {
 	let editor = getEditor(range);
 	let start = getChildEditor(editor, range.startContainer);
 	let end = getChildEditor(editor, range.endContainer);

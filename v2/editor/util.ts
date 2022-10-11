@@ -1,14 +1,13 @@
 import { Editor } from "../base/editor.js";
-import { ele, ELE } from "../base/ele.js";
+import { ele, ELE, END_TO_END, LOC, NODE, nodeOf, RANGE, START_TO_START } from "../base/ele.js";
 import { getView, bindViewNode } from "../box/box.js";
-
 
 export { getEditor, bindViewNode }
 
 //Hide the ViewBox return type so the implementation doesn't leak
-const getEditor = getView as (node: Node | Range) => Editor ;
+const getEditor = getView as (node: LOC) => Editor ;
 
-export function getChildEditor(editor: Editor, node: Node): Editor {
+export function getChildEditor(editor: Editor, node: NODE): Editor {
 	if (node == editor.content) return null;
 	while (node?.parentElement != editor.content) {
 		node = node.parentElement;
@@ -16,7 +15,7 @@ export function getChildEditor(editor: Editor, node: Node): Editor {
 	if (ele(node) && node["$control"]) return node["$control"] as Editor;
 }
 
-export function narrowRange(range: Range) {
+export function narrowRange(range: RANGE) {
 	let editor = getView(range);
 	if (!editor) return;
 
@@ -34,27 +33,27 @@ export function narrowRange(range: Range) {
 	}
 }
 
-export function getHeader(view: ELE, node: Node) {
+export function getHeader(view: ELE, node: NODE) {
 	while (node && node != view) {
 		if (node.nodeName == "HEADER" && node.parentElement == view) return node as ELE;
 		node = node.parentElement;
 	}
 }
 
-export function getFooter(view: ELE, node: Node) {
+export function getFooter(view: ELE, node: NODE) {
 	while (node && node != view) {
 		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as ELE;
 		node = node.parentElement;
 	}
 }
 
-export function mark(range: Range) {
+export function mark(range: RANGE) {
 	let marker = insertMarker(range, "end");
 	range.setEndBefore(marker);
 	marker = insertMarker(range, "start");
 	range.setStartAfter(marker);
 
-	function insertMarker(range: Range, point: "start" | "end") {
+	function insertMarker(range: RANGE, point: "start" | "end") {
 		let marker = range.commonAncestorContainer.ownerDocument.createElement("I");
 		marker.id = point + "-marker";
 		range = range.cloneRange();
@@ -64,7 +63,7 @@ export function mark(range: Range) {
 	}	
 }
 
-export function unmark(range: Range) {
+export function unmark(range: RANGE) {
 	let doc = range.commonAncestorContainer.ownerDocument;
 	//Patch the replacement points.
 	let r = patchPoint(doc.getElementById("start-marker"));
@@ -114,7 +113,7 @@ function patchText(marker: Node) {
 	}
 }
 
-export function clearContent(range: Range) {
+export function clearContent(range: RANGE) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		let editor = getView(node);
@@ -143,20 +142,21 @@ compareToRange(node, range):
 - INSIDE	The Node is enclosed by the range.
 - END		The Node intersects the end of the range.
 */
-function enclosedInRange(view: ELE, range: Range) {
+function enclosedInRange(view: ELE, range: RANGE) {
 	let r = view.ownerDocument.createRange();
 	r.selectNode(view);
 	// before −1.
 	// equal 0.
 	// after 1.
-	if (range.compareBoundaryPoints(Range.START_TO_START, r) != 1
-		&& range.compareBoundaryPoints(Range.END_TO_END, r) != -1) {
+	if (range.compareBoundaryPoints(START_TO_START, r) != 1
+		&& range.compareBoundaryPoints(END_TO_END, r) != -1) {
 		return true;
 	}
 }
 
-export function rangeIterator(range: Range) {
-	return document.createNodeIterator(range.commonAncestorContainer, NodeFilter.SHOW_ALL, 
+export function rangeIterator(range: RANGE) {
+	let node = nodeOf(range) as Node;
+	return document.createNodeIterator(node, NodeFilter.SHOW_ALL, 
 		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
 	)
 }

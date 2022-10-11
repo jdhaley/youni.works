@@ -1,5 +1,5 @@
 import { item } from "../../base/model.js";
-import { ele } from "../../base/ele.js";
+import { ele, RANGE } from "../../base/ele.js";
 import { getView } from "../box.js";
 import { TextBox } from "./text.js";
 
@@ -71,7 +71,7 @@ export class LineBox extends TextBox {
 			this.level = content.level;	
 		}
 	}
-	valueOf(range?: Range): item {
+	valueOf(range?: RANGE): item {
 		let line = this.node;
 		if (range && !range.intersectsNode(this.content)) return;
 		let content = super.valueOf(range);

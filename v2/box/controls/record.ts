@@ -2,7 +2,7 @@ import { value, record } from "../../base/model.js";
 import { Editor } from "../../base/editor.js";
 
 import { getView, ViewBox } from "../box.js";
-import { ele, ELE } from "../../base/ele.js";
+import { ele, ELE, RANGE } from "../../base/ele.js";
 
 export class RecordBox extends ViewBox {
 	contentType = "record";
@@ -41,7 +41,7 @@ export class RecordBox extends ViewBox {
 		return member;
 	}
 
-	valueOf(range?: Range): value {
+	valueOf(range?: RANGE): value {
 		let model = recordContent(null, this.content as ELE, range);
 		if (model) {
 			model["type$"] = this.type.name;
@@ -50,7 +50,7 @@ export class RecordBox extends ViewBox {
 	}
 }
 
-function recordContent(model: record, view: ELE, range: Range): record {
+function recordContent(model: record, view: ELE, range: RANGE): record {
 	if (range && !range.intersectsNode(view)) return model;
 	
 	for (let child of view.children) {

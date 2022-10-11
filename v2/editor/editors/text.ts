@@ -3,8 +3,9 @@ import { Editor } from "../../base/editor.js";
 
 import { getEditor, getHeader, mark, narrowRange, unmark } from "../util.js";
 import { Replace } from "../commands/replace.js";
+import { RANGE } from "../../base/ele.js";
 
-export default function	edit(this: Editor, commandName: string, range: Range, content: string): Range {
+export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): RANGE {
 	if (getEditor(range) != this) console.warn("Invalid edit range");
 	positionToText(range);
 	let cmd = COMMANDS[commandName];
@@ -38,7 +39,7 @@ let lastEdit = {
 	start: 0,
 	end: 0
 }
-function doit(commandName: string, range: Range, text: string): Range {
+function doit(commandName: string, range: RANGE, text: string): RANGE {
 	let node = range.commonAncestorContainer;
 	let editor = getEditor(node);
 
@@ -73,7 +74,7 @@ function doit(commandName: string, range: Range, text: string): Range {
 }
 
 
-function doAgain(cmd: Replace, range: Range, text: string) {
+function doAgain(cmd: Replace, range: RANGE, text: string) {
 	let currentOffset = range.startOffset; //start & end are the same.
 	switch (cmd.name) {
 		case "Entry":
@@ -94,7 +95,7 @@ function doAgain(cmd: Replace, range: Range, text: string) {
 	}
 }
 
-function editAgain(range: Range, cmd: Replace, char: string) {
+function editAgain(range: RANGE, cmd: Replace, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.end) + char + text.substring(lastEdit.end);
@@ -105,7 +106,7 @@ function editAgain(range: Range, cmd: Replace, char: string) {
 	return endagain(range, cmd);
 }
 
-function deleteAgain(range: Range, cmd: Replace, char: string) {
+function deleteAgain(range: RANGE, cmd: Replace, char: string) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.start) + text.substring(lastEdit.start + 1);
@@ -115,7 +116,7 @@ function deleteAgain(range: Range, cmd: Replace, char: string) {
 	return endagain(range, cmd);
 }
 
-function eraseAgain(range: Range, cmd: Replace) {
+function eraseAgain(range: RANGE, cmd: Replace) {
 	let node = range.commonAncestorContainer;
 	let text = node.textContent;
 	text = text.substring(0, lastEdit.start - 1) + text.substring(lastEdit.start);
@@ -126,7 +127,7 @@ function eraseAgain(range: Range, cmd: Replace) {
 	return endagain(range, cmd);
 }
 
-function endagain(range: Range, cmd: Replace) {
+function endagain(range: RANGE, cmd: Replace) {
 	mark(range);
 	cmd.after = getEditor(range).content.innerHTML || "";
 	unmark(range);
@@ -158,7 +159,7 @@ function endagain(range: Range, cmd: Replace) {
 // 	console.log("unmark:", out, range)
 // }
 
-function positionToText(range: Range) {
+function positionToText(range: RANGE) {
 	let inHeader = getHeader(getEditor(range).node, range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {

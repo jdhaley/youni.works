@@ -2,12 +2,13 @@ import { ItemEditor } from "../../base/editor.js";
 
 import { Edit } from "./edit.js";
 import { getChildEditor, getEditor } from "../util.js";
+import { RANGE } from "../../base/ele.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
 	startId: string;
 	endId: string;
-	exec(range: Range): Range {
+	exec(range: RANGE): RANGE {
 		let editor = this.owner.getControl(this.viewId);
 		this.startId = getChildEditor(editor, range.startContainer)?.node.id;
 		this.endId = getChildEditor(editor, range.endContainer)?.node.id;

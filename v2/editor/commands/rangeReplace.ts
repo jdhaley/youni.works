@@ -1,5 +1,5 @@
 import { value } from "../../base/model.js";
-import { ELE } from "../../base/ele.js";
+import { ELE, RANGE } from "../../base/ele.js";
 
 import { unmark, bindViewNode, narrowRange, mark, getEditor, getChildEditor } from "../util.js";
 import { Replace } from "./replace.js";
@@ -8,14 +8,14 @@ export abstract class RangeReplace extends Replace {
 	startId: string;
 	endId: string;
 
-	exec(range: Range, content: any): Range {
+	exec(range: RANGE, content: any): RANGE {
 		this.execBefore(range);
 		range = this.execReplace(range, content);
 		return this.execAfter(range);
 	}
 
-	protected abstract execReplace(range: Range, content: value): Range;
-	protected execBefore(range: Range) {
+	protected abstract execReplace(range: RANGE, content: value): RANGE;
+	protected execBefore(range: RANGE) {
 		narrowRange(range);
 		mark(range);
 		//NB - the outer range is a different range from the
@@ -25,13 +25,13 @@ export abstract class RangeReplace extends Replace {
 		captureRange(this, view.content, range.startOffset, range.endOffset);
 		this.before = view.getContent(range).innerHTML;
 	}
-	protected execAfter(range: Range): Range {
+	protected execAfter(range: RANGE): RANGE {
 		range = this.getReplaceRange();
 		let view = getEditor(range);
 		this.after = view.getContent(range).innerHTML;
 		return unmark(range);
 	}
-	protected getOuterRange(range: Range) {
+	protected getOuterRange(range: RANGE) {
 		range = range.cloneRange();
 		let editor = getEditor(range);
 		range.selectNodeContents(editor.content);
@@ -75,7 +75,7 @@ export abstract class RangeReplace extends Replace {
 			range.insertNode(node);
 			range.collapse();
 			if (node.nodeType == Node.ELEMENT_NODE) {
-				bindViewNode(node as ELE);
+				bindViewNode(node as any);
 			}
 		}
 		return unmark(range);

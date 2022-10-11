@@ -1,7 +1,8 @@
 import { Command } from "../../base/command.js";
 import { Article } from "../../base/editor.js";
+import { RANGE } from "../../base/ele.js";
 
-export abstract class Edit extends Command<Range> {
+export abstract class Edit extends Command<RANGE> {
 	constructor(owner: Article, name: string, viewId: string) {
 		super();
 		this.owner = owner;

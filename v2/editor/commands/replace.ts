@@ -1,3 +1,4 @@
+import { RANGE } from "../../base/ele.js";
 import { getEditor, mark, unmark } from "../util.js";
 import { Edit } from "./edit.js";
 
@@ -5,7 +6,7 @@ export class Replace extends Edit {
 	before: string;
 	after: string;
 
-	exec(range: Range, text: string): Range {
+	exec(range: RANGE, text: string): RANGE {
 		mark(range);
 		let content = getEditor(range)?.content;
 		if (!content) return;
