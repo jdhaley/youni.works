@@ -1,5 +1,5 @@
 import { Change } from "../../base/view.js";
-import { ELE, TREENODE, RANGE } from "../../base/ele";
+import { ELE, TREENODE, RANGE } from "../../base/dom";
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 

@@ -3,7 +3,7 @@ import { Editor } from "../../base/editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { getChildEditor, getEditor, clearContent } from "../util.js";
-import { RANGE } from "../../base/ele.js";
+import { RANGE } from "../../base/dom.js";
 
 export class RecordReplace extends RangeReplace {
 	protected execReplace(range: RANGE, record: record): RANGE {

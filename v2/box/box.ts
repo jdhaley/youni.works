@@ -1,11 +1,11 @@
 import { value } from "../base/model.js";
 import { Box, ViewType } from "../base/view.js";
-import { ELE, ele, RANGE, TREENODE } from "../base/ele.js";
+import { ELE, ele, RANGE, TREENODE } from "../base/dom.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions } from "../base/control.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
-import { nodeOf } from "../base/ele.js";
+import { nodeOf } from "../base/dom.js";
 import { ElementController, ElementOwner } from "./shape.js";
 
 interface ViewNode extends ELE {

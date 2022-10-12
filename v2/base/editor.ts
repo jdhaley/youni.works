@@ -1,6 +1,6 @@
 import { value } from "./model.js";
 import { View, ViewType } from "./view.js";
-import { ELE, RANGE } from "./ele.js";
+import { ELE, RANGE } from "./dom.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
 import { Receiver, Graph } from "./control.js";

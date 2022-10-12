@@ -4,7 +4,7 @@ import { Editor } from "../../base/editor.js";
 
 import { RecordReplace } from "../commands/recordReplace.js";
 import { getEditor } from "../util.js";
-import { RANGE } from "../../base/ele.js";
+import { RANGE } from "../../base/dom.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, record: record) {
 	if (getEditor(range) != this) console.warn("Invalid edit range");

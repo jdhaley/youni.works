@@ -9,6 +9,7 @@ interface DOCUMENT {
 	createTextNode(text: string): TREENODE;
 	createRange(): RANGE;
 }
+
 interface NODE {
 	readonly ownerDocument: DOCUMENT;
 	readonly nodeType: number;

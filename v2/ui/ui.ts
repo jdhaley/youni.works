@@ -10,7 +10,7 @@ import { toHtml } from "../transform/toHtml.js";
 
 import { ViewOwner, getView } from "../box/box.js";
 import { Article, Editor } from "../base/editor.js";
-import { ELE, RANGE } from "../base/ele";
+import { ELE, RANGE } from "../base/dom";
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {

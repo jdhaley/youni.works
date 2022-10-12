@@ -1,5 +1,5 @@
 import {Actions} from "../../base/control.js";
-import { ELE, nodeOf, RANGE, TREENODE } from "../../base/ele.js";
+import { ELE, nodeOf, RANGE, TREENODE } from "../../base/dom.js";
 import {Frame, UserEvent} from "../ui.js";
 
 export default {

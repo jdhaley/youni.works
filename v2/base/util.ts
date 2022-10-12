@@ -11,7 +11,7 @@ export interface bundle<T> {
 }
 
 export interface Sequence<T> extends Iterable<T> {
-	length: number;
+	readonly length: number;
 }
 export interface Collection<T>  {
 	contains(value: T): boolean;

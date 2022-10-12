@@ -1,5 +1,5 @@
 import { Editor } from "../base/editor.js";
-import { ele, ELE, END_TO_END, TREENODE, nodeOf, RANGE, START_TO_START } from "../base/ele.js";
+import { ele, ELE, END_TO_END, TREENODE, nodeOf, RANGE, START_TO_START } from "../base/dom.js";
 import { getView, bindViewNode } from "../box/box.js";
 
 export { getEditor, bindViewNode }

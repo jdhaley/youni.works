@@ -1,5 +1,5 @@
 import { bundle } from "../base/util.js";
-import { ELE, TREENODE } from "../base/ele.js";
+import { ELE, TREENODE } from "../base/dom.js";
 import { Part } from "./item.js";
 
 export function fromHtml(source: Node): Part[] {

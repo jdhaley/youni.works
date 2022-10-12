@@ -3,7 +3,7 @@ import { Editor } from "../../base/editor.js";
 
 import { getEditor, getHeader, mark, narrowRange, unmark } from "../util.js";
 import { Replace } from "../commands/replace.js";
-import { RANGE } from "../../base/ele.js";
+import { RANGE } from "../../base/dom.js";
 
 export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): RANGE {
 	if (getEditor(range) != this) console.warn("Invalid edit range");

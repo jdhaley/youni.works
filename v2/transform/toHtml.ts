@@ -1,5 +1,5 @@
 import { record } from "../base/model.js";
-import { ELE } from "../base/ele.js";
+import { ELE } from "../base/dom.js";
 import { Part } from "./item.js";
 
 export function toHtml(item: Part) {

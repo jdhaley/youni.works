@@ -1,4 +1,4 @@
-import { RANGE } from "../../base/ele.js";
+import { RANGE } from "../../base/dom.js";
 import { getEditor, mark, unmark } from "../util.js";
 import { Edit } from "./edit.js";
 

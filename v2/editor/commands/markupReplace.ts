@@ -3,7 +3,7 @@ import { Editor, ItemEditor } from "../../base/editor.js";
 
 import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
-import { RANGE } from "../../base/ele.js";
+import { RANGE } from "../../base/dom.js";
 
 export class MarkupReplace extends ListReplace {
 	protected getOuterRange(range: RANGE) {

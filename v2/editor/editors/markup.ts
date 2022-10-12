@@ -5,7 +5,7 @@ import { Editor } from "../../base/editor.js";
 import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/markupReplace.js";
 import { getChildEditor, getEditor } from "../util.js";
-import { RANGE } from "../../base/ele.js";
+import { RANGE } from "../../base/dom.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, content: string) {
 	if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"

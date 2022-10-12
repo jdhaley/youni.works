@@ -1,5 +1,5 @@
 import { Editor } from "../../base/editor.js";
-import { RANGE } from "../../base/ele.js";
+import { RANGE } from "../../base/dom.js";
 import { value } from "../../base/model.js";
 import { Change } from "../../base/view.js";
 

@@ -1,6 +1,6 @@
 import { value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
-import { ele, ELE, RANGE } from "../../base/ele.js";
+import { ele, ELE, RANGE } from "../../base/dom.js";
 
 import { ViewBox } from "../box.js";
 

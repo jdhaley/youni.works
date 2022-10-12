@@ -1,5 +1,5 @@
 import { item } from "../../base/model.js";
-import { ele, RANGE } from "../../base/ele.js";
+import { ele, RANGE } from "../../base/dom.js";
 import { getView } from "../box.js";
 import { TextBox } from "./text.js";
 
