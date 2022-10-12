@@ -165,24 +165,24 @@ export abstract class ViewOwner extends ElementOwner {
 	}
 }
 
-export function bindViewNode(view: ELE): void {
-	let control: ViewBox = view["$control"];
+export function bindViewNode(node: ELE): void {
+	let control: ViewBox = node["$control"];
 	if (!control) {
-		let name = view.getAttribute("data-item");
-		let parent = getViewNode(view.parentNode) as ViewNode;
+		let name = node.getAttribute("data-item");
+		let parent = getViewNode(node.parentNode) as ViewNode;
 		if (name && parent) {
 			console.log("binding.");
 			let type = parent.$control.type.types[name] as ViewBoxType;
 			if (type) {
 				control = Object.create(type.prototype);
-				control.control(view as any);
+				control.control(node as any);
 			} else {
 				console.warn(`Bind failed: Type "${name}" not found in "${parent.getAttribute("data-item")}"`)
 			}
 		}
 	}
 
-	if (control) for (let child of view["$control"].content.children) {
+	if (control) for (let child of node["$control"].content.children) {
 		bindViewNode(child as ViewNode);
 	}
 }
@@ -246,14 +246,16 @@ function content(view: ViewBox, range: RANGE, out: ELE) {
 	}
 }
 
-
-export function navigate(start: TREENODE | RANGE, isBack?: boolean) {
+interface NAVIGABLE_ELE extends ELE{
+	scrollIntoView(arg: any): void;
+}
+export function navigate(start: TREENODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
 	let editor = getView(start);
 	while (editor) {
 		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
-			if (next) return next;
+			if (next) return next as NAVIGABLE_ELE;
 		}
 		editor = getView(editor.node.parentNode);
 	}

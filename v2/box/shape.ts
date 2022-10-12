@@ -3,7 +3,12 @@ import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
 import { ELE, TREENODE } from "../base/dom.js";
 
+interface SHAPE_ELE extends ELE {
+	style: CSSStyleDeclaration;
+	getBoundingClientRect(): Area;
+}
 export class ElementController extends BaseController<ELE> implements Shape {
+	declare node: SHAPE_ELE;
 	get owner(): Graph<ELE> {
 		return ELEMENT_OWNER;
 	}
@@ -17,8 +22,8 @@ export class ElementController extends BaseController<ELE> implements Shape {
 		return EMPTY.array;
 	}
 
-	protected get style(): CSSStyleDeclaration {
-		return this.node["style"]
+	protected get style() {
+		return this.node.style;
 	}
 
 	getStyle(name: string): string {

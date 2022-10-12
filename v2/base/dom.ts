@@ -1,5 +1,4 @@
 import { Control } from "./control";
-import { Area } from "./shape";
 import { Collection, Sequence } from "./util";
 
 interface DOCUMENT {
@@ -10,9 +9,8 @@ interface DOCUMENT {
 	createRange(): RANGE;
 }
 
-interface NODE {
+export interface NODE {
 	readonly ownerDocument: DOCUMENT;
-	readonly nodeType: number;
 	readonly nodeName: string;
 	textContent: string;
 	innerHTML?: string;
@@ -52,9 +50,6 @@ export interface ELE extends TREENODE, MUTABLENODE {
 	append(data: any): void;
 	//use the mutable node before/after instead...
 		//insertBefore(ele: TREENODE, before: TREENODE): any;
-
-	scrollIntoView(arg: any): void;
-	getBoundingClientRect(): Area;
 }
 
 interface EXTENT {

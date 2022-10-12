@@ -3,7 +3,7 @@ import { Editor } from "../../base/editor.js";
 
 import { getEditor, getHeader, mark, narrowRange, unmark } from "../util.js";
 import { Replace } from "../commands/replace.js";
-import { RANGE } from "../../base/dom.js";
+import { ele, RANGE } from "../../base/dom.js";
 
 export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): RANGE {
 	if (getEditor(range) != this) console.warn("Invalid edit range");
@@ -168,7 +168,7 @@ function positionToText(range: RANGE) {
 			//force single text node...
 			content.textContent = content.textContent;
 		}
-		if (range.commonAncestorContainer.nodeType != Node.TEXT_NODE) {
+		if (ele(range.commonAncestorContainer)) {
 			range.selectNodeContents(content?.lastChild || content);
 			range.collapse(inHeader ? true : false);	
 		}

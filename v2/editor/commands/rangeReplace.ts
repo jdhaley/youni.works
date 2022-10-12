@@ -1,5 +1,5 @@
 import { value } from "../../base/model.js";
-import { ELE, RANGE } from "../../base/dom.js";
+import { ele, ELE, RANGE } from "../../base/dom.js";
 
 import { unmark, bindViewNode, narrowRange, mark, getEditor, getChildEditor } from "../util.js";
 import { Replace } from "./replace.js";
@@ -74,9 +74,7 @@ export abstract class RangeReplace extends Replace {
 			let node = content.firstChild;
 			range.insertNode(node);
 			range.collapse();
-			if (node.nodeType == Node.ELEMENT_NODE) {
-				bindViewNode(node as any);
-			}
+			if (ele(node)) bindViewNode(node as ELE);
 		}
 		return unmark(range);
 	}

@@ -11,7 +11,7 @@ export class RowBox extends RecordBox {
 	memberType = "cell";
 	declare isHeader: boolean;
 	get rowHeader(): RowBox {
-		for (let ele = this.node; ele; ele = ele.previousElementSibling) {
+		for (let ele = this.node as ELE; ele; ele = ele.previousElementSibling) {
 			if (ele.previousElementSibling?.nodeName != "UI-ROW") {
 				let editor = ele["$control"];
 				return editor instanceof RowBox && editor.isHeader ? editor : undefined;
