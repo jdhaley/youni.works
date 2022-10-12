@@ -1,16 +1,16 @@
 import { Editor } from "../base/editor.js";
-import { ele, ELE, END_TO_END, LOC, NODE, nodeOf, RANGE, START_TO_START } from "../base/ele.js";
+import { ele, ELE, END_TO_END, TREENODE, nodeOf, RANGE, START_TO_START } from "../base/ele.js";
 import { getView, bindViewNode } from "../box/box.js";
 
 export { getEditor, bindViewNode }
 
 //Hide the ViewBox return type so the implementation doesn't leak
-const getEditor = getView as (node: LOC) => Editor ;
+const getEditor = getView as (node: TREENODE | RANGE) => Editor ;
 
-export function getChildEditor(editor: Editor, node: NODE): Editor {
+export function getChildEditor(editor: Editor, node: TREENODE): Editor {
 	if (node == editor.content) return null;
-	while (node?.parentElement != editor.content) {
-		node = node.parentElement;
+	while (node?.parentNode != editor.content) {
+		node = node.parentNode;
 	}
 	if (ele(node) && node["$control"]) return node["$control"] as Editor;
 }
@@ -33,17 +33,17 @@ export function narrowRange(range: RANGE) {
 	}
 }
 
-export function getHeader(view: ELE, node: NODE) {
+export function getHeader(view: ELE, node: TREENODE) {
 	while (node && node != view) {
-		if (node.nodeName == "HEADER" && node.parentElement == view) return node as ELE;
-		node = node.parentElement;
+		if (node.nodeName == "HEADER" && node.parentNode == view) return node as ELE;
+		node = node.parentNode;
 	}
 }
 
-export function getFooter(view: ELE, node: NODE) {
+export function getFooter(view: ELE, node: TREENODE) {
 	while (node && node != view) {
-		if (node.nodeName == "FOOTER" && node.parentElement == view) return node as ELE;
-		node = node.parentElement;
+		if (node.nodeName == "FOOTER" && node.parentNode == view) return node as ELE;
+		node = node.parentNode;
 	}
 }
 
@@ -118,7 +118,7 @@ export function clearContent(range: RANGE) {
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		let editor = getView(node);
 		if (editor?.contentType == "record") {
-			if (getView(editor.node.parentElement)?.contentType == "list") {
+			if (getView(editor.node.parentNode)?.contentType == "list") {
 				if (enclosedInRange(editor.node, range)) editor.node.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {

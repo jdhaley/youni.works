@@ -21,11 +21,11 @@ export class ListBox extends ViewBox {
 	viewElement(content: ELE) {
 		if (!content) return;
 		for (let child of content.children) {
-			let childType = this.type.types[child.tagName];
+			let childType = this.type.types[child.nodeName];
 			if (childType) {
 				childType.view(child, this);
 			} else if (!child.id.endsWith("-marker")) {
-				console.warn("Unknown type: ", child.tagName);
+				console.warn("Unknown type: ", child.nodeName);
 			}
 		}
 	}

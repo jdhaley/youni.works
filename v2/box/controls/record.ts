@@ -28,7 +28,7 @@ export class RecordBox extends ViewBox {
 	protected viewElement(content: ELE): void {
 		let idx = {};
 		for (let member of content.children) {
-			idx[member.tagName] = member;
+			idx[member.nodeName] = member;
 		}
 		for (let name in this.type.types) {
 			this.viewMember(name, idx[name]);

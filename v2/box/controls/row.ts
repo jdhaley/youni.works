@@ -12,7 +12,7 @@ export class RowBox extends RecordBox {
 	declare isHeader: boolean;
 	get rowHeader(): RowBox {
 		for (let ele = this.node; ele; ele = ele.previousElementSibling) {
-			if (ele.previousElementSibling?.tagName != "UI-ROW") {
+			if (ele.previousElementSibling?.nodeName != "UI-ROW") {
 				let editor = ele["$control"];
 				return editor instanceof RowBox && editor.isHeader ? editor : undefined;
 			}
@@ -30,7 +30,7 @@ export class RowBox extends RecordBox {
 		if (!this.rowHeader && !content.header) {
 			let item = createHeaderItem(this.type);
 			let hdr = this.type.view(item) as RowBox;
-			this.node.parentElement.insertBefore(hdr.node, this.node);
+			this.node.before(hdr.node);
 		} else if (content.header) {
 			this.isHeader = true;
 		}
@@ -52,7 +52,7 @@ export class RowBox extends RecordBox {
 	protected viewElement(content: ELE): void {
 		let idx = {};
 		for (let child of content.children) {
-			idx[child.tagName] = child;
+			idx[child.nodeName] = child;
 		}
 		for (let name in this.type.types) {
 			let type = this.type.types[name];

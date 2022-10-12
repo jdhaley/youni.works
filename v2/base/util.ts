@@ -10,7 +10,10 @@ export interface bundle<T> {
 	[key: string]: T
 }
 
-export interface Bag<T> extends Iterable<T> {
+export interface Sequence<T> extends Iterable<T> {
+	length: number;
+}
+export interface Collection<T>  {
 	contains(value: T): boolean;
 	add(value: T): void;
 	remove(value: T): void;

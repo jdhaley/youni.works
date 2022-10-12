@@ -33,7 +33,7 @@ const COMMANDS = {
 function replace(this: Editor, commandName: string, range: RANGE, content?: value): RANGE {
 	let editor = getEditor(range);
 	if (editor.contentType == "line") {
-		editor = getEditor(editor.node.parentElement);
+		editor = getEditor(editor.node.parentNode);
 	}
 	if (editor.contentType != "markup") console.warn("View is not markup:", editor);
 

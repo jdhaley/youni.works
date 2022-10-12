@@ -1,5 +1,5 @@
 import { bundle } from "../base/util.js";
-import { ELE, NODE } from "../base/ele.js";
+import { ELE, TREENODE } from "../base/ele.js";
 import { Part } from "./item.js";
 
 export function fromHtml(source: Node): Part[] {
@@ -11,7 +11,7 @@ export function fromHtml(source: Node): Part[] {
 	}
 	return target;
 }
-type transform = (source: NODE, target: Part[], level?: number) => void;
+type transform = (source: TREENODE, target: Part[], level?: number) => void;
 
 const methods: bundle<transform> = {
 	strip(source: Node, target: Part[], level?: number) {
@@ -65,7 +65,7 @@ const methods: bundle<transform> = {
 		target.push(item);
 		methods.transform(source, target, level);
 	},
-	text(source: NODE, target: Part[]) {
+	text(source: TREENODE, target: Part[]) {
 		//For some stupid reason google docs puts everything in a "b" tag (with an id)
 		if (source.nodeName == "B" && (source as ELE).id) {
 			return methods.transform(source, target);
@@ -99,7 +99,7 @@ function append(item: Part, text: string) {
 		item.content = content;
 	}
 }
-function transformText(source: NODE) {
+function transformText(source: TREENODE) {
 	let text = source.textContent;
 	let out = "";
 	for (let i = 0; i < text.length; i++) {

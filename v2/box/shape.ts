@@ -1,7 +1,7 @@
 import { BaseController, Graph, Owner, Receiver } from "../base/control.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
-import { ELE } from "../base/ele.js";
+import { ELE, TREENODE } from "../base/ele.js";
 
 export class ElementController extends BaseController<ELE> implements Shape {
 	get owner(): Graph<ELE> {
@@ -81,8 +81,8 @@ export class ElementOwner extends Owner<ELE> {
 		return node["$control"];
 	}
 	getContainerOf(node: ELE): ELE {
-		for (let parent = node.parentElement; parent; parent = parent.parentElement) {
-			if (parent["$control"]) return parent;
+		for (let parent = node.parentNode as TREENODE; parent; parent = parent.parentNode) {
+			if (parent["$control"]) return parent as ELE;
 		}
 	}
 	getPartsOf(node: ELE): Iterable<ELE> {

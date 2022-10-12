@@ -1,6 +1,6 @@
 import { value } from "../base/model.js";
 import { Box, ViewType } from "../base/view.js";
-import { ELE, ele, LOC, RANGE } from "../base/ele.js";
+import { ELE, ele, RANGE, TREENODE } from "../base/ele.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -169,7 +169,7 @@ export function bindViewNode(view: ELE): void {
 	let control: ViewBox = view["$control"];
 	if (!control) {
 		let name = view.getAttribute("data-item");
-		let parent = getViewNode(view.parentElement) as ViewNode;
+		let parent = getViewNode(view.parentNode) as ViewNode;
 		if (name && parent) {
 			console.log("binding.");
 			let type = parent.$control.type.types[name] as ViewBoxType;
@@ -187,9 +187,8 @@ export function bindViewNode(view: ELE): void {
 	}
 }
 
-function getViewNode(loc: LOC): ViewNode {
-	let node = nodeOf(loc);
-	while (node) {
+function getViewNode(loc: TREENODE | RANGE): ViewNode {
+	for (let node = nodeOf(loc) as TREENODE; node; node = node.parentNode) {
 		let e = ele(node);
 		if (e?.getAttribute("data-item")) {
 			if (!node["$control"]) {
@@ -198,11 +197,10 @@ function getViewNode(loc: LOC): ViewNode {
 			}
 			return e as ViewNode;
 		}
-		node = node.parentElement;
 	}
 }
 
-export function getView(node: LOC): ViewBox {
+export function getView(node: TREENODE | RANGE): ViewBox {
 	let view = getViewNode(node)?.$control;
 	if (view instanceof ViewBox) return view;
 }
@@ -249,7 +247,7 @@ function content(view: ViewBox, range: RANGE, out: ELE) {
 }
 
 
-export function navigate(start: LOC, isBack?: boolean) {
+export function navigate(start: TREENODE | RANGE, isBack?: boolean) {
 	let editor = getView(start);
 	while (editor) {
 		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;
@@ -257,7 +255,7 @@ export function navigate(start: LOC, isBack?: boolean) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next;
 		}
-		editor = getView(editor.node.parentElement);
+		editor = getView(editor.node.parentNode);
 	}
 }
 function navigateInto(ele: ELE, isBack?: boolean) {

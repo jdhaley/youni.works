@@ -1,5 +1,5 @@
 import {Actions} from "../../base/control.js";
-import { ELE, LOC, nodeOf, RANGE } from "../../base/ele.js";
+import { ELE, nodeOf, RANGE, TREENODE } from "../../base/ele.js";
 import {Frame, UserEvent} from "../ui.js";
 
 export default {
@@ -33,7 +33,7 @@ function trackEvent(event: UserEvent) {
 }
 
 function sense(event: UserEvent) {
-    let source = viewOf(event.range ? event.range.commonAncestorContainer : event.target as Node);
+    let source = viewOf(event.range ? event.range.commonAncestorContainer : event.target);
     if (source) {
         event.frame = ownerOf(source);
         event.source = source;
@@ -47,13 +47,13 @@ function sense(event: UserEvent) {
     }
 }
 
-export function viewOf(loc: LOC): HTMLElement {
- 	for (let node  = nodeOf(loc); node; node = node.parentElement) {
-		if (node["$control"]) return node as HTMLElement;
+export function viewOf(loc: TREENODE | RANGE): ELE {
+ 	for (let node  = nodeOf(loc) as TREENODE; node; node = node.parentNode) {
+		if (node["$control"]) return node as ELE;
 	}
 }
 
-export function ownerOf(loc: LOC): Frame  {
+export function ownerOf(loc: TREENODE | RANGE): Frame  {
 	if (loc instanceof Document) return loc["$owner"];
 	return nodeOf(loc).ownerDocument["$owner"];
 }

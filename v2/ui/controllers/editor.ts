@@ -1,5 +1,5 @@
 import { Change } from "../../base/view.js";
-import { ELE, NODE, RANGE } from "../../base/ele";
+import { ELE, TREENODE, RANGE } from "../../base/ele";
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
@@ -157,11 +157,11 @@ function getInsertableRange(range: RANGE) {
 	}
 }
 
-export function atStart(view: ELE, node: NODE, offset: number) {
+export function atStart(view: ELE, node: TREENODE, offset: number) {
 	if (offset != 0) return false;
 	while (node && node != view) {
 		if (node.previousSibling && node.previousSibling.nodeName != "HEADER") return false;
-		node = node.parentElement;
+		node = node.parentNode;
 	}
 	return true;
 }

@@ -184,7 +184,7 @@ function getArticle(range: RANGE) {
 	let view = getView(range);
 	while (view) {
 		if (!view.type.partOf) return view;
-		let parent = getView(view.node.parentElement);
+		let parent = getView(view.node.parentNode);
 		if (!parent) return view;
 		view = parent;
 	}
