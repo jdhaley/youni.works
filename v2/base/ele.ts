@@ -2,8 +2,15 @@ import { Control } from "./control";
 import { Area } from "./shape";
 import { Collection, Sequence } from "./util";
 
+interface DOCUMENT {
+	getElementById(id: string): ELE;
+	getElementsByClassName(name: string): Sequence<ELE>;
+	createElement(name: string): ELE;
+	createTextNode(text: string): TREENODE;
+	createRange(): RANGE;
+}
 interface NODE {
-	readonly ownerDocument: any;
+	readonly ownerDocument: DOCUMENT;
 	readonly nodeType: number;
 	readonly nodeName: string;
 	textContent: string;

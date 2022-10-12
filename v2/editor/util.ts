@@ -66,10 +66,10 @@ export function mark(range: RANGE) {
 export function unmark(range: RANGE) {
 	let doc = range.commonAncestorContainer.ownerDocument;
 	//Patch the replacement points.
-	let r = patchPoint(doc.getElementById("start-marker"));
+	let r = patchPoint(ele(doc.getElementById("start-marker")));
 	let start = r?.startContainer;
 	let startOffset = r?.startOffset;
-	r = patchPoint(doc.getElementById("end-marker"));
+	r = patchPoint(ele(doc.getElementById("end-marker")));
 	if (start) range.setStart(start, startOffset);
 	if (r) range.setEnd(r.endContainer, r.endOffset);
 	return range;
