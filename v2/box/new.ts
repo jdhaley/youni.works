@@ -1,108 +1,126 @@
-import { Actions, BaseReceiver, Receiver, Signal } from "../base/control";
+import { Part, ElementPart } from "../base/control";
 import { value } from "../base/model";
-import { EMPTY, extend } from "../base/util";
 
-interface Part extends Receiver {
-	whole: Receiver;
-	partOf?: Part;
-	parts: Iterable<Part>
-}
+interface Content extends Part, Entity {
+	readonly type: unknown;
+	readonly contentType: string;
+	readonly contents: Iterable<Content>;
 
-abstract class BasePart<T extends Part> extends BaseReceiver implements Part {
-	declare actions: Actions;
-
-	get whole(): Receiver {
-		return null;
-	}
-	get partOf(): Part {
-		return null;
-	}
-	get parts(): Iterable<T> {
-		return EMPTY.array;
-	}
-	send(signal: Signal | string) {
-		signal = validSignal("down", signal);
-		signal && Promise.resolve(signal).then(sig => sendTo(this, sig));
-		return;
-
-		function sendTo(on: Part, signal: Signal) {
-			if (!signal.subject) return;
-			signal["source"] = this;
-			on.receive(signal);	
-			if (on.parts) for (let part of on.parts) {
-				signal.from = on;
-				sendTo(part, signal);
-			}
-		}
-	}
-	sense(signal: Signal | string) {
-		signal = validSignal("up", signal);
-		for (let on = this as Part; on; on = on.partOf) {
-			if (!signal.subject) return;
-			signal["source"] = this;
-			signal.from = on;
-			on.receive(signal);
-		}
-	}
-}
-
-function validSignal(direction: "up" | "down", signal: string | Signal): Signal {
-	if (!signal) return;
-	if (typeof signal == "string") return extend(null, {
-		direction: direction,
-		subject: signal
-	});
-	if (signal.direction != direction) throw new Error("Invalid direction");
-	if (signal.subject) return signal;
-}
-
-interface Content extends Part {
-	type: unknown;
-	partOf?: Content;
-	parts: Iterable<Content>;
 	textContent: string;
 	markupContent: string;
 
-	// add(part: Content, before?: Content): void;
-	// remove(part: Content): void;
-	valueOf(filter?: any): value;
+	edit(commandName: string, filter?: Filter, content?: value): unknown;
+	valueOf(filter?: Filter): value;
 }
 
-export class ElementContent<T extends Content> extends BasePart<T> implements Content {
-	constructor(element: Element) {
-		super();
-		this.#ele = element;
-	}
-	#ele: Element;
-	[Symbol.iterator] = function* parts() {
-		const nodes = this.#ele.childNodes;
-		for (let i = 0, len = nodes.length; i < len; i++) {
-			let node = nodes[i];
-			if (node["$control"]) yield node["$control"];
-		}
-	}
+interface Filter {
+}
 
-	get type() {
-		return null;
+interface Entity {
+	id: string;
+	at(name: string): string;
+	put(name: string, value?: string): void;
+}
+
+
+export class ContentView<T extends Part> extends ElementPart<T> implements Content, Entity {
+	declare type: unknown;
+	declare contentType: "";
+
+	get id(): string {
+		return this._ele.id;
 	}
-	get partOf(): Content {
-		for (let node = this.#ele; node; node = node.parentElement) {
-			let control = node["$control"];
-			if (control) return control;
-		}	
+	set id(id: string) {
+		this._ele.id = id;
 	}
 	get textContent() {
-		return this.#ele.textContent;
+		return this._ele.textContent;
 	}
-
+	set textContent(text: string) {
+		this._ele.textContent = text;
+	}
 	get markupContent() {
-		return this.#ele.innerHTML;
+		return this._ele.innerHTML;
+	}
+	set markupContent(markup: string) {
+		this._ele.innerHTML = markup;
+	}
+	get contents() {
+		return this;
 	}
 
-	add(part: ElementContent<T>, before?: ElementContent<T>): void {
-		this.#ele.insertBefore(part.#ele, before.#ele);
+	at(name: string): string {
+		return this._ele.getAttribute(name);
 	}
-	remove(part: ElementContent<T>): void {
-		this.#ele.removeChild(part.#ele);
+	put(name: string, value?: string): void {
+		if (value === undefined) {
+			this._ele.removeAttribute(name);
+		} else {
+			this._ele.setAttribute(name, value);
+		}
+	}
+	valueOf(filter?: any): unknown {
+		return null;
+	}
+	edit(commandName: string, filter?: Filter, content?: unknown): unknown {
+		return null;
+	}
+	add(part: ContentView<T>, before?: ContentView<T>): void {
+		this._ele.insertBefore(part._ele, before._ele);
+	}
+	remove(part: ContentView<T>): void {
+		this._ele.removeChild(part._ele);
 	}
 }
+
+
+
+	// arcs: Iterable<Arc>;
+	// size(width: number, height: number): void {
+	// 	throw new Error("Method not implemented.");
+	// }
+	// position(x: number, y: number): void {
+	// 	throw new Error("Method not implemented.");
+	// }
+	// zone(x: number, y: number): Zone {
+	// 	throw new Error("Method not implemented.");
+	// }
+
+	// declare type: unknown;
+	// get content(): Iterable<Content> {
+	// 	return this.contentNode.parts as Iterable<Content>;
+	// }
+	// get area(): Area {
+	// 	return this._ele.getBoundingClientRect();
+	// }
+	// get styles(): Collection<string> {
+	// 	return this._ele.classList;
+	// }
+
+	// getStyle(name: string): string {
+	// 	return (this._ele as HTMLElement).style?.getPropertyValue(name);
+	// }
+	// setStyle(name: string, value?: string): boolean {
+	// 	let style = (this._ele as HTMLElement).style;
+	// 	if (style) {
+	// 		if (value || value === "") {
+	// 			style.setProperty(name, "" + value);
+	// 		} else {
+	// 			style.removeProperty(name);
+	// 		}
+	// 		return true;
+	// 	}
+	// 	return false;
+	// }
+	// valueOf(filter?: any): unknown {
+	// 	return null;
+	// }
+	// instance(element: Element): X<T> {
+	// 	let part = Object.create(this);
+	// 	element["$control"] = part;
+	// 	part._ele = element;
+	// 	return part;
+	// }
+	// protected get contentNode(): Content {
+	// 	return this;
+	// }
