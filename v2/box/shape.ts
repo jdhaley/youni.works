@@ -1,14 +1,17 @@
-import { BaseController, Graph, Owner, Receiver } from "../base/control.js";
+import { BaseController, Control, Graph, Owner, Receiver } from "../base/control.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
 import { ELE, TREENODE } from "../base/dom.js";
+import { ContentView } from "./new.js";
 
 interface SHAPE_ELE extends ELE {
 	style: CSSStyleDeclaration;
 	getBoundingClientRect(): Area;
 }
-export class ElementController extends BaseController<ELE> implements Shape {
-	declare node: SHAPE_ELE;
+export class ElementController extends ContentView<ElementController> implements Shape, Control<ELE> {
+	get node(): SHAPE_ELE {
+		return this._ele as HTMLElement;
+	}
 	get owner(): Graph<ELE> {
 		return ELEMENT_OWNER;
 	}
@@ -78,6 +81,16 @@ export class ElementController extends BaseController<ELE> implements Shape {
 		style.minWidth = style.width;
 		style.height = Math.max(height, 16) + "px";
 		style.minHeight = style.height;
+	}
+	protected control(node: ELE) {
+		if (node["$control"]) {
+			this.uncontrol(node);
+		}
+		this._ele = node as Element;
+		node["$control"] = this;
+	}
+	protected uncontrol(node: ELE) {
+		throw new Error("Node is already controlled.");
 	}
 }
 

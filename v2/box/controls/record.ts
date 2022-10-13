@@ -8,7 +8,7 @@ export class RecordBox extends ViewBox {
 	contentType = "record";
 	memberType = "field";
 
-	at(name: string): Editor {
+	get(name: string): Editor {
 		for (let node of this.content.children) {
 			let view = getView(node);
 			if (name == view?.type.name) return view;
@@ -16,7 +16,7 @@ export class RecordBox extends ViewBox {
 	}
 
 	get title(): string {
-		return this.at("title").content.textContent;
+		return this.get("title").content.textContent;
 	}
 
 	viewContent(model: value | ELE): void {

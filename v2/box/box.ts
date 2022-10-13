@@ -16,7 +16,8 @@ type editor = (this: Editor, commandName: string, range: RANGE, content?: value)
 
 export abstract class ViewBox extends ElementController implements Box<ELE>, Editor {
 	constructor(actions: Actions, editor: editor) {
-		super(actions);
+		super();
+		this.actions = actions;
 		if (editor) this["edit"] = editor;
 	}
 	declare contentType: string;

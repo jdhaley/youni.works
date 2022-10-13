@@ -1,5 +1,5 @@
-import { Part, ElementPart } from "../base/control";
-import { value } from "../base/model";
+import { Part, ElementPart } from "../base/control.js";
+import { value } from "../base/model.js";
 
 interface Content extends Part, Entity {
 	readonly type: unknown;
@@ -22,10 +22,8 @@ interface Entity {
 	put(name: string, value?: string): void;
 }
 
-
 export class ContentView<T extends Part> extends ElementPart<T> implements Content, Entity {
-	declare type: unknown;
-	declare contentType: "";
+	declare contentType: string;
 
 	get id(): string {
 		return this._ele.id;
@@ -47,6 +45,9 @@ export class ContentView<T extends Part> extends ElementPart<T> implements Conte
 	}
 	get contents() {
 		return this;
+	}
+	get type() {
+		return null;
 	}
 
 	at(name: string): string {
