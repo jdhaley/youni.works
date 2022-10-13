@@ -2,13 +2,13 @@ import { BaseController, Control, Graph, Owner, Receiver } from "../base/control
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
 import { ELE, TREENODE } from "../base/dom.js";
-import { ContentView } from "./new.js";
+import { BaseContent } from "./new.js";
 
 interface SHAPE_ELE extends ELE {
 	style: CSSStyleDeclaration;
 	getBoundingClientRect(): Area;
 }
-export class ElementController extends ContentView<ElementController> implements Shape, Control<ELE> {
+export class ElementController extends BaseContent<ElementController> implements Shape, Control<ELE> {
 	get node(): SHAPE_ELE {
 		return this._ele as HTMLElement;
 	}

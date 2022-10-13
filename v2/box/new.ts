@@ -1,28 +1,7 @@
 import { Part, ElementPart } from "../base/control.js";
-import { value } from "../base/model.js";
+import { Content, Filter } from "../base/view.js";
 
-interface Content extends Part, Entity {
-	readonly type: unknown;
-	readonly contentType: string;
-	readonly contents: Iterable<Content>;
-
-	textContent: string;
-	markupContent: string;
-
-	edit(commandName: string, filter?: Filter, content?: value): unknown;
-	valueOf(filter?: Filter): value;
-}
-
-interface Filter {
-}
-
-interface Entity {
-	id: string;
-	at(name: string): string;
-	put(name: string, value?: string): void;
-}
-
-export class ContentView<T extends Part> extends ElementPart<T> implements Content, Entity {
+export class BaseContent<T extends Part> extends ElementPart<T> implements Content {
 	declare contentType: string;
 
 	get id(): string {
@@ -66,10 +45,10 @@ export class ContentView<T extends Part> extends ElementPart<T> implements Conte
 	edit(commandName: string, filter?: Filter, content?: unknown): unknown {
 		return null;
 	}
-	add(part: ContentView<T>, before?: ContentView<T>): void {
+	add(part: BaseContent<T>, before?: BaseContent<T>): void {
 		this._ele.insertBefore(part._ele, before._ele);
 	}
-	remove(part: ContentView<T>): void {
+	remove(part: BaseContent<T>): void {
 		this._ele.removeChild(part._ele);
 	}
 }

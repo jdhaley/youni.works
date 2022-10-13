@@ -1,12 +1,24 @@
-import { Control, Signal } from "./control.js";
+import { Control, Part, Signal } from "./control.js";
 import { value, Type, typeOf } from "./model.js";
 import { Shape } from "./shape.js";
+
+export interface Entity {
+	id: string;
+	at(name: string): string;
+	put(name: string, value?: string): void;
+}
+
+export interface Content extends Part, Entity {
+	readonly contents: Iterable<Content>;
+	textContent: string;
+	markupContent: string;
+}
 
 export interface ViewType<T> extends Type {
 	view(content: value, container?: View<T>): View<T>;
 }
 
-export interface View<T> {
+export interface View<T> extends Content{
 	readonly type: ViewType<T>;
 	readonly contentType: string;
 	readonly content: T;
@@ -15,7 +27,7 @@ export interface View<T> {
 	valueOf(filter?: Filter): value;
 }
 
-interface Filter {
+export interface Filter {
 }
 
 export interface Box<T> extends View<T>, Control<T>, Shape {
