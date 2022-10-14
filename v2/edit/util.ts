@@ -1,6 +1,6 @@
 import { Editor } from "../base/editor.js";
 import { ele, ELE, END_TO_END, TREENODE, nodeOf, RANGE, START_TO_START } from "../base/dom.js";
-import { getView, bindViewNode } from "../box/view.js";
+import { getView, bindViewNode } from "../display/view.js";
 
 export { getEditor, bindViewNode }
 

@@ -2,15 +2,15 @@ import { CommandBuffer } from "../base/command.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
 import { RemoteFileService } from "../base/remote.js";
 import { start } from "../base/type.js";
+import { Article, Editor } from "../base/editor.js";
+import { ELE, RANGE } from "../base/dom";
 import { bundle, EMPTY } from "../base/util.js";
 
 import { section } from "../transform/item.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { ViewOwner, getView } from "../box/view.js";
-import { Article, Editor } from "../base/editor.js";
-import { ELE, RANGE } from "../base/dom";
+import { ViewOwner, getView } from "../display/view.js";
 
 export class Display extends ViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {
@@ -30,10 +30,6 @@ export class Display extends ViewOwner implements Article {
 			if (collapse) range.collapse();
 			this.frame.selectionRange = range;
 		}
-	}
-
-	getControl(id: string): Editor {
-		return super.getControl(id) as Editor;
 	}
 	createElement(tagName: string): ELE {
 		return this.frame.createElement(tagName);

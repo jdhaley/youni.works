@@ -1,12 +1,12 @@
 import { bundle } from "../../base/util.js";
 
-import { ViewType } from "../../box/view.js";
+import { ViewType } from "../../display/view.js";
 
-import { TextBox } from "../../box/controls/text.js";
-import { RecordBox } from "../../box/controls/record.js";
-import { ListBox } from "../../box/controls/list.js";
-import { LineBox } from "../../box/controls/line.js";
-import { RowBox } from "../../box/controls/row.js";
+import { TextBox } from "../../display/controls/text.js";
+import { RecordBox } from "../../display/controls/record.js";
+import { ListBox } from "../../display/controls/list.js";
+import { LineBox } from "../../display/controls/line.js";
+import { RowBox } from "../../display/controls/row.js";
 
 import text from "../controllers/text.js";
 import record from "../controllers/record.js";
@@ -15,10 +15,10 @@ import markup from "../controllers/markup.js";
 import line from "../controllers/line.js";
 import row from "../controllers/row.js";
 
-import textEd from "../../editor/editors/text.js";
-import recordEd from "../../editor/editors/record.js";
-import listEd from "../../editor/editors/list.js";
-import markupEd from "../../editor/editors/markup.js";
+import textEd from "../../edit/editors/text.js";
+import recordEd from "../../edit/editors/record.js";
+import listEd from "../../edit/editors/list.js";
+import markupEd from "../../edit/editors/markup.js";
 
 import shortcuts from "./shortcuts.js";
 

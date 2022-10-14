@@ -3,7 +3,7 @@ import { ELE, TREENODE, RANGE } from "../../base/dom";
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
-import { getView, navigate } from "../../box/view.js";
+import { getView, navigate } from "../../display/view.js";
 
 import { EditEvent, UserEvent, getClipboard, setClipboard } from "../ui.js";
 

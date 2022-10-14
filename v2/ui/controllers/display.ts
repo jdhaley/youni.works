@@ -1,5 +1,5 @@
 import {Response} from "../../base/message.js";
-import {ViewType, EditorView} from "../../box/view.js";
+import {ViewType, EditorView} from "../../display/view.js";
 
 import {extend} from "../../base/util.js";
 
@@ -66,7 +66,7 @@ function getType(article: Display, path: string, data: any): ViewType {
 }
 
 import shape from "./shape.js";
-import { TextBox } from "../../box/controls/text.js";
+import { TextBox } from "../../display/controls/text.js";
 import { Change } from "../../base/view.js";
 
 function shapetest(this: Display) {
