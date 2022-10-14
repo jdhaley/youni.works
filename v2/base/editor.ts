@@ -8,8 +8,9 @@ import { Receiver, Graph } from "./control.js";
 export interface Editor extends View{
 	readonly owner: Article;
 	readonly node: ELE;
+	readonly contentType: string;
 	readonly content: ELE;
-	edit(commandName: string, range: RANGE, content?: value): RANGE;
+	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
 	getContent(range?: RANGE): ELE;
 }
 

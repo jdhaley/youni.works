@@ -3,6 +3,7 @@ import { Editor } from "../../base/editor.js";
 
 import { getView, ViewBox } from "../view.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
+import { View } from "../../base/view.js";
 
 export class RecordBox extends ViewBox {
 	contentType = "record";
@@ -34,9 +35,9 @@ export class RecordBox extends ViewBox {
 			this.viewMember(name, idx[name]);
 		}
 	}
-	protected viewMember(name: string, value: any): ViewBox {
+	protected viewMember(name: string, value: any): View {
 		let type = this.type.types[name];
-		let member = type.view(value, this);
+		let member = type.view(value, this) as Editor;
 		member.node.classList.add(this.memberType);
 		return member;
 	}

@@ -1,5 +1,5 @@
 import { value } from "../base/model.js";
-import { Content, ViewType } from "../base/view.js";
+import { Content, View, ViewType } from "../base/view.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions, Owner, Part, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -15,61 +15,42 @@ interface ViewNode extends ELE {
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
 
-export abstract class ViewBox extends BaseShape implements Editor {
-	constructor(actions: Actions, editor: editor) {
-		super();
-		this.actions = actions;
-		if (editor) this["edit"] = editor;
-	}
+export abstract class BaseView extends BaseShape implements View {
+	protected _type: ViewBoxType;
 
-	declare contentType: string;
-
-	get header(): ELE {
-		for (let child of this.node.children) {
-			if (child.nodeName == "header") return child;
-		}
-	}
-	get footer(): ELE {
-		for (let child of this.node.children) {
-			if (child.nodeName == "footer") return child;
-		}
-	}
-	get content(): ELE {
-		if (!this.isContainer) return this._ele;
-		for (let child of this.node.children) {
-			if (child.classList.contains("content")) return child;
-		}	
+	get type(): ViewType {
+		return this._type;
 	}
 	get contents(): Iterable<Content> {
 		let content = this.content;
 		let control = content["$control"] as Content;
 		return control?.contents || EMPTY.array;
 	}
-	get node(): ELE {
-		return this._ele;
-	}
-	get type(): ViewBoxType {
-		return this["_type"];
-	}
-	get owner(): Article {
-		return this["_type"].owner;
-	}
 	get isContainer(): boolean {
 		return this.type.conf.container;
 	}
-	get shortcuts(): bundle<string> {
-		return this.type.conf.shortcuts;
+	get header(): ELE {
+		for (let child of this._ele.children) {
+			if (child.nodeName == "header") return child;
+		}
+	}
+	get content(): ELE {
+		if (!this.isContainer) return this._ele;
+		for (let child of this._ele.children) {
+			if (child.classList.contains("content")) return child;
+		}	
+	}
+	get footer(): ELE {
+		for (let child of this._ele.children) {
+			if (child.nodeName == "footer") return child;
+		}
 	}
 	
 	protected abstract viewContent(model: value): void;
 	abstract valueOf(range?: RANGE): value;
 
-	edit(commandName: string, range: RANGE, content?: value): RANGE {
-		console.warn("edit() has not been configured.")
-		return null;
-	}
 	draw(content: value) {
-		this.node.textContent = "";
+		this._ele.textContent = "";
 		if (this.isContainer) {
 			this.createHeader();
 			this.createContent();
@@ -80,21 +61,18 @@ export abstract class ViewBox extends BaseShape implements Editor {
 		this.viewContent(content as value);
 	}
 	protected createHeader(model?: value) {
-		let header = this.owner.createElement("header");
+		let header = this._type.owner.createElement("header") as Element;
 		header.textContent = this.type.conf.title || "";
-		this.node.append(header);
+		this._ele.append(header);
 	}
 	protected createContent(model?: value) {
-		let ele = this.owner.createElement("div");
+		let ele = this._type.owner.createElement("div") as Element;
 		ele.classList.add("content");
 		let content = new BaseContent<Part>();
 		content.control(ele as Element);
-		this.node.append(ele);
+		this._ele.append(ele);
 	}
 	protected createFooter(model?: value) {
-		if (this.contentType != "list") return;
-		let footer = this.owner.createElement("footer");
-		this.node.append(footer);
 	}
 	control(element: ViewNode) {
 		super.control(element as Element);
@@ -105,6 +83,30 @@ export abstract class ViewBox extends BaseShape implements Editor {
 		super.uncontrol(element as Element);
 		element.removeAttribute("data-item");
 		delete element.id;
+	}
+}
+
+export abstract class ViewBox extends BaseView {
+	constructor(actions: Actions, editor: editor) {
+		super();
+		this.actions = actions;
+		if (editor) this["edit"] = editor;
+	}
+	declare contentType: string;
+
+	get owner(): Article {
+		return this._type.owner;
+	}
+	get node(): ELE {
+	 	return this._ele
+	}
+
+	get shortcuts(): bundle<string> {
+		return this.type.conf.shortcuts;
+	}
+	edit(commandName: string, range: RANGE, content?: value): RANGE {
+		console.warn("edit() has not been configured.")
+		return null;
 	}
 	getContent(range?: RANGE): ELE {
 		return viewContent(this, range);
@@ -117,10 +119,10 @@ export class ViewBoxType extends BaseType implements ViewType {
 		this.owner = owner;
 	}
 	declare owner: Article;
-	declare types: bundle<ViewBoxType>;
-	declare partOf: ViewBoxType;
+	declare types: bundle<ViewType>;
+	declare partOf: ViewType;
 
-	view(content: value | ELE, parent?: ViewBox): ViewBox {
+	view(content: value | ELE, parent?: ViewBox): Editor {
 		let view: ViewBox = Object.create(this.prototype);
 		let node = this.owner.createElement(this.conf.tagName || "div");
 		if (parent) parent.content.append(node);

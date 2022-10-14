@@ -1,8 +1,9 @@
 import { Signal } from "./control.js";
 import { value, Type, typeOf } from "./model.js";
+import { bundle } from "./util.js";
 
 export interface Entity {
-	id: string;
+	id?: string;
 	at(name: string): string;
 	put(name: string, value?: string): void;
 }
@@ -13,16 +14,14 @@ export interface Content {
 	markupContent: string;
 }
 
-export interface ViewType extends Type {
-	view(content: value, container?: View): View;
-}
-
 export interface View extends Content, Entity {
 	readonly type: ViewType;
-	readonly contentType: string;
-
 	valueOf(filter?: Filter): value;
-	edit(commandName: string, filter?: Filter, content?: value): unknown;
+}
+
+export interface ViewType extends Type {
+	types: bundle<ViewType>
+	view(content: value, container?: View): View;
 }
 
 export interface Filter {
