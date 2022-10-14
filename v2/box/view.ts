@@ -1,5 +1,5 @@
 import { contentType, Type, value } from "../base/model.js";
-import { Content, View } from "../base/view.js";
+import { Content, View, viewTypes } from "../base/view.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions, Owner, Part, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -8,21 +8,6 @@ import { ELE, ele, RANGE, TREENODE, nodeOf } from "../base/dom.js";
 
 import { BaseShape } from "./shape.js";
 import { BaseContent } from "./content.js";
-
-const viewTypes: bundle<contentType> = {
-	"widget": "unit",
-	"image": "unit",
-	"video": "unit",
-	"text": "unit",
-	"line": "unit",
-
-	"form": "record",
-	"row": "record",
-
-	"list": "list",
-	"table": "list",
-	"markup": "list"
-}
 
 interface ViewNode extends ELE {
 	$control?: Editor;
