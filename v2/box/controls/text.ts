@@ -2,9 +2,9 @@ import { contentType, value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 
-import { ViewBox } from "../view.js";
+import { EditorView } from "../view.js";
 
-export class TextBox extends ViewBox {
+export class TextBox extends EditorView {
 	viewType = "text";
 	viewContent(model: value): void {
 		if (ele(model)) {

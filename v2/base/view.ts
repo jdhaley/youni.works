@@ -1,6 +1,6 @@
 import { Signal } from "./control.js";
 import { value, Type, typeOf, contentType } from "./model.js";
-import { bundle } from "./util.js";
+import { bundle, Collection } from "./util.js";
 
 export interface Entity {
 	readonly id?: string;
@@ -11,6 +11,7 @@ export interface Entity {
 export interface Content {
 	readonly contentType: contentType;
 	readonly contents: Iterable<Content>;
+	readonly styles: Collection<string>;
 	textContent: string;
 	markupContent: string;
 }

@@ -1,11 +1,11 @@
 import { value, record, contentType } from "../../base/model.js";
 import { Editor } from "../../base/editor.js";
 
-import { getView, ViewBox } from "../view.js";
+import { getView, EditorView } from "../view.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { View } from "../../base/view.js";
 
-export class RecordBox extends ViewBox {
+export class RecordBox extends EditorView {
 	memberType = "field";
 
 	get(name: string): Editor {

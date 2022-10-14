@@ -2,7 +2,7 @@ import { value, record, item } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
 import { Editor } from "../../base/editor.js";
-import { ViewBoxType } from "../view.js";
+import { ViewType } from "../view.js";
 
 import { RecordBox } from "./record.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
@@ -88,7 +88,7 @@ function getColumns(row: item) {
 	}
 	return columns;
 }
-function createType(type: ViewBoxType, columns: string[]): ViewBoxType {
+function createType(type: ViewType, columns: string[]): ViewType {
 	type.types = Object.create(null);
 	let column = type.owner.types.column;
 	for (let col of columns) {
@@ -117,7 +117,7 @@ function rowContent(model: record, view: ELE, range: RANGE): record {
 	return model;
 }
 
-function createHeaderItem(type: ViewBoxType): item {
+function createHeaderItem(type: ViewType): item {
 	let item = {
 		type$: type.name,
 		header: true, 

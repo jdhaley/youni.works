@@ -1,9 +1,9 @@
 import { Type, value } from "./model.js";
 import { View } from "./view.js";
-import { ELE, RANGE, TREENODE } from "./dom.js";
 import { CommandBuffer } from "./command.js";
-import { bundle } from "./util.js";
 import { Receiver, Graph } from "./control.js";
+import { bundle } from "./util.js";
+import { ELE, RANGE, TREENODE } from "./dom.js";
 
 export interface Editor extends View {
 	readonly owner: Article;

@@ -1,6 +1,6 @@
 import { item } from "../../base/model.js";
 import { ele, RANGE } from "../../base/dom.js";
-import { getView, ViewBoxType } from "../view.js";
+import { getView, ViewType } from "../view.js";
 import { TextBox } from "./text.js";
 
 export class LineBox extends TextBox {
@@ -53,7 +53,7 @@ export class LineBox extends TextBox {
 		}
 	}
 	convert(name: string) {
-		let toType = this.type.partOf?.types[name] as ViewBoxType;
+		let toType = this.type.partOf?.types[name] as ViewType;
 		if (toType) {
 			this._type = toType;
 			this.node.setAttribute("data-item", toType.name);

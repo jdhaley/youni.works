@@ -1,8 +1,9 @@
 import { Part, ElementPart } from "../base/control.js";
-import { contentType } from "../base/model.js";
 import { Content, Entity } from "../base/view.js";
+import { contentType } from "../base/model.js";
+import { Collection } from "../base/util.js";
 
-export class BaseContent<T extends Part> extends ElementPart<T> implements Content, Entity {
+export class ContentEntity<T extends Part> extends ElementPart<T> implements Content, Entity {
 	get contentType(): contentType {
 		return undefined;
 	}
@@ -23,6 +24,9 @@ export class BaseContent<T extends Part> extends ElementPart<T> implements Conte
 	}
 	get contents(): Iterable<Content> {
 		return this;
+	}
+	get styles(): Collection<string> {
+		return this._ele.classList;
 	}
 
 	at(name: string): string {

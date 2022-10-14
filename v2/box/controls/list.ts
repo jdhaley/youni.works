@@ -2,9 +2,9 @@ import { value, list, Type, contentType } from "../../base/model.js";
 import { viewTypeOf } from "../../base/view.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 
-import { getView, ViewBox } from "../view.js";
+import { getView, EditorView } from "../view.js";
 
-export class ListBox extends ViewBox {
+export class ListBox extends EditorView {
 	viewContent(model: list): void {
 		if (ele(model)) return this.viewElement(ele(model));
 		if (model && model[Symbol.iterator]) for (let item of model) {

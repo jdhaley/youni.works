@@ -1,5 +1,5 @@
 import {Response} from "../../base/message.js";
-import {ViewBoxType, ViewBox} from "../../box/view.js";
+import {ViewType, EditorView} from "../../box/view.js";
 
 import {extend} from "../../base/util.js";
 
@@ -55,7 +55,7 @@ export default extend(null, {
 	}
 });
 
-function getType(article: Display, path: string, data: any): ViewBoxType {
+function getType(article: Display, path: string, data: any): ViewType {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";
@@ -70,13 +70,13 @@ import { TextBox } from "../../box/controls/text.js";
 import { Change } from "../../base/view.js";
 
 function shapetest(this: Display) {
-	let type = new ViewBoxType(this);
+	let type = new ViewType(this);
 	type.start("shape", {
 		prototype: new TextBox(shape, null),
 		actions: shape
 	});
 	
-	let viewer = type.view("HELLO THERE") as unknown as ViewBox;
+	let viewer = type.view("HELLO THERE") as unknown as EditorView;
 	viewer.content.classList.add("shape");
 	viewer.position(300, 0);
 

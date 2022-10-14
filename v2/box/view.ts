@@ -7,7 +7,7 @@ import { bundle, EMPTY } from "../base/util.js";
 import { ELE, ele, RANGE, TREENODE, nodeOf } from "../base/dom.js";
 
 import { BaseShape } from "./shape.js";
-import { BaseContent } from "./content.js";
+import { ContentEntity } from "./content.js";
 
 interface ViewNode extends ELE {
 	$control?: Editor;
@@ -16,7 +16,7 @@ interface ViewNode extends ELE {
 type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
 
 export abstract class BaseView extends BaseShape implements View {
-	protected _type: ViewBoxType;
+	protected _type: ViewType;
 
 	get type(): Type<View> {
 		return this._type;
@@ -52,7 +52,7 @@ export abstract class BaseView extends BaseShape implements View {
 	abstract viewContent(data: value): void;
 	abstract valueOf(range?: RANGE): value;
 
-	view(value: value, parent?: ViewBox) {
+	view(value: value, parent?: EditorView) {
 		if (parent) parent.content.append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
@@ -80,7 +80,7 @@ export abstract class BaseView extends BaseShape implements View {
 	protected createContent(model?: value) {
 		let ele = this._type.owner.createElement("div") as Element;
 		ele.classList.add("content");
-		let content = new BaseContent<Part>();
+		let content = new ContentEntity<Part>();
 		content.control(ele as Element);
 		this._ele.append(ele);
 	}
@@ -97,7 +97,7 @@ export abstract class BaseView extends BaseShape implements View {
 	}
 }
 
-export abstract class ViewBox extends BaseView implements Editor {
+export abstract class EditorView extends BaseView implements Editor {
 	constructor(actions: Actions, editor: editor) {
 		super();
 		this.actions = actions;
@@ -123,23 +123,21 @@ export abstract class ViewBox extends BaseView implements Editor {
 	}
 }
 
-export class ViewBoxType extends BaseType implements Type<View> {
+export class ViewType extends BaseType<View> {
 	constructor(owner: Article) {
 		super();
 		this.owner = owner;
 	}
 	declare owner: Article;
 	declare viewType: string;
-	declare types: bundle<Type<View>>;
-	declare partOf: Type<View>;
 
 	create(): Editor {
-		let view: ViewBox = super.create();
+		let view: EditorView = super.create();
 		let node = this.owner.createElement(this.conf.tagName || "div");
 		view.control(node);
 		return view;
 	}
-	view(content: value | ELE, parent?: ViewBox): Editor {
+	view(content: value | ELE, parent?: EditorView): Editor {
 		let view = this.create();
 		view.view(content, parent);
 		return view;
@@ -175,9 +173,9 @@ export abstract class ViewOwner extends ElementOwner {
 	}
 	node: ELE;
 	conf: bundle<any>;
-	types: bundle<ViewBoxType>;
-	unknownType: ViewBoxType;
-	type: ViewBoxType;
+	types: bundle<ViewType>;
+	unknownType: ViewType;
+	type: ViewType;
 
 	abstract createElement(tagName: string): ELE;
 	
@@ -203,13 +201,13 @@ export abstract class ViewOwner extends ElementOwner {
 }
 
 export function bindViewNode(node: ELE): void {
-	let control: ViewBox = node["$control"];
+	let control: EditorView = node["$control"];
 	if (!control) {
 		let name = node.getAttribute("data-item");
 		let parent = getViewNode(node.parentNode) as ViewNode;
 		if (name && parent) {
 			console.log("binding.");
-			let type = parent.$control.type.types[name] as ViewBoxType;
+			let type = parent.$control.type.types[name] as ViewType;
 			if (type) {
 				control = Object.create(type.prototype);
 				control.control(node as any);
@@ -237,12 +235,12 @@ function getViewNode(loc: TREENODE | RANGE): ViewNode {
 	}
 }
 
-export function getView(node: TREENODE | RANGE): ViewBox {
+export function getView(node: TREENODE | RANGE): EditorView {
 	let view = getViewNode(node)?.$control;
-	if (view instanceof ViewBox) return view;
+	if (view instanceof EditorView) return view;
 }
 
-function viewContent(view: ViewBox, range: RANGE, out?: ELE) {
+function viewContent(view: EditorView, range: RANGE, out?: ELE) {
 	if (range && !range.intersectsNode(view.content as any)) return;
 	let item: ELE;
 	if (!out) {
@@ -258,7 +256,7 @@ function viewContent(view: ViewBox, range: RANGE, out?: ELE) {
 	return item;
 }
 
-function content(view: ViewBox, range: RANGE, out: ELE) {
+function content(view: EditorView, range: RANGE, out: ELE) {
 	for (let node of view.content.childNodes) {
 		if (range && !range.intersectsNode(node))
 			continue;

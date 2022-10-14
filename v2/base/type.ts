@@ -11,14 +11,14 @@ export function start(owner: TypeOwner) {
 type types = bundle<Type<unknown>>;
 type source = bundle<string | source> | string;
 
-export class BaseType implements Type<unknown> {
+export class BaseType<T> implements Type<T> {
 	declare name: string;
 	declare prototype: object;
 
-	types: bundle<Type<unknown>> = EMPTY.object;
+	types: bundle<Type<T>> = EMPTY.object;
 	conf: bundle<any>;
 
-	generalizes(type: Type<unknown>): boolean {
+	generalizes(type: Type<T>): boolean {
 		return type == this;
 	}
 	start(name: string, conf: bundle<any>): void {
@@ -56,7 +56,7 @@ function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type<un
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
-		let type = new conf.class(owner) as BaseType;
+		let type = new conf.class(owner) as BaseType<unknown>;
 		types[name] = type;
 		type.start(name, conf);
 	}
@@ -91,7 +91,7 @@ function getType(name: string, types: types, source: source): Type<unknown> {
 
 function createType(name: string, conf: ViewConf, types: types, source: source) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
-	let type = Object.create(supertype) as BaseType;
+	let type = Object.create(supertype) as BaseType<unknown>;
 	type.start(name, conf)
 
 	if (name) {
