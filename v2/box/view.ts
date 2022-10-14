@@ -1,4 +1,4 @@
-import { Type, value } from "../base/model.js";
+import { contentType, Type, value } from "../base/model.js";
 import { Content, View } from "../base/view.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions, Owner, Part, Receiver } from "../base/control.js";
@@ -8,6 +8,21 @@ import { ELE, ele, RANGE, TREENODE, nodeOf } from "../base/dom.js";
 
 import { BaseShape } from "./shape.js";
 import { BaseContent } from "./content.js";
+
+const viewTypes: bundle<contentType> = {
+	"widget": "unit",
+	"image": "unit",
+	"video": "unit",
+	"text": "unit",
+	"line": "unit",
+
+	"form": "record",
+	"row": "record",
+
+	"list": "list",
+	"table": "list",
+	"markup": "list"
+}
 
 interface ViewNode extends ELE {
 	$control?: Editor;
@@ -21,13 +36,16 @@ export abstract class BaseView extends BaseShape implements View {
 	get type(): Type<View> {
 		return this._type;
 	}
+	get contentType(): contentType {
+		return viewTypes[this._type.conf.viewType];
+	}
 	get contents(): Iterable<Content> {
 		let content = this.content;
 		let control = content["$control"] as Content;
 		return control?.contents || EMPTY.array;
 	}
 	get isContainer(): boolean {
-		return this.type.conf.container;
+		return this._type.conf.container;
 	}
 	get header(): ELE {
 		for (let child of this._ele.children) {
@@ -71,7 +89,7 @@ export abstract class BaseView extends BaseShape implements View {
 	}
 	protected createHeader(model?: value) {
 		let header = this._type.owner.createElement("header") as Element;
-		header.textContent = this.type.conf.title || "";
+		header.textContent = this._type.conf.title || "";
 		this._ele.append(header);
 	}
 	protected createContent(model?: value) {
@@ -94,13 +112,12 @@ export abstract class BaseView extends BaseShape implements View {
 	}
 }
 
-export abstract class ViewBox extends BaseView {
+export abstract class ViewBox extends BaseView implements Editor {
 	constructor(actions: Actions, editor: editor) {
 		super();
 		this.actions = actions;
 		if (editor) this["edit"] = editor;
 	}
-	declare contentType: string;
 
 	get owner(): Article {
 		return this._type.owner;
@@ -110,7 +127,7 @@ export abstract class ViewBox extends BaseView {
 	}
 
 	get shortcuts(): bundle<string> {
-		return this.type.conf.shortcuts;
+		return this._type.conf.shortcuts;
 	}
 	edit(commandName: string, range: RANGE, content?: value): RANGE {
 		console.warn("edit() has not been configured.")
@@ -127,6 +144,7 @@ export class ViewBoxType extends BaseType implements Type<View> {
 		this.owner = owner;
 	}
 	declare owner: Article;
+	declare viewType: string;
 	declare types: bundle<Type<View>>;
 	declare partOf: Type<View>;
 
@@ -299,16 +317,13 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 	if (!editor) return;
 	let content = editor.content as ELE;
 	switch (editor.contentType) {
-		case "text":
-		case "line":
-		case "scalar":
+		case "unit":
 			break;
 		case "record":
 			ele = isBack ? content.lastElementChild : content.firstElementChild;
 			if (ele) content = navigateInto(ele);
 			break;
 		case "list":
-		case "markup":
 			let item = isBack ? content.lastElementChild : content.firstElementChild;
 			if (item) {
 				content = navigateInto(item);

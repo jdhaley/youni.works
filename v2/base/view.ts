@@ -1,5 +1,5 @@
 import { Signal } from "./control.js";
-import { value, Type, typeOf } from "./model.js";
+import { value, Type, typeOf, contentType } from "./model.js";
 
 export interface Entity {
 	readonly id?: string;
@@ -8,6 +8,7 @@ export interface Entity {
 }
 
 export interface Content {
+	readonly contentType: contentType;
 	readonly contents: Iterable<Content>;
 	textContent: string;
 	markupContent: string;

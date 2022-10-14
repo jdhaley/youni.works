@@ -4,8 +4,6 @@ import { getView, ViewBoxType } from "../view.js";
 import { TextBox } from "./text.js";
 
 export class LineBox extends TextBox {
-	contentType = "line";
-
 	get level(): number {
 		return Number.parseInt(this.node.getAttribute("aria-level")) || 0;
 	}

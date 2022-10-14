@@ -1,7 +1,11 @@
 import { Part, ElementPart } from "../base/control.js";
+import { contentType } from "../base/model.js";
 import { Content, Entity } from "../base/view.js";
 
 export class BaseContent<T extends Part> extends ElementPart<T> implements Content, Entity {
+	get contentType(): contentType {
+		return undefined;
+	}
 	get id(): string {
 		return this._ele.id;
 	}

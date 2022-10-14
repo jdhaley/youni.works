@@ -26,7 +26,6 @@ export interface Type<T> {
 	name: string;
 	partOf?: Type<T>;
 	types: bundle<Type<T>>;
-	conf: bundle<any>;
 
 	create(): T;
 }

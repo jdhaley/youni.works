@@ -13,7 +13,7 @@ export default extend(editable, {
 		if (event.target == this.header) {
 			event.subject = "";
 			if (this.node.classList.contains("collapsed")) {
-				this.header.textContent = this.type.conf.title;
+				this.header.textContent = this._type.conf.title;
 				this.node.classList.remove("collapsed");
 			} else {
 				let title = this.get("title").content.textContent || "";

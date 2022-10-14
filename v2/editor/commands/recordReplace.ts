@@ -19,7 +19,7 @@ function mergeContent(cmd: RangeReplace, range: RANGE, record: record) {
 	let end = getChildEditor(editor, range.endContainer);
 	for (let member = start.node || editor.node.firstElementChild; member; member = member.nextElementSibling) {
 		let control = member["$control"] as Editor;
-		if (control?.contentType == "text") {
+		if (control?.contentType == "unit") {
 			let value = record[control.type.name];
 			if (value) {
 				member.children[1].textContent += value;

@@ -125,8 +125,8 @@ function createHeaderItem(type: ViewBoxType): item {
 		}
 	}
 	for (let name in type.types) {
-		let title = type.types[name].conf.title;
-		item.content[name] = title;
+		let title = (type.types[name] as any).conf?.title;
+		item.content[name] = title || "";
 	}
 	return item;
 }

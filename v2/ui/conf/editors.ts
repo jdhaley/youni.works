@@ -1,4 +1,3 @@
-import { Editor } from "../../base/editor.js";
 import { bundle } from "../../base/util.js";
 
 import { ViewBoxType } from "../../box/view.js";
@@ -6,7 +5,6 @@ import { ViewBoxType } from "../../box/view.js";
 import { TextBox } from "../../box/controls/text.js";
 import { RecordBox } from "../../box/controls/record.js";
 import { ListBox } from "../../box/controls/list.js";
-import { MarkupBox } from "../../box/controls/markup.js";
 import { LineBox } from "../../box/controls/line.js";
 import { RowBox } from "../../box/controls/row.js";
 
@@ -26,7 +24,8 @@ import shortcuts from "./shortcuts.js";
 
 export interface TypeConf {
 	class: typeof ViewBoxType;
-	prototype?: Editor,
+	viewType: string,
+	prototype?: any,
 	container: boolean;
 	tagName: string;
 	shortcuts: bundle<string>;
@@ -35,6 +34,7 @@ export interface TypeConf {
 const conf: bundle<TypeConf> = {
 	text: {
 		class: ViewBoxType,
+		viewType: "text",
 		prototype: new TextBox(text, textEd),
 		container: true,
 		tagName: "ui-text",
@@ -42,6 +42,7 @@ const conf: bundle<TypeConf> = {
 	},
 	record: {
 		class: ViewBoxType,
+		viewType: "form",
 		prototype: new RecordBox(record, recordEd),
 		container: true,
 		tagName: "ui-record",
@@ -49,6 +50,7 @@ const conf: bundle<TypeConf> = {
 	},
 	list: {
 		class: ViewBoxType,
+		viewType: "list",
 		prototype: new ListBox(list, listEd),
 		container: true,
 		tagName: "ui-list",
@@ -56,13 +58,15 @@ const conf: bundle<TypeConf> = {
 	},
 	markup: {
 		class: ViewBoxType,
-		prototype: new MarkupBox(markup, markupEd),
+		viewType: "markup",
+		prototype: new ListBox(markup, markupEd),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	line: {
 		class: ViewBoxType,
+		viewType: "line",
 		prototype: new LineBox(line, textEd),
 		container: false,
 		tagName: "p",
@@ -70,6 +74,7 @@ const conf: bundle<TypeConf> = {
 	},
 	row: {
 		class: ViewBoxType,
+		viewType: "row",
 		prototype: new RowBox(row, recordEd),
 		container: false,
 		tagName: "ui-row",

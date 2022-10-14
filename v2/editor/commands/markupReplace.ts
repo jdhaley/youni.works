@@ -13,7 +13,7 @@ export class MarkupReplace extends ListReplace {
 			the entire view so that the outer range is like a multi-item range.
 		*/
 		let editor = getEditor(range);
-		if (editor.contentType == "line") {
+		if (editor.contentType != "list") {
 			range = range.cloneRange();
 			range.selectNode(editor.node);
 			return range;
