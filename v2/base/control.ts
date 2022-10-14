@@ -37,7 +37,7 @@ export class BaseReceiver implements Receiver {
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
 		while (subject) try {
-			let action = this.actions[subject];
+			let action = this.actions && this.actions[subject];
 			action && action.call(this, signal);
 			subject = (subject != signal.subject ? signal.subject : "");	
 		} catch (error) {
@@ -101,14 +101,10 @@ export abstract class Owner<T> extends BaseReceiver implements Graph<T> {
 }
 
 export abstract class BasePart<T extends Part> extends BaseReceiver implements Part, Iterable<T> {
-	declare actions: Actions;
-
 	get partOf(): Part {
 		return null;
 	}
-	get parts(): Iterable<T> {
-		return EMPTY.array;
-	}
+
 	send(signal: Signal | string) {
 		signal = validSignal("down", signal);
 		signal && Promise.resolve(signal).then(sig => sendTo(this, sig));
@@ -133,18 +129,13 @@ export abstract class BasePart<T extends Part> extends BaseReceiver implements P
 			on.receive(signal);
 		}
 	}
+
 	[Symbol.iterator] = function* parts() {
 	} as any;
 }
 
 export class ElementPart<T extends Part> extends BasePart<T> {
-	get partOf(): T {
-		for (let node = this._ele; node; node = node.parentElement) {
-			let control = node["$control"];
-			if (control) return control;
-		}	
-	}
-
+	declare protected _ele: Element;
 	[Symbol.iterator] = function* parts() {
 		const nodes = this._ele.childNodes;
 		for (let i = 0, len = nodes.length; i < len; i++) {
@@ -152,7 +143,26 @@ export class ElementPart<T extends Part> extends BasePart<T> {
 			if (node["$control"]) yield node["$control"];
 		}
 	}
-	declare protected _ele: Element;
+
+	get partOf(): T {
+		for (let node = this._ele; node; node = node.parentElement) {
+			let control = node["$control"];
+			if (control) return control;
+		}	
+	}
+
+	control(node: Element) {
+		if (node["$control"]) {
+			this.uncontrol(node);
+		}
+		node["$control"] = this;
+		this._ele = node;
+	}
+	uncontrol(node: Element) {
+		if (node["$control"]) {
+			throw new Error("Node is already controlled.");
+		}
+	}
 }
 
 function validSignal(direction: "up" | "down", signal: string | Signal): Signal {
