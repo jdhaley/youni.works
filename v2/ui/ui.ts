@@ -8,7 +8,7 @@ import { section } from "../transform/item.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { ViewOwner, getView } from "../box/box.js";
+import { ViewOwner, getView } from "../box/view.js";
 import { Article, Editor } from "../base/editor.js";
 import { ELE, RANGE } from "../base/dom";
 

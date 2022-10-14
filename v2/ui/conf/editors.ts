@@ -1,7 +1,7 @@
 import { Editor } from "../../base/editor.js";
 import { bundle } from "../../base/util.js";
 
-import { ViewBoxType } from "../../box/box.js";
+import { ViewBoxType } from "../../box/view.js";
 
 import { TextBox } from "../../box/controls/text.js";
 import { RecordBox } from "../../box/controls/record.js";

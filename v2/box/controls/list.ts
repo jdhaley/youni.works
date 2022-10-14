@@ -2,7 +2,7 @@ import { value, list } from "../../base/model.js";
 import { ViewType, viewTypeOf } from "../../base/view.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 
-import { getView, ViewBox } from "../box.js";
+import { getView, ViewBox } from "../view.js";
 
 export class ListBox extends ViewBox {
 	contentType = "list";

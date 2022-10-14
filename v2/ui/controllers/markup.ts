@@ -1,7 +1,7 @@
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
 
-import { navigate } from "../../box/box.js";
+import { navigate } from "../../box/view.js";
 
 import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 

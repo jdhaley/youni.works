@@ -1,7 +1,7 @@
 import { value, record } from "../../base/model.js";
 import { Editor } from "../../base/editor.js";
 
-import { getView, ViewBox } from "../box.js";
+import { getView, ViewBox } from "../view.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 
 export class RecordBox extends ViewBox {

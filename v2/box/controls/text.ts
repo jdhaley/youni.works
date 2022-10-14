@@ -2,7 +2,7 @@ import { value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 
-import { ViewBox } from "../box.js";
+import { ViewBox } from "../view.js";
 
 export class TextBox extends ViewBox {
 	contentType = "text";

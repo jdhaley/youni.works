@@ -6,7 +6,7 @@ import { RowBox } from "../../box/controls/row.js";
 import { getHeader } from "../../editor/util.js";
 import { UserEvent } from "../ui.js";
 import editable from "./editor.js";
-import { getView } from "../../box/box.js";
+import { getView } from "../../box/view.js";
 export default extend(editable, {
 	dblclick(this: RecordBox, event: UserEvent) {
 		event.subject = "";

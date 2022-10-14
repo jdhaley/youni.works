@@ -1,6 +1,6 @@
 import { item } from "../../base/model.js";
 import { ele, RANGE } from "../../base/dom.js";
-import { getView } from "../box.js";
+import { getView } from "../view.js";
 import { TextBox } from "./text.js";
 
 export class LineBox extends TextBox {

@@ -1,5 +1,5 @@
 import {Response} from "../../base/message.js";
-import {ViewBoxType, ViewBox} from "../../box/box.js";
+import {ViewBoxType, ViewBox} from "../../box/view.js";
 
 import {extend} from "../../base/util.js";
 
