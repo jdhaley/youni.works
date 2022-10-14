@@ -17,7 +17,6 @@ export class BaseType implements Type {
 
 	types: bundle<Type> = EMPTY.object;
 	conf: bundle<any>;
-//	isProperty: boolean;
 
 	generalizes(type: Type): boolean {
 		return type == this;
@@ -35,6 +34,9 @@ export class BaseType implements Type {
 			this.prototype = Object.create(this.prototype);
 		}
 		this.prototype["_type"] = this;
+	}
+	create(): any {
+		return Object.create(this.prototype);
 	}
 }
 

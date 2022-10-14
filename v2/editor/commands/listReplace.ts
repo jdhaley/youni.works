@@ -54,9 +54,10 @@ export class ListReplace extends RangeReplace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		let views = (editor.type.view(content) as Editor).content as ELE;
-		while (views.firstChild) {
-			range.insertNode(views.firstChild);
+		let view = editor.type.create() as Editor;
+		view.draw(content);
+		while (view.content.firstChild) {
+			range.insertNode(view.content.firstChild);
 			range.collapse();
 		}
 	}

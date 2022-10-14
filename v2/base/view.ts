@@ -3,7 +3,7 @@ import { value, Type, typeOf } from "./model.js";
 import { bundle } from "./util.js";
 
 export interface Entity {
-	id?: string;
+	readonly id?: string;
 	at(name: string): string;
 	put(name: string, value?: string): void;
 }
@@ -15,12 +15,14 @@ export interface Content {
 }
 
 export interface View extends Content, Entity {
-	readonly type: ViewType;
+	readonly type: Type;
 	valueOf(filter?: Filter): value;
+	draw(content: value, container?: View): void;
 }
 
 export interface ViewType extends Type {
 	types: bundle<ViewType>
+	create(): View;
 	view(content: value, container?: View): View;
 }
 

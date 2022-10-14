@@ -46,10 +46,19 @@ export abstract class BaseView extends BaseShape implements View {
 		}
 	}
 	
-	protected abstract viewContent(model: value): void;
+	abstract viewContent(data: value): void;
 	abstract valueOf(range?: RANGE): value;
 
-	draw(content: value) {
+	draw(value: value, parent?: ViewBox) {
+		if (parent) parent.content.append(this._ele);
+		if (!this.id) {
+			if (value instanceof Element && value.id) {
+				this._ele.id = value.id;
+			} else {
+				this._ele.id = "" + NEXT_ID++;
+			}
+		}
+
 		this._ele.textContent = "";
 		if (this.isContainer) {
 			this.createHeader();
@@ -58,7 +67,7 @@ export abstract class BaseView extends BaseShape implements View {
 		} else {
 			this.content.classList.add("content");
 		}
-		this.viewContent(content as value);
+		this.viewContent(value as value);
 	}
 	protected createHeader(model?: value) {
 		let header = this._type.owner.createElement("header") as Element;
@@ -77,7 +86,6 @@ export abstract class BaseView extends BaseShape implements View {
 	control(element: ViewNode) {
 		super.control(element as Element);
 		element.setAttribute("data-item", this.type.name);
-		if (!element.id) element.id = "" + NEXT_ID++;
 	}
 	uncontrol(element: ELE): void {
 		super.uncontrol(element as Element);
@@ -122,14 +130,15 @@ export class ViewBoxType extends BaseType implements ViewType {
 	declare types: bundle<ViewType>;
 	declare partOf: ViewType;
 
-	view(content: value | ELE, parent?: ViewBox): Editor {
-		let view: ViewBox = Object.create(this.prototype);
+	create(): Editor {
+		let view: ViewBox = super.create();
 		let node = this.owner.createElement(this.conf.tagName || "div");
-		if (parent) parent.content.append(node);
-		let id = ele(content)?.id;
-		if (id) node.id = id;
 		view.control(node);
-		view.draw(content);
+		return view;
+	}
+	view(content: value | ELE, parent?: ViewBox): Editor {
+		let view = this.create();
+		view.draw(content, parent);
 		return view;
 	}
 }

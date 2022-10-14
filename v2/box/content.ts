@@ -5,9 +5,6 @@ export class BaseContent<T extends Part> extends ElementPart<T> implements Conte
 	get id(): string {
 		return this._ele.id;
 	}
-	set id(id: string) {
-		this._ele.id = id;
-	}
 	get textContent() {
 		return this._ele.textContent;
 	}

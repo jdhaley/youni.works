@@ -27,6 +27,8 @@ export interface Type {
 	partOf?: Type;
 	types: bundle<Type>;
 	conf: bundle<any>;
+
+	create(): unknown;
 }
 
 function contentTypeOf(value: any): contentType {

@@ -15,7 +15,7 @@ export class ListBox extends ViewBox {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
 				type =  this.owner.unknownType;
 			}
-			type.view(item, this);
+			type.create().draw(item, this);
 		}
 	}
 	viewElement(content: ELE) {
