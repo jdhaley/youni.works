@@ -29,7 +29,8 @@ export class RowBox extends RecordBox {
 	draw(content: item): void {
 		if (!this.rowHeader && !content.header) {
 			let item = createHeaderItem(this._type);
-			let hdr = this.type.view(item) as RowBox;
+			let hdr = this.type.create() as RowBox;
+			hdr.draw(item);
 			this.node.before(hdr.node);
 		} else if (content.header) {
 			this.isHeader = true;
@@ -46,7 +47,7 @@ export class RowBox extends RecordBox {
 		let content = row.content || EMPTY.object;
 		for (let name in types) {
 			let value = content[name];
-			types[name].view(value, this);
+			types[name].create().draw(value, this);
 		}
 	}
 	protected viewElement(content: ELE): void {
@@ -56,7 +57,8 @@ export class RowBox extends RecordBox {
 		}
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
-			let child = type.view(idx[name], this) as Editor;
+			let child = type.create() as Editor;
+			child.draw(idx[name], this);
 			child.node.classList.add("field");
 		}
 	}

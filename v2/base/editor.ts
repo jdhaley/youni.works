@@ -1,5 +1,5 @@
-import { value } from "./model.js";
-import { View, ViewType } from "./view.js";
+import { Type, value } from "./model.js";
+import { View } from "./view.js";
 import { ELE, RANGE } from "./dom.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
@@ -23,8 +23,8 @@ export interface ItemEditor extends Editor {
 
 export interface Article extends Graph<ELE>, Receiver {
 	node: ELE;
-	types: bundle<ViewType>;
-	unknownType: ViewType;
+	types: bundle<Type<View>>;
+	unknownType: Type<View>;
 	commands: CommandBuffer<RANGE>;
 
 	getControl(id: string): Editor;

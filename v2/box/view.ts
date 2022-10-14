@@ -1,5 +1,5 @@
-import { value } from "../base/model.js";
-import { Content, View, ViewType } from "../base/view.js";
+import { Type, value } from "../base/model.js";
+import { Content, View } from "../base/view.js";
 import { Article, Editor } from "../base/editor.js";
 import { Actions, Owner, Part, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -18,7 +18,7 @@ type editor = (this: Editor, commandName: string, range: RANGE, content?: value)
 export abstract class BaseView extends BaseShape implements View {
 	protected _type: ViewBoxType;
 
-	get type(): ViewType {
+	get type(): Type<View> {
 		return this._type;
 	}
 	get contents(): Iterable<Content> {
@@ -121,14 +121,14 @@ export abstract class ViewBox extends BaseView {
 	}
 }
 
-export class ViewBoxType extends BaseType implements ViewType {
+export class ViewBoxType extends BaseType implements Type<View> {
 	constructor(owner: Article) {
 		super();
 		this.owner = owner;
 	}
 	declare owner: Article;
-	declare types: bundle<ViewType>;
-	declare partOf: ViewType;
+	declare types: bundle<Type<View>>;
+	declare partOf: Type<View>;
 
 	create(): Editor {
 		let view: ViewBox = super.create();

@@ -37,7 +37,8 @@ export class RecordBox extends ViewBox {
 	}
 	protected viewMember(name: string, value: any): View {
 		let type = this.type.types[name];
-		let member = type.view(value, this) as Editor;
+		let member = type.create() as Editor;
+		member.draw(value, this);
 		member.node.classList.add(this.memberType);
 		return member;
 	}

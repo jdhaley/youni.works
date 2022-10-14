@@ -8,17 +8,17 @@ export function start(owner: TypeOwner) {
 	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
 }
 
-type types = bundle<Type>;
+type types = bundle<Type<unknown>>;
 type source = bundle<string | source> | string;
 
-export class BaseType implements Type {
+export class BaseType implements Type<unknown> {
 	declare name: string;
 	declare prototype: object;
 
-	types: bundle<Type> = EMPTY.object;
+	types: bundle<Type<unknown>> = EMPTY.object;
 	conf: bundle<any>;
 
-	generalizes(type: Type): boolean {
+	generalizes(type: Type<unknown>): boolean {
 		return type == this;
 	}
 	start(name: string, conf: bundle<any>): void {
@@ -42,8 +42,8 @@ export class BaseType implements Type {
 
 interface TypeOwner {
 	conf: bundle<any>;
-	types: bundle<Type>;
-	unknownType: Type;
+	types: bundle<Type<unknown>>;
+	unknownType: Type<unknown>;
 }
 
 interface ViewConf {
@@ -52,7 +52,7 @@ interface ViewConf {
 	conf: bundle<any>;
 }
 
-function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type> {
+function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type<unknown>> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
@@ -72,7 +72,7 @@ function loadTypes(source: bundle<source>, base: types): types {
 	return types
 }
 
-function getType(name: string, types: types, source: source): Type {
+function getType(name: string, types: types, source: source): Type<unknown> {
 	let type = types[name];
 	if (!type && source[name]) {
 		let value = source[name];
@@ -105,8 +105,8 @@ function createType(name: string, conf: ViewConf, types: types, source: source) 
 	}
 	return type;
 
-	function getMember(owner: Type, name: string, part: source) {
-		let member: Type;
+	function getMember(owner: Type<unknown>, name: string, part: source) {
+		let member: Type<unknown>;
 		if (typeof part == "object") {
 			member = createType("", part as any, types, source);
 		} else {

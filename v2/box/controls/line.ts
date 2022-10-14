@@ -2,7 +2,6 @@ import { item } from "../../base/model.js";
 import { ele, RANGE } from "../../base/dom.js";
 import { getView, ViewBoxType } from "../view.js";
 import { TextBox } from "./text.js";
-import { ViewType } from "../../base/view.js";
 
 export class LineBox extends TextBox {
 	contentType = "line";

@@ -22,13 +22,13 @@ export interface item extends record {
 export interface date {
 }
 
-export interface Type {
+export interface Type<T> {
 	name: string;
-	partOf?: Type;
-	types: bundle<Type>;
+	partOf?: Type<T>;
+	types: bundle<Type<T>>;
 	conf: bundle<any>;
 
-	create(): unknown;
+	create(): T;
 }
 
 function contentTypeOf(value: any): contentType {
