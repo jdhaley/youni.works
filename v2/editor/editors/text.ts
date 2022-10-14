@@ -49,7 +49,7 @@ function doit(commandName: string, range: RANGE, text: string): RANGE {
 
 	if (range.collapsed && node == lastEdit.node) {
 		let cmd = this.owner.commands.peek() as Replace;
-		if (cmd?.name == commandName && editor?.node.id == cmd.viewId) {
+		if (cmd?.name == commandName && editor?.id == cmd.viewId) {
 			let r = doAgain(cmd, range, text);
 			if (r) return r;		
 		}
@@ -70,7 +70,7 @@ function doit(commandName: string, range: RANGE, text: string): RANGE {
 		lastEdit.node = null;
 	}
 
-	return new Replace(this.owner, commandName, editor.node.id).exec(range, text);
+	return new Replace(this.owner, commandName, editor.id).exec(range, text);
 }
 
 

@@ -37,11 +37,11 @@ function replace(this: Editor, commandName: string, range: RANGE, content?: valu
 	}
 	if (editor.contentType != "markup") console.warn("View is not markup:", editor);
 
-	return new MarkupReplace(this.owner, commandName, editor.node.id).exec(range, content);
+	return new MarkupReplace(this.owner, commandName, editor.id).exec(range, content);
 }
 
 function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
-	if (!this.content.firstElementChild) return;
+	if (!this.content.firstChild) return;
 	let start = getChildEditor(this, range.startContainer);
 	let end = getChildEditor(this, range.endContainer);
 	//If a range of items, check that there are no headings
@@ -51,7 +51,7 @@ function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
 			console.warn("No range promote with headings");
 			return range;
 		}
-		if (item.id == end.node.id) break;
+		if (item.id == end.id) break;
 	}
-	return new LevelCommand(this.owner, name, this.node.id).exec(range);
+	return new LevelCommand(this.owner, name, this.id).exec(range);
 }

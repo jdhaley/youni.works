@@ -1,15 +1,15 @@
 import { Type, value } from "./model.js";
 import { View } from "./view.js";
-import { ELE, RANGE } from "./dom.js";
+import { ELE, RANGE, TREENODE } from "./dom.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
 import { Receiver, Graph } from "./control.js";
 
-export interface Editor extends View{
+export interface Editor extends View {
 	readonly owner: Article;
 	readonly node: ELE;
 	readonly contentType: string;
-	readonly content: ELE;
+	readonly content: TREENODE;
 	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
 	getContent(range?: RANGE): ELE;
 }

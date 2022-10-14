@@ -10,8 +10,8 @@ export class LevelCommand extends Edit {
 	endId: string;
 	exec(range: RANGE): RANGE {
 		let editor = this.owner.getControl(this.viewId);
-		this.startId = getChildEditor(editor, range.startContainer)?.node.id;
-		this.endId = getChildEditor(editor, range.endContainer)?.node.id;
+		this.startId = getChildEditor(editor, range.startContainer)?.id;
+		this.endId = getChildEditor(editor, range.endContainer)?.id;
 		this.do(this.name);
 		console.log(this);
 		return range;

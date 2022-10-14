@@ -23,7 +23,7 @@ export abstract class RangeReplace extends Replace {
 		//passed range and should only be used within this method.
 		range = this.getOuterRange(range);
 		let view = getEditor(range);
-		captureRange(this, view.content, range.startOffset, range.endOffset);
+		captureRange(this, view.content as ELE, range.startOffset, range.endOffset);
 		this.before = view.getContent(range).innerHTML;
 	}
 	protected execAfter(range: RANGE): RANGE {
