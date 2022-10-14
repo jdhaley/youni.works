@@ -5,7 +5,7 @@ import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
 import { Receiver, Graph } from "./control.js";
 
-export interface Editor extends View<ELE> {
+export interface Editor extends View{
 	readonly owner: Article;
 	readonly node: ELE;
 	readonly content: ELE;
@@ -22,8 +22,8 @@ export interface ItemEditor extends Editor {
 
 export interface Article extends Graph<ELE>, Receiver {
 	node: ELE;
-	types: bundle<ViewType<ELE>>;
-	unknownType: ViewType<ELE>;
+	types: bundle<ViewType>;
+	unknownType: ViewType;
 	commands: CommandBuffer<RANGE>;
 
 	getControl(id: string): Editor;

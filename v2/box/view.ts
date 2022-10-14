@@ -111,7 +111,7 @@ export abstract class ViewBox extends BaseShape implements Editor {
 	}
 }
 
-export class ViewBoxType extends BaseType implements ViewType<ELE> {
+export class ViewBoxType extends BaseType implements ViewType {
 	constructor(owner: Article) {
 		super();
 		this.owner = owner;

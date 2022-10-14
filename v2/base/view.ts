@@ -13,12 +13,12 @@ export interface Content {
 	markupContent: string;
 }
 
-export interface ViewType<T> extends Type {
-	view(content: value, container?: View<T>): View<T>;
+export interface ViewType extends Type {
+	view(content: value, container?: View): View;
 }
 
-export interface View<T> extends Content, Entity {
-	readonly type: ViewType<T>;
+export interface View extends Content, Entity {
+	readonly type: ViewType;
 	readonly contentType: string;
 
 	valueOf(filter?: Filter): value;
@@ -48,7 +48,7 @@ export function viewTypeOf(value: any): string {
 // }
 
 export class Change implements Signal {
-	constructor(command: string, view?: View<any>) {
+	constructor(command: string, view?: View) {
 		this.direction = view ? "up" : "down";
 		this.subject = "change";
 		this.from = view;
@@ -56,9 +56,9 @@ export class Change implements Signal {
 		this.commandName = command;
 	}
 	direction: "up" | "down";
-	source: View<any>;
-	from: View<any>;
-	on: View<any>;
+	source: View;
+	from: View;
+	on: View;
 	subject: string;
 	commandName: string;
 }
