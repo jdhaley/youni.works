@@ -49,7 +49,7 @@ export abstract class BaseView extends BaseShape implements View {
 	abstract viewContent(data: value): void;
 	abstract valueOf(range?: RANGE): value;
 
-	draw(value: value, parent?: ViewBox) {
+	view(value: value, parent?: ViewBox) {
 		if (parent) parent.content.append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
@@ -138,7 +138,7 @@ export class ViewBoxType extends BaseType implements Type<View> {
 	}
 	view(content: value | ELE, parent?: ViewBox): Editor {
 		let view = this.create();
-		view.draw(content, parent);
+		view.view(content, parent);
 		return view;
 	}
 }

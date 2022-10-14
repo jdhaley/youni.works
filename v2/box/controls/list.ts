@@ -14,7 +14,7 @@ export class ListBox extends ViewBox {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
 				type =  this.owner.unknownType;
 			}
-			type.create().draw(item, this);
+			type.create().view(item, this);
 		}
 	}
 	viewElement(content: ELE) {
@@ -22,7 +22,7 @@ export class ListBox extends ViewBox {
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
-				childType.create().draw(child, this);
+				childType.create().view(child, this);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}

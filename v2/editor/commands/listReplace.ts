@@ -55,7 +55,7 @@ export class ListReplace extends RangeReplace {
 			range.collapse(true);
 		}
 		let view = editor.type.create() as Editor;
-		view.draw(content);
+		view.view(content);
 		while (view.content.firstChild) {
 			range.insertNode(view.content.firstChild);
 			range.collapse();

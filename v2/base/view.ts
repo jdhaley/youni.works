@@ -16,7 +16,7 @@ export interface Content {
 export interface View extends Content, Entity {
 	readonly type: Type<View>;
 	valueOf(filter?: Filter): value;
-	draw(content: value, container?: View): void;
+	view(value: value, container?: View): void;
 }
 
 export interface Filter {

@@ -67,6 +67,6 @@ function addCol(editor: RowBox, col: Editor) {
 function addColumn(row: RowBox, index: number) {
 	let column = getView(row.content.children[index]);
 	let newcol = column.type.create() as Editor;
-	newcol.draw("");
+	newcol.view("");
 	column.node.after(newcol.node);
 }
