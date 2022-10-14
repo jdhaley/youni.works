@@ -1,12 +1,13 @@
 import { value } from "../base/model.js";
-import { Box, ViewType } from "../base/view.js";
-import { ELE, ele, RANGE, TREENODE } from "../base/dom.js";
+import { Content, ViewType } from "../base/view.js";
 import { Article, Editor } from "../base/editor.js";
-import { Actions } from "../base/control.js";
+import { Actions, Owner, Part, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
-import { bundle } from "../base/util.js";
-import { nodeOf } from "../base/dom.js";
-import { ElementController, ElementOwner } from "./shape.js";
+import { bundle, EMPTY } from "../base/util.js";
+import { ELE, ele, RANGE, TREENODE, nodeOf } from "../base/dom.js";
+
+import { BaseShape } from "./shape.js";
+import { BaseContent } from "./content.js";
 
 interface ViewNode extends ELE {
 	$control?: Editor;
@@ -14,17 +15,39 @@ interface ViewNode extends ELE {
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
 
-export abstract class ViewBox extends ElementController implements Box<ELE>, Editor {
+export abstract class ViewBox extends BaseShape implements Editor {
 	constructor(actions: Actions, editor: editor) {
 		super();
 		this.actions = actions;
 		if (editor) this["edit"] = editor;
 	}
-	declare contentType: string;
-	declare header: ELE;
-	declare content: ELE;
-	declare footer: ELE;
 
+	declare contentType: string;
+
+	get header(): ELE {
+		for (let child of this.node.children) {
+			if (child.nodeName == "header") return child;
+		}
+	}
+	get footer(): ELE {
+		for (let child of this.node.children) {
+			if (child.nodeName == "footer") return child;
+		}
+	}
+	get content(): ELE {
+		if (!this.isContainer) return this._ele;
+		for (let child of this.node.children) {
+			if (child.classList.contains("content")) return child;
+		}	
+	}
+	get contents(): Iterable<Content> {
+		let content = this.content;
+		let control = content["$control"] as Content;
+		return control?.contents || EMPTY.array;
+	}
+	get node(): ELE {
+		return this._ele;
+	}
 	get type(): ViewBoxType {
 		return this["_type"];
 	}
@@ -45,14 +68,13 @@ export abstract class ViewBox extends ElementController implements Box<ELE>, Edi
 		console.warn("edit() has not been configured.")
 		return null;
 	}
-	draw(content: unknown) {
+	draw(content: value) {
 		this.node.textContent = "";
 		if (this.isContainer) {
 			this.createHeader();
 			this.createContent();
 			this.createFooter()
 		} else {
-			this.content = this.node;
 			this.content.classList.add("content");
 		}
 		this.viewContent(content as value);
@@ -61,33 +83,26 @@ export abstract class ViewBox extends ElementController implements Box<ELE>, Edi
 		let header = this.owner.createElement("header");
 		header.textContent = this.type.conf.title || "";
 		this.node.append(header);
-		this.header = header;
 	}
 	protected createContent(model?: value) {
 		let ele = this.owner.createElement("div");
 		ele.classList.add("content");
+		let content = new BaseContent<Part>();
+		content.control(ele as Element);
 		this.node.append(ele);
-		this.content = ele;
 	}
 	protected createFooter(model?: value) {
 		if (this.contentType != "list") return;
 		let footer = this.owner.createElement("footer");
 		this.node.append(footer);
-		this.footer = footer;
 	}
 	control(element: ViewNode) {
-		super.control(element);
+		super.control(element as Element);
 		element.setAttribute("data-item", this.type.name);
 		if (!element.id) element.id = "" + NEXT_ID++;
-
-		if (this.isContainer) {
-			bindContainer(element);
-		} else {
-			this.content = element;
-		}
 	}
 	uncontrol(element: ELE): void {
-		super.uncontrol(element);
+		super.uncontrol(element as Element);
 		element.removeAttribute("data-item");
 		delete element.id;
 	}
@@ -119,14 +134,21 @@ export class ViewBoxType extends BaseType implements ViewType<ELE> {
 
 let NEXT_ID = 1;
 
-function bindContainer(node: ViewNode) {
-	let control: ViewBox = node.$control as any;
-	for (let child of node.children) {
-		if (child.nodeName == "header") control.header = child;
-		if (child.nodeName == "footer") control.footer = child;
-		if (child.classList.contains("content")) control.content = child;
+export class ElementOwner extends Owner<ELE> {
+	getControlOf(node: ELE): Receiver {
+		return node["$control"];
+	}
+	getContainerOf(node: ELE): ELE {
+		for (let parent = node.parentNode as TREENODE; parent; parent = parent.parentNode) {
+			if (parent["$control"]) return parent as ELE;
+		}
+	}
+	getPartsOf(node: ELE): Iterable<ELE> {
+		return node.children as Iterable<ELE>;
 	}
 }
+
+const ELEMENT_OWNER = new ElementOwner();
 
 export abstract class ViewOwner extends ElementOwner {
 	constructor(conf: bundle<any>) {

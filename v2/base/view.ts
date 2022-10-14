@@ -1,6 +1,5 @@
-import { Control, Part, Signal } from "./control.js";
+import { Signal } from "./control.js";
 import { value, Type, typeOf } from "./model.js";
-import { Shape } from "./shape.js";
 
 export interface Entity {
 	id: string;
@@ -8,7 +7,7 @@ export interface Entity {
 	put(name: string, value?: string): void;
 }
 
-export interface Content extends Part, Entity {
+export interface Content {
 	readonly contents: Iterable<Content>;
 	textContent: string;
 	markupContent: string;
@@ -18,22 +17,35 @@ export interface ViewType<T> extends Type {
 	view(content: value, container?: View<T>): View<T>;
 }
 
-export interface View<T> extends Content{
+export interface View<T> extends Content, Entity {
 	readonly type: ViewType<T>;
 	readonly contentType: string;
-	readonly content: T;
 
-	edit(commandName: string, filter?: Filter, content?: value): unknown;
 	valueOf(filter?: Filter): value;
+	edit(commandName: string, filter?: Filter, content?: value): unknown;
 }
 
 export interface Filter {
 }
 
-export interface Box<T> extends View<T>, Control<T>, Shape {
-	readonly header?: T;
-	readonly footer?: T;
+export function viewTypeOf(value: any): string {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+		case "date":
+		case "null":
+		case "unknown":
+			return "text";	//TODO "unit"
+	}
+	return type; //"list" or value.type$
 }
+
+// export interface Box<T> extends View<T>, Control<T>, Shape {
+// 	readonly header?: T;
+// 	readonly footer?: T;
+// }
 
 export class Change implements Signal {
 	constructor(command: string, view?: View<any>) {
@@ -49,18 +61,4 @@ export class Change implements Signal {
 	on: View<any>;
 	subject: string;
 	commandName: string;
-}
-
-export function viewTypeOf(value: any): string {
-	let type = typeOf(value);
-	switch (type) {
-		case "string":
-		case "number":
-		case "boolean":
-		case "date":
-		case "null":
-		case "unknown":
-			return "text";	//TODO "unit"
-	}
-	return type; //"list" or value.type$
 }
