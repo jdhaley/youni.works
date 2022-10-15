@@ -66,7 +66,7 @@ export class RowBox extends RecordBox {
 		if (this.isHeader) return;
 		let row: item = {
 			type$: this.type.name,
-			content: rowContent(null, this.contentNode as ELE, range)
+			content: rowContent(null, this.content.node as ELE, range)
 		}
 		return row;
 	}

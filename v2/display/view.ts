@@ -4,7 +4,7 @@ import { Article, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
-import { ELE, ele, RANGE, TREENODE, nodeOf } from "../base/dom.js";
+import { ELE, ele, RANGE, TREENODE, nodeOf, NODE } from "../base/dom.js";
 
 import { BaseShape } from "./shape.js";
 import { ContentEntity } from "./content.js";
@@ -39,15 +39,6 @@ export abstract class BaseView extends BaseShape<BaseView> implements View {
 			if (child.nodeName == "header") return child;
 		}
 	}
-	/**
-	 * @deprecated Replace with content.node
-	 */
-	get contentNode(): ELE {
-		if (!this.isContainer) return this._ele;
-		for (let child of this._ele.children) {
-			if (child.classList.contains("content")) return child;
-		}	
-	}
 	get footer(): ELE {
 		for (let child of this._ele.children) {
 			if (child.nodeName == "footer") return child;
@@ -58,7 +49,7 @@ export abstract class BaseView extends BaseShape<BaseView> implements View {
 	abstract valueOf(range?: RANGE): value;
 
 	view(value: value, parent?: EditorView) {
-		if (parent) parent.contentNode.append(this._ele);
+		if (parent) (parent.content.node as ELE).append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
 				this._ele.id = value.id;
@@ -73,7 +64,7 @@ export abstract class BaseView extends BaseShape<BaseView> implements View {
 			this.createContent();
 			this.createFooter()
 		} else {
-			this.contentNode.classList.add("content");
+			this.content.styles.add("content");
 		}
 		this.viewContent(value as value);
 	}
@@ -224,7 +215,7 @@ export function bindViewNode(node: ELE): void {
 	}
 }
 
-function getViewNode(loc: TREENODE | RANGE): ViewNode {
+function getViewNode(loc: NODE | RANGE): ViewNode {
 	for (let node = nodeOf(loc) as TREENODE; node; node = node.parentNode) {
 		let e = ele(node);
 		if (e?.getAttribute("data-item")) {
@@ -237,13 +228,13 @@ function getViewNode(loc: TREENODE | RANGE): ViewNode {
 	}
 }
 
-export function getView(node: TREENODE | RANGE): EditorView {
+export function getView(node: NODE | RANGE): EditorView {
 	let view = getViewNode(node)?.$control;
 	if (view instanceof EditorView) return view;
 }
 
 function viewContent(view: EditorView, range: RANGE, out?: ELE) {
-	if (range && !range.intersectsNode(view.contentNode as any)) return;
+	if (range && !range.intersectsNode(view.content.node)) return;
 	let item: ELE;
 	if (!out) {
 		item = document.implementation.createDocument("", view.type.name).documentElement as unknown as ELE;
@@ -259,7 +250,7 @@ function viewContent(view: EditorView, range: RANGE, out?: ELE) {
 }
 
 function content(view: EditorView, range: RANGE, out: ELE) {
-	for (let node of view.contentNode.childNodes) {
+	for (let node of view.content.contents) {
 		if (range && !range.intersectsNode(node))
 			continue;
 		let childView = getView(node);
@@ -300,7 +291,7 @@ export function navigate(start: TREENODE | RANGE, isBack?: boolean): NAVIGABLE_E
 function navigateInto(ele: ELE, isBack?: boolean) {
 	let editor = getView(ele);
 	if (!editor) return;
-	let content = editor.contentNode as ELE;
+	let content = editor.content.node as ELE;
 	switch (editor.contentType) {
 		case "unit":
 			break;

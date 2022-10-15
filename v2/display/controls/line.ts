@@ -62,16 +62,16 @@ export class LineBox extends TextBox {
 	viewContent(content: item): void {
 		let e = ele(content);
 		if (e) {
-			this.contentNode.innerHTML = e.innerHTML;
+			this.content.markupContent = e.innerHTML;
 			this.level = Number.parseInt(e.getAttribute("level"));
 		} else {
-			this.contentNode.innerHTML = (content ? "" + content.content : "");
+			this.content.markupContent = (content ? "" + content.content : "");
 			this.level = content.level;	
 		}
 	}
 	valueOf(range?: RANGE): item {
 		let line = this.node;
-		if (range && !range.intersectsNode(this.contentNode)) return;
+		if (range && !range.intersectsNode(this.content.node)) return;
 		let content = super.valueOf(range);
 		let item: item = {
 			type$: line.getAttribute("data-item"),

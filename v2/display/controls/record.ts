@@ -9,7 +9,7 @@ export class RecordBox extends EditorView {
 	memberType = "field";
 
 	get(name: string): Editor {
-		for (let node of this.contentNode.children) {
+		for (let node of this.contents) {
 			let view = getView(node);
 			if (name == view?.type.name) return view;
 		}
@@ -43,7 +43,7 @@ export class RecordBox extends EditorView {
 	}
 
 	valueOf(range?: RANGE): value {
-		let model = recordContent(null, this.contentNode as ELE, range);
+		let model = recordContent(null, this.content.node as ELE, range);
 		if (model) {
 			model["type$"] = this.type.name;
 		}
