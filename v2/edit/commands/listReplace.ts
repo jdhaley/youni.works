@@ -31,14 +31,14 @@ export class ListReplace extends RangeReplace {
 	}
 	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
-		r.setEnd(start.contentNode, start.contentNode.childNodes.length);
+		r.setEnd(start.content.node, start.content.node.childNodes.length);
 		clearContent(r);
 		this.merge(start, r, content, true);
 		range.setStartAfter(start.node);
 	}
 	protected onEndContainer(range: RANGE, content: value, end: Editor): void {
 		let r = range.cloneRange();
-		r.setStart(end.contentNode, 0);
+		r.setStart(end.content.node, 0);
 		clearContent(r);
 		this.merge(end, r, content, false);
 		range.setEndBefore(end.node);
@@ -48,7 +48,7 @@ export class ListReplace extends RangeReplace {
 		range.deleteContents();
 		if (!content) return;
 		let editor = this.owner.getControl(this.viewId);
-		let ctx = editor.contentNode;
+		let ctx = editor.content.node;
 		//Ensure the range must be on the list conent. (It may be on a markup line).
 		while (range.commonAncestorContainer != ctx) {
 			range.setStartBefore(range.commonAncestorContainer);
@@ -56,8 +56,8 @@ export class ListReplace extends RangeReplace {
 		}
 		let view = editor.type.create() as Editor;
 		view.view(content);
-		while (view.contentNode.firstChild) {
-			range.insertNode(view.contentNode.firstChild);
+		while (view.content.node.firstChild) {
+			range.insertNode(view.content.node.firstChild);
 			range.collapse();
 		}
 	}

@@ -16,7 +16,7 @@ export class RecordBox extends EditorView {
 	}
 
 	get title(): string {
-		return this.get("title").contentNode.textContent;
+		return this.get("title").content.node.textContent;
 	}
 
 	viewContent(model: value | ELE): void {

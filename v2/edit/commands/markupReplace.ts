@@ -24,7 +24,7 @@ export class MarkupReplace extends ListReplace {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
-		let ctx = editor.contentNode;
+		let ctx = editor.content.node;
 		let r = range.cloneRange();
 		//Delete the range within the line.
 		r.deleteContents();
@@ -58,7 +58,7 @@ export class MarkupReplace extends ListReplace {
 	}
 	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
-		r.setEnd(start.contentNode, start.contentNode.childNodes.length);
+		r.setEnd(start.content.node, start.content.node.childNodes.length);
 		r.deleteContents();
 		let startItem: item = start.valueOf() as any;
 		let items = content as item[];

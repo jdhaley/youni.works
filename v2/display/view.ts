@@ -196,7 +196,7 @@ export abstract class ViewOwner extends ElementOwner {
 				debugger;
 			}
 		} else {
-			view.$control.contentNode; //checks the view isn't corrupted.
+			view.$control.content.node; //checks the view isn't corrupted.
 		}
 		return view.$control;
 	}

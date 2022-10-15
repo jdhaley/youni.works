@@ -7,16 +7,11 @@ import { ELE, NODE, RANGE, TREENODE } from "./dom.js";
 
 export interface NodeContent extends Content, Entity {
 	contents: Sequence<NODE>;
-	/** @deprecated change to NODE or TREENODE? */
-	//node: TREENODE;
+	node: TREENODE;
 }
 export interface Editor extends View, NodeContent {
 	readonly owner: Article;
 	readonly node: ELE;
-	/**
- 	* @deprecated use content.node
- 	*/
-	readonly contentNode: TREENODE;
 	readonly content: NodeContent;
 	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
 	getContent(range?: RANGE): ELE;

@@ -8,8 +8,8 @@ export { getEditor, bindViewNode }
 const getEditor = getView as (node: TREENODE | RANGE) => Editor ;
 
 export function getChildEditor(editor: Editor, node: TREENODE): Editor {
-	if (node == editor.contentNode) return null;
-	while (node?.parentNode != editor.contentNode) {
+	if (node == editor.content.node) return null;
+	while (node?.parentNode != editor.content.node) {
 		node = node.parentNode;
 	}
 	if (ele(node) && node["$control"]) return node["$control"] as Editor;
@@ -21,7 +21,7 @@ export function narrowRange(range: RANGE) {
 
 	let start = range.startContainer;
 	let end = range.endContainer;
-	let content = getView(range).contentNode;
+	let content = getView(range).content.node;
 	if (getHeader(editor.node, start)) {;
 		range.setStart(content, 0);
 	}
@@ -122,7 +122,7 @@ export function clearContent(range: RANGE) {
 				if (enclosedInRange(editor.node, range)) editor.node.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
-			if (editor && node.parentElement == editor.contentNode) {
+			if (editor && node.parentElement == editor.content.node) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
 				} else if (node == range.endContainer) {
