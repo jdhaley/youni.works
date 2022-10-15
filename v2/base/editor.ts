@@ -1,14 +1,23 @@
 import { Type, value } from "./model.js";
-import { View } from "./view.js";
+import { Content, Entity, View } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { Receiver, Graph } from "./control.js";
-import { bundle } from "./util.js";
-import { ELE, RANGE, TREENODE } from "./dom.js";
+import { bundle, Sequence } from "./util.js";
+import { ELE, NODE, RANGE, TREENODE } from "./dom.js";
 
-export interface Editor extends View {
+export interface NodeContent extends Content, Entity {
+	contents: Sequence<NODE>;
+	/** @deprecated change to NODE or TREENODE? */
+	//node: TREENODE;
+}
+export interface Editor extends View, NodeContent {
 	readonly owner: Article;
 	readonly node: ELE;
-	readonly content: TREENODE;
+	/**
+ 	* @deprecated use content.node
+ 	*/
+	readonly contentNode: TREENODE;
+	readonly content: NodeContent;
 	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
 	getContent(range?: RANGE): ELE;
 }

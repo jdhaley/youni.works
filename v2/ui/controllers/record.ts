@@ -14,7 +14,7 @@ export default extend(editable, {
 				this.header.textContent = this._type.conf.title;
 				this.node.classList.remove("collapsed");
 			} else {
-				let title = this.get("title").content.textContent || "";
+				let title = this.get("title").contentNode.textContent || "";
 				this.header.innerHTML += ": " + `<b>${title}</b>`;
 				this.node.classList.add("collapsed");
 			}

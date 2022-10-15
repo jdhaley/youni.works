@@ -1,4 +1,4 @@
-import {EMPTY, extend} from "./util.js";
+import { EMPTY, extend} from "./util.js";
 
 export interface Signal {
 	readonly direction: "up" | "down"
@@ -132,37 +132,6 @@ export abstract class BasePart<T extends Part> extends BaseReceiver implements P
 
 	[Symbol.iterator] = function* parts() {
 	} as any;
-}
-
-export class ElementPart<T extends Part> extends BasePart<T> {
-	declare protected _ele: Element;
-	[Symbol.iterator] = function* parts() {
-		const nodes = this._ele.childNodes;
-		for (let i = 0, len = nodes.length; i < len; i++) {
-			let node = nodes[i];
-			if (node["$control"]) yield node["$control"];
-		}
-	}
-
-	get partOf(): T {
-		for (let node = this._ele; node; node = node.parentElement) {
-			let control = node["$control"];
-			if (control) return control;
-		}	
-	}
-
-	control(node: Element) {
-		if (node["$control"]) {
-			this.uncontrol(node);
-		}
-		node["$control"] = this;
-		this._ele = node;
-	}
-	uncontrol(node: Element) {
-		if (node["$control"]) {
-			throw new Error("Node is already controlled.");
-		}
-	}
 }
 
 function validSignal(direction: "up" | "down", signal: string | Signal): Signal {

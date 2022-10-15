@@ -1,8 +1,9 @@
+import { Part } from "../base/control.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
 import { ContentEntity } from "./content.js";
 
-export class BaseShape extends ContentEntity<BaseShape> implements Shape {
+export class BaseShape<T extends Part> extends ContentEntity<T> implements Shape {
 	declare _ele: HTMLElement;
 
 	get area(): Area {

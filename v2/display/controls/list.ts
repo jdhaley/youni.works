@@ -29,8 +29,8 @@ export class ListBox extends EditorView {
 	}
 	valueOf(range?: RANGE): list {
 		let model: value[];
-		if (range && !range.intersectsNode(this.content)) return;
-		for (let part of this.content.children) {
+		if (range && !range.intersectsNode(this.contentNode)) return;
+		for (let part of this.contentNode.children) {
 			let editor = getView(part);
 			let value = editor?.valueOf(range);
 			if (value) {

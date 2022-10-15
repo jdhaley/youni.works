@@ -77,7 +77,7 @@ function shapetest(this: Display) {
 	});
 	
 	let viewer = type.view("HELLO THERE") as unknown as EditorView;
-	viewer.content.classList.add("shape");
+	viewer.contentNode.classList.add("shape");
 	viewer.position(300, 0);
 
 	this.frame.view.append(viewer.node);

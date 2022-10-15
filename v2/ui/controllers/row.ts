@@ -16,7 +16,7 @@ export default extend(editable, {
 				this.header.textContent = this._type.conf.title;
 				this.node.classList.remove("collapsed");
 			} else {
-				let title = this.get("title").content.textContent || "";
+				let title = this.get("title").contentNode.textContent || "";
 				this.header.innerHTML += ": " + `<b>${title}</b>`;
 				this.node.classList.add("collapsed");
 			}
@@ -50,7 +50,7 @@ export default extend(editable, {
 });
 
 function addCol(editor: RowBox, col: Editor) {
-	let content = editor.content.children;
+	let content = editor.contentNode.children;
 	for (let i = 0; i < content.length; i++) {
 		if (content[i] == col.node) {
 			addColumn(editor, i);
@@ -65,7 +65,7 @@ function addCol(editor: RowBox, col: Editor) {
 	}
 }
 function addColumn(row: RowBox, index: number) {
-	let column = getView(row.content.children[index]);
+	let column = getView(row.contentNode.children[index]);
 	let newcol = column.type.create() as Editor;
 	newcol.view("");
 	column.node.after(newcol.node);

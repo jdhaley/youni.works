@@ -1,9 +1,9 @@
 import { contentType, Type, value } from "../base/model.js";
-import { Content, View, viewTypes } from "../base/view.js";
-import { Article, Editor } from "../base/editor.js";
-import { Actions, Owner, Part, Receiver } from "../base/control.js";
+import { View, viewTypes } from "../base/view.js";
+import { Article, Editor, NodeContent } from "../base/editor.js";
+import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
-import { bundle, EMPTY } from "../base/util.js";
+import { bundle } from "../base/util.js";
 import { ELE, ele, RANGE, TREENODE, nodeOf } from "../base/dom.js";
 
 import { BaseShape } from "./shape.js";
@@ -15,7 +15,7 @@ interface ViewNode extends ELE {
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
 
-export abstract class BaseView extends BaseShape implements View {
+export abstract class BaseView extends BaseShape<BaseView> implements View {
 	protected _type: ViewType;
 
 	get type(): Type<View> {
@@ -24,10 +24,12 @@ export abstract class BaseView extends BaseShape implements View {
 	get contentType(): contentType {
 		return viewTypes[this._type.conf.viewType];
 	}
-	get contents(): Iterable<Content> {
-		let content = this.content;
-		let control = content["$control"] as Content;
-		return control?.contents || EMPTY.array;
+	get content(): NodeContent {
+		if (!this.isContainer) return this;
+		for (let child of this._ele.children) {
+			if (child.classList.contains("content")) return child["$control"];
+		}
+		throw new Error("Missing content in container.");
 	}
 	get isContainer(): boolean {
 		return this._type.conf.container;
@@ -37,7 +39,10 @@ export abstract class BaseView extends BaseShape implements View {
 			if (child.nodeName == "header") return child;
 		}
 	}
-	get content(): ELE {
+	/**
+	 * @deprecated Replace with content.node
+	 */
+	get contentNode(): ELE {
 		if (!this.isContainer) return this._ele;
 		for (let child of this._ele.children) {
 			if (child.classList.contains("content")) return child;
@@ -53,7 +58,7 @@ export abstract class BaseView extends BaseShape implements View {
 	abstract valueOf(range?: RANGE): value;
 
 	view(value: value, parent?: EditorView) {
-		if (parent) parent.content.append(this._ele);
+		if (parent) parent.contentNode.append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
 				this._ele.id = value.id;
@@ -68,7 +73,7 @@ export abstract class BaseView extends BaseShape implements View {
 			this.createContent();
 			this.createFooter()
 		} else {
-			this.content.classList.add("content");
+			this.contentNode.classList.add("content");
 		}
 		this.viewContent(value as value);
 	}
@@ -80,7 +85,7 @@ export abstract class BaseView extends BaseShape implements View {
 	protected createContent(model?: value) {
 		let ele = this._type.owner.createElement("div") as Element;
 		ele.classList.add("content");
-		let content = new ContentEntity<Part>();
+		let content = new ContentEntity<BaseView>();
 		content.control(ele as Element);
 		this._ele.append(ele);
 	}
@@ -106,9 +111,6 @@ export abstract class EditorView extends BaseView implements Editor {
 
 	get owner(): Article {
 		return this._type.owner;
-	}
-	get node(): ELE {
-	 	return this._ele
 	}
 
 	get shortcuts(): bundle<string> {
@@ -194,7 +196,7 @@ export abstract class ViewOwner extends ElementOwner {
 				debugger;
 			}
 		} else {
-			view.$control.content; //checks the view isn't corrupted.
+			view.$control.contentNode; //checks the view isn't corrupted.
 		}
 		return view.$control;
 	}
@@ -217,8 +219,8 @@ export function bindViewNode(node: ELE): void {
 		}
 	}
 
-	if (control) for (let child of node["$control"].content.children) {
-		bindViewNode(child as ViewNode);
+	if (control) for (let child of control.contents) {
+		if (ele(child)) bindViewNode(child as ELE);
 	}
 }
 
@@ -241,7 +243,7 @@ export function getView(node: TREENODE | RANGE): EditorView {
 }
 
 function viewContent(view: EditorView, range: RANGE, out?: ELE) {
-	if (range && !range.intersectsNode(view.content as any)) return;
+	if (range && !range.intersectsNode(view.contentNode as any)) return;
 	let item: ELE;
 	if (!out) {
 		item = document.implementation.createDocument("", view.type.name).documentElement as unknown as ELE;
@@ -257,7 +259,7 @@ function viewContent(view: EditorView, range: RANGE, out?: ELE) {
 }
 
 function content(view: EditorView, range: RANGE, out: ELE) {
-	for (let node of view.content.childNodes) {
+	for (let node of view.contentNode.childNodes) {
 		if (range && !range.intersectsNode(node))
 			continue;
 		let childView = getView(node);
@@ -298,7 +300,7 @@ export function navigate(start: TREENODE | RANGE, isBack?: boolean): NAVIGABLE_E
 function navigateInto(ele: ELE, isBack?: boolean) {
 	let editor = getView(ele);
 	if (!editor) return;
-	let content = editor.content as ELE;
+	let content = editor.contentNode as ELE;
 	switch (editor.contentType) {
 		case "unit":
 			break;

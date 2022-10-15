@@ -129,7 +129,7 @@ function eraseAgain(range: RANGE, cmd: Replace) {
 
 function endagain(range: RANGE, cmd: Replace) {
 	mark(range);
-	cmd.after = getEditor(range).content.innerHTML || "";
+	cmd.after = getEditor(range).contentNode.innerHTML || "";
 	unmark(range);
 	range.collapse();
 	return range;
@@ -163,7 +163,7 @@ function positionToText(range: RANGE) {
 	let inHeader = getHeader(getEditor(range).node, range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
-		let content = getEditor(range).content;
+		let content = getEditor(range).contentNode;
 		if (content.childNodes.length != 1) {
 			//force single text node...
 			content.textContent = content.textContent;

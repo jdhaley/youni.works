@@ -41,7 +41,7 @@ function replace(this: Editor, commandName: string, range: RANGE, content?: valu
 }
 
 function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
-	if (!this.content.firstChild) return;
+	if (!this.contentNode.firstChild) return;
 	let start = getChildEditor(this, range.startContainer);
 	let end = getChildEditor(this, range.endContainer);
 	//If a range of items, check that there are no headings

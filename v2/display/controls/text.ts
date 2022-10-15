@@ -9,15 +9,15 @@ export class TextBox extends EditorView {
 	viewContent(model: value): void {
 		if (ele(model)) {
 			//even with plain text, always use HTML so that the marker is transferred to the view.
-			this.content.innerHTML = ele(model).innerHTML;
+			this.contentNode.innerHTML = ele(model).innerHTML;
 		} else {
-			this.content.textContent = model ? "" + model : "";
+			this.contentNode.textContent = model ? "" + model : "";
 		}
 	}
 	valueOf(range?: RANGE): value {
 		let model = "";
-		if (range && !range.intersectsNode(this.content)) return;
-		for (let node of (this.content as ELE).childNodes) {
+		if (range && !range.intersectsNode(this.contentNode)) return;
+		for (let node of (this.contentNode as ELE).childNodes) {
 			if (node == range?.startContainer && node == range?.endContainer) {
 				model += node.textContent.substring(range.startOffset, range.endOffset);
 			} else if (node == range?.startContainer) {

@@ -8,7 +8,7 @@ export class Replace extends Edit {
 
 	exec(range: RANGE, text: string): RANGE {
 		mark(range);
-		let content = getEditor(range)?.content;
+		let content = getEditor(range)?.contentNode;
 		if (!content) return;
 		this.before = content.innerHTML;	
 		range.deleteContents();
@@ -30,10 +30,10 @@ export class Replace extends Edit {
 		let editor = this.owner.getControl(this.viewId);
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 
-		editor.content.innerHTML = markup;
+		editor.contentNode.innerHTML = markup;
 
 		let range = editor.node.ownerDocument.createRange();
-		range.selectNode(editor.content);
+		range.selectNode(editor.contentNode);
 		return unmark(range);
 	}
 }

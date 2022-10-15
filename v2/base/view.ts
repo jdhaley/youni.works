@@ -9,15 +9,16 @@ export interface Entity {
 }
 
 export interface Content {
-	readonly contentType: contentType;
-	readonly contents: Iterable<Content>;
 	readonly styles: Collection<string>;
+	contents: Iterable<unknown>;
 	textContent: string;
 	markupContent: string;
 }
 
-export interface View extends Content, Entity {
+export interface View extends Entity {
 	readonly type: Type<View>;
+	readonly contentType: contentType;
+	readonly content: Content;
 	view(value: value, container?: View): void;
 	valueOf(filter?: Filter): value;
 }
@@ -26,9 +27,9 @@ export interface Filter {
 }
 
 export const viewTypes: bundle<contentType> = {
-	"widget": "unit",
-	"image": "unit",
-	"video": "unit",
+	// "widget": "unit",
+	// "image": "unit",
+	// "video": "unit",
 	"text": "unit",
 	"line": "unit",
 
@@ -36,7 +37,7 @@ export const viewTypes: bundle<contentType> = {
 	"row": "record",
 
 	"list": "list",
-	"table": "list",
+	// "table": "list",
 	"markup": "list"
 }
 

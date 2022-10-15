@@ -23,7 +23,7 @@ export abstract class RangeReplace extends Replace {
 		//passed range and should only be used within this method.
 		range = this.getOuterRange(range);
 		let view = getEditor(range);
-		captureRange(this, view.content as ELE, range.startOffset, range.endOffset);
+		captureRange(this, view.contentNode as ELE, range.startOffset, range.endOffset);
 		this.before = view.getContent(range).innerHTML;
 	}
 	protected execAfter(range: RANGE): RANGE {
@@ -35,13 +35,13 @@ export abstract class RangeReplace extends Replace {
 	protected getOuterRange(range: RANGE) {
 		range = range.cloneRange();
 		let editor = getEditor(range);
-		range.selectNodeContents(editor.content);
+		range.selectNodeContents(editor.contentNode);
 		let start = getChildEditor(editor, range.startContainer);
 		if (start) range.setStartBefore(start.node);
 		let end = getChildEditor(editor, range.endContainer);
 		if (end) range.setEndAfter(end.node);
 
-		let content = editor.content;
+		let content = editor.contentNode;
 		if (!(range.startContainer == content && range.endContainer == content)) {
 			throw new Error("Invalid range for edit.");
 		}
@@ -51,7 +51,7 @@ export abstract class RangeReplace extends Replace {
 		let editor = this.owner.getControl(this.viewId);
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 		let range = editor.node.ownerDocument.createRange();
-		range.selectNodeContents(editor.content);
+		range.selectNodeContents(editor.contentNode);
 		if (this.startId) {
 			let start = this.owner.getControl(this.startId);
 			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
@@ -72,8 +72,8 @@ export abstract class RangeReplace extends Replace {
 		view.view(element);
 		let range = this.getReplaceRange();
 		range.deleteContents();
-		while (view.content.firstChild) {
-			let node = view.content.firstChild;
+		while (view.contentNode.firstChild) {
+			let node = view.contentNode.firstChild;
 			range.insertNode(node);
 			range.collapse();
 			if (ele(node)) bindViewNode(node as ELE);
