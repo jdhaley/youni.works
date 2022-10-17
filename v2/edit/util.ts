@@ -1,13 +1,14 @@
 import { Editor } from "../base/editor.js";
-import { ele, ELE, END_TO_END, TREENODE, nodeOf, RANGE, START_TO_START } from "../base/dom.js";
+import { ele, ELE, END_TO_END, nodeOf, RANGE, START_TO_START, NODE } from "../base/dom.js";
 import { getView, bindViewNode } from "../display/view.js";
+import { Change } from "../base/view.js";
 
 export { getEditor, bindViewNode }
 
 //Hide the ViewBox return type so the implementation doesn't leak
-const getEditor = getView as (node: TREENODE | RANGE) => Editor ;
+const getEditor = getView as (node: NODE | RANGE) => Editor ;
 
-export function getChildEditor(editor: Editor, node: TREENODE): Editor {
+export function getChildEditor(editor: Editor, node: NODE): Editor {
 	if (node == editor.content.node) return null;
 	while (node?.parentNode != editor.content.node) {
 		node = node.parentNode;
@@ -22,27 +23,27 @@ export function narrowRange(range: RANGE) {
 	let start = range.startContainer;
 	let end = range.endContainer;
 	let content = getView(range).content.node;
-	if (getHeader(editor.node, start)) {;
+	if (getHeader(editor, start)) {;
 		range.setStart(content, 0);
 	}
-	if (getFooter(editor.node, start)) {
+	if (getFooter(editor, start)) {
 		range.setStart(content, content.childNodes.length);
 	}
-	if (getFooter(editor.node, end)) {
+	if (getFooter(editor, end)) {
 		range.setEnd(content, content.childNodes.length);
 	}
 }
 
-export function getHeader(view: ELE, node: TREENODE) {
-	while (node && node != view) {
-		if (node.nodeName == "HEADER" && node.parentNode == view) return node as ELE;
+export function getHeader(view: Editor, node: NODE) {
+	while (node && node != view.node) {
+		if (node.nodeName == "HEADER" && node.parentNode == view.node) return node as ELE;
 		node = node.parentNode;
 	}
 }
 
-export function getFooter(view: ELE, node: TREENODE) {
-	while (node && node != view) {
-		if (node.nodeName == "FOOTER" && node.parentNode == view) return node as ELE;
+export function getFooter(view: Editor, node: NODE) {
+	while (node && node != view.node) {
+		if (node.nodeName == "FOOTER" && node.parentNode == view.node) return node as ELE;
 		node = node.parentNode;
 	}
 }
@@ -66,15 +67,16 @@ export function mark(range: RANGE) {
 export function unmark(range: RANGE) {
 	let doc = range.commonAncestorContainer.ownerDocument;
 	//Patch the replacement points.
-	let r = patchPoint(ele(doc.getElementById("start-marker")));
+	let r = patchPoint(doc.getElementById("start-marker"));
 	let start = r?.startContainer;
 	let startOffset = r?.startOffset;
-	r = patchPoint(ele(doc.getElementById("end-marker")));
+	r = patchPoint(doc.getElementById("end-marker"));
 	if (start) range.setStart(start, startOffset);
 	if (r) range.setEnd(r.endContainer, r.endOffset);
 	return range;
 
-	function patchPoint(point: ChildNode) {
+	function patchPoint(marker: ELE) {
+		let point = ele(marker) as Element;
 		if (!point) return;
 		patchText(point);
 		let range = point.ownerDocument.createRange();
@@ -159,4 +161,8 @@ export function rangeIterator(range: RANGE) {
 	return document.createNodeIterator(node, NodeFilter.SHOW_ALL, 
 		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
 	)
+}
+
+export function senseChange(editor: Editor, commandName: string) {
+	editor.owner.sense(new Change(commandName, editor), editor.node as ELE);
 }

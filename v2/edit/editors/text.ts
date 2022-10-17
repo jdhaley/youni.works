@@ -1,7 +1,7 @@
 import { Change } from "../../base/view.js";
 import { Editor } from "../../base/editor.js";
 
-import { getEditor, getHeader, mark, narrowRange, unmark } from "../util.js";
+import { getEditor, getHeader, mark, narrowRange, senseChange, unmark } from "../util.js";
 import { Replace } from "../commands/replace.js";
 import { ele, RANGE } from "../../base/dom.js";
 
@@ -11,7 +11,7 @@ export default function	edit(this: Editor, commandName: string, range: RANGE, co
 	let cmd = COMMANDS[commandName];
 	if (!cmd) throw new Error("Unrecognized command");
 	range = cmd.call(this, commandName, range, content);
-	this.owner.sense(new Change(commandName, this), this.node);
+	senseChange(this, commandName);
 	return range;
 }
 
@@ -129,7 +129,7 @@ function eraseAgain(range: RANGE, cmd: Replace) {
 
 function endagain(range: RANGE, cmd: Replace) {
 	mark(range);
-	cmd.after = getEditor(range).content.node.innerHTML || "";
+	cmd.after = getEditor(range).content.markupContent || "";
 	unmark(range);
 	range.collapse();
 	return range;
@@ -160,7 +160,7 @@ function endagain(range: RANGE, cmd: Replace) {
 // }
 
 function positionToText(range: RANGE) {
-	let inHeader = getHeader(getEditor(range).node, range.startContainer);
+	let inHeader = getHeader(getEditor(range), range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
 		let content = getEditor(range).content.node;
@@ -169,7 +169,7 @@ function positionToText(range: RANGE) {
 			content.textContent = content.textContent;
 		}
 		if (ele(range.commonAncestorContainer)) {
-			range.selectNodeContents(content?.lastChild || content);
+			range.selectNodeContents(content.childNodes[content.childNodes.length - 1] || content);
 			range.collapse(inHeader ? true : false);	
 		}
 	}

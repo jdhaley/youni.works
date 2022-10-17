@@ -2,7 +2,7 @@ import { ItemEditor } from "../../base/editor.js";
 
 import { Edit } from "./edit.js";
 import { getChildEditor, getEditor } from "../util.js";
-import { RANGE } from "../../base/dom.js";
+import { ele, RANGE } from "../../base/dom.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
@@ -25,7 +25,7 @@ export class LevelCommand extends Edit {
 			while (start) {
 				way == "Promote" ? start.promote() : start.demote();
 				if (start == end) break;
-				start = getEditor(start.node.nextElementSibling) as ItemEditor;
+				start = getEditor(ele(start.node).nextElementSibling) as ItemEditor;
 			}
 		}
 

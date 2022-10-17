@@ -3,7 +3,7 @@ import { Editor, ItemEditor } from "../../base/editor.js";
 
 import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
-import { RANGE } from "../../base/dom.js";
+import { ele, RANGE } from "../../base/dom.js";
 
 export class MarkupReplace extends ListReplace {
 	protected getOuterRange(range: RANGE) {
@@ -45,7 +45,7 @@ export class MarkupReplace extends ListReplace {
 		//Create the end line and add it after the command line.
 		let end = editor.type.create() as ItemEditor;
 		end.view(model);
-		editor.node.after(end.node);
+		ele(editor.node).after(end.node);
 		//We can now set the new range now that we have the end line.
 		range.setEnd(end.node, 0);
 		mark(range);

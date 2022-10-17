@@ -5,14 +5,14 @@ import { TextBox } from "./text.js";
 
 export class LineBox extends TextBox {
 	get level(): number {
-		return Number.parseInt(this.node.getAttribute("aria-level")) || 0;
+		return Number.parseInt(this.at("aria-level")) || 0;
 	}
 	set level(level: number) {
 		level = level || 0;
 		if (level < 1) {
-			this.node.removeAttribute("aria-level");
+			this.put("aria-level");
 		} else {
-			this.node.setAttribute("aria-level", "" + (level <= 6 ? level : 6));
+			this.put("aria-level", "" + (level <= 6 ? level : 6));
 		}
 	}
 
@@ -56,7 +56,7 @@ export class LineBox extends TextBox {
 		let toType = this.type.partOf?.types[name] as ViewType;
 		if (toType) {
 			this._type = toType;
-			this.node.setAttribute("data-item", toType.name);
+			this.put("data-item", toType.name);
 		}
 	}
 	viewContent(content: item): void {
@@ -70,14 +70,13 @@ export class LineBox extends TextBox {
 		}
 	}
 	valueOf(range?: RANGE): item {
-		let line = this.node;
 		if (range && !range.intersectsNode(this.content.node)) return;
 		let content = super.valueOf(range);
 		let item: item = {
-			type$: line.getAttribute("data-item"),
+			type$: this.at("data-item"),
 			content: content,
 		}
-		let level = Number.parseInt(line.getAttribute("aria-level"));
+		let level = Number.parseInt(this.at("aria-level"));
 		if (level) item.level = level;
 		return item;
 	}

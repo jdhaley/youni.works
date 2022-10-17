@@ -8,15 +8,15 @@ export class Replace extends Edit {
 
 	exec(range: RANGE, text: string): RANGE {
 		mark(range);
-		let content = getEditor(range)?.content.node;
+		let content = getEditor(range)?.content;
 		if (!content) return;
-		this.before = content.innerHTML;	
+		this.before = content.markupContent;	
 		range.deleteContents();
 		if (text) {
-			let ins = content.ownerDocument.createTextNode(text);
+			let ins = content.node.ownerDocument.createTextNode(text);
 			range.insertNode(ins);
 		}
-		this.after = content.innerHTML;
+		this.after = content.markupContent;
 		return unmark(range);	
 	}
 	undo() {
@@ -30,7 +30,7 @@ export class Replace extends Edit {
 		let editor = this.owner.getControl(this.viewId);
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 
-		editor.content.node.innerHTML = markup;
+		editor.content.markupContent = markup;
 
 		let range = editor.node.ownerDocument.createRange();
 		range.selectNode(editor.content.node);

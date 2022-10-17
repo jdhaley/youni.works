@@ -9,7 +9,7 @@ export default extend(null, {
 	open(this: Display, res: Response<string>) {
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, model);
-		this.node = type.view(model).node;
+		this.node = type.view(model).node as ELE;
 		this.node.setAttribute("data-file", res.req.to);
 		this.node.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.node);
@@ -68,6 +68,7 @@ function getType(article: Display, path: string, data: any): ViewType {
 import shape from "./shape.js";
 import { TextBox } from "../../display/controls/text.js";
 import { Change } from "../../base/view.js";
+import { ELE } from "../../base/dom.js";
 
 function shapetest(this: Display) {
 	let type = new ViewType(this);

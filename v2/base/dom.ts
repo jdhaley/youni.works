@@ -1,61 +1,53 @@
-import { Control } from "./control";
 import { Collection, Sequence } from "./util";
 
 interface DOCUMENT {
 	getElementById(id: string): ELE;
 	getElementsByClassName(name: string): Sequence<ELE>;
 	createElement(name: string): ELE;
-	createTextNode(text: string): TREENODE;
+	createTextNode(text: string): NODE;
 	createRange(): RANGE;
 }
 
 export interface NODE {
 	readonly ownerDocument: DOCUMENT;
+	readonly parentNode?: NODE;
 	readonly nodeName: string;
+	readonly childNodes: Sequence<NODE>;
 	textContent: string;
-	innerHTML?: string;
+}
 
+interface MUTABLE {
 	cloneNode(deep: boolean): NODE;
-}
-
-export interface TREENODE extends NODE {
-	readonly parentNode: TREENODE;
-	readonly childNodes: Sequence<TREENODE>;
-	readonly firstChild: TREENODE;
-	readonly lastChild: TREENODE;
-	readonly previousSibling: TREENODE;
-}
-
-interface MUTABLENODE {
     after(...nodes: (NODE | string)[]): void;
     before(...nodes: (NODE | string)[]): void;
     remove(): void;
     replaceWith(...nodes: (NODE | string)[]): void;
 }
 
-export interface ELE extends TREENODE, MUTABLENODE {
+export interface ELE extends NODE, MUTABLE {
+	id: string;												//minimized from view
+	readonly classList: Collection<string>;					//minimized from view
+
+	getAttribute(name: string): string;						//minimized from view
+	setAttribute(name: string, value: string): void;		//minimized from view
+	removeAttribute(name: string): void;					//minimized from view
+
 	readonly children: Sequence<ELE>;
-	readonly classList: Collection<string>;
-	id: string;
-
-	getAttribute(name: string): string;
-	setAttribute(name: string, value: string): void;
-	removeAttribute(name: string): void;
-
 	readonly firstElementChild: ELE;
 	readonly lastElementChild: ELE;
 	readonly nextElementSibling: ELE;
 	readonly previousElementSibling: ELE;
 	
+	innerHTML: string;
 	append(data: any): void;
 	//use the mutable node before/after instead...
 		//insertBefore(ele: TREENODE, before: TREENODE): any;
 }
 
 interface EXTENT {
-	readonly startContainer: TREENODE;
+	readonly startContainer: NODE;
     readonly startOffset: number;
-	readonly endContainer: TREENODE;
+	readonly endContainer: NODE;
     readonly endOffset: number;
 }
 
@@ -72,7 +64,7 @@ interface ADJUSTABLE {
 }
 
 export interface RANGE extends EXTENT, ADJUSTABLE {
-	readonly commonAncestorContainer: TREENODE;
+	readonly commonAncestorContainer: NODE;
 	readonly collapsed: boolean;
 
 	intersectsNode(node: NODE): boolean;
@@ -86,14 +78,15 @@ export interface RANGE extends EXTENT, ADJUSTABLE {
 export const START_TO_START = Range.START_TO_START;
 export const END_TO_END = Range.END_TO_END;
 
-export function ele(value: any): Element {
+export function ele(value: any): ELE {
 	return value instanceof Element ? value : null;
 }
 export function nodeOf(loc: NODE | RANGE): NODE {
-	return (loc instanceof Range ? loc.commonAncestorContainer : loc) as TREENODE;
+	if (loc instanceof Range) loc = loc.commonAncestorContainer;
+	return loc instanceof Node ? loc : null;
 }
-export function controlOf(loc: NODE | RANGE): Control<ELE> {
-	for (let node = nodeOf(loc) as TREENODE; node; node = node.parentNode) {
+export function controlOf(loc: NODE | RANGE) {
+	for (let node = nodeOf(loc); node; node = node.parentNode) {
 		let control = node["$control"];
 		if (control) return control;
 	}

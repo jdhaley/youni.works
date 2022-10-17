@@ -1,7 +1,7 @@
 import { BasePart, Part } from "../base/control.js";
 import { Content, Entity } from "../base/view.js";
 import { Collection } from "../base/util.js";
-import { ELE, TREENODE } from "../base/dom.js";
+import { ELE } from "../base/dom.js";
 
 export class ElementPart<T extends Part> extends BasePart<T> {
 	declare protected _ele: ELE;
@@ -14,7 +14,7 @@ export class ElementPart<T extends Part> extends BasePart<T> {
 	}
 
 	get partOf(): T {
-		for (let node = this._ele as TREENODE; node; node = node.parentNode) {
+		for (let node = this._ele as ELE; node; node = node.parentNode as ELE) {
 			let control = node["$control"];
 			if (control) return control;
 		}	

@@ -6,20 +6,19 @@ import { Editor } from "../../base/editor.js";
 import { ELE, RANGE } from "../../base/dom";
 
 export default extend(editable, {
-	dblclick(event: UserEvent) {
-		let view = event.on;
-		let header = getHeader(event.on, event.target as Node);
+	dblclick(this: Editor, event: UserEvent) {
+		let header = getHeader(this, event.target as Node);
 		if (header) {
 			event.subject = "";
-			if (view.classList.contains("collapsed")) {
-				view.classList.remove("collapsed");
+			if (this.styles.contains("collapsed")) {
+				this.styles.remove("collapsed");
 			} else {
-				view.classList.add("collapsed");
+				this.styles.add("collapsed");
 			}
 		}
 	},
 	insertText(this: Editor, event: EditEvent) {
-		if (getFooter(event.on, event.range.commonAncestorContainer)) {
+		if (getFooter(this, event.range.commonAncestorContainer)) {
 			event.subject = "";
 			let model = {
 				"title": event.data,

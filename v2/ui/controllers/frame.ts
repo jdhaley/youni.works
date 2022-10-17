@@ -1,5 +1,5 @@
 import {Actions} from "../../base/control.js";
-import { ELE, nodeOf, RANGE, TREENODE } from "../../base/dom.js";
+import { ELE, NODE, nodeOf, RANGE } from "../../base/dom.js";
 import {Frame, UserEvent} from "../ui.js";
 
 export default {
@@ -47,13 +47,13 @@ function sense(event: UserEvent) {
     }
 }
 
-export function viewOf(loc: TREENODE | RANGE): ELE {
- 	for (let node  = nodeOf(loc) as TREENODE; node; node = node.parentNode) {
+export function viewOf(loc: NODE | RANGE): ELE {
+ 	for (let node  = nodeOf(loc); node; node = node.parentNode) {
 		if (node["$control"]) return node as ELE;
 	}
 }
 
-export function ownerOf(loc: TREENODE | RANGE): Frame  {
+export function ownerOf(loc: NODE | RANGE): Frame  {
 	if (loc instanceof Document) return loc["$owner"];
 	return nodeOf(loc).ownerDocument["$owner"];
 }

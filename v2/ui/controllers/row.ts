@@ -12,19 +12,19 @@ export default extend(editable, {
 		event.subject = "";
 		if (event.target == this.header) {
 			event.subject = "";
-			if (this.node.classList.contains("collapsed")) {
+			if (this.styles.contains("collapsed")) {
 				this.header.textContent = this._type.conf.title;
-				this.node.classList.remove("collapsed");
+				this.styles.remove("collapsed");
 			} else {
 				let title = this.get("title").content.node.textContent || "";
 				this.header.innerHTML += ": " + `<b>${title}</b>`;
-				this.node.classList.add("collapsed");
+				this.styles.add("collapsed");
 			}
 		}
 	},
-	click(event: UserEvent) {
+	click(this: RowBox, event: UserEvent) {
 		event.subject = "";
-		if (event.altKey && getHeader(event.on, event.target as Node)) {
+		if (event.altKey && getHeader(this, event.target as Node)) {
 			let range = event.on.ownerDocument.createRange();
 			range.selectNode(event.on);
 			event.frame.selectionRange = range;

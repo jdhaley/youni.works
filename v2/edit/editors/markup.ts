@@ -4,15 +4,15 @@ import { Editor } from "../../base/editor.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/markupReplace.js";
-import { getChildEditor, getEditor } from "../util.js";
-import { RANGE } from "../../base/dom.js";
+import { getChildEditor, getEditor, senseChange } from "../util.js";
+import { ELE, RANGE } from "../../base/dom.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, content: string) {
 	if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
 	let cmd = COMMANDS[commandName];
 	if (!cmd) throw new Error("Unrecognized command");
 	range = cmd.call(this, commandName, range, content);
-	this.owner.sense(new Change(commandName, this), this.node);
+	senseChange(this, commandName);
 	return range;
 }
 
@@ -41,11 +41,11 @@ function replace(this: Editor, commandName: string, range: RANGE, content?: valu
 }
 
 function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
-	if (!this.content.node.firstChild) return;
+	if (!this.content.contents.length) return;
 	let start = getChildEditor(this, range.startContainer);
 	let end = getChildEditor(this, range.endContainer);
 	//If a range of items, check that there are no headings
-	if (start != end) for (let item = start.node; item; item = item.nextElementSibling) {
+	if (start != end) for (let item = start.node as ELE; item; item = item.nextElementSibling) {
 		let role = getEditor(item).type.name;
 		if (role == "heading") {
 			console.warn("No range promote with headings");

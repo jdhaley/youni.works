@@ -3,7 +3,7 @@ import { Editor } from "../../base/editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { getChildEditor, getEditor, clearContent } from "../util.js";
-import { RANGE } from "../../base/dom.js";
+import { ele, RANGE } from "../../base/dom.js";
 
 export class RecordReplace extends RangeReplace {
 	protected execReplace(range: RANGE, record: record): RANGE {
@@ -17,7 +17,7 @@ function mergeContent(cmd: RangeReplace, range: RANGE, record: record) {
 	let editor = getEditor(range);
 	let start = getChildEditor(editor, range.startContainer);
 	let end = getChildEditor(editor, range.endContainer);
-	for (let member = start.node || editor.node.firstElementChild; member; member = member.nextElementSibling) {
+	for (let member = ele(start.node) || ele(editor.node).firstElementChild; member; member = member.nextElementSibling) {
 		let control = member["$control"] as Editor;
 		if (control?.contentType == "unit") {
 			let value = record[control.type.name];

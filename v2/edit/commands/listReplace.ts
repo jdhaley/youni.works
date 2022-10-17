@@ -43,10 +43,10 @@ export class ListReplace extends RangeReplace {
 		this.merge(end, r, content, false);
 		range.setEndBefore(end.node);
 	}
-	protected onInsert(range: RANGE, content: value): void {
+	protected onInsert(range: RANGE, value: value): void {
 		range = range.cloneRange();
 		range.deleteContents();
-		if (!content) return;
+		if (!value) return;
 		let editor = this.owner.getControl(this.viewId);
 		let ctx = editor.content.node;
 		//Ensure the range must be on the list conent. (It may be on a markup line).
@@ -54,10 +54,11 @@ export class ListReplace extends RangeReplace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		let view = editor.type.create() as Editor;
-		view.view(content);
-		while (view.content.node.firstChild) {
-			range.insertNode(view.content.node.firstChild);
+		editor = editor.type.create() as Editor;
+		editor.view(value);
+		let contents = editor.content.contents;
+		while (contents.length) {
+			range.insertNode(contents[0]); //this also removes the entry from the sequence.
 			range.collapse();
 		}
 	}

@@ -59,7 +59,7 @@ export class RowBox extends RecordBox {
 			let type = this.type.types[name];
 			let child = type.create() as Editor;
 			child.view(idx[name], this);
-			child.node.classList.add("field");
+			child.styles.add("field");
 		}
 	}
 	valueOf(range?: RANGE): value {

@@ -1,4 +1,4 @@
-import { value, record, contentType } from "../../base/model.js";
+import { value, record } from "../../base/model.js";
 import { Editor } from "../../base/editor.js";
 
 import { getView, EditorView } from "../view.js";
@@ -38,7 +38,7 @@ export class RecordBox extends EditorView {
 		let type = this.type.types[name];
 		let member = type.create() as Editor;
 		member.view(value, this);
-		member.node.classList.add(this.memberType);
+		member.styles.add(this.memberType);
 		return member;
 	}
 

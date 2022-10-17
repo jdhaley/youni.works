@@ -4,7 +4,7 @@ import { Article, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
-import { ELE, ele, RANGE, TREENODE, nodeOf, NODE } from "../base/dom.js";
+import { ELE, ele, RANGE, nodeOf, NODE } from "../base/dom.js";
 
 import { BaseShape } from "./shape.js";
 import { ContentEntity } from "./content.js";
@@ -144,7 +144,7 @@ export class ElementOwner extends Owner<ELE> {
 		return node["$control"];
 	}
 	getContainerOf(node: ELE): ELE {
-		for (let parent = node.parentNode as TREENODE; parent; parent = parent.parentNode) {
+		for (let parent = node.parentNode; parent; parent = parent.parentNode) {
 			if (parent["$control"]) return parent as ELE;
 		}
 	}
@@ -216,7 +216,7 @@ export function bindViewNode(node: ELE): void {
 }
 
 function getViewNode(loc: NODE | RANGE): ViewNode {
-	for (let node = nodeOf(loc) as TREENODE; node; node = node.parentNode) {
+	for (let node = nodeOf(loc); node; node = node.parentNode) {
 		let e = ele(node);
 		if (e?.getAttribute("data-item")) {
 			if (!node["$control"]) {
@@ -242,8 +242,8 @@ function viewContent(view: EditorView, range: RANGE, out?: ELE) {
 		item = out.ownerDocument.createElement(view.type.name);
 		out.append(item);
 	}
-	if (view.node.id) item.id = view.node.id;
-	let level = view.node.getAttribute("aria-level");
+	if (view.id) item.id = view.id;
+	let level = view.at("aria-level");
 	if (level) item.setAttribute("level", level);
 	content(view, range, item);
 	return item;
@@ -257,7 +257,7 @@ function content(view: EditorView, range: RANGE, out: ELE) {
 		if (childView != view) {
 			viewContent(childView, range, out);
 		} else if (ele(node)) {
-			out.append(node.cloneNode(true));
+			out.append(ele(node).cloneNode(true));
 		} else {
 			let text = node.textContent;
 			if (range) {
@@ -277,7 +277,7 @@ function content(view: EditorView, range: RANGE, out: ELE) {
 interface NAVIGABLE_ELE extends ELE{
 	scrollIntoView(arg: any): void;
 }
-export function navigate(start: TREENODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
+export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
 	let editor = getView(start);
 	while (editor) {
 		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;

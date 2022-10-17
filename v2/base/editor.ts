@@ -3,16 +3,16 @@ import { Content, Entity, View } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { Receiver, Graph } from "./control.js";
 import { bundle, Sequence } from "./util.js";
-import { ELE, NODE, RANGE, TREENODE } from "./dom.js";
+import { ELE, NODE, RANGE } from "./dom.js";
 
 export interface NodeContent extends Content, Entity {
 	contents: Sequence<NODE>;
-	node: TREENODE;
+	node: NODE;
 }
-export interface Editor extends View, NodeContent {
+export interface Editor extends View, Content {
 	readonly owner: Article;
-	readonly node: ELE;
 	readonly content: NodeContent;
+	readonly node: NODE
 	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
 	getContent(range?: RANGE): ELE;
 }
