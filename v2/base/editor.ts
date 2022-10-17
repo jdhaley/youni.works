@@ -5,16 +5,15 @@ import { Receiver, Graph } from "./control.js";
 import { bundle, Entity, Sequence } from "./util.js";
 import { ELE, NODE, RANGE } from "./dom.js";
 
-export interface NodeContent extends Content, Entity<string> {
+export interface NodeContent extends Content<NODE>, Entity<string> {
 	contents: Sequence<NODE>;
 	node: NODE;
 }
-export interface Editor extends View, Content {
+export interface Editor extends View, NodeContent {
 	readonly owner: Article;
 	readonly content: NodeContent;
-	readonly node: NODE
-	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
 	getContent(range?: RANGE): ELE;
+	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
 }
 
 export interface ItemEditor extends Editor {

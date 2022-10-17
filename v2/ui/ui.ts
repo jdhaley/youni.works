@@ -34,6 +34,9 @@ export class Display extends ViewOwner implements Article {
 	createElement(tagName: string): ELE {
 		return this.frame.createElement(tagName);
 	}
+	getControl(id: string): Editor {
+		return super.getControl(id) as Editor;
+	}
 }
 
 export class Frame extends Owner<ELE> {
@@ -170,10 +173,6 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 	}
 	if (!(model instanceof Array)) model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
-	// TODO remove - tests the XML format...
-	// let article = getArticle(range);
-	// let content = article.getContent(range);
-	// control.type.view(content as any, article as ViewBox);
 }
 
 function getArticle(range: RANGE) {

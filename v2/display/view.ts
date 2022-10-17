@@ -1,5 +1,5 @@
 import { contentType, Type, value } from "../base/model.js";
-import { Content, View, viewTypes } from "../base/view.js";
+import { View, viewTypes } from "../base/view.js";
 import { Article, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -9,13 +9,16 @@ import { ELE, ele, RANGE, nodeOf, NODE } from "../base/dom.js";
 import { ElementContent } from "./content.js";
 import { ElementShape } from "./shape.js";
 
+let NEXT_ID = 1;
+
 interface VIEW_ELE extends ELE {
 	$control?: Editor;
 }
 
-type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
-
 export abstract class ElementView extends ElementShape implements View {
+	abstract viewContent(data: value): void;
+	abstract valueOf(range?: RANGE): value;
+
 	protected _type: ViewType;
 
 	get type(): Type<View> {
@@ -48,11 +51,8 @@ export abstract class ElementView extends ElementShape implements View {
 		return this._ele
 	}
 
-	abstract viewContent(data: value): void;
-	abstract valueOf(range?: RANGE): value;
-
-	view(value: value, parent?: EditorView) {
-		if (parent) (parent._ele).append(this._ele);
+	view(value: value, parent?: ElementView) {
+		if (parent) (parent.content.node as ELE).append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
 				this._ele.id = value.id;
@@ -96,29 +96,6 @@ export abstract class ElementView extends ElementShape implements View {
 	}
 }
 
-export abstract class EditorView extends ElementView implements Editor {
-	constructor(actions: Actions, editor: editor) {
-		super();
-		this.actions = actions;
-		if (editor) this["edit"] = editor;
-	}
-
-	get owner(): Article {
-		return this._type.owner;
-	}
-
-	get shortcuts(): bundle<string> {
-		return this._type.conf.shortcuts;
-	}
-	edit(commandName: string, range: RANGE, content?: value): RANGE {
-		console.warn("edit() has not been configured.")
-		return null;
-	}
-	getContent(range?: RANGE): ELE {
-		return viewContent(this, range);
-	}
-}
-
 export class ViewType extends BaseType<View> {
 	constructor(owner: Article) {
 		super();
@@ -127,20 +104,18 @@ export class ViewType extends BaseType<View> {
 	declare owner: Article;
 	declare viewType: string;
 
-	create(): Editor {
-		let view: EditorView = super.create();
+	create(): ElementView {
+		let view: ElementView = super.create();
 		let node = this.owner.createElement(this.conf.tagName || "div");
 		view.control(node);
 		return view;
 	}
-	view(content: value | ELE, parent?: EditorView): Editor {
+	view(content: value | ELE, parent?: ElementView): ElementView {
 		let view = this.create();
 		view.view(content, parent);
 		return view;
 	}
 }
-
-let NEXT_ID = 1;
 
 export class ElementOwner extends Owner<ELE> {
 	getControlOf(node: ELE): Receiver {
@@ -155,8 +130,6 @@ export class ElementOwner extends Owner<ELE> {
 		return node.children as Iterable<ELE>;
 	}
 }
-
-const ELEMENT_OWNER = new ElementOwner();
 
 export abstract class ViewOwner extends ElementOwner {
 	constructor(conf: bundle<any>) {
@@ -178,7 +151,7 @@ export abstract class ViewOwner extends ElementOwner {
 	getElementById(id: string): ELE {
 		return this.node.ownerDocument.getElementById(id);
 	}
-	getControl(id: string): Editor {
+	getControl(id: string): View {
 		let view = this.node.ownerDocument.getElementById(id) as VIEW_ELE;
 		if (!view) throw new Error("Can't find view element.");
 		//if (view.getAttribute("data-item")) return view;
@@ -231,11 +204,6 @@ function getViewNode(loc: NODE | RANGE): VIEW_ELE {
 	}
 }
 
-export function getView(node: NODE | RANGE): EditorView {
-	let view = getViewNode(node)?.$control;
-	if (view instanceof EditorView) return view;
-}
-
 function viewContent(view: EditorView, range: RANGE, out?: ELE) {
 	if (range && !range.intersectsNode(view.content.node)) return;
 	let item: ELE;
@@ -277,6 +245,11 @@ function content(view: EditorView, range: RANGE, out: ELE) {
 	}
 }
 
+export function getView(node: NODE | RANGE): EditorView {
+	let view = getViewNode(node)?.$control;
+	if (view instanceof EditorView) return view;
+}
+
 interface NAVIGABLE_ELE extends ELE{
 	scrollIntoView(arg: any): void;
 }
@@ -313,3 +286,30 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 	}
 	return content;
 }
+
+
+type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
+
+export abstract class EditorView extends ElementView implements Editor {
+	constructor(actions: Actions, editor: editor) {
+		super();
+		this.actions = actions;
+		if (editor) this["edit"] = editor;
+	}
+
+	get owner(): Article {
+		return this._type.owner;
+	}
+
+	get shortcuts(): bundle<string> {
+		return this._type.conf.shortcuts;
+	}
+	edit(commandName: string, range: RANGE, content?: value): RANGE {
+		console.warn("edit() has not been configured.")
+		return null;
+	}
+	getContent(range?: RANGE): ELE {
+		return viewContent(this, range);
+	}
+}
+

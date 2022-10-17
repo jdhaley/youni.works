@@ -2,17 +2,17 @@ import { Signal } from "./control.js";
 import { value, Type, typeOf, contentType } from "./model.js";
 import { bundle, Collection, Entity } from "./util.js";
 
-export interface Content {
+export interface Content<T> {
 	readonly styles: Collection<string>;
-	contents: Iterable<unknown>;
+	contents: Iterable<T>;
 	textContent: string;
-	markupContent: string;
+	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 
 export interface View extends Entity<string> {
 	readonly type: Type<View>;
 	readonly contentType: contentType;
-	readonly content: Content;
+	readonly content: Content<unknown>;
 	view(value: value, container?: View): void;
 	valueOf(filter?: Filter): value;
 }

@@ -9,7 +9,7 @@ export class RecordBox extends EditorView {
 	memberType = "field";
 
 	get(name: string): Editor {
-		for (let node of this.contents) {
+		for (let node of this.content.contents) {
 			let view = getView(node);
 			if (name == view?.type.name) return view;
 		}

@@ -50,9 +50,9 @@ class ElementEntity extends ElementPart implements Entity<string> {
 	}
 }
 
-export class ElementContent extends ElementEntity implements Content {
-	get contents() {
-		return this._ele.childNodes as Sequence<NODE>;
+export class ElementContent extends ElementEntity implements Content<NODE> {
+	get contents(): Sequence<NODE> {
+		return this._ele.childNodes;
 	}
 	get textContent() {
 		return this._ele.textContent;
@@ -68,5 +68,8 @@ export class ElementContent extends ElementEntity implements Content {
 	}
 	get styles(): Collection<string> {
 		return this._ele.classList;
+	}
+	get node(): ELE {
+		return this._ele;
 	}
 }
