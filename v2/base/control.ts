@@ -100,7 +100,7 @@ export abstract class Owner<T> extends BaseReceiver implements Graph<T> {
 	}
 }
 
-export abstract class BasePart<T extends Part> extends BaseReceiver implements Part, Iterable<T> {
+export abstract class BasePart extends BaseReceiver implements Part, Iterable<Part> {
 	get partOf(): Part {
 		return null;
 	}

@@ -1,11 +1,16 @@
-import { Part } from "../base/control.js";
+import { ELE } from "../base/dom.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
-import { ContentEntity } from "./content.js";
+import { ElementContent } from "./content.js";
 
-export class BaseShape<T extends Part> extends ContentEntity<T> implements Shape {
-	declare _ele: HTMLElement;
 
+interface SHAPE_ELE extends ELE {
+	getBoundingClientRect(): Area;
+	style: CSSStyleDeclaration;
+}
+
+export class ElementShape extends ElementContent implements Shape {
+	declare protected _ele: SHAPE_ELE;
 	get area(): Area {
 		return this._ele.getBoundingClientRect();
 	}

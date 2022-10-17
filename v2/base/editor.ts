@@ -1,11 +1,11 @@
 import { Type, value } from "./model.js";
-import { Content, Entity, View } from "./view.js";
+import { Content, View } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { Receiver, Graph } from "./control.js";
-import { bundle, Sequence } from "./util.js";
+import { bundle, Entity, Sequence } from "./util.js";
 import { ELE, NODE, RANGE } from "./dom.js";
 
-export interface NodeContent extends Content, Entity {
+export interface NodeContent extends Content, Entity<string> {
 	contents: Sequence<NODE>;
 	node: NODE;
 }

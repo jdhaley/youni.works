@@ -18,6 +18,11 @@ export interface Collection<T>  {
 	add(value: T): void;
 	remove(value: T): void;
 }
+export interface Entity<T> {
+	readonly id?: T;
+	at(name: string): T;
+	put(name: string, value?: T): void;
+}
 
 export const EMPTY = Object.freeze({
 	object: Object.freeze(Object.create(null)),

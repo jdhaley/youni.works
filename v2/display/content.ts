@@ -1,9 +1,9 @@
-import { BasePart, Part } from "../base/control.js";
-import { Content, Entity } from "../base/view.js";
-import { Collection } from "../base/util.js";
-import { ELE } from "../base/dom.js";
+import { Content } from "../base/view.js";
+import { Collection, Entity, Sequence } from "../base/util.js";
+import { ELE, NODE } from "../base/dom.js";
+import { BasePart } from "../base/control.js";
 
-export class ElementPart<T extends Part> extends BasePart<T> {
+class ElementPart extends BasePart {
 	declare protected _ele: ELE;
 	[Symbol.iterator] = function* parts() {
 		const nodes = this._ele.childNodes;
@@ -13,11 +13,11 @@ export class ElementPart<T extends Part> extends BasePart<T> {
 		}
 	}
 
-	get partOf(): T {
+	get partOf(): ElementPart {
 		for (let node = this._ele as ELE; node; node = node.parentNode as ELE) {
 			let control = node["$control"];
 			if (control) return control;
-		}	
+		}
 	}
 
 	control(node: Element) {
@@ -34,12 +34,25 @@ export class ElementPart<T extends Part> extends BasePart<T> {
 	}
 }
 
-export class ContentEntity<T extends Part> extends ElementPart<T> implements Content, Entity {
-	get contents() {
-		return this._ele.childNodes;
-	}
+class ElementEntity extends ElementPart implements Entity<string> {
 	get id(): string {
 		return this._ele.id;
+	}
+	at(name: string): string {
+		return this._ele.getAttribute(name);
+	}
+	put(name: string, value?: string): void {
+		if (value === undefined) {
+			this._ele.removeAttribute(name);
+		} else {
+			this._ele.setAttribute(name, value);
+		}
+	}
+}
+
+export class ElementContent extends ElementEntity implements Content {
+	get contents() {
+		return this._ele.childNodes as Sequence<NODE>;
 	}
 	get textContent() {
 		return this._ele.textContent;
@@ -55,19 +68,5 @@ export class ContentEntity<T extends Part> extends ElementPart<T> implements Con
 	}
 	get styles(): Collection<string> {
 		return this._ele.classList;
-	}
-	get node(): ELE {
-		return this._ele
-	}
-
-	at(name: string): string {
-		return this._ele.getAttribute(name);
-	}
-	put(name: string, value?: string): void {
-		if (value === undefined) {
-			this._ele.removeAttribute(name);
-		} else {
-			this._ele.setAttribute(name, value);
-		}
 	}
 }

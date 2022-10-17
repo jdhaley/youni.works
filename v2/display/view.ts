@@ -1,21 +1,21 @@
 import { contentType, Type, value } from "../base/model.js";
-import { View, viewTypes } from "../base/view.js";
+import { Content, View, viewTypes } from "../base/view.js";
 import { Article, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
 import { ELE, ele, RANGE, nodeOf, NODE } from "../base/dom.js";
 
-import { BaseShape } from "./shape.js";
-import { ContentEntity } from "./content.js";
+import { ElementContent } from "./content.js";
+import { ElementShape } from "./shape.js";
 
-interface ViewNode extends ELE {
+interface VIEW_ELE extends ELE {
 	$control?: Editor;
 }
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
 
-export abstract class BaseView extends BaseShape<BaseView> implements View {
+export abstract class ElementView extends ElementShape implements View {
 	protected _type: ViewType;
 
 	get type(): Type<View> {
@@ -44,12 +44,15 @@ export abstract class BaseView extends BaseShape<BaseView> implements View {
 			if (child.nodeName == "footer") return child;
 		}
 	}
-	
+	get node(): ELE {
+		return this._ele
+	}
+
 	abstract viewContent(data: value): void;
 	abstract valueOf(range?: RANGE): value;
 
 	view(value: value, parent?: EditorView) {
-		if (parent) (parent.content.node as ELE).append(this._ele);
+		if (parent) (parent._ele).append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
 				this._ele.id = value.id;
@@ -76,13 +79,13 @@ export abstract class BaseView extends BaseShape<BaseView> implements View {
 	protected createContent(model?: value) {
 		let ele = this._type.owner.createElement("div") as Element;
 		ele.classList.add("content");
-		let content = new ContentEntity<BaseView>();
+		let content = new ElementContent();
 		content.control(ele as Element);
 		this._ele.append(ele);
 	}
 	protected createFooter(model?: value) {
 	}
-	control(element: ViewNode) {
+	control(element: VIEW_ELE) {
 		super.control(element as Element);
 		element.setAttribute("data-item", this.type.name);
 	}
@@ -93,7 +96,7 @@ export abstract class BaseView extends BaseShape<BaseView> implements View {
 	}
 }
 
-export abstract class EditorView extends BaseView implements Editor {
+export abstract class EditorView extends ElementView implements Editor {
 	constructor(actions: Actions, editor: editor) {
 		super();
 		this.actions = actions;
@@ -176,7 +179,7 @@ export abstract class ViewOwner extends ElementOwner {
 		return this.node.ownerDocument.getElementById(id);
 	}
 	getControl(id: string): Editor {
-		let view = this.node.ownerDocument.getElementById(id) as ViewNode;
+		let view = this.node.ownerDocument.getElementById(id) as VIEW_ELE;
 		if (!view) throw new Error("Can't find view element.");
 		//if (view.getAttribute("data-item")) return view;
 		if (!view.$control) {
@@ -197,7 +200,7 @@ export function bindViewNode(node: ELE): void {
 	let control: EditorView = node["$control"];
 	if (!control) {
 		let name = node.getAttribute("data-item");
-		let parent = getViewNode(node.parentNode) as ViewNode;
+		let parent = getViewNode(node.parentNode) as VIEW_ELE;
 		if (name && parent) {
 			console.log("binding.");
 			let type = parent.$control.type.types[name] as ViewType;
@@ -215,7 +218,7 @@ export function bindViewNode(node: ELE): void {
 	}
 }
 
-function getViewNode(loc: NODE | RANGE): ViewNode {
+function getViewNode(loc: NODE | RANGE): VIEW_ELE {
 	for (let node = nodeOf(loc); node; node = node.parentNode) {
 		let e = ele(node);
 		if (e?.getAttribute("data-item")) {
@@ -223,7 +226,7 @@ function getViewNode(loc: NODE | RANGE): ViewNode {
 				console.warn("Unbound view.");
 				bindViewNode(e);
 			}
-			return e as ViewNode;
+			return e as VIEW_ELE;
 		}
 	}
 }
