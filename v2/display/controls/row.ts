@@ -103,10 +103,10 @@ function createType(type: ViewType, columns: string[]): ViewType {
 	return type;
 }
 
-function rowContent(model: record, view: ELE, range: RANGE): record {
-	if (range && !range.intersectsNode(view)) return model;
+function rowContent(model: record, content: ELE, range: RANGE): record {
+	if (range && !range.intersectsNode(content)) return model;
 	
-	for (let child of view.children) {
+	for (let child of content.childNodes) {
 		let viewer = child["$control"] as Editor;
 		let value = viewer.valueOf(range);
 		if (value) {

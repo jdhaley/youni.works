@@ -2,7 +2,7 @@ import { value, record } from "../../base/model.js";
 import { Editor } from "../../base/editor.js";
 
 import { getView, EditorView } from "../view.js";
-import { ele, ELE, RANGE } from "../../base/dom.js";
+import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { View } from "../../base/view.js";
 
 export class RecordBox extends EditorView {
@@ -51,11 +51,11 @@ export class RecordBox extends EditorView {
 	}
 }
 
-function recordContent(model: record, view: ELE, range: RANGE): record {
+function recordContent(model: record, view: NODE, range: RANGE): record {
 	if (range && !range.intersectsNode(view)) return model;
 	
-	for (let child of view.children) {
-		if (child.classList.contains("field")) {
+	for (let child of view.childNodes) {
+		if (ele(child)?.classList.contains("field")) {
 			let viewer = child["$control"] as Editor;
 			let value = viewer.valueOf(range);
 			if (value) {

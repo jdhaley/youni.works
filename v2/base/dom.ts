@@ -22,26 +22,27 @@ interface MUTABLE {
     before(...nodes: (NODE | string)[]): void;
     remove(): void;
     replaceWith(...nodes: (NODE | string)[]): void;
+
+	innerHTML: string;
+	append(data: any): void;
+	//use the mutable node before/after instead...
+		//insertBefore(ele: TREENODE, before: TREENODE): any;
 }
 
-export interface ELE extends NODE, MUTABLE {
+interface TREE {
+	readonly children: Sequence<ELE>;
+	readonly firstElementChild: ELE;
+	readonly lastElementChild: ELE;
+	readonly nextElementSibling: ELE;
+	readonly previousElementSibling: ELE;
+}
+export interface ELE extends MUTABLE, TREE, NODE {
 	id: string;												//minimized from view
 	readonly classList: Collection<string>;					//minimized from view
 
 	getAttribute(name: string): string;						//minimized from view
 	setAttribute(name: string, value: string): void;		//minimized from view
 	removeAttribute(name: string): void;					//minimized from view
-
-	readonly children: Sequence<ELE>;
-	readonly firstElementChild: ELE;
-	readonly lastElementChild: ELE;
-	readonly nextElementSibling: ELE;
-	readonly previousElementSibling: ELE;
-	
-	innerHTML: string;
-	append(data: any): void;
-	//use the mutable node before/after instead...
-		//insertBefore(ele: TREENODE, before: TREENODE): any;
 }
 
 interface EXTENT {
@@ -84,10 +85,4 @@ export function ele(value: any): ELE {
 export function nodeOf(loc: NODE | RANGE): NODE {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	return loc instanceof Node ? loc : null;
-}
-export function controlOf(loc: NODE | RANGE) {
-	for (let node = nodeOf(loc); node; node = node.parentNode) {
-		let control = node["$control"];
-		if (control) return control;
-	}
 }

@@ -6,32 +6,64 @@ import { Entity } from "../base/util";
 import { Content, filter, Filter, View, viewTypeOf } from "../base/view";
 import { ViewType } from "./view";
 
-export abstract class AbstractView extends BasePart implements View {
+let NEXT_ID = 1;
+export abstract class AbstractView<T> extends BasePart implements View {
 	declare type: ViewType;
-	declare protected _entity: Entity<string>
 
 	abstract get contentType(): contentType;
-	abstract get content(): Content<unknown>;
-
-	abstract view(value: unknown, container?: View): void;
-	abstract valueOf(filter?: Filter): unknown;
-	protected abstract viewElement(ele: ELE): void;
+	abstract get content(): Content<T>;
+	get isContainer(): boolean {
+		return this.type.conf.container;
+	}
 	get owner(): Article {
 		return this.type.owner;
 	}
-	get id(): string {
-		return this._entity.id;
+	protected get _entity(): Entity<string> {
+		return undefined;
 	}
+
+	get id(): string {
+		return this._entity?.id;
+	}
+
+	abstract valueOf(filter?: Filter): unknown;
+	protected abstract viewElement(ele: ELE): void;
+	protected abstract viewContent(content: value): void;
+
 	at(name: string): string {
-		return this._entity.at(name);
+		return this._entity?.at(name);
 	}
 	put(name: string, value?: string): void {
-		this._entity.put(name, value);
+		//TODO should we throw an error instead?
+		this._entity?.put(name, value);
 	}
+
+	view(value: value) {
+		if (!this.id) {
+			if (value instanceof Element && value.id) {
+				this["x"] = value.id;
+			} else {
+				this["x"] = "" + NEXT_ID++;
+			}
+		}
+
+	//	this.textContent = "";
+		if (this.isContainer) {
+			this.createHeader();
+			this.createContent();
+			this.createFooter()
+		} else {
+			this.content.styles.add("content");
+		}
+		this.viewContent(value as value);
+	}
+	abstract createHeader(): void;
+	abstract createContent(): void;
+	abstract createFooter(): void;
 }
 
 const LIST = {
-	viewContent(this: AbstractView, model: list): void {
+	viewContent(this: AbstractView<unknown>, model: list): void {
 		if (ele(model)) return this.viewElement(ele(model));
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type.types[viewTypeOf(item)];
@@ -42,7 +74,7 @@ const LIST = {
 			type.create().view(item, this);
 		}
 	},
-	viewElement(this: AbstractView, content: ELE) {
+	viewElement(this: AbstractView<unknown>, content: ELE) {
 		if (!content) return;
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];

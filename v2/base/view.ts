@@ -12,7 +12,7 @@ export interface Content<T> {
 export interface View extends Entity<string> {
 	readonly type: Type<View>;
 	readonly contentType: contentType;
-	readonly content: Content<unknown>;
+	//readonly content: Content<unknown>;
 	view(value: value, container?: View): void;
 	valueOf(filter?: Filter | filter): value;
 }

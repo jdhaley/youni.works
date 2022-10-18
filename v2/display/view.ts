@@ -1,5 +1,5 @@
 import { contentType, Type, value } from "../base/model.js";
-import { Content, filter, View, viewTypes } from "../base/view.js";
+import { filter, View, viewTypes } from "../base/view.js";
 import { Article, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
