@@ -30,6 +30,7 @@ export interface Article extends Graph<ELE>, Receiver {
 	commands: CommandBuffer<RANGE>;
 
 	getControl(id: string): Editor;
+	getView(source: any): Editor;
 	setRange(extent: RANGE, collapse?: boolean): void;
 	createElement(tag: string): ELE;
 }

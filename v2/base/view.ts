@@ -14,9 +14,9 @@ export interface View extends Entity<string> {
 	readonly contentType: contentType;
 	readonly content: Content<unknown>;
 	view(value: value, container?: View): void;
-	valueOf(filter?: Filter): value;
+	valueOf(filter?: Filter | filter): value;
 }
-
+export type filter = (content: Content<unknown>) => boolean;
 export interface Filter {
 }
 
