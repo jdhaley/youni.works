@@ -1,10 +1,10 @@
 import { Receiver, Signal } from "./control.js";
 import { value, Type, typeOf, contentType } from "./model.js";
 import { Shape } from "./shape.js";
-import { bundle, Collection, Entity } from "./util.js";
+import { bundle, Bag, Entity } from "./util.js";
 
 export interface Content<T> {
-	readonly styles: Collection<string>;
+	readonly styles: Bag<string>;
 	readonly contents: Iterable<T>;
 	textContent: string;
 	markupContent: string; //May be HTML, XML, or a simplification thereof.

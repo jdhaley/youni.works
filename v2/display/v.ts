@@ -2,7 +2,7 @@ import { BasePart, Graph } from "../base/control";
 import { ele, ELE } from "../base/dom";
 import { contentType, list, Type, value } from "../base/model";
 import { Content, filter, Filter, View, viewTypeOf, viewTypes } from "../base/view";
-import { bundle, Collection, Entity, Sequence } from "../base/util";
+import { bundle, Bag, Entity, Sequence } from "../base/util";
 
 interface ContentOwner<T> extends Graph<T> {
 	types: bundle<Type<View<T>>>;
@@ -20,7 +20,7 @@ interface ViewType<T> extends Type<View<T>> {
 }
 
 abstract class AbstractContent<T> extends BasePart implements Content<T> {
-	abstract get styles(): Collection<string>;
+	abstract get styles(): Bag<string>;
 	abstract get contents(): Sequence<T>;
 	abstract get textContent(): string;
 	abstract set textContent(text: string);

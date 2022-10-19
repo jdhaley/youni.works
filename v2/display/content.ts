@@ -1,5 +1,5 @@
 import { Content } from "../base/view.js";
-import { Collection, Entity, Sequence } from "../base/util.js";
+import { Bag, Entity, Sequence } from "../base/util.js";
 import { ELE, NODE } from "../base/dom.js";
 import { BasePart } from "../base/control.js";
 
@@ -66,7 +66,7 @@ export class ElementContent extends ElementEntity implements Content<NODE> {
 	set markupContent(markup: string) {
 		this._ele.innerHTML = markup;
 	}
-	get styles(): Collection<string> {
+	get styles(): Bag<string> {
 		return this._ele.classList;
 	}
 	get node(): ELE {

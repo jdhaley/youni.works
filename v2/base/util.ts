@@ -13,7 +13,7 @@ export interface bundle<T> {
 export interface Sequence<T> extends Iterable<T> {
 	readonly length: number;
 }
-export interface Collection<T>  {
+export interface Bag<T>  {
 	contains(value: T): boolean;
 	add(value: T): void;
 	remove(value: T): void;

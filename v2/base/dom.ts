@@ -1,4 +1,4 @@
-import { Collection, Sequence } from "./util";
+import { Bag, Sequence } from "./util";
 
 interface DOCUMENT {
 	getElementById(id: string): ELE;
@@ -38,7 +38,7 @@ interface TREE {
 }
 export interface ELE extends MUTABLE, TREE, NODE {
 	id: string;												//minimized from view
-	readonly classList: Collection<string>;					//minimized from view
+	readonly classList: Bag<string>;					//minimized from view
 
 	getAttribute(name: string): string;						//minimized from view
 	setAttribute(name: string, value: string): void;		//minimized from view
