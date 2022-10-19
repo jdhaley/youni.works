@@ -1,8 +1,8 @@
 import { Type, value } from "./model.js";
-import { Container, Content, View } from "./view.js";
+import { Content, View } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { Receiver, Graph } from "./control.js";
-import { bundle, Entity, Sequence } from "./util.js";
+import { bundle, Sequence } from "./util.js";
 import { ELE, NODE, RANGE } from "./dom.js";
 
 export interface NodeContent extends Content<NODE> {
@@ -10,9 +10,9 @@ export interface NodeContent extends Content<NODE> {
 	readonly node: NODE;
 }
 
-export interface Editor extends Entity<string>, View<NODE>, NodeContent {
+export interface Editor extends View<NODE>, NodeContent {
 	readonly owner: Article;
-	readonly contents: Sequence<NODE>
+	readonly id: string;
 	readonly content: NodeContent;
 
 	getContent(range?: RANGE): ELE;
@@ -26,14 +26,21 @@ export interface ItemEditor extends Editor {
 	convert(type: string): void;
 }
 
-export interface Article extends Graph<ELE>, Receiver {
+interface ViewType<T> extends Type<View<T>> {
+	owner: ViewOwner<T>;
+}
+interface ViewOwner<T> {
+	types: bundle<ViewType<T>>;
+	unknownType: ViewType<T>;
+}
+
+export interface Article extends ViewOwner<NODE>, Graph<NODE>, Receiver {
 	node: ELE;
-	types: bundle<Type<View<NODE>>>;
-	unknownType: Type<View<NODE>>;
 	commands: CommandBuffer<RANGE>;
 
 	getControl(id: string): Editor;
 	getView(source: any): Editor;
+	//getNode(source: any): NODE;
 	setRange(extent: RANGE, collapse?: boolean): void;
 	createElement(tag: string): ELE;
 }

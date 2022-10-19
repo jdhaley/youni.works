@@ -1,4 +1,4 @@
-import { Receiver, Signal } from "./control.js";
+import { Signal } from "./control.js";
 import { value, Type, typeOf, contentType } from "./model.js";
 import { Shape } from "./shape.js";
 import { bundle, Bag, Entity } from "./util.js";
@@ -10,19 +10,15 @@ export interface Content<T> {
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 
-export interface View<T> extends Content<T>, Receiver {
+export interface View<T>  {
 	readonly type: Type<View<T>>;
 	readonly contentType: contentType;
+//	readonly content: Content<T>;
 	view(value: value, container?: Content<T>): void;
 	valueOf(filter?: Filter | filter): value;
 }
 
-export interface Container<T> extends View<T>, Entity<string> {
-	header?: T;
-	content: Content<T>;
-	footer?: T;
-}
-export interface Box<T> extends Container<T>, Shape {
+export interface Box<T> extends Shape, Content<T>, View<T>, Entity<string> {
 }
 
 export type filter = (content: Content<unknown>) => boolean;

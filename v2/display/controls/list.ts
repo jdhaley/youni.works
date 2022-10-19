@@ -44,7 +44,7 @@ export class ListBox extends EditorView {
 		return model;
 	}
 	protected createFooter(model?: value) {
-		let footer = this._type.owner.createElement("footer") as Element;
+		let footer = this.node.ownerDocument.createElement("footer") as Element;
 		this._ele.append(footer);
 	}
 }

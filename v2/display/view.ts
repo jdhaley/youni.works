@@ -72,12 +72,12 @@ export abstract class ElementView extends ElementShape implements View<NODE> {
 		this.viewContent(value as value);
 	}
 	protected createHeader(model?: value) {
-		let header = this._type.owner.createElement("header") as Element;
+		let header = this.node.ownerDocument.createElement("header") as Element;
 		header.textContent = this._type.conf.title || "";
 		this._ele.append(header);
 	}
 	protected createContent(model?: value) {
-		let ele = this._type.owner.createElement("div") as Element;
+		let ele = this.node.ownerDocument.createElement("div") as Element;
 		ele.classList.add("content");
 		let content = new ElementContent();
 		content.control(ele as Element);
@@ -170,6 +170,10 @@ export abstract class ViewOwner extends ElementOwner {
 	getView(source: any) {
 		return getViewNode(source).$control;
 	}
+	// getNode(source: any): NODE {
+	// 	if (source instanceof ElementContent) return source.node;
+	// 	return nodeOf(source);
+	// }
 }
 
 export function bindViewNode(node: ELE): void {
