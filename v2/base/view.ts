@@ -1,21 +1,30 @@
-import { Signal } from "./control.js";
+import { Receiver, Signal } from "./control.js";
 import { value, Type, typeOf, contentType } from "./model.js";
+import { Shape } from "./shape.js";
 import { bundle, Collection, Entity } from "./util.js";
 
 export interface Content<T> {
 	readonly styles: Collection<string>;
-	contents: Iterable<T>;
+	readonly contents: Iterable<T>;
 	textContent: string;
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 
-export interface View extends Entity<string> {
-	readonly type: Type<View>;
+export interface View<T> extends Content<T>, Receiver {
+	readonly type: Type<View<T>>;
 	readonly contentType: contentType;
-	//readonly content: Content<unknown>;
-	view(value: value, container?: View): void;
+	view(value: value, container?: Content<T>): void;
 	valueOf(filter?: Filter | filter): value;
 }
+
+export interface Container<T> extends View<T>, Entity<string> {
+	header?: T;
+	content: Content<T>;
+	footer?: T;
+}
+export interface Box<T> extends Container<T>, Shape {
+}
+
 export type filter = (content: Content<unknown>) => boolean;
 export interface Filter {
 }
@@ -55,7 +64,7 @@ export function viewTypeOf(value: any): string {
 // }
 
 export class Change implements Signal {
-	constructor(command: string, view?: View) {
+	constructor(command: string, view?: View<any>) {
 		this.direction = view ? "up" : "down";
 		this.subject = "change";
 		this.from = view;
@@ -63,9 +72,9 @@ export class Change implements Signal {
 		this.commandName = command;
 	}
 	direction: "up" | "down";
-	source: View;
-	from: View;
-	on: View;
+	source: View<any>;
+	from: View<any>;
+	on: View<any>;
 	subject: string;
 	commandName: string;
 }

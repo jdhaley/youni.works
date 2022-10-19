@@ -1,53 +1,62 @@
-import { BasePart } from "../base/control";
+import { BasePart, Graph } from "../base/control";
 import { ele, ELE } from "../base/dom";
-import { Article } from "../base/editor";
-import { contentType, list, value } from "../base/model";
-import { Entity } from "../base/util";
-import { Content, filter, Filter, View, viewTypeOf } from "../base/view";
-import { ViewType } from "./view";
+import { contentType, list, Type, value } from "../base/model";
+import { Content, filter, Filter, View, viewTypeOf, viewTypes } from "../base/view";
+import { bundle, Collection, Entity, Sequence } from "../base/util";
+
+interface ContentOwner<T> extends Graph<T> {
+	types: bundle<Type<View<T>>>;
+	unknownType: Type<View<T>>;
+
+	getControlOf(node: T): AbstractContent<T>;
+	getView(source: any): View<T>;
+	// getControl(id: string): AbstractContent<T>;
+	//commands: CommandBuffer<RANGE>;
+}
+
+interface ViewType<T> extends Type<View<T>> {
+	owner: ContentOwner<T>;
+	conf: bundle<any>;
+}
+
+abstract class AbstractContent<T> extends BasePart implements Content<T> {
+	abstract get styles(): Collection<string>;
+	abstract get contents(): Sequence<T>;
+	abstract get textContent(): string;
+	abstract set textContent(text: string);
+	abstract get markupContent(): string;
+}
+
+abstract class ContentEntity<T> extends AbstractContent<T> implements Entity<any> {
+	abstract get id(): string;
+	abstract at(name: string): string;
+	abstract put(name: string, value?: string): void;
+}
 
 let NEXT_ID = 1;
-export abstract class AbstractView<T> extends BasePart implements View {
-	declare type: ViewType;
+export abstract class AbstractView<T> extends ContentEntity<T> implements View<T> {
+	declare type: ViewType<T>;
 
-	abstract get contentType(): contentType;
-	abstract get content(): Content<T>;
+	get owner(): ContentOwner<T> {
+		return this.type.owner;
+	}
+	get contentType(): contentType {
+		return viewTypes[this.type.conf.viewType];
+	}
 	get isContainer(): boolean {
 		return this.type.conf.container;
 	}
-	get owner(): Article {
-		return this.type.owner;
-	}
-	protected get _entity(): Entity<string> {
-		return undefined;
-	}
-
-	get id(): string {
-		return this._entity?.id;
-	}
-
-	abstract valueOf(filter?: Filter): unknown;
-	protected abstract viewElement(ele: ELE): void;
-	protected abstract viewContent(content: value): void;
-
-	at(name: string): string {
-		return this._entity?.at(name);
-	}
-	put(name: string, value?: string): void {
-		//TODO should we throw an error instead?
-		this._entity?.put(name, value);
+	get content(): Content<T> {
+		if (!this.isContainer) return this;
+		for (let content of this.contents) {
+			let cc: Content<T> = this.owner.getControlOf(content as any) as any;
+			if (cc?.styles.contains("content")) return cc;
+		}
 	}
 
 	view(value: value) {
-		if (!this.id) {
-			if (value instanceof Element && value.id) {
-				this["x"] = value.id;
-			} else {
-				this["x"] = "" + NEXT_ID++;
-			}
-		}
-
-	//	this.textContent = "";
+		this.preview(value);
+		if (value instanceof Element) return this.viewElement(value);
 		if (this.isContainer) {
 			this.createHeader();
 			this.createContent();
@@ -57,9 +66,51 @@ export abstract class AbstractView<T> extends BasePart implements View {
 		}
 		this.viewContent(value as value);
 	}
-	abstract createHeader(): void;
-	abstract createContent(): void;
-	abstract createFooter(): void;
+	valueOf(filter?: filter): list {
+		let model: value[];
+		if (filter && filter(this.content)) return;
+		for (let part of this.content.contents) {
+			let view = this.owner.getView(part);
+			let value = view?.valueOf(filter);
+			if (value) {
+				if (!model) {
+					model = [];
+					if (this.type.name) model["type$"] = this.type.name;
+				}
+				model.push(value);
+			}
+		}
+		return model;
+	}
+	protected viewElement(value: ELE) {
+		if (this.contentType == "unit") {
+			this.textContent = value.textContent;
+			return;
+		}
+		for (let child of value.children) {
+			let childType = this.type.types[child.nodeName];
+			if (childType) {
+				childType.create().view(child, this.content);
+			} else if (!child.id.endsWith("-marker")) {
+				console.warn("Unknown type: ", child.nodeName);
+			}
+		}
+	}
+	protected preview(value: value): void {
+		if (!this.id) {
+			if (value instanceof Element && value.id) {
+				this["x"] = value.id;
+			} else {
+				this["x"] = "" + NEXT_ID++;
+			}
+		}
+		this.textContent = "";
+	}
+	protected abstract createHeader(): void;
+	protected abstract createContent(): void;
+	protected abstract createFooter(): void;
+	protected abstract viewContent(content: value): void;
+
 }
 
 const LIST = {
@@ -87,10 +138,10 @@ const LIST = {
 	},
 	valueOf(filter?: filter): list {
 		let model: value[];
-		if (filter && !filter(this.content)) return;
+		if (filter && filter(this.content)) return;
 		for (let part of this.content.contents) {
-			let editor = this.owner.getView(part);
-			let value = editor?.valueOf(filter);
+			let view = this.owner.getView(part);
+			let value = view?.valueOf(filter);
 			if (value) {
 				if (!model) {
 					model = [];
@@ -101,8 +152,8 @@ const LIST = {
 		}
 		return model;
 	},
-	createFooter(model?: value) {
-		let footer = this._type.owner.createElement("footer") as Element;
-		this._ele.append(footer);
+	createFooter(this: AbstractView<unknown>, model?: value) {
+		// let footer = this._type.owner.createElement("footer") as Element;
+		// this._ele.append(footer);
 	}
 }
