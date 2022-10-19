@@ -34,7 +34,7 @@ export class RecordBox extends EditorView {
 			this.viewMember(name, idx[name]);
 		}
 	}
-	protected viewMember(name: string, value: any): View<any> {
+	protected viewMember(name: string, value: any): View {
 		let type = this.type.types[name];
 		let member = type.create() as Editor;
 		member.view(value, this);

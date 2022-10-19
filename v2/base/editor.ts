@@ -5,12 +5,12 @@ import { Receiver, Graph } from "./control.js";
 import { bundle, Sequence } from "./util.js";
 import { ELE, NODE, RANGE } from "./dom.js";
 
-export interface NodeContent extends Content<NODE> {
+export interface NodeContent extends Content {
 	readonly contents: Sequence<NODE>
 	readonly node: NODE;
 }
 
-export interface Editor extends View<NODE>, NodeContent {
+export interface Editor extends View, NodeContent {
 	readonly owner: Article;
 	readonly id: string;
 	readonly content: NodeContent;
@@ -26,15 +26,15 @@ export interface ItemEditor extends Editor {
 	convert(type: string): void;
 }
 
-interface ViewType<T> extends Type<View<T>> {
-	owner: ViewOwner<T>;
+interface ViewType extends Type<View> {
+	owner: ViewOwner;
 }
-interface ViewOwner<T> {
-	types: bundle<ViewType<T>>;
-	unknownType: ViewType<T>;
+interface ViewOwner {
+	types: bundle<ViewType>;
+	unknownType: ViewType;
 }
 
-export interface Article extends ViewOwner<NODE>, Graph<NODE>, Receiver {
+export interface Article extends ViewOwner, Graph<NODE>, Receiver {
 	node: ELE;
 	commands: CommandBuffer<RANGE>;
 

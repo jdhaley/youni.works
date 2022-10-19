@@ -1,11 +1,11 @@
 import { ELE, NODE } from "../base/dom";
 import { list, value } from "../base/model";
 import { filter } from "../base/view";
-import { Bag } from "../base/util";
+import { Bag, Sequence } from "../base/util";
 
 import { AbstractContainer } from "./v";
 
-export class ElementContainer extends AbstractContainer<NODE> {
+export class ElementContainer extends AbstractContainer {
 	declare _node: ELE;
 
 	get id(): string {
@@ -14,7 +14,7 @@ export class ElementContainer extends AbstractContainer<NODE> {
 	get styles(): Bag<string> {
 		return this._node.classList;
 	}
-	get contents(): Iterable<NODE> {
+	get contents(): Sequence<NODE> {
 		return this._node.childNodes;
 	}
 	get textContent(): string {

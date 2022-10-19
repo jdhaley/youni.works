@@ -3,25 +3,25 @@ import { value, Type, typeOf, contentType } from "./model.js";
 import { Shape } from "./shape.js";
 import { bundle, Bag, Entity } from "./util.js";
 
-export interface Content<T> {
+export interface Content {
 	readonly styles: Bag<string>;
-	readonly contents: Iterable<T>;
+	readonly contents: Iterable<unknown>;
 	textContent: string;
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 
-export interface View<T>  {
-	readonly type: Type<View<T>>;
+export interface View  {
+	readonly type: Type<View>;
 	readonly contentType: contentType;
 //	readonly content: Content<T>;
-	view(value: value, container?: Content<T>): void;
+	view(value: value, container?: Content): void;
 	valueOf(filter?: Filter | filter): value;
 }
 
-export interface Box<T> extends Shape, Content<T>, View<T>, Entity<string> {
+export interface Box extends Shape, Content, View, Entity<string> {
 }
 
-export type filter = (content: Content<unknown>) => boolean;
+export type filter = (content: Content) => boolean;
 export interface Filter {
 }
 
@@ -60,7 +60,7 @@ export function viewTypeOf(value: any): string {
 // }
 
 export class Change implements Signal {
-	constructor(command: string, view?: View<any>) {
+	constructor(command: string, view?: View) {
 		this.direction = view ? "up" : "down";
 		this.subject = "change";
 		this.from = view;
@@ -68,9 +68,9 @@ export class Change implements Signal {
 		this.commandName = command;
 	}
 	direction: "up" | "down";
-	source: View<any>;
-	from: View<any>;
-	on: View<any>;
+	source: View;
+	from: View;
+	on: View;
 	subject: string;
 	commandName: string;
 }

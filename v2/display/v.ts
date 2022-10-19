@@ -3,23 +3,24 @@ import { contentType, list, Type, value } from "../base/model";
 import { Content, View, filter, viewTypeOf, viewTypes } from "../base/view";
 import { bundle, Bag, Entity } from "../base/util";
 import { ele, ELE } from "../base/dom"; //For viewing Element values ONLY.
+import { ElementContent } from "./content";
 
 interface ContentOwner<T> extends Graph<T> {
-	types: bundle<Type<View<T>>>;
-	unknownType: Type<View<T>>;
+	types: bundle<Type<View>>;
+	unknownType: Type<View>;
 
 	getControlOf(node: T): AbstractContent<T>;
-	getView(source: any): View<T>;
+	getView(source: any): View;
 	// getControl(id: string): AbstractContent<T>;
 	//commands: CommandBuffer<RANGE>;
 }
 
-interface ViewType<T> extends Type<View<T>> {
+interface ViewType<T> extends Type<View> {
 	owner: ContentOwner<T>;
 	conf: bundle<any>;
 }
 
-abstract class AbstractContent<T> extends BasePart implements Content<T> {
+abstract class AbstractContent<T> extends BasePart implements Content {
 	abstract get styles(): Bag<string>;
 	abstract get contents(): Iterable<T>;
 	abstract get textContent(): string;
@@ -34,16 +35,16 @@ abstract class AbstractContentEntity<T> extends AbstractContent<T> implements En
 }
 
 let NEXT_ID = 1;
-export abstract class AbstractView<T> extends AbstractContentEntity<T> implements View<T> {
-	declare type: ViewType<T>;
+export abstract class AbstractView extends ElementContent implements View {
+	declare type: ViewType<unknown>;
 
-	get owner(): ContentOwner<T> {
+	get owner(): ContentOwner<unknown> {
 		return this.type.owner;
 	}
 	get contentType(): contentType {
 		return viewTypes[this.type.conf.viewType];
 	}
-	get content(): Content<T> {
+	get content(): Content {
 		return this;
 	}
 
@@ -79,14 +80,14 @@ export abstract class AbstractView<T> extends AbstractContentEntity<T> implement
 	protected abstract setId(id: string): void;
 }
 
-export abstract class AbstractContainer<T> extends AbstractView<T> {
+export abstract class AbstractContainer extends AbstractView {
 	get isContainer(): boolean {
 		return this.type.conf.container;
 	}
-	get content(): Content<T> {
+	get content(): Content {
 		if (!this.isContainer) return this;
 		for (let content of this.contents) {
-			let cc: Content<T> = this.owner.getControlOf(content as any) as any;
+			let cc: Content = this.owner.getControlOf(content as any) as any;
 			if (cc?.styles.contains("content")) return cc;
 		}
 	}
@@ -108,7 +109,7 @@ export abstract class AbstractContainer<T> extends AbstractView<T> {
 }
 
 const LIST = {
-	viewContent(this: AbstractView<unknown>, model: list): void {
+	viewContent(this: AbstractView, model: list): void {
 		if (ele(model)) return this.viewElement(ele(model));
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type.types[viewTypeOf(item)];
@@ -119,7 +120,7 @@ const LIST = {
 			type.create().view(item, this);
 		}
 	},
-	viewElement(this: AbstractView<unknown>, content: ELE) {
+	viewElement(this: AbstractView, content: ELE) {
 		if (!content) return;
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
@@ -146,7 +147,7 @@ const LIST = {
 		}
 		return model;
 	},
-	createFooter(this: AbstractView<unknown>, model?: value) {
+	createFooter(this: AbstractView, model?: value) {
 		// let footer = this._type.owner.createElement("footer") as Element;
 		// this._ele.append(footer);
 	}

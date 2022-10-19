@@ -15,13 +15,13 @@ interface VIEW_ELE extends ELE {
 	$control?: Editor;
 }
 
-export abstract class ElementView extends ElementShape implements View<NODE> {
+export abstract class ElementView extends ElementShape implements View {
 	abstract viewContent(data: value): void;
 	abstract valueOf(range?: RANGE): value;
 
 	protected _type: ViewType;
 
-	get type(): Type<View<NODE>> {
+	get type(): Type<View> {
 		return this._type;
 	}
 	get contentType(): contentType {
@@ -96,7 +96,7 @@ export abstract class ElementView extends ElementShape implements View<NODE> {
 	}
 }
 
-export class ViewType extends BaseType<View<NODE>> {
+export class ViewType extends BaseType<View> {
 	constructor(owner: Article) {
 		super();
 		this.owner = owner;
@@ -151,7 +151,7 @@ export abstract class ViewOwner extends ElementOwner {
 	getElementById(id: string): ELE {
 		return this.node.ownerDocument.getElementById(id);
 	}
-	getControl(id: string): View<NODE> {
+	getControl(id: string): View {
 		let view = this.node.ownerDocument.getElementById(id) as VIEW_ELE;
 		if (!view) throw new Error("Can't find view element.");
 		//if (view.getAttribute("data-item")) return view;
