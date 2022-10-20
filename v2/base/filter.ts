@@ -1,5 +1,4 @@
 import { NODE, RANGE } from "./dom";
-import { NodeContent } from "./editor";
 import { Extent } from "./util";
 import { Content } from "./view";
 
@@ -16,14 +15,14 @@ export class RangeFilter extends ExtentFilter<NODE> {
 		this.extent = range;
 	}
 	declare extent: RANGE;
-	filter(content: NodeContent): boolean {
-		return !this.extent.intersectsNode(content.node);
+	filter(content: Content): boolean {
+		return !this.extent.intersectsNode(content["node"]);
 	}
 }
 
 type filter = (content: Content) => boolean;
 export function createFilter(range: Range): filter {
-	return function filter(content: NodeContent) {
-		return !range.intersectsNode(content.node as Node);
+	return function filter(content: Content) {
+		return !range.intersectsNode(content["node"] as Node);
 	}
 }

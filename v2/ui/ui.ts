@@ -159,7 +159,7 @@ export function getClipboard(clipboard: DataTransfer) {
 }
 
 export function setClipboard(range: RANGE, clipboard: DataTransfer) {
-	let control = getView(range) as Editor;
+	let control = getView(range);
 	let model = control?.valueOf(range);
 	if (!model) return;
 	if (typeof model == "string") {
