@@ -1,7 +1,7 @@
 import { Signal } from "./control.js";
 import { value, Type, typeOf, contentType } from "./model.js";
 import { Shape } from "./shape.js";
-import { bundle, Bag, Entity } from "./util.js";
+import { bundle, Bag, Entity, Extent } from "./util.js";
 
 export interface Content {
 	readonly styles: Bag<string>;
@@ -15,14 +15,10 @@ export interface View  {
 	readonly contentType: contentType;
 //	readonly content: Content<T>;
 	view(value: value, container?: Content): void;
-	valueOf(filter?: Filter | filter): value;
+	valueOf(filter?: unknown): value;
 }
 
 export interface Box extends Shape, Content, View, Entity<string> {
-}
-
-export type filter = (content: Content) => boolean;
-export interface Filter {
 }
 
 export const viewTypes: bundle<contentType> = {

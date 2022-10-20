@@ -23,6 +23,14 @@ export interface Entity<T> {
 	at(name: string): T;
 	put(name: string, value?: T): void;
 }
+export interface Extent<T> {
+	readonly startContainer: T;
+    readonly startOffset: number;
+	readonly endContainer: T;
+    readonly endOffset: number;
+	setStart(container: T, index: number): void;
+	setEnd(container: T, index: number): void;
+}
 
 export const EMPTY = Object.freeze({
 	object: Object.freeze(Object.create(null)),

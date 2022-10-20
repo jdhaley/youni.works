@@ -1,4 +1,4 @@
-import { Bag, Sequence } from "./util";
+import { Bag, Extent, Sequence } from "./util";
 
 interface DOCUMENT {
 	getElementById(id: string): ELE;
@@ -45,13 +45,6 @@ export interface ELE extends MUTABLE, TREE, NODE {
 	removeAttribute(name: string): void;					//minimized from view
 }
 
-interface EXTENT {
-	readonly startContainer: NODE;
-    readonly startOffset: number;
-	readonly endContainer: NODE;
-    readonly endOffset: number;
-}
-
 interface ADJUSTABLE {
 	collapse(toStart?: boolean): void;
 	selectNode(node: NODE): void;
@@ -64,7 +57,7 @@ interface ADJUSTABLE {
 	setEndAfter(node: NODE): void;
 }
 
-export interface RANGE extends EXTENT, ADJUSTABLE {
+export interface RANGE extends Extent<NODE>, ADJUSTABLE {
 	readonly commonAncestorContainer: NODE;
 	readonly collapsed: boolean;
 
