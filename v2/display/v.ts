@@ -1,9 +1,10 @@
 import { BasePart, Graph } from "../base/control";
 import { contentType, list, Type, value } from "../base/model";
-import { Content, View, filter, viewTypeOf, viewTypes } from "../base/view";
+import { Content, View, viewTypeOf, viewTypes } from "../base/view";
 import { bundle, Bag, Entity } from "../base/util";
 import { ele, ELE } from "../base/dom"; //For viewing Element values ONLY.
 import { ElementContent } from "./content";
+import { Filter } from "../base/filter";
 
 interface ContentOwner<T> extends Graph<T> {
 	types: bundle<Type<View>>;
@@ -48,7 +49,7 @@ export abstract class AbstractView extends ElementContent implements View {
 		return this;
 	}
 
-	abstract valueOf(filter?: filter): list;
+	abstract valueOf(filter?: Filter): list;
 	view(value: value) {
 		this.preview(value);
 		this.content.styles.add("content");
@@ -131,9 +132,9 @@ const LIST = {
 			}
 		}
 	},
-	valueOf(filter?: filter): list {
+	valueOf(filter?: Filter): list {
 		let model: value[];
-		if (filter && filter(this.content)) return;
+		if (filter && filter.filter(this.content)) return;
 		for (let part of this.content.contents) {
 			let view = this.owner.getView(part);
 			let value = view?.valueOf(filter);

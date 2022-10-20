@@ -20,3 +20,10 @@ export class RangeFilter extends ExtentFilter<NODE> {
 		return !this.extent.intersectsNode(content.node);
 	}
 }
+
+type filter = (content: Content) => boolean;
+export function createFilter(range: Range): filter {
+	return function filter(content: NodeContent) {
+		return !range.intersectsNode(content.node as Node);
+	}
+}

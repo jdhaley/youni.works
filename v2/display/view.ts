@@ -1,5 +1,5 @@
 import { contentType, Type, value } from "../base/model.js";
-import { filter, View, viewTypes } from "../base/view.js";
+import { View, viewTypes } from "../base/view.js";
 import { Article, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -255,12 +255,6 @@ function content(view: EditorView, range: RANGE, out: ELE) {
 export function getView(node: NODE | RANGE): EditorView {
 	let view = getViewNode(node)?.$control;
 	if (view instanceof EditorView) return view;
-}
-
-export function createFilter(range: Range): filter {
-	return function filter(content: NodeContent) {
-		return !range.intersectsNode(content.node as Node);
-	}
 }
 
 interface NAVIGABLE_ELE extends ELE{

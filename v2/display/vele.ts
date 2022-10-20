@@ -1,6 +1,6 @@
 import { ELE, NODE } from "../base/dom";
+import { Filter } from "../base/filter";
 import { list, value } from "../base/model";
-import { filter } from "../base/view";
 import { Bag, Sequence } from "../base/util";
 
 import { AbstractContainer } from "./v";
@@ -30,7 +30,7 @@ export class ElementContainer extends AbstractContainer {
 	protected viewContent(content: unknown): void {
 		throw new Error("Method not implemented.");
 	}
-	valueOf(filter?: filter): list {
+	valueOf(filter?: Filter): list {
 		throw new Error("Method not implemented.");
 	}
 
