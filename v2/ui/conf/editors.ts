@@ -15,11 +15,7 @@ import markup from "../controllers/markup.js";
 import line from "../controllers/line.js";
 import row from "../controllers/row.js";
 
-import textEd from "../../edit/editors/text.js";
-import recordEd from "../../edit/editors/record.js";
-import listEd from "../../edit/editors/list.js";
-import markupEd from "../../edit/editors/markup.js";
-
+import editor from "./editing.js";
 import shortcuts from "./shortcuts.js";
 
 export interface TypeConf {
@@ -35,7 +31,7 @@ const conf: bundle<TypeConf> = {
 	text: {
 		class: ViewType,
 		viewType: "text",
-		prototype: new TextBox(text, textEd),
+		prototype: new TextBox(text, editor.text),
 		container: true,
 		tagName: "ui-text",
 		shortcuts: shortcuts
@@ -43,7 +39,7 @@ const conf: bundle<TypeConf> = {
 	record: {
 		class: ViewType,
 		viewType: "form",
-		prototype: new RecordBox(record, recordEd),
+		prototype: new RecordBox(record, editor.record),
 		container: true,
 		tagName: "ui-record",
 		shortcuts: shortcuts
@@ -51,7 +47,7 @@ const conf: bundle<TypeConf> = {
 	list: {
 		class: ViewType,
 		viewType: "list",
-		prototype: new ListBox(list, listEd),
+		prototype: new ListBox(list, editor.list),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -59,7 +55,7 @@ const conf: bundle<TypeConf> = {
 	markup: {
 		class: ViewType,
 		viewType: "markup",
-		prototype: new ListBox(markup, markupEd),
+		prototype: new ListBox(markup, editor.markup),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -67,7 +63,7 @@ const conf: bundle<TypeConf> = {
 	line: {
 		class: ViewType,
 		viewType: "line",
-		prototype: new LineBox(line, textEd),
+		prototype: new LineBox(line, editor.text),
 		container: false,
 		tagName: "p",
 		shortcuts: shortcuts
@@ -75,7 +71,7 @@ const conf: bundle<TypeConf> = {
 	row: {
 		class: ViewType,
 		viewType: "row",
-		prototype: new RowBox(row, recordEd),
+		prototype: new RowBox(row, editor.record),
 		container: false,
 		tagName: "ui-row",
 		shortcuts: shortcuts
