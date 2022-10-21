@@ -37,6 +37,9 @@ export class Display extends ViewOwner implements Article {
 	getControl(id: string): Editor {
 		return super.getControl(id) as Editor;
 	}
+	getView(source: any): Editor {
+		return super.getView(source) as Editor;
+	}
 }
 
 export class Frame extends Owner<ELE> {

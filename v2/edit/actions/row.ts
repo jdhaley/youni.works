@@ -5,8 +5,9 @@ import { RowBox } from "../../display/controls/row.js";
 import { getHeader } from "../../display/util.js";
 import { UserEvent } from "../../ui/ui.js";
 import editable from "./editor.js";
-import { getView } from "../../display/view.js";
+import { ElementView, getView } from "../../display/view.js";
 import { Change } from "../../display/FROMVIEW.js";
+import { View } from "../../base/view.js";
 export default extend(editable, {
 	dblclick(this: RecordBox, event: UserEvent) {
 		event.subject = "";
@@ -16,7 +17,7 @@ export default extend(editable, {
 				this.header.textContent = this._type.conf.title;
 				this.styles.remove("collapsed");
 			} else {
-				let title = this.get("title").content.node.textContent || "";
+				let title = this.get("title").content.textContent || "";
 				this.header.innerHTML += ": " + `<b>${title}</b>`;
 				this.styles.add("collapsed");
 			}
@@ -49,7 +50,7 @@ export default extend(editable, {
 	}
 });
 
-function addCol(editor: RowBox, col: Editor) {
+function addCol(editor: RowBox, col: ElementView) {
 	let contents = editor.content.contents;
 	for (let i = 0; i < contents.length; i++) {
 		if (contents[i] == col.node) {

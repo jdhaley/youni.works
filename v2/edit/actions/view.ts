@@ -1,6 +1,5 @@
 import { extend } from "../../base/util.js";
-
-import { EditorView } from "../../display/view.js";
+import { EditorView } from "../../display/editor.js";
 
 import { UserEvent, setClipboard } from "../../ui/ui.js";
 

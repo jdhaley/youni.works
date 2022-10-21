@@ -1,7 +1,8 @@
 import { item } from "../../base/model.js";
-import { ELE, ele, RANGE } from "../../base/dom.js";
-import { getView, ViewTypeImpl } from "../view.js";
+import { ELE, RANGE } from "../../base/dom.js";
+import { ElementViewType, getView } from "../view.js";
 import { TextBox } from "./text.js";
+import { ArticleType } from "../editor.js";
 
 export class LineBox extends TextBox {
 	get level(): number {
@@ -53,9 +54,9 @@ export class LineBox extends TextBox {
 		}
 	}
 	convert(name: string) {
-		let toType = this.type.partOf?.types[name] as ViewTypeImpl;
+		let toType = this.type.partOf?.types[name] as ArticleType;
 		if (toType) {
-			this._type = toType;
+			this._type = toType as ElementViewType;
 			this.put("data-item", toType.name);
 		}
 	}

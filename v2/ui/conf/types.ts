@@ -1,19 +1,18 @@
 import { bundle } from "../../base/util.js";
 
-import { ViewTypeImpl } from "../../display/view.js";
-
 import { TextBox } from "../../display/controls/text.js";
 import { RecordBox } from "../../display/controls/record.js";
 import { ListBox } from "../../display/controls/list.js";
 import { LineBox } from "../../display/controls/line.js";
 import { RowBox } from "../../display/controls/row.js";
 
+import { ElementViewType } from "../../display/view.js";
 import edit from "../../edit/conf/edit.js";
 import actions from "../../edit/conf/actions.js";
 import shortcuts from "./shortcuts.js";
 
 export interface TypeConf {
-	class: typeof ViewTypeImpl;
+	class: typeof ElementViewType;
 	viewType: string,
 	prototype?: any,
 	container: boolean;
@@ -23,7 +22,7 @@ export interface TypeConf {
 
 const conf: bundle<TypeConf> = {
 	text: {
-		class: ViewTypeImpl,
+		class: ElementViewType,
 		viewType: "text",
 		prototype: new TextBox(actions.text, edit.text),
 		container: true,
@@ -31,7 +30,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	record: {
-		class: ViewTypeImpl,
+		class: ElementViewType,
 		viewType: "form",
 		prototype: new RecordBox(actions.record, edit.record),
 		container: true,
@@ -39,7 +38,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	list: {
-		class: ViewTypeImpl,
+		class: ElementViewType,
 		viewType: "list",
 		prototype: new ListBox(actions.list, edit.list),
 		container: true,
@@ -47,7 +46,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: ViewTypeImpl,
+		class: ElementViewType,
 		viewType: "markup",
 		prototype: new ListBox(actions.markup, edit.markup),
 		container: true,
@@ -55,7 +54,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	line: {
-		class: ViewTypeImpl,
+		class: ElementViewType,
 		viewType: "line",
 		prototype: new LineBox(actions.line, edit.text),
 		container: false,
@@ -63,7 +62,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	row: {
-		class: ViewTypeImpl,
+		class: ElementViewType,
 		viewType: "row",
 		prototype: new RowBox(actions.row, edit.record),
 		container: false,

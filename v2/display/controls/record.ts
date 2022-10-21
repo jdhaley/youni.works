@@ -1,14 +1,14 @@
 import { value, record } from "../../base/model.js";
-import { Editor } from "../editor.js";
+import { Editor, EditorView } from "../editor.js";
 
-import { getView, EditorView } from "../view.js";
+import { getView } from "../view.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { View } from "../../base/view.js";
 
 export class RecordBox extends EditorView {
 	memberType = "field";
 
-	get(name: string): Editor {
+	get(name: string): View {
 		for (let node of this.content.contents) {
 			let view = getView(node);
 			if (name == view?.type.name) return view;

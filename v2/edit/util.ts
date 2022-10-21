@@ -1,4 +1,4 @@
-import { Editor } from "../display/editor.js";
+import { Editor, EditorView } from "../display/editor.js";
 import { ele, ELE, END_TO_END, nodeOf, RANGE, START_TO_START, NODE } from "../base/dom.js";
 import { getView, bindViewNode } from "../display/view.js";
 import { Change } from "../display/FROMVIEW.js";
@@ -6,7 +6,7 @@ import { Change } from "../display/FROMVIEW.js";
 export { getEditor, bindViewNode }
 
 //Hide the ViewBox return type so the implementation doesn't leak
-const getEditor = getView as (node: NODE | RANGE) => Editor ;
+const getEditor = getView as (node: NODE | RANGE) => EditorView ;
 
 export function getChildEditor(editor: Editor, node: NODE): Editor {
 	if (node == editor.content.node) return null;
@@ -17,7 +17,7 @@ export function getChildEditor(editor: Editor, node: NODE): Editor {
 }
 
 export function narrowRange(range: RANGE) {
-	let editor = getView(range);
+	let editor = getEditor(range);
 	if (!editor) return;
 
 	let start = range.startContainer;
@@ -118,9 +118,9 @@ function patchText(marker: Node) {
 export function clearContent(range: RANGE) {
 	let it = rangeIterator(range);
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
-		let editor = getView(node);
+		let editor = getEditor(node);
 		if (editor?.contentType == "record") {
-			if (getView(editor.node.parentNode)?.contentType == "list") {
+			if (getEditor(editor.node.parentNode)?.contentType == "list") {
 				if (enclosedInRange(editor.node, range)) editor.node.remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {

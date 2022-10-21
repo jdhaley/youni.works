@@ -2,11 +2,10 @@ import { value, record, item } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
 import { Editor } from "../editor.js";
-import { ViewTypeImpl } from "../view.js";
 
 import { RecordBox } from "./record.js";
-import { ele, ELE, RANGE } from "../../base/dom.js";
-import { View } from "../../base/view.js";
+import { ELE, RANGE } from "../../base/dom.js";
+import { View, ViewType } from "../../base/view.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
@@ -88,7 +87,7 @@ function getColumns(row: item) {
 	}
 	return columns;
 }
-function createType(type: ViewTypeImpl, columns: string[]): ViewTypeImpl {
+function createType(type: ViewType, columns: string[]): ViewType {
 	type.types = Object.create(null);
 	let column = type.owner.types.column;
 	for (let col of columns) {
@@ -98,8 +97,8 @@ function createType(type: ViewTypeImpl, columns: string[]): ViewTypeImpl {
 		colType.prototype._type = colType;
 		type.types[col] = colType;
 	}
-	type.prototype = Object.create(type.prototype);
-	type.prototype["_type"] = type;
+	// type.prototype = Object.create(type.prototype);
+	// type.prototype["_type"] = type;
 	return type;
 }
 
@@ -117,7 +116,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	return model;
 }
 
-function createHeaderItem(type: ViewTypeImpl): item {
+function createHeaderItem(type: ViewType): item {
 	let item = {
 		type$: type.name,
 		header: true, 

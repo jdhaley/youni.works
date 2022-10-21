@@ -1,7 +1,7 @@
 import { Content } from "../base/view.js";
 import { Bag, Entity, Sequence } from "../base/util.js";
 import { ELE, NODE } from "../base/dom.js";
-import { BasePart } from "../base/control.js";
+import { BasePart, Owner, Receiver } from "../base/control.js";
 
 class ElementPart extends BasePart {
 	declare protected _ele: ELE;
@@ -71,5 +71,19 @@ export class ElementContent extends ElementEntity implements Content {
 	}
 	get node(): ELE {
 		return this._ele;
+	}
+}
+
+export class ElementOwner extends Owner<ELE> {
+	getControlOf(node: ELE): Receiver {
+		return node["$control"];
+	}
+	getContainerOf(node: ELE): ELE {
+		for (let parent = node.parentNode; parent; parent = parent.parentNode) {
+			if (parent["$control"]) return parent as ELE;
+		}
+	}
+	getPartsOf(node: ELE): Iterable<ELE> {
+		return node.children as Iterable<ELE>;
 	}
 }

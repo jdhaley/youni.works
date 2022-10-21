@@ -1,8 +1,8 @@
 import { contentType, value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
+import { EditorView } from "../editor.js";
 
-import { EditorView } from "../view.js";
 
 export class TextBox extends EditorView {
 	viewType = "text";

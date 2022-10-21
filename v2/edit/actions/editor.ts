@@ -8,6 +8,7 @@ import { getView, navigate } from "../../display/view.js";
 import { EditEvent, UserEvent, getClipboard, setClipboard } from "../../ui/ui.js";
 
 import view from "./view.js";
+import { getEditor } from "../util.js";
 
 let UNDONE = false;
 
@@ -46,7 +47,7 @@ export default extend(view, {
 				console.warn("Not insertable range");
 				return;
 			}
-			target = getView(range);
+			target = getEditor(range);
 		} 
 		range = target.edit("Paste", range, model);
 		range &&  this.type.owner.setRange(range, true);
@@ -142,7 +143,7 @@ export default extend(view, {
  */
 function getInsertableRange(range: RANGE) {
 	range = range.cloneRange();
-	let view = getView(range);
+	let view = getEditor(range);
 	while (view) {
 		if (view?.contentType == "list") {
 			return range;
@@ -153,7 +154,7 @@ function getInsertableRange(range: RANGE) {
 
 		range.setStartBefore(view.node);
 		range.collapse(true);
-		view = getView(range);
+		view = getEditor(range);
 	}
 }
 
