@@ -1,7 +1,7 @@
 import { BasePart, Graph } from "../base/control";
 import { contentType, list, Type, value } from "../base/model";
 import { Content, View, viewTypeOf, viewTypes } from "../base/view";
-import { bundle, Bag, Entity } from "../base/util";
+import { bundle, Bag, Entity, Extent } from "../base/util";
 import { ele, ELE } from "../base/dom"; //For viewing Element values ONLY.
 import { ElementContent } from "./content";
 import { Filter } from "../base/filter";
@@ -49,6 +49,10 @@ export abstract class AbstractView extends ElementContent implements View {
 		return this;
 	}
 
+	edit(commandName: string, range: Extent<unknown>, replacement?: unknown): Extent<unknown> {
+		console.log("edit not implemented");
+		return;
+	}
 	abstract valueOf(filter?: Filter): list;
 	view(value: value) {
 		this.preview(value);

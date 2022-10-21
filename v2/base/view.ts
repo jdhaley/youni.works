@@ -1,7 +1,7 @@
-import { Signal } from "./control.js";
+import { Receiver, Signal } from "./control.js";
 import { value, Type, typeOf, contentType } from "./model.js";
 import { Shape } from "./shape.js";
-import { bundle, Bag, Entity, Extent } from "./util.js";
+import { bundle, Bag, Entity, Extent, Sequence } from "./util.js";
 
 export interface Content {
 	readonly styles: Bag<string>;
@@ -10,15 +10,15 @@ export interface Content {
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 
-export interface View  {
+export interface View extends Receiver {
 	readonly type: Type<View>;
-	readonly contentType: contentType;
-//	readonly content: Content<T>;
 	view(value: value, container?: Content): void;
 	valueOf(filter?: unknown): value;
 }
 
 export interface Box extends Shape, Content, View, Entity<string> {
+	content: Content;
+	edit(commandName: string, range: Extent<unknown>, replacement?: value): Extent<unknown>;
 }
 
 export const viewTypes: bundle<contentType> = {

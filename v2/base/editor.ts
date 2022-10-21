@@ -1,11 +1,11 @@
-import { Type, value } from "./model.js";
-import { Content, View } from "./view.js";
+import { contentType, Type, value } from "./model.js";
+import { Box, Content } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { Receiver, Graph } from "./control.js";
 import { bundle, Sequence } from "./util.js";
 import { ELE, NODE, RANGE } from "./dom.js";
 
-interface ViewType extends Type<View> {
+interface ViewType extends Type<Box> {
 	owner: ViewOwner;
 }
 interface ViewOwner {
@@ -18,16 +18,15 @@ export interface NodeContent extends Content {
 	readonly node: NODE;
 }
 
-export interface NodeView extends View, NodeContent {
-	readonly content: NodeContent;
-}
-
-export interface Editor extends NodeView {
+export interface Editor extends Box, NodeContent {
 	readonly owner: Article;
 	readonly id: string;
+	readonly contents: Sequence<NODE>;
+	readonly contentType: contentType;
+	readonly content: NodeContent;
 
-	getContent(range?: RANGE): ELE;
 	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
+	getContent(range?: RANGE): ELE;
 }
 
 export interface ItemEditor extends Editor {

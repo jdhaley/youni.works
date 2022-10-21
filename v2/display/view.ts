@@ -51,6 +51,10 @@ export abstract class ElementView extends ElementShape implements View {
 		return this._ele
 	}
 
+	edit(commandName: string, range: RANGE, content?: value): RANGE {
+		console.warn("edit() has not been configured.")
+		return null;
+	}
 	view(value: value, parent?: ElementView) {
 		if (parent) (parent.content.node as ELE).append(this._ele);
 		if (!this.id) {
@@ -307,14 +311,10 @@ export abstract class EditorView extends ElementView implements Editor {
 	get owner(): Article {
 		return this._type.owner;
 	}
-
 	get shortcuts(): bundle<string> {
 		return this._type.conf.shortcuts;
 	}
-	edit(commandName: string, range: RANGE, content?: value): RANGE {
-		console.warn("edit() has not been configured.")
-		return null;
-	}
+
 	getContent(range?: RANGE): ELE {
 		return viewContent(this, range);
 	}
