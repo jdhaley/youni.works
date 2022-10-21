@@ -6,13 +6,12 @@ import { EditorView } from "../view.js";
 
 export class TextBox extends EditorView {
 	viewType = "text";
-	viewContent(model: value): void {
-		if (ele(model)) {
-			//even with plain text, always use HTML so that the marker is transferred to the view.
-			this.content.markupContent = ele(model).innerHTML;
-		} else {
-			this.content.textContent = model ? "" + model : "";
-		}
+	viewValue(model: value): void {
+		this.content.textContent = model ? "" + model : "";
+	}
+	viewElement(ele: ELE) {
+		//even with plain text, always use HTML so that the marker is transferred to the view.
+		this.content.markupContent = ele.innerHTML;
 	}
 	valueOf(range?: RANGE): value {
 		let model = "";

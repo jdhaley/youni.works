@@ -1,24 +1,16 @@
-import { contentType, Type, value } from "./model.js";
-import { Box, Content } from "./view.js";
+import { contentType, value } from "./model.js";
+import { Content, View, ViewOwner } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { Receiver, Graph } from "./control.js";
-import { bundle, Sequence } from "./util.js";
+import { Sequence } from "./util.js";
 import { ELE, NODE, RANGE } from "./dom.js";
-
-interface ViewType extends Type<Box> {
-	owner: ViewOwner;
-}
-interface ViewOwner {
-	types: bundle<ViewType>;
-	unknownType: ViewType;
-}
 
 export interface NodeContent extends Content {
 	readonly contents: Sequence<NODE>
 	readonly node: NODE;
 }
 
-export interface Editor extends Box, NodeContent {
+export interface Editor extends View, NodeContent {
 	readonly owner: Article;
 	readonly id: string;
 	readonly contents: Sequence<NODE>;

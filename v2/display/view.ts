@@ -1,5 +1,5 @@
 import { contentType, Type, value } from "../base/model.js";
-import { View, viewTypes } from "../base/view.js";
+import { Content, View, ViewType, viewTypes } from "../base/view.js";
 import { Article, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -16,10 +16,11 @@ interface VIEW_ELE extends ELE {
 }
 
 export abstract class ElementView extends ElementShape implements View {
-	abstract viewContent(data: value): void;
+	abstract viewValue(data: value): void;
+	abstract viewElement(content: ELE): void;
 	abstract valueOf(range?: RANGE): value;
 
-	protected _type: ViewType;
+	protected _type: ViewTypeImpl;
 
 	get type(): Type<View> {
 		return this._type;
@@ -55,7 +56,7 @@ export abstract class ElementView extends ElementShape implements View {
 		console.warn("edit() has not been configured.")
 		return null;
 	}
-	view(value: value, parent?: ElementView) {
+	view(value: value, parent?: ElementView): void {
 		if (parent) (parent.content.node as ELE).append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
@@ -73,7 +74,11 @@ export abstract class ElementView extends ElementShape implements View {
 		} else {
 			this.content.styles.add("content");
 		}
-		this.viewContent(value as value);
+		if (ele(value)) {
+			this.viewElement(value as ELE);
+		} else {
+			this.viewValue(value as value);
+		}
 	}
 	protected createHeader(model?: value) {
 		let header = this.node.ownerDocument.createElement("header") as Element;
@@ -100,7 +105,7 @@ export abstract class ElementView extends ElementShape implements View {
 	}
 }
 
-export class ViewType extends BaseType<View> {
+export class ViewTypeImpl extends BaseType<View> implements ViewType {
 	constructor(owner: Article) {
 		super();
 		this.owner = owner;
@@ -108,15 +113,11 @@ export class ViewType extends BaseType<View> {
 	declare owner: Article;
 	declare viewType: string;
 
-	create(): ElementView {
-		let view: ElementView = super.create();
+	create(value: value, container?: ElementView): ElementView {
+		let view = super.create() as ElementView;
 		let node = this.owner.createElement(this.conf.tagName || "div");
 		view.control(node);
-		return view;
-	}
-	view(content: value | ELE, parent?: ElementView): ElementView {
-		let view = this.create();
-		view.view(content, parent);
+		view.view(value, container);
 		return view;
 	}
 }
@@ -146,9 +147,9 @@ export abstract class ViewOwner extends ElementOwner {
 	}
 	node: ELE;
 	conf: bundle<any>;
-	types: bundle<ViewType>;
-	unknownType: ViewType;
-	type: ViewType;
+	types: bundle<ViewTypeImpl>;
+	unknownType: ViewTypeImpl;
+	type: ViewTypeImpl;
 
 	abstract createElement(tagName: string): ELE;
 	
@@ -187,7 +188,7 @@ export function bindViewNode(node: ELE): void {
 		let parent = getViewNode(node.parentNode) as VIEW_ELE;
 		if (name && parent) {
 			console.log("binding.");
-			let type = parent.$control.type.types[name] as ViewType;
+			let type = parent.$control.type.types[name] as ViewTypeImpl;
 			if (type) {
 				control = Object.create(type.prototype);
 				control.control(node as any);

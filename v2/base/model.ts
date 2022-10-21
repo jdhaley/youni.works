@@ -27,7 +27,7 @@ export interface Type<T> {
 	partOf?: Type<T>;
 	types: bundle<Type<T>>;
 
-	create(): T;
+	create(...args: any[]): T;
 }
 
 function contentTypeOf(value: any): contentType {

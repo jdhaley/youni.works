@@ -1,6 +1,6 @@
 import { bundle } from "../../base/util.js";
 
-import { ViewType } from "../../display/view.js";
+import { ViewTypeImpl } from "../../display/view.js";
 
 import { TextBox } from "../../display/controls/text.js";
 import { RecordBox } from "../../display/controls/record.js";
@@ -13,7 +13,7 @@ import actions from "../../edit/conf/actions.js";
 import shortcuts from "./shortcuts.js";
 
 export interface TypeConf {
-	class: typeof ViewType;
+	class: typeof ViewTypeImpl;
 	viewType: string,
 	prototype?: any,
 	container: boolean;
@@ -23,7 +23,7 @@ export interface TypeConf {
 
 const conf: bundle<TypeConf> = {
 	text: {
-		class: ViewType,
+		class: ViewTypeImpl,
 		viewType: "text",
 		prototype: new TextBox(actions.text, edit.text),
 		container: true,
@@ -31,7 +31,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	record: {
-		class: ViewType,
+		class: ViewTypeImpl,
 		viewType: "form",
 		prototype: new RecordBox(actions.record, edit.record),
 		container: true,
@@ -39,7 +39,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	list: {
-		class: ViewType,
+		class: ViewTypeImpl,
 		viewType: "list",
 		prototype: new ListBox(actions.list, edit.list),
 		container: true,
@@ -47,7 +47,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: ViewType,
+		class: ViewTypeImpl,
 		viewType: "markup",
 		prototype: new ListBox(actions.markup, edit.markup),
 		container: true,
@@ -55,7 +55,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	line: {
-		class: ViewType,
+		class: ViewTypeImpl,
 		viewType: "line",
 		prototype: new LineBox(actions.line, edit.text),
 		container: false,
@@ -63,7 +63,7 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	row: {
-		class: ViewType,
+		class: ViewTypeImpl,
 		viewType: "row",
 		prototype: new RowBox(actions.row, edit.record),
 		container: false,

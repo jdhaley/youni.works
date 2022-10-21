@@ -35,7 +35,7 @@ export class BaseType<T> implements Type<T> {
 		}
 		this.prototype["_type"] = this;
 	}
-	create(): any {
+	create(...args: any[]): T {
 		return Object.create(this.prototype);
 	}
 }

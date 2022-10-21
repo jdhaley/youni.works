@@ -54,11 +54,15 @@ export abstract class AbstractView extends ElementContent implements View {
 		return;
 	}
 	abstract valueOf(filter?: Filter): list;
-	view(value: value) {
+	create(value: value): View {
 		this.preview(value);
 		this.content.styles.add("content");
-		if (value instanceof Element) return this.viewElement(value);
-		this.viewContent(value as value);
+		if (value instanceof Element) {
+			this.viewElement(value);
+		} else {
+			this.viewContent(value as value);
+		}
+		return this;
 	}
 
 	protected preview(value: value): void {
@@ -75,7 +79,7 @@ export abstract class AbstractView extends ElementContent implements View {
 		for (let child of value.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
-				childType.create().view(child, this.content);
+				childType.create(child, this.content);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}
@@ -97,7 +101,7 @@ export abstract class AbstractContainer extends AbstractView {
 		}
 	}
 
-	view(value: value) {
+	create(value: value): View{
 		this.preview(value);
 		if (value instanceof Element) {
 			this.viewElement(value);
@@ -106,6 +110,7 @@ export abstract class AbstractContainer extends AbstractView {
 			this.createContent();
 			this.createFooter()
 		}
+		return this;
 	}
 	protected abstract createHeader(): void;
 	protected abstract createContent(): void;
@@ -122,7 +127,7 @@ const LIST = {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
 				type =  this.owner.unknownType;
 			}
-			type.create().view(item, this);
+			type.create(item, this);
 		}
 	},
 	viewElement(this: AbstractView, content: ELE) {
@@ -130,7 +135,7 @@ const LIST = {
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
-				childType.create().view(child, this);
+				childType.create(child, this);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}

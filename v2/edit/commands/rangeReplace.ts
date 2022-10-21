@@ -68,8 +68,7 @@ export abstract class RangeReplace extends Replace {
 		let element = document.implementation.createDocument(null, "root").documentElement as ELE;
 		element.innerHTML = markup;
 		let editor = this.owner.getControl(this.viewId);
-		editor = editor.type.create() as Editor;
-		editor.view(element);
+		editor = editor.type.create(element) as Editor;
 		let range = this.getReplaceRange();
 		range.deleteContents();
 		let contents = editor.content.contents;

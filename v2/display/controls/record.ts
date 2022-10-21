@@ -19,8 +19,7 @@ export class RecordBox extends EditorView {
 		return this.get("title").content.textContent;
 	}
 
-	viewContent(model: value | ELE): void {
-		if (ele(model)) return this.viewElement(ele(model));
+	viewValue(model: value | ELE): void {
 		for (let name in this.type.types) {
 			this.viewMember(name, model ? model[name] : undefined);
 		}
@@ -36,8 +35,7 @@ export class RecordBox extends EditorView {
 	}
 	protected viewMember(name: string, value: any): View {
 		let type = this.type.types[name];
-		let member = type.create() as Editor;
-		member.view(value, this);
+		let member = type.create(value, this) as Editor;
 		member.styles.add(this.memberType);
 		return member;
 	}

@@ -1,5 +1,5 @@
 import {Response} from "../../base/message.js";
-import {ViewType, EditorView} from "../../display/view.js";
+import {ViewTypeImpl, EditorView} from "../../display/view.js";
 
 import {extend} from "../../base/util.js";
 
@@ -9,7 +9,7 @@ export default extend(null, {
 	open(this: Display, res: Response<string>) {
 		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, model);
-		this.node = type.view(model).node as ELE;
+		this.node = type.create(model).node as ELE;
 		this.node.setAttribute("data-file", res.req.to);
 		this.node.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.node);
@@ -55,7 +55,7 @@ export default extend(null, {
 	}
 });
 
-function getType(article: Display, path: string, data: any): ViewType {
+function getType(article: Display, path: string, data: any): ViewTypeImpl {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";
@@ -71,13 +71,13 @@ import { Change } from "../../base/view.js";
 import { ELE } from "../../base/dom.js";
 
 function shapetest(this: Display) {
-	let type = new ViewType(this);
+	let type = new ViewTypeImpl(this);
 	type.start("shape", {
 		prototype: new TextBox(shape, null),
 		actions: shape
 	});
 	
-	let view = type.view("HELLO THERE") as unknown as EditorView;
+	let view = type.create("HELLO THERE") as EditorView;
 	view.content.styles.add("shape");
 	view.position(300, 0);
 

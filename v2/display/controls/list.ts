@@ -1,19 +1,18 @@
-import { value, list, Type, contentType } from "../../base/model.js";
+import { value, list } from "../../base/model.js";
 import { viewTypeOf } from "../../base/view.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 
 import { getView, EditorView } from "../view.js";
 
 export class ListBox extends EditorView {
-	viewContent(model: list): void {
-		if (ele(model)) return this.viewElement(ele(model));
+	viewValue(model: list): void {
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
 				type =  this.owner.unknownType;
 			}
-			type.create().view(item, this);
+			type.create(item, this);
 		}
 	}
 	viewElement(content: ELE) {
@@ -21,7 +20,7 @@ export class ListBox extends EditorView {
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
-				childType.create().view(child, this);
+				childType.create(child, this);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}

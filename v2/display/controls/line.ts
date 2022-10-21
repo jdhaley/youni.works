@@ -1,6 +1,6 @@
 import { item } from "../../base/model.js";
-import { ele, RANGE } from "../../base/dom.js";
-import { getView, ViewType } from "../view.js";
+import { ELE, ele, RANGE } from "../../base/dom.js";
+import { getView, ViewTypeImpl } from "../view.js";
 import { TextBox } from "./text.js";
 
 export class LineBox extends TextBox {
@@ -53,21 +53,19 @@ export class LineBox extends TextBox {
 		}
 	}
 	convert(name: string) {
-		let toType = this.type.partOf?.types[name] as ViewType;
+		let toType = this.type.partOf?.types[name] as ViewTypeImpl;
 		if (toType) {
 			this._type = toType;
 			this.put("data-item", toType.name);
 		}
 	}
-	viewContent(content: item): void {
-		let e = ele(content);
-		if (e) {
-			this.content.markupContent = e.innerHTML;
-			this.level = Number.parseInt(e.getAttribute("level"));
-		} else {
-			this.content.markupContent = (content ? "" + content.content : "");
-			this.level = content.level;	
-		}
+	viewValue(content: item): void {
+		this.content.markupContent = (content ? "" + content.content : "");
+		this.level = content.level;	
+	}
+	viewEle(content: ELE): void {
+		this.content.markupContent = content.innerHTML;
+		this.level = Number.parseInt(content.getAttribute("level"));
 	}
 	valueOf(range?: RANGE): item {
 		if (range && !range.intersectsNode(this.content.node)) return;

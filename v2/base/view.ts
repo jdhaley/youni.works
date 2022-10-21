@@ -1,4 +1,5 @@
 import { Receiver, Signal } from "./control.js";
+import { ELE } from "./dom.js";
 import { value, Type, typeOf, contentType } from "./model.js";
 import { Shape } from "./shape.js";
 import { bundle, Bag, Entity, Extent, Sequence } from "./util.js";
@@ -10,16 +11,24 @@ export interface Content {
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 
+export type format = "value" | "markup";
 export interface View extends Receiver {
-	readonly type: Type<View>;
-	view(value: value, container?: Content): void;
+	readonly type: ViewType;
 	valueOf(filter?: unknown): value;
 }
-
-export interface Box extends Shape, Content, View, Entity<string> {
-	content: Content;
-	edit(commandName: string, range: Extent<unknown>, replacement?: value): Extent<unknown>;
+export interface ViewType extends Type<View> {
+	//owner: ViewOwner;
+	create(value: value, container?: Content): View;
 }
+export interface ViewOwner {
+	types: bundle<ViewType>;
+	unknownType: ViewType;
+}
+
+// export interface Box extends Shape, Content, View, Entity<string> {
+// 	content: Content;
+// 	edit(commandName: string, range: Extent<unknown>, replacement?: value): Extent<unknown>;
+// }
 
 export const viewTypes: bundle<contentType> = {
 	// "widget": "unit",

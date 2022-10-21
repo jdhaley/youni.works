@@ -2,10 +2,11 @@ import { value, record, item } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
 import { Editor } from "../../base/editor.js";
-import { ViewType } from "../view.js";
+import { ViewTypeImpl } from "../view.js";
 
 import { RecordBox } from "./record.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
+import { View } from "../../base/view.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
@@ -26,7 +27,7 @@ export class RowBox extends RecordBox {
 	// 	if (header) return header["_type"];
 	// }
 
-	view(content: item): void {
+	view(content: item): View {
 		if (!this.rowHeader && !content.header) {
 			let item = createHeaderItem(this._type);
 			let hdr = this.type.create() as RowBox;
@@ -38,27 +39,26 @@ export class RowBox extends RecordBox {
 
 		if (content.isHeader) this.isHeader = true;
 		super.view(content);
+		return this;
 	}
-	viewContent(model: value | ELE): void {
-		if (ele(model)) return this.viewElement(ele(model));
+	viewValue(model: value | ELE): void {
 		if (!model) return;
 		let row = model as item;
 		let types = this.type.types;
 		let content = row.content || EMPTY.object;
 		for (let name in types) {
 			let value = content[name];
-			types[name].create().view(value, this);
+			types[name].create(value, this);
 		}
 	}
-	protected viewElement(content: ELE): void {
+	viewElement(content: ELE): void {
 		let idx = {};
 		for (let child of content.children) {
 			idx[child.nodeName] = child;
 		}
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
-			let child = type.create() as Editor;
-			child.view(idx[name], this);
+			let child = type.create(idx[name], this) as Editor;
 			child.styles.add("field");
 		}
 	}
@@ -88,7 +88,7 @@ function getColumns(row: item) {
 	}
 	return columns;
 }
-function createType(type: ViewType, columns: string[]): ViewType {
+function createType(type: ViewTypeImpl, columns: string[]): ViewTypeImpl {
 	type.types = Object.create(null);
 	let column = type.owner.types.column;
 	for (let col of columns) {
@@ -117,7 +117,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	return model;
 }
 
-function createHeaderItem(type: ViewType): item {
+function createHeaderItem(type: ViewTypeImpl): item {
 	let item = {
 		type$: type.name,
 		header: true, 
