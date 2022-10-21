@@ -7,7 +7,7 @@ import { getEditor, senseChange } from "../util.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, content?: value): RANGE {
 	if (getEditor(range) != this) console.warn("Invalid edit range.");
-	range = new ListReplace(this.owner, commandName, this.id).exec(range, content);
+	range = new ListReplace(this.type.owner, commandName, this.id).exec(range, content);
 	senseChange(this, commandName);
 	return range;
 }

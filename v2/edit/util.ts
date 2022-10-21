@@ -164,5 +164,5 @@ export function rangeIterator(range: RANGE) {
 }
 
 export function senseChange(editor: Editor, commandName: string) {
-	editor.owner.sense(new Change(commandName, editor), editor.node as ELE);
+	editor.type.owner.sense(new Change(commandName, editor), editor.node as ELE);
 }

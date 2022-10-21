@@ -1,6 +1,6 @@
 import { contentType, Type, value } from "../base/model.js";
 import { View, ViewType } from "../base/view.js";
-import { Article, Editor, NodeContent } from "../base/editor.js";
+import { Article, ArticleType, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
@@ -23,7 +23,7 @@ export abstract class ElementView extends ElementShape implements View {
 
 	protected _type: ViewTypeImpl;
 
-	get type(): Type<View> {
+	get type(): ArticleType {
 		return this._type;
 	}
 	get contentType(): contentType {

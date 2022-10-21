@@ -1,5 +1,5 @@
 import { contentType, value } from "./model.js";
-import { Content, View, ViewOwner } from "./view.js";
+import { Content, View, ViewOwner, ViewType } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { Receiver, Graph } from "./control.js";
 import { Sequence } from "./util.js";
@@ -10,8 +10,12 @@ export interface NodeContent extends Content {
 	readonly node: NODE;
 }
 
-export interface Editor extends View, NodeContent {
+export interface ArticleType extends ViewType {
 	readonly owner: Article;
+}
+
+export interface Editor extends View, NodeContent {
+	readonly type: ArticleType;
 	readonly id: string;
 	readonly contents: Sequence<NODE>;
 	readonly contentType: contentType;

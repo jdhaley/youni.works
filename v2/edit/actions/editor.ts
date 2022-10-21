@@ -33,7 +33,7 @@ export default extend(view, {
 		}
 		setClipboard(range.cloneRange(), event.clipboardData);
 		range = this.edit("Cut", range);
-		range && this.owner.setRange(range, true);
+		range && this.type.owner.setRange(range, true);
 	},
 	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
@@ -49,14 +49,14 @@ export default extend(view, {
 			target = getView(range);
 		} 
 		range = target.edit("Paste", range, model);
-		range &&  this.owner.setRange(range, true);
+		range &&  this.type.owner.setRange(range, true);
 	},
 	delete(event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
 			range = this.edit("Delete", range);
-			range && this.owner.setRange(range, true);	
+			range && this.type.owner.setRange(range, true);	
 		}
 	},
 	erase(event: UserEvent) {
@@ -64,7 +64,7 @@ export default extend(view, {
 		let range = event.range;
 		if (!range.collapsed) {
 			range = this.edit("Delete", range);
-			range && this.owner.setRange(range, true);
+			range && this.type.owner.setRange(range, true);
 		}
 	},
 	next(event: UserEvent) {
@@ -86,8 +86,8 @@ export default extend(view, {
 	change(this: Editor, signal: Change) {
 		if (signal.direction == "up") {
 			//console.log(signal.direction, this.type.name, signal.commandName);
-			if (this.node == this.owner.node) {
-				this.owner.receive(signal);
+			if (this.node == this.type.owner.node) {
+				this.type.owner.receive(signal);
 			}
 		} else {
 			//console.log("down");
@@ -95,13 +95,13 @@ export default extend(view, {
 	},
 	undo(this: Editor, event: UserEvent) {
 		event.subject = "";
-		this.owner.setRange(this.owner.commands.undo(), false);
-		this.owner.receive(new Change("undo"));
+		this.type.owner.setRange(this.type.owner.commands.undo(), false);
+		this.type.owner.receive(new Change("undo"));
 	},
 	redo(this: Editor, event: UserEvent) {
 		event.subject = "";
-		this.owner.setRange(this.owner.commands.redo(), false);
-		this.owner.receive(new Change("redo"));
+		this.type.owner.setRange(this.type.owner.commands.redo(), false);
+		this.type.owner.receive(new Change("redo"));
 	},
 	selectionchange(this: Editor, event: UserEvent) {
 		event.subject = "";

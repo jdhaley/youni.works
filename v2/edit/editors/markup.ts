@@ -36,7 +36,7 @@ function replace(this: Editor, commandName: string, range: RANGE, content?: valu
 	}
 	if (editor != this) console.warn("Invalid edit range.", editor);
 
-	return new MarkupReplace(this.owner, commandName, editor.id).exec(range, content);
+	return new MarkupReplace(this.type.owner, commandName, editor.id).exec(range, content);
 }
 
 function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
@@ -52,5 +52,5 @@ function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
 		}
 		if (item.id == end.id) break;
 	}
-	return new LevelCommand(this.owner, name, this.id).exec(range);
+	return new LevelCommand(this.type.owner, name, this.id).exec(range);
 }

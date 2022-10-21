@@ -16,8 +16,8 @@ export interface View extends Receiver {
 }
 
 export interface ViewType extends Type<View> {
-	//owner: ViewOwner;
-	create(value: value, container?: Content): View;
+	owner: ViewOwner;
+	create(value?: value, container?: Content): View;
 }
 
 export interface ViewOwner {
