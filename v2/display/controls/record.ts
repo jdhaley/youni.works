@@ -24,7 +24,7 @@ export class RecordBox extends EditorView {
 			this.viewMember(name, model ? model[name] : undefined);
 		}
 	}
-	protected viewElement(content: ELE): void {
+	viewElement(content: ELE): void {
 		let idx = {};
 		for (let member of content.children) {
 			idx[member.nodeName] = member;
