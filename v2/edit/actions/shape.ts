@@ -1,6 +1,6 @@
 import { Shape } from "../../base/shape.js";
 import { extend } from "../../base/util.js";
-import { UserEvent } from "../ui.js";
+import { UserEvent } from "../../ui/ui.js";
 
 let tracking = {
 //	range: null,

@@ -2,7 +2,7 @@ import { extend } from "../../base/util.js";
 
 import { EditorView } from "../../display/view.js";
 
-import { UserEvent, setClipboard } from "../ui.js";
+import { UserEvent, setClipboard } from "../../ui/ui.js";
 
 export default extend(null, {
 	keydown(this: EditorView, event: UserEvent) {

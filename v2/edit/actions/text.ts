@@ -1,6 +1,6 @@
 import { Editor } from "../../base/editor.js";
 import { CHAR, extend } from "../../base/util.js";
-import { EditEvent, UserEvent, setClipboard } from "../ui.js";
+import { EditEvent, UserEvent, setClipboard } from "../../ui/ui.js";
 
 import editable from "./editor.js";
 

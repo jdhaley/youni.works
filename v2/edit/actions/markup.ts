@@ -4,7 +4,7 @@ import { getChildEditor } from "../../display/util.js";
 
 import { navigate } from "../../display/view.js";
 
-import { EditEvent, UserEvent, getClipboard } from "../ui.js";
+import { EditEvent, UserEvent, getClipboard } from "../../ui/ui.js";
 
 import list from "./list.js";
 

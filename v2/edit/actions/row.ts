@@ -4,7 +4,7 @@ import { Editor } from "../../base/editor.js";
 import { RecordBox } from "../../display/controls/record.js";
 import { RowBox } from "../../display/controls/row.js";
 import { getHeader } from "../../display/util.js";
-import { UserEvent } from "../ui.js";
+import { UserEvent } from "../../ui/ui.js";
 import editable from "./editor.js";
 import { getView } from "../../display/view.js";
 export default extend(editable, {

@@ -8,14 +8,8 @@ import { ListBox } from "../../display/controls/list.js";
 import { LineBox } from "../../display/controls/line.js";
 import { RowBox } from "../../display/controls/row.js";
 
-import text from "../controllers/text.js";
-import record from "../controllers/record.js";
-import list from "../controllers/list.js";
-import markup from "../controllers/markup.js";
-import line from "../controllers/line.js";
-import row from "../controllers/row.js";
-
-import editor from "./editing.js";
+import edit from "../../edit/conf/edit.js";
+import actions from "../../edit/conf/actions.js";
 import shortcuts from "./shortcuts.js";
 
 export interface TypeConf {
@@ -31,7 +25,7 @@ const conf: bundle<TypeConf> = {
 	text: {
 		class: ViewType,
 		viewType: "text",
-		prototype: new TextBox(text, editor.text),
+		prototype: new TextBox(actions.text, edit.text),
 		container: true,
 		tagName: "ui-text",
 		shortcuts: shortcuts
@@ -39,7 +33,7 @@ const conf: bundle<TypeConf> = {
 	record: {
 		class: ViewType,
 		viewType: "form",
-		prototype: new RecordBox(record, editor.record),
+		prototype: new RecordBox(actions.record, edit.record),
 		container: true,
 		tagName: "ui-record",
 		shortcuts: shortcuts
@@ -47,7 +41,7 @@ const conf: bundle<TypeConf> = {
 	list: {
 		class: ViewType,
 		viewType: "list",
-		prototype: new ListBox(list, editor.list),
+		prototype: new ListBox(actions.list, edit.list),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -55,7 +49,7 @@ const conf: bundle<TypeConf> = {
 	markup: {
 		class: ViewType,
 		viewType: "markup",
-		prototype: new ListBox(markup, editor.markup),
+		prototype: new ListBox(actions.markup, edit.markup),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -63,7 +57,7 @@ const conf: bundle<TypeConf> = {
 	line: {
 		class: ViewType,
 		viewType: "line",
-		prototype: new LineBox(line, editor.text),
+		prototype: new LineBox(actions.line, edit.text),
 		container: false,
 		tagName: "p",
 		shortcuts: shortcuts
@@ -71,7 +65,7 @@ const conf: bundle<TypeConf> = {
 	row: {
 		class: ViewType,
 		viewType: "row",
-		prototype: new RowBox(row, editor.record),
+		prototype: new RowBox(actions.row, edit.record),
 		container: false,
 		tagName: "ui-row",
 		shortcuts: shortcuts

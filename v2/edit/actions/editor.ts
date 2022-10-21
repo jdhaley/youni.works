@@ -5,7 +5,7 @@ import { extend } from "../../base/util.js";
 
 import { getView, navigate } from "../../display/view.js";
 
-import { EditEvent, UserEvent, getClipboard, setClipboard } from "../ui.js";
+import { EditEvent, UserEvent, getClipboard, setClipboard } from "../../ui/ui.js";
 
 import view from "./view.js";
 

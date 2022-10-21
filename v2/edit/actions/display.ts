@@ -3,7 +3,7 @@ import {ViewType, EditorView} from "../../display/view.js";
 
 import {extend} from "../../base/util.js";
 
-import {Display, UserEvent} from "../ui.js";
+import {Display, UserEvent} from "../../ui/ui.js";
 
 export default extend(null, {
 	open(this: Display, res: Response<string>) {
