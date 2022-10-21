@@ -1,5 +1,5 @@
 import { value } from "../../base/model.js";
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../display/editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { clearContent, getChildEditor } from "../util.js";

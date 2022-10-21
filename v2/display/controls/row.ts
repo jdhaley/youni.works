@@ -1,7 +1,7 @@
 import { value, record, item } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../editor.js";
 import { ViewTypeImpl } from "../view.js";
 
 import { RecordBox } from "./record.js";

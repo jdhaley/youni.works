@@ -1,5 +1,5 @@
 import { ELE, RANGE, NODE } from "../../base/dom.js";
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../display/editor.js";
 import { extend } from "../../base/util.js";
 import { Change } from "../../display/FROMVIEW.js";
 

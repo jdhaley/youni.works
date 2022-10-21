@@ -2,7 +2,7 @@ import {extend} from "../../base/util.js";
 import {EditEvent, UserEvent} from "../../ui/ui.js";
 import {getFooter, getHeader} from "../../display/util.js";
 import editable from "./editor.js";
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../display/editor.js";
 import { ELE, RANGE } from "../../base/dom";
 
 export default extend(editable, {

@@ -2,7 +2,7 @@ import { CommandBuffer } from "../base/command.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
 import { RemoteFileService } from "../base/remote.js";
 import { start } from "../base/type.js";
-import { Article, Editor } from "../base/editor.js";
+import { Article, Editor } from "../display/editor.js";
 import { ELE, RANGE } from "../base/dom";
 import { bundle, EMPTY } from "../base/util.js";
 

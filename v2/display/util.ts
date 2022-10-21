@@ -1,5 +1,5 @@
 import { ele, ELE, NODE } from "../base/dom.js";
-import { Editor } from "../base/editor.js";
+import { Editor } from "./editor.js";
 
 export function getHeader(view: Editor, node: NODE) {
 	while (node && node != view.node) {

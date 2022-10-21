@@ -1,5 +1,5 @@
 import { Command } from "../../base/command.js";
-import { Article } from "../../base/editor.js";
+import { Article } from "../../display/editor.js";
 import { RANGE } from "../../base/dom.js";
 
 export abstract class Edit extends Command<RANGE> {

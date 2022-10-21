@@ -1,4 +1,4 @@
-import { ItemEditor } from "../../base/editor.js";
+import { ItemEditor } from "../../display/editor.js";
 
 import { Edit } from "./edit.js";
 import { getChildEditor, getEditor } from "../util.js";

@@ -1,4 +1,4 @@
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../display/editor.js";
 import { extend } from "../../base/util.js";
 import { getChildEditor } from "../../display/util.js";
 

@@ -1,5 +1,5 @@
 import { value, item } from "../../base/model.js";
-import { Editor, ItemEditor } from "../../base/editor.js";
+import { Editor, ItemEditor } from "../../display/editor.js";
 
 import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";

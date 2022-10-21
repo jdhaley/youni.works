@@ -1,9 +1,9 @@
-import { contentType, value } from "./model.js";
-import { Content, View, ViewOwner, ViewType } from "./view.js";
-import { CommandBuffer } from "./command.js";
-import { Receiver, Graph } from "./control.js";
-import { Sequence } from "./util.js";
-import { ELE, NODE, RANGE } from "./dom.js";
+import { contentType, value } from "../base/model.js";
+import { Content, View, ViewOwner, ViewType } from "../base/view.js";
+import { CommandBuffer } from "../base/command.js";
+import { Receiver, Graph } from "../base/control.js";
+import { Sequence } from "../base/util.js";
+import { ELE, NODE, RANGE } from "../base/dom.js";
 
 export interface NodeContent extends Content {
 	readonly contents: Sequence<NODE>

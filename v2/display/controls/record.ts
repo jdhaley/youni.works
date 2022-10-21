@@ -1,5 +1,5 @@
 import { value, record } from "../../base/model.js";
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../editor.js";
 
 import { getView, EditorView } from "../view.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";

@@ -3,7 +3,7 @@ import { ele, ELE, RANGE } from "../../base/dom.js";
 
 import { unmark, bindViewNode, narrowRange, mark, getEditor, getChildEditor } from "../util.js";
 import { Replace } from "./replace.js";
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../display/editor.js";
 
 export abstract class RangeReplace extends Replace {
 	startId: string;

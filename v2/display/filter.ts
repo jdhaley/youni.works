@@ -1,6 +1,6 @@
-import { NODE, RANGE } from "./dom";
-import { Extent } from "./util";
-import { Content } from "./view";
+import { NODE, RANGE } from "../base/dom";
+import { Extent } from "../base/util";
+import { Content } from "../base/view";
 
 export abstract class Filter {
 	abstract filter(content: Content): boolean;

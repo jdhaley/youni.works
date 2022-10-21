@@ -1,5 +1,5 @@
 import { extend } from "../../base/util.js";
-import { Editor } from "../../base/editor.js";
+import { Editor } from "../../display/editor.js";
 import { RecordBox } from "../../display/controls/record.js";
 import { RowBox } from "../../display/controls/row.js";
 import { getHeader } from "../../display/util.js";
