@@ -1,5 +1,5 @@
 import { contentType, Type, value } from "../base/model.js";
-import { Content, View, ViewType, viewTypes } from "../base/view.js";
+import { View, ViewType } from "../base/view.js";
 import { Article, Editor, NodeContent } from "../base/editor.js";
 import { Actions, Owner, Receiver } from "../base/control.js";
 import { BaseType } from "../base/type.js";
@@ -8,6 +8,7 @@ import { ELE, ele, RANGE, nodeOf, NODE } from "../base/dom.js";
 
 import { ElementContent } from "./content.js";
 import { ElementShape } from "./shape.js";
+import { viewTypes } from "./FROMVIEW.js";
 
 let NEXT_ID = 1;
 

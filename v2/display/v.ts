@@ -1,10 +1,11 @@
 import { BasePart, Graph } from "../base/control";
 import { contentType, list, Type, value } from "../base/model";
-import { Content, View, viewTypeOf, viewTypes } from "../base/view";
+import { Content, View } from "../base/view";
 import { bundle, Bag, Entity, Extent } from "../base/util";
 import { ele, ELE } from "../base/dom"; //For viewing Element values ONLY.
 import { ElementContent } from "./content";
 import { Filter } from "../base/filter";
+import { viewTypeOf, viewTypes } from "./FROMVIEW";
 
 interface ContentOwner<T> extends Graph<T> {
 	types: bundle<Type<View>>;

@@ -1,7 +1,7 @@
-import { Change } from "../../base/view.js";
-import { ELE, RANGE, NODE } from "../../base/dom";
+import { ELE, RANGE, NODE } from "../../base/dom.js";
 import { Editor } from "../../base/editor.js";
 import { extend } from "../../base/util.js";
+import { Change } from "../../display/FROMVIEW.js";
 
 import { getView, navigate } from "../../display/view.js";
 

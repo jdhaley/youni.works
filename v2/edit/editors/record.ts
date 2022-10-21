@@ -1,5 +1,4 @@
 import { record } from "../../base/model.js";
-import { Change } from "../../base/view.js";
 import { Editor } from "../../base/editor.js";
 
 import { RecordReplace } from "../commands/recordReplace.js";

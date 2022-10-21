@@ -1,7 +1,7 @@
 import { Editor } from "../base/editor.js";
 import { ele, ELE, END_TO_END, nodeOf, RANGE, START_TO_START, NODE } from "../base/dom.js";
 import { getView, bindViewNode } from "../display/view.js";
-import { Change } from "../base/view.js";
+import { Change } from "../display/FROMVIEW.js";
 
 export { getEditor, bindViewNode }
 

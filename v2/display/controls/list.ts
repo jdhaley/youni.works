@@ -1,8 +1,8 @@
 import { value, list } from "../../base/model.js";
-import { viewTypeOf } from "../../base/view.js";
-import { ele, ELE, RANGE } from "../../base/dom.js";
+import { ELE, RANGE } from "../../base/dom.js";
 
 import { getView, EditorView } from "../view.js";
+import { viewTypeOf } from "../FROMVIEW.js";
 
 export class ListBox extends EditorView {
 	viewValue(model: list): void {

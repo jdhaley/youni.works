@@ -1,5 +1,4 @@
 import { value } from "../../base/model.js";
-import { Change } from "../../base/view.js";
 import { Editor } from "../../base/editor.js";
 
 import { LevelCommand } from "../commands/level.js";

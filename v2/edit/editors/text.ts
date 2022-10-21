@@ -1,4 +1,3 @@
-import { Change } from "../../base/view.js";
 import { Editor } from "../../base/editor.js";
 
 import { getEditor, getHeader, mark, narrowRange, senseChange, unmark } from "../util.js";
