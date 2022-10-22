@@ -1,9 +1,9 @@
 import { value, item } from "../../base/model.js";
-import { Editor, ItemEditor } from "../editor.js";
+import { ele, RANGE } from "../../base/dom.js";
 
 import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
-import { ele, RANGE } from "../../base/dom.js";
+import { Editor, TreeItem } from "../editor.js";
 
 export class MarkupReplace extends ListReplace {
 	protected getOuterRange(range: RANGE) {
@@ -20,7 +20,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		return super.getOuterRange(range);
 	}
-	protected onSingleContainer(range: RANGE, content: value, editor: ItemEditor): void {
+	protected onSingleContainer(range: RANGE, content: value, editor: TreeItem): void {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
@@ -43,7 +43,7 @@ export class MarkupReplace extends ListReplace {
 			model.level = 0;
 		}
 		//Create the end line and add it after the command line.
-		let end = editor.type.create(model) as any as ItemEditor;
+		let end = editor.type.create(model) as any as TreeItem;
 		ele(editor.node).after(end.node);
 		//We can now set the new range now that we have the end line.
 		range.setEnd(end.node, 0);
@@ -69,7 +69,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		range.setStartBefore(start.node);
 	}
-	protected merge(view: ItemEditor, range: RANGE, content: any, isStart: boolean) {
+	protected merge(view: TreeItem, range: RANGE, content: any, isStart: boolean) {
 		let item: item = content?.length && content[isStart ? 0 : content.length - 1];
 		if (!item) return;
 

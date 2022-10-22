@@ -1,15 +1,14 @@
-import { ItemEditor } from "../editor.js";
-
 import { Edit } from "./edit.js";
 import { getChildEditor, getEditor } from "../util.js";
 import { ele, RANGE } from "../../base/dom.js";
+import { Editor, TreeItem } from "../editor.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
 	startId: string;
 	endId: string;
 	exec(range: RANGE): RANGE {
-		let editor = this.owner.getControl(this.viewId);
+		let editor = this.owner.getControl(this.viewId) as Editor;
 		this.startId = getChildEditor(editor, range.startContainer)?.id;
 		this.endId = getChildEditor(editor, range.endContainer)?.id;
 		this.do(this.name);
@@ -17,15 +16,15 @@ export class LevelCommand extends Edit {
 		return range;
 	}
 	protected do(way: "Promote" | "Demote") {
-		let start = this.owner.getControl(this.startId) as any as ItemEditor;
-		let end = this.owner.getControl(this.endId) as any as ItemEditor;
+		let start = this.owner.getControl(this.startId) as TreeItem;
+		let end = this.owner.getControl(this.endId) as any as TreeItem;
 		if (start == end) {
 			way == "Promote" ? start.promote() : start.demote();
 		} else {
 			while (start) {
 				way == "Promote" ? start.promote() : start.demote();
 				if (start == end) break;
-				start = getEditor(ele(start.node).nextElementSibling) as any as ItemEditor;
+				start = getEditor(ele(start.node).nextElementSibling) as any as TreeItem;
 			}
 		}
 

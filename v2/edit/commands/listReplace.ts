@@ -3,7 +3,7 @@ import { Editor } from "../editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { clearContent, getChildEditor } from "../util.js";
-import { ELE, RANGE } from "../../base/dom.js";
+import { RANGE } from "../../base/dom.js";
 export class ListReplace extends RangeReplace {
 	exec(range: RANGE, content: value): RANGE {
 		if (!content) content = [];
@@ -14,7 +14,7 @@ export class ListReplace extends RangeReplace {
 		return super.exec(range, content);
 	}
 	protected execReplace(range: RANGE, content: value): RANGE {
-		let editor = this.owner.getControl(this.viewId);
+		let editor = this.owner.getControl(this.viewId) as Editor;
 		let start = getChildEditor(editor, range.startContainer);
 		let end = getChildEditor(editor, range.endContainer);
 		if (start && start == end) {
@@ -47,14 +47,14 @@ export class ListReplace extends RangeReplace {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!value) return;
-		let editor = this.owner.getControl(this.viewId);
+		let editor = this.owner.getControl(this.viewId) as Editor;
 		let ctx = editor.content.node;
 		//Ensure the range must be on the list conent. (It may be on a markup line).
 		while (range.commonAncestorContainer != ctx) {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		editor = editor.type.create(value);
+		editor = editor.type.create(value) as Editor;
 		let contents = editor.content.contents;
 		while (contents.length) {
 			range.insertNode(contents[0]); //this also removes the entry from the sequence.

@@ -1,8 +1,6 @@
-import { ele, ELE, NODE, nodeOf, RANGE } from "../base/dom.js";
-import { View } from "../base/view.js";
-
-import { Box } from "../base/box.js";
-import { ElementView, ElementViewType, VIEW_ELE } from "./view.js";
+import { ele, ELE, NODE, RANGE } from "../base/dom.js";
+import { Box, getViewNode, VIEW_ELE } from "../base/box.js";
+import { ElementView, ElementViewType } from "./view.js";
 
 export function getHeader(view: ElementView, node: NODE) {
 	while (node && node != view.node) {
@@ -60,7 +58,7 @@ export function bindViewNode(node: ELE): void {
 	let control: ElementView = node["$control"];
 	if (!control) {
 		let name = node.getAttribute("data-item");
-		let parent = getViewNode(node.parentNode) as VIEW_ELE;
+		let parent = getViewNode(node.parentNode);
 		if (name && parent) {
 			console.log("binding.");
 			let type = parent.$control.type.types[name] as ElementViewType;
@@ -78,19 +76,11 @@ export function bindViewNode(node: ELE): void {
 	}
 }
 
-function getViewNode(loc: NODE | RANGE): ELE {
-	for (let node = nodeOf(loc); node; node = node.parentNode) {
-		let e = ele(node);
-		if (e?.getAttribute("data-item")) {
-			if (!node["$control"]) {
-				console.warn("Unbound view.");
-				bindViewNode(e);
-			}
-			return e as ELE;
-		}
-	}
-}
 export function getView(node: NODE | RANGE): ElementView {
 	let viewNode = getViewNode(node) as VIEW_ELE;
 	if (viewNode?.$control instanceof ElementView) return viewNode.$control;
+}
+export function getBox(node: NODE | RANGE): Box {
+	let viewNode = getViewNode(node) as VIEW_ELE;
+	if (viewNode?.$control instanceof ElementView) return viewNode.$control as any;
 }

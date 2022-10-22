@@ -2,17 +2,14 @@ import { contentType, value } from "../base/model.js";
 import { View, ViewOwner, ViewType } from "../base/view.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
-import { ELE, RANGE, ele, DomView, NodeContent } from "../base/dom.js";
+import { ELE, RANGE, ele } from "../base/dom.js";
 
 import { ElementContent, ElementOwner } from "./content.js";
 import { ElementShape } from "./shape.js";
 import { bindViewNode } from "./util.js";
+import { DomView, NodeContent, VIEW_ELE } from "../base/box.js";
 
 let NEXT_ID = 1;
-
-export interface VIEW_ELE extends ELE {
-	$control?: View;
-}
 
 export abstract class ElementView extends ElementShape implements DomView {
 	declare _type: ViewType;

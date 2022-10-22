@@ -1,14 +1,4 @@
-import { Bag, Entity, Extent, Sequence } from "./util";
-import { Content, View } from "./view";
-
-export interface NodeContent extends Content {
-	readonly contents: Sequence<NODE>
-	readonly node: NODE;
-}
-
-export interface DomView extends View, Entity<string>, NodeContent {
-	readonly content: NodeContent;
-}
+import { Bag, Extent, Sequence } from "./util";
 
 interface DOCUMENT {
 	getElementById(id: string): ELE;

@@ -65,9 +65,8 @@ function getType(article: Display, path: string, data: any): ViewType {
 }
 
 import { ELE } from "../../base/dom.js";
-import { ViewType } from "../../base/view.js";
+import { Change, ViewType } from "../../base/view.js";
 import { Box } from "../../base/box.js";
-import { Change } from "../editor.js";
 
 function shapetest(this: Display) {
 	// let type = new ViewTypeImpl(this);

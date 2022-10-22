@@ -1,4 +1,4 @@
-import { Receiver } from "./control.js";
+import { Receiver, Signal } from "./control.js";
 import { value, Type, contentType } from "./model.js";
 import { bundle, Bag } from "./util.js";
 
@@ -22,9 +22,25 @@ export interface ViewType extends Type<View> {
 	create(value?: value, container?: Content): View;
 }
 
-export interface ViewOwner {
+export interface ViewOwner extends Receiver {
 	conf: bundle<any>;
 	types: bundle<ViewType>;
 	unknownType: ViewType;
 	defaultType: ViewType;
+}
+
+export class Change implements Signal {
+	constructor(command: string, view?: View) {
+		this.direction = view ? "up" : "down";
+		this.subject = "change";
+		this.from = view;
+		this.source = view;
+		this.commandName = command;
+	}
+	direction: "up" | "down";
+	source: View;
+	from: View;
+	on: View;
+	subject: string;
+	commandName: string;
 }
