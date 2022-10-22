@@ -61,11 +61,9 @@ function getType(article: Display, path: string, data: any): ViewType {
 	if (!typeName && data && typeof data == "object" && data.type$) {
 		typeName = data.type$;
 	}
-	return article.types[typeName] as any || article.type;
+	return article.types[typeName] as any || article.defaultType;
 }
 
-import shape from "./shape.js";
-import { TextBox } from "../../display/controls/text.js";
 import { ELE } from "../../base/dom.js";
 import { Change } from "../../display/FROMVIEW.js";
 import { ViewType } from "../../base/view.js";

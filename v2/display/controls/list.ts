@@ -11,7 +11,7 @@ export class ListBox extends EditorView {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
-				type =  this.owner.unknownType;
+				type =  this.type.owner.unknownType;
 			}
 			type.create(item, this);
 		}

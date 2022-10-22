@@ -38,7 +38,7 @@ let lastEdit = {
 	start: 0,
 	end: 0
 }
-function doit(commandName: string, range: RANGE, text: string): RANGE {
+function doit(this: Editor, commandName: string, range: RANGE, text: string): RANGE {
 	let node = range.commonAncestorContainer;
 	let editor = getEditor(node);
 
@@ -47,7 +47,7 @@ function doit(commandName: string, range: RANGE, text: string): RANGE {
 	}
 
 	if (range.collapsed && node == lastEdit.node) {
-		let cmd = this.owner.commands.peek() as Replace;
+		let cmd = this.type.owner.commands.peek() as Replace;
 		if (cmd?.name == commandName && editor?.id == cmd.viewId) {
 			let r = doAgain(cmd, range, text);
 			if (r) return r;		
@@ -69,9 +69,8 @@ function doit(commandName: string, range: RANGE, text: string): RANGE {
 		lastEdit.node = null;
 	}
 
-	return new Replace(this.owner, commandName, editor.id).exec(range, text);
+	return new Replace(this.type.owner, commandName, editor.id).exec(range, text);
 }
-
 
 function doAgain(cmd: Replace, range: RANGE, text: string) {
 	let currentOffset = range.startOffset; //start & end are the same.

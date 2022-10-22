@@ -1,17 +1,13 @@
 import { contentType, value } from "../base/model.js";
-import { Content, View, ViewOwner, ViewType } from "../base/view.js";
+import { View, ViewOwner, ViewType } from "../base/view.js";
 import { CommandBuffer } from "../base/command.js";
 import { Receiver, Graph, Actions } from "../base/control.js";
 import { bundle, Sequence } from "../base/util.js";
 import { ele, ELE, NODE, RANGE } from "../base/dom.js";
 import { ElementView } from "./view.js";
+import { NodeContent } from "./content.js";
 import { viewTypes } from "./FROMVIEW.js";
 import { getView } from "./util.js";
-
-export interface NodeContent extends Content {
-	readonly contents: Sequence<NODE>
-	readonly node: NODE;
-}
 
 export interface ArticleType extends ViewType {
 	readonly owner: Article;
@@ -44,8 +40,6 @@ export interface Article extends ViewOwner, Graph<NODE>, Receiver {
 	createElement(tag: string): ELE;
 }
 
-
-
 type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
 
 export abstract class EditorView extends ElementView implements Editor {
@@ -54,15 +48,11 @@ export abstract class EditorView extends ElementView implements Editor {
 		this.actions = actions;
 		if (editor) this["edit"] = editor;
 	}
-
 	get type(): ArticleType {
 		return this._type as ArticleType;
 	}
 	get contentType(): contentType {
 		return viewTypes[this._type.conf.viewType];
-	}
-	get owner(): Article {
-		return this._type.owner;
 	}
 	get shortcuts(): bundle<string> {
 		return this._type.conf.shortcuts;

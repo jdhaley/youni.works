@@ -17,10 +17,12 @@ export interface View extends Receiver {
 
 export interface ViewType extends Type<View> {
 	owner: ViewOwner;
+	conf: bundle<any>;
 	create(value?: value, container?: Content): View;
 }
 
 export interface ViewOwner {
 	types: bundle<ViewType>;
 	unknownType: ViewType;
+	defaultType: ViewType;
 }

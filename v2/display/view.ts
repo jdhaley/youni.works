@@ -1,14 +1,12 @@
 import { value } from "../base/model.js";
-import { View, ViewType } from "../base/view.js";
+import { View, ViewOwner, ViewType } from "../base/view.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
 import { ELE, RANGE, ele } from "../base/dom.js";
 
-import { ElementContent, ElementOwner } from "./content.js";
+import { ElementContent, ElementOwner, NodeContent } from "./content.js";
 import { ElementShape } from "./shape.js";
 import { bindViewNode } from "./util.js";
-
-import { Article, NodeContent } from "./editor.js";
 
 let NEXT_ID = 1;
 
@@ -17,7 +15,7 @@ export interface VIEW_ELE extends ELE {
 }
 
 export abstract class ElementView extends ElementShape implements View {
-	declare _type: ElementViewType;
+	declare _type: ViewType;
 	abstract viewValue(data: value): void;
 	abstract viewElement(content: ELE): void;
 	abstract valueOf(range?: RANGE): value;
@@ -103,16 +101,16 @@ export abstract class ElementView extends ElementShape implements View {
 }
 
 export class ElementViewType extends BaseType<View> implements ViewType {
-	constructor(owner: Article) {
+	constructor(owner: ElementViewOwner) {
 		super();
 		this.owner = owner;
 	}
-	declare owner: Article;
+	declare owner: ViewOwner;
 	declare viewType: string;
 
 	create(value: value, container?: ElementView): ElementView {
 		let view = super.create() as ElementView;
-		let node = this.owner.createElement(this.conf.tagName || "div");
+		let node = (this.owner as ElementViewOwner).createElement(this.conf.tagName || "div");
 		view.control(node);
 		view.view(value, container);
 		return view;
@@ -132,7 +130,7 @@ export abstract class ElementViewOwner extends ElementOwner {
 	conf: bundle<any>;
 	types: bundle<ElementViewType>;
 	unknownType: ElementViewType;
-	type: ElementViewType;
+	defaultType: ElementViewType;
 
 	abstract createElement(tagName: string): ELE;
 	

@@ -10,7 +10,7 @@ export default extend(null, {
        // console.log(event.shortcut, event.subject);
 	},
 	save(this: EditorView, event: UserEvent) {
-		this.owner.receive(event);
+		this.type.owner.receive(event);
 		event.subject = "";
 	},
 	copy(this: EditorView, event: UserEvent) {

@@ -55,7 +55,7 @@ export class LineBox extends TextBox {
 		}
 	}
 	convert(name: string) {
-		let toType = this.type.partOf?.types[name] as ArticleType;
+		let toType = this.type.partOf?.types[name];
 		if (toType) {
 			this._type = toType as ElementViewType;
 			this.put("data-item", toType.name);
