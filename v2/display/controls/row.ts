@@ -1,11 +1,10 @@
 import { value, record, item } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
-import { Editor } from "../editor.js";
-
 import { RecordBox } from "./record.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { View, ViewType } from "../../base/view.js";
+import { Box } from "../../base/box.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
@@ -57,7 +56,7 @@ export class RowBox extends RecordBox {
 		}
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
-			let child = type.create(idx[name], this) as Editor;
+			let child = type.create(idx[name], this) as Box;
 			child.styles.add("field");
 		}
 	}
@@ -106,7 +105,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	if (range && !range.intersectsNode(content)) return model;
 	
 	for (let child of content.childNodes) {
-		let viewer = child["$control"] as Editor;
+		let viewer = child["$control"] as Box;
 		let value = viewer.valueOf(range);
 		if (value) {
 			if (!model) model = Object.create(null);

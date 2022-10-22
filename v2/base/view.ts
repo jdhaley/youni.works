@@ -1,5 +1,5 @@
 import { Receiver } from "./control.js";
-import { value, Type } from "./model.js";
+import { value, Type, contentType } from "./model.js";
 import { bundle, Bag } from "./util.js";
 
 export interface Content {
@@ -11,6 +11,7 @@ export interface Content {
 
 export interface View extends Receiver {
 	readonly type: ViewType;
+	readonly contentType: contentType;
 	readonly content: Content;
 	valueOf(filter?: unknown): value;
 }
@@ -22,6 +23,7 @@ export interface ViewType extends Type<View> {
 }
 
 export interface ViewOwner {
+	conf: bundle<any>;
 	types: bundle<ViewType>;
 	unknownType: ViewType;
 	defaultType: ViewType;

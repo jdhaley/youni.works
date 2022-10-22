@@ -3,11 +3,6 @@ import { Bag, Entity, Sequence } from "../base/util.js";
 import { ELE, NODE } from "../base/dom.js";
 import { BasePart, Owner, Receiver } from "../base/control.js";
 
-export interface NodeContent extends Content {
-	readonly contents: Sequence<NODE>
-	readonly node: NODE;
-}
-
 class ElementPart extends BasePart {
 	declare protected _ele: ELE;
 	[Symbol.iterator] = function* parts() {

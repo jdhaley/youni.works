@@ -1,5 +1,5 @@
 import { record } from "../../base/model.js";
-import { Editor } from "../../display/editor.js";
+import { Editor } from "../editor.js";
 
 import { RecordReplace } from "../commands/recordReplace.js";
 import { getEditor, senseChange } from "../util.js";

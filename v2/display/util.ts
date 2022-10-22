@@ -1,30 +1,22 @@
 import { ele, ELE, NODE, nodeOf, RANGE } from "../base/dom.js";
-import { getEditor } from "../edit/util.js";
-import { Editor } from "./editor.js";
+import { View } from "../base/view.js";
+
+import { Box } from "../base/box.js";
 import { ElementView, ElementViewType, VIEW_ELE } from "./view.js";
 
-export function getHeader(view: Editor, node: NODE) {
+export function getHeader(view: ElementView, node: NODE) {
 	while (node && node != view.node) {
 		if (node.nodeName == "HEADER" && node.parentNode == view.node) return node as ELE;
 		node = node.parentNode;
 	}
 }
 
-export function getFooter(view: Editor, node: NODE) {
+export function getFooter(view: ElementView, node: NODE) {
 	while (node && node != view.node) {
 		if (node.nodeName == "FOOTER" && node.parentNode == view.node) return node as ELE;
 		node = node.parentNode;
 	}
 }
-
-export function getChildEditor(editor: Editor, node: NODE): Editor {
-	if (node == editor.content.node) return null;
-	while (node?.parentNode != editor.content.node) {
-		node = node.parentNode;
-	}
-	if (ele(node) && node["$control"]) return node["$control"] as Editor;
-}
-
 
 interface NAVIGABLE_ELE extends ELE{
 	scrollIntoView(arg: any): void;
@@ -41,10 +33,10 @@ export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
 	}
 }
 function navigateInto(ele: ELE, isBack?: boolean) {
-	let editor = getEditor(ele);
-	if (!editor) return;
-	let content = editor.content.node as ELE;
-	switch (editor.contentType) {
+	let view = getView(ele);
+	if (!view) return;
+	let content = view.content.node as ELE;
+	switch (view.contentType) {
 		case "unit":
 			break;
 		case "record":
@@ -56,7 +48,7 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 			if (item) {
 				content = navigateInto(item);
 			} else {
-				content = editor["footer"];
+				content = view["footer"];
 			}
 			break;
 	}

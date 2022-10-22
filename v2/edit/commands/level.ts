@@ -1,4 +1,4 @@
-import { ItemEditor } from "../../display/editor.js";
+import { ItemEditor } from "../editor.js";
 
 import { Edit } from "./edit.js";
 import { getChildEditor, getEditor } from "../util.js";
@@ -17,8 +17,8 @@ export class LevelCommand extends Edit {
 		return range;
 	}
 	protected do(way: "Promote" | "Demote") {
-		let start = this.owner.getControl(this.startId) as ItemEditor;
-		let end = this.owner.getControl(this.endId) as ItemEditor;
+		let start = this.owner.getControl(this.startId) as any as ItemEditor;
+		let end = this.owner.getControl(this.endId) as any as ItemEditor;
 		if (start == end) {
 			way == "Promote" ? start.promote() : start.demote();
 		} else {

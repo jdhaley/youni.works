@@ -1,5 +1,5 @@
 import { value } from "../../base/model.js";
-import { Editor } from "../../display/editor.js";
+import { Editor } from "../editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
 import { clearContent, getChildEditor } from "../util.js";
@@ -54,7 +54,7 @@ export class ListReplace extends RangeReplace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		editor = editor.type.create(value) as Editor;
+		editor = editor.type.create(value);
 		let contents = editor.content.contents;
 		while (contents.length) {
 			range.insertNode(contents[0]); //this also removes the entry from the sequence.

@@ -1,5 +1,5 @@
 import { value, item } from "../../base/model.js";
-import { Editor, ItemEditor } from "../../display/editor.js";
+import { Editor, ItemEditor } from "../editor.js";
 
 import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
@@ -43,7 +43,7 @@ export class MarkupReplace extends ListReplace {
 			model.level = 0;
 		}
 		//Create the end line and add it after the command line.
-		let end = editor.type.create(model) as ItemEditor;
+		let end = editor.type.create(model) as any as ItemEditor;
 		ele(editor.node).after(end.node);
 		//We can now set the new range now that we have the end line.
 		range.setEnd(end.node, 0);

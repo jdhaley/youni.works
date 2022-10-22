@@ -1,12 +1,12 @@
 import { value, record } from "../../base/model.js";
-import { Editor } from "../editor.js";
 
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { View } from "../../base/view.js";
 import { getView } from "../util.js";
-import { EditorView } from "./box.js";
+import { ElementBox } from "./box.js";
+import { Box } from "../../base/box.js";
 
-export class RecordBox extends EditorView {
+export class RecordBox extends ElementBox {
 	memberType = "field";
 
 	get(name: string): View {
@@ -36,7 +36,7 @@ export class RecordBox extends EditorView {
 	}
 	protected viewMember(name: string, value: any): View {
 		let type = this.type.types[name];
-		let member = type.create(value, this) as Editor;
+		let member = type.create(value, this) as Box;
 		member.styles.add(this.memberType);
 		return member;
 	}
@@ -55,7 +55,7 @@ function recordContent(model: record, view: NODE, range: RANGE): record {
 	
 	for (let child of view.childNodes) {
 		if (ele(child)?.classList.contains("field")) {
-			let viewer = child["$control"] as Editor;
+			let viewer = child["$control"] as Box;
 			let value = viewer.valueOf(range);
 			if (value) {
 				if (!model) model = Object.create(null);

@@ -2,7 +2,7 @@ import { CommandBuffer } from "../base/command.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
 import { RemoteFileService } from "../base/remote.js";
 import { start } from "../base/type.js";
-import { Article, Editor } from "../display/editor.js";
+import { Article, Box } from "../base/box.js";
 import { ELE, RANGE } from "../base/dom";
 import { bundle, EMPTY } from "../base/util.js";
 
@@ -35,8 +35,8 @@ export class Display extends ElementViewOwner implements Article {
 	createElement(tagName: string): ELE {
 		return this.frame.createElement(tagName);
 	}
-	getControl(id: string): Editor {
-		return super.getControl(id) as Editor;
+	getControl(id: string): Box {
+		return super.getControl(id) as Box;
 	}
 	// getView(source: any): Editor {
 	// 	return super.getView(source) as Editor;

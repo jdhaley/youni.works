@@ -1,10 +1,11 @@
-import { Editor } from "../../display/editor.js";
+import { Editor } from "../editor.js";
 import { extend } from "../../base/util.js";
-import { getChildEditor, navigate } from "../../display/util.js";
+import { navigate } from "../../display/util.js";
 
 import { EditEvent, UserEvent, getClipboard } from "../../ui/ui.js";
 
 import list from "./list.js";
+import { getChildEditor } from "../util.js";
 
 //import { getChildEditor } from "../../display/util.js";
 

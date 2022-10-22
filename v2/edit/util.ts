@@ -1,13 +1,12 @@
-import { Editor } from "../display/editor.js";
+import { Change, Editor } from "./editor.js";
 import { ele, ELE, END_TO_END, nodeOf, RANGE, START_TO_START, NODE } from "../base/dom.js";
 import { getView, bindViewNode } from "../display/util.js";
-import { Change } from "../display/FROMVIEW.js";
-import { EditorView } from "../display/controls/box.js";
+import { ElementBox } from "../display/controls/box.js";
 
 export { getEditor, bindViewNode }
 
 //Hide the ViewBox return type so the implementation doesn't leak
-const getEditor = getView as (node: NODE | RANGE) => EditorView ;
+const getEditor = getView as (node: NODE | RANGE) => ElementBox ;
 
 export function getChildEditor(editor: Editor, node: NODE): Editor {
 	if (node == editor.content.node) return null;
@@ -165,5 +164,5 @@ export function rangeIterator(range: RANGE) {
 }
 
 export function senseChange(editor: Editor, commandName: string) {
-	editor.type.owner.sense(new Change(commandName, editor), editor.node as ELE);
+	editor.type.owner.sense(new Change(commandName, editor), editor.node);
 }

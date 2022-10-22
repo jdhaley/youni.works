@@ -1,11 +1,10 @@
-import { value, list } from "../../base/model.js";
+import { value, list, typeOf } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
-import { viewTypeOf } from "../FROMVIEW.js";
 import { getView } from "../util.js";
-import { EditorView } from "./box.js";
+import { ElementBox } from "./box.js";
 
-export class ListBox extends EditorView {
+export class ListBox extends ElementBox {
 	viewValue(model: list): void {
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type.types[viewTypeOf(item)];
@@ -47,4 +46,18 @@ export class ListBox extends EditorView {
 		let footer = this.node.ownerDocument.createElement("footer") as Element;
 		this._ele.append(footer);
 	}
+}
+
+export function viewTypeOf(value: any): string {
+	let type = typeOf(value);
+	switch (type) {
+		case "string":
+		case "number":
+		case "boolean":
+		case "date":
+		case "null":
+		case "unknown":
+			return "text";	//TODO "unit"
+	}
+	return type; //"list" or value.type$
 }

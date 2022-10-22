@@ -1,5 +1,5 @@
 import { value } from "../../base/model.js";
-import { Editor } from "../../display/editor.js";
+import { Editor } from "../editor.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/markupReplace.js";

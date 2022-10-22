@@ -1,7 +1,6 @@
 import { ELE, RANGE, NODE } from "../../base/dom.js";
-import { Editor } from "../../display/editor.js";
+import { Change, Editor } from "../editor.js";
 import { extend } from "../../base/util.js";
-import { Change } from "../../display/FROMVIEW.js";
 
 import { EditEvent, UserEvent, getClipboard, setClipboard } from "../../ui/ui.js";
 

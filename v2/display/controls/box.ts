@@ -1,26 +1,22 @@
-import { Actions } from "../../base/control";
-import { ele, ELE, RANGE } from "../../base/dom";
-import { contentType, value } from "../../base/model";
-import { bundle } from "../../base/util";
-import { viewTypes } from "../FROMVIEW";
-import { getView } from "../util";
-import { ElementView } from "../view";
+import { value } from "../../base/model.js";
+import { BoxType, Box } from "../../base/box.js";
+import { Actions } from "../../base/control.js";
+import { ele, ELE, RANGE } from "../../base/dom.js";
+import { bundle } from "../../base/util.js";
 
-import { ArticleType, Editor } from "../editor";
+import { getView } from "../util.js";
+import { ElementView } from "../view.js";
 
-type editor = (this: Editor, commandName: string, range: RANGE, content?: value) => RANGE;
+type editor = (this: Box, commandName: string, range: RANGE, content?: value) => RANGE;
 
-export abstract class EditorView extends ElementView implements Editor {
+export abstract class ElementBox extends ElementView implements Box {
 	constructor(actions: Actions, editor: editor) {
 		super();
 		this.actions = actions;
 		if (editor) this["edit"] = editor;
 	}
-	get type(): ArticleType {
-		return this._type as ArticleType;
-	}
-	get contentType(): contentType {
-		return viewTypes[this._type.conf.viewType];
+	get type(): BoxType {
+		return this._type as BoxType;
 	}
 	get shortcuts(): bundle<string> {
 		return this._type.conf.shortcuts;

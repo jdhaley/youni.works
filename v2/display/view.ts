@@ -1,10 +1,10 @@
-import { value } from "../base/model.js";
+import { contentType, value } from "../base/model.js";
 import { View, ViewOwner, ViewType } from "../base/view.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
-import { ELE, RANGE, ele } from "../base/dom.js";
+import { ELE, RANGE, ele, DomView, NodeContent } from "../base/dom.js";
 
-import { ElementContent, ElementOwner, NodeContent } from "./content.js";
+import { ElementContent, ElementOwner } from "./content.js";
 import { ElementShape } from "./shape.js";
 import { bindViewNode } from "./util.js";
 
@@ -14,7 +14,7 @@ export interface VIEW_ELE extends ELE {
 	$control?: View;
 }
 
-export abstract class ElementView extends ElementShape implements View {
+export abstract class ElementView extends ElementShape implements DomView {
 	declare _type: ViewType;
 	abstract viewValue(data: value): void;
 	abstract viewElement(content: ELE): void;
@@ -22,6 +22,9 @@ export abstract class ElementView extends ElementShape implements View {
 
 	get type(): ViewType {
 		return this._type;
+	}
+	get contentType(): contentType {
+		return this.type.owner.conf.contentTypes[this._type.conf.viewType];
 	}
 	get content(): NodeContent {
 		if (!this.isContainer) return this;

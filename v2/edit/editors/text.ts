@@ -1,4 +1,4 @@
-import { Editor } from "../../display/editor.js";
+import { Editor } from "../editor.js";
 
 import { getEditor, getHeader, mark, narrowRange, senseChange, unmark } from "../util.js";
 import { Replace } from "../commands/replace.js";

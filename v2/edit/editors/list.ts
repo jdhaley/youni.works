@@ -1,4 +1,4 @@
-import { Editor } from "../../display/editor.js";
+import { Editor } from "../editor.js";
 import { RANGE } from "../../base/dom.js";
 import { value } from "../../base/model.js";
 

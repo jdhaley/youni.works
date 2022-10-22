@@ -3,7 +3,7 @@ import { ele, ELE, RANGE } from "../../base/dom.js";
 
 import { unmark, bindViewNode, narrowRange, mark, getEditor, getChildEditor } from "../util.js";
 import { Replace } from "./replace.js";
-import { Editor } from "../../display/editor.js";
+import { Editor } from "../editor.js";
 
 export abstract class RangeReplace extends Replace {
 	startId: string;
@@ -67,11 +67,11 @@ export abstract class RangeReplace extends Replace {
 	protected replace(markup: string) {
 		let element = document.implementation.createDocument(null, "root").documentElement as ELE;
 		element.innerHTML = markup;
-		let editor = this.owner.getControl(this.viewId);
-		editor = editor.type.create(element) as Editor;
+		let view = this.owner.getControl(this.viewId);
+		view = view.type.create(element);
 		let range = this.getReplaceRange();
 		range.deleteContents();
-		let contents = editor.content.contents;
+		let contents = view.content.contents;
 		while (contents.length) {
 			let node = contents[0];
 			range.insertNode(node);
