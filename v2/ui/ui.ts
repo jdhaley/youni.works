@@ -10,9 +10,10 @@ import { section } from "../transform/item.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { ViewOwner, getView } from "../display/view.js";
+import { ElementViewOwner } from "../display/view.js";
+import { getView } from "../display/util.js";
 
-export class Display extends ViewOwner implements Article {
+export class Display extends ElementViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
 		this.frame = frame;
@@ -37,9 +38,9 @@ export class Display extends ViewOwner implements Article {
 	getControl(id: string): Editor {
 		return super.getControl(id) as Editor;
 	}
-	getView(source: any): Editor {
-		return super.getView(source) as Editor;
-	}
+	// getView(source: any): Editor {
+	// 	return super.getView(source) as Editor;
+	// }
 }
 
 export class Frame extends Owner<ELE> {

@@ -4,8 +4,9 @@ import { CommandBuffer } from "../base/command.js";
 import { Receiver, Graph, Actions } from "../base/control.js";
 import { bundle, Sequence } from "../base/util.js";
 import { ele, ELE, NODE, RANGE } from "../base/dom.js";
-import { ElementView, getView } from "./view.js";
+import { ElementView } from "./view.js";
 import { viewTypes } from "./FROMVIEW.js";
+import { getView } from "./util.js";
 
 export interface NodeContent extends Content {
 	readonly contents: Sequence<NODE>
@@ -39,8 +40,6 @@ export interface Article extends ViewOwner, Graph<NODE>, Receiver {
 	commands: CommandBuffer<RANGE>;
 
 	getControl(id: string): Editor;
-	getView(source: any): Editor;
-	//getNode(source: any): NODE;
 	setRange(extent: RANGE, collapse?: boolean): void;
 	createElement(tag: string): ELE;
 }

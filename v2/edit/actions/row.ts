@@ -2,12 +2,12 @@ import { extend } from "../../base/util.js";
 import { Editor } from "../../display/editor.js";
 import { RecordBox } from "../../display/controls/record.js";
 import { RowBox } from "../../display/controls/row.js";
-import { getHeader } from "../../display/util.js";
+import { getHeader, getView } from "../../display/util.js";
 import { UserEvent } from "../../ui/ui.js";
 import editable from "./editor.js";
-import { ElementView, getView } from "../../display/view.js";
+import { ElementView } from "../../display/view.js";
 import { Change } from "../../display/FROMVIEW.js";
-import { View } from "../../base/view.js";
+
 export default extend(editable, {
 	dblclick(this: RecordBox, event: UserEvent) {
 		event.subject = "";

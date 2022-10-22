@@ -2,16 +2,17 @@ import { value } from "../base/model.js";
 import { View, ViewType } from "../base/view.js";
 import { BaseType } from "../base/type.js";
 import { bundle } from "../base/util.js";
-import { ELE, ele, RANGE, nodeOf, NODE } from "../base/dom.js";
+import { ELE, RANGE, ele } from "../base/dom.js";
 
-import { Article, NodeContent } from "./editor.js";
 import { ElementContent, ElementOwner } from "./content.js";
 import { ElementShape } from "./shape.js";
-import { getEditor } from "../edit/util.js";
+import { bindViewNode } from "./util.js";
+
+import { Article, NodeContent } from "./editor.js";
 
 let NEXT_ID = 1;
 
-interface VIEW_ELE extends ELE {
+export interface VIEW_ELE extends ELE {
 	$control?: View;
 }
 
@@ -118,7 +119,7 @@ export class ElementViewType extends BaseType<View> implements ViewType {
 	}
 }
 
-export abstract class ViewOwner extends ElementOwner {
+export abstract class ElementViewOwner extends ElementOwner {
 	constructor(conf: bundle<any>) {
 		super();
 		/*
@@ -152,87 +153,4 @@ export abstract class ViewOwner extends ElementOwner {
 		}
 		return view.$control;
 	}
-	getView(source: any): View {
-		return getViewNode(source).$control;
-	}
-	// getNode(source: any): NODE {
-	// 	if (source instanceof ElementContent) return source.node;
-	// 	return nodeOf(source);
-	// }
-}
-
-export function bindViewNode(node: ELE): void {
-	let control: ElementView = node["$control"];
-	if (!control) {
-		let name = node.getAttribute("data-item");
-		let parent = getViewNode(node.parentNode) as VIEW_ELE;
-		if (name && parent) {
-			console.log("binding.");
-			let type = parent.$control.type.types[name] as ElementViewType;
-			if (type) {
-				control = Object.create(type.prototype);
-				control.control(node as any);
-			} else {
-				console.warn(`Bind failed: Type "${name}" not found in "${parent.getAttribute("data-item")}"`)
-			}
-		}
-	}
-
-	if (control) for (let child of control.contents) {
-		if (ele(child)) bindViewNode(child as ELE);
-	}
-}
-
-function getViewNode(loc: NODE | RANGE): VIEW_ELE {
-	for (let node = nodeOf(loc); node; node = node.parentNode) {
-		let e = ele(node);
-		if (e?.getAttribute("data-item")) {
-			if (!node["$control"]) {
-				console.warn("Unbound view.");
-				bindViewNode(e);
-			}
-			return e as VIEW_ELE;
-		}
-	}
-}
-export function getView(node: NODE | RANGE): ElementView {
-	let view = getViewNode(node)?.$control;
-	if (view instanceof ElementView) return view;
-}
-
-interface NAVIGABLE_ELE extends ELE{
-	scrollIntoView(arg: any): void;
-}
-export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
-	let editor = getView(start);
-	while (editor) {
-		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;
-		if (toEle) {
-			let next = navigateInto(toEle, isBack);
-			if (next) return next as NAVIGABLE_ELE;
-		}
-		editor = getView(editor.node.parentNode);
-	}
-}
-function navigateInto(ele: ELE, isBack?: boolean) {
-	let editor = getEditor(ele);
-	if (!editor) return;
-	let content = editor.content.node as ELE;
-	switch (editor.contentType) {
-		case "unit":
-			break;
-		case "record":
-			ele = isBack ? content.lastElementChild : content.firstElementChild;
-			if (ele) content = navigateInto(ele);
-			break;
-		case "list":
-			let item = isBack ? content.lastElementChild : content.firstElementChild;
-			if (item) {
-				content = navigateInto(item);
-			} else {
-				content = editor["footer"];
-			}
-			break;
-	}
-	return content;
 }

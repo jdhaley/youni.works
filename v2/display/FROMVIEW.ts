@@ -1,13 +1,13 @@
 
-// export interface Box extends Shape, Content, View, Entity<string> {
-// 	content: Content;
-// 	edit(commandName: string, range: Extent<unknown>, replacement?: value): Extent<unknown>;
-// }
-
 import { Signal } from "../base/control.js";
-import { contentType, typeOf } from "../base/model.js";
-import { bundle } from "../base/util.js";
-import { View } from "../base/view.js";
+import { contentType, typeOf, value } from "../base/model.js";
+import { Shape } from "../base/shape.js";
+import { bundle, Entity, Extent } from "../base/util.js";
+import { Content, View } from "../base/view.js";
+
+export interface Box extends Shape, Content, View, Entity<string> {
+	edit(commandName: string, range: Extent<unknown>, replacement?: value): Extent<unknown>;
+}
 
 export const viewTypes: bundle<contentType> = {
 	// "widget": "unit",

@@ -3,12 +3,11 @@ import { Editor } from "../../display/editor.js";
 import { extend } from "../../base/util.js";
 import { Change } from "../../display/FROMVIEW.js";
 
-import { getView, navigate } from "../../display/view.js";
-
 import { EditEvent, UserEvent, getClipboard, setClipboard } from "../../ui/ui.js";
 
 import view from "./view.js";
 import { getEditor } from "../util.js";
+import { navigate } from "../../display/util.js";
 
 let UNDONE = false;
 
@@ -113,7 +112,7 @@ export default extend(view, {
 	 	for (let ele of eles) ele.classList.remove("active");
 		let range = event.range;
 		for (let node of this.content.node.childNodes) {
-			let editor = getView(node);
+			let editor = getEditor(node);
 			if (range.intersectsNode(editor.content.node)) {
 				editor.content.styles.add("active");
 			}
