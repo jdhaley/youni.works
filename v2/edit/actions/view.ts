@@ -1,19 +1,19 @@
 import { extend } from "../../base/util.js";
-import { EditorView } from "../../display/editor.js";
+import { Editor } from "../../display/editor.js";
 
 import { UserEvent, setClipboard } from "../../ui/ui.js";
 
 export default extend(null, {
-	keydown(this: EditorView, event: UserEvent) {
+	keydown(this: Editor, event: UserEvent) {
 		event.shortcut = getShortcut(event);
 		event.subject = this.shortcuts[event.shortcut] || "keydown";
        // console.log(event.shortcut, event.subject);
 	},
-	save(this: EditorView, event: UserEvent) {
+	save(this: Editor, event: UserEvent) {
 		this.type.owner.receive(event);
 		event.subject = "";
 	},
-	copy(this: EditorView, event: UserEvent) {
+	copy(this: Editor, event: UserEvent) {
 		event.subject = "";
 		setClipboard(event.range, event.clipboardData);
 	}

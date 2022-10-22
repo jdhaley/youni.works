@@ -1,9 +1,10 @@
 import { value, record } from "../../base/model.js";
-import { Editor, EditorView } from "../editor.js";
+import { Editor } from "../editor.js";
 
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { View } from "../../base/view.js";
 import { getView } from "../util.js";
+import { EditorView } from "./box.js";
 
 export class RecordBox extends EditorView {
 	memberType = "field";

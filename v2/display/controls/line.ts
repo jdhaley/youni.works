@@ -2,7 +2,6 @@ import { item } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { ElementViewType } from "../view.js";
 import { TextBox } from "./text.js";
-import { ArticleType } from "../editor.js";
 import { getView } from "../util.js";
 
 export class LineBox extends TextBox {
