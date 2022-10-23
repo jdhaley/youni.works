@@ -1,6 +1,6 @@
 import { extend } from "../../base/util.js";
 import { RecordBox } from "../controls/record.js";
-import { UserEvent } from "../ui.js";
+import { UserEvent } from "../frame";
 import editable from "./editor.js";
 
 import { getHeader } from "../util.js";

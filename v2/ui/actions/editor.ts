@@ -2,9 +2,11 @@ import { RANGE, NODE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 import { getView } from "../../base/domview.js";
 
-import { UserEvent, getClipboard, setClipboard, EditEvent, Box } from "../ui.js";
+import { Box } from "../box.js";
+import { getClipboard, setClipboard } from "../util.js";
 
 import view from "./view.js";
+import { EditEvent, UserEvent } from "../frame.js";
 
 const EDIT_MAPPING = {
 	"insertText": "insertText",
@@ -14,6 +16,7 @@ const EDIT_MAPPING = {
 	"deleteContentForward": "delete",
 	"deleteContentBackward": "erase",
 }
+
 export default extend(view, {
 	beforeinput(event: EditEvent) {
 		let subject = EDIT_MAPPING[event.inputType];

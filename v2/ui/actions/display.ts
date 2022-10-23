@@ -1,9 +1,10 @@
 import { ELE } from "../../base/dom.js";
-import {Response} from "../../base/message.js";
-import {extend} from "../../base/util.js";
+import { Response } from "../../base/message.js";
+import { extend } from "../../base/util.js";
 import { Change, ViewType } from "../../base/view.js";
+import { UserEvent } from "../frame.js";
 
-import {Box, Display, UserEvent} from "../ui.js";
+import { Box, Display } from "../box.js";
 
 export default extend(null, {
 	open(this: Display, res: Response<string>) {

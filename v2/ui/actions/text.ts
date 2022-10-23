@@ -1,6 +1,8 @@
 import { CHAR, extend } from "../../base/util.js";
 
-import { Box, EditEvent, UserEvent, setClipboard } from "../ui.js";
+import { Box } from "../box.js";
+import { EditEvent, UserEvent } from "../frame.js";
+import { setClipboard } from "../util.js";
 import editable from "./editor.js";
 
 export default extend(editable, {

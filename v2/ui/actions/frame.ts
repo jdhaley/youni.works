@@ -1,7 +1,7 @@
 import { Actions } from "../../base/control.js";
 import { ELE, NODE, nodeOf, RANGE } from "../../base/dom.js";
 
-import { Frame, UserEvent } from "../ui.js";
+import { Frame, UserEvent } from "../frame.js";
 
 export default {
     mousedown: trackEvent,    

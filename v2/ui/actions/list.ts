@@ -1,8 +1,9 @@
-import {extend} from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom";
+import { extend } from "../../base/util.js";
 
-import {Box, EditEvent, UserEvent} from "../ui.js";
-import {getFooter, getHeader} from "../util.js";
+import { Box } from "../box.js";
+import { EditEvent, UserEvent } from "../frame.js";
+import { getFooter, getHeader } from "../util.js";
 import editable from "./editor.js";
 
 export default extend(editable, {

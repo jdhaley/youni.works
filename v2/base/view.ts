@@ -19,7 +19,7 @@ export interface View extends Receiver {
 
 export class ViewType extends BaseType<View> {
 	owner: ViewOwner;
-	create(value?: value, container?: Content): View {
+	create(value?: value): View {
 		return super.create();
 	}
 }

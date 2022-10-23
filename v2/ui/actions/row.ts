@@ -4,7 +4,8 @@ import { getView } from "../../base/domview.js";
 
 import { RowBox } from "../controls/row.js";
 import { getHeader } from "../util.js";
-import { Box, UserEvent } from "../ui.js";
+import { Box } from "../box.js";
+import { UserEvent } from "../frame.js";
 
 import editable from "./editor.js";
 

@@ -2,8 +2,8 @@ import { value, record } from "../../base/model.js";
 import { getView } from "../../base/domview.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 
+import { Box } from "../box.js";
 import { ElementBox } from "./box.js";
-import { Box } from "../ui.js";
 
 export class RecordBox extends ElementBox {
 	memberType = "field";

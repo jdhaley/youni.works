@@ -1,8 +1,9 @@
 import { ele, NODE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
-import { Box, EditEvent, UserEvent, getClipboard } from "../ui.js";
-import { navigate } from "../util.js";
+import { Box } from "../box.js";
+import { EditEvent, UserEvent } from "../frame.js";
+import { navigate, getClipboard } from "../util.js";
 
 import list from "./list.js";
 

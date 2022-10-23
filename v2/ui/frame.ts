@@ -1,51 +1,6 @@
-import { CommandBuffer } from "../base/command.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
-import { Article, Editable, getView } from "../base/domview.js";
 import { ELE, RANGE } from "../base/dom";
-import { RemoteFileService } from "../base/remote.js";
-import { start } from "../base/type.js";
-import { bundle, EMPTY } from "../base/util.js";
-
-import { section } from "../transform/item.js";
-import { fromHtml } from "../transform/fromHtml.js";
-import { toHtml } from "../transform/toHtml.js";
-
-import { ElementViewOwner } from "../control/view.js";
-import { Shape } from "../base/shape.js";
-
-export interface Box extends Editable, Shape {
-	readonly shortcuts: bundle<string>;
-}
-
-export class Display extends ElementViewOwner implements Article {
-	constructor(frame: Frame, conf: bundle<any>) {
-		super(conf);
-		this.frame = frame;
-		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		this.commands = new CommandBuffer();
-		start(this);
-	}
-	readonly frame: Frame;
-	readonly service: RemoteFileService;
-	readonly commands: CommandBuffer<RANGE>;
-
-	/* Supports the Article interface (which has no owner dependency) */
-	setRange(range: RANGE, collapse?: boolean): void {
-		if (range) {
-			if (collapse) range.collapse();
-			this.frame.selectionRange = range;
-		}
-	}
-	createElement(tagName: string): ELE {
-		return this.frame.createElement(tagName);
-	}
-	getControl(id: string): Box {
-		return super.getControl(id) as Box;
-	}
-	// getView(source: any): Editor {
-	// 	return super.getView(source) as Editor;
-	// }
-}
+import { EMPTY } from "../base/util.js";
 
 export class Frame extends Owner<ELE> {
 	constructor(window: Window, actions: Actions) {
@@ -122,6 +77,7 @@ export interface EditEvent extends Signal, InputEvent {
 	//selection events (selection, keyboard, clipboard)
 	range: RANGE;
 }
+
 export interface UserEvent extends Signal, UIEvent {
 	frame: Frame;
 	source: ELE;
@@ -151,34 +107,4 @@ export interface UserEvent extends Signal, UIEvent {
     y?: number;
 
 	target: any;
-}
-
-export function getClipboard(clipboard: DataTransfer) {
-	let data = clipboard.getData("application/json");
-	if (data) return JSON.parse(data);
-	data = clipboard.getData("text/html");
-	if (data) {
-		let div = document.createElement("div");
-		div.innerHTML = data;
-		console.log("HTML: ", div);
-		return fromHtml(div) as any;
-	}
-	return clipboard.getData("text/plain");
-}
-
-export function setClipboard(range: RANGE, clipboard: DataTransfer) {
-	let control = getView(range);
-	let model = control?.valueOf(range);
-	if (!model) return;
-	if (typeof model == "string") {
-		clipboard.setData("text/plain", model);
-		return;
-	}
-	if (control.type["conf"].viewType == "markup") {
-		let item = section(model as any);
-		let article = toHtml(item);
-		clipboard.setData("text/html", article.outerHTML);
-	}
-	if (!(model instanceof Array)) model = [model];
-	clipboard.setData("application/json", JSON.stringify(model || null));
 }

@@ -7,7 +7,7 @@ import { bundle } from "../../base/util.js";
 import { ElementView } from "../../control/view.js";
 import { viewContent } from "../../transform/content.js";
 import { ElementContent } from "../../control/content.js";
-import { Box } from "../ui.js";
+import { Box } from "../box.js";
 
 type editor = (this: Box, commandName: string, range: RANGE, content?: value) => RANGE;
 

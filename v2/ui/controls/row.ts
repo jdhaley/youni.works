@@ -1,10 +1,10 @@
+import { View, ViewType } from "../../base/view.js";
+import { ELE, RANGE } from "../../base/dom.js";
 import { value, record, item } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
+import { Box } from "../box.js";
 import { RecordBox } from "./record.js";
-import { ELE, RANGE } from "../../base/dom.js";
-import { View, ViewType } from "../../base/view.js";
-import { Box } from "../ui.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
