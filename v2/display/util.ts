@@ -1,6 +1,5 @@
-import { ele, ELE, NODE, RANGE } from "../base/dom.js";
-import { Box, getViewNode, VIEW_ELE } from "../base/box.js";
-import { ElementView } from "./view.js";
+import { ELE, NODE, RANGE } from "../base/dom.js";
+import { Box, getView } from "../base/box.js";
 
 export function getHeader(view: Box, node: NODE) {
 	while (node && node != view.node) {
@@ -51,20 +50,4 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 			break;
 	}
 	return content;
-}
-
-export function getView(node: NODE | RANGE): ElementView {
-	let viewNode = getViewNode(node) as VIEW_ELE;
-	if (viewNode?.$control instanceof ElementView) return viewNode.$control;
-}
-export function getBox(node: NODE | RANGE): Box {
-	let viewNode = getViewNode(node) as VIEW_ELE;
-	if (viewNode?.$control instanceof ElementView) return viewNode.$control as any;
-}
-export function getChildBox(editor: Box, node: NODE): Box {
-	if (node == editor.content.node) return null;
-	while (node?.parentNode != editor.content.node) {
-		node = node.parentNode;
-	}
-	if (ele(node) && node["$control"]) return node["$control"] as Box;
 }

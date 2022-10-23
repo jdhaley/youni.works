@@ -1,8 +1,8 @@
 import { Editor } from "../editor.js";
 
-import { getEditor, getHeader, mark, narrowRange, senseChange, unmark } from "../util.js";
+import { getEditor, mark, narrowRange, senseChange, unmark } from "../util.js";
 import { Replace } from "../commands/replace.js";
-import { ele, RANGE } from "../../base/dom.js";
+import { ele, NODE, RANGE } from "../../base/dom.js";
 
 export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): RANGE {
 	if (getEditor(range) != this) console.warn("Invalid edit range");
@@ -133,32 +133,15 @@ function endagain(range: RANGE, cmd: Replace) {
 	return range;
 }
 
-// function markText(range: Range) {
-// 	let node = range.commonAncestorContainer;
-// 	let text = node.textContent;
-// 	let out = text.substring(0, range.startOffset) + CHAR.STX;
-// 	out += text.substring(range.startOffset, range.endOffset);
-// 	out += CHAR.ETX + text.substring(range.endOffset);
-// 	node.textContent = out;
-// 	console.log("mark:", out, range)
-// }
-// function unmarkText(range: Range) {
-// 	let node = range.commonAncestorContainer;
-// 	let text = node.textContent;
-// 	let start = text.indexOf(CHAR.STX);
-// 	let end = text.indexOf(CHAR.ETX);
-// 	let out = text.substring(0, start);
-// 	out += text.substring(start + 1, end);
-// 	out += text.substring(end + 1);
-// 	node.textContent = out;
-// 	range.setStart(node, start);
-// 	range.setEnd(node, end);
-
-// 	console.log("unmark:", out, range)
-// }
+function inHeader(view: Editor, node: NODE): boolean {
+	while (node && node != view.node) {
+		if (node.nodeName == "HEADER" && node.parentNode == view.node) return true;
+		node = node.parentNode;
+	}
+}
 
 function positionToText(range: RANGE) {
-	let inHeader = getHeader(getEditor(range), range.startContainer);
+	let hdr = inHeader(getEditor(range), range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
 		let content = getEditor(range).content.node;
@@ -168,7 +151,7 @@ function positionToText(range: RANGE) {
 		}
 		if (ele(range.commonAncestorContainer)) {
 			range.selectNodeContents(content.childNodes[content.childNodes.length - 1] || content);
-			range.collapse(inHeader ? true : false);	
+			range.collapse(hdr ? true : false);	
 		}
 	}
 }

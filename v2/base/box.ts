@@ -44,19 +44,6 @@ export interface VIEW_ELE extends ELE {
 	$control?: DomView;
 }
 
-export function getViewNode(loc: NODE | RANGE): VIEW_ELE {
-	for (let node = nodeOf(loc); node; node = node.parentNode) {
-		let e = ele(node);
-		if (e?.getAttribute("data-item")) {
-			if (!node["$control"]) {
-				console.warn("Unbound view.");
-				//bindViewNode(e);
-			}
-			return e;
-		}
-	}
-}
-
 export function getView(loc: NODE | RANGE): DomView {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	loc = loc instanceof Node ? loc : null;

@@ -1,9 +1,10 @@
 import { extend } from "../../base/util.js";
 import { Change } from "../../base/view.js";
-import { Box } from "../../base/box.js";
+import { Box, getView } from "../../base/box.js";
+
+import { getHeader } from "../../display/util.js";
 
 import { RowBox } from "../controls/row.js";
-import { getBox, getHeader, getView } from "../../display/util.js";
 import { UserEvent } from "../ui.js";
 
 import editable from "./editor.js";
@@ -45,7 +46,7 @@ export default extend(editable, {
 		if (!range.collapsed) return;
 		if (this instanceof RowBox && this == this.rowHeader) {
 				event.subject = "";
-				addCol(this, getBox(range));
+				addCol(this, getView(range) as Box);
 		}
 	}
 });

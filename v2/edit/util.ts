@@ -23,27 +23,27 @@ export function narrowRange(range: RANGE) {
 	let start = range.startContainer;
 	let end = range.endContainer;
 	let content = getView(range).content.node;
-	if (getHeader(editor, start)) {;
+	if (inHeader(editor, start)) {;
 		range.setStart(content, 0);
 	}
-	if (getFooter(editor, start)) {
+	if (inFooter(editor, start)) {
 		range.setStart(content, content.childNodes.length);
 	}
-	if (getFooter(editor, end)) {
+	if (inFooter(editor, end)) {
 		range.setEnd(content, content.childNodes.length);
 	}
 }
 
-export function getHeader(view: Editor, node: NODE) {
+function inHeader(view: Editor, node: NODE): boolean {
 	while (node && node != view.node) {
-		if (node.nodeName == "HEADER" && node.parentNode == view.node) return node as ELE;
+		if (node.nodeName == "HEADER" && node.parentNode == view.node) return true;
 		node = node.parentNode;
 	}
 }
 
-export function getFooter(view: Editor, node: NODE) {
+function inFooter(view: Editor, node: NODE): boolean {
 	while (node && node != view.node) {
-		if (node.nodeName == "FOOTER" && node.parentNode == view.node) return node as ELE;
+		if (node.nodeName == "FOOTER" && node.parentNode == view.node) return true;
 		node = node.parentNode;
 	}
 }

@@ -5,8 +5,7 @@ import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 
 import list from "./list.js";
 import { Box } from "../../base/box.js";
-
-import { getChildBox } from "../../display/util.js";
+import { ele, NODE } from "../../base/dom.js";
 
 export default extend(list, {
 	paste(this: Box, event: UserEvent) {
@@ -85,6 +84,14 @@ export default extend(list, {
 		this.edit("Insert", range, [item]);
 	}
 });
+
+export function getChildBox(editor: Box, node: NODE): Box {
+	if (node == editor.content.node) return null;
+	while (node?.parentNode != editor.content.node) {
+		node = node.parentNode;
+	}
+	if (ele(node) && node["$control"]) return node["$control"] as Box;
+}
 
 // function createItem(refNode: Editor): item {
 // 	let item: item;

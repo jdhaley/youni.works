@@ -1,17 +1,15 @@
 import { value, record } from "../../base/model.js";
-
+import { Box, getView } from "../../base/box.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
-import { View } from "../../base/view.js";
-import { getView } from "../../display/util.js";
+
 import { ElementBox } from "./box.js";
-import { Box } from "../../base/box.js";
 
 export class RecordBox extends ElementBox {
 	memberType = "field";
 
-	get(name: string): View {
+	get(name: string): Box {
 		for (let node of this.content.contents) {
-			let view = getView(node);
+			let view = getView(node) as Box;
 			if (name == view?.type.name) return view;
 		}
 	}
@@ -34,7 +32,7 @@ export class RecordBox extends ElementBox {
 			this.viewMember(name, idx[name]);
 		}
 	}
-	protected viewMember(name: string, value: any): View {
+	protected viewMember(name: string, value: any): Box {
 		let type = this.type.types[name];
 		let member = type.create(value, this) as Box;
 		member.styles.add(this.memberType);

@@ -1,9 +1,9 @@
 import { CommandBuffer } from "../base/command.js";
 import { Signal, Actions, Control, Owner } from "../base/control.js";
+import { Article, Box, getView } from "../base/box.js";
+import { ELE, RANGE } from "../base/dom";
 import { RemoteFileService } from "../base/remote.js";
 import { start } from "../base/type.js";
-import { Article, Box } from "../base/box.js";
-import { ELE, RANGE } from "../base/dom";
 import { bundle, EMPTY } from "../base/util.js";
 
 import { section } from "../transform/item.js";
@@ -11,7 +11,6 @@ import { fromHtml } from "../transform/fromHtml.js";
 import { toHtml } from "../transform/toHtml.js";
 
 import { ElementViewOwner } from "../display/view.js";
-import { getView } from "../display/util.js";
 
 export class Display extends ElementViewOwner implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {
