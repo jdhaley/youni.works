@@ -2,7 +2,7 @@ import { value, record } from "../../base/model.js";
 
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { View } from "../../base/view.js";
-import { getView } from "../util.js";
+import { getView } from "../../display/util.js";
 import { ElementBox } from "./box.js";
 import { Box } from "../../base/box.js";
 

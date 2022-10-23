@@ -1,13 +1,12 @@
 import {extend} from "../../base/util.js";
-import {EditEvent, UserEvent} from "../../ui/ui.js";
+import {EditEvent, UserEvent} from "../ui.js";
 import {getFooter, getHeader} from "../../display/util.js";
 import editable from "./editor.js";
-import { Editor } from "../editor.js";
 import { ELE, RANGE } from "../../base/dom";
-import { ElementView } from "../../display/view.js";
+import { Box } from "../../base/box.js";
 
 export default extend(editable, {
-	dblclick(this: ElementView, event: UserEvent) {
+	dblclick(this: Box, event: UserEvent) {
 		let header = getHeader(this, event.target as Node);
 		if (header) {
 			event.subject = "";
@@ -18,7 +17,7 @@ export default extend(editable, {
 			}
 		}
 	},
-	insertText(this: ElementView, event: EditEvent) {
+	insertText(this: Box, event: EditEvent) {
 		if (getFooter(this, event.range.commonAncestorContainer)) {
 			event.subject = "";
 			let model = {

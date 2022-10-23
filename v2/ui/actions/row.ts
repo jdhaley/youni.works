@@ -1,12 +1,12 @@
 import { extend } from "../../base/util.js";
 import { Change } from "../../base/view.js";
-
-import { RowBox } from "../../display/controls/row.js";
-import { getHeader, getView } from "../../display/util.js";
-import { UserEvent } from "../../ui/ui.js";
-import editable from "./editor.js";
-import { ElementView } from "../../display/view.js";
 import { Box } from "../../base/box.js";
+
+import { RowBox } from "../controls/row.js";
+import { getBox, getHeader, getView } from "../../display/util.js";
+import { UserEvent } from "../ui.js";
+
+import editable from "./editor.js";
 
 export default extend(editable, {
 	dblclick(this: RowBox, event: UserEvent) {
@@ -45,12 +45,12 @@ export default extend(editable, {
 		if (!range.collapsed) return;
 		if (this instanceof RowBox && this == this.rowHeader) {
 				event.subject = "";
-				addCol(this, getView(range));
+				addCol(this, getBox(range));
 		}
 	}
 });
 
-function addCol(editor: RowBox, col: ElementView) {
+function addCol(editor: RowBox, col: Box) {
 	let contents = editor.content.contents;
 	for (let i = 0; i < contents.length; i++) {
 		if (contents[i] == col.node) {

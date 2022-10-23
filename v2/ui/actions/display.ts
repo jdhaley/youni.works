@@ -2,7 +2,7 @@ import {Response} from "../../base/message.js";
 
 import {extend} from "../../base/util.js";
 
-import {Display, UserEvent} from "../../ui/ui.js";
+import {Display, UserEvent} from "../ui.js";
 
 export default extend(null, {
 	open(this: Display, res: Response<string>) {

@@ -1,14 +1,15 @@
 import { bundle } from "../../base/util.js";
 
-import { TextBox } from "../../display/controls/text.js";
-import { RecordBox } from "../../display/controls/record.js";
-import { ListBox } from "../../display/controls/list.js";
-import { LineBox } from "../../display/controls/line.js";
-import { RowBox } from "../../display/controls/row.js";
+import { TextBox } from "../controls/text.js";
+import { RecordBox } from "../controls/record.js";
+import { ListBox } from "../controls/list.js";
+import { LineBox } from "../controls/line.js";
+import { RowBox } from "../controls/row.js";
 
 import { ElementViewType } from "../../display/view.js";
-import edit from "../../edit/conf/edit.js";
-import actions from "../../edit/conf/actions.js";
+
+import edit from "./edit.js";
+import actions from "./actions.js";
 import shortcuts from "./shortcuts.js";
 
 export interface TypeConf {

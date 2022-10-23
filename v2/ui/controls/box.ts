@@ -4,7 +4,7 @@ import { Actions } from "../../base/control.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
-import { ElementView } from "../view.js";
+import { ElementView } from "../../display/view.js";
 import { viewContent } from "../../transform/content.js";
 
 type editor = (this: Box, commandName: string, range: RANGE, content?: value) => RANGE;

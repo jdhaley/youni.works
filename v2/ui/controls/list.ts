@@ -1,7 +1,7 @@
 import { value, list, typeOf } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
-import { getView } from "../util.js";
+import { getView } from "../../display/util.js";
 import { ElementBox } from "./box.js";
 
 export class ListBox extends ElementBox {

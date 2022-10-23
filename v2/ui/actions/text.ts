@@ -1,11 +1,11 @@
-import { Editor } from "../editor.js";
+import { Box } from "../../base/box.js";
 import { CHAR, extend } from "../../base/util.js";
-import { EditEvent, UserEvent, setClipboard } from "../../ui/ui.js";
+import { EditEvent, UserEvent, setClipboard } from "../ui.js";
 
 import editable from "./editor.js";
 
 export default extend(editable, {
-	cut(this: Editor, event: UserEvent) {
+	cut(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) return;
@@ -13,7 +13,7 @@ export default extend(editable, {
 		range = this.edit("Cut", range);
 		range && this.type.owner.setRange(range, true);
 	},
-	paste(this: Editor, event: UserEvent) {
+	paste(this: Box, event: UserEvent) {
 		event.subject = "";
 		let text = event.clipboardData.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
@@ -21,7 +21,7 @@ export default extend(editable, {
 		range = this.edit("Paste", range, text);
 		range && this.type.owner.setRange(range, true);
 	},
-	replaceText(this: Editor, event: EditEvent) {
+	replaceText(this: Box, event: EditEvent) {
 		event.subject = "";
 		let text = event.dataTransfer.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to replace.
@@ -29,7 +29,7 @@ export default extend(editable, {
 		range = this.edit("Replace", range, text);
 		range && this.type.owner.setRange(range, true);
 	},
-	insertText(this: Editor, event: EditEvent) {
+	insertText(this: Box, event: EditEvent) {
 		event.subject = "";
 		let char = event.data;
 		let range = event.range;
@@ -61,14 +61,14 @@ export default extend(editable, {
 	deleteWordBackward(event: EditEvent) {
 		event.subject = "deleteWordForward";
 	},
-	erase(this: Editor, event: UserEvent) {
+	erase(this: Box, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) return;
 		range = this.edit("Erase", range, "");
 		range && this.type.owner.setRange(range, true);
 	},
-	delete(this: Editor, event: UserEvent) {
+	delete(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;

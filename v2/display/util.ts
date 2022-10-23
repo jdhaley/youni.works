@@ -2,14 +2,14 @@ import { ele, ELE, NODE, RANGE } from "../base/dom.js";
 import { Box, getViewNode, VIEW_ELE } from "../base/box.js";
 import { ElementView, ElementViewType } from "./view.js";
 
-export function getHeader(view: ElementView, node: NODE) {
+export function getHeader(view: Box, node: NODE) {
 	while (node && node != view.node) {
 		if (node.nodeName == "HEADER" && node.parentNode == view.node) return node as ELE;
 		node = node.parentNode;
 	}
 }
 
-export function getFooter(view: ElementView, node: NODE) {
+export function getFooter(view: Box, node: NODE) {
 	while (node && node != view.node) {
 		if (node.nodeName == "FOOTER" && node.parentNode == view.node) return node as ELE;
 		node = node.parentNode;
@@ -83,4 +83,11 @@ export function getView(node: NODE | RANGE): ElementView {
 export function getBox(node: NODE | RANGE): Box {
 	let viewNode = getViewNode(node) as VIEW_ELE;
 	if (viewNode?.$control instanceof ElementView) return viewNode.$control as any;
+}
+export function getChildBox(editor: Box, node: NODE): Box {
+	if (node == editor.content.node) return null;
+	while (node?.parentNode != editor.content.node) {
+		node = node.parentNode;
+	}
+	if (ele(node) && node["$control"]) return node["$control"] as Box;
 }

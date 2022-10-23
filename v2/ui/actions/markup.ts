@@ -1,23 +1,22 @@
-import { Editor } from "../editor.js";
 import { extend } from "../../base/util.js";
 import { navigate } from "../../display/util.js";
 
-import { EditEvent, UserEvent, getClipboard } from "../../ui/ui.js";
+import { EditEvent, UserEvent, getClipboard } from "../ui.js";
 
 import list from "./list.js";
-import { getChildEditor } from "../util.js";
+import { Box } from "../../base/box.js";
 
-//import { getChildEditor } from "../../display/util.js";
+import { getChildBox } from "../../display/util.js";
 
 export default extend(list, {
-	paste(this: Editor, event: UserEvent) {
+	paste(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
 		range = this.edit("Paste", range, model);
 		range &&  this.type.owner.setRange(range, true);
 	},
-	insertText(this: Editor, event: EditEvent) {
+	insertText(this: Box, event: EditEvent) {
 		event.subject = "";
 		let model = {
 			"type$": "para",
@@ -26,7 +25,7 @@ export default extend(list, {
 		let range = this.edit("Entry", event.range, [model]);
 		range &&  this.type.owner.setRange(range, true);
 	},
-	split(this: Editor, event: UserEvent) {
+	split(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = null;
@@ -49,13 +48,13 @@ export default extend(list, {
 		}
 		range && this.type.owner.setRange(range, true);
 	},
-	join(this: Editor, event: UserEvent) {
+	join(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		range = this.edit("Join", range, "");
 		range && this.type.owner.setRange(range, true);
 	},
-	next(this: Editor, event: UserEvent) {
+	next(this: Box, event: UserEvent) {
 		event.subject = "";
 		if (event.altKey || event.ctrlKey) {
 			nav(event);
@@ -63,7 +62,7 @@ export default extend(list, {
 			this.edit("Demote", event.range);
 		}
 	},
-	previous(this: Editor, event: UserEvent) {
+	previous(this: Box, event: UserEvent) {
 		event.subject = "";
 		if (event.altKey || event.ctrlKey) {
 			nav(event, true);
@@ -71,11 +70,11 @@ export default extend(list, {
 			this.edit("Promote", event.range);
 		}
 	},
-	insert(this: Editor, event: UserEvent) {
+	insert(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) return;
-		let current = getChildEditor(this, range.commonAncestorContainer);
+		let current = getChildBox(this, range.commonAncestorContainer);
 		if (!current) return;
 		//let item = createItem(current);
 		let item = {

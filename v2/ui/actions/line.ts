@@ -1,12 +1,12 @@
+import { Box } from "../../base/box.js";
 import { extend } from "../../base/util.js";
-import { Editor } from "../editor.js";
 
-import { UserEvent, getClipboard } from "../../ui/ui.js";
+import { UserEvent, getClipboard } from "../ui.js";
 
 import text from "./text.js";
 
 export default extend(text, {
-	paste(this: Editor, event: UserEvent) {
+	paste(this: Box, event: UserEvent) {
 		let x = getClipboard(event.clipboardData);
 		if (x instanceof Array) return;
 		event.subject = "";
@@ -16,7 +16,7 @@ export default extend(text, {
 		range = this.edit("Paste", range, text);
 		range && this.type.owner.setRange(range, true);
 	},
-	erase(this: Editor, event: UserEvent) {
+	erase(this: Box, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) {
@@ -30,7 +30,7 @@ export default extend(text, {
 			range && this.type.owner.setRange(range, true);	
 		}
 	},
-	delete(this: Editor, event: UserEvent) {
+	delete(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) {

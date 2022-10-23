@@ -1,11 +1,11 @@
-import { ELE, RANGE, NODE } from "../../base/dom.js";
+import { RANGE, NODE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 import { Box } from "../../base/box.js";
 
-import { UserEvent, getClipboard, setClipboard, EditEvent } from "../../ui/ui.js";
+import { UserEvent, getClipboard, setClipboard, EditEvent } from "../ui.js";
 
 import view from "./view.js";
-import { getBox, getView } from "../../display/util.js";
+import { getBox } from "../../display/util.js";
 
 const EDIT_MAPPING = {
 	"insertText": "insertText",
