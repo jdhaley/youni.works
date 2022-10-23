@@ -1,15 +1,61 @@
+import { BasePart, Owner, Receiver } from "../base/control.js";
 import { ELE } from "../base/dom.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { EMPTY } from "../base/util.js";
-import { ElementContent } from "./content.js";
 
+
+export class ElementOwner extends Owner<ELE> {
+	getControlOf(node: ELE): Receiver {
+		return node["$control"];
+	}
+	getContainerOf(node: ELE): ELE {
+		for (let parent = node.parentNode; parent; parent = parent.parentNode) {
+			if (parent["$control"]) return parent as ELE;
+		}
+	}
+	getPartsOf(node: ELE): Iterable<ELE> {
+		return node.children as Iterable<ELE>;
+	}
+}
+
+class ElementPart extends BasePart {
+	declare protected _ele: ELE;
+	[Symbol.iterator] = function* parts() {
+		const nodes = this._ele.childNodes;
+		for (let i = 0, len = nodes.length; i < len; i++) {
+			let node = nodes[i];
+			if (node["$control"]) yield node["$control"];
+		}
+	}
+
+	get partOf(): ElementPart {
+		for (let node = this._ele as ELE; node; node = node.parentNode as ELE) {
+			let control = node["$control"];
+			if (control) return control;
+		}
+	}
+
+	control(node: Element) {
+		if (node["$control"]) {
+			this.uncontrol(node);
+		}
+		node["$control"] = this;
+		this._ele = node;
+	}
+	uncontrol(node: Element) {
+		if (node["$control"]) {
+			throw new Error("Node is already controlled.");
+		}
+	}
+}
 
 interface SHAPE_ELE extends ELE {
 	getBoundingClientRect(): Area;
 	style: CSSStyleDeclaration;
 }
 
-export class ElementShape extends ElementContent implements Shape {
+
+export class ElementShape extends ElementPart implements Shape {
 	declare protected _ele: SHAPE_ELE;
 	get area(): Area {
 		return this._ele.getBoundingClientRect();

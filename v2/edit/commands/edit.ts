@@ -1,4 +1,4 @@
-import { Article } from "../../base/box.js";
+import { Article } from "../../base/domview.js";
 import { Command } from "../../base/command.js";
 import { RANGE } from "../../base/dom.js";
 

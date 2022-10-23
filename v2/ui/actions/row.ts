@@ -1,11 +1,10 @@
 import { extend } from "../../base/util.js";
 import { Change } from "../../base/view.js";
-import { Box, getView } from "../../base/box.js";
-
-import { getHeader } from "../../display/util.js";
+import { getView } from "../../base/domview.js";
 
 import { RowBox } from "../controls/row.js";
-import { UserEvent } from "../ui.js";
+import { getHeader } from "../util.js";
+import { Box, UserEvent } from "../ui.js";
 
 import editable from "./editor.js";
 

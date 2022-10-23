@@ -1,7 +1,6 @@
-import { Box } from "../../base/box.js";
 import { extend } from "../../base/util.js";
 
-import { UserEvent, getClipboard } from "../ui.js";
+import { Box, UserEvent, getClipboard } from "../ui.js";
 
 import text from "./text.js";
 

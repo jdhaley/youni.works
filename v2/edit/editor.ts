@@ -1,4 +1,4 @@
-import { Editable } from "../base/box.js";
+import { Editable } from "../base/domview.js";
 
 export interface Editor extends Editable {
 }

@@ -1,11 +1,10 @@
+import { ele, NODE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
-import { navigate } from "../../display/util.js";
 
-import { EditEvent, UserEvent, getClipboard } from "../ui.js";
+import { Box, EditEvent, UserEvent, getClipboard } from "../ui.js";
+import { navigate } from "../util.js";
 
 import list from "./list.js";
-import { Box } from "../../base/box.js";
-import { ele, NODE } from "../../base/dom.js";
 
 export default extend(list, {
 	paste(this: Box, event: UserEvent) {

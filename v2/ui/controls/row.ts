@@ -4,7 +4,7 @@ import { EMPTY } from "../../base/util.js";
 import { RecordBox } from "./record.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { View, ViewType } from "../../base/view.js";
-import { Box } from "../../base/box.js";
+import { Box } from "../ui.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";

@@ -1,8 +1,8 @@
 import { item } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
-import { ElementViewType } from "../../display/view.js";
+import { ElementViewType } from "../../control/view.js";
 import { TextBox } from "./text.js";
-import { getView } from "../../base/box.js";
+import { getView } from "../../base/domview.js";
 
 export class LineBox extends TextBox {
 	get level(): number {

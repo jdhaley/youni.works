@@ -1,10 +1,9 @@
 import { value } from "./model.js";
 import { Content, View, ViewOwner, ViewType } from "./view.js";
-import { Shape } from "./shape.js";
-import { ELE, NODE, RANGE, ele, nodeOf } from "./dom.js";
+import { ELE, NODE, RANGE, ele } from "./dom.js";
 import { Graph } from "./control.js";
 import { CommandBuffer } from "./command.js";
-import { bundle, Sequence } from "./util.js";
+import { Sequence } from "./util.js";
 
 export interface NodeContent extends Content {
 	readonly contents: Sequence<NODE>
@@ -20,10 +19,6 @@ export interface Editable extends DomView {
 	id: string;
 	edit(commandName: string, range: RANGE, replacement?: value): RANGE;
 	getContent(range?: RANGE): ELE
-}
-
-export interface Box extends Editable, Shape {
-	readonly shortcuts: bundle<string>;
 }
 
 export interface ArticleType extends ViewType {

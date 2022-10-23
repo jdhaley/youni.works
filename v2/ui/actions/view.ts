@@ -1,9 +1,9 @@
 import { extend } from "../../base/util.js";
-import { Box, getView } from "../../base/box.js";
+import { getView } from "../../base/domview.js";
 import { Change } from "../../base/view.js";
 
-import { UserEvent, setClipboard } from "../ui.js";
-import { navigate } from "../../display/util.js";
+import { Box, UserEvent, setClipboard } from "../ui.js";
+import { navigate } from "../util.js";
 
 export default extend(null, {
 	keydown(this: Box, event: UserEvent) {

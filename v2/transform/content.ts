@@ -1,4 +1,4 @@
-import { DomView, getView } from "../base/box.js";
+import { DomView, getView } from "../base/domview.js";
 import { ele, ELE, RANGE } from "../base/dom.js";
 
 export function viewContent(view: DomView, range: RANGE, out?: ELE) {

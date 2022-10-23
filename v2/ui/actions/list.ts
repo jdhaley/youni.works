@@ -1,9 +1,9 @@
 import {extend} from "../../base/util.js";
-import {EditEvent, UserEvent} from "../ui.js";
-import {getFooter, getHeader} from "../../display/util.js";
-import editable from "./editor.js";
 import { ELE, RANGE } from "../../base/dom";
-import { Box } from "../../base/box.js";
+
+import {Box, EditEvent, UserEvent} from "../ui.js";
+import {getFooter, getHeader} from "../util.js";
+import editable from "./editor.js";
 
 export default extend(editable, {
 	dblclick(this: Box, event: UserEvent) {

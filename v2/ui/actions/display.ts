@@ -1,8 +1,9 @@
+import { ELE } from "../../base/dom.js";
 import {Response} from "../../base/message.js";
-
 import {extend} from "../../base/util.js";
+import { Change, ViewType } from "../../base/view.js";
 
-import {Display, UserEvent} from "../ui.js";
+import {Box, Display, UserEvent} from "../ui.js";
 
 export default extend(null, {
 	open(this: Display, res: Response<string>) {
@@ -63,10 +64,6 @@ function getType(article: Display, path: string, data: any): ViewType {
 	}
 	return article.types[typeName] as any || article.defaultType;
 }
-
-import { ELE } from "../../base/dom.js";
-import { Change, ViewType } from "../../base/view.js";
-import { Box } from "../../base/box.js";
 
 function shapetest(this: Display) {
 	// let type = new ViewTypeImpl(this);

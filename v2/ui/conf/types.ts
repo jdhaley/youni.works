@@ -6,7 +6,7 @@ import { ListBox } from "../controls/list.js";
 import { LineBox } from "../controls/line.js";
 import { RowBox } from "../controls/row.js";
 
-import { ElementViewType } from "../../display/view.js";
+import { ElementViewType } from "../../control/view.js";
 
 import edit from "./edit.js";
 import actions from "./actions.js";

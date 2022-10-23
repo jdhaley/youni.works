@@ -1,6 +1,6 @@
 import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE } from "../base/dom.js";
 import { Change } from "../base/view.js";
-import { getView, bindViewEle } from "../base/box.js";
+import { getView, bindViewEle } from "../base/domview.js";
 
 import { Editor } from "./editor.js";
 

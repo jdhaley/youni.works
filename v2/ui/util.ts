@@ -1,5 +1,6 @@
 import { ELE, NODE, RANGE } from "../base/dom.js";
-import { Box, getView } from "../base/box.js";
+import { getView } from "../base/domview.js";
+import { Box } from "./ui.js";
 
 export function getHeader(view: Box, node: NODE) {
 	while (node && node != view.node) {
