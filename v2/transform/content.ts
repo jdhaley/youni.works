@@ -1,4 +1,4 @@
-import { DomView, getViewNode } from "../base/box.js";
+import { DomView, getView } from "../base/box.js";
 import { ele, ELE, RANGE } from "../base/dom.js";
 
 export function viewContent(view: DomView, range: RANGE, out?: ELE) {
@@ -22,7 +22,7 @@ function content(view: DomView, range: RANGE, out: ELE) {
 	for (let node of view.content.contents) {
 		if (range && !range.intersectsNode(node))
 			continue;
-		let childView = getViewNode(node)?.$control;
+		let childView = getView(node);
 		if (childView && childView != view) {
 			viewContent(childView, range, out);
 		} else if (ele(node)) {

@@ -25,13 +25,12 @@ function rangeEvent(event: UserEvent) {
     sense(event);
 }
 
-let TRACK: ELE;
-
 function trackEvent(event: UserEvent) {
     event.track = TRACK;
     sense(event);
     TRACK = event.track;
 }
+let TRACK: ELE;
 
 function sense(event: UserEvent) {
     let source = viewOf(event.range ? event.range.commonAncestorContainer : event.target);

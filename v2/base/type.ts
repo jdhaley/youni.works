@@ -12,6 +12,7 @@ type types = bundle<Type<unknown>>;
 type source = bundle<string | source> | string;
 
 export class BaseType<T> implements Type<T> {
+	declare partOf: BaseType<T>;
 	declare name: string;
 	declare prototype: object;
 
@@ -46,7 +47,7 @@ interface TypeOwner {
 	unknownType: Type<unknown>;
 }
 
-interface ViewConf {
+interface TypeConf {
 	type: string;
 	types: bundle<source>;
 	conf: bundle<any>;
@@ -89,7 +90,7 @@ function getType(name: string, types: types, source: source): Type<unknown> {
 	return type;
 }
 
-function createType(name: string, conf: ViewConf, types: types, source: source) {
+function createType(name: string, conf: TypeConf, types: types, source: source) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
 	let type = Object.create(supertype) as BaseType<unknown>;
 	type.start(name, conf)

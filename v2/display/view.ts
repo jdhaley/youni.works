@@ -6,8 +6,7 @@ import { ELE, RANGE, ele } from "../base/dom.js";
 
 import { ElementContent, ElementOwner } from "./content.js";
 import { ElementShape } from "./shape.js";
-import { bindViewNode } from "./util.js";
-import { DomView, NodeContent, VIEW_ELE } from "../base/box.js";
+import { DomView, NodeContent, VIEW_ELE, bindViewEle, ArticleType } from "../base/box.js";
 
 let NEXT_ID = 1;
 
@@ -100,7 +99,7 @@ export abstract class ElementView extends ElementShape implements DomView {
 	}
 }
 
-export class ElementViewType extends BaseType<View> implements ViewType {
+export class ElementViewType extends ViewType {
 	constructor(owner: ElementViewOwner) {
 		super();
 		this.owner = owner;
@@ -113,6 +112,11 @@ export class ElementViewType extends BaseType<View> implements ViewType {
 		let node = (this.owner as ElementViewOwner).createElement(this.conf.tagName || "div");
 		view.control(node);
 		view.view(value, container);
+		return view;
+	}
+	control(node: ELE): ElementView {
+		let view = super.create() as ElementView;
+		view.control(node);
 		return view;
 	}
 }
@@ -143,7 +147,7 @@ export abstract class ElementViewOwner extends ElementOwner {
 		//if (view.getAttribute("data-item")) return view;
 		if (!view.$control) {
 			console.warn("binding...");
-			bindViewNode(view as any);
+			bindViewEle(view);
 			if (!view.$control) {
 				console.error("Unable to bind missing control. Please collect info / analyze.");
 				debugger;

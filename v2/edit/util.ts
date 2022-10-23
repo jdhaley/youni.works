@@ -1,13 +1,12 @@
-import { Editor } from "./editor.js";
-import { ele, ELE, END_TO_END, nodeOf, RANGE, START_TO_START, NODE } from "../base/dom.js";
-import { getView, bindViewNode } from "../display/util.js";
-import { ElementBox } from "../ui/controls/box.js";
+import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE } from "../base/dom.js";
 import { Change } from "../base/view.js";
+import { getView, bindViewEle } from "../base/box.js";
 
-export { getEditor, bindViewNode }
+import { Editor } from "./editor.js";
 
-//Hide the ViewBox return type so the implementation doesn't leak
-const getEditor = getView as (node: NODE | RANGE) => ElementBox ;
+const getEditor = getView as (node: NODE | RANGE) => Editor ;
+
+export { getEditor, bindViewEle }
 
 export function getChildEditor(editor: Editor, node: NODE): Editor {
 	if (node == editor.content.node) return null;
@@ -145,9 +144,9 @@ compareToRange(node, range):
 - INSIDE	The Node is enclosed by the range.
 - END		The Node intersects the end of the range.
 */
-function enclosedInRange(view: ELE, range: RANGE) {
-	let r = view.ownerDocument.createRange();
-	r.selectNode(view);
+function enclosedInRange(node: NODE, range: RANGE) {
+	let r = node.ownerDocument.createRange();
+	r.selectNode(node);
 	// before −1.
 	// equal 0.
 	// after 1.
@@ -158,7 +157,7 @@ function enclosedInRange(view: ELE, range: RANGE) {
 }
 
 export function rangeIterator(range: RANGE) {
-	let node = nodeOf(range) as Node;
+	let node = range.commonAncestorContainer as Node;
 	return document.createNodeIterator(node, NodeFilter.SHOW_ALL, 
 		(node) => range.intersectsNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
 	)

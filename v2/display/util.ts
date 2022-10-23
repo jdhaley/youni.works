@@ -1,6 +1,6 @@
 import { ele, ELE, NODE, RANGE } from "../base/dom.js";
 import { Box, getViewNode, VIEW_ELE } from "../base/box.js";
-import { ElementView, ElementViewType } from "./view.js";
+import { ElementView } from "./view.js";
 
 export function getHeader(view: Box, node: NODE) {
 	while (node && node != view.node) {
@@ -51,29 +51,6 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 			break;
 	}
 	return content;
-}
-
-
-export function bindViewNode(node: ELE): void {
-	let control: ElementView = node["$control"];
-	if (!control) {
-		let name = node.getAttribute("data-item");
-		let parent = getViewNode(node.parentNode);
-		if (name && parent) {
-			console.log("binding.");
-			let type = parent.$control.type.types[name] as ElementViewType;
-			if (type) {
-				control = Object.create(type.prototype);
-				control.control(node as any);
-			} else {
-				console.warn(`Bind failed: Type "${name}" not found in "${parent.getAttribute("data-item")}"`)
-			}
-		}
-	}
-
-	if (control) for (let child of control.contents) {
-		if (ele(child)) bindViewNode(child as ELE);
-	}
 }
 
 export function getView(node: NODE | RANGE): ElementView {

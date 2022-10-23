@@ -36,9 +36,10 @@ interface TREE {
 	readonly nextElementSibling: ELE;
 	readonly previousElementSibling: ELE;
 }
+
 export interface ELE extends MUTABLE, TREE, NODE {
 	id: string;												//minimized from view
-	readonly classList: Bag<string>;					//minimized from view
+	readonly classList: Bag<string>;						//minimized from view
 
 	getAttribute(name: string): string;						//minimized from view
 	setAttribute(name: string, value: string): void;		//minimized from view

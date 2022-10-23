@@ -1,5 +1,6 @@
 import { Receiver, Signal } from "./control.js";
-import { value, Type, contentType } from "./model.js";
+import { value, contentType } from "./model.js";
+import { BaseType } from "./type.js";
 import { bundle, Bag } from "./util.js";
 
 export interface Content {
@@ -16,10 +17,11 @@ export interface View extends Receiver {
 	valueOf(filter?: unknown): value;
 }
 
-export interface ViewType extends Type<View> {
+export class ViewType extends BaseType<View> {
 	owner: ViewOwner;
-	conf: bundle<any>;
-	create(value?: value, container?: Content): View;
+	create(value?: value, container?: Content): View {
+		return super.create();
+	}
 }
 
 export interface ViewOwner extends Receiver {
