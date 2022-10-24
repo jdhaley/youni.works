@@ -1,5 +1,5 @@
 import { extend } from "../../base/util.js";
-import { getView } from "../../base/domview.js";
+import { getView } from "../../base/article.js";
 import { Change } from "../../base/view.js";
 
 import { Box } from "../box.js";

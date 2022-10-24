@@ -1,7 +1,8 @@
 import { value } from "../../base/model.js";
-import { ArticleType, NodeContent } from "../../base/domview.js";
+import { NodeContent } from "../../base/view.js";
 import { Actions } from "../../base/control.js";
-import { ele, ELE, RANGE } from "../../base/dom.js";
+import { ArticleType } from "../../base/article.js";
+import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
 import { ElementView } from "../../control/view.js";
@@ -32,7 +33,7 @@ export abstract class ElementBox extends ElementView implements Box {
 			if (child.nodeName == "header") return child;
 		}
 	}
-	get content(): NodeContent {
+	get content(): NodeContent<NODE> {
 		if (!this.isContainer) return this;
 		for (let child of this._ele.children) {
 			if (child.classList.contains("content")) return child["$control"];

@@ -1,6 +1,7 @@
 import { extend } from "../../base/util.js";
 import { Change } from "../../base/view.js";
-import { getView } from "../../base/domview.js";
+import { getView } from "../../base/article.js";
+import { ele } from "../../base/dom.js";
 
 import { RowBox } from "../controls/row.js";
 import { getHeader } from "../util.js";
@@ -69,5 +70,5 @@ function addCol(editor: RowBox, col: Box) {
 function addColumn(row: RowBox, index: number) {
 	let column = getView(row.content.contents[index]);
 	let newcol = column.type.create("") as Box;
-	column.node.after(newcol.node);
+	ele(column.node).after(newcol.node);
 }

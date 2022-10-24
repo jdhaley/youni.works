@@ -2,7 +2,7 @@ import { item } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { ElementViewType } from "../../control/view.js";
 import { TextBox } from "./text.js";
-import { getView } from "../../base/domview.js";
+import { getView } from "../../base/article.js";
 
 export class LineBox extends TextBox {
 	get level(): number {

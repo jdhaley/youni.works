@@ -24,12 +24,12 @@ export abstract class RangeReplace extends Replace {
 		range = this.getOuterRange(range);
 		let view = getEditor(range);
 		captureRange(this, view.content.node as ELE, range.startOffset, range.endOffset);
-		this.before = view.getContent(range).innerHTML;
+		this.before = ele(view.getContent(range)).innerHTML;
 	}
 	protected execAfter(range: RANGE): RANGE {
 		range = this.getReplaceRange();
 		let view = getEditor(range);
-		this.after = view.getContent(range).innerHTML;
+		this.after = ele(view.getContent(range)).innerHTML;
 		return unmark(range);
 	}
 	protected getOuterRange(range: RANGE) {

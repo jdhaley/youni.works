@@ -1,6 +1,6 @@
 import { RANGE, NODE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
-import { getView } from "../../base/domview.js";
+import { getView } from "../../base/article.js";
 
 import { Box } from "../box.js";
 import { getClipboard, setClipboard } from "../util.js";

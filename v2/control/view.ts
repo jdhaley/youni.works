@@ -1,13 +1,13 @@
 import { contentType, value } from "../base/model.js";
-import { View, ViewOwner, ViewType } from "../base/view.js";
-import { DomView, NodeContent, VIEW_ELE, bindViewEle } from "../base/domview.js";
+import { ContentView, NodeContent, View, ViewType, ViewOwner } from "../base/view.js";
+import { VIEW_ELE, bindViewEle } from "../base/article.js";
 import { bundle } from "../base/util.js";
-import { ELE, RANGE } from "../base/dom.js";
+import { ELE, NODE, RANGE } from "../base/dom.js";
 
 import { ElementContent } from "./content.js";
 import { ElementOwner } from "./element.js";
 
-export abstract class ElementView extends ElementContent implements DomView {
+export abstract class ElementView extends ElementContent implements ContentView<NODE> {
 	declare _type: ViewType;
 
 	get type(): ViewType {
@@ -16,7 +16,7 @@ export abstract class ElementView extends ElementContent implements DomView {
 	get contentType(): contentType {
 		return this.type.owner.conf.contentTypes[this._type.conf.viewType];
 	}
-	get content(): NodeContent {
+	get content(): NodeContent<NODE> {
 		return this;
 	}
 

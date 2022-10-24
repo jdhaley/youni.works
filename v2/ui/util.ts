@@ -1,5 +1,5 @@
-import { ELE, NODE, RANGE } from "../base/dom.js";
-import { getView } from "../base/domview.js";
+import { ele, ELE, NODE, RANGE } from "../base/dom.js";
+import { getView } from "../base/article.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
@@ -26,7 +26,7 @@ interface NAVIGABLE_ELE extends ELE{
 export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
 	let editor = getView(start);
 	while (editor) {
-		let toEle = isBack ? editor.node.previousElementSibling : editor.node.nextElementSibling;
+		let toEle = isBack ? ele(editor.node).previousElementSibling : ele(editor.node).nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next as NAVIGABLE_ELE;
