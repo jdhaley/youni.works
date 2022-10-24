@@ -21,6 +21,7 @@ export interface ContentView<T extends Text> extends NodeContent<T>, View {
 }
 
 export interface Editable<T extends Text, E extends Extent<T>> extends ContentView<T> {
+	readonly type: ArticleType<T>;
 	id: string;
 	edit(commandName: string, extent: E, replacement?: value): E;
 	getContent(range?: E): T

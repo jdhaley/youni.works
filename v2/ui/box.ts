@@ -11,7 +11,6 @@ import { ElementViewOwner } from "../control/view.js";
 import { Frame } from "./frame.js";
 
 export interface Box extends Editable<NODE, RANGE>, Shape {
-	readonly type: ArticleType<NODE>;
 	readonly shortcuts: bundle<string>;
 }
 
