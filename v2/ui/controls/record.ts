@@ -1,9 +1,9 @@
 import { value, record } from "../../base/model.js";
-import { getView } from "../../base/article.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 
 import { Box } from "../box.js";
 import { ElementBox } from "./box.js";
+import { getView } from "../util.js";
 
 export class RecordBox extends ElementBox {
 	memberType = "field";

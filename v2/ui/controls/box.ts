@@ -1,7 +1,6 @@
 import { value } from "../../base/model.js";
-import { NodeContent } from "../../base/view.js";
 import { Actions } from "../../base/control.js";
-import { ArticleType } from "../../base/article.js";
+import { NodeContent, ArticleType } from "../../base/article.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
@@ -19,8 +18,8 @@ export abstract class ElementBox extends ElementView implements Box {
 		if (editor) this["edit"] = editor;
 	}
 
-	get type(): ArticleType {
-		return this._type as ArticleType;
+	get type(): ArticleType<NODE> {
+		return this._type as ArticleType<NODE>;
 	}
 	get shortcuts(): bundle<string> {
 		return this._type.conf.shortcuts;

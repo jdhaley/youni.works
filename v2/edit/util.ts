@@ -1,6 +1,5 @@
-import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE } from "../base/dom.js";
 import { Change } from "../base/view.js";
-import { getView, bindViewEle } from "../base/article.js";
+import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getView, bindViewEle } from "../base/dom.js";
 
 import { Editor } from "./editor.js";
 
@@ -121,7 +120,7 @@ export function clearContent(range: RANGE) {
 		let editor = getEditor(node);
 		if (editor?.contentType == "record") {
 			if (getEditor(editor.node.parentNode)?.contentType == "list") {
-				if (enclosedInRange(editor.node, range)) editor.node.remove();	
+				if (enclosedInRange(editor.node, range)) (editor.node as any).remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
 			if (editor && node.parentElement == editor.content.node) {

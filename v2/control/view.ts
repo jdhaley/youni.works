@@ -1,8 +1,8 @@
 import { contentType, value } from "../base/model.js";
-import { ContentView, NodeContent, View, ViewType, ViewOwner } from "../base/view.js";
-import { VIEW_ELE, bindViewEle } from "../base/article.js";
+import {  ViewType, ViewOwner } from "../base/view.js";
+import { ContentView, NodeContent } from "../base/article.js";
 import { bundle } from "../base/util.js";
-import { ELE, NODE, RANGE } from "../base/dom.js";
+import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle } from "../base/dom.js";
 
 import { ElementContent } from "./content.js";
 import { ElementOwner } from "./element.js";
@@ -50,7 +50,7 @@ export class ElementViewType extends ViewType {
 
 	create(value: value, container?: ElementView): ElementView {
 		let view = super.create() as ElementView;
-		let node = (this.owner as ElementViewOwner).createElement(this.conf.tagName || "div");
+		let node = (this.owner as ElementViewOwner).createNode(this.conf.tagName || "div");
 		view.control(node);
 		view.view(value, container);
 		return view;
@@ -77,15 +77,14 @@ export abstract class ElementViewOwner extends ElementOwner {
 	unknownType: ElementViewType;
 	defaultType: ElementViewType;
 
-	abstract createElement(tagName: string): ELE;
+	abstract createNode(tagName: string): ELE;
 	
-	getElementById(id: string): ELE {
+	findNode(id: string): ELE {
 		return this.node.ownerDocument.getElementById(id);
 	}
-	getControl(id: string): View {
-		let view = this.node.ownerDocument.getElementById(id) as VIEW_ELE;
+	getControl(id: string): ContentView<NODE> {
+		let view = this.findNode(id) as VIEW_ELE;
 		if (!view) throw new Error("Can't find view element.");
-		//if (view.getAttribute("data-item")) return view;
 		if (!view.$control) {
 			console.warn("binding...");
 			bindViewEle(view);

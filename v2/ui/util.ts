@@ -1,10 +1,11 @@
-import { ele, ELE, NODE, RANGE } from "../base/dom.js";
-import { getView } from "../base/article.js";
+import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
 
 import { Box } from "./box.js";
+
+export { getView };
 
 export function getHeader(view: Box, node: NODE) {
 	while (node && node != view.node) {

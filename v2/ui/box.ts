@@ -1,6 +1,5 @@
-import { Editable } from "../base/view.js";
 import { Shape } from "../base/shape.js";
-import { Article, ArticleType } from "../base/article.js";
+import { Editable, Article, ArticleType } from "../base/article.js";
 import { ELE, NODE, RANGE } from "../base/dom";
 
 import { CommandBuffer } from "../base/command.js";
@@ -12,12 +11,11 @@ import { ElementViewOwner } from "../control/view.js";
 import { Frame } from "./frame.js";
 
 export interface Box extends Editable<NODE, RANGE>, Shape {
-	readonly type: ArticleType;
-	readonly node: ELE;
+	readonly type: ArticleType<NODE>;
 	readonly shortcuts: bundle<string>;
 }
 
-export class Display extends ElementViewOwner implements Article {
+export class Display extends ElementViewOwner implements Article<NODE> {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf);
 		this.frame = frame;
@@ -36,7 +34,7 @@ export class Display extends ElementViewOwner implements Article {
 			this.frame.selectionRange = range;
 		}
 	}
-	createElement(tagName: string): ELE {
+	createNode(tagName: string): ELE {
 		return this.frame.createElement(tagName);
 	}
 	getControl(id: string): Box {

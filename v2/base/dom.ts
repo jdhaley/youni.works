@@ -1,4 +1,6 @@
-import { Bag, Extent, Sequence } from "./util";
+import { ViewType } from "./view.js";
+import { ArticleType, ContentView } from "./article.js";
+import { Bag, Extent, Sequence } from "./util.js";
 
 interface DOCUMENT {
 	getElementById(id: string): ELE;
@@ -16,14 +18,15 @@ export interface NODE {
 	textContent: string;
 }
 
-interface MUTABLE {
-	cloneNode(deep: boolean): NODE;
-    after(...nodes: (NODE | string)[]): void;
-    before(...nodes: (NODE | string)[]): void;
+export interface Mutable<T> {
+	after(...nodes: (T | string)[]): void;
+    before(...nodes: (T | string)[]): void;
     remove(): void;
+}
+interface MUTABLE extends Mutable<NODE> {
+	cloneNode(deep: boolean): NODE;
     replaceWith(...nodes: (NODE | string)[]): void;
 
-	innerHTML: string;
 	append(data: any): void;
 	//use the mutable node before/after instead...
 		//insertBefore(ele: TREENODE, before: TREENODE): any;
@@ -38,12 +41,13 @@ interface TREE {
 }
 
 export interface ELE extends MUTABLE, TREE, NODE {
-	id: string;												//minimized from view
-	readonly classList: Bag<string>;						//minimized from view
+	id: string;
+	innerHTML: string;
+	readonly classList: Bag<string>;
 
-	getAttribute(name: string): string;						//minimized from view
-	setAttribute(name: string, value: string): void;		//minimized from view
-	removeAttribute(name: string): void;					//minimized from view
+	getAttribute(name: string): string;
+	setAttribute(name: string, value: string): void;
+	removeAttribute(name: string): void;
 }
 
 interface ADJUSTABLE {
@@ -79,4 +83,42 @@ export function ele(value: any): ELE {
 export function nodeOf(loc: NODE | RANGE): NODE {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	return loc instanceof Node ? loc : null;
+}
+
+///////////////////// View Support //////////////////////////
+
+export interface VIEW_ELE extends ELE {
+	$control?: ContentView<NODE>;
+}
+
+export function getView(loc: NODE | RANGE): ContentView<NODE> {
+	if (loc instanceof Range) loc = loc.commonAncestorContainer;
+	loc = loc instanceof Node ? loc : null;
+	while (loc) {
+		let e = ele(loc) as VIEW_ELE;
+		if (e?.$control?.type instanceof ViewType) {
+			return e.$control;
+		}
+		loc = loc.parentNode;
+	}
+}
+
+export function bindViewEle(node: VIEW_ELE) {
+	let view = node["$control"];
+	if (view) return;
+	view = getView(node.parentNode);
+	let name = node.getAttribute("data-item");
+	if (view && name) {
+		console.log("binding.");
+		let type = view.type.types[name] as ArticleType<NODE>;
+		if (type) {
+			view = type.control(node);
+		} else {
+			console.warn(`Bind failed: Type "${name}" not found in "${view.type.name}"`);
+			return;
+		}
+	}
+	for (let child of view.contents) {
+		if (ele(child)) bindViewEle(child as ELE);
+	}
 }
