@@ -10,7 +10,7 @@ export class ListBox extends ElementBox {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
-				type =  this.type.owner.unknownType;
+				type =  this.type.owner.af.unknownType;
 			}
 			type.create(item, this);
 		}

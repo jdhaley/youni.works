@@ -21,18 +21,8 @@ export interface View extends Receiver {
 }
 
 export class ViewType extends BaseType<View> {
-	owner: ViewOwner;
-	create(value?: value): View {
-		return super.create();
-	}
 }
 
-export interface ViewOwner extends Receiver {
-	conf: bundle<any>;
-	types: bundle<ViewType>;
-	unknownType: ViewType;
-	defaultType: ViewType;
-}
 
 export class Change implements Signal {
 	constructor(command: string, view?: View) {

@@ -1,16 +1,40 @@
 import { contentType, value } from "../base/model.js";
-import {  ViewType, ViewOwner } from "../base/view.js";
-import { ContentView, NodeContent } from "../base/article.js";
-import { bundle } from "../base/util.js";
+import { Content, View, ViewType } from "../base/view.js";
+import { Article, ArticleType, ContentView, NodeContent } from "../base/article.js";
+import { Bag, bundle, Sequence } from "../base/util.js";
 import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle } from "../base/dom.js";
 
-import { ElementContent } from "./content.js";
-import { ElementOwner } from "./element.js";
+import { ElementOwner, ElementShape } from "./element.js";
+import { BaseType } from "../base/type.js";
+
+export class ElementContent extends ElementShape implements Content {
+	get contents(): Sequence<NODE> {
+		return this._ele.childNodes;
+	}
+	get textContent() {
+		return this._ele.textContent;
+	}
+	set textContent(text: string) {
+		this._ele.textContent = text;
+	}
+	get markupContent() {
+		return this._ele.innerHTML;
+	}
+	set markupContent(markup: string) {
+		this._ele.innerHTML = markup;
+	}
+	get styles(): Bag<string> {
+		return this._ele.classList;
+	}
+	get node(): ELE {
+		return this._ele;
+	}
+}
 
 export abstract class ElementView extends ElementContent implements ContentView<NODE> {
-	declare _type: ViewType;
+	declare _type: ArticleType<NODE>;
 
-	get type(): ViewType {
+	get type(): ArticleType<NODE> {
 		return this._type;
 	}
 	get contentType(): contentType {
@@ -40,18 +64,18 @@ export abstract class ElementView extends ElementContent implements ContentView<
 	}
 }
 
-export class ElementViewType extends ViewType {
-	constructor(owner: ElementViewOwner) {
+export class ElementViewType extends  ViewType implements ArticleType<NODE> {
+	constructor(owner: Article<Node>) {
 		super();
 		this.owner = owner;
 	}
-	declare owner: ViewOwner;
+	declare owner: Article<NODE>;
 	declare viewType: string;
 
 	create(value: value, container?: ElementView): ElementView {
 		let view = super.create() as ElementView;
-		let node = (this.owner as ElementViewOwner).createNode(this.conf.tagName || "div");
-		view.control(node);
+		let node = this.owner.createNode(this.conf.tagName || "div");
+		view.control(node as ELE);
 		view.view(value, container);
 		return view;
 	}

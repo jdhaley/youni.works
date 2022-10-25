@@ -1,9 +1,8 @@
 import { value } from "./model.js";
-import { Content, Text, View, ViewOwner, ViewType } from "./view.js";
-import { Graph } from "./control.js";
+import { Content, Text, View, ViewType } from "./view.js";
+import { Graph, Receiver } from "./control.js";
 import { CommandBuffer } from "./command.js";
-import { Extent, Sequence } from "./util.js";
-
+import { bundle, Extent, Sequence } from "./util.js";
 
 export interface NodeContent<T extends Text> extends Content {
 	readonly node: T;
@@ -33,10 +32,17 @@ export interface ArticleType<T extends Text> extends ViewType {
 	control(node: T): ContentView<T>;
 }
 
-export interface Article<T extends Text> extends ViewOwner, Graph<T> {
+export interface Article<T extends Text> extends Receiver, Graph<T> {
+	af: AF<T>;
 	node: T;
+	conf: bundle<any>;
 	commands: CommandBuffer<Extent<T>>;
 	getControl(id: string): ContentView<T>;
 	setRange(extent: Extent<T>, collapse?: boolean): void;
 	createNode(tag: string): T;
+}
+
+export interface AF<T extends Text> {
+	types: bundle<ArticleType<T>>;
+	unknownType: ArticleType<T>;
 }

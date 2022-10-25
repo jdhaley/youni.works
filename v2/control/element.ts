@@ -1,7 +1,7 @@
 import { BasePart, Owner, Receiver } from "../base/control.js";
-import { ELE } from "../base/dom.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
-import { EMPTY } from "../base/util.js";
+import { ELE } from "../base/dom.js";
+import { EMPTY, Entity } from "../base/util.js";
 
 
 export class ElementOwner extends Owner<ELE> {
@@ -49,13 +49,30 @@ class ElementPart extends BasePart {
 	}
 }
 
+class ElementEntity extends ElementPart implements Entity<string> {
+	get id(): string {
+		return this._ele.id;
+	}
+
+	at(name: string): string {
+		return this._ele.getAttribute(name);
+	}
+	put(name: string, value?: string): void {
+		if (value === undefined) {
+			this._ele.removeAttribute(name);
+		} else {
+			this._ele.setAttribute(name, value);
+		}
+	}
+}
+
 interface SHAPE_ELE extends ELE {
 	getBoundingClientRect(): Area;
 	style: CSSStyleDeclaration;
 }
 
 
-export class ElementShape extends ElementPart implements Shape {
+export class ElementShape extends ElementEntity implements Shape {
 	declare protected _ele: SHAPE_ELE;
 	get area(): Area {
 		return this._ele.getBoundingClientRect();

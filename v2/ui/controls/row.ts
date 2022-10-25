@@ -1,10 +1,11 @@
-import { View, ViewType } from "../../base/view.js";
-import { ELE, RANGE } from "../../base/dom.js";
+import { View } from "../../base/view.js";
+import { ELE, NODE, RANGE } from "../../base/dom.js";
 import { value, record, item } from "../../base/model.js";
 import { EMPTY } from "../../base/util.js";
 
-import { Box } from "../box.js";
 import { RecordBox } from "./record.js";
+import { Box } from "../box.js";
+import { ArticleType } from "../../base/article.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
@@ -86,9 +87,9 @@ function getColumns(row: item) {
 	}
 	return columns;
 }
-function createType(type: ViewType, columns: string[]): ViewType {
+function createType(type: ArticleType<NODE>, columns: string[]): ArticleType<NODE> {
 	type.types = Object.create(null);
-	let column = type.owner.types.column;
+	let column = type.owner.af.types.column;
 	for (let col of columns) {
 		let colType = Object.create(column);
 		colType.name = col;
@@ -115,7 +116,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	return model;
 }
 
-function createHeaderItem(type: ViewType): item {
+function createHeaderItem(type: ArticleType<NODE>): item {
 	let item = {
 		type$: type.name,
 		header: true, 

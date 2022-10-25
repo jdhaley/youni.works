@@ -1,10 +1,11 @@
 import { ELE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
-import { Change, ViewType } from "../../base/view.js";
+import { Change, View } from "../../base/view.js";
 import { UserEvent } from "../frame.js";
 
 import { Box, Display } from "../box.js";
+import { Type } from "../../base/model.js";
 
 export default extend(null, {
 	open(this: Display, res: Response<string>) {
@@ -56,7 +57,7 @@ export default extend(null, {
 	}
 });
 
-function getType(article: Display, path: string, data: any): ViewType {
+function getType(article: Display, path: string, data: any): Type<View> {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";

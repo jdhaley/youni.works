@@ -15,9 +15,9 @@ export class BaseType<T> implements Type<T> {
 	declare partOf: BaseType<T>;
 	declare name: string;
 	declare prototype: object;
+	declare conf: bundle<any>;
 
 	types: bundle<Type<T>> = EMPTY.object;
-	conf: bundle<any>;
 
 	generalizes(type: Type<T>): boolean {
 		return type == this;
@@ -41,7 +41,7 @@ export class BaseType<T> implements Type<T> {
 	}
 }
 
-interface TypeOwner {
+export interface TypeOwner {
 	conf: bundle<any>;
 	types: bundle<Type<unknown>>;
 	unknownType: Type<unknown>;
