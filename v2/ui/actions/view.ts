@@ -3,7 +3,7 @@ import { extend } from "../../base/util.js";
 
 import { Box } from "../box.js";
 import { UserEvent } from "../frame.js";
-import { getView, navigate, setClipboard } from "../util.js";
+import { getBox, navigate, setClipboard } from "../util.js";
 
 export default extend(null, {
 	keydown(this: Box, event: UserEvent) {
@@ -54,7 +54,7 @@ export default extend(null, {
 	 	for (let ele of eles) ele.classList.remove("active");
 		let range = event.range;
 		for (let node of this.content.node.childNodes) {
-			let editor = getView(node);
+			let editor = getBox(node);
 			if (range.intersectsNode(editor.content.node)) {
 				editor.content.styles.add("active");
 			}

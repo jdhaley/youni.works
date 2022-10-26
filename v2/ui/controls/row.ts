@@ -89,7 +89,7 @@ function getColumns(row: item) {
 }
 function createType(type: ArticleType<NODE>, columns: string[]): ArticleType<NODE> {
 	type.types = Object.create(null);
-	let column = type.owner.af.types.column;
+	let column = type.owner.types.column;
 	for (let col of columns) {
 		let colType = Object.create(column);
 		colType.name = col;

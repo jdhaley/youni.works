@@ -3,7 +3,6 @@ import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { ELE } from "../base/dom.js";
 import { EMPTY, Entity } from "../base/util.js";
 
-
 export class ElementOwner extends Owner<ELE> {
 	getControlOf(node: ELE): Receiver {
 		return node["$control"];

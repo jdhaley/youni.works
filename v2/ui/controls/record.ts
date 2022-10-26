@@ -3,14 +3,14 @@ import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 
 import { Box } from "../box.js";
 import { ElementBox } from "./box.js";
-import { getView } from "../util.js";
+import { getBox } from "../util.js";
 
 export class RecordBox extends ElementBox {
 	memberType = "field";
 
 	get(name: string): Box {
 		for (let node of this.content.contents) {
-			let view = getView(node) as Box;
+			let view = getBox(node);
 			if (name == view?.type.name) return view;
 		}
 	}

@@ -1,8 +1,9 @@
-import { value, list, typeOf } from "../../base/model.js";
+import { value, list, typeOf, Type } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
-import { getView } from "../util.js";
+import { getBox } from "../util.js";
 
 import { ElementBox } from "./box.js";
+import { View } from "../../base/view.js";
 
 export class ListBox extends ElementBox {
 	viewValue(model: list): void {
@@ -10,7 +11,7 @@ export class ListBox extends ElementBox {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
-				type =  this.type.owner.af.unknownType;
+				type =  this.type.owner.unknownType as Type<View>;
 			}
 			type.create(item, this);
 		}
@@ -30,7 +31,7 @@ export class ListBox extends ElementBox {
 		let model: value[];
 		if (range && !range.intersectsNode(this.content.node)) return;
 		for (let part of this.content.contents) {
-			let editor = getView(part);
+			let editor = getBox(part);
 			let value = editor?.valueOf(range);
 			if (value) {
 				if (!model) {

@@ -5,7 +5,7 @@ import { toHtml } from "../transform/toHtml.js";
 
 import { Box } from "./box.js";
 
-export { getView };
+export const getBox = getView as (node: NODE | RANGE) => Box ;
 
 export function getHeader(view: Box, node: NODE) {
 	while (node && node != view.node) {
@@ -25,18 +25,18 @@ interface NAVIGABLE_ELE extends ELE{
 	scrollIntoView(arg: any): void;
 }
 export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
-	let editor = getView(start);
+	let editor = getBox(start);
 	while (editor) {
 		let toEle = isBack ? ele(editor.node).previousElementSibling : ele(editor.node).nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next as NAVIGABLE_ELE;
 		}
-		editor = getView(editor.node.parentNode);
+		editor = getBox(editor.node.parentNode);
 	}
 }
 function navigateInto(ele: ELE, isBack?: boolean) {
-	let view = getView(ele);
+	let view = getBox(ele);
 	if (!view) return;
 	let content = view.content.node as ELE;
 	switch (view.contentType) {

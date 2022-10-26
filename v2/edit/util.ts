@@ -21,7 +21,7 @@ export function narrowRange(range: RANGE) {
 
 	let start = range.startContainer;
 	let end = range.endContainer;
-	let content = getView(range).content.node;
+	let content = getEditor(range).content.node;
 	if (inHeader(editor, start)) {;
 		range.setStart(content, 0);
 	}

@@ -22,7 +22,7 @@ function content(view: ContentView<NODE>, range: RANGE, out: ELE) {
 	for (let node of view.content.contents) {
 		if (range && !range.intersectsNode(node))
 			continue;
-		let childView = getView(node);
+		let childView = getView(node) as ContentView<NODE>;
 		if (childView && childView != view) {
 			viewContent(childView, range, out);
 		} else if (ele(node)) {

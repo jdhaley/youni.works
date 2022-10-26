@@ -1,4 +1,4 @@
-import { ViewType } from "./view.js";
+import { View, ViewType } from "./view.js";
 import { ArticleType, ContentView } from "./article.js";
 import { Bag, Extent, Sequence } from "./util.js";
 
@@ -88,10 +88,10 @@ export function nodeOf(loc: NODE | RANGE): NODE {
 ///////////////////// View Support //////////////////////////
 
 export interface VIEW_ELE extends ELE {
-	$control?: ContentView<NODE>;
+	$control?: View;
 }
 
-export function getView(loc: NODE | RANGE): ContentView<NODE> {
+export function getView(loc: NODE | RANGE): View {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	loc = loc instanceof Node ? loc : null;
 	while (loc) {
@@ -104,9 +104,9 @@ export function getView(loc: NODE | RANGE): ContentView<NODE> {
 }
 
 export function bindViewEle(node: VIEW_ELE) {
-	let view = node["$control"];
+	let view = node["$control"] as ContentView<NODE>;
 	if (view) return;
-	view = getView(node.parentNode);
+	view = getView(node.parentNode) as ContentView<NODE>;
 	let name = node.getAttribute("data-item");
 	if (view && name) {
 		console.log("binding.");

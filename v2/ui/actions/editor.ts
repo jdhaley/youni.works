@@ -2,7 +2,7 @@ import { RANGE, NODE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
 import { Box } from "../box.js";
-import { getView, getClipboard, setClipboard } from "../util.js";
+import { getBox, getClipboard, setClipboard } from "../util.js";
 
 import view from "./view.js";
 import { EditEvent, UserEvent } from "../frame.js";
@@ -43,7 +43,7 @@ export default extend(view, {
 				console.warn("Not insertable range");
 				return;
 			}
-			target = getView(range) as Box;
+			target = getBox(range);
 		} 
 		range = target.edit("Paste", range, model);
 		range &&  this.type.owner.setRange(range, true);
@@ -71,7 +71,7 @@ export default extend(view, {
  */
 function getInsertableRange(range: RANGE) {
 	range = range.cloneRange();
-	let view = getView(range);
+	let view = getBox(range);
 	while (view) {
 		if (view?.contentType == "list") {
 			return range;
@@ -82,7 +82,7 @@ function getInsertableRange(range: RANGE) {
 
 		range.setStartBefore(view.node);
 		range.collapse(true);
-		view = getView(range);
+		view = getBox(range);
 	}
 }
 

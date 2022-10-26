@@ -1,13 +1,12 @@
 import { contentType, value } from "../base/model.js";
-import { Content, View, ViewType } from "../base/view.js";
+import { ViewType } from "../base/view.js";
 import { Article, ArticleType, ContentView, NodeContent } from "../base/article.js";
 import { Bag, bundle, Sequence } from "../base/util.js";
 import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle } from "../base/dom.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
-import { BaseType } from "../base/type.js";
 
-export class ElementContent extends ElementShape implements Content {
+export class ElementContent extends ElementShape implements NodeContent<NODE> {
 	get contents(): Sequence<NODE> {
 		return this._ele.childNodes;
 	}
@@ -107,16 +106,16 @@ export abstract class ElementViewOwner extends ElementOwner {
 		return this.node.ownerDocument.getElementById(id);
 	}
 	getControl(id: string): ContentView<NODE> {
-		let view = this.findNode(id) as VIEW_ELE;
-		if (!view) throw new Error("Can't find view element.");
-		if (!view.$control) {
+		let ele = this.findNode(id) as VIEW_ELE;
+		if (!ele) throw new Error("Can't find view element.");
+		if (!ele.$control) {
 			console.warn("binding...");
-			bindViewEle(view);
-			if (!view.$control) {
+			bindViewEle(ele);
+			if (!ele.$control) {
 				console.error("Unable to bind missing control. Please collect info / analyze.");
 				debugger;
 			}
 		}
-		return view.$control;
+		return ele.$control as ContentView<NODE>;
 	}
 }

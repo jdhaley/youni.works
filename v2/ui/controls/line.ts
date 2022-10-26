@@ -3,7 +3,7 @@ import { ELE, RANGE } from "../../base/dom.js";
 
 import { ElementViewType } from "../../control/view.js";
 import { TextBox } from "./text.js";
-import { getView } from "../util.js";
+import { getBox } from "../util.js";
 
 export class LineBox extends TextBox {
 	get level(): number {
@@ -49,7 +49,7 @@ export class LineBox extends TextBox {
 	getSection(): LineBox {
 		let node = this.node.previousElementSibling;
 		while (node) {
-			let editor = getView(node);
+			let editor = getBox(node);
 			if (editor.type.name == "heading") return editor as LineBox;
 			node = node.previousElementSibling;
 		}

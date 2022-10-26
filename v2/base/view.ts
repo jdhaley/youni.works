@@ -1,7 +1,7 @@
 import { Receiver, Signal } from "./control.js";
 import { value, contentType } from "./model.js";
 import { BaseType } from "./type.js";
-import { bundle, Bag, Sequence } from "./util.js";
+import { Bag, Sequence } from "./util.js";
 
 export interface Text {
 	textContent: string;
