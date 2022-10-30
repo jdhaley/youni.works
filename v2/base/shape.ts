@@ -1,5 +1,3 @@
-import { Control } from "./control";
-
 export interface Shape {
 	readonly area: Area;
 	readonly arcs: Iterable<Arc>;

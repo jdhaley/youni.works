@@ -26,9 +26,6 @@ export class ListReplace extends RangeReplace {
 		this.onInsert(range, content);
 		return range;
 	}
-	protected onSingleContainer(range: RANGE, content: value, container: Editor): void {
-		//overridden for markup
-	}
 	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
 		r.setEnd(start.content.node, start.content.node.childNodes.length);
@@ -60,6 +57,9 @@ export class ListReplace extends RangeReplace {
 			range.insertNode(contents[0]); //this also removes the entry from the sequence.
 			range.collapse();
 		}
+	}
+	protected onSingleContainer(range: RANGE, content: value, container: Editor): void {
+		//overridden for markup
 	}
 	protected merge(view: Editor, range: RANGE, content: any, isStart: boolean) {
 		//overridden for markup

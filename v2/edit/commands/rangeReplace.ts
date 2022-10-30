@@ -9,12 +9,6 @@ export abstract class RangeReplace extends Replace {
 	startId: string;
 	endId: string;
 
-	exec(range: RANGE, content: any): RANGE {
-		this.execBefore(range);
-		range = this.execReplace(range, content);
-		return this.execAfter(range);
-	}
-
 	protected abstract execReplace(range: RANGE, content: value): RANGE;
 	protected execBefore(range: RANGE) {
 		narrowRange(range);
@@ -64,7 +58,7 @@ export abstract class RangeReplace extends Replace {
 		}
 		return range;
 	}
-	protected replace(markup: string) {
+	protected doReplace(markup: string) {
 		let element = document.implementation.createDocument(null, "root").documentElement as ELE;
 		element.innerHTML = markup;
 		let view = this.owner.getControl(this.viewId) as Editor;
