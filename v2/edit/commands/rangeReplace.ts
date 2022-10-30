@@ -1,15 +1,18 @@
 import { value } from "../../base/model.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 
-import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor } from "../util.js";
-import { Replace } from "./replace.js";
 import { Editor } from "../editor.js";
+import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
+import { Replace } from "./replace.js";
 
-export abstract class RangeReplace extends Replace {
+export class RangeReplace extends Replace {
 	startId: string;
 	endId: string;
 
-	protected abstract execReplace(range: RANGE, content: value): RANGE;
+	protected execReplace(range: RANGE, value: value) {
+		clearContent(range);
+		if (value) mergeContent(range, value);
+	}
 	protected execBefore(range: RANGE) {
 		narrowRange(range);
 		mark(range);
@@ -73,6 +76,22 @@ export abstract class RangeReplace extends Replace {
 			if (ele(node)) bindViewEle(node as ELE);
 		}
 		return unmark(range);
+	}
+}
+
+function mergeContent(range: RANGE, value: value) {
+	let editor = getEditor(range);
+	let start = getChildEditor(editor, range.startContainer);
+	let end = getChildEditor(editor, range.endContainer);
+	for (let member = ele(start.node) || ele(editor.node).firstElementChild; member; member = member.nextElementSibling) {
+		let control = member["$control"] as Editor;
+		if (control?.contentType == "unit") {
+			let mvalue = value[control.type.name];
+			if (mvalue) {
+				member.children[1].textContent += mvalue;
+			}
+		}
+		if (member == end.node) break;
 	}
 }
 
