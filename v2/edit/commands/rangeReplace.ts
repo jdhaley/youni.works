@@ -29,20 +29,20 @@ export class RangeReplace extends Replace {
 		this.after = ele(view.getContent(range)).innerHTML;
 		return unmark(range);
 	}
-	protected getOuterRange(range: RANGE) {
-		range = range.cloneRange();
-		let editor = getEditor(range);
-		range.selectNodeContents(editor.content.node);
-		let start = getChildEditor(editor, range.startContainer);
-		if (start) range.setStartBefore(start.node);
-		let end = getChildEditor(editor, range.endContainer);
-		if (end) range.setEndAfter(end.node);
+	protected getOuterRange(inner: RANGE) {
+		let editor = getEditor(inner);
+		let outer = inner.cloneRange();
+		outer.selectNodeContents(editor.content.node);
+		let start = getChildEditor(editor, inner.startContainer);
+		if (start) outer.setStartBefore(start.node);
+		let end = getChildEditor(editor, inner.endContainer);
+		if (end) outer.setEndAfter(end.node);
 
 		let content = editor.content.node;
-		if (!(range.startContainer == content && range.endContainer == content)) {
+		if (!(outer.startContainer == content && outer.endContainer == content)) {
 			throw new Error("Invalid range for edit.");
 		}
-		return range;
+		return outer;
 	}	
 	protected getReplaceRange() {
 		let editor = this.owner.getControl(this.viewId);
