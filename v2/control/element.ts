@@ -17,6 +17,8 @@ export class ElementOwner extends Owner<ELE> {
 	}
 }
 
+//TODO we're still using the owner to propagate events.
+//If that is to remain, we shouldn't extend BasePart.
 class ElementPart extends BasePart {
 	declare protected _ele: ELE;
 	[Symbol.iterator] = function* parts() {
@@ -28,7 +30,7 @@ class ElementPart extends BasePart {
 	}
 
 	get partOf(): ElementPart {
-		for (let node = this._ele as ELE; node; node = node.parentNode as ELE) {
+		for (let node = this._ele.parentNode as ELE; node; node = node.parentNode as ELE) {
 			let control = node["$control"];
 			if (control) return control;
 		}

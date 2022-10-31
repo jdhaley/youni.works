@@ -3,6 +3,7 @@ import { ArticleType, ContentView } from "./article.js";
 import { Bag, Extent, Sequence } from "./util.js";
 
 interface DOCUMENT {
+	readonly body: ELE;
 	getElementById(id: string): ELE;
 	getElementsByClassName(name: string): Sequence<ELE>;
 	createElement(name: string): ELE;

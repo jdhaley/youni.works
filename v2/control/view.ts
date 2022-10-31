@@ -42,6 +42,14 @@ export abstract class ElementView extends ElementContent implements ContentView<
 	get content(): NodeContent<NODE> {
 		return this;
 	}
+	get partOf() {
+		for (let node = this._ele.parentNode as ELE; node; node = node.parentNode as ELE) {
+			let control = node["$control"];
+			if (control) return control;
+			//Propagate events to the owner when this is a top-level view in the body.
+			if (node == node.ownerDocument.body) return this.type.owner;
+		}
+	}
 
 	abstract valueOf(range?: RANGE): value;
 	abstract viewValue(data: value): void;
