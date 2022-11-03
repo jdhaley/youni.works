@@ -1,5 +1,5 @@
 import { Change } from "../base/view.js";
-import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getView, bindViewEle } from "../base/dom.js";
+import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getView, bindViewEle, DOCUMENT } from "../base/dom.js";
 
 import { Editor } from "./editor.js";
 
@@ -164,4 +164,52 @@ export function rangeIterator(range: RANGE) {
 
 export function senseChange(editor: Editor, commandName: string) {
 	editor.type.owner.sense(new Change(commandName, editor), editor.node);
+}
+
+export function getNodePath(node: NODE, offset: number): string {
+	let editor = getEditor(node);
+	let path = "/" + offset;
+	while (node) {
+		if (node == editor.content.node) {
+			return editor.id + path;
+		}
+		path = "/" + getNodeIndex(node.parentNode, node) + path;
+		node = node.parentNode;
+	}
+	return path;
+}
+function getNodeIndex(parent: NODE, node: NODE): number {
+	for (let i = 0; i < parent?.childNodes.length; i++) {
+		if (parent.childNodes[i] == node) {
+			return i;
+		}
+	}
+}
+
+export function getRangeFromPath(doc: DOCUMENT, startPath: string, endPath: string): RANGE {
+	let range = doc.createRange();
+	let path = startPath.split("/");
+	let node = getNode(doc, path);
+	if (node) {
+		let offset = Number.parseInt(path.at(-1));
+		range.setStart(node, offset);
+	}
+	path = endPath.split("/");
+	node = getNode(doc, path);
+	if (node) {
+		let offset = Number.parseInt(path.at(-1));
+		range.setEnd(node, offset);
+	}
+	return range;
+}
+
+function getNode(doc: DOCUMENT, path: string[]) {
+	let editor = getEditor(doc.getElementById(path[0]));
+	if (!editor) console.error("can't find view");
+	let node = editor.content.node;
+	for (let i = 1; i < path.length - 1; i++) {
+		let index = Number.parseInt(path[i]);
+		node = node?.childNodes[index];
+	}
+	return node;
 }

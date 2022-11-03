@@ -1,15 +1,26 @@
 import { RANGE } from "../../base/dom.js";
-import { getEditor, mark, unmark } from "../util.js";
+import { getEditor, mark, getNodePath, getRangeFromPath, unmark } from "../util.js";
 import { Edit } from "./edit.js";
 
 export class Replace extends Edit {
 	before: string;
 	after: string;
+	range?: object;
+	value?: any;
 
 	exec(range: RANGE, content: any): RANGE {
+		this.range = {
+			start: getNodePath(range.startContainer, range.startOffset),
+			end: getNodePath(range.endContainer, range.endOffset)
+		}
+		let rx = getRangeFromPath(range.commonAncestorContainer.ownerDocument, this.range["start"], this.range["end"]);
+		console.log("RANGES", range, rx);
+		this.value = content;
 		this.execBefore(range);
 		this.execReplace(range, content);
-		return this.execAfter(range);
+		range = this.execAfter(range);
+		console.log(this);
+		return range;
 	}
 	undo() {
 		return this.doReplace(this.before);
