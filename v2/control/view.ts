@@ -102,6 +102,7 @@ export abstract class ElementViewOwner extends ElementOwner {
 		this.conf = conf;
 		this.actions = conf.actions;
 	}
+	source: value;
 	node: ELE;
 	conf: bundle<any>;
 	types: bundle<ElementViewType>;

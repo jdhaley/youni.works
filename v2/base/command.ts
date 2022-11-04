@@ -3,6 +3,7 @@ export abstract class Command<T> {
 	next: Command<T>;
 
 	abstract get name(): string;
+	abstract serialize(): object;
 	abstract undo(): T;
 	abstract redo(): T;
 }

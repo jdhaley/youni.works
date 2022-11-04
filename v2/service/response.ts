@@ -28,4 +28,5 @@ export interface FileSystem {
 	readFileSync(path: string): string;
 	writeFileSync(path: string, content: string): void;
 	existsSync(path: string): boolean;
+	mkdirSync(path: string): void;
 }

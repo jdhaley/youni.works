@@ -9,13 +9,15 @@ export class Replace extends Edit {
 	value?: any;
 
 	exec(range: RANGE, content: any): RANGE {
-		this.range = {
-			start: getNodePath(range.startContainer, range.startOffset),
-			end: getNodePath(range.endContainer, range.endOffset)
+		if (this.owner.conf.recordCommands) {
+			this.range = {
+				start: getNodePath(range.startContainer, range.startOffset),
+				end: getNodePath(range.endContainer, range.endOffset)
+			}
+			let rx = getRangeFromPath(range.commonAncestorContainer.ownerDocument, this.range["start"], this.range["end"]);
+			console.log("RANGES", range, rx);
+			this.value = content;	
 		}
-		let rx = getRangeFromPath(range.commonAncestorContainer.ownerDocument, this.range["start"], this.range["end"]);
-		console.log("RANGES", range, rx);
-		this.value = content;
 		this.execBefore(range);
 		this.execReplace(range, content);
 		range = this.execAfter(range);
@@ -27,6 +29,17 @@ export class Replace extends Edit {
 	}
 	redo() {
 		return this.doReplace(this.after);
+	}
+	serialize() {
+		return {
+			name: this.name,
+			timestamp: Date.now,
+			viewId: this.viewId,
+			before: this.before,
+			after: this.after,
+			range: this.range,
+			value: this.value
+		}
 	}
 
 	protected execBefore(range: RANGE) {

@@ -8,6 +8,18 @@ export function start(owner: TypeOwner) {
 	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
 }
 
+export interface TypeOwner {
+	conf: bundle<any>;
+	types: bundle<Type<unknown>>;
+	unknownType: Type<unknown>;
+}
+
+interface TypeConf {
+	type: string;
+	types: bundle<source>;
+	conf: bundle<any>;
+}
+
 type types = bundle<Type<unknown>>;
 type source = bundle<string | source> | string;
 
@@ -39,18 +51,6 @@ export class BaseType<T> implements Type<T> {
 	create(...args: any[]): T {
 		return Object.create(this.prototype);
 	}
-}
-
-export interface TypeOwner {
-	conf: bundle<any>;
-	types: bundle<Type<unknown>>;
-	unknownType: Type<unknown>;
-}
-
-interface TypeConf {
-	type: string;
-	types: bundle<source>;
-	conf: bundle<any>;
 }
 
 function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type<unknown>> {

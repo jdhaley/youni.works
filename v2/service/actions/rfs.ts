@@ -12,6 +12,10 @@ export default function rfs(res: Response) {
 			res.send(source);		
 		}
 	} else if (req.method == "PUT") {
+		let dir = f.substring(0, f.lastIndexOf("/"));
+		if (!res.fs.existsSync(dir)) {
+			res.fs.mkdirSync(dir);
+		}		
 		res.fs.writeFileSync(f, req.body as any as string);
 		res.sendStatus(200);
 	}

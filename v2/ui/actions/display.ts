@@ -6,12 +6,13 @@ import { UserEvent } from "../frame.js";
 
 import { Box, Display } from "../box.js";
 import { Type } from "../../base/model.js";
+import { CommandBuffer } from "../../base/command.js";
 
 export default extend(null, {
 	open(this: Display, res: Response<string>) {
-		let model = res.statusCode == 404 ? [] : JSON.parse(res.body);
-		let type = getType(this, res.req.to, model);
-		this.node = (type.create(model) as Box).node as ELE;
+		this.source = res.statusCode == 404 ? [] : JSON.parse(res.body);
+		let type = getType(this, res.req.to, this.source);
+		this.node = (type.create(this.source) as Box).node as ELE;
 		this.node.setAttribute("data-file", res.req.to);
 		this.node.setAttribute("contentEditable", "true");	
 		this.frame.view.append(this.node);
@@ -26,7 +27,15 @@ export default extend(null, {
 		} else {
 			let model = (this.node["$control"] as any).valueOf();
 			console.log("Save: ", model);
-			this.service.save(this.node.getAttribute("data-file"), JSON.stringify(model, null, 2), this);	
+			this.service.save(this.node.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
+			if (this.conf.recordCommands) {
+				let tc = {
+					source: this.source,
+					target: model,
+					commands: serializeCommands(this.commands)
+				}
+				this.service.save("/test" + this.node.getAttribute("data-file"), tc, this);
+			}
 		}
 	},
 	undo(this: Display, event: UserEvent) {
@@ -65,6 +74,14 @@ function getType(article: Display, path: string, data: any): Type<View> {
 		typeName = data.type$;
 	}
 	return article.types[typeName] as any || article.defaultType;
+}
+
+function serializeCommands(history: CommandBuffer<any>) {
+	let out = [];
+	for (let command = history.peek(); command; command = command.prior) {
+		if (command.prior) out.unshift(command.serialize());
+	}
+	return out;
 }
 
 function shapetest(this: Display) {

@@ -2,6 +2,7 @@ import { Edit } from "./edit.js";
 import { getChildEditor, getEditor } from "../util.js";
 import { ele, RANGE } from "../../base/dom.js";
 import { Editor, TreeItem } from "../editor.js";
+import { EMPTY } from "../../base/util.js";
 
 export class LevelCommand extends Edit {
 	declare name: "Promote" | "Demote";
@@ -38,5 +39,8 @@ export class LevelCommand extends Edit {
 	}
 	redo() {
 		return this.do(this.name);
+	}
+	serialize() {
+		return EMPTY.object;
 	}
 }
