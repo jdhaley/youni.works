@@ -1,8 +1,8 @@
 import { contentType, value } from "../base/model.js";
 import { ViewType } from "../base/view.js";
-import { Article, ArticleType, ContentView, NodeContent } from "../base/article.js";
+import { Article, ArticleType, ContentView, Editable, Edits, NodeContent } from "../base/article.js";
+import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView, DOCUMENT } from "../base/dom.js";
 import { Bag, bundle, Sequence } from "../base/util.js";
-import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle } from "../base/dom.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
 
@@ -103,13 +103,16 @@ export abstract class ElementViewOwner extends ElementOwner {
 		this.actions = conf.actions;
 	}
 	source: value;
+	frame: ViewFrame;
 	node: ELE;
 	conf: bundle<any>;
 	types: bundle<ElementViewType>;
 	unknownType: ElementViewType;
 	defaultType: ElementViewType;
 
-	abstract createNode(tagName: string): ELE;
+	createNode(tagName: string): ELE {
+		return this.frame.createElement(tagName);
+	}
 	
 	findNode(id: string): ELE {
 		return this.node.ownerDocument.getElementById(id);
@@ -127,4 +130,67 @@ export abstract class ElementViewOwner extends ElementOwner {
 		}
 		return ele.$control as ContentView<NODE>;
 	}
+	getPath(node: NODE, offset: number): string {
+		let view = getView(node) as Editable<NODE, RANGE>;
+		let path = "/" + offset;
+		while (node) {
+			if (node == view.content.node) {
+				return view.id + path;
+			}
+			path = "/" + getNodeIndex(node.parentNode, node) + path;
+			node = node.parentNode;
+		}
+		return path;
+	}
+	rangeFrom(startPath: string, endPath: string): RANGE {
+		let doc = this.node.ownerDocument;
+		let range = doc.createRange();
+		let path = startPath.split("/");
+		let node = getNode(doc, path);
+		if (node) {
+			let offset = Number.parseInt(path.at(-1));
+			range.setStart(node, offset);
+		}
+		path = endPath.split("/");
+		node = getNode(doc, path);
+		if (node) {
+			let offset = Number.parseInt(path.at(-1));
+			range.setEnd(node, offset);
+		}
+		return range;
+	}
+	play(edits: Edits) {
+		let type = this.types[edits.type];
+		let view = type.create(edits.source);
+		this.node = view.node;
+		this.frame.view.append(this.node);
+		for (let edit of edits.edits) {
+			let editor = this.getControl(edit.viewId) as Editable<NODE, RANGE>;
+			let range = this.rangeFrom(edit.range.start, edit.range.end);
+			editor.edit(edit.name, range, edit.value);
+		}
+	}
+}
+
+function getNodeIndex(parent: NODE, node: NODE): number {
+	for (let i = 0; i < parent?.childNodes.length; i++) {
+		if (parent.childNodes[i] == node) {
+			return i;
+		}
+	}
+}
+function getNode(doc: DOCUMENT, path: string[]) {
+	let view = getView(doc.getElementById(path[0])) as Editable<NODE, RANGE>;
+	if (!view) console.error("can't find view");
+	let node = view.content.node;
+	for (let i = 1; i < path.length - 1; i++) {
+		let index = Number.parseInt(path[i]);
+		node = node?.childNodes[index];
+	}
+	return node;
+}
+
+interface ViewFrame {
+	view: ELE;
+	createElement(tagName: string): ELE;
 }

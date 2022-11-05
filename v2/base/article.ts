@@ -24,7 +24,7 @@ export interface Editable<T extends Text, E extends Extent<T>> extends ContentVi
 	readonly type: ArticleType<T>;
 	id: string;
 	edit(commandName: string, extent: E, replacement?: value): E;
-	getContent(range?: E): T
+	getContent(extent?: E): T
 }
 
 export interface ArticleType<T extends Text> extends ViewType {
@@ -34,10 +34,31 @@ export interface ArticleType<T extends Text> extends ViewType {
 }
 
 export interface Article<T extends Text> extends TypeOwner, Receiver, Graph<T> {
+	frame: unknown;
 	node: T;
 	conf: bundle<any>;
 	commands: CommandBuffer<Extent<T>>;
 	getControl(id: string): ContentView<T>;
 	setRange(extent: Extent<T>, collapse?: boolean): void;
 	createNode(tag: string): T;
+	getPath(node: T, offset: number): string;
+	rangeFrom(startPath: string, endPath: string): Extent<T>;
+	play(edits: Edits): void;
+}
+
+export interface Edits {
+	type: string;
+	source: value;
+	target: value;
+	edits: Edit[];
+}
+
+export interface Edit {
+	name: string;
+	viewId: string;
+	range: {
+		start: string;
+		end: string;
+	}
+	value: any;
 }

@@ -3,7 +3,7 @@ import { RANGE } from "../../base/dom.js";
 
 import { Editor } from "../editor.js";
 import { getEditor, senseChange } from "../util.js";
-import { RangeReplace } from "../commands/rangereplace.js";
+import { RangeReplace } from "../commands/rangeReplace.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, record: record) {
 	if (getEditor(range) != this) console.warn("Invalid edit range");

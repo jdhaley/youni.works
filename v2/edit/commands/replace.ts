@@ -1,20 +1,18 @@
 import { RANGE } from "../../base/dom.js";
-import { getEditor, mark, getNodePath, getRangeFromPath, unmark } from "../util.js";
-import { Edit } from "./edit.js";
+import { getEditor, mark, unmark } from "../util.js";
+import { EditCommand } from "./edit.js";
 
-export class Replace extends Edit {
+export class Replace extends EditCommand {
 	before: string;
 	after: string;
-	range?: object;
-	value?: any;
 
 	exec(range: RANGE, content: any): RANGE {
 		if (this.owner.conf.recordCommands) {
 			this.range = {
-				start: getNodePath(range.startContainer, range.startOffset),
-				end: getNodePath(range.endContainer, range.endOffset)
+				start: this.owner.getPath(range.startContainer, range.startOffset),
+				end: this.owner.getPath(range.endContainer, range.endOffset)
 			}
-			let rx = getRangeFromPath(range.commonAncestorContainer.ownerDocument, this.range["start"], this.range["end"]);
+			let rx = this.owner.rangeFrom(this.range["start"], this.range["end"]);
 			console.log("RANGES", range, rx);
 			this.value = content;	
 		}

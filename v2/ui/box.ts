@@ -1,10 +1,9 @@
 import { Shape } from "../base/shape.js";
-import { Editable, Article, ArticleType } from "../base/article.js";
-import { ELE, NODE, RANGE } from "../base/dom";
-
+import { Editable, Article } from "../base/article.js";
+import { NODE, RANGE } from "../base/dom";
 import { CommandBuffer } from "../base/command.js";
 import { RemoteFileService } from "../base/remote.js";
-import { start, TypeOwner } from "../base/type.js";
+import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
 import { ElementViewOwner } from "../control/view.js";
@@ -22,7 +21,7 @@ export class Display extends ElementViewOwner implements Article<NODE> {
 		this.commands = new CommandBuffer();
 		start(this);
 	}
-	readonly frame: Frame;
+	declare readonly frame: Frame;
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<RANGE>;
 
@@ -32,9 +31,6 @@ export class Display extends ElementViewOwner implements Article<NODE> {
 			if (collapse) range.collapse();
 			this.frame.selectionRange = range;
 		}
-	}
-	createNode(tagName: string): ELE {
-		return this.frame.createElement(tagName);
 	}
 	getControl(id: string): Box {
 		return super.getControl(id) as Box;

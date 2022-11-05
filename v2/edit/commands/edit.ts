@@ -1,8 +1,8 @@
-import { Article } from "../../base/article.js";
+import { Article, Edit } from "../../base/article.js";
 import { Command } from "../../base/command.js";
 import { NODE, RANGE } from "../../base/dom.js";
 
-export abstract class Edit extends Command<RANGE> {
+export abstract class EditCommand extends Command<RANGE> implements Edit {
 	constructor(owner: Article<NODE>, name: string, viewId: string) {
 		super();
 		this.owner = owner;
@@ -15,4 +15,9 @@ export abstract class Edit extends Command<RANGE> {
 	name: string;
 	timestamp: number;
 	viewId: string;
+	declare range: {
+		start: string;
+		end: string;
+	}
+	declare value: any;
 }
