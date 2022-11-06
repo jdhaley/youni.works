@@ -1,4 +1,4 @@
-import { contentType } from "../../base/model";
+import { model } from "../../base/model";
 import { bundle } from "../../base/util";
 
 export default {
@@ -14,5 +14,5 @@ export default {
 	"list": "list",
 	// "table": "list",
 	"markup": "list"
-} as bundle<contentType>
+} as bundle<model>
 

@@ -1,12 +1,19 @@
-export interface Shape {
+import { Bag, Instance } from "./util";
+
+
+export interface Styled extends Instance {
+	getStyle(name: string): string;
+	setStyle(name: string, value?: string): void; // Omitting the value removes the style.
+}
+
+export interface Shape extends Styled {
 	readonly area: Area;
 	readonly arcs: Iterable<Arc>;
+	readonly kind: Bag<string>;
 
 	size(width: number, height: number): void;
 	position(x: number, y: number): void;
 	zone(x: number, y: number): Zone;
-	getStyle(name: string): string;
-	setStyle(name: string, value?: string): void; // Omitting the value removes the style.
 }
 
 export interface Point {

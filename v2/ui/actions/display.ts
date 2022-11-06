@@ -1,7 +1,7 @@
 import { ELE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
-import { Change, View } from "../../base/view.js";
+import { Change } from "../../base/article.js";
 import { UserEvent } from "../frame.js";
 
 import { Box, Display } from "../box.js";
@@ -15,7 +15,7 @@ export default extend(null, {
 		this.node = (type.create(this.source) as Box).node as ELE;
 		this.node.setAttribute("data-file", res.req.to);
 		this.node.setAttribute("contentEditable", "true");	
-		this.frame.view.append(this.node);
+		this.frame.append(this.node);
 
 		//shapetest.call(this);
 	},
@@ -66,7 +66,7 @@ export default extend(null, {
 	}
 });
 
-function getType(article: Display, path: string, data: any): Type<View> {
+function getType(article: Display, path: string, data: any): Type<Box> {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";

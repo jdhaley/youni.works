@@ -21,7 +21,7 @@ export class Display extends ElementViewOwner implements Article<NODE> {
 		this.commands = new CommandBuffer();
 		start(this);
 	}
-	declare readonly frame: Frame;
+	//declare readonly frame: Frame;
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<RANGE>;
 

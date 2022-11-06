@@ -39,7 +39,7 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 	let view = getBox(ele);
 	if (!view) return;
 	let content = view.content.node as ELE;
-	switch (view.contentType) {
+	switch (view.type.model) {
 		case "unit":
 			break;
 		case "record":

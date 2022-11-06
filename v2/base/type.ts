@@ -1,4 +1,4 @@
-import { Type } from "./model.js";
+import { model, Type } from "./model.js";
 import { bundle, EMPTY, extend } from "./util.js";
 
 export function start(owner: TypeOwner) {
@@ -31,6 +31,9 @@ export class BaseType<T> implements Type<T> {
 
 	types: bundle<Type<T>> = EMPTY.object;
 
+	get model(): model {
+		return undefined;
+	}
 	generalizes(type: Type<T>): boolean {
 		return type == this;
 	}

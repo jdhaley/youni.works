@@ -18,18 +18,15 @@ export interface Bag<T>  {
 	add(value: T): void;
 	remove(value: T): void;
 }
-export interface Entity<T> {
+
+export interface Instance {
+	readonly kind: Bag<string>;
+}
+
+export interface Entity<T> extends Instance {
 	readonly id?: T;
 	at(name: string): T;
 	put(name: string, value?: T): void;
-}
-export interface Extent<T> {
-	readonly startContainer: T;
-    readonly startOffset: number;
-	readonly endContainer: T;
-    readonly endOffset: number;
-	setStart(container: T, index: number): void;
-	setEnd(container: T, index: number): void;
 }
 
 export const EMPTY = Object.freeze({

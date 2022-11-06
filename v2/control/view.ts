@@ -1,10 +1,11 @@
-import { contentType, value } from "../base/model.js";
-import { ViewType } from "../base/view.js";
-import { Article, ArticleType, ContentView, Editable, Edits, NodeContent } from "../base/article.js";
+import { model, value } from "../base/model.js";
+import { Article, ArticleType, Viewer, Editable, Edits, Extent, NodeContent, ViewFrame } from "../base/article.js";
 import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView, DOCUMENT } from "../base/dom.js";
-import { Bag, bundle, Sequence } from "../base/util.js";
+import { bundle, Sequence } from "../base/util.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
+import { Receiver } from "../base/control.js";
+import { Location } from "../base/remote.js";
 
 export class ElementContent extends ElementShape implements NodeContent<NODE> {
 	get contents(): Sequence<NODE> {
@@ -22,22 +23,16 @@ export class ElementContent extends ElementShape implements NodeContent<NODE> {
 	set markupContent(markup: string) {
 		this._ele.innerHTML = markup;
 	}
-	get styles(): Bag<string> {
-		return this._ele.classList;
-	}
 	get node(): ELE {
 		return this._ele;
 	}
 }
 
-export abstract class ElementView extends ElementContent implements ContentView<NODE> {
+export abstract class ElementView extends ElementContent implements Viewer<NODE> {
 	declare _type: ArticleType<NODE>;
 
 	get type(): ArticleType<NODE> {
 		return this._type;
-	}
-	get contentType(): contentType {
-		return this.type.owner.conf.contentTypes[this._type.conf.viewType];
 	}
 	get content(): NodeContent<NODE> {
 		return this;
@@ -58,7 +53,7 @@ export abstract class ElementView extends ElementContent implements ContentView<
 		if (parent) (parent.content.node as ELE).append(this._ele);
 		this.node.textContent = "";
 		this.viewValue(value as value);
-		this.styles.add("content");
+		this.kind.add("content");
 	}
 	control(element: VIEW_ELE) {
 		super.control(element as Element);
@@ -71,13 +66,16 @@ export abstract class ElementView extends ElementContent implements ContentView<
 	}
 }
 
-export class ElementViewType extends  ViewType implements ArticleType<NODE> {
+export class ElementViewType extends  ArticleType<NODE> {
 	constructor(owner: Article<Node>) {
 		super();
 		this.owner = owner;
 	}
 	declare owner: Article<NODE>;
-	declare viewType: string;
+
+	get model(): model {
+		return this.owner.conf.contentTypes[this.conf.viewType];
+	}
 
 	create(value: value, container?: ElementView): ElementView {
 		let view = super.create() as ElementView;
@@ -103,7 +101,7 @@ export abstract class ElementViewOwner extends ElementOwner {
 		this.actions = conf.actions;
 	}
 	source: value;
-	frame: ViewFrame;
+	frame: ViewFrame<NODE>;
 	node: ELE;
 	conf: bundle<any>;
 	types: bundle<ElementViewType>;
@@ -111,13 +109,13 @@ export abstract class ElementViewOwner extends ElementOwner {
 	defaultType: ElementViewType;
 
 	createNode(tagName: string): ELE {
-		return this.frame.createElement(tagName);
+		return this.frame.createNode(tagName) as ELE;
 	}
 	
 	findNode(id: string): ELE {
 		return this.node.ownerDocument.getElementById(id);
 	}
-	getControl(id: string): ContentView<NODE> {
+	getControl(id: string): Viewer<NODE> {
 		let ele = this.findNode(id) as VIEW_ELE;
 		if (!ele) throw new Error("Can't find view element.");
 		if (!ele.$control) {
@@ -128,7 +126,7 @@ export abstract class ElementViewOwner extends ElementOwner {
 				debugger;
 			}
 		}
-		return ele.$control as ContentView<NODE>;
+		return ele.$control as Viewer<NODE>;
 	}
 	getPath(node: NODE, offset: number): string {
 		let view = getView(node) as Editable<NODE, RANGE>;
@@ -163,7 +161,7 @@ export abstract class ElementViewOwner extends ElementOwner {
 		let type = this.types[edits.type];
 		let view = type.create(edits.source);
 		this.node = view.node;
-		this.frame.view.append(this.node);
+		this.frame.append(this.node);
 		for (let edit of edits.edits) {
 			let editor = this.getControl(edit.viewId) as Editable<NODE, RANGE>;
 			let range = this.rangeFrom(edit.range.start, edit.range.end);
@@ -188,9 +186,4 @@ function getNode(doc: DOCUMENT, path: string[]) {
 		node = node?.childNodes[index];
 	}
 	return node;
-}
-
-interface ViewFrame {
-	view: ELE;
-	createElement(tagName: string): ELE;
 }

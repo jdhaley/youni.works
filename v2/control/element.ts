@@ -1,7 +1,7 @@
 import { BasePart, Owner, Receiver } from "../base/control.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { ELE } from "../base/dom.js";
-import { EMPTY, Entity } from "../base/util.js";
+import { Bag, EMPTY, Entity } from "../base/util.js";
 
 export class ElementOwner extends Owner<ELE> {
 	getControlOf(node: ELE): Receiver {
@@ -53,6 +53,9 @@ class ElementPart extends BasePart {
 class ElementEntity extends ElementPart implements Entity<string> {
 	get id(): string {
 		return this._ele.id;
+	}
+	get kind(): Bag<string> {
+		return this._ele.classList;
 	}
 
 	at(name: string): string {

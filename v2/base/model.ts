@@ -1,7 +1,7 @@
 import { bundle } from "./util";
 
+export type model = "unit" | "list" | "record";
 export type value =  unit | list | record ;
-export type contentType = "unit" | "list" | "record";
 
 type unit = string | number | boolean | date | null | unknown;
 
@@ -24,13 +24,14 @@ export interface date {
 
 export interface Type<T> {
 	name: string;
+	model: model;
 	partOf?: Type<T>;
 	types: bundle<Type<T>>;
 
 	create(...args: any[]): T;
 }
 
-function contentTypeOf(value: any): contentType {
+function contentTypeOf(value: any): model {
 	let type = typeOf(value);
 	switch (type) {
 		case "string":

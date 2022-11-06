@@ -1,6 +1,5 @@
-import { View, ViewType } from "./view.js";
-import { ArticleType, ContentView } from "./article.js";
-import { Bag, Extent, Sequence } from "./util.js";
+import { ArticleType, Viewer, Extent } from "./article.js";
+import { Bag, Sequence } from "./util.js";
 
 export interface DOCUMENT {
 	readonly body: ELE;
@@ -89,15 +88,15 @@ export function nodeOf(loc: NODE | RANGE): NODE {
 ///////////////////// View Support //////////////////////////
 
 export interface VIEW_ELE extends ELE {
-	$control?: View;
+	$control?: Viewer<ELE>;
 }
 
-export function getView(loc: NODE | RANGE): View {
+export function getView(loc: NODE | RANGE): Viewer<NODE> {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	loc = loc instanceof Node ? loc : null;
 	while (loc) {
 		let e = ele(loc) as VIEW_ELE;
-		if (e?.$control?.type instanceof ViewType) {
+		if (e?.$control?.type instanceof ArticleType) {
 			return e.$control;
 		}
 		loc = loc.parentNode;
@@ -105,9 +104,9 @@ export function getView(loc: NODE | RANGE): View {
 }
 
 export function bindViewEle(node: VIEW_ELE) {
-	let view = node["$control"] as ContentView<NODE>;
+	let view = node["$control"] as Viewer<NODE>;
 	if (view) return;
-	view = getView(node.parentNode) as ContentView<NODE>;
+	view = getView(node.parentNode) as Viewer<NODE>;
 	let name = node.getAttribute("data-item");
 	if (view && name) {
 		console.log("binding.");
@@ -119,7 +118,7 @@ export function bindViewEle(node: VIEW_ELE) {
 			return;
 		}
 	}
-	for (let child of view.contents) {
+	for (let child of view.content.contents) {
 		if (ele(child)) bindViewEle(child as ELE);
 	}
 }

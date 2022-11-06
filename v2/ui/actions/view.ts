@@ -1,4 +1,4 @@
-import { Change } from "../../base/view.js";
+import { Change } from "../../base/article.js";
 import { extend } from "../../base/util.js";
 
 import { Box } from "../box.js";
@@ -56,7 +56,7 @@ export default extend(null, {
 		for (let node of this.content.node.childNodes) {
 			let editor = getBox(node);
 			if (range.intersectsNode(editor.content.node)) {
-				editor.content.styles.add("active");
+				editor.content.kind.add("active");
 			}
 		}
 	},

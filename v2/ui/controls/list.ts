@@ -1,9 +1,8 @@
 import { value, list, typeOf, Type } from "../../base/model.js";
-import { ELE, RANGE } from "../../base/dom.js";
+import { ELE, NODE, RANGE } from "../../base/dom.js";
 import { getBox } from "../util.js";
 
 import { ElementBox } from "./box.js";
-import { View } from "../../base/view.js";
 
 export class ListBox extends ElementBox {
 	viewValue(model: list): void {
@@ -11,7 +10,7 @@ export class ListBox extends ElementBox {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
-				type =  this.type.owner.unknownType as Type<View>;
+				type =  this.type.owner.unknownType as any;
 			}
 			type.create(item, this);
 		}

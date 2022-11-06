@@ -113,6 +113,8 @@ export class RemoteFileService extends Remote {
 export interface Location {
 	/** A stringifier that returns a USVString containing the whole URL. */
 	href: string;
+	/** Returns a USVString containing the origin of the URL, that is its scheme, its domain and its port.*/
+	origin: string;
 
 	/** A USVString containing the protocol scheme of the URL, including the final ':'. */
 	protocol: string
@@ -133,8 +135,6 @@ export interface Location {
 	// /** A USVString containing the password specified before the domain. */
 	// password: string;
 	
-	/** Returns a USVString containing the origin of the URL, that is its scheme, its domain and its port.*/
-	//readonly origin: string;
 	/** A USVString containing the domain (that is the hostname) followed by (if a port was specified) a ':' and the port of the URL. */
 	//readonly host: string;
 

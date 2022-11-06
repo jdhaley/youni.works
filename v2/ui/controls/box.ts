@@ -69,7 +69,7 @@ export abstract class ElementBox extends ElementView implements Box {
 			this.createContent();
 			this.createFooter()
 		} else {
-			this.content.styles.add("content");
+			this.content.kind.add("content");
 		}
 		if (ele(value)) {
 			this.viewElement(value as ELE);

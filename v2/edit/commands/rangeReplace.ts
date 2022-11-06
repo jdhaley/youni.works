@@ -85,7 +85,7 @@ function mergeContent(range: RANGE, value: value) {
 	let end = getChildEditor(editor, range.endContainer);
 	for (let member = ele(start.node) || ele(editor.node).firstElementChild; member; member = member.nextElementSibling) {
 		let control = member["$control"] as Editor;
-		if (control?.contentType == "unit") {
+		if (control?.type.model == "unit") {
 			let mvalue = value[control.type.name];
 			if (mvalue) {
 				member.children[1].textContent += mvalue;

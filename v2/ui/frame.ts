@@ -17,7 +17,7 @@ export class Frame extends Owner<ELE> {
 	}
 	#window: Window;
 
-	get view(): ELE {
+	get node(): ELE {
 		return this.#window.document.body;
 	}
 	get location() {
@@ -47,11 +47,18 @@ export class Frame extends Owner<ELE> {
 		if (range) selection.addRange(range as Range);
 	}
 
+	//So Frame can implement the view frame interface:
+	createNode(tagName: string): HTMLElement {
+		return this.#window.document.createElement(tagName) as HTMLElement;
+	}
 	createElement(tagName: string): HTMLElement {
 		return this.#window.document.createElement(tagName) as HTMLElement;
 	}
 	createRange(): RANGE {
 		return this.#window.document.createRange();
+	}
+	append(ele: ELE) {
+		this.node.append(ele);
 	}
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);

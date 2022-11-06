@@ -73,7 +73,7 @@ function getInsertableRange(range: RANGE) {
 	range = range.cloneRange();
 	let view = getBox(range);
 	while (view) {
-		if (view?.contentType == "list") {
+		if (view?.type.model == "list") {
 			return range;
 		}
 		if (!atStart(view.node, range.startContainer, range.startOffset)) {

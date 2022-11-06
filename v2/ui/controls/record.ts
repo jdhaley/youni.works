@@ -36,7 +36,7 @@ export class RecordBox extends ElementBox {
 	protected viewMember(name: string, value: any): Box {
 		let type = this.type.types[name];
 		let member = type.create(value, this) as Box;
-		member.styles.add(this.memberType);
+		member.kind.add(this.memberType);
 		return member;
 	}
 

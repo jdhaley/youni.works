@@ -11,10 +11,10 @@ export default extend(editable, {
 		let header = getHeader(this, event.target as Node);
 		if (header) {
 			event.subject = "";
-			if (this.styles.contains("collapsed")) {
-				this.styles.remove("collapsed");
+			if (this.kind.contains("collapsed")) {
+				this.kind.remove("collapsed");
 			} else {
-				this.styles.add("collapsed");
+				this.kind.add("collapsed");
 			}
 		}
 	},

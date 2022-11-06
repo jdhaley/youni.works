@@ -58,7 +58,7 @@ export class RowBox extends RecordBox {
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
 			let child = type.create(idx[name], this) as Box;
-			child.styles.add("field");
+			child.kind.add("field");
 		}
 	}
 	valueOf(range?: RANGE): value {

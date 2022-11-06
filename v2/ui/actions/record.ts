@@ -10,13 +10,13 @@ export default extend(editable, {
 		event.subject = "";
 		if (event.target == this.header) {
 			event.subject = "";
-			if (this.styles.contains("collapsed")) {
+			if (this.kind.contains("collapsed")) {
 				this.header.textContent = this._type.conf.title;
-				this.styles.remove("collapsed");
+				this.kind.remove("collapsed");
 			} else {
 				let title = this.get("title").content.textContent || "";
 				this.header.innerHTML += ": " + `<b>${title}</b>`;
-				this.styles.add("collapsed");
+				this.kind.add("collapsed");
 			}
 		}
 	},
