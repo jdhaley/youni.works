@@ -1,4 +1,4 @@
-import { value } from "../../base/model.js";
+import { value } from "../../base/mvc.js";
 import { CHAR } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { ElementBox } from "./box.js";

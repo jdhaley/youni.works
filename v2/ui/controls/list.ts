@@ -1,4 +1,4 @@
-import { value, list, typeOf, Type } from "../../base/model.js";
+import { value, list, typeOf, Type } from "../../base/mvc.js";
 import { ELE, NODE, RANGE } from "../../base/dom.js";
 import { getBox } from "../util.js";
 

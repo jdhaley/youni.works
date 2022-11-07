@@ -1,7 +1,7 @@
-import { NODE, RANGE } from "../base/dom.js";
+import { NODE } from "../base/dom.js";
 import { Editable } from "../base/article.js";
 
-export interface Editor extends Editable<NODE, RANGE> {
+export interface Editor extends Editable<NODE> {
 }
 
 export interface TreeItem extends Editor {

@@ -1,4 +1,4 @@
-import { model, Type } from "./model.js";
+import { model, Type } from "./mvc.js";
 import { bundle, EMPTY, extend } from "./util.js";
 
 export function start(owner: TypeOwner) {

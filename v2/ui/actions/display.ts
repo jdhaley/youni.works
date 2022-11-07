@@ -5,7 +5,7 @@ import { Change } from "../../base/article.js";
 import { UserEvent } from "../frame.js";
 
 import { Box, Display } from "../box.js";
-import { Type } from "../../base/model.js";
+import { Type } from "../../base/mvc.js";
 import { CommandBuffer } from "../../base/command.js";
 
 export default extend(null, {

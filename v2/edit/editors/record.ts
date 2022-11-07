@@ -1,4 +1,4 @@
-import { record } from "../../base/model.js";
+import { record } from "../../base/mvc.js";
 import { RANGE } from "../../base/dom.js";
 
 import { Editor } from "../editor.js";

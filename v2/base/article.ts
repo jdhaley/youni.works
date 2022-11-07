@@ -1,16 +1,16 @@
-import { value } from "./model.js";
-import { Content, Text, View } from "./view.js";
+import { Content, View, value } from "./mvc.js";
 import { BaseType, TypeOwner } from "./type.js";
 import { Graph, Receiver, Signal } from "./control.js";
 import { CommandBuffer } from "./command.js";
 import { bundle, Sequence } from "./util.js";
 
-export interface NodeContent<T extends Text> extends Content {
+export interface NodeContent<T> extends Content<T> {
 	readonly node: T;
-	readonly contents: Sequence<T>
+	readonly contents: Sequence<T>;
 }
 
-export interface Viewer<T extends Text> extends View {
+export interface Viewer<T> extends View<T> {
+	readonly type: ArticleType<T>;
 	readonly node: T;
 	/**
 	 * The content may be the Viewer itself or a different content object.
@@ -18,21 +18,20 @@ export interface Viewer<T extends Text> extends View {
 	readonly content: NodeContent<T>;
 }
 
-export interface Editable<T extends Text, E extends Extent<T>> extends Viewer<T> {
-	readonly type: ArticleType<T>;
+export interface Editable<T> extends Viewer<T> {
 	id: string;
-	edit(commandName: string, extent: E, replacement?: value): E;
-	getContent(extent?: E): T
+	edit(commandName: string, extent: Extent<T>, replacement?: value): Extent<T>;
+	getContent(extent?: Extent<T>): T
 }
 
-export abstract class ArticleType<T extends Text> extends BaseType<Viewer<T>> {
+export abstract class ArticleType<T> extends BaseType<Viewer<T>> {
 	readonly owner: Article<T>;
 
 	//abstract create(value?: value, container?: Content): ContentView<T>;
 	abstract control(node: T): Viewer<T>;
 }
 
-export interface Article<T extends Text> extends TypeOwner, Receiver, Graph<T> {
+export interface Article<T> extends TypeOwner, Receiver, Graph<T> {
 	frame: ViewFrame<T>;
 	node: T;
 	conf: bundle<any>;
@@ -51,7 +50,7 @@ export interface ViewFrame<T> extends Receiver {
 	node: T;
 	selectionRange: Extent<T>;
 
-	createNode(tagName: string): T;
+	createNode(name: string): T;
 	append(node: T): void;
 }
 
@@ -81,7 +80,7 @@ export interface Edit {
 
 
 export class Change implements Signal {
-	constructor(command: string, view?: View) {
+	constructor(command: string, view?: View<unknown>) {
 		this.direction = view ? "up" : "down";
 		this.subject = "change";
 		this.from = view;
@@ -89,9 +88,9 @@ export class Change implements Signal {
 		this.commandName = command;
 	}
 	direction: "up" | "down";
-	source: View;
-	from: View;
-	on: View;
+	source: View<unknown>;
+	from: View<unknown>;
+	on: View<unknown>;
 	subject: string;
 	commandName: string;
 }

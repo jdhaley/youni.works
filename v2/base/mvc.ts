@@ -1,4 +1,4 @@
-import { bundle } from "./util";
+import { bundle, Instance } from "./util";
 
 export type model = "unit" | "list" | "record";
 export type value =  unit | list | record ;
@@ -29,6 +29,22 @@ export interface Type<T> {
 	types: bundle<Type<T>>;
 
 	create(...args: any[]): T;
+}
+
+
+export interface Text {
+	textContent: string;
+}
+
+export interface Content<T> extends Text, Instance {
+	readonly contents: Iterable<T>;
+	markupContent: string; //May be HTML, XML, or a simplification thereof.
+}
+
+export interface View<T> extends Instance {
+	readonly type: Type<View<T>>;
+	readonly content: Content<T>;
+	valueOf(filter?: unknown): value;
 }
 
 function contentTypeOf(value: any): model {

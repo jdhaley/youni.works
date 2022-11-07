@@ -1,4 +1,4 @@
-import { value } from "../../base/model.js";
+import { value } from "../../base/mvc.js";
 import { Editor } from "../editor.js";
 
 import { LevelCommand } from "../commands/level.js";

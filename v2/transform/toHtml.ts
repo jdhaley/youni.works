@@ -1,4 +1,4 @@
-import { record } from "../base/model.js";
+import { record } from "../base/mvc.js";
 import { ELE } from "../base/dom.js";
 import { Part } from "./item.js";
 

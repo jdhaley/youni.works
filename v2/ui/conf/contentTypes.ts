@@ -1,4 +1,4 @@
-import { model } from "../../base/model";
+import { model } from "../../base/mvc";
 import { bundle } from "../../base/util";
 
 export default {

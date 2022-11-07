@@ -1,4 +1,4 @@
-import { value } from "../../base/model.js";
+import { value } from "../../base/mvc.js";
 import { Actions } from "../../base/control.js";
 import { NodeContent, ArticleType } from "../../base/article.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";

@@ -1,11 +1,9 @@
-import { model, value } from "../base/model.js";
+import { model, value } from "../base/mvc.js";
 import { Article, ArticleType, Viewer, Editable, Edits, Extent, NodeContent, ViewFrame } from "../base/article.js";
 import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView, DOCUMENT } from "../base/dom.js";
 import { bundle, Sequence } from "../base/util.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
-import { Receiver } from "../base/control.js";
-import { Location } from "../base/remote.js";
 
 export class ElementContent extends ElementShape implements NodeContent<NODE> {
 	get contents(): Sequence<NODE> {
@@ -129,7 +127,7 @@ export abstract class ElementViewOwner extends ElementOwner {
 		return ele.$control as Viewer<NODE>;
 	}
 	getPath(node: NODE, offset: number): string {
-		let view = getView(node) as Editable<NODE, RANGE>;
+		let view = getView(node) as Editable<NODE>;
 		let path = "/" + offset;
 		while (node) {
 			if (node == view.content.node) {
@@ -163,7 +161,7 @@ export abstract class ElementViewOwner extends ElementOwner {
 		this.node = view.node;
 		this.frame.append(this.node);
 		for (let edit of edits.edits) {
-			let editor = this.getControl(edit.viewId) as Editable<NODE, RANGE>;
+			let editor = this.getControl(edit.viewId) as Editable<NODE>;
 			let range = this.rangeFrom(edit.range.start, edit.range.end);
 			editor.edit(edit.name, range, edit.value);
 		}
@@ -178,7 +176,7 @@ function getNodeIndex(parent: NODE, node: NODE): number {
 	}
 }
 function getNode(doc: DOCUMENT, path: string[]) {
-	let view = getView(doc.getElementById(path[0])) as Editable<NODE, RANGE>;
+	let view = getView(doc.getElementById(path[0])) as Editable<NODE>;
 	if (!view) console.error("can't find view");
 	let node = view.content.node;
 	for (let i = 1; i < path.length - 1; i++) {

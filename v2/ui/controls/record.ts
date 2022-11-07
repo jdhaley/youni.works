@@ -1,4 +1,4 @@
-import { value, record } from "../../base/model.js";
+import { value, record } from "../../base/mvc.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 
 import { Box } from "../box.js";

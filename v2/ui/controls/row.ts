@@ -1,6 +1,5 @@
-import { View } from "../../base/view.js";
 import { ELE, NODE, RANGE } from "../../base/dom.js";
-import { value, record, item } from "../../base/model.js";
+import { View, value, record, item } from "../../base/mvc.js";
 import { EMPTY } from "../../base/util.js";
 
 import { RecordBox } from "./record.js";
@@ -26,7 +25,7 @@ export class RowBox extends RecordBox {
 	// 	if (header) return header["_type"];
 	// }
 
-	view(content: item): View {
+	view(content: item): View<NODE> {
 		if (!this.rowHeader && !content.header) {
 			let item = createHeaderItem(this._type);
 			let hdr = this.type.create() as RowBox;
