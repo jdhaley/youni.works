@@ -1,5 +1,4 @@
-import { Bag, Instance } from "./util";
-
+import { Instance } from "./util";
 
 export interface Styled extends Instance {
 	getStyle(name: string): string;
@@ -9,7 +8,6 @@ export interface Styled extends Instance {
 export interface Shape extends Styled {
 	readonly area: Area;
 	readonly arcs: Iterable<Arc>;
-	readonly kind: Bag<string>;
 
 	size(width: number, height: number): void;
 	position(x: number, y: number): void;

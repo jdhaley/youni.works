@@ -69,7 +69,6 @@ export interface Edit {
 	value: any;
 }
 
-
 export class Change implements Signal {
 	constructor(command: string, view?: View<unknown>) {
 		this.direction = view ? "up" : "down";
