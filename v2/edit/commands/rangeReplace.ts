@@ -4,6 +4,7 @@ import { ele, ELE, RANGE } from "../../base/dom.js";
 import { Editor } from "../editor.js";
 import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
 import { Replace } from "./replace.js";
+import { viewContent } from "../../transform/content.js";
 
 export class RangeReplace extends Replace {
 	startId: string;
@@ -21,12 +22,12 @@ export class RangeReplace extends Replace {
 		range = this.getOuterRange(range);
 		let view = getEditor(range);
 		captureRange(this, view.content.node as ELE, range.startOffset, range.endOffset);
-		this.before = ele(view.getContent(range)).innerHTML;
+		this.before = viewContent(view, range).innerHTML;
 	}
 	protected execAfter(range: RANGE): RANGE {
 		range = this.getReplaceRange();
 		let view = getEditor(range);
-		this.after = ele(view.getContent(range)).innerHTML;
+		this.after = viewContent(view, range).innerHTML;
 		return unmark(range);
 	}
 	protected getOuterRange(inner: RANGE) {

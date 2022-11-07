@@ -15,7 +15,7 @@ export default extend(text, {
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
 		range = this.edit("Paste", range, text);
-		range && this.type.owner.setRange(range, true);
+		range && this.type.owner.setExtent(range, true);
 	},
 	erase(this: Box, event: UserEvent) {
 		event.subject = ""
@@ -28,7 +28,7 @@ export default extend(text, {
 			}	
 		} else {
 			range = this.edit("Erase", range, "");
-			range && this.type.owner.setRange(range, true);	
+			range && this.type.owner.setExtent(range, true);	
 		}
 	},
 	delete(this: Box, event: UserEvent) {
@@ -42,7 +42,7 @@ export default extend(text, {
 			}
 		} else {
 			range = this.edit("Delete", range, "");
-			range && this.type.owner.setRange(range, true);	
+			range && this.type.owner.setExtent(range, true);	
 		}
 	},
 	next() {

@@ -1,6 +1,6 @@
 import { value } from "../../base/mvc.js";
 import { Actions } from "../../base/control.js";
-import { NodeContent, ArticleType } from "../../base/article.js";
+import { NodeContent, ViewerType } from "../../base/article.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
@@ -17,8 +17,8 @@ export abstract class ElementBox extends ElementView implements Box {
 		if (editor) this["edit"] = editor;
 	}
 
-	get type(): ArticleType<NODE> {
-		return this._type as ArticleType<NODE>;
+	get type(): ViewerType<NODE> {
+		return this._type as ViewerType<NODE>;
 	}
 	get shortcuts(): bundle<string> {
 		return this._type.conf.shortcuts;
@@ -49,9 +49,6 @@ export abstract class ElementBox extends ElementView implements Box {
 	edit(commandName: string, range: RANGE, content?: value): RANGE {
 		console.warn("edit() has not been configured.")
 		return null;
-	}
-	getContent(range?: RANGE): ELE {
-		return viewContent(this, range);
 	}
 	view(value: value, parent?: ElementView): void {
 		if (parent) (parent.content.node as ELE).append(this._ele);

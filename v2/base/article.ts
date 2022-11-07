@@ -10,7 +10,7 @@ export interface NodeContent<T> extends Content<T> {
 }
 
 export interface Viewer<T> extends View<T> {
-	readonly type: ArticleType<T>;
+	readonly type: ViewerType<T>;
 	readonly node: T;
 	/**
 	 * The content may be the Viewer itself or a different content object.
@@ -18,16 +18,9 @@ export interface Viewer<T> extends View<T> {
 	readonly content: NodeContent<T>;
 }
 
-export interface Editable<T> extends Viewer<T> {
-	id: string;
-	edit(commandName: string, extent: Extent<T>, replacement?: value): Extent<T>;
-	getContent(extent?: Extent<T>): T
-}
-
-export abstract class ArticleType<T> extends BaseType<Viewer<T>> {
+export abstract class ViewerType<T> extends BaseType<Viewer<T>> {
 	readonly owner: Article<T>;
-
-	//abstract create(value?: value, container?: Content): ContentView<T>;
+	abstract create(value?: value, container?: Viewer<T>): Viewer<T>
 	abstract control(node: T): Viewer<T>;
 }
 
@@ -39,10 +32,8 @@ export interface Article<T> extends TypeOwner, Receiver, Graph<T> {
 
 	createNode(tag: string): T;
 	getControl(id: string): Viewer<T>;
-	getPath(node: T, offset: number): string;
-	setRange(extent: Extent<T>, collapse?: boolean): void;
-	rangeFrom(startPath: string, endPath: string): Extent<T>;
-	play(edits: Edits): void;
+	setExtent(extent: Extent<T>, collapse?: boolean): void;
+	extentFrom(startPath: string, endPath: string): Extent<T>;
 }
 
 export interface ViewFrame<T> extends Receiver {

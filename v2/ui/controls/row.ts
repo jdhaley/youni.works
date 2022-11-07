@@ -4,7 +4,7 @@ import { EMPTY } from "../../base/util.js";
 
 import { RecordBox } from "./record.js";
 import { Box } from "../box.js";
-import { ArticleType } from "../../base/article.js";
+import { ViewerType } from "../../base/article.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
@@ -86,7 +86,7 @@ function getColumns(row: item) {
 	}
 	return columns;
 }
-function createType(type: ArticleType<NODE>, columns: string[]): ArticleType<NODE> {
+function createType(type: ViewerType<NODE>, columns: string[]): ViewerType<NODE> {
 	type.types = Object.create(null);
 	let column = type.owner.types.column;
 	for (let col of columns) {
@@ -115,7 +115,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	return model;
 }
 
-function createHeaderItem(type: ArticleType<NODE>): item {
+function createHeaderItem(type: ViewerType<NODE>): item {
 	let item = {
 		type$: type.name,
 		header: true, 

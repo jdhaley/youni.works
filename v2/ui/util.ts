@@ -1,3 +1,4 @@
+import { Article, Edits, ViewerType } from "../base/article.js";
 import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
@@ -87,4 +88,17 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 	}
 	if (!(model instanceof Array)) model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
+}
+
+
+export function play(article: Article<NODE>, edits: Edits) {
+	let type = article.types[edits.type] as ViewerType<NODE>;
+	let view = type.create(edits.source);
+	article.node = view.node;
+	this.frame.append(this.node);
+	for (let edit of edits.edits) {
+		let editor = this.getControl(edit.viewId) as Box;
+		let range = this.extentFrom(edit.range.start, edit.range.end);
+		editor.edit(edit.name, range, edit.value);
+	}
 }

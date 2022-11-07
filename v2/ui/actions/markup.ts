@@ -13,7 +13,7 @@ export default extend(list, {
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
 		range = this.edit("Paste", range, model);
-		range &&  this.type.owner.setRange(range, true);
+		range &&  this.type.owner.setExtent(range, true);
 	},
 	insertText(this: Box, event: EditEvent) {
 		event.subject = "";
@@ -22,7 +22,7 @@ export default extend(list, {
 			"content": event.data
 		};
 		let range = this.edit("Entry", event.range, [model]);
-		range &&  this.type.owner.setRange(range, true);
+		range &&  this.type.owner.setExtent(range, true);
 	},
 	split(this: Box, event: UserEvent) {
 		event.subject = "";
@@ -45,13 +45,13 @@ export default extend(list, {
 			range.selectNodeContents(range.startContainer);
 			range.collapse();
 		}
-		range && this.type.owner.setRange(range, true);
+		range && this.type.owner.setExtent(range, true);
 	},
 	join(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		range = this.edit("Join", range, "");
-		range && this.type.owner.setRange(range, true);
+		range && this.type.owner.setExtent(range, true);
 	},
 	next(this: Box, event: UserEvent) {
 		event.subject = "";

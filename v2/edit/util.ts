@@ -1,5 +1,5 @@
 import { Change } from "../base/article.js";
-import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getView, bindViewEle, DOCUMENT } from "../base/dom.js";
+import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getView, bindViewEle, getNodeIndex } from "../base/dom.js";
 
 import { Editor } from "./editor.js";
 
@@ -13,6 +13,19 @@ export function getChildEditor(editor: Editor, node: NODE): Editor {
 		node = node.parentNode;
 	}
 	if (ele(node) && node["$control"]) return node["$control"] as Editor;
+}
+
+export function getPath(node: NODE): string {
+	let view = getEditor(node);
+	let path = "";
+	while (node) {
+		if (node == view.content.node) {
+			return view.id + path;
+		}
+		path = "/" + getNodeIndex(node.parentNode, node) + path;
+		node = node.parentNode;
+	}
+	return path;
 }
 
 export function narrowRange(range: RANGE) {

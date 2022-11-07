@@ -1,9 +1,11 @@
 import { model, value } from "../base/mvc.js";
-import { Article, ArticleType, Viewer, Editable, Edits, Extent, NodeContent, ViewFrame } from "../base/article.js";
+import { CommandBuffer } from "../base/command.js";
+import { Article, ViewerType, Viewer, Edits, NodeContent, ViewFrame } from "../base/article.js";
 import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView, DOCUMENT } from "../base/dom.js";
 import { bundle, Sequence } from "../base/util.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
+import { Editor } from "../edit/editor.js";
 
 export class ElementContent extends ElementShape implements NodeContent<NODE> {
 	get contents(): Sequence<NODE> {
@@ -27,9 +29,9 @@ export class ElementContent extends ElementShape implements NodeContent<NODE> {
 }
 
 export abstract class ElementView extends ElementContent implements Viewer<NODE> {
-	declare _type: ArticleType<NODE>;
+	declare _type: ViewerType<NODE>;
 
-	get type(): ArticleType<NODE> {
+	get type(): ViewerType<NODE> {
 		return this._type;
 	}
 	get content(): NodeContent<NODE> {
@@ -64,7 +66,7 @@ export abstract class ElementView extends ElementContent implements Viewer<NODE>
 	}
 }
 
-export class ElementViewType extends  ArticleType<NODE> {
+export class ElementViewType extends  ViewerType<NODE> {
 	constructor(owner: Article<Node>) {
 		super();
 		this.owner = owner;
@@ -76,20 +78,20 @@ export class ElementViewType extends  ArticleType<NODE> {
 	}
 
 	create(value: value, container?: ElementView): ElementView {
-		let view = super.create() as ElementView;
+		let view = Object.create(this.prototype) as ElementView;
 		let node = this.owner.createNode(this.conf.tagName || "div");
 		view.control(node as ELE);
 		view.view(value, container);
 		return view;
 	}
 	control(node: ELE): ElementView {
-		let view = super.create() as ElementView;
+		let view = Object.create(this.prototype) as ElementView;
 		view.control(node);
 		return view;
 	}
 }
 
-export abstract class ElementViewOwner extends ElementOwner {
+export abstract class ElementViewOwner extends ElementOwner implements Article<NODE> {
 	constructor(conf: bundle<any>) {
 		super();
 		/*
@@ -97,14 +99,16 @@ export abstract class ElementViewOwner extends ElementOwner {
 		*/
 		this.conf = conf;
 		this.actions = conf.actions;
+		this.commands = new CommandBuffer();
 	}
-	source: value;
 	frame: ViewFrame<NODE>;
 	node: ELE;
 	conf: bundle<any>;
 	types: bundle<ElementViewType>;
 	unknownType: ElementViewType;
 	defaultType: ElementViewType;
+	readonly commands: CommandBuffer<RANGE>;
+	source: value;
 
 	createNode(tagName: string): ELE {
 		return this.frame.createNode(tagName) as ELE;
@@ -126,28 +130,17 @@ export abstract class ElementViewOwner extends ElementOwner {
 		}
 		return ele.$control as Viewer<NODE>;
 	}
-	getPath(node: NODE, offset: number): string {
-		let view = getView(node) as Editable<NODE>;
-		let path = "/" + offset;
-		while (node) {
-			if (node == view.content.node) {
-				return view.id + path;
-			}
-			path = "/" + getNodeIndex(node.parentNode, node) + path;
-			node = node.parentNode;
-		}
-		return path;
-	}
-	rangeFrom(startPath: string, endPath: string): RANGE {
+	/** the Loc(ation) is: path + "/" + offset */
+	extentFrom(startLoc: string, endLoc: string): RANGE {
 		let doc = this.node.ownerDocument;
 		let range = doc.createRange();
-		let path = startPath.split("/");
+		let path = startLoc.split("/");
 		let node = getNode(doc, path);
 		if (node) {
 			let offset = Number.parseInt(path.at(-1));
 			range.setStart(node, offset);
 		}
-		path = endPath.split("/");
+		path = endLoc.split("/");
 		node = getNode(doc, path);
 		if (node) {
 			let offset = Number.parseInt(path.at(-1));
@@ -155,28 +148,16 @@ export abstract class ElementViewOwner extends ElementOwner {
 		}
 		return range;
 	}
-	play(edits: Edits) {
-		let type = this.types[edits.type];
-		let view = type.create(edits.source);
-		this.node = view.node;
-		this.frame.append(this.node);
-		for (let edit of edits.edits) {
-			let editor = this.getControl(edit.viewId) as Editable<NODE>;
-			let range = this.rangeFrom(edit.range.start, edit.range.end);
-			editor.edit(edit.name, range, edit.value);
+	setExtent(range: RANGE, collapse?: boolean): void {
+		if (range) {
+			if (collapse) range.collapse();
+			this.frame.selectionRange = range;
 		}
 	}
 }
 
-function getNodeIndex(parent: NODE, node: NODE): number {
-	for (let i = 0; i < parent?.childNodes.length; i++) {
-		if (parent.childNodes[i] == node) {
-			return i;
-		}
-	}
-}
 function getNode(doc: DOCUMENT, path: string[]) {
-	let view = getView(doc.getElementById(path[0])) as Editable<NODE>;
+	let view = getView(doc.getElementById(path[0])) as Viewer<NODE>;
 	if (!view) console.error("can't find view");
 	let node = view.content.node;
 	for (let i = 1; i < path.length - 1; i++) {

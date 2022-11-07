@@ -1,5 +1,5 @@
 import { RANGE } from "../../base/dom.js";
-import { getEditor, mark, unmark } from "../util.js";
+import { getEditor, getPath, mark, unmark } from "../util.js";
 import { EditCommand } from "./edit.js";
 
 export class Replace extends EditCommand {
@@ -9,10 +9,10 @@ export class Replace extends EditCommand {
 	exec(range: RANGE, content: any): RANGE {
 		if (this.owner.conf.recordCommands) {
 			this.range = {
-				start: this.owner.getPath(range.startContainer, range.startOffset),
-				end: this.owner.getPath(range.endContainer, range.endOffset)
+				start: getPath(range.startContainer) + "/" + range.startOffset,
+				end: getPath(range.endContainer) + "/" + range.endOffset
 			}
-			let rx = this.owner.rangeFrom(this.range["start"], this.range["end"]);
+			let rx = this.owner.extentFrom(this.range["start"], this.range["end"]);
 			console.log("RANGES", range, rx);
 			this.value = content;	
 		}

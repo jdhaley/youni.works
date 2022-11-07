@@ -31,7 +31,6 @@ export interface Type<T> {
 	create(...args: any[]): T;
 }
 
-
 export interface Text {
 	textContent: string;
 }

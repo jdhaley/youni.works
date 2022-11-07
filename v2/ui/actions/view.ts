@@ -37,12 +37,12 @@ export default extend(null, {
 	},
 	undo(this: Box, event: UserEvent) {
 		event.subject = "";
-		this.type.owner.setRange(this.type.owner.commands.undo(), false);
+		this.type.owner.setExtent(this.type.owner.commands.undo(), false);
 		this.type.owner.receive(new Change("undo"));
 	},
 	redo(this: Box, event: UserEvent) {
 		event.subject = "";
-		this.type.owner.setRange(this.type.owner.commands.redo(), false);
+		this.type.owner.setExtent(this.type.owner.commands.redo(), false);
 		this.type.owner.receive(new Change("redo"));
 	},
 	selectionchange(this: Box, event: UserEvent) {

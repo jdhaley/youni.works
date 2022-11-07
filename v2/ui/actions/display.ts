@@ -42,7 +42,7 @@ export default extend(null, {
 		event.subject = "";
 		let range = this.commands.redo();
 		if (range) {
-			this.setRange(range, false);
+			this.setExtent(range, false);
 			let signal = new Change("undo");
 			this.send(signal, this.node);
 			this.frame.receive(signal);	
@@ -52,7 +52,7 @@ export default extend(null, {
 		event.subject = "";
 		let range = this.commands.redo();
 		if (range) {
-			this.setRange(range, false);
+			this.setExtent(range, false);
 			let signal = new Change("undo");
 			this.send(signal, this.node);
 			this.frame.receive(signal);	

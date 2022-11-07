@@ -1,4 +1,4 @@
-import { ArticleType, Viewer, Extent } from "./article.js";
+import { ViewerType, Viewer, Extent } from "./article.js";
 import { Bag, Sequence } from "./util.js";
 
 export interface DOCUMENT {
@@ -85,6 +85,13 @@ export function nodeOf(loc: NODE | RANGE): NODE {
 	return loc instanceof Node ? loc : null;
 }
 
+export function getNodeIndex(parent: NODE, node: NODE): number {
+	for (let i = 0; i < parent?.childNodes.length; i++) {
+		if (parent.childNodes[i] == node) {
+			return i;
+		}
+	}
+}
 ///////////////////// View Support //////////////////////////
 
 export interface VIEW_ELE extends ELE {
@@ -96,7 +103,7 @@ export function getView(loc: NODE | RANGE): Viewer<NODE> {
 	loc = loc instanceof Node ? loc : null;
 	while (loc) {
 		let e = ele(loc) as VIEW_ELE;
-		if (e?.$control?.type instanceof ArticleType) {
+		if (e?.$control?.type instanceof ViewerType) {
 			return e.$control;
 		}
 		loc = loc.parentNode;
@@ -110,7 +117,7 @@ export function bindViewEle(node: VIEW_ELE) {
 	let name = node.getAttribute("data-item");
 	if (view && name) {
 		console.log("binding.");
-		let type = view.type.types[name] as ArticleType<NODE>;
+		let type = view.type.types[name] as ViewerType<NODE>;
 		if (type) {
 			view = type.control(node);
 		} else {
