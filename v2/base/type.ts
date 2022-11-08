@@ -26,7 +26,7 @@ type source = bundle<string | source> | string;
 export class BaseType<T> implements Type<T> {
 	declare partOf: BaseType<T>;
 	declare name: string;
-	declare prototype: object;
+	declare prototype: T;
 	declare conf: bundle<any>;
 
 	types: bundle<Type<T>> = EMPTY.object;
@@ -47,12 +47,12 @@ export class BaseType<T> implements Type<T> {
 		if (conf.proto) {
 			this.prototype = extend(this.prototype, conf.proto);
 		} else {
-			this.prototype = Object.create(this.prototype);
+			this.prototype = Object.create(this.prototype as any);
 		}
 		this.prototype["_type"] = this;
 	}
 	create(...args: any[]): T {
-		return Object.create(this.prototype);
+		return Object.create(this.prototype as any);
 	}
 }
 
