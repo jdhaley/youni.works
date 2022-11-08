@@ -1,12 +1,12 @@
-import { ELE, NODE, RANGE } from "../base/dom";
-import { Editor } from "./editor";
-import { getEditor, getChildEditor, clearContent, narrowRange, mark } from "./util";
+import { ELE, NODE, RANGE } from "../base/dom.js";
+import { Editor } from "./editor.js";
+import { getEditor, getChildEditor, clearContent, narrowRange, mark } from "./util.js";
 
 interface E extends ELE {
 	$control: Editor
 }
 
-export class Editer {
+export class Arrange /* implements Extent<NODE> */ {
 	constructor(range: RANGE) {
 		this.#range = range;
 	}
@@ -43,6 +43,52 @@ export class Editer {
 	unmark() {
 		return mark(this.#range);
 	}
+}
+
+
+export class ERANGE extends Range {
+	private get $range(): RANGE {
+		return this;
+	}
+	protected get editor(): Editor {
+		return getEditor(this.$range);
+	}
+	get contentType(): string {
+		return this.editor.type.model;
+	}
+	get content(): E {
+		return this.editor.content.node as E;
+	}
+	get value(): any {
+		return this.editor.valueOf(this.$range);
+	}
+
+	getChild(node: NODE): Editor {
+		return getChildEditor(this.editor, node)
+	}
+	exec(commandName: string, ...args: any[]): void {
+		let range = this.editor.edit(commandName, this.$range, args[0]);
+	}
+	narrow() {
+		return narrowRange(this.$range);
+	}
+	clear() {
+		return clearContent(this.$range);
+	}
+	mark() {
+		return mark(this.$range);
+	}
+	unmark() {
+		return mark(this.$range);
+	}
+}
+
+export function createRange(range: RANGE) {
+	let object = Object.create(range);
+	for (let name of Object.getOwnPropertyNames(ERANGE.prototype)) {
+		Object.defineProperty(object, name, Object.getOwnPropertyDescriptor(ERANGE.prototype, name));
+	}
+	return object;
 }
 /*
 Type<T> {
