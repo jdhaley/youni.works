@@ -1,7 +1,7 @@
 import { Viewer } from "../base/article.js";
 import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
 
-export function viewContent(view: Viewer<NODE>, range: RANGE, out?: ELE) {
+export function xmlContent(view: Viewer<NODE>, range: RANGE, out?: ELE): ELE {
 	if (range && !range.intersectsNode(view.content.node)) return;
 	let item: ELE;
 	if (!out) {
@@ -24,7 +24,7 @@ function content(view: Viewer<NODE>, range: RANGE, out: ELE) {
 			continue;
 		let childView = getView(node) as Viewer<NODE>;
 		if (childView && childView != view) {
-			viewContent(childView, range, out);
+			xmlContent(childView, range, out);
 		} else if (ele(node)) {
 			out.append(ele(node).cloneNode(true));
 		} else {

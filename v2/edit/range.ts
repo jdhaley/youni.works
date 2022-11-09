@@ -1,6 +1,7 @@
 import { ELE, NODE, RANGE } from "../base/dom.js";
+import { xmlContent } from "../transform/content.js";
 import { Editor } from "./editor.js";
-import { getEditor, getChildEditor, clearContent, narrowRange, mark } from "./util.js";
+import { getEditor, getChildEditor, clearContent, narrowRange, mark, unmark } from "./util.js";
 
 interface E extends ELE {
 	$control: Editor
@@ -8,12 +9,12 @@ interface E extends ELE {
 
 export class Arrange /* implements Extent<NODE> */ {
 	constructor(range: RANGE) {
-		this.#range = range;
+		this.range = range;
 	}
-	#range: RANGE;
+	range: RANGE;
 
 	protected get editor(): Editor {
-		return getEditor(this.#range);
+		return getEditor(this.range);
 	}
 	get contentType(): string {
 		return this.editor.type.model;
@@ -22,26 +23,29 @@ export class Arrange /* implements Extent<NODE> */ {
 		return this.editor.content.node as E;
 	}
 	get value(): any {
-		return this.editor.valueOf(this.#range);
+		return this.editor.valueOf(this.range);
 	}
 
-	getChild(node: NODE): Editor {
-		return getChildEditor(this.editor, node)
-	}
 	exec(commandName: string, ...args: any[]): void {
-		let range = this.editor.edit(commandName, this.#range, args[0]);
+		let range = this.editor.edit(commandName, this.range, args[0]);
 	}
 	narrow() {
-		return narrowRange(this.#range);
+		return narrowRange(this.range);
 	}
 	clear() {
-		return clearContent(this.#range);
+		return clearContent(this.range);
 	}
 	mark() {
-		return mark(this.#range);
+		mark(this.range);
 	}
 	unmark() {
-		return mark(this.#range);
+		unmark(this.range);
+	}
+	xmlContent() {
+		return xmlContent(this.editor, this.range);
+	}
+	getChild(node: NODE): Editor {
+		return getChildEditor(this.editor, node)
 	}
 }
 

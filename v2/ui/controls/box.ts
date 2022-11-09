@@ -5,7 +5,6 @@ import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
 import { ElementContent, ElementView } from "../../control/view.js";
-import { viewContent } from "../../transform/content.js";
 import { Box } from "../box.js";
 
 type editor = (this: Box, commandName: string, range: RANGE, content?: value) => RANGE;
