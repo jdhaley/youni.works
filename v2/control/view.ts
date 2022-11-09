@@ -1,11 +1,10 @@
 import { model, value } from "../base/mvc.js";
 import { CommandBuffer } from "../base/command.js";
-import { Article, ViewerType, Viewer, Edits, NodeContent, ViewFrame } from "../base/article.js";
+import { Article, ViewerType, Viewer, NodeContent, ViewFrame } from "../base/article.js";
 import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView, DOCUMENT } from "../base/dom.js";
 import { bundle, Sequence } from "../base/util.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
-import { Editor } from "../edit/editor.js";
 
 export class ElementContent extends ElementShape implements NodeContent<NODE> {
 	get contents(): Sequence<NODE> {
