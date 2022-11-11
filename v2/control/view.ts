@@ -44,6 +44,25 @@ export abstract class ElementView extends ElementContent implements Viewer<NODE>
 			if (node == node.ownerDocument.body) return this.type.owner;
 		}
 	}
+	get level(): number {
+		return Number.parseInt(this.at("aria-level")) || 0;
+	}
+	set level(level: number) {
+		level = level || 0;
+		if (level < 1) {
+			this.put("aria-level");
+		} else {
+			this.put("aria-level", "" + (level <= 6 ? level : 6));
+		}
+	}
+
+	demote() {
+		let level = this.level;
+		if (level < 6) this.level = ++level;
+	}
+	promote() {
+		--this.level;
+	}
 
 	abstract valueOf(range?: RANGE): value;
 	abstract viewValue(data: value): void;

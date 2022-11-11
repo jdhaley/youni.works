@@ -25,9 +25,9 @@ export abstract class ElementBox extends ElementView implements Box {
 	get isContainer(): boolean {
 		return this._type.conf.container;
 	}
-	get header(): ELE {
+	get header(): NodeContent<NODE> {
 		for (let child of this._ele.children) {
-			if (child.nodeName == "header") return child;
+			if (child.nodeName == "header") return child["$control"];
 		}
 	}
 	get content(): NodeContent<NODE> {
@@ -37,9 +37,9 @@ export abstract class ElementBox extends ElementView implements Box {
 		}
 		throw new Error("Missing content in container.");
 	}
-	get footer(): ELE {
+	get footer(): NodeContent<NODE> {
 		for (let child of this._ele.children) {
-			if (child.nodeName == "footer") return child;
+			if (child.nodeName == "footer") return child["$control"];
 		}
 	}
 
@@ -74,9 +74,11 @@ export abstract class ElementBox extends ElementView implements Box {
 		}
 	}
 	protected createHeader(model?: value) {
-		let header = this.node.ownerDocument.createElement("header") as Element;
-		header.textContent = this._type.conf.title || "";
-		this._ele.append(header);
+		let ele = this.node.ownerDocument.createElement("header") as Element;
+		ele.textContent = this._type.conf.title || "";
+		this._ele.append(ele);
+		let content = new ElementContent();
+		content.control(ele as Element);
 	}
 	protected createContent(model?: value) {
 		let ele = this.node.ownerDocument.createElement("div") as Element;

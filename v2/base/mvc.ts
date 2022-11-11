@@ -1,5 +1,9 @@
 import { bundle, Instance } from "./util";
 
+/*
+	A *value* is a model instance.
+	A *model* classifies a value into unit, record, list.
+*/
 export type model = "unit" | "list" | "record";
 export type value =  unit | list | record ;
 
@@ -24,19 +28,19 @@ export interface date {
 
 export interface Type<T> {
 	name: string;
-	model: model;
 	partOf?: Type<T>;
 	types: bundle<Type<T>>;
 
 	create(...args: any[]): T;
 }
 
-export interface Text {
-	textContent: string;
-}
+// export interface Text {
+// 	textContent: string;
+// }
 
-export interface Content<T> extends Text, Instance {
+export interface Content<T> extends Instance {
 	readonly contents: Iterable<T>;
+	textContent: string;
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 

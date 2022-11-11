@@ -4,12 +4,27 @@ import { Graph, Receiver, Signal } from "./control.js";
 import { CommandBuffer } from "./command.js";
 import { bundle, Sequence } from "./util.js";
 
+export interface Component<T> {
+	readonly header?: NodeContent<T>;
+	readonly content: NodeContent<T>;
+	readonly footer?: NodeContent<T>;
+	level: number;
+	demote(): void;
+	promote(): void;
+}
+
+export interface TreeItem {
+	level: number;
+	demote(): void;
+	promote(): void;
+}
+
 export interface NodeContent<T> extends Content<T> {
 	readonly node: T;
 	readonly contents: Sequence<T>;
 }
 
-export interface Viewer<T> extends View<T> {
+export interface Viewer<T> extends View<T>, Component<T> {
 	readonly type: ViewerType<T>;
 	readonly node: T;
 	/**

@@ -6,18 +6,6 @@ import { TextBox } from "./text.js";
 import { getBox } from "../util.js";
 
 export class LineBox extends TextBox {
-	get level(): number {
-		return Number.parseInt(this.at("aria-level")) || 0;
-	}
-	set level(level: number) {
-		level = level || 0;
-		if (level < 1) {
-			this.put("aria-level");
-		} else {
-			this.put("aria-level", "" + (level <= 6 ? level : 6));
-		}
-	}
-
 	demote() {
 		let level = this.level;
 		if (this.type.name == "heading") {

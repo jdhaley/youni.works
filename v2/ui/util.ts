@@ -52,13 +52,12 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 			if (item) {
 				content = navigateInto(item);
 			} else {
-				content = view["footer"];
+				content = view.footer.node as ELE;
 			}
 			break;
 	}
 	return content;
 }
-
 
 export function getClipboard(clipboard: DataTransfer) {
 	let data = clipboard.getData("application/json");

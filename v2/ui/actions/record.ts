@@ -15,7 +15,7 @@ export default extend(editable, {
 				this.kind.remove("collapsed");
 			} else {
 				let title = this.get("title").content.textContent || "";
-				this.header.innerHTML += ": " + `<b>${title}</b>`;
+				this.header.markupContent += ": " + `<b>${title}</b>`;
 				this.kind.add("collapsed");
 			}
 		}

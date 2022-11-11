@@ -13,3 +13,24 @@ export class GenType extends BaseType<any> {
 		}
 	}
 }
+// 
+// For example, this code written with JSX:
+
+// class Hello extends React.Component {
+//   render() {
+//     return <div>Hello {this.props.toWhat}</div>;
+//   }
+// }
+
+// const root = ReactDOM.createRoot(document.getElementById('root'));
+// root.render(<Hello toWhat="World" />);
+// can be compiled to this code that does not use JSX:
+
+// class Hello extends React.Component {
+//   render() {
+//     return React.createElement('div', null, `Hello ${this.props.toWhat}`);
+//   }
+// }
+
+// const root = ReactDOM.createRoot(document.getElementById('root'));
+// root.render(React.createElement(Hello, {toWhat: 'World'}, null));

@@ -1,7 +1,7 @@
 import { EditCommand } from "./edit.js";
 import { getChildEditor, getEditor } from "../util.js";
 import { ele, RANGE } from "../../base/dom.js";
-import { Editor, TreeItem } from "../editor.js";
+import { Editor } from "../editor.js";
 import { EMPTY } from "../../base/util.js";
 
 export class LevelCommand extends EditCommand {
@@ -17,15 +17,15 @@ export class LevelCommand extends EditCommand {
 		return range;
 	}
 	protected do(way: "Promote" | "Demote") {
-		let start = this.owner.getControl(this.startId) as TreeItem;
-		let end = this.owner.getControl(this.endId) as any as TreeItem;
+		let start = this.owner.getControl(this.startId);
+		let end = this.owner.getControl(this.endId);
 		if (start == end) {
 			way == "Promote" ? start.promote() : start.demote();
 		} else {
 			while (start) {
 				way == "Promote" ? start.promote() : start.demote();
 				if (start == end) break;
-				start = getEditor(ele(start.node).nextElementSibling) as any as TreeItem;
+				start = getEditor(ele(start.node).nextElementSibling);
 			}
 		}
 
