@@ -1,7 +1,7 @@
-import { Component } from "../base/component.js";
+import { Control } from "../base/control.js";
 import { ELE } from "../base/dom.js";
 
-export interface Editor extends Component<ELE> {
+export interface Editor extends Control<ELE> {
 	id: string;
 	/** @deprecated */
 	convert?(type: string): void;

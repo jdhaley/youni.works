@@ -1,4 +1,4 @@
-import { BasePart, Owner, Receiver } from "../base/control.js";
+import { BasePart, Owner, Receiver } from "../base/controller.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { ELE } from "../base/dom.js";
 import { Bag, EMPTY, Entity } from "../base/util.js";

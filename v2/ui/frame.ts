@@ -1,4 +1,4 @@
-import { Signal, Actions, Control, Owner } from "../base/control.js";
+import { Signal, Actions, Owner, Receiver } from "../base/controller.js";
 import { ELE, RANGE } from "../base/dom";
 import { EMPTY } from "../base/util.js";
 
@@ -63,7 +63,7 @@ export class Frame extends Owner<ELE> {
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);
 	}
-	getControlOf(view: HTMLElement): Control<HTMLElement> {
+	getControlOf(view: HTMLElement): Receiver {
 		return view["$control"];
 	}
 	getContainerOf(view: HTMLElement): HTMLElement {

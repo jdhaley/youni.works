@@ -1,4 +1,4 @@
-import { ComponentType, Component, Extent } from "./component.js";
+import { ControlType, Control, Extent } from "./control.js";
 import { Text } from "./model.js";
 import { Bag, Sequence } from "./util.js";
 
@@ -95,27 +95,27 @@ export function getNodeIndex(parent: NODE, node: NODE): number {
 ///////////////////// View Support //////////////////////////
 
 export interface VIEW_ELE extends ELE {
-	$control?: Component<ELE>;
+	$control?: Control<ELE>;
 }
 
-export function getView(loc: Text | RANGE): Component<NODE> {
+export function getView(loc: Text | RANGE): Control<NODE> {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	for (let node = loc instanceof Node ? loc : null; node; node = node.parentNode) {
 		let e = ele(node) as VIEW_ELE;
-		if (e?.$control?.type instanceof ComponentType) {
+		if (e?.$control?.type instanceof ControlType) {
 			return e.$control;
 		}
 	}
 }
 
 export function bindViewEle(node: VIEW_ELE) {
-	let view = node["$control"] as Component<NODE>;
+	let view = node["$control"] as Control<NODE>;
 	if (view) return;
-	view = getView(node.parentNode) as Component<NODE>;
+	view = getView(node.parentNode) as Control<NODE>;
 	let name = node.getAttribute("data-item");
 	if (view && name) {
 		console.log("binding.");
-		let type = view.type.types[name] as ComponentType<NODE>;
+		let type = view.type.types[name] as ControlType<NODE>;
 		if (type) {
 			view = type.control(node);
 		} else {

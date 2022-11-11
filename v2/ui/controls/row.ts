@@ -1,6 +1,6 @@
 import { ELE, NODE, RANGE } from "../../base/dom.js";
 import { value, record, item } from "../../base/model.js";
-import { Component, ComponentType } from "../../base/component.js";
+import { Control, ControlType } from "../../base/control.js";
 import { EMPTY } from "../../base/util.js";
 
 import { RecordBox } from "./record.js";
@@ -25,7 +25,7 @@ export class RowBox extends RecordBox {
 	// 	if (header) return header["_type"];
 	// }
 
-	render(content: item): Component<NODE> {
+	render(content: item): Control<NODE> {
 		if (!this.rowHeader && !content.header) {
 			let item = createHeaderItem(this._type);
 			let hdr = this.type.create() as RowBox;
@@ -86,7 +86,7 @@ function getColumns(row: item) {
 	}
 	return columns;
 }
-function createType(type: ComponentType<NODE>, columns: string[]): ComponentType<NODE> {
+function createType(type: ControlType<NODE>, columns: string[]): ControlType<NODE> {
 	type.types = Object.create(null);
 	let column = type.owner.types.column;
 	for (let col of columns) {
@@ -115,7 +115,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	return model;
 }
 
-function createHeaderItem(type: ComponentType<NODE>): item {
+function createHeaderItem(type: ControlType<NODE>): item {
 	let item = {
 		type$: type.name,
 		header: true, 

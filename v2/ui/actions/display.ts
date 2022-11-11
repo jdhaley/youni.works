@@ -1,7 +1,7 @@
 import { ELE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
-import { Change } from "../../base/component.js";
+import { Change } from "../../base/control.js";
 import { UserEvent } from "../frame.js";
 
 import { Box, Display } from "../box.js";

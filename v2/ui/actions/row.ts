@@ -1,5 +1,5 @@
 import { extend } from "../../base/util.js";
-import { Change } from "../../base/component.js";
+import { Change } from "../../base/control.js";
 import { ele } from "../../base/dom.js";
 
 import { RowBox } from "../controls/row.js";

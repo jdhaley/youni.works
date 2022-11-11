@@ -1,4 +1,4 @@
-import { Actions } from "../../base/control.js";
+import { Actions } from "../../base/controller.js";
 import { ELE, NODE, RANGE } from "../../base/dom.js";
 
 import { Frame, UserEvent } from "../frame.js";

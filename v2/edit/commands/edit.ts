@@ -1,4 +1,4 @@
-import { Article, Edit } from "../../base/component.js";
+import { Article, Edit } from "../../base/control.js";
 import { Command } from "../../base/command.js";
 import { NODE, RANGE } from "../../base/dom.js";
 

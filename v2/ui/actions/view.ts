@@ -1,4 +1,4 @@
-import { Change } from "../../base/component.js";
+import { Change } from "../../base/control.js";
 import { extend } from "../../base/util.js";
 
 import { Box } from "../box.js";

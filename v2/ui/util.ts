@@ -1,4 +1,4 @@
-import { Article, Edits, ComponentType } from "../base/component.js";
+import { Article, Edits, ControlType } from "../base/control.js";
 import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
 import { Text } from "../base/model.js";
 import { fromHtml } from "../transform/fromHtml.js";
@@ -92,7 +92,7 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 
 
 export function play(article: Article<NODE>, edits: Edits) {
-	let type = article.types[edits.type] as ComponentType<NODE>;
+	let type = article.types[edits.type] as ControlType<NODE>;
 	let view = type.create(edits.source);
 	article.view = view.view;
 	this.frame.append(this.node);

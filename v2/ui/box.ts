@@ -1,6 +1,6 @@
 import { Shape } from "../base/shape.js";
 import { View } from "../base/model.js";
-import { ArticleContext, Component } from "../base/component.js";
+import { ArticleContext, Control } from "../base/control.js";
 import { ELE, NODE, RANGE } from "../base/dom";
 import { RemoteFileService } from "../base/remote.js";
 import { start } from "../base/type.js";
@@ -8,7 +8,7 @@ import { bundle } from "../base/util.js";
 
 import { ElementViewOwner } from "../control/view.js";
 
-export interface Box extends Shape, Component<ELE> {
+export interface Box extends Shape, Control<ELE> {
 	readonly shortcuts: bundle<string>;
 	id: string;
 	header?: View<ELE>;

@@ -1,6 +1,6 @@
 import { value, View } from "../../base/model.js";
-import { Actions } from "../../base/control.js";
-import { ComponentType } from "../../base/component.js";
+import { Actions } from "../../base/controller.js";
+import { ControlType } from "../../base/control.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
@@ -16,8 +16,8 @@ export abstract class ElementBox extends ElementViewer implements Box {
 		if (editor) this["exec"] = editor;
 	}
 
-	get type(): ComponentType<ELE> {
-		return this._type as ComponentType<ELE>;
+	get type(): ControlType<ELE> {
+		return this._type as ControlType<ELE>;
 	}
 	get shortcuts(): bundle<string> {
 		return this._type.conf.shortcuts;
