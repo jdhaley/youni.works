@@ -1,6 +1,6 @@
 import { extend } from "../../base/util.js";
 
-import { Box } from "../box.js";
+import { Viewbox as Box } from "../box.js";
 import { UserEvent } from "../frame.js";
 import { getClipboard } from "../util.js";
 

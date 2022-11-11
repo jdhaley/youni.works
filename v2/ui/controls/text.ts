@@ -1,10 +1,10 @@
 import { value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
-import { ElementBox } from "./box.js";
+import { Viewbox } from "../box.js";
 
 
-export class TextBox extends ElementBox {
+export class TextBox extends Viewbox {
 	viewType = "text";
 	viewValue(model: value): void {
 		this.content.textContent = model ? "" + model : "";

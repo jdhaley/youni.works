@@ -1,7 +1,7 @@
 import { Change } from "../../base/control.js";
 import { extend } from "../../base/util.js";
 
-import { Box } from "../box.js";
+import { Viewbox as Box } from "../box.js";
 import { UserEvent } from "../frame.js";
 import { getBox, navigate, setClipboard } from "../util.js";
 

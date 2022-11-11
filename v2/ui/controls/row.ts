@@ -4,7 +4,7 @@ import { Control, ControlType } from "../../base/control.js";
 import { EMPTY } from "../../base/util.js";
 
 import { RecordBox } from "./record.js";
-import { Box } from "../box.js";
+import { Viewbox as Box } from "../box.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";

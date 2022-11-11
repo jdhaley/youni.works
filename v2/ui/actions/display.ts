@@ -4,7 +4,7 @@ import { extend } from "../../base/util.js";
 import { Change } from "../../base/control.js";
 import { UserEvent } from "../frame.js";
 
-import { Box, Display } from "../box.js";
+import { Viewbox as Box, Display } from "../box.js";
 import { CommandBuffer } from "../../base/command.js";
 import { Type } from "../../base/type.js";
 

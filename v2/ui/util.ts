@@ -5,7 +5,7 @@ import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { Box } from "./box.js";
+import { Viewbox as Box } from "./box.js";
 
 export const getBox = getView as (node: Text | RANGE) => Box ;
 

@@ -3,6 +3,7 @@ import { Graph, Receiver, Signal } from "./controller.js";
 import { BaseType, TypeOwner } from "./type.js";
 import { CommandBuffer } from "./command.js";
 import { bundle } from "./util.js";
+import { Shape } from "./shape.js";
 
 export interface Control<T> extends Receiver {
 	readonly type: ControlType<T>;
@@ -16,6 +17,11 @@ export interface Control<T> extends Receiver {
 	valueOf(filter?: unknown): value;
 	demote(): void;
 	promote(): void;
+}
+
+export interface Box<T> extends Shape, Control<T> {
+	header?: View<T>;
+	footer?: View<T>;
 }
 
 export abstract class ControlType<T> extends BaseType<Control<T>> {

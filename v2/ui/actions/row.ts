@@ -4,7 +4,7 @@ import { ele } from "../../base/dom.js";
 
 import { RowBox } from "../controls/row.js";
 import { getBox, getHeader } from "../util.js";
-import { Box } from "../box.js";
+import { Viewbox as Box } from "../box.js";
 import { UserEvent } from "../frame.js";
 
 import editable from "./editor.js";

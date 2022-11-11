@@ -2,9 +2,9 @@ import { value, list, typeOf } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { getBox } from "../util.js";
 
-import { ElementBox } from "./box.js";
+import { Viewbox } from "../box.js";
 
-export class ListBox extends ElementBox {
+export class ListBox extends Viewbox {
 	viewValue(model: list): void {
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type.types[viewTypeOf(item)];

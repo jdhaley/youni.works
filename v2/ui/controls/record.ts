@@ -1,11 +1,10 @@
 import { value, record } from "../../base/model.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 
-import { Box } from "../box.js";
-import { ElementBox } from "./box.js";
+import { Viewbox as Box, Viewbox } from "../box.js";
 import { getBox } from "../util.js";
 
-export class RecordBox extends ElementBox {
+export class RecordBox extends Viewbox {
 	memberType = "field";
 
 	get(name: string): Box {

@@ -1,6 +1,6 @@
 import { CHAR, extend } from "../../base/util.js";
 
-import { Box } from "../box.js";
+import { Viewbox as Box } from "../box.js";
 import { EditEvent, UserEvent } from "../frame.js";
 import { setClipboard } from "../util.js";
 import editable from "./editor.js";
