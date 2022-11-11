@@ -1,16 +1,16 @@
 import { ELE, NODE, RANGE } from "../../base/dom.js";
-import { View, value, record, item } from "../../base/mvc.js";
+import { value, record, item } from "../../base/mvc.js";
+import { Viewer, ViewerType } from "../../base/article.js";
 import { EMPTY } from "../../base/util.js";
 
 import { RecordBox } from "./record.js";
 import { Box } from "../box.js";
-import { ViewerType } from "../../base/article.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
 	declare isHeader: boolean;
 	get rowHeader(): RowBox {
-		for (let ele = this.node as ELE; ele; ele = ele.previousElementSibling) {
+		for (let ele = this.view as ELE; ele; ele = ele.previousElementSibling) {
 			if (ele.previousElementSibling?.nodeName != "UI-ROW") {
 				let editor = ele["$control"];
 				return editor instanceof RowBox && editor.isHeader ? editor : undefined;
@@ -25,18 +25,18 @@ export class RowBox extends RecordBox {
 	// 	if (header) return header["_type"];
 	// }
 
-	view(content: item): View<NODE> {
+	render(content: item): Viewer<NODE> {
 		if (!this.rowHeader && !content.header) {
 			let item = createHeaderItem(this._type);
 			let hdr = this.type.create() as RowBox;
-			hdr.view(item);
-			this.node.before(hdr.node);
+			hdr.render(item);
+			this.view.before(hdr.view);
 		} else if (content.header) {
 			this.isHeader = true;
 		}
 
 		if (content.isHeader) this.isHeader = true;
-		super.view(content);
+		super.render(content);
 		return this;
 	}
 	viewValue(model: value | ELE): void {
@@ -64,7 +64,7 @@ export class RowBox extends RecordBox {
 		if (this.isHeader) return;
 		let row: item = {
 			type$: this.type.name,
-			content: rowContent(null, this.content.node as ELE, range)
+			content: rowContent(null, this.content.view as ELE, range)
 		}
 		return row;
 	}

@@ -12,10 +12,10 @@ export default extend(null, {
 	open(this: Display, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, this.source);
-		this.node = (type.create(this.source) as Box).node as ELE;
-		this.node.setAttribute("data-file", res.req.to);
-		this.node.setAttribute("contentEditable", "true");	
-		this.frame.append(this.node);
+		this.view = (type.create(this.source) as Box).view as ELE;
+		this.view.setAttribute("data-file", res.req.to);
+		this.view.setAttribute("contentEditable", "true");	
+		this.frame.append(this.view);
 
 		//shapetest.call(this);
 	},
@@ -25,16 +25,16 @@ export default extend(null, {
 			console.log("Saved: ", signal);
 			return;
 		} else {
-			let model = (this.node["$control"] as any).valueOf();
+			let model = (this.view["$control"] as any).valueOf();
 			console.log("Save: ", model);
-			this.service.save(this.node.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
+			this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
 			if (this.conf.recordCommands) {
 				let tc = {
 					source: this.source,
 					target: model,
 					commands: serializeCommands(this.commands)
 				}
-				this.service.save("/test" + this.node.getAttribute("data-file"), tc, this);
+				this.service.save("/test" + this.view.getAttribute("data-file"), tc, this);
 			}
 		}
 	},
@@ -44,7 +44,7 @@ export default extend(null, {
 		if (range) {
 			this.setExtent(range, false);
 			let signal = new Change("undo");
-			this.send(signal, this.node);
+			this.send(signal, this.view);
 			this.frame.receive(signal);	
 		}
 	},
@@ -54,7 +54,7 @@ export default extend(null, {
 		if (range) {
 			this.setExtent(range, false);
 			let signal = new Change("undo");
-			this.send(signal, this.node);
+			this.send(signal, this.view);
 			this.frame.receive(signal);	
 		}
 	},

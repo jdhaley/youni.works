@@ -1,4 +1,4 @@
-import { bundle, Instance } from "./util";
+import { bundle, Instance, Sequence } from "./util";
 
 /*
 	A *value* is a model instance.
@@ -34,20 +34,16 @@ export interface Type<T> {
 	create(...args: any[]): T;
 }
 
-// export interface Text {
-// 	textContent: string;
-// }
-
-export interface Content<T> extends Instance {
-	readonly contents: Iterable<T>;
+export interface Text {
 	textContent: string;
-	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 
-export interface View<T> extends Instance {
-	readonly type: Type<View<T>>;
-	readonly content: Content<T>;
-	valueOf(filter?: unknown): value;
+interface Content extends Text, Instance {
+	readonly contents: Sequence<Text>;
+	markupContent: string; //May be HTML, XML, or a simplification thereof.
+}
+export interface View<T> extends Content {
+	readonly view: T;
 }
 
 function contentTypeOf(value: any): model {

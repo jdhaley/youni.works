@@ -15,14 +15,14 @@ export class MarkupReplace extends ListReplace {
 		let editor = getEditor(range);
 		if (editor.type.model != "list") {
 			range = range.cloneRange();
-			range.selectNode(editor.node);
+			range.selectNode(editor.view);
 			return range;
 		}
 		return super.getOuterRange(range);
 	}
 	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
-		r.setEnd(start.content.node, start.content.node.childNodes.length);
+		r.setEnd(start.content.view, start.content.view.childNodes.length);
 		r.deleteContents();
 		let startItem: item = start.valueOf() as any;
 		let items = content as item[];
@@ -32,7 +32,7 @@ export class MarkupReplace extends ListReplace {
 		} else {
 			items.push(startItem);
 		}
-		range.setStartBefore(start.node);
+		range.setStartBefore(start.view);
 	}
 	protected merge(view: Editor, range: RANGE, content: any, isStart: boolean) {
 		let item: item = content?.length && content[isStart ? 0 : content.length - 1];
@@ -51,7 +51,7 @@ export class MarkupReplace extends ListReplace {
 				view.level = item.level;
 			}
 			if (item.content) {
-				let node = 	view.node.ownerDocument.createTextNode("" + item.content);
+				let node = 	view.view.ownerDocument.createTextNode("" + item.content);
 				range.insertNode(node);	
 			}
 			if (isStart) {
@@ -66,7 +66,7 @@ export class MarkupReplace extends ListReplace {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
-		let ctx = editor.content.node;
+		let ctx = editor.content.view;
 		let r = range.cloneRange();
 		//Delete the range within the line.
 		r.deleteContents();
@@ -86,13 +86,13 @@ export class MarkupReplace extends ListReplace {
 		}
 		//Create the end line and add it after the command line.
 		let end = editor.type.create(model) as Editor;
-		ele(editor.node).after(end.node);
+		ele(editor.view).after(end.view);
 		//We can now set the new range now that we have the end line.
-		range.setEnd(end.node, 0);
+		range.setEnd(end.view, 0);
 		mark(range);
 		range.collapse();
 		//Prepend any 'paste' content to the start of the end line.
-		r.setStart(end.node, 0);
+		r.setStart(end.view, 0);
 		r.collapse(true);
 		if (!(this.name == "Split")) this.merge(end, r, content, false);
 		//note: onInsert() handles the remainder of the 'paste' content.

@@ -25,7 +25,7 @@ export default extend(editable, {
 				"title": event.data,
 				"type$": "task"
 			}
-			event.range.selectNodeContents(this.content.node);
+			event.range.selectNodeContents(this.content.view);
 			event.range.collapse();
 			let range = this.edit("Insert", event.range, [model]);
 			goToTask(event.on, range);

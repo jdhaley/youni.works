@@ -35,7 +35,7 @@ export class LineBox extends TextBox {
 		--this.level;
 	}
 	getSection(): LineBox {
-		let node = this.node.previousElementSibling;
+		let node = this.view.previousElementSibling;
 		while (node) {
 			let editor = getBox(node);
 			if (editor.type.name == "heading") return editor as LineBox;
@@ -58,7 +58,7 @@ export class LineBox extends TextBox {
 		this.level = Number.parseInt(content.getAttribute("level"));
 	}
 	valueOf(range?: RANGE): item {
-		if (range && !range.intersectsNode(this.content.node)) return;
+		if (range && !range.intersectsNode(this.content.view)) return;
 		let content = super.valueOf(range);
 		let item: item = {
 			type$: this.at("data-item"),

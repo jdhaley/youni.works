@@ -64,8 +64,8 @@ export class Replace extends EditCommand {
 
 		editor.content.markupContent = markup;
 
-		let range = editor.node.ownerDocument.createRange();
-		range.selectNode(editor.content.node);
+		let range = editor.view.ownerDocument.createRange();
+		range.selectNode(editor.content.view);
 		return unmark(range);
 	}
 }

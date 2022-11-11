@@ -2,7 +2,7 @@ import { Viewer } from "../base/article.js";
 import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
 
 export function xmlContent(view: Viewer<NODE>, range: RANGE, out?: ELE): ELE {
-	if (range && !range.intersectsNode(view.content.node)) return;
+	if (range && !range.intersectsNode(view.content.view)) return;
 	let item: ELE;
 	if (!out) {
 		item = document.implementation.createDocument("", view.type.name).documentElement as unknown as ELE;
@@ -10,7 +10,7 @@ export function xmlContent(view: Viewer<NODE>, range: RANGE, out?: ELE): ELE {
 		item = out.ownerDocument.createElement(view.type.name);
 		out.append(item);
 	}
-	let node = ele(view.node);
+	let node = ele(view.view);
 	if (node.id) item.id = node.id;
 	let level = node.getAttribute("aria-level");
 	if (level) item.setAttribute("level", level);
@@ -20,7 +20,7 @@ export function xmlContent(view: Viewer<NODE>, range: RANGE, out?: ELE): ELE {
 
 function content(view: Viewer<NODE>, range: RANGE, out: ELE) {
 	for (let node of view.content.contents) {
-		if (range && !range.intersectsNode(node))
+		if (range && !range.intersectsNode(node as NODE))
 			continue;
 		let childView = getView(node) as Viewer<NODE>;
 		if (childView && childView != view) {

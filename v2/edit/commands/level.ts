@@ -25,13 +25,13 @@ export class LevelCommand extends EditCommand {
 			while (start) {
 				way == "Promote" ? start.promote() : start.demote();
 				if (start == end) break;
-				start = getEditor(ele(start.node).nextElementSibling);
+				start = getEditor(ele(start.view).nextElementSibling);
 			}
 		}
 
-		let range = start.node.ownerDocument.createRange();
-		range.setStartBefore(start.node);
-		range.setEndAfter(end.node);
+		let range = start.view.ownerDocument.createRange();
+		range.setStartBefore(start.view);
+		range.setEndAfter(end.view);
 		return range;
 	}
 	undo() {

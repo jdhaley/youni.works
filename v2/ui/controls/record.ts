@@ -41,7 +41,7 @@ export class RecordBox extends ElementBox {
 	}
 
 	valueOf(range?: RANGE): value {
-		let model = recordContent(null, this.content.node as ELE, range);
+		let model = recordContent(null, this.content.view as ELE, range);
 		if (model) {
 			model["type$"] = this.type.name;
 		}

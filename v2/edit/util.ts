@@ -8,8 +8,8 @@ const getEditor = getView as (node: NODE | RANGE) => Editor ;
 export { getEditor, bindViewEle }
 
 export function getChildEditor(editor: Editor, node: NODE): Editor {
-	if (node == editor.content.node) return null;
-	while (node?.parentNode != editor.content.node) {
+	if (node == editor.content.view) return null;
+	while (node?.parentNode != editor.content.view) {
 		node = node.parentNode;
 	}
 	if (ele(node) && node["$control"]) return node["$control"] as Editor;
@@ -19,7 +19,7 @@ export function getPath(node: NODE): string {
 	let view = getEditor(node);
 	let path = "";
 	while (node) {
-		if (node == view.content.node) {
+		if (node == view.content.view) {
 			return view.id + path;
 		}
 		path = "/" + getNodeIndex(node.parentNode, node) + path;
@@ -34,7 +34,7 @@ export function narrowRange(range: RANGE) {
 
 	let start = range.startContainer;
 	let end = range.endContainer;
-	let content = getEditor(range).content.node;
+	let content = getEditor(range).content.view;
 	if (inHeader(editor, start)) {;
 		range.setStart(content, 0);
 	}
@@ -47,15 +47,15 @@ export function narrowRange(range: RANGE) {
 }
 
 function inHeader(view: Editor, node: NODE): boolean {
-	while (node && node != view.node) {
-		if (node.nodeName == "HEADER" && node.parentNode == view.node) return true;
+	while (node && node != view.view) {
+		if (node.nodeName == "HEADER" && node.parentNode == view.view) return true;
 		node = node.parentNode;
 	}
 }
 
 function inFooter(view: Editor, node: NODE): boolean {
-	while (node && node != view.node) {
-		if (node.nodeName == "FOOTER" && node.parentNode == view.node) return true;
+	while (node && node != view.view) {
+		if (node.nodeName == "FOOTER" && node.parentNode == view.view) return true;
 		node = node.parentNode;
 	}
 }
@@ -132,11 +132,11 @@ export function clearContent(range: RANGE) {
 	for (let node = it.nextNode(); node; node = it.nextNode()) {
 		let editor = getEditor(node);
 		if (editor?.type.model == "record") {
-			if (getEditor(editor.node.parentNode)?.type.model == "list") {
-				if (enclosedInRange(editor.node, range)) (editor.node as any).remove();	
+			if (getEditor(editor.view.parentNode)?.type.model == "list") {
+				if (enclosedInRange(editor.view, range)) (editor.view as any).remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
-			if (editor && node.parentElement == editor.content.node) {
+			if (editor && node.parentElement == editor.content.view) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
 				} else if (node == range.endContainer) {
@@ -176,5 +176,5 @@ export function rangeIterator(range: RANGE) {
 }
 
 export function senseChange(editor: Editor, commandName: string) {
-	editor.type.owner.sense(new Change(commandName, editor), editor.node);
+	editor.type.owner.sense(new Change(commandName, editor), editor.view);
 }

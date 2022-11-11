@@ -1,8 +1,10 @@
 import { ViewerType, Viewer, Extent } from "./article.js";
+import { Text } from "./mvc.js";
 import { Bag, Sequence } from "./util.js";
 
 export interface DOCUMENT {
 	readonly body: ELE;
+
 	getElementById(id: string): ELE;
 	getElementsByClassName(name: string): Sequence<ELE>;
 	createElement(name: string): ELE;
@@ -24,7 +26,6 @@ export interface Mutable<T> {
     remove(): void;
 }
 interface MUTABLE extends Mutable<NODE> {
-	cloneNode(deep: boolean): NODE;
     replaceWith(...nodes: (NODE | string)[]): void;
 
 	append(data: any): void;
@@ -32,7 +33,7 @@ interface MUTABLE extends Mutable<NODE> {
 		//insertBefore(ele: TREENODE, before: TREENODE): any;
 }
 
-interface TREE {
+interface BRANCH {
 	readonly children: Sequence<ELE>;
 	readonly firstElementChild: ELE;
 	readonly lastElementChild: ELE;
@@ -40,34 +41,37 @@ interface TREE {
 	readonly previousElementSibling: ELE;
 }
 
-export interface ELE extends MUTABLE, TREE, NODE {
+interface ENTITY {
 	id: string;
-	innerHTML: string;
 	readonly classList: Bag<string>;
-
 	getAttribute(name: string): string;
 	setAttribute(name: string, value: string): void;
 	removeAttribute(name: string): void;
 }
 
-interface ADJUSTABLE {
-	collapse(toStart?: boolean): void;
-	selectNode(node: NODE): void;
-	selectNodeContents(node: NODE): void;
-	setStart(node: NODE, index: number): void;
-	setStartBefore(node: NODE): void;
-	setStartAfter(node: NODE): void;
-	setEnd(node: NODE, index: number): void;
-	setEndBefore(node: NODE): void;
-	setEndAfter(node: NODE): void;
+export interface ELE extends MUTABLE, ENTITY, BRANCH, NODE {
+	cloneNode(deep: boolean): NODE;
+	innerHTML: string;
 }
 
-export interface RANGE extends Extent<NODE>, ADJUSTABLE {
+interface AdjustableExtent<T> extends Extent<T> {
+	collapse(toStart?: boolean): void;
+	selectNode(node: T): void;
+	selectNodeContents(node: T): void;
+	setStart(node: T, index: number): void;
+	setStartBefore(node: T): void;
+	setStartAfter(node: T): void;
+	setEnd(node: T, index: number): void;
+	setEndBefore(node: T): void;
+	setEndAfter(node: T): void;
+}
+
+export interface RANGE extends AdjustableExtent<NODE> {
 	readonly commonAncestorContainer: NODE;
 	readonly collapsed: boolean;
 
 	intersectsNode(node: NODE): boolean;
-	compareBoundaryPoints(how: number, sourceRange: RANGE): number;
+	compareBoundaryPoints(how: number, extent: Extent<NODE>): number;
 
 	cloneRange(): RANGE;
 	deleteContents(): void;
@@ -79,10 +83,6 @@ export const END_TO_END = Range.END_TO_END;
 
 export function ele(value: any): ELE {
 	return value instanceof Element ? value : null;
-}
-export function nodeOf(loc: NODE | RANGE): NODE {
-	if (loc instanceof Range) loc = loc.commonAncestorContainer;
-	return loc instanceof Node ? loc : null;
 }
 
 export function getNodeIndex(parent: NODE, node: NODE): number {
@@ -98,15 +98,13 @@ export interface VIEW_ELE extends ELE {
 	$control?: Viewer<ELE>;
 }
 
-export function getView(loc: NODE | RANGE): Viewer<NODE> {
+export function getView(loc: Text | RANGE): Viewer<NODE> {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
-	loc = loc instanceof Node ? loc : null;
-	while (loc) {
-		let e = ele(loc) as VIEW_ELE;
+	for (let node = loc instanceof Node ? loc : null; node; node = node.parentNode) {
+		let e = ele(node) as VIEW_ELE;
 		if (e?.$control?.type instanceof ViewerType) {
 			return e.$control;
 		}
-		loc = loc.parentNode;
 	}
 }
 

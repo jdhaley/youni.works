@@ -21,7 +21,7 @@ export class RangeReplace extends Replace {
 		//passed range and should only be used within this method.
 		range = this.getOuterRange(range);
 		let view = getEditor(range);
-		captureRange(this, view.content.node as ELE, range.startOffset, range.endOffset);
+		captureRange(this, view.content.view as ELE, range.startOffset, range.endOffset);
 		this.before = xmlContent(view, range).innerHTML;
 	}
 	protected execAfter(range: RANGE): RANGE {
@@ -33,13 +33,13 @@ export class RangeReplace extends Replace {
 	protected getOuterRange(inner: RANGE) {
 		let editor = getEditor(inner);
 		let outer = inner.cloneRange();
-		outer.selectNodeContents(editor.content.node);
+		outer.selectNodeContents(editor.content.view);
 		let start = getChildEditor(editor, inner.startContainer);
-		if (start) outer.setStartBefore(start.node);
+		if (start) outer.setStartBefore(start.view);
 		let end = getChildEditor(editor, inner.endContainer);
-		if (end) outer.setEndAfter(end.node);
+		if (end) outer.setEndAfter(end.view);
 
-		let content = editor.content.node;
+		let content = editor.content.view;
 		if (!(outer.startContainer == content && outer.endContainer == content)) {
 			throw new Error("Invalid range for edit.");
 		}
@@ -48,17 +48,17 @@ export class RangeReplace extends Replace {
 	protected getReplaceRange() {
 		let editor = this.owner.getControl(this.viewId);
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
-		let range = editor.node.ownerDocument.createRange();
-		range.selectNodeContents(editor.content.node);
+		let range = editor.view.ownerDocument.createRange();
+		range.selectNodeContents(editor.content.view);
 		if (this.startId) {
 			let start = this.owner.getControl(this.startId);
 			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
-			range.setStartAfter(start.node);
+			range.setStartAfter(start.view);
 		}
 		if (this.endId) {
 			let end = this.owner.getControl(this.endId);
 			if (!end) throw new Error(`End item.id '${this.endId}' not found.`);
-			range.setEndBefore(end.node);
+			range.setEndBefore(end.view);
 		}
 		return range;
 	}
@@ -84,7 +84,7 @@ function mergeContent(range: RANGE, value: value) {
 	let editor = getEditor(range);
 	let start = getChildEditor(editor, range.startContainer);
 	let end = getChildEditor(editor, range.endContainer);
-	for (let member = ele(start.node) || ele(editor.node).firstElementChild; member; member = member.nextElementSibling) {
+	for (let member = ele(start.view) || ele(editor.view).firstElementChild; member; member = member.nextElementSibling) {
 		let control = member["$control"] as Editor;
 		if (control?.type.model == "unit") {
 			let mvalue = value[control.type.name];
@@ -92,7 +92,7 @@ function mergeContent(range: RANGE, value: value) {
 				member.children[1].textContent += mvalue;
 			}
 		}
-		if (member == end.node) break;
+		if (member == end.view) break;
 	}
 }
 

@@ -28,7 +28,7 @@ export class ListBox extends ElementBox {
 	}
 	valueOf(range?: RANGE): list {
 		let model: value[];
-		if (range && !range.intersectsNode(this.content.node)) return;
+		if (range && !range.intersectsNode(this.content.view)) return;
 		for (let part of this.content.contents) {
 			let editor = getBox(part);
 			let value = editor?.valueOf(range);
@@ -43,7 +43,7 @@ export class ListBox extends ElementBox {
 		return model;
 	}
 	protected createFooter(model?: value) {
-		let footer = this.node.ownerDocument.createElement("footer") as Element;
+		let footer = this.view.ownerDocument.createElement("footer") as Element;
 		this._ele.append(footer);
 	}
 }

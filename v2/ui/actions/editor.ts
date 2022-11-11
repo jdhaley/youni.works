@@ -76,11 +76,11 @@ function getInsertableRange(range: RANGE) {
 		if (view?.type.model == "list") {
 			return range;
 		}
-		if (!atStart(view.node, range.startContainer, range.startOffset)) {
+		if (!atStart(view.view, range.startContainer, range.startOffset)) {
 			return;
 		}
 
-		range.setStartBefore(view.node);
+		range.setStartBefore(view.view);
 		range.collapse(true);
 		view = getBox(range);
 	}

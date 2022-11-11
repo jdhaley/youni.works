@@ -134,8 +134,8 @@ function endagain(range: RANGE, cmd: Replace) {
 }
 
 function inHeader(view: Editor, node: NODE): boolean {
-	while (node && node != view.node) {
-		if (node.nodeName == "HEADER" && node.parentNode == view.node) return true;
+	while (node && node != view.view) {
+		if (node.nodeName == "HEADER" && node.parentNode == view.view) return true;
 		node = node.parentNode;
 	}
 }
@@ -144,7 +144,7 @@ function positionToText(range: RANGE) {
 	let hdr = inHeader(getEditor(range), range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
-		let content = getEditor(range).content.node;
+		let content = getEditor(range).content.view;
 		if (content.childNodes.length != 1) {
 			//force single text node...
 			content.textContent = content.textContent;

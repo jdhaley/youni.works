@@ -15,8 +15,8 @@ export class TextBox extends ElementBox {
 	}
 	valueOf(range?: RANGE): value {
 		let model = "";
-		if (range && !range.intersectsNode(this.content.node)) return;
-		for (let node of (this.content.node as ELE).childNodes) {
+		if (range && !range.intersectsNode(this.content.view)) return;
+		for (let node of (this.content.view as ELE).childNodes) {
 			if (node == range?.startContainer && node == range?.endContainer) {
 				model += node.textContent.substring(range.startOffset, range.endOffset);
 			} else if (node == range?.startContainer) {

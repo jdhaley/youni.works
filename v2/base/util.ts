@@ -12,7 +12,10 @@ export interface bundle<T> {
 
 export interface Sequence<T> extends Iterable<T> {
 	readonly length: number;
+	//Should be optional?
+	//[key: number]: T
 }
+
 export interface Bag<T>  {
 	contains(value: T): boolean;
 	add(value: T): void;

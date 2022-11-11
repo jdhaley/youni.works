@@ -48,14 +48,14 @@ export default extend(null, {
 	selectionchange(this: Box, event: UserEvent) {
 		event.subject = "";
 		let eles = [];
-		for (let ele of this.node.ownerDocument.getElementsByClassName("active")) {
+		for (let ele of this.view.ownerDocument.getElementsByClassName("active")) {
 			eles.push(ele);
 		}
 	 	for (let ele of eles) ele.classList.remove("active");
 		let range = event.range;
-		for (let node of this.content.node.childNodes) {
+		for (let node of this.content.view.childNodes) {
 			let editor = getBox(node);
-			if (range.intersectsNode(editor.content.node)) {
+			if (range.intersectsNode(editor.content.view)) {
 				editor.content.kind.add("active");
 			}
 		}
@@ -63,7 +63,7 @@ export default extend(null, {
 	change(this: Box, signal: Change) {
 		if (signal.direction == "up") {
 			//console.log(signal.direction, this.type.name, signal.commandName);
-			if (this.node == this.type.owner.node) {
+			if (this.view == this.type.owner.view) {
 				this.type.owner.receive(signal);
 			}
 		} else {

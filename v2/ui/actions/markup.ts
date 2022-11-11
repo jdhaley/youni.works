@@ -79,15 +79,15 @@ export default extend(list, {
 		let item = {
 			type$: "worktask"
 		}
-		range.setStartBefore(current.node);
+		range.setStartBefore(current.view);
 		range.collapse(true);
 		this.edit("Insert", range, [item]);
 	}
 });
 
 export function getChildBox(editor: Box, node: NODE): Box {
-	if (node == editor.content.node) return null;
-	while (node?.parentNode != editor.content.node) {
+	if (node == editor.content.view) return null;
+	while (node?.parentNode != editor.content.view) {
 		node = node.parentNode;
 	}
 	if (ele(node) && node["$control"]) return node["$control"] as Box;

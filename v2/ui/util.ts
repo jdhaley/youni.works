@@ -1,23 +1,24 @@
 import { Article, Edits, ViewerType } from "../base/article.js";
 import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
+import { Text } from "../base/mvc.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
 
 import { Box } from "./box.js";
 
-export const getBox = getView as (node: NODE | RANGE) => Box ;
+export const getBox = getView as (node: Text | RANGE) => Box ;
 
 export function getHeader(view: Box, node: NODE) {
-	while (node && node != view.node) {
-		if (node.nodeName == "HEADER" && node.parentNode == view.node) return node as ELE;
+	while (node && node != view.view) {
+		if (node.nodeName == "HEADER" && node.parentNode == view.view) return node as ELE;
 		node = node.parentNode;
 	}
 }
 
 export function getFooter(view: Box, node: NODE) {
-	while (node && node != view.node) {
-		if (node.nodeName == "FOOTER" && node.parentNode == view.node) return node as ELE;
+	while (node && node != view.view) {
+		if (node.nodeName == "FOOTER" && node.parentNode == view.view) return node as ELE;
 		node = node.parentNode;
 	}
 }
@@ -28,18 +29,18 @@ interface NAVIGABLE_ELE extends ELE{
 export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
 	let editor = getBox(start);
 	while (editor) {
-		let toEle = isBack ? ele(editor.node).previousElementSibling : ele(editor.node).nextElementSibling;
+		let toEle = isBack ? ele(editor.view).previousElementSibling : ele(editor.view).nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next as NAVIGABLE_ELE;
 		}
-		editor = getBox(editor.node.parentNode);
+		editor = getBox(editor.view.parentNode);
 	}
 }
 function navigateInto(ele: ELE, isBack?: boolean) {
 	let view = getBox(ele);
 	if (!view) return;
-	let content = view.content.node as ELE;
+	let content = view.content.view as ELE;
 	switch (view.type.model) {
 		case "unit":
 			break;
@@ -52,7 +53,7 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 			if (item) {
 				content = navigateInto(item);
 			} else {
-				content = view.footer.node as ELE;
+				content = view.footer.view as ELE;
 			}
 			break;
 	}
@@ -93,7 +94,7 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 export function play(article: Article<NODE>, edits: Edits) {
 	let type = article.types[edits.type] as ViewerType<NODE>;
 	let view = type.create(edits.source);
-	article.node = view.node;
+	article.view = view.view;
 	this.frame.append(this.node);
 	for (let edit of edits.edits) {
 		let editor = this.getControl(edit.viewId) as Box;

@@ -32,7 +32,7 @@ const COMMANDS = {
 function replace(this: Editor, commandName: string, range: RANGE, content?: value): RANGE {
 	let editor = getEditor(range);
 	if (editor.type.model != "list") {
-		editor = getEditor(editor.node.parentNode);
+		editor = getEditor(editor.view.parentNode);
 	}
 	if (editor != this) console.warn("Invalid edit range.", editor);
 
@@ -44,7 +44,7 @@ function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
 	let start = getChildEditor(this, range.startContainer);
 	let end = getChildEditor(this, range.endContainer);
 	//If a range of items, check that there are no headings
-	if (start != end) for (let item = start.node as ELE; item; item = item.nextElementSibling) {
+	if (start != end) for (let item = start.view as ELE; item; item = item.nextElementSibling) {
 		let role = getEditor(item).type.name;
 		if (role == "heading") {
 			console.warn("No range promote with headings");

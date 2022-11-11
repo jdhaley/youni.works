@@ -20,7 +20,7 @@ export class Arrange /* implements Extent<NODE> */ {
 		return this.editor.type.model;
 	}
 	get content(): E {
-		return this.editor.content.node as E;
+		return this.editor.content.view as E;
 	}
 	get value(): any {
 		return this.editor.valueOf(this.range);
@@ -61,7 +61,7 @@ export class ERANGE extends Range {
 		return this.editor.type.model;
 	}
 	get content(): E {
-		return this.editor.content.node as E;
+		return this.editor.content.view as E;
 	}
 	get value(): any {
 		return this.editor.valueOf(this.$range);

@@ -28,24 +28,24 @@ export class ListReplace extends RangeReplace {
 	}
 	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
-		r.setEnd(start.content.node, start.content.node.childNodes.length);
+		r.setEnd(start.content.view, start.content.view.childNodes.length);
 		clearContent(r);
 		this.merge(start, r, content, true);
-		range.setStartAfter(start.node);
+		range.setStartAfter(start.view);
 	}
 	protected onEndContainer(range: RANGE, content: value, end: Editor): void {
 		let r = range.cloneRange();
-		r.setStart(end.content.node, 0);
+		r.setStart(end.content.view, 0);
 		clearContent(r);
 		this.merge(end, r, content, false);
-		range.setEndBefore(end.node);
+		range.setEndBefore(end.view);
 	}
 	protected onInsert(range: RANGE, value: value): void {
 		range = range.cloneRange();
 		range.deleteContents();
 		if (!value) return;
 		let editor = this.owner.getControl(this.viewId) as Editor;
-		let ctx = editor.content.node;
+		let ctx = editor.content.view;
 		//Ensure the range must be on the list conent. (It may be on a markup line).
 		while (range.commonAncestorContainer != ctx) {
 			range.setStartBefore(range.commonAncestorContainer);

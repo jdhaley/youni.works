@@ -54,10 +54,10 @@ export default extend(editable, {
 function addCol(editor: RowBox, col: Box) {
 	let contents = editor.content.contents;
 	for (let i = 0; i < contents.length; i++) {
-		if (contents[i] == col.node) {
+		if (contents[i] == col.view) {
 			addColumn(editor, i);
 			editor.type; //trigger the new type.
-			for (let row = editor.node.nextElementSibling; row; row = row.nextElementSibling) {
+			for (let row = editor.view.nextElementSibling; row; row = row.nextElementSibling) {
 				let type = getBox(row);
 				if (type instanceof RowBox) {
 					addColumn(type, i);
@@ -69,5 +69,5 @@ function addCol(editor: RowBox, col: Box) {
 function addColumn(row: RowBox, index: number) {
 	let column = getBox(row.content.contents[index]);
 	let newcol = column.type.create("") as Box;
-	ele(column.node).after(newcol.node);
+	ele(column.view).after(newcol.view);
 }

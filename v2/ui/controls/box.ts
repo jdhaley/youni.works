@@ -1,6 +1,6 @@
-import { value } from "../../base/mvc.js";
+import { View, value } from "../../base/mvc.js";
 import { Actions } from "../../base/control.js";
-import { NodeContent, ViewerType } from "../../base/article.js";
+import { ViewerType } from "../../base/article.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
@@ -25,19 +25,19 @@ export abstract class ElementBox extends ElementView implements Box {
 	get isContainer(): boolean {
 		return this._type.conf.container;
 	}
-	get header(): NodeContent<NODE> {
+	get header(): View<NODE> {
 		for (let child of this._ele.children) {
 			if (child.nodeName == "header") return child["$control"];
 		}
 	}
-	get content(): NodeContent<NODE> {
+	get content(): View<NODE> {
 		if (!this.isContainer) return this;
 		for (let child of this._ele.children) {
 			if (child.classList.contains("content")) return child["$control"];
 		}
 		throw new Error("Missing content in container.");
 	}
-	get footer(): NodeContent<NODE> {
+	get footer(): View<NODE> {
 		for (let child of this._ele.children) {
 			if (child.nodeName == "footer") return child["$control"];
 		}
@@ -49,8 +49,8 @@ export abstract class ElementBox extends ElementView implements Box {
 		console.warn("edit() has not been configured.")
 		return null;
 	}
-	view(value: value, parent?: ElementView): void {
-		if (parent) (parent.content.node as ELE).append(this._ele);
+	render(value: value, parent?: ElementView): void {
+		if (parent) (parent.content.view as ELE).append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
 				this._ele.id = value.id;
@@ -74,14 +74,14 @@ export abstract class ElementBox extends ElementView implements Box {
 		}
 	}
 	protected createHeader(model?: value) {
-		let ele = this.node.ownerDocument.createElement("header") as Element;
+		let ele = this.view.ownerDocument.createElement("header") as Element;
 		ele.textContent = this._type.conf.title || "";
 		this._ele.append(ele);
 		let content = new ElementContent();
 		content.control(ele as Element);
 	}
 	protected createContent(model?: value) {
-		let ele = this.node.ownerDocument.createElement("div") as Element;
+		let ele = this.view.ownerDocument.createElement("div") as Element;
 		ele.classList.add("content");
 		let content = new ElementContent();
 		content.control(ele as Element);

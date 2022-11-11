@@ -1,5 +1,5 @@
 import { Actions } from "../../base/control.js";
-import { ELE, NODE, nodeOf, RANGE } from "../../base/dom.js";
+import { ELE, NODE, RANGE } from "../../base/dom.js";
 
 import { Frame, UserEvent } from "../frame.js";
 
@@ -56,4 +56,9 @@ export function viewOf(loc: NODE | RANGE): ELE {
 export function ownerOf(loc: NODE | RANGE): Frame  {
 	if (loc instanceof Document) return loc["$owner"];
 	return nodeOf(loc).ownerDocument["$owner"];
+}
+
+export function nodeOf(loc: NODE | RANGE): NODE {
+	if (loc instanceof Range) loc = loc.commonAncestorContainer;
+	return loc instanceof Node ? loc : null;
 }
