@@ -1,4 +1,4 @@
-import { Change } from "../base/article.js";
+import { Change } from "../base/component.js";
 import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getView, bindViewEle, getNodeIndex } from "../base/dom.js";
 
 import { Editor } from "./editor.js";

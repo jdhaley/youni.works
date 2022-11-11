@@ -1,4 +1,4 @@
-import { item } from "../../base/mvc.js";
+import { item } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
 import { ElementViewType } from "../../control/view.js";

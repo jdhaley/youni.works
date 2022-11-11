@@ -27,7 +27,7 @@ export class Arrange /* implements Extent<NODE> */ {
 	}
 
 	exec(commandName: string, ...args: any[]): void {
-		let range = this.editor.edit(commandName, this.range, args[0]);
+		let range = this.editor.exec(commandName, this.range, args[0]);
 	}
 	narrow() {
 		return narrowRange(this.range);
@@ -71,7 +71,7 @@ export class ERANGE extends Range {
 		return getChildEditor(this.editor, node)
 	}
 	exec(commandName: string, ...args: any[]): void {
-		let range = this.editor.edit(commandName, this.$range, args[0]);
+		let range = this.editor.exec(commandName, this.$range, args[0]);
 	}
 	narrow() {
 		return narrowRange(this.$range);

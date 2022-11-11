@@ -27,7 +27,7 @@ export default extend(editable, {
 			}
 			event.range.selectNodeContents(this.content.view);
 			event.range.collapse();
-			let range = this.edit("Insert", event.range, [model]);
+			let range = this.exec("Insert", event.range, [model]);
 			goToTask(event.on, range);
 		}
 	}

@@ -1,6 +1,6 @@
 import { Editor } from "../editor.js";
 import { RANGE } from "../../base/dom.js";
-import { value } from "../../base/mvc.js";
+import { value } from "../../base/model.js";
 
 import { ListReplace } from "../commands/listReplace.js";
 import { getEditor, senseChange } from "../util.js";

@@ -14,7 +14,7 @@ export default extend(text, {
 		let text = event.clipboardData.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
-		range = this.edit("Paste", range, text);
+		range = this.exec("Paste", range, text);
 		range && this.type.owner.setExtent(range, true);
 	},
 	erase(this: Box, event: UserEvent) {
@@ -27,7 +27,7 @@ export default extend(text, {
 				event.subject = "join";
 			}	
 		} else {
-			range = this.edit("Erase", range, "");
+			range = this.exec("Erase", range, "");
 			range && this.type.owner.setExtent(range, true);	
 		}
 	},
@@ -41,7 +41,7 @@ export default extend(text, {
 				event.subject = "join";
 			}
 		} else {
-			range = this.edit("Delete", range, "");
+			range = this.exec("Delete", range, "");
 			range && this.type.owner.setExtent(range, true);	
 		}
 	},

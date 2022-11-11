@@ -1,12 +1,12 @@
 import { ELE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
-import { Change } from "../../base/article.js";
+import { Change } from "../../base/component.js";
 import { UserEvent } from "../frame.js";
 
 import { Box, Display } from "../box.js";
-import { Type } from "../../base/mvc.js";
 import { CommandBuffer } from "../../base/command.js";
+import { Type } from "../../base/type.js";
 
 export default extend(null, {
 	open(this: Display, res: Response<string>) {

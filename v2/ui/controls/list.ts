@@ -1,5 +1,5 @@
-import { value, list, typeOf, Type } from "../../base/mvc.js";
-import { ELE, NODE, RANGE } from "../../base/dom.js";
+import { value, list, typeOf } from "../../base/model.js";
+import { ELE, RANGE } from "../../base/dom.js";
 import { getBox } from "../util.js";
 
 import { ElementBox } from "./box.js";

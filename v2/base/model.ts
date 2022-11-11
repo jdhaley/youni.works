@@ -1,3 +1,4 @@
+import { Type } from "./type";
 import { bundle, Instance, Sequence } from "./util";
 
 /*
@@ -26,40 +27,18 @@ export interface item extends record {
 export interface date {
 }
 
-export interface Type<T> {
-	name: string;
-	partOf?: Type<T>;
-	types: bundle<Type<T>>;
-
-	create(...args: any[]): T;
-}
-
 export interface Text {
 	textContent: string;
 }
 
-interface Content extends Text, Instance {
+export interface Content extends Text, Instance {
 	readonly contents: Sequence<Text>;
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
-export interface View<T> extends Content {
-	readonly view: T;
-}
 
-function contentTypeOf(value: any): model {
-	let type = typeOf(value);
-	switch (type) {
-		case "string":
-		case "number":
-		case "boolean":
-		case "date":
-		case "null":
-		case "unknown":
-			return "unit";
-		case "list":
-			return "list";
-	}
-	return "record";
+export interface View<T> extends Content {
+	readonly type: Type<any>;
+	readonly view: T;
 }
 
 export function typeOf(value: any): string {

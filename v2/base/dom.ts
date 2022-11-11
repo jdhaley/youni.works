@@ -1,5 +1,5 @@
-import { ViewerType, Viewer, Extent } from "./article.js";
-import { Text } from "./mvc.js";
+import { ComponentType, Component, Extent } from "./component.js";
+import { Text } from "./model.js";
 import { Bag, Sequence } from "./util.js";
 
 export interface DOCUMENT {
@@ -95,27 +95,27 @@ export function getNodeIndex(parent: NODE, node: NODE): number {
 ///////////////////// View Support //////////////////////////
 
 export interface VIEW_ELE extends ELE {
-	$control?: Viewer<ELE>;
+	$control?: Component<ELE>;
 }
 
-export function getView(loc: Text | RANGE): Viewer<NODE> {
+export function getView(loc: Text | RANGE): Component<NODE> {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	for (let node = loc instanceof Node ? loc : null; node; node = node.parentNode) {
 		let e = ele(node) as VIEW_ELE;
-		if (e?.$control?.type instanceof ViewerType) {
+		if (e?.$control?.type instanceof ComponentType) {
 			return e.$control;
 		}
 	}
 }
 
 export function bindViewEle(node: VIEW_ELE) {
-	let view = node["$control"] as Viewer<NODE>;
+	let view = node["$control"] as Component<NODE>;
 	if (view) return;
-	view = getView(node.parentNode) as Viewer<NODE>;
+	view = getView(node.parentNode) as Component<NODE>;
 	let name = node.getAttribute("data-item");
 	if (view && name) {
 		console.log("binding.");
-		let type = view.type.types[name] as ViewerType<NODE>;
+		let type = view.type.types[name] as ComponentType<NODE>;
 		if (type) {
 			view = type.control(node);
 		} else {

@@ -1,12 +1,16 @@
-import { View, model, value } from "../base/mvc.js";
+import { model, View, value } from "../base/model.js";
 import { CommandBuffer } from "../base/command.js";
-import { Article, ViewerType, Viewer, ViewFrame } from "../base/article.js";
-import { ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView, DOCUMENT } from "../base/dom.js";
+import { Article, ComponentType, Component, ArticleContext, Extent } from "../base/component.js";
+import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../base/dom.js";
 import { bundle, Sequence } from "../base/util.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
+import { BaseType } from "../base/type.js";
 
-export class ElementContent extends ElementShape implements View<NODE> {
+export class ElementView extends ElementShape implements View<ELE> {
+	get type(): BaseType<any> {
+		return SIMPLE_TYPE;
+	}
 	get contents(): Sequence<NODE> {
 		return this._ele.childNodes;
 	}
@@ -26,14 +30,16 @@ export class ElementContent extends ElementShape implements View<NODE> {
 		return this._ele;
 	}
 }
+const SIMPLE_TYPE = new BaseType();
+SIMPLE_TYPE.start("", {prototype: new ElementView()});
 
-export abstract class ElementView extends ElementContent implements Viewer<NODE> {
-	declare _type: ViewerType<NODE>;
+export abstract class ElementViewer extends ElementView implements Component<ELE> {
+	declare _type: ComponentType<ELE>;
 
-	get type(): ViewerType<NODE> {
+	get type(): ComponentType<ELE> {
 		return this._type;
 	}
-	get content(): View<NODE> {
+	get content(): View<ELE> {
 		return this;
 	}
 	get partOf() {
@@ -66,8 +72,9 @@ export abstract class ElementView extends ElementContent implements Viewer<NODE>
 
 	abstract valueOf(range?: RANGE): value;
 	abstract viewValue(data: value): void;
+	abstract exec(commandName: string, ...args: unknown[]): Extent<unknown>;
 
-	render(value: value, parent?: ElementView): void {
+	render(value: value, parent?: ElementViewer): void {
 		if (parent) (parent.content.view as ELE).append(this._ele);
 		this.view.textContent = "";
 		this.viewValue(value as value);
@@ -84,26 +91,26 @@ export abstract class ElementView extends ElementContent implements Viewer<NODE>
 	}
 }
 
-export class ElementViewType extends  ViewerType<NODE> {
-	constructor(owner: Article<Node>) {
+export class ElementViewType extends  ComponentType<ELE> {
+	constructor(owner: Article<ELE>) {
 		super();
 		this.owner = owner;
 	}
-	declare owner: Article<NODE>;
+	declare owner: Article<ELE>;
 
 	get model(): model {
 		return this.owner.conf.contentTypes[this.conf.viewType];
 	}
 
-	create(value: value, container?: ElementView): ElementView {
-		let view = Object.create(this.prototype) as ElementView;
+	create(value: value, container?: ElementViewer): ElementViewer {
+		let view = Object.create(this.prototype) as ElementViewer;
 		let node = this.owner.createView(this.conf.tagName || "div");
 		view.control(node as ELE);
 		view.render(value, container);
 		return view;
 	}
-	control(node: ELE): ElementView {
-		let view = Object.create(this.prototype) as ElementView;
+	control(node: ELE): ElementViewer {
+		let view = Object.create(this.prototype) as ElementViewer;
 		view.control(node);
 		return view;
 	}
@@ -119,7 +126,7 @@ export abstract class ElementViewOwner extends ElementOwner implements Article<N
 		this.actions = conf.actions;
 		this.commands = new CommandBuffer();
 	}
-	frame: ViewFrame<NODE>;
+	frame: ArticleContext<NODE>;
 	view: ELE;
 	conf: bundle<any>;
 	types: bundle<ElementViewType>;
@@ -135,7 +142,7 @@ export abstract class ElementViewOwner extends ElementOwner implements Article<N
 	findNode(id: string): ELE {
 		return this.view.ownerDocument.getElementById(id);
 	}
-	getControl(id: string): Viewer<NODE> {
+	getControl(id: string): Component<NODE> {
 		let ele = this.findNode(id) as VIEW_ELE;
 		if (!ele) throw new Error("Can't find view element.");
 		if (!ele.$control) {
@@ -146,7 +153,7 @@ export abstract class ElementViewOwner extends ElementOwner implements Article<N
 				debugger;
 			}
 		}
-		return ele.$control as Viewer<NODE>;
+		return ele.$control as Component<NODE>;
 	}
 	/** the Loc(ation) is: path + "/" + offset */
 	extentFrom(startLoc: string, endLoc: string): RANGE {
@@ -175,7 +182,7 @@ export abstract class ElementViewOwner extends ElementOwner implements Article<N
 }
 
 function getNode(doc: DOCUMENT, path: string[]) {
-	let view = getView(doc.getElementById(path[0])) as Viewer<NODE>;
+	let view = getView(doc.getElementById(path[0])) as Component<NODE>;
 	if (!view) console.error("can't find view");
 	let node = view.content.view;
 	for (let i = 1; i < path.length - 1; i++) {

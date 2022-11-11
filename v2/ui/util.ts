@@ -1,6 +1,6 @@
-import { Article, Edits, ViewerType } from "../base/article.js";
+import { Article, Edits, ComponentType } from "../base/component.js";
 import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
-import { Text } from "../base/mvc.js";
+import { Text } from "../base/model.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
@@ -92,13 +92,13 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 
 
 export function play(article: Article<NODE>, edits: Edits) {
-	let type = article.types[edits.type] as ViewerType<NODE>;
+	let type = article.types[edits.type] as ComponentType<NODE>;
 	let view = type.create(edits.source);
 	article.view = view.view;
 	this.frame.append(this.node);
 	for (let edit of edits.edits) {
 		let editor = this.getControl(edit.viewId) as Box;
 		let range = this.extentFrom(edit.range.start, edit.range.end);
-		editor.edit(edit.name, range, edit.value);
+		editor.exec(edit.name, range, edit.value);
 	}
 }

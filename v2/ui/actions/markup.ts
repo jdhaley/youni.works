@@ -12,7 +12,7 @@ export default extend(list, {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
-		range = this.edit("Paste", range, model);
+		range = this.exec("Paste", range, model);
 		range &&  this.type.owner.setExtent(range, true);
 	},
 	insertText(this: Box, event: EditEvent) {
@@ -21,7 +21,7 @@ export default extend(list, {
 			"type$": "para",
 			"content": event.data
 		};
-		let range = this.edit("Entry", event.range, [model]);
+		let range = this.exec("Entry", event.range, [model]);
 		range &&  this.type.owner.setExtent(range, true);
 	},
 	split(this: Box, event: UserEvent) {
@@ -38,7 +38,7 @@ export default extend(list, {
 				"content": ""
 			}];	
 		}
-		range = this.edit("Split", range, model);
+		range = this.exec("Split", range, model);
 		//If split happened at the start of the paragraph
 		//leave the caret there (on the empty paragraph).
 		if (range && !range.startContainer.textContent) {
@@ -50,7 +50,7 @@ export default extend(list, {
 	join(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		range = this.edit("Join", range, "");
+		range = this.exec("Join", range, "");
 		range && this.type.owner.setExtent(range, true);
 	},
 	next(this: Box, event: UserEvent) {
@@ -58,7 +58,7 @@ export default extend(list, {
 		if (event.altKey || event.ctrlKey) {
 			nav(event);
 		} else {
-			this.edit("Demote", event.range);
+			this.exec("Demote", event.range);
 		}
 	},
 	previous(this: Box, event: UserEvent) {
@@ -66,7 +66,7 @@ export default extend(list, {
 		if (event.altKey || event.ctrlKey) {
 			nav(event, true);
 		} else {
-			this.edit("Promote", event.range);
+			this.exec("Promote", event.range);
 		}
 	},
 	insert(this: Box, event: UserEvent) {
@@ -81,7 +81,7 @@ export default extend(list, {
 		}
 		range.setStartBefore(current.view);
 		range.collapse(true);
-		this.edit("Insert", range, [item]);
+		this.exec("Insert", range, [item]);
 	}
 });
 

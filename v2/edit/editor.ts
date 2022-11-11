@@ -1,9 +1,8 @@
-import { Viewer } from "../base/article.js";
-import { NODE, RANGE } from "../base/dom.js";
+import { Component } from "../base/component.js";
+import { ELE } from "../base/dom.js";
 
-export interface Editor extends Viewer<NODE> {
+export interface Editor extends Component<ELE> {
 	id: string;
-	edit(commandName: string, extent: RANGE, replacement?: any): RANGE;
 	/** @deprecated */
 	convert?(type: string): void;
 }

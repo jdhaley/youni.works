@@ -1,23 +1,23 @@
-import { View, value } from "../../base/mvc.js";
+import { value, View } from "../../base/model.js";
 import { Actions } from "../../base/control.js";
-import { ViewerType } from "../../base/article.js";
-import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
+import { ComponentType } from "../../base/component.js";
+import { ele, ELE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
-import { ElementContent, ElementView } from "../../control/view.js";
+import { ElementView, ElementViewer } from "../../control/view.js";
 import { Box } from "../box.js";
 
 type editor = (this: Box, commandName: string, range: RANGE, content?: value) => RANGE;
 
-export abstract class ElementBox extends ElementView implements Box {
+export abstract class ElementBox extends ElementViewer implements Box {
 	constructor(actions: Actions, editor: editor) {
 		super();
 		this.actions = actions;
-		if (editor) this["edit"] = editor;
+		if (editor) this["exec"] = editor;
 	}
 
-	get type(): ViewerType<NODE> {
-		return this._type as ViewerType<NODE>;
+	get type(): ComponentType<ELE> {
+		return this._type as ComponentType<ELE>;
 	}
 	get shortcuts(): bundle<string> {
 		return this._type.conf.shortcuts;
@@ -25,19 +25,19 @@ export abstract class ElementBox extends ElementView implements Box {
 	get isContainer(): boolean {
 		return this._type.conf.container;
 	}
-	get header(): View<NODE> {
+	get header(): View<ELE> {
 		for (let child of this._ele.children) {
 			if (child.nodeName == "header") return child["$control"];
 		}
 	}
-	get content(): View<NODE> {
+	get content(): View<ELE> {
 		if (!this.isContainer) return this;
 		for (let child of this._ele.children) {
 			if (child.classList.contains("content")) return child["$control"];
 		}
 		throw new Error("Missing content in container.");
 	}
-	get footer(): View<NODE> {
+	get footer(): View<ELE> {
 		for (let child of this._ele.children) {
 			if (child.nodeName == "footer") return child["$control"];
 		}
@@ -45,11 +45,11 @@ export abstract class ElementBox extends ElementView implements Box {
 
 	abstract viewElement(content: ELE): void;
 
-	edit(commandName: string, range: RANGE, content?: value): RANGE {
+	exec(commandName: string, range: RANGE, content?: value): RANGE {
 		console.warn("edit() has not been configured.")
 		return null;
 	}
-	render(value: value, parent?: ElementView): void {
+	render(value: value, parent?: ElementViewer): void {
 		if (parent) (parent.content.view as ELE).append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
@@ -77,13 +77,13 @@ export abstract class ElementBox extends ElementView implements Box {
 		let ele = this.view.ownerDocument.createElement("header") as Element;
 		ele.textContent = this._type.conf.title || "";
 		this._ele.append(ele);
-		let content = new ElementContent();
+		let content = new ElementView();
 		content.control(ele as Element);
 	}
 	protected createContent(model?: value) {
 		let ele = this.view.ownerDocument.createElement("div") as Element;
 		ele.classList.add("content");
-		let content = new ElementContent();
+		let content = new ElementView();
 		content.control(ele as Element);
 		this._ele.append(ele);
 	}

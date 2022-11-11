@@ -1,17 +1,24 @@
-import { model, Type } from "./mvc.js";
 import { bundle, EMPTY, extend } from "./util.js";
 
-export function start(owner: TypeOwner) {
-	let base = loadBaseTypes(owner, owner.conf.baseTypes);
-	owner.types = loadTypes(owner.conf.viewTypes, base);
-	owner.unknownType = owner.types[owner.conf.unknownType];
-	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
+export interface Type<T> {
+	name: string;
+	partOf?: Type<T>;
+	types: bundle<Type<T>>;
+
+	create(...args: any[]): T;
 }
 
 export interface TypeOwner {
 	conf: bundle<any>;
 	types: bundle<Type<unknown>>;
 	unknownType: Type<unknown>;
+}
+
+export function start(owner: TypeOwner) {
+	let base = loadBaseTypes(owner, owner.conf.baseTypes);
+	owner.types = loadTypes(owner.conf.viewTypes, base);
+	owner.unknownType = owner.types[owner.conf.unknownType];
+	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
 }
 
 interface TypeConf {
@@ -31,9 +38,6 @@ export class BaseType<T> implements Type<T> {
 
 	types: bundle<Type<T>> = EMPTY.object;
 
-	get model(): model {
-		return undefined;
-	}
 	generalizes(type: Type<T>): boolean {
 		return type == this;
 	}

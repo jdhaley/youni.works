@@ -11,7 +11,7 @@ export default extend(editable, {
 		let range = event.range;
 		if (range.collapsed) return;
 		setClipboard(range.cloneRange(), event.clipboardData);
-		range = this.edit("Cut", range);
+		range = this.exec("Cut", range);
 		range && this.type.owner.setExtent(range, true);
 	},
 	paste(this: Box, event: UserEvent) {
@@ -19,7 +19,7 @@ export default extend(editable, {
 		let text = event.clipboardData.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
-		range = this.edit("Paste", range, text);
+		range = this.exec("Paste", range, text);
 		range && this.type.owner.setExtent(range, true);
 	},
 	replaceText(this: Box, event: EditEvent) {
@@ -27,7 +27,7 @@ export default extend(editable, {
 		let text = event.dataTransfer.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to replace.
 		let range = event.range;
-		range = this.edit("Replace", range, text);
+		range = this.exec("Replace", range, text);
 		range && this.type.owner.setExtent(range, true);
 	},
 	insertText(this: Box, event: EditEvent) {
@@ -48,7 +48,7 @@ export default extend(editable, {
 		if (char == " " && textEnd == text.textContent.length) {
 			char = CHAR.NBSP;
 		}
-		range = this.edit("Entry", range, char);
+		range = this.exec("Entry", range, char);
 		range && this.type.owner.setExtent(range, true);
 	},
 	deleteWordForward(event: EditEvent) {
@@ -66,14 +66,14 @@ export default extend(editable, {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) return;
-		range = this.edit("Erase", range, "");
+		range = this.exec("Erase", range, "");
 		range && this.type.owner.setExtent(range, true);
 	},
 	delete(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;
-		range = this.edit("Delete", range, "");
+		range = this.exec("Delete", range, "");
 		range && this.type.owner.setExtent(range, true);
 	}
 });

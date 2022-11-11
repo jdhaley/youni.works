@@ -1,4 +1,4 @@
-import { value } from "../../base/mvc.js";
+import { value } from "../../base/model.js";
 import { Editor } from "../editor.js";
 
 import { RangeReplace } from "./rangeReplace.js";
