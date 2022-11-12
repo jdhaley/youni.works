@@ -1,4 +1,4 @@
-import { ele, NODE } from "../../base/dom.js";
+import { ele, NODE, RANGE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
 import { Viewbox as Box } from "../box.js";
@@ -12,8 +12,7 @@ export default extend(list, {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
-		range = this.exec("Paste", range, model);
-		range &&  this.type.owner.setExtent(range, true);
+		this.exec("Paste", range, model);
 	},
 	insertText(this: Box, event: EditEvent) {
 		event.subject = "";
@@ -21,8 +20,7 @@ export default extend(list, {
 			"type$": "para",
 			"content": event.data
 		};
-		let range = this.exec("Entry", event.range, [model]);
-		range &&  this.type.owner.setExtent(range, true);
+		this.exec("Entry", event.range, [model]);
 	},
 	split(this: Box, event: UserEvent) {
 		event.subject = "";
@@ -38,20 +36,19 @@ export default extend(list, {
 				"content": ""
 			}];	
 		}
-		range = this.exec("Split", range, model);
+		this.exec("Split", range, model);
+		range = this.type.owner.frame.selectionRange as RANGE;
 		//If split happened at the start of the paragraph
 		//leave the caret there (on the empty paragraph).
 		if (range && !range.startContainer.textContent) {
 			range.selectNodeContents(range.startContainer);
 			range.collapse();
 		}
-		range && this.type.owner.setExtent(range, true);
 	},
 	join(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
-		range = this.exec("Join", range, "");
-		range && this.type.owner.setExtent(range, true);
+		this.exec("Join", range, "");
 	},
 	next(this: Box, event: UserEvent) {
 		event.subject = "";

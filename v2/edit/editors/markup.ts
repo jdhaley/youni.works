@@ -6,13 +6,16 @@ import { MarkupReplace } from "../commands/markupReplace.js";
 import { getChildEditor, getEditor, senseChange } from "../util.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
-export default function edit(this: Editor, commandName: string, range: RANGE, content: string) {
+export default function edit(this: Editor, commandName: string, range: RANGE, content: string): void {
 	if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
 	let cmd = COMMANDS[commandName];
 	if (!cmd) throw new Error("Unrecognized command");
-	range = cmd.call(this, commandName, range, content);
+
+	let r = range.cloneRange();
+	r = cmd.call(this, commandName, r, content);
+	this.type.owner.setExtent(r, true);
+
 	senseChange(this, commandName);
-	return range;
 }
 
 const COMMANDS = {

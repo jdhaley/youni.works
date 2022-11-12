@@ -5,10 +5,12 @@ import { Editor } from "../editor.js";
 import { getEditor, senseChange } from "../util.js";
 import { RangeReplace } from "../commands/rangeReplace.js";
 
-export default function edit(this: Editor, commandName: string, range: RANGE, record: record) {
+export default function edit(this: Editor, commandName: string, range: RANGE, record: record): void {
 	if (getEditor(range) != this) console.warn("Invalid edit range");
 	if (record && typeof record[0] == "object") record = record[0] as record;
-	range = new RangeReplace(this.type.owner, commandName, this.id).exec(range, record);
+
+	let r = range.cloneRange();
+	r = new RangeReplace(this.type.owner, commandName, this.id).exec(r, record);
+	this.type.owner.setExtent(r, true);
 	senseChange(this, commandName);
-	return range;
 }

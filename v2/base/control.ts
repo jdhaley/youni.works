@@ -8,12 +8,10 @@ import { Shape } from "./shape.js";
 export interface Control<T> extends Receiver {
 	readonly type: ControlType<T>;
 	readonly view: T;
-	//readonly header?: View<T>;
 	readonly content: View<T>;
-	//readonly footer?: View<T>;
 	level: number;
 
-	exec(commandName: string, extent: Extent<unknown>, replacement?: any): Extent<unknown>;
+	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
 	valueOf(filter?: unknown): value;
 	demote(): void;
 	promote(): void;

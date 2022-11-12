@@ -8,7 +8,7 @@ import { bundle } from "../base/util.js";
 import { ElementView, ElementViewer, ElementViewOwner } from "../control/view.js";
 import { Actions } from "../base/controller.js";
 
-type editor = (this: Viewbox, commandName: string, range: RANGE, content?: value) => RANGE;
+type editor = (this: Viewbox, commandName: string, range: RANGE, content?: value) => void;
 
 export abstract class Viewbox extends ElementViewer implements Box<ELE> {
 	constructor(actions: Actions, editor: editor) {
@@ -46,9 +46,8 @@ export abstract class Viewbox extends ElementViewer implements Box<ELE> {
 
 	abstract viewElement(content: ELE): void;
 
-	exec(commandName: string, range: RANGE, content?: value): RANGE {
-		console.warn("edit() has not been configured.")
-		return null;
+	exec(commandName: string, range: RANGE, content?: value): void {
+		console.warn("exec() has not been configured.")
 	}
 	render(value: value, parent?: ElementViewer): void {
 		if (parent) (parent.content.view as ELE).append(this._ele);

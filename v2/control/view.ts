@@ -72,7 +72,7 @@ export abstract class ElementViewer extends ElementView implements Control<ELE> 
 
 	abstract valueOf(range?: RANGE): value;
 	abstract viewValue(data: value): void;
-	abstract exec(commandName: string, ...args: unknown[]): Extent<unknown>;
+	abstract exec(commandName: string, ...args: unknown[]): void;
 
 	render(value: value, parent?: ElementViewer): void {
 		if (parent) (parent.content.view as ELE).append(this._ele);

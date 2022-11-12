@@ -29,8 +29,7 @@ export default extend(view, {
 			return;
 		}
 		setClipboard(range.cloneRange(), event.clipboardData);
-		range = this.exec("Cut", range);
-		range && this.type.owner.setExtent(range, true);
+		this.exec("Cut", range);
 	},
 	paste(this: Box, event: UserEvent) {
 		event.subject = "";
@@ -45,23 +44,20 @@ export default extend(view, {
 			}
 			target = getBox(range);
 		} 
-		range = target.exec("Paste", range, model);
-		range &&  this.type.owner.setExtent(range, true);
+		target.exec("Paste", range, model);
 	},
 	delete(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
-			range = this.exec("Delete", range);
-			range && this.type.owner.setExtent(range, true);	
+			this.exec("Delete", range);
 		}
 	},
 	erase(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
-			range = this.exec("Delete", range);
-			range && this.type.owner.setExtent(range, true);
+			this.exec("Delete", range);
 		}
 	},
 });

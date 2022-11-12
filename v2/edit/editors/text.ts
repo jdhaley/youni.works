@@ -4,14 +4,16 @@ import { getEditor, mark, narrowRange, senseChange, unmark } from "../util.js";
 import { Replace } from "../commands/replace.js";
 import { ele, NODE, RANGE } from "../../base/dom.js";
 
-export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): RANGE {
+export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): void {
 	if (getEditor(range) != this) console.warn("Invalid edit range");
 	positionToText(range);
 	let cmd = COMMANDS[commandName];
 	if (!cmd) throw new Error("Unrecognized command");
-	range = cmd.call(this, commandName, range, content);
+
+	let r = range.cloneRange();
+	r = cmd.call(this, commandName, r, content);
+	this.type.owner.setExtent(r, true);
 	senseChange(this, commandName);
-	return range;
 }
 
 const COMMANDS = {
