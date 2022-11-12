@@ -1,10 +1,9 @@
 import { value } from "../../base/model.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
-
-import { Editor } from "../editor.js";
-import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
-import { Replace } from "./replace.js";
 import { xmlContent } from "../../transform/content.js";
+
+import { Editor, unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
+import { Replace } from "./replace.js";
 
 export class RangeReplace extends Replace {
 	startId: string;

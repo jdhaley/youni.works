@@ -1,7 +1,11 @@
-import { Change } from "../base/control.js";
+import { Control, Change } from "../base/control.js";
 import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getView, bindViewEle, getNodeIndex } from "../base/dom.js";
 
-import { Editor } from "./editor.js";
+export interface Editor extends Control<ELE> {
+	id: string;
+	/** @deprecated */
+	convert?(type: string): void;
+}
 
 const getEditor = getView as (node: NODE | RANGE) => Editor ;
 

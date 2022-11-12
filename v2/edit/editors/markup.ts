@@ -1,10 +1,9 @@
 import { value } from "../../base/model.js";
-import { Editor } from "../editor.js";
+import { ELE, RANGE } from "../../base/dom.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/markupReplace.js";
-import { getChildEditor, getEditor, senseChange } from "../util.js";
-import { ELE, RANGE } from "../../base/dom.js";
+import { Editor, getChildEditor, getEditor, senseChange } from "../util.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, content: string): void {
 	if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"

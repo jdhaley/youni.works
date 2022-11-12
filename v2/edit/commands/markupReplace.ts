@@ -1,9 +1,8 @@
 import { value, item } from "../../base/model.js";
 import { ele, RANGE } from "../../base/dom.js";
 
-import { getEditor, mark, unmark } from "../util.js";
+import { Editor, getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
-import { Editor } from "../editor.js";
 
 export class MarkupReplace extends ListReplace {
 	protected getOuterRange(range: RANGE) {

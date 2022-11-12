@@ -1,8 +1,7 @@
-import { Editor } from "../editor.js";
-
-import { getEditor, mark, narrowRange, senseChange, unmark } from "../util.js";
-import { Replace } from "../commands/replace.js";
 import { ele, NODE, RANGE } from "../../base/dom.js";
+
+import { Editor, getEditor, mark, narrowRange, senseChange, unmark } from "../util.js";
+import { Replace } from "../commands/replace.js";
 
 export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): void {
 	if (getEditor(range) != this) console.warn("Invalid edit range");

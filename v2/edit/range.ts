@@ -1,7 +1,7 @@
 import { ELE, NODE, RANGE } from "../base/dom.js";
 import { xmlContent } from "../transform/content.js";
-import { Editor } from "./editor.js";
-import { getEditor, getChildEditor, clearContent, narrowRange, mark, unmark } from "./util.js";
+
+import { Editor, getEditor, getChildEditor, clearContent, narrowRange, mark, unmark } from "./util.js";
 
 interface E extends ELE {
 	$control: Editor

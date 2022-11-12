@@ -1,9 +1,9 @@
 import { value } from "../../base/model.js";
-import { Editor } from "../editor.js";
-
-import { RangeReplace } from "./rangeReplace.js";
-import { clearContent, getChildEditor } from "../util.js";
 import { RANGE } from "../../base/dom.js";
+
+import { Editor, clearContent, getChildEditor } from "../util.js";
+import { RangeReplace } from "./rangeReplace.js";
+
 export class ListReplace extends RangeReplace {
 	exec(range: RANGE, content: value): RANGE {
 		if (!content) content = [];

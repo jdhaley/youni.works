@@ -1,9 +1,8 @@
-import { Editor } from "../editor.js";
 import { RANGE } from "../../base/dom.js";
 import { value } from "../../base/model.js";
 
 import { ListReplace } from "../commands/listReplace.js";
-import { getEditor, senseChange } from "../util.js";
+import { Editor, getEditor, senseChange } from "../util.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, content?: value): void {
 	if (getEditor(range) != this) console.warn("Invalid edit range.");
