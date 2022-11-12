@@ -1,22 +1,20 @@
-import { Article, Edits, ControlType } from "../base/control.js";
+import { Article, Edits, ControlType, Box } from "../base/control.js";
 import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
 import { Text } from "../base/model.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
 
-import { Viewbox as Box } from "./box.js";
+export const getBox = getView as (node: Text | RANGE) => Box<ELE> ;
 
-export const getBox = getView as (node: Text | RANGE) => Box ;
-
-export function getHeader(view: Box, node: NODE) {
+export function getHeader(view: Box<ELE>, node: NODE) {
 	while (node && node != view.view) {
 		if (node.nodeName == "HEADER" && node.parentNode == view.view) return node as ELE;
 		node = node.parentNode;
 	}
 }
 
-export function getFooter(view: Box, node: NODE) {
+export function getFooter(view: Box<ELE>, node: NODE) {
 	while (node && node != view.view) {
 		if (node.nodeName == "FOOTER" && node.parentNode == view.view) return node as ELE;
 		node = node.parentNode;
@@ -97,7 +95,7 @@ export function play(article: Article<NODE>, edits: Edits) {
 	article.view = view.view;
 	this.frame.append(this.node);
 	for (let edit of edits.edits) {
-		let editor = this.getControl(edit.viewId) as Box;
+		let editor = this.getControl(edit.viewId) as Box<ELE>;
 		let range = this.extentFrom(edit.range.start, edit.range.end);
 		editor.exec(edit.name, range, edit.value);
 	}

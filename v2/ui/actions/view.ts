@@ -1,21 +1,21 @@
-import { Change } from "../../base/control.js";
+import { Box, Change } from "../../base/control.js";
+import { ELE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
-import { Viewbox as Box } from "../box.js";
-import { UserEvent } from "../frame.js";
+import { UserEvent } from "../../control/frame.js";
 import { getBox, navigate, setClipboard } from "../util.js";
 
 export default extend(null, {
-	keydown(this: Box, event: UserEvent) {
+	keydown(this: Box<ELE>, event: UserEvent) {
 		event.shortcut = getShortcut(event);
-		event.subject = this.shortcuts[event.shortcut] || "keydown";
+		event.subject = this.type.conf.shortcuts[event.shortcut] || "keydown";
        // console.log(event.shortcut, event.subject);
 	},
-	save(this: Box, event: UserEvent) {
+	save(this: Box<ELE>, event: UserEvent) {
 		this.type.owner.receive(event);
 		event.subject = "";
 	},
-	copy(this: Box, event: UserEvent) {
+	copy(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		setClipboard(event.range, event.clipboardData);
 	},
@@ -35,17 +35,17 @@ export default extend(null, {
 			prev.scrollIntoView({block: "center"});
 		}
 	},
-	undo(this: Box, event: UserEvent) {
+	undo(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		this.type.owner.setExtent(this.type.owner.commands.undo(), false);
 		this.type.owner.receive(new Change("undo"));
 	},
-	redo(this: Box, event: UserEvent) {
+	redo(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		this.type.owner.setExtent(this.type.owner.commands.redo(), false);
 		this.type.owner.receive(new Change("redo"));
 	},
-	selectionchange(this: Box, event: UserEvent) {
+	selectionchange(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		let eles = [];
 		for (let ele of this.view.ownerDocument.getElementsByClassName("active")) {
@@ -60,7 +60,7 @@ export default extend(null, {
 			}
 		}
 	},
-	change(this: Box, signal: Change) {
+	change(this: Box<ELE>, signal: Change) {
 		if (signal.direction == "up") {
 			//console.log(signal.direction, this.type.name, signal.commandName);
 			if (this.view == this.type.owner.view) {

@@ -1,10 +1,9 @@
 import { ELE, NODE, RANGE } from "../../base/dom.js";
 import { value, record, item } from "../../base/model.js";
-import { Control, ControlType } from "../../base/control.js";
+import { Box, Control, ControlType } from "../../base/control.js";
 import { EMPTY } from "../../base/util.js";
 
 import { RecordBox } from "./record.js";
-import { Viewbox as Box } from "../box.js";
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
@@ -56,7 +55,7 @@ export class RowBox extends RecordBox {
 		}
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
-			let child = type.create(idx[name], this) as Box;
+			let child = type.create(idx[name], this) as Box<ELE>;
 			child.kind.add("field");
 		}
 	}
@@ -105,7 +104,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	if (range && !range.intersectsNode(content)) return model;
 	
 	for (let child of content.childNodes) {
-		let viewer = child["$control"] as Box;
+		let viewer = child["$control"] as Box<ELE>;
 		let value = viewer.valueOf(range);
 		if (value) {
 			if (!model) model = Object.create(null);

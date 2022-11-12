@@ -1,11 +1,11 @@
-import { RANGE, NODE } from "../../base/dom.js";
+import { RANGE, NODE, ELE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
-import { Viewbox as Box } from "../box.js";
 import { getBox, getClipboard, setClipboard } from "../util.js";
 
 import view from "./view.js";
-import { EditEvent, UserEvent } from "../frame.js";
+import { EditEvent, UserEvent } from "../../control/frame.js";
+import { Box } from "../../base/control.js";
 
 const EDIT_MAPPING = {
 	"insertText": "insertText",
@@ -22,7 +22,7 @@ export default extend(view, {
 		event.subject =  subject || event.inputType;
 		if (!subject) console.log(event.inputType);
 	},
-	cut(this: Box, event: UserEvent) {
+	cut(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) {
@@ -31,7 +31,7 @@ export default extend(view, {
 		setClipboard(range.cloneRange(), event.clipboardData);
 		this.exec("Cut", range);
 	},
-	paste(this: Box, event: UserEvent) {
+	paste(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
@@ -46,14 +46,14 @@ export default extend(view, {
 		} 
 		target.exec("Paste", range, model);
 	},
-	delete(this: Box, event: UserEvent) {
+	delete(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
 			this.exec("Delete", range);
 		}
 	},
-	erase(this: Box, event: UserEvent) {
+	erase(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {

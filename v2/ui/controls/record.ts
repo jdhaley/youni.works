@@ -1,13 +1,14 @@
 import { value, record } from "../../base/model.js";
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
+import { Box } from "../../base/control.js";
 
-import { Viewbox as Box, Viewbox } from "../box.js";
+import { Viewbox } from "./box.js";
 import { getBox } from "../util.js";
 
 export class RecordBox extends Viewbox {
 	memberType = "field";
 
-	get(name: string): Box {
+	get(name: string): Box<ELE> {
 		for (let node of this.content.contents) {
 			let view = getBox(node);
 			if (name == view?.type.name) return view;
@@ -32,9 +33,9 @@ export class RecordBox extends Viewbox {
 			this.viewMember(name, idx[name]);
 		}
 	}
-	protected viewMember(name: string, value: any): Box {
+	protected viewMember(name: string, value: any): Box<ELE> {
 		let type = this.type.types[name];
-		let member = type.create(value, this) as Box;
+		let member = type.create(value, this) as Box<ELE>;
 		member.kind.add(this.memberType);
 		return member;
 	}
@@ -53,7 +54,7 @@ function recordContent(model: record, view: NODE, range: RANGE): record {
 	
 	for (let child of view.childNodes) {
 		if (ele(child)?.classList.contains("field")) {
-			let viewer = child["$control"] as Box;
+			let viewer = child["$control"] as Box<ELE>;
 			let value = viewer.valueOf(range);
 			if (value) {
 				if (!model) model = Object.create(null);

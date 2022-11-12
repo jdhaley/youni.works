@@ -1,9 +1,10 @@
 import { View, model, Text, typeOf, value } from "./model.js";
-import { Graph, Receiver, Signal } from "./controller.js";
-import { BaseType, TypeOwner } from "./type.js";
-import { CommandBuffer } from "./command.js";
-import { bundle } from "./util.js";
 import { Shape } from "./shape.js";
+import { Graph, Receiver, Signal } from "./controller.js";
+import { Type, BaseType, TypeOwner } from "./type.js";
+import { CommandBuffer } from "./command.js";
+import { RemoteFileService } from "./remote.js";
+import { bundle } from "./util.js";
 
 export interface Control<T> extends Receiver {
 	readonly type: ControlType<T>;
@@ -33,10 +34,13 @@ export abstract class ControlType<T> extends BaseType<Control<T>> {
 }
 
 export interface Article<T> extends TypeOwner, Receiver, Graph<T> {
-	view: T;
-	frame: ArticleContext<T>;
 	conf: bundle<any>;
+	source: value;
+	view: T;
+	defaultType: Type<Control<T>>
+	frame: ArticleContext<T>;
 	commands: CommandBuffer<Extent<Text>>;
+	service: RemoteFileService;
 
 	createView(name: string): T;
 	getControl(id: string): Control<T>;

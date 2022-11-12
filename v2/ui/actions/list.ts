@@ -1,13 +1,13 @@
+import { Box } from "../../base/control";
 import { ELE, RANGE } from "../../base/dom";
 import { extend } from "../../base/util.js";
 
-import { Viewbox as Box } from "../box.js";
-import { EditEvent, UserEvent } from "../frame.js";
+import { EditEvent, UserEvent } from "../../control/frame.js";
 import { getFooter, getHeader } from "../util.js";
 import editable from "./editor.js";
 
 export default extend(editable, {
-	dblclick(this: Box, event: UserEvent) {
+	dblclick(this: Box<ELE>, event: UserEvent) {
 		let header = getHeader(this, event.target as Node);
 		if (header) {
 			event.subject = "";
@@ -18,7 +18,7 @@ export default extend(editable, {
 			}
 		}
 	},
-	insertText(this: Box, event: EditEvent) {
+	insertText(this: Box<ELE>, event: EditEvent) {
 		if (getFooter(this, event.range.commonAncestorContainer)) {
 			event.subject = "";
 			let model = {

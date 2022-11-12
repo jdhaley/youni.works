@@ -1,16 +1,14 @@
-import { value, View } from "../base/model.js";
-import { ArticleContext, Box, ControlType } from "../base/control.js";
-import { ele, ELE, NODE, RANGE } from "../base/dom.js";
-import { RemoteFileService } from "../base/remote.js";
-import { start } from "../base/type.js";
-import { bundle } from "../base/util.js";
+import { value, View } from "../../base/model.js";
+import { Box, ControlType } from "../../base/control.js";
+import { Actions } from "../../base/controller.js";
+import { ele, ELE, RANGE } from "../../base/dom.js";
+import { bundle } from "../../base/util.js";
 
-import { ElementView, ElementViewer, ElementViewOwner } from "../control/view.js";
-import { Actions } from "../base/controller.js";
+import { ElementView, ElementControl } from "../../control/view.js";
 
 type editor = (this: Viewbox, commandName: string, range: RANGE, content?: value) => void;
 
-export abstract class Viewbox extends ElementViewer implements Box<ELE> {
+export abstract class Viewbox extends ElementControl implements Box<ELE> {
 	constructor(actions: Actions, editor: editor) {
 		super();
 		this.actions = actions;
@@ -49,7 +47,7 @@ export abstract class Viewbox extends ElementViewer implements Box<ELE> {
 	exec(commandName: string, range: RANGE, content?: value): void {
 		console.warn("exec() has not been configured.")
 	}
-	render(value: value, parent?: ElementViewer): void {
+	render(value: value, parent?: ElementControl): void {
 		if (parent) (parent.content.view as ELE).append(this._ele);
 		if (!this.id) {
 			if (value instanceof Element && value.id) {
@@ -92,15 +90,3 @@ export abstract class Viewbox extends ElementViewer implements Box<ELE> {
 }
 
 let NEXT_ID = 1;
-export class Display extends ElementViewOwner {
-	constructor(frame: ArticleContext<NODE>, conf: bundle<any>) {
-		super(conf);
-		this.frame = frame;
-		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		start(this);
-	}
-	readonly service: RemoteFileService;
-	getControl(id: string): Box<ELE> {
-		return super.getControl(id) as Box<ELE>;
-	}
-}

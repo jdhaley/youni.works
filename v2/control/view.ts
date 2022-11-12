@@ -5,7 +5,8 @@ import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../b
 import { bundle, Sequence } from "../base/util.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
-import { BaseType } from "../base/type.js";
+import { BaseType, start } from "../base/type.js";
+import { RemoteFileService } from "../base/remote.js";
 
 export class ElementView extends ElementShape implements View<ELE> {
 	get type(): BaseType<any> {
@@ -33,7 +34,7 @@ export class ElementView extends ElementShape implements View<ELE> {
 const SIMPLE_TYPE = new BaseType();
 SIMPLE_TYPE.start("", {prototype: new ElementView()});
 
-export abstract class ElementViewer extends ElementView implements Control<ELE> {
+export abstract class ElementControl extends ElementView implements Control<ELE> {
 	declare _type: ControlType<ELE>;
 
 	get type(): ControlType<ELE> {
@@ -74,7 +75,7 @@ export abstract class ElementViewer extends ElementView implements Control<ELE> 
 	abstract viewValue(data: value): void;
 	abstract exec(commandName: string, ...args: unknown[]): void;
 
-	render(value: value, parent?: ElementViewer): void {
+	render(value: value, parent?: ElementControl): void {
 		if (parent) (parent.content.view as ELE).append(this._ele);
 		this.view.textContent = "";
 		this.viewValue(value as value);
@@ -102,29 +103,32 @@ export class ElementViewType extends  ControlType<ELE> {
 		return this.owner.conf.contentTypes[this.conf.viewType];
 	}
 
-	create(value: value, container?: ElementViewer): ElementViewer {
-		let view = Object.create(this.prototype) as ElementViewer;
+	create(value: value, container?: ElementControl): ElementControl {
+		let view = Object.create(this.prototype) as ElementControl;
 		let node = this.owner.createView(this.conf.tagName || "div");
 		view.control(node as ELE);
 		view.render(value, container);
 		return view;
 	}
-	control(node: ELE): ElementViewer {
-		let view = Object.create(this.prototype) as ElementViewer;
+	control(node: ELE): ElementControl {
+		let view = Object.create(this.prototype) as ElementControl;
 		view.control(node);
 		return view;
 	}
 }
 
-export abstract class ElementViewOwner extends ElementOwner implements Article<NODE> {
-	constructor(conf: bundle<any>) {
-		super();
+export abstract class ElementArticle extends ElementOwner implements Article<NODE> {
 		/*
 		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
 		*/
+		constructor(frame: ArticleContext<NODE>, conf: bundle<any>) {
+		super();
+		this.frame = frame;
 		this.conf = conf;
 		this.actions = conf.actions;
 		this.commands = new CommandBuffer();
+		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
+		start(this);
 	}
 	frame: ArticleContext<NODE>;
 	view: ELE;
@@ -133,6 +137,7 @@ export abstract class ElementViewOwner extends ElementOwner implements Article<N
 	unknownType: ElementViewType;
 	defaultType: ElementViewType;
 	readonly commands: CommandBuffer<RANGE>;
+	readonly service: RemoteFileService;
 	source: value;
 
 	createView(tagName: string): ELE {

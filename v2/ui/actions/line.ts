@@ -1,13 +1,14 @@
+import { Box } from "../../base/control.js";
+import { ELE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
-import { Viewbox as Box } from "../box.js";
-import { UserEvent } from "../frame.js";
+import { UserEvent } from "../../control/frame.js";
 import { getClipboard } from "../util.js";
 
 import text from "./text.js";
 
 export default extend(text, {
-	paste(this: Box, event: UserEvent) {
+	paste(this: Box<ELE>, event: UserEvent) {
 		let x = getClipboard(event.clipboardData);
 		if (x instanceof Array) return;
 		event.subject = "";
@@ -16,7 +17,7 @@ export default extend(text, {
 		let range = event.range;
 		this.exec("Paste", range, text);
 	},
-	erase(this: Box, event: UserEvent) {
+	erase(this: Box<ELE>, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) {
@@ -29,7 +30,7 @@ export default extend(text, {
 			this.exec("Erase", range, "");
 		}
 	},
-	delete(this: Box, event: UserEvent) {
+	delete(this: Box<ELE>, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) {

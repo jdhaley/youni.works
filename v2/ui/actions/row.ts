@@ -1,11 +1,10 @@
 import { extend } from "../../base/util.js";
-import { Change } from "../../base/control.js";
-import { ele } from "../../base/dom.js";
+import { Box, Change } from "../../base/control.js";
+import { ELE, ele } from "../../base/dom.js";
 
 import { RowBox } from "../controls/row.js";
 import { getBox, getHeader } from "../util.js";
-import { Viewbox as Box } from "../box.js";
-import { UserEvent } from "../frame.js";
+import { UserEvent } from "../../control/frame.js";
 
 import editable from "./editor.js";
 
@@ -51,7 +50,7 @@ export default extend(editable, {
 	}
 });
 
-function addCol(editor: RowBox, col: Box) {
+function addCol(editor: RowBox, col: Box<ELE>) {
 	let contents = editor.content.contents;
 	for (let i = 0; i < contents.length; i++) {
 		if (contents[i] == col.view) {
@@ -68,6 +67,6 @@ function addCol(editor: RowBox, col: Box) {
 }
 function addColumn(row: RowBox, index: number) {
 	let column = getBox(row.content.contents[index]);
-	let newcol = column.type.create("") as Box;
+	let newcol = column.type.create("") as Box<ELE>;
 	ele(column.view).after(newcol.view);
 }

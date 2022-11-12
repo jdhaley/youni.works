@@ -1,25 +1,24 @@
 import { ELE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
-import { Change } from "../../base/control.js";
-import { UserEvent } from "../frame.js";
+import { Article, Box, Change } from "../../base/control.js";
+import { UserEvent } from "../../control/frame.js";
 
-import { Viewbox as Box, Display } from "../box.js";
 import { CommandBuffer } from "../../base/command.js";
 import { Type } from "../../base/type.js";
 
 export default extend(null, {
-	open(this: Display, res: Response<string>) {
+	open(this: Article<ELE>, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, this.source);
-		this.view = (type.create(this.source) as Box).view as ELE;
+		this.view = (type.create(this.source)).view as ELE;
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.frame.append(this.view);
 
 		//shapetest.call(this);
 	},
-	save(this: Display, signal: UserEvent | Response<string>) {
+	save(this: Article<ELE>, signal: UserEvent | Response<string>) {
 		signal.subject = "";
 		if (signal instanceof Response) {
 			console.log("Saved: ", signal);
@@ -38,7 +37,7 @@ export default extend(null, {
 			}
 		}
 	},
-	undo(this: Display, event: UserEvent) {
+	undo(this: Article<ELE>, event: UserEvent) {
 		event.subject = "";
 		let range = this.commands.redo();
 		if (range) {
@@ -48,7 +47,7 @@ export default extend(null, {
 			this.frame.receive(signal);	
 		}
 	},
-	redo(this: Display, event: UserEvent) {
+	redo(this: Article<ELE>, event: UserEvent) {
 		event.subject = "";
 		let range = this.commands.redo();
 		if (range) {
@@ -58,7 +57,7 @@ export default extend(null, {
 			this.frame.receive(signal);	
 		}
 	},
-	change(this: Display, signal: Change) {
+	change(this: Article<ELE>, signal: Change) {
 		// console.log("Article changed:", this.commands.peek());
 		// signal.direction = "down";
 		// this.send(signal, this.node);
@@ -66,7 +65,7 @@ export default extend(null, {
 	}
 });
 
-function getType(article: Display, path: string, data: any): Type<Box> {
+function getType(article: Article<ELE>, path: string, data: any): Type<Box<ELE>> {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";
@@ -84,7 +83,7 @@ function serializeCommands(history: CommandBuffer<any>) {
 	return out;
 }
 
-function shapetest(this: Display) {
+function shapetest(this: Article<ELE>) {
 	// let type = new ViewTypeImpl(this);
 	// type.start("shape", {
 	// 	prototype: new TextBox(shape, null),
