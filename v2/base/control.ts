@@ -1,4 +1,4 @@
-import { View, model, Text, typeOf, value } from "./model.js";
+import { model, Text, typeOf, value, Content, View } from "./model.js";
 import { Shape } from "./shape.js";
 import { Graph, Receiver, Signal } from "./controller.js";
 import { Type, BaseType, TypeOwner } from "./type.js";
@@ -12,8 +12,8 @@ export interface Control<T> extends Receiver {
 	readonly content: View<T>;
 	level: number;
 
-	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
 	valueOf(filter?: unknown): value;
+	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
 	demote(): void;
 	promote(): void;
 }

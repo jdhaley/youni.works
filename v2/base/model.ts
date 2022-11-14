@@ -8,7 +8,7 @@ import { bundle, Instance, Sequence } from "./util";
 export type model = "unit" | "list" | "record";
 export type value =  unit | list | record ;
 
-type unit = string | number | boolean | date | null | unknown;
+export type unit = string | number | boolean | date | null | unknown;
 
 export interface list extends Iterable<value> {
 	length?: number;

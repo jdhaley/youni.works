@@ -46,7 +46,7 @@ export class LineBox extends TextBox {
 		let toType = this.type.partOf?.types[name];
 		if (toType) {
 			this._type = toType as ElementViewType;
-			this.put("data-item", toType.name);
+			this.view.setAttribute("data-item", toType.name);
 		}
 	}
 	viewValue(content: item): void {
@@ -61,10 +61,10 @@ export class LineBox extends TextBox {
 		if (range && !range.intersectsNode(this.content.view)) return;
 		let content = super.valueOf(range);
 		let item: item = {
-			type$: this.at("data-item"),
+			type$: this.view.getAttribute("data-item"),
 			content: content,
 		}
-		let level = Number.parseInt(this.at("aria-level"));
+		let level = Number.parseInt(this.view.getAttribute("aria-level"));
 		if (level) item.level = level;
 		return item;
 	}

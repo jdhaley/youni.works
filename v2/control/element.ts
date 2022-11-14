@@ -1,7 +1,9 @@
 import { BasePart, Owner, Receiver } from "../base/controller.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
-import { ELE } from "../base/dom.js";
-import { Bag, EMPTY, Entity } from "../base/util.js";
+import { ELE, NODE } from "../base/dom.js";
+import { Bag, EMPTY, Sequence } from "../base/util.js";
+import { Content, View } from "../base/model.js";
+import { BaseType } from "../base/type.js";
 
 export class ElementOwner extends Owner<ELE> {
 	getControlOf(node: ELE): Receiver {
@@ -50,34 +52,43 @@ class ElementPart extends BasePart {
 	}
 }
 
-class ElementEntity extends ElementPart implements Entity<string> {
-	get id(): string {
-		return this._ele.id;
+export class ElementContent extends ElementPart implements Content {
+	get type(): BaseType<any> {
+		return SIMPLE_TYPE;
 	}
 	get kind(): Bag<string> {
 		return this._ele.classList;
 	}
-
-	at(name: string): string {
-		return this._ele.getAttribute(name);
+	get contents(): Sequence<NODE> {
+		return this._ele.childNodes;
 	}
-	put(name: string, value?: string): void {
-		if (value === undefined) {
-			this._ele.removeAttribute(name);
-		} else {
-			this._ele.setAttribute(name, value);
-		}
+	get textContent() {
+		return this._ele.textContent;
+	}
+	set textContent(text: string) {
+		this._ele.textContent = text;
+	}
+	get markupContent() {
+		return this._ele.innerHTML;
+	}
+	set markupContent(markup: string) {
+		this._ele.innerHTML = markup;
 	}
 }
+const SIMPLE_TYPE = new BaseType();
+SIMPLE_TYPE.start("", {prototype: new ElementContent()});
 
 interface SHAPE_ELE extends ELE {
 	getBoundingClientRect(): Area;
 	style: CSSStyleDeclaration;
 }
 
-
-export class ElementShape extends ElementEntity implements Shape {
+export class ElementShape extends ElementContent implements Shape, View<ELE> {
 	declare protected _ele: SHAPE_ELE;
+
+	get view(): ELE {
+		return this._ele;
+	}
 	get area(): Area {
 		return this._ele.getBoundingClientRect();
 	}
@@ -99,12 +110,6 @@ export class ElementShape extends ElementEntity implements Shape {
 		}
 	}
 
-	position(x: number, y: number) {
-		let style = this._ele.style;
-		style.position = "absolute";			
-		style.left = x + "px";
-		style.top = y + "px";
-	}
 	zone(x: number, y: number): Zone {
 		if (!this.border) return "CC";
 		let box = this.area;
@@ -129,6 +134,12 @@ export class ElementShape extends ElementEntity implements Shape {
 			zone += "C";
 		}
 		return zone as Zone;
+	}
+	position(x: number, y: number) {
+		let style = this._ele.style;
+		style.position = "absolute";			
+		style.left = x + "px";
+		style.top = y + "px";
 	}
 	size(width: number, height: number) {
 		let style = this._ele.style;

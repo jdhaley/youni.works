@@ -1,44 +1,21 @@
 import { model, View, value } from "../base/model.js";
+import { Control, ControlType, Article, ArticleContext } from "../base/control.js";
 import { CommandBuffer } from "../base/command.js";
-import { Article, ControlType, Control, ArticleContext, Extent } from "../base/control.js";
 import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../base/dom.js";
-import { bundle, Sequence } from "../base/util.js";
+import { bundle } from "../base/util.js";
 
 import { ElementOwner, ElementShape } from "./element.js";
-import { BaseType, start } from "../base/type.js";
+import { start } from "../base/type.js";
 import { RemoteFileService } from "../base/remote.js";
 
-export class ElementView extends ElementShape implements View<ELE> {
-	get type(): BaseType<any> {
-		return SIMPLE_TYPE;
-	}
-	get contents(): Sequence<NODE> {
-		return this._ele.childNodes;
-	}
-	get textContent() {
-		return this._ele.textContent;
-	}
-	set textContent(text: string) {
-		this._ele.textContent = text;
-	}
-	get markupContent() {
-		return this._ele.innerHTML;
-	}
-	set markupContent(markup: string) {
-		this._ele.innerHTML = markup;
-	}
-	get view(): ELE {
-		return this._ele;
-	}
-}
-const SIMPLE_TYPE = new BaseType();
-SIMPLE_TYPE.start("", {prototype: new ElementView()});
-
-export abstract class ElementControl extends ElementView implements Control<ELE> {
+export abstract class ElementControl extends ElementShape implements Control<ELE> {
 	declare _type: ControlType<ELE>;
 
 	get type(): ControlType<ELE> {
 		return this._type;
+	}
+	get view(): ELE {
+		return this._ele;
 	}
 	get content(): View<ELE> {
 		return this;
@@ -52,28 +29,21 @@ export abstract class ElementControl extends ElementView implements Control<ELE>
 		}
 	}
 	get level(): number {
-		return Number.parseInt(this.at("aria-level")) || 0;
+		return Number.parseInt(this.view.getAttribute("aria-level")) || 0;
 	}
 	set level(level: number) {
 		level = level || 0;
 		if (level < 1) {
-			this.put("aria-level");
+			this.view.removeAttribute("aria-level");
 		} else {
-			this.put("aria-level", "" + (level <= 6 ? level : 6));
+			this.view.setAttribute("aria-level", "" + (level <= 6 ? level : 6));
 		}
 	}
 
-	demote() {
-		let level = this.level;
-		if (level < 6) this.level = ++level;
-	}
-	promote() {
-		--this.level;
-	}
-
 	abstract valueOf(range?: RANGE): value;
-	abstract viewValue(data: value): void;
 	abstract exec(commandName: string, ...args: unknown[]): void;
+
+	abstract viewValue(data: value): void;
 
 	render(value: value, parent?: ElementControl): void {
 		if (parent) (parent.content.view as ELE).append(this._ele);
@@ -89,6 +59,13 @@ export abstract class ElementControl extends ElementView implements Control<ELE>
 		super.uncontrol(element as Element);
 		element.removeAttribute("data-item");
 		delete element.id;
+	}
+	demote() {
+		let level = this.level;
+		if (level < 6) this.level = ++level;
+	}
+	promote() {
+		--this.level;
 	}
 }
 
@@ -187,7 +164,7 @@ export abstract class ElementArticle extends ElementOwner implements Article<NOD
 }
 
 function getNode(doc: DOCUMENT, path: string[]) {
-	let view = getView(doc.getElementById(path[0])) as Control<NODE>;
+	let view = getView(doc.getElementById(path[0])) as ElementControl;
 	if (!view) console.error("can't find view");
 	let node = view.content.view;
 	for (let i = 1; i < path.length - 1; i++) {
