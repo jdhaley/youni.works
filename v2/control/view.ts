@@ -77,12 +77,12 @@ export class ElementViewType extends  ControlType<ELE> {
 	declare owner: Article<ELE>;
 
 	get model(): model {
-		return this.owner.conf.contentTypes[this.props.viewType];
+		return this.owner.conf.contentTypes[this.conf.viewType];
 	}
 
 	create(value: value, container?: ElementControl): ElementControl {
 		let view = Object.create(this.prototype) as ElementControl;
-		let node = this.owner.createView(this.props.tagName || "div");
+		let node = this.owner.createView(this.conf.tagName || "div");
 		view.control(node as ELE);
 		view.render(value, container);
 		return view;

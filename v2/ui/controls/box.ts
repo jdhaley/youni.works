@@ -22,10 +22,10 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 		return this._type as ControlType<ELE>;
 	}
 	get shortcuts(): bundle<string> {
-		return this._type.props.shortcuts;
+		return this._type.conf.shortcuts;
 	}
 	get isContainer(): boolean {
-		return this._type.props.container;
+		return this._type.conf.container;
 	}
 	get header(): View<ELE> {
 		for (let child of this._ele.children) {
@@ -76,7 +76,7 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 	}
 	protected createHeader(model?: value) {
 		let ele = this.view.ownerDocument.createElement("header") as Element;
-		ele.textContent = this._type.props.title || "";
+		ele.textContent = this._type.conf.title || "";
 		this._ele.append(ele);
 		let content = new ElementShape();
 		content.control(ele as Element);

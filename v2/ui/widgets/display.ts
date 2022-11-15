@@ -1,7 +1,8 @@
 import { Actions } from "../../base/controller.js"
 import { ELE } from "../../base/dom.js"
 import { Shape } from "../../base/shape.js"
-import { bundle, Sequence } from "../../base/util.js"
+import { Type } from "../../base/type.js"
+import { bundle, EMPTY, extend, Sequence } from "../../base/util.js"
 import { ElementShape } from "../../control/element.js"
 
 export interface Display {
@@ -98,4 +99,35 @@ export class ElementView extends CView {
 function setKinds(view: CView, kind: string | string[]) {
 	let kinds = typeof kind == "string" ? kind.split(" ") : kind;
 	if (kinds) for (let kind of kinds) view.kind.add(kind);
+}
+
+
+export class BaseType<T> implements Type<T> {
+	declare partOf: BaseType<T>;
+	declare name: string;
+	declare prototype: T;
+	declare props: bundle<any>;
+
+	types: bundle<Type<T>> = EMPTY.object;
+
+	generalizes(type: Type<T>): boolean {
+		return type == this;
+	}
+	start(name: string, conf: bundle<any>): void {
+		this.name = name;
+		if (conf) {
+			this.props = extend(this.props || null, conf);
+		}
+		if (conf.prototype) this.prototype = conf.prototype;
+
+		if (conf.proto) {
+			this.prototype = extend(this.prototype, conf.proto);
+		} else {
+			this.prototype = Object.create(this.prototype as any);
+		}
+		this.prototype["_type"] = this;
+	}
+	create(...args: any[]): T {
+		return Object.create(this.prototype as any);
+	}
 }

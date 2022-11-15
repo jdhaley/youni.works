@@ -50,7 +50,7 @@ export class BaseType<T> implements Type<T> {
 	declare partOf: BaseType<T>;
 	declare name: string;
 	declare prototype: T;
-	declare props: bundle<any>;
+	declare conf: bundle<any>;
 
 	types: bundle<Type<T>> = EMPTY.object;
 
@@ -60,7 +60,7 @@ export class BaseType<T> implements Type<T> {
 	start(name: string, conf: bundle<any>): void {
 		this.name = name;
 		if (conf) {
-			this.props = extend(this.props || null, conf);
+			this.conf = extend(this.conf || null, conf);
 		}
 		if (conf.prototype) this.prototype = conf.prototype;
 
