@@ -1,3 +1,4 @@
+import { Actions } from "./controller.js";
 import { bundle, EMPTY, extend } from "./util.js";
 
 export interface Type<T> {
@@ -20,11 +21,26 @@ export function start(owner: TypeOwner) {
 	owner.unknownType = owner.types[owner.conf.unknownType];
 	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
 }
-
+/*
+export interface Display {
+	kind?: string | string[];
+	options?: string | string[];
+	props?: bundle<any>;
+	header?: Display;
+	content: (conf: bundle<any>) => string | Box | Sequence<Display> | bundle<Display> | string | number | boolean | null;
+	footer?: Display;
+	actions?: Actions;
+}
+*/
 interface TypeConf {
 	type: string;
+	kind?: string | string[]
+	props: bundle<any>; //props?: bundle<any>
+	header?: TypeConf;
+	//content: (conf: bundle<any>) => string | Box | Sequence<Display> | bundle<Display> | string | number | boolean | null;
 	types: bundle<source>;
-	conf: bundle<any>;
+	footer?: TypeConf
+	actions?: Actions
 }
 
 type types = bundle<Type<unknown>>;
@@ -34,7 +50,7 @@ export class BaseType<T> implements Type<T> {
 	declare partOf: BaseType<T>;
 	declare name: string;
 	declare prototype: T;
-	declare conf: bundle<any>;
+	declare props: bundle<any>;
 
 	types: bundle<Type<T>> = EMPTY.object;
 
@@ -44,7 +60,7 @@ export class BaseType<T> implements Type<T> {
 	start(name: string, conf: bundle<any>): void {
 		this.name = name;
 		if (conf) {
-			this.conf = extend(this.conf || null, conf);
+			this.props = extend(this.props || null, conf);
 		}
 		if (conf.prototype) this.prototype = conf.prototype;
 

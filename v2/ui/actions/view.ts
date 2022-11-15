@@ -8,7 +8,7 @@ import { getBox, navigate, setClipboard } from "../util.js";
 export default extend(null, {
 	keydown(this: Box<ELE>, event: UserEvent) {
 		event.shortcut = getShortcut(event);
-		event.subject = this.type.conf.shortcuts[event.shortcut] || "keydown";
+		event.subject = this.type.props.shortcuts[event.shortcut] || "keydown";
        // console.log(event.shortcut, event.subject);
 	},
 	save(this: Box<ELE>, event: UserEvent) {
