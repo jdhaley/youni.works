@@ -14,9 +14,11 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 		super();
 		this.actions = actions;
 		if (editor) this["exec"] = editor;
-		if (this._type.conf.container) this.isContainer = true;
 	}
 
+	get isContainer(): boolean {
+		return this._type.conf.container;
+	}
 	get id() {
 		return this.view.id;
 	}

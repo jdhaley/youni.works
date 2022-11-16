@@ -151,8 +151,9 @@ export class ElementShape extends ElementContent implements Shape, View<ELE> {
 }
 
 export class EBox extends ElementShape {
-	declare isContainer: boolean;
-
+	get isContainer(): boolean {
+		return false;
+	}
 	get header(): EBox {
 		for (let child of this._ele.children) {
 			if (child.nodeName == "header") return child["$control"];
