@@ -10,7 +10,7 @@ let tracking = {
 }
 
 function getNode(shape: Shape) {
-	return (shape as any).node;
+	return (shape as any).view;
 }
 
 export default extend(null, {
