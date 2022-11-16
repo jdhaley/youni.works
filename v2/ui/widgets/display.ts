@@ -13,7 +13,7 @@ content:
 	UNIT - string | number | boolean | null;
 	RECORD - bundle<Display>
 	LIST - Sequence<Display>
-	
+
 	(parent: ELE, conf: Display) => Box
 	Box
 	Type<Box>
@@ -36,10 +36,10 @@ interface ViewBox extends Content {
 }
 
 export class ElementView extends EBox implements Box {
-	constructor(parent: ELE, conf?: Display, tagName?: string) {
-		super();
-		this.init(parent, conf, tagName);
-	}
+	// constructor(parent: ELE, conf?: Display, tagName?: string) {
+	// 	super();
+	// 	this.init(parent, conf, tagName);
+	// }
 	declare props: bundle<any>;
 	
 	init(parent: ELE, conf?: Display, tagName?: string) {
@@ -65,10 +65,10 @@ export class ElementView extends EBox implements Box {
 			ele.textContent = "" + c;
 		} else if (c instanceof EBox) {
 		} else if (c.length) {
-			for (let display of c as Sequence<Display>) new ElementView(ele, display);
+			for (let display of c as Sequence<Display>) create(ele, display);
 		} else if (c && typeof c == "object") {
 			for (let name in c) {
-				let member = new ElementView(ele, c[name]);
+				let member = create(ele, c[name]);
 				member.view.setAttribute("data-field", name);
 			}
 		}
@@ -76,13 +76,14 @@ export class ElementView extends EBox implements Box {
 }
 
 function createContainer(ele: ELE, conf: Display) {
-	if (conf.header) new ElementView(ele, conf.header, "header");
-	let content = new ElementView(ele);
+	if (conf.header) create(ele, conf.header, "header");
+	let content = create(ele);
 	content.kind.add("content");
-	if (conf.footer) new ElementView(ele, conf.footer, "footer");
+	if (conf.footer) create(ele, conf.footer, "footer");
 }
 function setKinds(view: ElementView, kinds: string) {
-	if (kinds) for (let kind of kinds.split(" ")) view.kind.add(kind);
+	//handles the case where multiple spaces separate the tokens.
+	if (kinds) for (let kind of kinds.split(" ")) if (kind) view.kind.add(kind);
 }
 
 export interface TypeConf {
@@ -102,6 +103,7 @@ export interface Display {
 	footer?: Display;
 	actions?: Actions;
 	prototype?: ElementView;
+	type?: Display;
 }
 
 export class ElementViewType extends BaseType<Box> {
@@ -112,14 +114,12 @@ export class ElementViewType extends BaseType<Box> {
 	}
 }
 
-function create(parent: ELE, conf?: Display, tag?: string) {
-	let view: ElementView;
-	if (conf?.prototype) {
-		view = Object.create(conf.prototype) as ElementView;
-		view.init(parent, conf, tag);
-	} else {
-		view = new ElementView(parent, conf, tag);
-	}
+const PROTOTYPE = new ElementView();
+
+export function create(parent: ELE, conf?: Display, tag?: string) {
+	if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf.type, conf);
+	let view = Object.create(conf?.prototype || PROTOTYPE) as ElementView;
+	view.init(parent, conf, tag);
 	return view;
 }
 
@@ -137,9 +137,8 @@ function create(parent: ELE, conf?: Display, tag?: string) {
 */
 export function extendDisplay(display: Display, conf: Display): Display {
 	display = Object.create(display);
-
-	if (conf.header)	display.header = extendDisplay(display.header, conf.header);
-	if (conf.footer)	display.footer = extendDisplay(display.footer, conf.footer);
+	if (conf.header)	display.header = display.header ? extendDisplay(display.header, conf.header) : conf.header;
+	if (conf.footer)	display.footer = display.footer ? extendDisplay(display.footer, conf.footer) : conf.footer;
 
 	if (conf.kind)		display.kind = display.kind ? display.kind + " " + conf.kind : conf.kind;
 	if (conf.props)		display.props = extend(display.props, conf.props);

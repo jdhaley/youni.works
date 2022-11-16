@@ -1,31 +1,38 @@
 import { Frame } from "../../control/frame.js";
-import { Display, ElementView, extendDisplay } from "./display.js";
+import { create, Display, ElementView, extendDisplay } from "./display.js";
 
 import controller from "../actions/frame.js";
 import shape from "../actions/shape.js";
 
-new Frame(window, controller);
+let base = {
+	prototype: new ElementView(),
+}
 
-let test = {
-	kind: "test",
-	prop: {
-		title: "Test thing"
+new Frame(window, controller);
+//We need to handle if a Display is extended outside of a create(). For now just
+//call the extendDisplay directly.
+
+let dialog = extendDisplay(base, {
+	type: base,
+	kind: "dialogue",
+	props: {
+		aprop: "a value"
 	},
 	header: {
+		type: base,
 		kind: "caption",
 		content: "Test thing",
 	},
 	content: "test content",
 	actions: shape
-}
-let ext = extendDisplay(test, {
-	header: {
-		content: "Ext thing"
-	},
-	content: "ext content"
-})
+});
 
-new ElementView(document.body, ext);
+let instance = {
+	type: dialog,
+	content: "instance content"
+}
+
+create(document.body, instance);
 
 let person: Display = {
 	kind: "person",
@@ -66,8 +73,9 @@ let person: Display = {
 	}
 }
 person = extendDisplay(person, {
+	kind: " flat  iron",
 	header: {
 		content: "New Person"
 	}
 });
-new ElementView(document.body, person);
+create(document.body, person);
