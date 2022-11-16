@@ -1,53 +1,68 @@
-import { Frame } from "../../control/frame.js";
+import { Frame, UserEvent } from "../../control/frame.js";
 import { create, Display, ElementView, extendDisplay } from "./display.js";
 
 import controller from "../actions/frame.js";
 import shape from "../actions/shape.js";
 
-new Frame(window, controller);
+const frame = new Frame(window, controller);
 
 let base = {
 	prototype: new ElementView(),
 }
 
+// let caption = extendDisplay(base, {
+// 	type: base,
+// 	kind: "caption",
+// 	header: {
+// 	},
+// 	content: "Dialogue",
+// });
 //We need to handle if a Display is extended outside of a create(). For now just
 //call the extendDisplay directly.
 
 let dialog = extendDisplay(base, {
 	type: base,
 	kind: "dialogue",
-	props: {
-		aprop: "a value"
-	},
 	header: {
 		type: base,
 		kind: "caption",
-		content: "Test thing",
+		header: {
+			content: () => "<i data-cmd='edit'>✎</i>"
+		},
+		content: "Dialogue",
+		actions: {
+			render: function (this: ElementView, event: UserEvent) {
+				this.content.textContent = (this.partOf as ElementView).props.title;
+			},
+			click: function (this: ElementView, event: UserEvent) {
+				if (event.target.getAttribute("data-cmd") == "edit") {
+					(this.partOf as ElementView).content.textContent = "click edit";
+				}
+			}
+		}
 	},
-	content: "test content",
+	content: "",
 	actions: shape
 });
 
 create(document.body, {
 	type: dialog,
-	header: {
-		content: "Hello world!"
+	props: {
+		title: "Hello world!"
 	},
 	content: "instance content",
-	actions: {
-		click: () => console.log("instance click")
-	}
 });
 
-let person: Display = {
+let person = extendDisplay(dialog, {
+	type: dialog,
 	kind: "person",
 	props: {
 		title: "Person"
 	},
-	header: {
-		kind: "caption",
-		content: "Person"
-	},
+	// header: {
+	// 	kind: "caption",
+	// 	content: "Person"
+	// },
 	content: {
 		firstName: {
 			header: {
@@ -69,6 +84,28 @@ let person: Display = {
 				content: "Date of Birth"
 			},
 			content: new Date().toISOString()
+		},
+		job: {
+			header: {
+				kind: "label",
+				content: "Job Info"
+			},
+			content: {
+				name: {
+					header: {
+						kind: "label",
+						content: "Job Name"
+					},
+					content: "&nbsp;"
+				},
+				band: {
+					header: {
+						kind: "label",
+						content: "Band Level"
+					},
+					content: 0
+				}
+			}
 		}
 	},
 	footer: {
@@ -76,7 +113,7 @@ let person: Display = {
 	},
 	actions: {
 	}
-}
+});
 
 create(document.body, {
 	type: person,
@@ -85,3 +122,5 @@ create(document.body, {
 		content: "New Person"
 	}
 });
+
+frame.send("render", document.body);
