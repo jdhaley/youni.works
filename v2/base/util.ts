@@ -39,7 +39,7 @@ export const EMPTY = Object.freeze({
 });
 
 export function extend(proto: Object, extension: Object) {
-	let object = Object.create(proto);
+	let object = Object.create(proto || null);
 	for (let name in extension) {
 		object[name] = extension[name];
 	}

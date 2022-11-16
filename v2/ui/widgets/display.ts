@@ -1,18 +1,19 @@
 import { Extent } from "../../base/control.js"
 import { Actions } from "../../base/controller.js"
 import { ELE } from "../../base/dom.js"
-import { value } from "../../base/model.js"
+import { unit, value } from "../../base/model.js"
 import { Shape } from "../../base/shape.js"
 import { BaseType } from "../../base/type.js"
-import { bundle, Sequence } from "../../base/util.js"
+import { bundle, extend, Sequence } from "../../base/util.js"
 
 import { EBox } from "../../control/element.js"
 
-
 /*
+content:
 	UNIT - string | number | boolean | null;
 	RECORD - bundle<Display>
 	LIST - Sequence<Display>
+	
 	(parent: ELE, conf: Display) => Box
 	Box
 	Type<Box>
@@ -47,15 +48,12 @@ export class ElementView extends EBox implements Box {
 		parent.append(ele as any);
 		if (!conf) return;
 		if (conf.kind) setKinds(this, conf.kind);
-		if (conf.header) new ElementView(ele, conf.header, "header");
 		if (conf.header || conf.footer) {
 			this.isContainer = true;
-			let view = new ElementView(ele);
-			view.kind.add("content");
+			createContainer(ele, conf);
 		}
-		if (conf.footer) new ElementView(ele, conf.footer, "footer");
+		if (conf.actions) this.actions = extend(this.actions, conf.actions);
 		this.createContent(conf);
-		if (conf.actions) this.actions = conf.actions;
 	}
 	protected createContent(conf: Display) {
 		let ele = this.content.view;
@@ -77,19 +75,33 @@ export class ElementView extends EBox implements Box {
 	}
 }
 
-function setKinds(view: ElementView, kind: string | string[]) {
-	let kinds = typeof kind == "string" ? kind.split(" ") : kind;
-	if (kinds) for (let kind of kinds) view.kind.add(kind);
+function createContainer(ele: ELE, conf: Display) {
+	if (conf.header) new ElementView(ele, conf.header, "header");
+	let content = new ElementView(ele);
+	content.kind.add("content");
+	if (conf.footer) new ElementView(ele, conf.footer, "footer");
+}
+function setKinds(view: ElementView, kinds: string) {
+	if (kinds) for (let kind of kinds.split(" ")) view.kind.add(kind);
+}
+
+export interface TypeConf {
+	class: typeof ElementViewType;
+	viewType: string,
+	prototype?: any,
+	container: boolean;
+	tagName: string;
+	shortcuts: bundle<string>;
 }
 
 export interface Display {
-	kind?: string | string[];
-	options?: string | string[];
+	kind?: string; //space separated names.
 	props?: bundle<any>;
 	header?: Display;
-	content: (conf: bundle<any>) => string | Box | Sequence<Display> | bundle<Display> | string | number | boolean | null;
+	content?: unit | Sequence<Display> | bundle<Display> | ((conf: bundle<any>) => string);
 	footer?: Display;
 	actions?: Actions;
+	prototype?: ElementView;
 }
 
 export class ElementViewType extends BaseType<Box> {
@@ -98,4 +110,40 @@ export class ElementViewType extends BaseType<Box> {
 		view.init(parent, this.conf as Display)
 		return view;
 	}
+}
+
+function create(parent: ELE, conf?: Display, tag?: string) {
+	let view: ElementView;
+	if (conf?.prototype) {
+		view = Object.create(conf.prototype) as ElementView;
+		view.init(parent, conf, tag);
+	} else {
+		view = new ElementView(parent, conf, tag);
+	}
+	return view;
+}
+
+/*
+	kind:		concat string.
+	props:		extend
+	actions:	extend
+	header: 	extendDisplay
+	footer:		extendDisplay
+
+	content:	set if specified
+
+	--prototype?: ElementView;
+
+*/
+export function extendDisplay(display: Display, conf: Display): Display {
+	display = Object.create(display);
+
+	if (conf.header)	display.header = extendDisplay(display.header, conf.header);
+	if (conf.footer)	display.footer = extendDisplay(display.footer, conf.footer);
+
+	if (conf.kind)		display.kind = display.kind ? display.kind + " " + conf.kind : conf.kind;
+	if (conf.props)		display.props = extend(display.props, conf.props);
+	if (conf.actions)	display.actions = extend(display.actions, conf.actions);
+	if (conf.content)	display.content = conf.content;
+	return display;
 }
