@@ -52,6 +52,7 @@ export class ElementView extends EBox implements Box {
 			this._container = true;
 			createContainer(ele, conf);
 		}
+		if (conf.props) this.props = extend(this.props, conf.props);
 		if (conf.actions) this.actions = extend(this.actions, conf.actions);
 		this.createContent(conf);
 	}
