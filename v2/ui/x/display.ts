@@ -36,8 +36,12 @@ interface ViewBox extends Content {
 }
 
 export class ElementView extends EBox implements Box {
+	declare _container: boolean;
 	declare props: bundle<any>;
 	
+	get isContainer() {
+		return this._container;
+	}
 	init(parent: ELE, conf?: Display, tagName?: string) {
 		let ele = parent.ownerDocument.createElement(tagName || "div") as HTMLElement;
 		this.control(ele);
@@ -45,7 +49,7 @@ export class ElementView extends EBox implements Box {
 		if (!conf) return;
 		if (conf.kind) setKinds(this, conf.kind);
 		if (conf.header || conf.footer) {
-			this.isContainer = true;
+			this._container = true;
 			createContainer(ele, conf);
 		}
 		if (conf.actions) this.actions = extend(this.actions, conf.actions);
