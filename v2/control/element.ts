@@ -150,6 +150,28 @@ export class ElementShape extends ElementContent implements Shape, View<ELE> {
 	}
 }
 
+export class EBox extends ElementShape {
+	declare isContainer: boolean;
+
+	get header(): EBox {
+		for (let child of this._ele.children) {
+			if (child.nodeName == "header") return child["$control"];
+		}
+	}
+	get footer(): EBox {
+		for (let child of this._ele.children) {
+			if (child.nodeName == "footer") return child["$control"];
+		}
+	}
+	get content(): EBox {
+		if (!this.isContainer) return this;
+		for (let child of this._ele.children) {
+			if (child.classList.contains("content")) return child["$control"];
+		}
+		throw new Error("Missing content in container.");
+	}
+}
+
 const DEFAULT_BORDER: Edges = {
 	top: 3,
 	right: 5,

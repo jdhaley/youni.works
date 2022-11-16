@@ -14,7 +14,9 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 		super();
 		this.actions = actions;
 		if (editor) this["exec"] = editor;
+		if (this._type.conf.container) this.isContainer = true;
 	}
+
 	get id() {
 		return this.view.id;
 	}
@@ -24,32 +26,13 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 	get shortcuts(): bundle<string> {
 		return this._type.conf.shortcuts;
 	}
-	get isContainer(): boolean {
-		return this._type.conf.container;
-	}
-	get header(): View<ELE> {
-		for (let child of this._ele.children) {
-			if (child.nodeName == "header") return child["$control"];
-		}
-	}
-	get content(): View<ELE> {
-		if (!this.isContainer) return this;
-		for (let child of this._ele.children) {
-			if (child.classList.contains("content")) return child["$control"];
-		}
-		throw new Error("Missing content in container.");
-	}
-	get footer(): View<ELE> {
-		for (let child of this._ele.children) {
-			if (child.nodeName == "footer") return child["$control"];
-		}
-	}
 
 	abstract viewElement(content: ELE): void;
 
 	exec(commandName: string, range: RANGE, content?: value): void {
 		console.warn("exec() has not been configured.")
 	}
+	
 	render(value: value, parent?: ElementControl): void {
 		if (parent) (parent.content.view as ELE).append(this._ele);
 		if (!this.view.id) {

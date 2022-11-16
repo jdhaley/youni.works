@@ -4,11 +4,11 @@ import { CommandBuffer } from "../base/command.js";
 import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../base/dom.js";
 import { bundle } from "../base/util.js";
 
-import { ElementOwner, ElementShape } from "./element.js";
+import { EBox, ElementOwner } from "./element.js";
 import { start } from "../base/type.js";
 import { RemoteFileService } from "../base/remote.js";
 
-export abstract class ElementControl extends ElementShape implements Control<ELE> {
+export abstract class ElementControl extends EBox implements Control<ELE> {
 	declare _type: ControlType<ELE>;
 
 	get type(): ControlType<ELE> {
@@ -16,9 +16,6 @@ export abstract class ElementControl extends ElementShape implements Control<ELE
 	}
 	get view(): ELE {
 		return this._ele;
-	}
-	get content(): View<ELE> {
-		return this;
 	}
 	get partOf() {
 		for (let node = this._ele.parentNode as ELE; node; node = node.parentNode as ELE) {

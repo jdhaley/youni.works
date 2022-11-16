@@ -1,24 +1,18 @@
+import { Extent } from "../../base/control.js"
 import { Actions } from "../../base/controller.js"
 import { ELE } from "../../base/dom.js"
+import { value } from "../../base/model.js"
 import { Shape } from "../../base/shape.js"
-import { Type } from "../../base/type.js"
-import { bundle, EMPTY, extend, Sequence } from "../../base/util.js"
-import { ElementShape } from "../../control/element.js"
+import { BaseType } from "../../base/type.js"
+import { bundle, Sequence } from "../../base/util.js"
 
-export interface Display {
-	kind?: string | string[];
-	options?: string | string[];
-	props?: bundle<any>;
-	header?: Display;
-	content: (conf: bundle<any>) => string | Box | Sequence<Display> | bundle<Display> | string | number | boolean | null;
-	footer?: Display;
-	actions?: Actions;
-}
+import { EBox } from "../../control/element.js"
+
 
 /*
-	string | number | boolean | null;
-	bundle<Display>
-	Sequence<Display>
+	UNIT - string | number | boolean | null;
+	RECORD - bundle<Display>
+	LIST - Sequence<Display>
 	(parent: ELE, conf: Display) => Box
 	Box
 	Type<Box>
@@ -35,31 +29,19 @@ interface Content extends Box {
 	markupContent: string;
 }
 
-class CView extends ElementShape implements Box {
-	declare isContainer: boolean;
-
-	get header(): Box {
-		for (let child of this._ele.children) {
-			if (child.nodeName == "header") return child["$control"];
-		}
-	}
-	get footer(): Box {
-		for (let child of this._ele.children) {
-			if (child.nodeName == "footer") return child["$control"];
-		}
-	}
-	get content(): ElementShape {
-		if (!this.isContainer) return this;
-		for (let child of this._ele.children) {
-			if (child.classList.contains("content")) return child["$control"];
-		}
-		throw new Error("Missing content in container.");
-	}
+interface ViewBox extends Content {
+	valueOf(filter?: unknown): value;
+	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
 }
 
-export class ElementView extends CView {
+export class ElementView extends EBox implements Box {
 	constructor(parent: ELE, conf?: Display, tagName?: string) {
 		super();
+		this.init(parent, conf, tagName);
+	}
+	declare props: bundle<any>;
+	
+	init(parent: ELE, conf?: Display, tagName?: string) {
 		let ele = parent.ownerDocument.createElement(tagName || "div") as HTMLElement;
 		this.control(ele);
 		parent.append(ele as any);
@@ -75,7 +57,6 @@ export class ElementView extends CView {
 		this.createContent(conf);
 		if (conf.actions) this.actions = conf.actions;
 	}
-
 	protected createContent(conf: Display) {
 		let ele = this.content.view;
 		let c = conf.content as any;
@@ -84,7 +65,7 @@ export class ElementView extends CView {
 			if (typeof ret == "string") ele.innerHTML = ret;
 		} else if (typeof c != "object") {
 			ele.textContent = "" + c;
-		} else if (c instanceof CView) {
+		} else if (c instanceof EBox) {
 		} else if (c.length) {
 			for (let display of c as Sequence<Display>) new ElementView(ele, display);
 		} else if (c && typeof c == "object") {
@@ -96,38 +77,25 @@ export class ElementView extends CView {
 	}
 }
 
-function setKinds(view: CView, kind: string | string[]) {
+function setKinds(view: ElementView, kind: string | string[]) {
 	let kinds = typeof kind == "string" ? kind.split(" ") : kind;
 	if (kinds) for (let kind of kinds) view.kind.add(kind);
 }
 
+export interface Display {
+	kind?: string | string[];
+	options?: string | string[];
+	props?: bundle<any>;
+	header?: Display;
+	content: (conf: bundle<any>) => string | Box | Sequence<Display> | bundle<Display> | string | number | boolean | null;
+	footer?: Display;
+	actions?: Actions;
+}
 
-export class BaseType<T> implements Type<T> {
-	declare partOf: BaseType<T>;
-	declare name: string;
-	declare prototype: T;
-	declare props: bundle<any>;
-
-	types: bundle<Type<T>> = EMPTY.object;
-
-	generalizes(type: Type<T>): boolean {
-		return type == this;
-	}
-	start(name: string, conf: bundle<any>): void {
-		this.name = name;
-		if (conf) {
-			this.props = extend(this.props || null, conf);
-		}
-		if (conf.prototype) this.prototype = conf.prototype;
-
-		if (conf.proto) {
-			this.prototype = extend(this.prototype, conf.proto);
-		} else {
-			this.prototype = Object.create(this.prototype as any);
-		}
-		this.prototype["_type"] = this;
-	}
-	create(...args: any[]): T {
-		return Object.create(this.prototype as any);
+export class ElementViewType extends BaseType<Box> {
+	create(parent: ELE): Box {
+		let view = Object.create(this.prototype) as ElementView;
+		view.init(parent, this.conf as Display)
+		return view;
 	}
 }

@@ -1,4 +1,4 @@
-import { model, Text, typeOf, value, Content, View } from "./model.js";
+import { model, Text, typeOf, value, View } from "./model.js";
 import { Shape } from "./shape.js";
 import { Graph, Receiver, Signal } from "./controller.js";
 import { Type, BaseType, TypeOwner } from "./type.js";
