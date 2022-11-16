@@ -4,11 +4,12 @@ import { create, Display, ElementView, extendDisplay } from "./display.js";
 import controller from "../actions/frame.js";
 import shape from "../actions/shape.js";
 
+new Frame(window, controller);
+
 let base = {
 	prototype: new ElementView(),
 }
 
-new Frame(window, controller);
 //We need to handle if a Display is extended outside of a create(). For now just
 //call the extendDisplay directly.
 
@@ -27,12 +28,16 @@ let dialog = extendDisplay(base, {
 	actions: shape
 });
 
-let instance = {
+create(document.body, {
 	type: dialog,
-	content: "instance content"
-}
-
-create(document.body, instance);
+	header: {
+		content: "Hello world!"
+	},
+	content: "instance content",
+	actions: {
+		click: () => console.log("instance click")
+	}
+});
 
 let person: Display = {
 	kind: "person",
@@ -72,10 +77,11 @@ let person: Display = {
 	actions: {
 	}
 }
-person = extendDisplay(person, {
+
+create(document.body, {
+	type: person,
 	kind: " flat  iron",
 	header: {
 		content: "New Person"
 	}
 });
-create(document.body, person);

@@ -36,10 +36,6 @@ interface ViewBox extends Content {
 }
 
 export class ElementView extends EBox implements Box {
-	// constructor(parent: ELE, conf?: Display, tagName?: string) {
-	// 	super();
-	// 	this.init(parent, conf, tagName);
-	// }
 	declare props: bundle<any>;
 	
 	init(parent: ELE, conf?: Display, tagName?: string) {
