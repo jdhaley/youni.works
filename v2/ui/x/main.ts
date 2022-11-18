@@ -1,5 +1,5 @@
 import { Frame } from "../../control/frame.js";
-import { create, Display, ElementView, extendDisplay } from "./display";
+import { create, Display, ElementView, extendDisplay } from "./display.js";
 
 import controller from "../actions/frame.js";
 import shape from "../actions/shape.js";
@@ -31,52 +31,41 @@ let taskParent = extendDisplay(base, {
 create(document.body, {
 	type: taskParent,
 	header: {
-		content: "Hello task world!"
-	},
-	content: "task instance content",
-	actions: {
-		click: () => console.log("you freak")
-	}
-});
-
-let person: Display = {
-	kind: "person",
-	props: {
-		title: "Person"
-	},
-	header: {
-		kind: "caption",
-		content: "Person"
+		content: "Task"
 	},
 	content: {
-		firstName: {
-			header: {
-				kind: "label",
-				content: () => "<b>F</b>irst <b>N</b>ame"
-			},
-			content: "Billy"
+	  id: {
+		header: {
+			kind: "label",
+			content: () => "<b>ID</b>"
 		},
-		lastName: {
-			header: {
-				kind: "label",
-				content: "Last Name"
-			},
-			content: "Willy"
-		},
-		dob: {
-			header: {
-				kind: "label",
-				content: "Date of Birth"
-			},
-			content: new Date().toISOString()
-		}
+		content: "0001"
 	},
-	footer: {
-		content: "A person is a person no matter how small."
+	description: {
+		header: {
+			kind: "label",
+			content: "Description"
+		},
+		content: "Simple record type display (table). click on it to do a dialog of the record. "
+	},
+	dateCreated: {
+		header: {
+			kind: "label",
+			content: "Date Created"
+		},
+		content: new Date().toISOString()
+	},
+	status: {
+		header: {
+			kind: "label",
+			content: "Assigned"
+		}
+	}
 	},
 	actions: {
+		click: () => console.log("clicked on task header")
 	}
-}
+});
 
 create(document.body, {
 	type: person,
