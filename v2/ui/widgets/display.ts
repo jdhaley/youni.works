@@ -21,7 +21,7 @@ content:
 
 interface Box extends Shape {
 	header?: Box;
-	content: Iterable<Content>; //No parts when this is a unit view - use textContent or markupContent.
+	contents: Iterable<Content>; //No parts when this is a unit view - use textContent or markupContent.
 	footer?: Box;
 }
 
