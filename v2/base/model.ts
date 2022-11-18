@@ -32,12 +32,11 @@ export interface Text {
 }
 
 export interface Content extends Text, Instance {
-	readonly contents: Sequence<Text>;
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 
 export interface View<T> extends Content {
-	readonly type: Type<any>;
+	readonly contents: Sequence<Text>;
 	readonly view: T;
 }
 

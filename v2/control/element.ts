@@ -53,9 +53,6 @@ class ElementPart extends BasePart {
 }
 
 export class ElementContent extends ElementPart implements Content {
-	get type(): BaseType<any> {
-		return SIMPLE_TYPE;
-	}
 	get kind(): Bag<string> {
 		return this._ele.classList;
 	}
@@ -75,20 +72,15 @@ export class ElementContent extends ElementPart implements Content {
 		this._ele.innerHTML = markup;
 	}
 }
-const SIMPLE_TYPE = new BaseType();
-SIMPLE_TYPE.start("", {prototype: new ElementContent()});
 
 interface SHAPE_ELE extends ELE {
 	getBoundingClientRect(): Area;
 	style: CSSStyleDeclaration;
 }
 
-export class ElementShape extends ElementContent implements Shape, View<ELE> {
+export class ElementShape extends ElementContent implements Shape {
 	declare protected _ele: SHAPE_ELE;
 
-	get view(): ELE {
-		return this._ele;
-	}
 	get area(): Area {
 		return this._ele.getBoundingClientRect();
 	}
@@ -151,6 +143,9 @@ export class ElementShape extends ElementContent implements Shape, View<ELE> {
 }
 
 export class EBox extends ElementShape {
+	get view(): ELE {
+		return this._ele;
+	}
 	get isContainer(): boolean {
 		return false;
 	}
