@@ -53,7 +53,7 @@ let person = {
 						kind: "label",
 						content: "Job Name"
 					},
-					content: "&nbsp;"
+					content: () => "&nbsp;"
 				},
 				band: {
 					header: {

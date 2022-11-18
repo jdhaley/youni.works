@@ -47,7 +47,7 @@ const dialog = {
 	},
 	content: "",
 	style: {
-		".dialogue>.content": {
+		".dialog>.content": {
 			padding: "4px",
 			border: "0 solid gainsboro",
 			border_width: "0 1px 1px 1px"
@@ -62,11 +62,11 @@ const formDialog = {
 		".label": `
 			color: steelblue;
 		`,
-		".dialogue>.content": `
+		".dialog>.content": `
 			display: flex;
 			flex-direction: row;
 		`,
-		".dialogue>.content>*": `
+		".dialog>.content>*": `
 			flex: 1;
 		`
 	}
