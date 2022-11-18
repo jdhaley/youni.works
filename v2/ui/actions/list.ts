@@ -28,7 +28,7 @@ export default extend(editable, {
 			event.range.selectNodeContents(this.content.view);
 			event.range.collapse();
 			this.exec("Insert", event.range, [model]);
-			goToTask(event.on, this.type.owner.frame.selectionRange as RANGE);
+			goToTask(event.on, this.type.owner.selectionRange as RANGE);
 		}
 	}
 });

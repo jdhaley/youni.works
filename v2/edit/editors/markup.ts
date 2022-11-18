@@ -12,7 +12,8 @@ export default function edit(this: Editor, commandName: string, range: RANGE, co
 
 	let r = range.cloneRange();
 	r = cmd.call(this, commandName, r, content);
-	this.type.owner.setExtent(r, true);
+	r.collapse();
+	this.type.owner.selectionRange = r;
 
 	senseChange(this, commandName);
 }

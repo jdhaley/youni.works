@@ -1,5 +1,5 @@
-import { model, View, value } from "../base/model.js";
-import { Control, ControlType, Article, ArticleContext } from "../base/control.js";
+import { model, value, Text } from "../base/model.js";
+import { Control, ControlType, Article, ArticleContext, Extent } from "../base/control.js";
 import { CommandBuffer } from "../base/command.js";
 import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../base/dom.js";
 import { bundle } from "../base/util.js";
@@ -79,7 +79,7 @@ export class ElementViewType extends  ControlType<ELE> {
 
 	create(value: value, container?: ElementControl): ElementControl {
 		let view = Object.create(this.prototype) as ElementControl;
-		let node = this.owner.createView(this.conf.tagName || "div");
+		let node = this.owner.frame.createNode(this.conf.tagName || "div");
 		view.control(node as ELE);
 		view.render(value, container);
 		return view;
@@ -114,6 +114,12 @@ export abstract class ElementArticle extends ElementOwner implements Article<NOD
 	readonly service: RemoteFileService;
 	source: value;
 
+	get selectionRange(): Extent<Text> {
+		return this.frame.selectionRange;
+	}
+	set selectionRange(range: Extent<Text>) {
+		this.frame.selectionRange = range;
+	}
 	createView(tagName: string): ELE {
 		return this.frame.createNode(tagName) as ELE;
 	}
@@ -151,12 +157,6 @@ export abstract class ElementArticle extends ElementOwner implements Article<NOD
 			range.setEnd(node, offset);
 		}
 		return range;
-	}
-	setExtent(range: RANGE, collapse?: boolean): void {
-		if (range) {
-			if (collapse) range.collapse();
-			this.frame.selectionRange = range;
-		}
 	}
 }
 

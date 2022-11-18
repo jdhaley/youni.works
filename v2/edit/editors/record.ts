@@ -10,6 +10,7 @@ export default function edit(this: Editor, commandName: string, range: RANGE, re
 
 	let r = range.cloneRange();
 	r = new RangeReplace(this.type.owner, commandName, this.id).exec(r, record);
-	this.type.owner.setExtent(r, true);
+	r.collapse();
+	this.type.owner.selectionRange = r;
 	senseChange(this, commandName);
 }

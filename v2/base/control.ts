@@ -33,19 +33,21 @@ export abstract class ControlType<T> extends BaseType<Control<T>> {
 	abstract control(node: T): Control<T>;
 }
 
-export interface Article<T> extends TypeOwner, Receiver, Graph<T> {
+export interface ECTX<T> {
+	commands: CommandBuffer<Extent<Text>>;
+	selectionRange: Extent<Text>;
+	getControl(id: string): Control<T>;
+	extentFrom(startPath: string, endPath: string): Extent<Text>;
+	sense(signal: Signal | string, on: T): void;
+}
+
+export interface Article<T> extends ECTX<T>, TypeOwner, Receiver, Graph<T> {
 	conf: bundle<any>;
 	source: value;
 	view: T;
 	defaultType: Type<Control<T>>
 	frame: ArticleContext<T>;
-	commands: CommandBuffer<Extent<Text>>;
 	service: RemoteFileService;
-
-	createView(name: string): T;
-	getControl(id: string): Control<T>;
-	setExtent(extent: Extent<Text>, collapse?: boolean): void;
-	extentFrom(startPath: string, endPath: string): Extent<Text>;
 }
 
 export interface ArticleContext<T> extends Receiver {

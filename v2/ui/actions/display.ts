@@ -37,26 +37,26 @@ export default extend(null, {
 			}
 		}
 	},
-	undo(this: Article<ELE>, event: UserEvent) {
-		event.subject = "";
-		let range = this.commands.redo();
-		if (range) {
-			this.setExtent(range, false);
-			let signal = new Change("undo");
-			this.send(signal, this.view);
-			this.frame.receive(signal);	
-		}
-	},
-	redo(this: Article<ELE>, event: UserEvent) {
-		event.subject = "";
-		let range = this.commands.redo();
-		if (range) {
-			this.setExtent(range, false);
-			let signal = new Change("undo");
-			this.send(signal, this.view);
-			this.frame.receive(signal);	
-		}
-	},
+	// undo(this: Article<ELE>, event: UserEvent) {
+	// 	event.subject = "";
+	// 	let range = this.commands.redo();
+	// 	if (range) {
+	// 		this.selectionRange = range;
+	// 		let signal = new Change("undo");
+	// 		this.send(signal, this.view);
+	// 		this.frame.receive(signal);	
+	// 	}
+	// },
+	// redo(this: Article<ELE>, event: UserEvent) {
+	// 	event.subject = "";
+	// 	let range = this.commands.redo();
+	// 	if (range) {
+	// 		this.selectionRange = range;
+	// 		let signal = new Change("undo");
+	// 		this.send(signal, this.view);
+	// 		this.frame.receive(signal);	
+	// 	}
+	// },
 	change(this: Article<ELE>, signal: Change) {
 		// console.log("Article changed:", this.commands.peek());
 		// signal.direction = "down";

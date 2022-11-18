@@ -37,7 +37,7 @@ export default extend(list, {
 			}];	
 		}
 		this.exec("Split", range, model);
-		range = this.type.owner.frame.selectionRange as RANGE;
+		range = this.type.owner.selectionRange as RANGE;
 		//If split happened at the start of the paragraph
 		//leave the caret there (on the empty paragraph).
 		if (range && !range.startContainer.textContent) {

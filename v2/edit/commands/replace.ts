@@ -7,7 +7,8 @@ export class Replace extends EditCommand {
 	after: string;
 
 	exec(range: RANGE, content: any): RANGE {
-		if (this.owner.conf.recordCommands) {
+		//TODO temporary - flag check removed to reduce the footprint of Article for the editing.
+		if (true /*this.owner.conf.recordCommands*/) {
 			this.range = {
 				start: getPath(range.startContainer) + "/" + range.startOffset,
 				end: getPath(range.endContainer) + "/" + range.endOffset
