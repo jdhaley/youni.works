@@ -58,7 +58,10 @@ create(document.body, {
 	status: {
 		header: {
 			kind: "label",
-			content: "Assigned"
+			content: "Status",
+			actions: {
+				click: () => console.log("clicked on status")
+			}
 		}
 	}
 	},
@@ -67,10 +70,4 @@ create(document.body, {
 	}
 });
 
-create(document.body, {
-	type: person,
-	kind: " flat  iron",
-	header: {
-		content: "New Person"
-	}
-});
+
