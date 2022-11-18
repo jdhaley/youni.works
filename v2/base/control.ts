@@ -1,44 +1,26 @@
 import { model, Text, typeOf, value, View } from "./model.js";
 import { Shape } from "./shape.js";
 import { Graph, Receiver, Signal } from "./controller.js";
-import { Type, BaseType, TypeOwner } from "./type.js";
-import { CommandBuffer } from "./command.js";
+import { Type, TypeOwner } from "./type.js";
 import { RemoteFileService } from "./remote.js";
 import { bundle } from "./util.js";
+import { ECTL, ECTX, ETYPE } from "./editing.js";
 
-export interface Control<T> extends Receiver {
+export interface Control<T> extends ECTL<T> {
 	readonly type: ControlType<T>;
-	readonly view: T;
-	readonly content: View<T>;
-	level: number;
+}
 
-	valueOf(filter?: unknown): value;
-	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
-	demote(): void;
-	promote(): void;
+export interface ControlType<T> extends ETYPE<T>, Type<Control<T>> {
+	readonly owner: Article<T>;
+	create(value?: value, container?: Control<T>): Control<T>
+
+	conf: bundle<any>;
+	control(node: T): Control<T>;
 }
 
 export interface Box<T> extends Shape, Control<T> {
 	header?: View<T>;
 	footer?: View<T>;
-}
-
-export abstract class ControlType<T> extends BaseType<Control<T>> {
-	readonly owner: Article<T>;
-	get model(): string {
-		return undefined;
-	}
-
-	abstract create(value?: value, container?: Control<T>): Control<T>
-	abstract control(node: T): Control<T>;
-}
-
-export interface ECTX<T> {
-	commands: CommandBuffer<Extent<Text>>;
-	selectionRange: Extent<Text>;
-	getControl(id: string): Control<T>;
-	extentFrom(startPath: string, endPath: string): Extent<Text>;
-	sense(signal: Signal | string, on: T): void;
 }
 
 export interface Article<T> extends ECTX<T>, TypeOwner, Receiver, Graph<T> {

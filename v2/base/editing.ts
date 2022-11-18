@@ -3,9 +3,9 @@ import { Extent } from "./control";
 import { Signal } from "./controller";
 import { Text, value, View } from "./model";
 
-export interface Control<T> {
+export interface ECTL<T> {
 	readonly id: string;
-	readonly type: ControlType<T>;
+	readonly type: ETYPE<T>;
 	readonly view: T;
 	readonly content: View<T>;
 
@@ -16,24 +16,23 @@ export interface Control<T> {
 	demote(): void;
 	promote(): void;
 }
-export interface ControlType<T> {
-	readonly name: string;
-	readonly model: string;
+export interface ETYPE<T> {
 	readonly owner: ECTX<T>;
-
-	create(value?: value, container?: Control<T>): Control<T>
+	name: string;
+	readonly model: string;
+	create(value?: value, container?: ECTL<T>): ECTL<T>
 }
 
 export interface ECTX<T> {
 	commands: CommandBuffer<Extent<Text>>;
 	selectionRange: Extent<Text>;
-	getControl(id: string): Control<T>;
+	getControl(id: string): ECTL<T>;
 	extentFrom(startPath: string, endPath: string): Extent<Text>;
 	sense(signal: Signal | string, on: T): void;
 }
-
+/*
 export class Change implements Signal {
-	constructor(command: string, view?: Control<unknown>) {
+	constructor(command: string, view?: ECTL<unknown>) {
 		this.direction = view ? "up" : "down";
 		this.subject = "change";
 		this.from = view;
@@ -41,9 +40,10 @@ export class Change implements Signal {
 		this.commandName = command;
 	}
 	direction: "up" | "down";
-	source: Control<unknown>;
-	from: Control<unknown>;
-	on: Control<unknown>;
+	source: ECTL<unknown>;
+	from: ECTL<unknown>;
+	on: ECTL<unknown>;
 	subject: string;
 	commandName: string;
 }
+*/

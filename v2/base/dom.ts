@@ -102,7 +102,7 @@ export function getView(loc: Text | RANGE): Control<NODE> {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	for (let node = loc instanceof Node ? loc : null; node; node = node.parentNode) {
 		let e = ele(node) as VIEW_ELE;
-		if (e?.$control?.type instanceof ControlType) {
+		if (e?.$control?.type /*instanceof ControlType*/) {
 			return e.$control;
 		}
 	}

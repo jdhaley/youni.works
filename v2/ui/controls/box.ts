@@ -19,9 +19,6 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 	get isContainer(): boolean {
 		return this._type.conf.container;
 	}
-	get id() {
-		return this.view.id;
-	}
 	get type(): ControlType<ELE> {
 		return this._type as ControlType<ELE>;
 	}

@@ -5,7 +5,7 @@ import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../b
 import { bundle } from "../base/util.js";
 
 import { EBox, ElementOwner } from "./element.js";
-import { start } from "../base/type.js";
+import { BaseType, start } from "../base/type.js";
 import { RemoteFileService } from "../base/remote.js";
 
 export abstract class ElementControl extends EBox implements Control<ELE> {
@@ -13,6 +13,9 @@ export abstract class ElementControl extends EBox implements Control<ELE> {
 
 	get type(): ControlType<ELE> {
 		return this._type;
+	}
+	get id() {
+		return this.view.id;
 	}
 	get view(): ELE {
 		return this._ele;
@@ -66,18 +69,19 @@ export abstract class ElementControl extends EBox implements Control<ELE> {
 	}
 }
 
-export class ElementViewType extends  ControlType<ELE> {
+export class ElementViewType extends BaseType<Control<ELE>> implements ControlType<ELE> {
 	constructor(owner: Article<ELE>) {
 		super();
 		this.owner = owner;
 	}
+	declare types: bundle<ControlType<ELE>>
 	declare owner: Article<ELE>;
 
 	get model(): model {
 		return this.owner.conf.contentTypes[this.conf.viewType];
 	}
 
-	create(value: value, container?: ElementControl): ElementControl {
+	create(value: value, container?: any): ElementControl {
 		let view = Object.create(this.prototype) as ElementControl;
 		let node = this.owner.frame.createNode(this.conf.tagName || "div");
 		view.control(node as ELE);

@@ -2,7 +2,7 @@ import { Extent } from "../../base/control";
 import { ELE } from "../../base/dom";
 import { value } from "../../base/model";
 import { Shape } from "../../base/shape";
-import { Control, ControlType } from "../../base/editing";
+import { ECTL, ETYPE } from "../../base/editing";
 import { ElementView } from "./display";
 
 interface Box extends Shape {
@@ -21,9 +21,9 @@ interface ViewBox extends Content {
 	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
 }
 
-export class Editor extends ElementView implements Control<ELE> {
+export class Editor extends ElementView implements ECTL<ELE> {
 	id: string;
-	type: ControlType<ELE>;
+	type: ETYPE<ELE>;
 
 	valueOf(filter?: unknown): unknown {
 		throw new Error("Method not implemented.");
