@@ -105,6 +105,7 @@ export interface Display {
 	actions?: Actions;
 	prototype?: ElementView;
 	type?: Display;
+	style?: object;
 }
 
 export class ElementViewType extends BaseType<Box> {
@@ -144,6 +145,38 @@ export function extendDisplay(display: Display, conf: Display): Display {
 	if (conf.kind)		display.kind = display.kind ? display.kind + " " + conf.kind : conf.kind;
 	if (conf.props)		display.props = extend(display.props, conf.props);
 	if (conf.actions)	display.actions = extend(display.actions, conf.actions);
+	if (conf.style)		createStyles(display, conf.style);
 	if (conf.content)	display.content = conf.content;
 	return display;
+}
+
+let ele = document.createElement("style");
+ele.type = "text/css";
+document.head.appendChild(ele);
+
+let STYLES = ele.sheet;
+
+function createStyles(display: Display, conf: Display) {
+	let styles = Object.create(display.style || null);
+	for (let name in conf) {
+		let rule = conf[name];
+		if (typeof rule == "object") {
+			if (styles[name]) rule = extend(styles[name], rule);
+			styles[name] = rule;
+		}
+		createRule(name, rule);
+	}
+	display.style = styles;
+}
+function createRule(selector: string, object: object | string) {
+	let out = selector + " {";
+	if (typeof object == "string") {
+		out += object;
+	} else if (object) for (let name in object) {
+		out += name.replace("_", "-") + ":" + object[name] + ";"
+	}
+	out += "}";
+	console.log(out);
+	let index = STYLES.insertRule(out);
+	return STYLES.cssRules[index];
 }
