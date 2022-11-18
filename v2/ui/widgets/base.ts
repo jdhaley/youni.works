@@ -9,7 +9,7 @@ const base = {
 	prototype: new ElementView(),
 };
 
-const dialog = extendDisplay(base, {
+const dialog = {
 	type: base,
 	kind: "dialogue",
 	props: {
@@ -56,9 +56,10 @@ const dialog = extendDisplay(base, {
 		}		
 	},
 	actions: shape
-});
+};
 
-const formDialog = extendDisplay(dialog, {
+const formDialog = {
+	type: dialog,
 	style: {
 		".label": `
 			color: steelblue;
@@ -71,4 +72,4 @@ const formDialog = extendDisplay(dialog, {
 			flex: 1;
 		`
 	}
-});
+};

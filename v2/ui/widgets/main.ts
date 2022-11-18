@@ -1,7 +1,7 @@
 import { Frame } from "../../control/frame.js";
 import controller from "../actions/frame.js";
 
-import { create, extendDisplay } from "./display.js";
+import { create } from "./display.js";
 import { base, dialog, formDialog } from "./base.js";
 
 const frame = new Frame(window, controller);
@@ -14,7 +14,7 @@ create(document.body, {
 	content: "instance content",
 });
 
-let person = extendDisplay(formDialog, {
+let person = {
 	type: formDialog,
 	kind: "person",
 	props: {
@@ -77,7 +77,7 @@ let person = extendDisplay(formDialog, {
 	},
 	actions: {
 	}
-});
+};
 
 create(document.body, {
 	type: person,

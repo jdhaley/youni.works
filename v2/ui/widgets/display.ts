@@ -137,17 +137,20 @@ export function create(parent: ELE, conf?: Display, tag?: string) {
 	--prototype?: ElementView;
 
 */
-export function extendDisplay(display: Display, conf: Display): Display {
-	display = Object.create(display);
-	if (conf.header)	display.header = display.header ? extendDisplay(display.header, conf.header) : conf.header;
-	if (conf.footer)	display.footer = display.footer ? extendDisplay(display.footer, conf.footer) : conf.footer;
+export function extendDisplay(conf: Display, from?: Display): Display {
+	if (!conf) return;
+	let type =  extendDisplay(from ? from : conf.type);
+	if (type == Object.getPrototypeOf(conf)) return conf;
+	type = Object.create(type || null);
+	if (conf.header)	type.header = type.header ? extendDisplay(conf.header, type.header) : conf.header;
+	if (conf.footer)	type.footer = type.footer ? extendDisplay(conf.footer, type.footer) : conf.footer;
 
-	if (conf.kind)		display.kind = display.kind ? display.kind + " " + conf.kind : conf.kind;
-	if (conf.props)		display.props = extend(display.props, conf.props);
-	if (conf.actions)	display.actions = extend(display.actions, conf.actions);
-	if (conf.style)		createStyles(display, conf.style);
-	if (conf.content)	display.content = conf.content;
-	return display;
+	if (conf.kind)		type.kind = type.kind ? type.kind + " " + conf.kind : conf.kind;
+	if (conf.props)		type.props = extend(type.props, conf.props);
+	if (conf.actions)	type.actions = extend(type.actions, conf.actions);
+	if (conf.style)		createStyles(type, conf.style);
+	if (conf.content)	type.content = conf.content;
+	return type;
 }
 
 let ele = document.createElement("style");
@@ -180,3 +183,19 @@ function createRule(selector: string, object: object | string) {
 	let index = STYLES.insertRule(out);
 	return STYLES.cssRules[index];
 }
+
+/*
+by default, names are class names, i.e. converted to ".name"
+slash start a child selector: "/name" becomes ">.name"
+	name: {
+		"/name": {
+			.name>.name
+
+			"/*": {
+			}
+			border: {
+				top: // generates... border-top
+			}
+		}
+	}
+*/
