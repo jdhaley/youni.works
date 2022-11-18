@@ -165,6 +165,9 @@ export class EBox extends ElementShape {
 		}
 		throw new Error("Missing content in container.");
 	}
+	get contents(): Iterable<EBox> {
+		return this.content;
+	}
 }
 
 const DEFAULT_BORDER: Edges = {
