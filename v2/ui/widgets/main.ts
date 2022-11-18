@@ -1,49 +1,10 @@
-import { Frame, UserEvent } from "../../control/frame.js";
-import { create, Display, ElementView, extendDisplay } from "./display.js";
-
+import { Frame } from "../../control/frame.js";
 import controller from "../actions/frame.js";
-import shape from "../actions/shape.js";
+
+import { create } from "./display.js";
+import { base, dialog, formDialog } from "./base.js";
 
 const frame = new Frame(window, controller);
-
-let base = {
-	prototype: new ElementView(),
-}
-
-// let caption = extendDisplay(base, {
-// 	type: base,
-// 	kind: "caption",
-// 	header: {
-// 	},
-// 	content: "Dialogue",
-// });
-//We need to handle if a Display is extended outside of a create(). For now just
-//call the extendDisplay directly.
-
-let dialog = extendDisplay(base, {
-	type: base,
-	kind: "dialogue",
-	header: {
-		type: base,
-		kind: "caption",
-		header: {
-			content: () => "<i data-cmd='edit'>✎</i>"
-		},
-		content: "Dialogue",
-		actions: {
-			render: function (this: ElementView, event: UserEvent) {
-				this.content.textContent = (this.partOf as ElementView).props.title;
-			},
-			click: function (this: ElementView, event: UserEvent) {
-				if (event.target.getAttribute("data-cmd") == "edit") {
-					(this.partOf as ElementView).content.textContent = "click edit";
-				}
-			}
-		}
-	},
-	content: "",
-	actions: shape
-});
 
 create(document.body, {
 	type: dialog,
@@ -53,16 +14,12 @@ create(document.body, {
 	content: "instance content",
 });
 
-let person = extendDisplay(dialog, {
-	type: dialog,
+let person = {
+	type: formDialog,
 	kind: "person",
 	props: {
 		title: "Person"
 	},
-	// header: {
-	// 	kind: "caption",
-	// 	content: "Person"
-	// },
 	content: {
 		firstName: {
 			header: {
@@ -109,11 +66,18 @@ let person = extendDisplay(dialog, {
 		}
 	},
 	footer: {
-		content: "A person is a person no matter who small."
+		type: base,
+		content: "A person is a person no matter who small.",
+		style: {
+			FOOTER: {
+				padding_top: "4px",
+				font_size: "x-small"
+			}			
+		}
 	},
 	actions: {
 	}
-});
+};
 
 create(document.body, {
 	type: person,
