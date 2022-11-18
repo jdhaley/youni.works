@@ -199,3 +199,9 @@ slash start a child selector: "/name" becomes ">.name"
 		}
 	}
 */
+const CMDS = {
+	"edit": "highlight_off"
+}
+export function icon(name: string) {
+	return `<i class="material-icons" data-cmd="${name}">${CMDS[name]}</i>`
+}

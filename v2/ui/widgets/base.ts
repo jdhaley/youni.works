@@ -1,4 +1,4 @@
-import { ElementView, extendDisplay } from "./display.js";
+import { ElementView, extendDisplay, icon } from "./display.js";
 
 import shape from "../actions/shape.js";
 import { UserEvent } from "../../control/frame.js";
@@ -19,7 +19,7 @@ const dialog = {
 		type: base,
 		kind: "caption",
 		header: {
-			content: () => "<i data-cmd='edit'>✎</i>"
+			content: () => icon("edit")
 		},
 		content: "Dialog",
 		style: {
