@@ -11,9 +11,9 @@ const base = {
 
 const dialog = {
 	type: base,
-	kind: "dialogue",
+	kind: "dialog",
 	props: {
-		title: "Dialogue"
+		title: "Dialog"
 	},
 	header: {
 		type: base,
@@ -21,18 +21,16 @@ const dialog = {
 		header: {
 			content: () => "<i data-cmd='edit'>✎</i>"
 		},
-		content: "Dialogue",
+		content: "Dialog",
 		style: {
-			".caption": {
+			".dialog>.caption": {
+				display: "flex",
+				flex_direction: "row-reverse",
 				background_color: "lightsteelblue",
 				color: "white",
 				padding: "3px 6px 3px 6px"
-			},	
-			".dialogue>.caption": {
-				display: "flex",
-				flex_direction: "row-reverse"
 			},
-			".dialogue>.caption>.content": {
+			".dialog>.caption>.content": {
 				flex: 1
 			}				
 		},
