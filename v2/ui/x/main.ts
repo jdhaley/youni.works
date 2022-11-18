@@ -1,5 +1,5 @@
 import { Frame } from "../../control/frame.js";
-import { create, Display, ElementView, extendDisplay } from "./display.js";
+import { create, Display, ElementView, extendDisplay } from "./display";
 
 import controller from "../actions/frame.js";
 import shape from "../actions/shape.js";
