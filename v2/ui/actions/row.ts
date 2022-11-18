@@ -51,7 +51,7 @@ export default extend(editable, {
 });
 
 function addCol(editor: RowBox, col: Box<ELE>) {
-	let contents = editor.content.contents;
+	let contents = editor.content.viewContent;
 	for (let i = 0; i < contents.length; i++) {
 		if (contents[i] == col.view) {
 			addColumn(editor, i);
@@ -66,7 +66,7 @@ function addCol(editor: RowBox, col: Box<ELE>) {
 	}
 }
 function addColumn(row: RowBox, index: number) {
-	let column = getBox(row.content.contents[index]);
+	let column = getBox(row.content.viewContent[index]);
 	let newcol = column.type.create("") as Box<ELE>;
 	ele(column.view).after(newcol.view);
 }

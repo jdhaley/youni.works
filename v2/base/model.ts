@@ -36,7 +36,7 @@ export interface Content extends Text, Instance {
 }
 
 export interface View<T> extends Content {
-	readonly contents: Sequence<Text>;
+	readonly viewContent: Sequence<Text>;
 	readonly view: T;
 }
 

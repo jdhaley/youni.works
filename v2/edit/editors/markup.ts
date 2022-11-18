@@ -43,7 +43,7 @@ function replace(this: Editor, commandName: string, range: RANGE, content?: valu
 }
 
 function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
-	if (!this.content.contents.length) return;
+	if (!this.content.viewContent.length) return;
 	let start = getChildEditor(this, range.startContainer);
 	let end = getChildEditor(this, range.endContainer);
 	//If a range of items, check that there are no headings

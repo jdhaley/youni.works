@@ -29,7 +29,7 @@ export class ListBox extends Viewbox {
 	valueOf(range?: RANGE): list {
 		let model: value[];
 		if (range && !range.intersectsNode(this.content.view)) return;
-		for (let part of this.content.contents) {
+		for (let part of this.content.viewContent) {
 			let editor = getBox(part);
 			let value = editor?.valueOf(range);
 			if (value) {

@@ -123,7 +123,7 @@ export function bindViewEle(node: VIEW_ELE) {
 			return;
 		}
 	}
-	for (let child of view.content.contents) {
+	for (let child of view.content.viewContent) {
 		if (ele(child)) bindViewEle(child as ELE);
 	}
 }

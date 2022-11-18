@@ -2,8 +2,7 @@ import { BasePart, Owner, Receiver } from "../base/controller.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { ELE, NODE } from "../base/dom.js";
 import { Bag, EMPTY, Sequence } from "../base/util.js";
-import { Content, View } from "../base/model.js";
-import { BaseType } from "../base/type.js";
+import { Content } from "../base/model.js";
 
 export class ElementOwner extends Owner<ELE> {
 	getControlOf(node: ELE): Receiver {
@@ -56,7 +55,7 @@ export class ElementContent extends ElementPart implements Content {
 	get kind(): Bag<string> {
 		return this._ele.classList;
 	}
-	get contents(): Sequence<NODE> {
+	get viewContent(): Sequence<NODE> {
 		return this._ele.childNodes;
 	}
 	get textContent() {

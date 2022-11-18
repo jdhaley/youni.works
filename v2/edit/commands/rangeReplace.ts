@@ -68,7 +68,7 @@ export class RangeReplace extends Replace {
 		view = view.type.create(element) as Editor;
 		let range = this.getReplaceRange();
 		range.deleteContents();
-		let contents = view.content.contents;
+		let contents = view.content.viewContent;
 		while (contents.length) {
 			let node = contents[0];
 			range.insertNode(node);

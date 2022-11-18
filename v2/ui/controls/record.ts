@@ -9,7 +9,7 @@ export class RecordBox extends Viewbox {
 	memberType = "field";
 
 	get(name: string): Box<ELE> {
-		for (let node of this.content.contents) {
+		for (let node of this.content.viewContent) {
 			let view = getBox(node);
 			if (name == view?.type.name) return view;
 		}

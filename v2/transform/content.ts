@@ -19,7 +19,7 @@ export function xmlContent(view: Control<NODE>, range: RANGE, out?: ELE): ELE {
 }
 
 function content(view: Control<NODE>, range: RANGE, out: ELE) {
-	for (let node of view.content.contents) {
+	for (let node of view.content.viewContent) {
 		if (range && !range.intersectsNode(node as NODE))
 			continue;
 		let childView = getView(node) as Control<NODE>;

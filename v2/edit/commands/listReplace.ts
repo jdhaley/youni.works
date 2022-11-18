@@ -52,7 +52,7 @@ export class ListReplace extends RangeReplace {
 			range.collapse(true);
 		}
 		editor = editor.type.create(value) as Editor;
-		let contents = editor.content.contents;
+		let contents = editor.content.viewContent;
 		while (contents.length) {
 			range.insertNode(contents[0]); //this also removes the entry from the sequence.
 			range.collapse();
