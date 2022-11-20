@@ -109,7 +109,7 @@ export interface UserEvent extends Signal, UIEvent {
     key: string;
 
 	//mouse support - to be reviewed.
-    track?: ELE;
+    pointerId: number;
     x?: number;
     y?: number;
 

@@ -4,14 +4,15 @@ import { ELE, NODE, RANGE } from "../../base/dom.js";
 import { Frame, UserEvent } from "../../control/frame.js";
 
 export default {
-    mousedown: trackEvent,    
-    mousemove: trackEvent,
-    mouseup: trackEvent,
-    mouseout: trackEvent,
+    pointerdown: sense,    
+    pointermove: sense,
+    pointerup: sense,
+    pointerout: sense,
     click: sense,
     dblclick: sense,
     contextmenu:sense,
     input: sense,
+
     selectionchange: rangeEvent,
     keydown: rangeEvent,
     beforeinput: rangeEvent,
@@ -25,12 +26,6 @@ function rangeEvent(event: UserEvent) {
     sense(event);
 }
 
-function trackEvent(event: UserEvent) {
-    event.track = TRACK;
-    sense(event);
-    TRACK = event.track;
-}
-let TRACK: ELE;
 
 function sense(event: UserEvent) {
     let source = viewOf(event.range ? event.range.commonAncestorContainer : event.target);
@@ -42,7 +37,7 @@ function sense(event: UserEvent) {
         if (!event.subject) event.subject = event.type;
  
         event.stopPropagation();
-        event.frame.sense(event, event.track || source);
+        event.frame.sense(event, source);
         if (!event.subject) event.preventDefault();    
     }
 }
