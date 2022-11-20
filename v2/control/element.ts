@@ -141,32 +141,29 @@ export class ElementShape extends ElementContent implements Shape {
 	}
 }
 
-export class EBox extends ElementShape {
+export class ElementBox extends ElementShape {
 	get view(): ELE {
 		return this._ele;
 	}
 	get isContainer(): boolean {
 		return false;
 	}
-	get header(): EBox {
+	get header(): ElementBox {
 		for (let child of this._ele.children) {
-			if (child.nodeName == "header") return child["$control"];
+			if (child.nodeName == "HEADER") return child["$control"];
 		}
 	}
-	get footer(): EBox {
+	get footer(): ElementBox {
 		for (let child of this._ele.children) {
-			if (child.nodeName == "footer") return child["$control"];
+			if (child.nodeName == "FOOTER") return child["$control"];
 		}
 	}
-	get content(): EBox {
+	get content(): ElementBox {
 		if (!this.isContainer) return this;
 		for (let child of this._ele.children) {
 			if (child.classList.contains("content")) return child["$control"];
 		}
 		throw new Error("Missing content in container.");
-	}
-	get contents(): Iterable<EBox> {
-		return this.content;
 	}
 }
 

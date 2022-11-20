@@ -1,4 +1,4 @@
-import { ElementView, extendDisplay, icon } from "./display.js";
+import { EDisp, icon } from "./display.js";
 
 import shape from "../actions/shape.js";
 import { UserEvent } from "../../control/frame.js";
@@ -6,7 +6,7 @@ import { UserEvent } from "../../control/frame.js";
 export {base, dialog, formDialog}
 
 const base = {
-	prototype: new ElementView(),
+	prototype: new EDisp(),
 };
 
 const dialog = {
@@ -35,12 +35,12 @@ const dialog = {
 			}				
 		},
 		actions: {
-			render: function (this: ElementView, event: UserEvent) {
-				this.content.textContent = (this.partOf as ElementView).props.title;
+			render: function (this: EDisp, event: UserEvent) {
+				this.content.textContent = (this.partOf as EDisp).props.title;
 			},
-			click: function (this: ElementView, event: UserEvent) {
+			click: function (this: EDisp, event: UserEvent) {
 				if (event.target.getAttribute("data-cmd") == "edit") {
-					(this.partOf as ElementView).content.textContent = "click edit";
+					(this.partOf as EDisp).content.textContent = "click edit";
 				}
 			}
 		}

@@ -1,12 +1,10 @@
-import { Extent } from "../../base/control.js"
 import { Actions } from "../../base/controller.js"
-import { ELE } from "../../base/dom.js"
-import { unit, value } from "../../base/model.js"
+import { unit } from "../../base/model.js"
 import { Shape } from "../../base/shape.js"
-import { BaseType } from "../../base/type.js"
+import { ELE } from "../../base/dom.js"
 import { bundle, extend, Sequence } from "../../base/util.js"
 
-import { EBox } from "../../control/element.js"
+import { ElementBox } from "../../control/element.js"
 
 /*
 content:
@@ -19,23 +17,32 @@ content:
 	Type<Box>
 */
 
-interface Box extends Shape {
+export interface Box extends Shape {
 	header?: Box;
-	contents: Iterable<Content>; //No parts when this is a unit view - use textContent or markupContent.
+	content: Contents; //No parts when this is a unit view - use textContent or markupContent.
 	footer?: Box;
 }
 
-interface Content extends Box {
+export interface Contents extends Box, Iterable<Contents> {
 	textContent: string;
 	markupContent: string;
 }
 
-interface ViewBox extends Content {
-	valueOf(filter?: unknown): value;
-	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
+export interface Display {
+	type?: Display;
+	/** space sepearted names */
+	kind?: string;
+	props?: bundle<any>;
+	header?: Display;
+	content?: unit | Sequence<Display> | bundle<Display> | ((conf: bundle<any>) => string);
+	footer?: Display;
+	actions?: Actions;
+
+	prototype?: EDisp;
+	style?: object;
 }
 
-export class ElementView extends EBox implements Box {
+export class EDisp extends ElementBox implements Contents {
 	declare _container: boolean;
 	declare props: bundle<any>;
 	
@@ -64,7 +71,7 @@ export class ElementView extends EBox implements Box {
 			if (typeof ret == "string") ele.innerHTML = ret;
 		} else if (typeof c != "object") {
 			ele.textContent = "" + c;
-		} else if (c instanceof EBox) {
+		} else if (c instanceof ElementBox) {
 		} else if (c.length) {
 			for (let display of c as Sequence<Display>) create(ele, display);
 		} else if (c && typeof c == "object") {
@@ -82,45 +89,17 @@ function createContainer(ele: ELE, conf: Display) {
 	content.kind.add("content");
 	if (conf.footer) create(ele, conf.footer, "footer");
 }
-function setKinds(view: ElementView, kinds: string) {
+function setKinds(view: EDisp, kinds: string) {
 	//handles the case where multiple spaces separate the tokens.
 	if (kinds) for (let kind of kinds.split(" ")) if (kind) view.kind.add(kind);
 }
 
-export interface TypeConf {
-	class: typeof ElementViewType;
-	viewType: string,
-	prototype?: any,
-	container: boolean;
-	tagName: string;
-	shortcuts: bundle<string>;
-}
 
-export interface Display {
-	kind?: string; //space separated names.
-	props?: bundle<any>;
-	header?: Display;
-	content?: unit | Sequence<Display> | bundle<Display> | ((conf: bundle<any>) => string);
-	footer?: Display;
-	actions?: Actions;
-	prototype?: ElementView;
-	type?: Display;
-	style?: object;
-}
-
-export class ElementViewType extends BaseType<Box> {
-	create(parent: ELE): Box {
-		let view = Object.create(this.prototype) as ElementView;
-		view.init(parent, this.conf as Display)
-		return view;
-	}
-}
-
-const PROTOTYPE = new ElementView();
+const PROTOTYPE = new EDisp();
 
 export function create(parent: ELE, conf?: Display, tag?: string) {
 	if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf.type, conf);
-	let view = Object.create(conf?.prototype || PROTOTYPE) as ElementView;
+	let view = Object.create(conf?.prototype || PROTOTYPE) as EDisp;
 	view.init(parent, conf, tag);
 	return view;
 }
@@ -145,7 +124,7 @@ export function extendDisplay(conf: Display, from?: Display): Display {
 	if (conf.header)	type.header = type.header ? extendDisplay(conf.header, type.header) : conf.header;
 	if (conf.footer)	type.footer = type.footer ? extendDisplay(conf.footer, type.footer) : conf.footer;
 
-	if (conf.kind)		type.kind = type.kind ? type.kind + " " + conf.kind : conf.kind;
+	if (conf.kind)		type.kind = /*type.kind ? type.kind + " " + conf.kind :*/ conf.kind;
 	if (conf.props)		type.props = extend(type.props, conf.props);
 	if (conf.actions)	type.actions = extend(type.actions, conf.actions);
 	if (conf.style)		createStyles(type, conf.style);
@@ -154,12 +133,11 @@ export function extendDisplay(conf: Display, from?: Display): Display {
 }
 
 let ele = document.createElement("style");
-ele.type = "text/css";
 document.head.appendChild(ele);
 
 let STYLES = ele.sheet;
 
-function createStyles(display: Display, conf: Display) {
+function createStyles(display: Display, conf: object) {
 	let styles = Object.create(display.style || null);
 	for (let name in conf) {
 		let rule = conf[name];

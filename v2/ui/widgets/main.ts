@@ -16,7 +16,7 @@ create(document.body, {
 
 let person = {
 	type: formDialog,
-	kind: "person",
+	kind: "person dialog",
 	props: {
 		title: "Person"
 	},

@@ -6,7 +6,7 @@ import { Shape } from "../../base/shape.js"
 import { BaseType } from "../../base/type.js"
 import { bundle, extend, Sequence } from "../../base/util.js"
 
-import { EBox } from "../../control/element.js"
+import { ElementBox } from "../../control/element.js"
 
 /*
 content:
@@ -35,7 +35,7 @@ interface ViewBox extends Content {
 	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
 }
 
-export class ElementView extends EBox implements Box {
+export class ElementView extends ElementBox implements Box {
 	declare _container: boolean;
 	declare props: bundle<any>;
 	
@@ -63,7 +63,7 @@ export class ElementView extends EBox implements Box {
 			if (typeof ret == "string") ele.innerHTML = ret;
 		} else if (typeof c != "object") {
 			ele.textContent = "" + c;
-		} else if (c instanceof EBox) {
+		} else if (c instanceof ElementBox) {
 		} else if (c.length) {
 			for (let display of c as Sequence<Display>) create(ele, display);
 		} else if (c && typeof c == "object") {
