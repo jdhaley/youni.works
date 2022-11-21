@@ -3,6 +3,8 @@ import { create, Display, ElementView, extendDisplay } from "./display.js";
 
 import controller from "../actions/frame.js";
 import shape from "../actions/shape.js";
+import { base } from "./base.js";
+import { base, dialog, formDialog } from "./base.js";
 
 new Frame(window, controller);
 
