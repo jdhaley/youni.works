@@ -1,7 +1,8 @@
-import { EDisp, icon } from "./display.js";
+import { Box, Display, EDisp, icon } from "./display.js";
 
 import shape from "../actions/shape.js";
 import { UserEvent } from "../../control/frame.js";
+import { Signal } from "../../base/controller.js";
 
 export {base, dialog, formDialog}
 
@@ -71,3 +72,67 @@ const formDialog = {
 		`
 	}
 };
+
+
+export const action = {
+	props: {
+		action: "",
+		icon: ""
+	},
+	content: (i: Display) => `<i class="material-icons" data-cmd="${i.props.action}">${i.props.icon}</i>`,
+	actions: {
+		click(this: Box, event: Signal) {
+			event.subject = this.props.action;
+		}
+	}
+}
+
+export const workbench = {
+	extends: base,
+	kind: "wb",
+	header: {
+		extends: base,
+		kind: "wb-header",
+		content: "Header",
+	},
+	content: {
+		nav: {
+			extends: base,
+			content: {
+				main: {
+					extends: action,
+					props: {
+						action: "activateTab",
+						icon: "dashboard"
+					}
+				}
+			}
+		},
+		body: {
+			content: {
+				tree: {
+					content: "tree"
+				},
+				editors: {
+					content: "editors"
+				}
+			}
+		}
+	},
+	footer: {
+		kind: "wb-footer",
+		content: "Footer",
+	},
+	style: {
+		".wb": {
+			color: "white",
+			background: "black"
+		},
+		".wb>.content": {
+			display: "flex",
+			flex_direction: "row",
+			color: "black",
+			background: "white"
+		}
+	}
+}

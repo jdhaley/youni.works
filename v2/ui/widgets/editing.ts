@@ -4,7 +4,8 @@ import { value } from "../../base/model";
 import { ECTL, ECTX, ETYPE } from "../../base/editing";
 import { Box, Contents, Display, EDisp, extendDisplay } from "./display";
 import { bundle, EMPTY } from "../../base/util";
-import { BaseType } from "../../base/type";
+import { BaseType, Type } from "../../base/type";
+import { Actions } from "../../base/controller";
 
 export class Editor extends EDisp implements ECTL<ELE> {
 	type: ETYPE<ELE>;
@@ -68,13 +69,3 @@ export class EditorType implements ETYPE<ELE> {
 	}
 }
 const PROTOTYPE = new EDisp();
-
-export interface TypeConf {
-	class: typeof ElementViewType;
-	viewType: string,
-	prototype?: any,
-	container: boolean;
-	tagName: string;
-	shortcuts: bundle<string>;
-}
-

@@ -1,8 +1,8 @@
 import { Frame } from "../../control/frame.js";
 import controller from "../actions/frame.js";
 
-import { create } from "./display.js";
-import { base, dialog, formDialog } from "./base.js";
+import { create, Display } from "./display.js";
+import { base, dialog, formDialog, workbench } from "./base.js";
 
 const frame = new Frame(window, controller);
 
@@ -66,7 +66,7 @@ let person = {
 		}
 	},
 	footer: {
-		type: base,
+		extends: base,
 		content: "A person is a person no matter who small.",
 		style: {
 			FOOTER: {
@@ -85,6 +85,9 @@ create(document.body, {
 	header: {
 		content: "New Person"
 	}
+});
+create(document.body, {
+	type: workbench
 });
 
 frame.send("render", document.body);

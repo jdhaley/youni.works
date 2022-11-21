@@ -1,10 +1,10 @@
-import { Actions } from "../../base/controller.js"
-import { unit } from "../../base/model.js"
 import { Shape } from "../../base/shape.js"
 import { ELE } from "../../base/dom.js"
 import { bundle, extend, Sequence } from "../../base/util.js"
 
 import { ElementBox } from "../../control/element.js"
+import { Actions } from "../../base/controller.js";
+import { unit } from "../../base/model.js";
 
 /*
 content:
@@ -18,6 +18,7 @@ content:
 */
 
 export interface Box extends Shape {
+	props: bundle<any>;
 	header?: Box;
 	content: Contents; //No parts when this is a unit view - use textContent or markupContent.
 	footer?: Box;
@@ -28,23 +29,37 @@ export interface Contents extends Box, Iterable<Contents> {
 	markupContent: string;
 }
 
-export interface Display {
+export interface TypeConf {
 	type?: Display;
-	/** space sepearted names */
-	kind?: string;
-	props?: bundle<any>;
-	header?: Display;
-	content?: unit | Sequence<Display> | bundle<Display> | ((conf: bundle<any>) => string);
-	footer?: Display;
-	actions?: Actions;
 
-	prototype?: EDisp;
-	style?: object;
+	kind?: string;
+	props?: bundle<any>; //props?: bundle<any>
+	header?: TypeConf;
+	footer?: TypeConf;
+	actions?: Actions;
+	style?: bundle<any>;
+
+	types?: bundle<TypeConf>;
+	content?: unit | Sequence<TypeConf> | bundle<TypeConf> | ((conf: bundle<any>) => string);
+
+	prototype?: any;
 }
+
+export type Display = TypeConf;
+	// /** space sepearted names */
+	// kind?: string;
+	// props?: bundle<any>;
+	// header?: Display;
+	// content?: unit | Sequence<Display> | bundle<Display> | ((conf: bundle<any>) => string);
+	// footer?: Display;
+	// actions?: Actions;
+
+	// prototype?: EDisp;
+	// style?: object;
+
 
 export class EDisp extends ElementBox implements Contents {
 	declare _container: boolean;
-	declare props: bundle<any>;
 	
 	get isContainer() {
 		return this._container;
@@ -67,7 +82,7 @@ export class EDisp extends ElementBox implements Contents {
 		let ele = this.content.view;
 		let c = conf.content as any;
 		if (typeof c == "function") {
-			let ret = c(ele, conf);
+			let ret = c.call(this, conf);
 			if (typeof ret == "string") ele.innerHTML = ret;
 		} else if (typeof c != "object") {
 			ele.textContent = "" + c;
@@ -99,6 +114,8 @@ const PROTOTYPE = new EDisp();
 
 export function create(parent: ELE, conf?: Display, tag?: string) {
 	if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf.type, conf);
+//	if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf);
+
 	let view = Object.create(conf?.prototype || PROTOTYPE) as EDisp;
 	view.init(parent, conf, tag);
 	return view;
@@ -126,10 +143,21 @@ export function extendDisplay(conf: Display, from?: Display): Display {
 
 	if (conf.kind)		type.kind = /*type.kind ? type.kind + " " + conf.kind :*/ conf.kind;
 	if (conf.props)		type.props = extend(type.props, conf.props);
-	if (conf.actions)	type.actions = extend(type.actions, conf.actions);
+	if (conf.actions)	type.actions = extendActions(type.actions, conf.actions);
 	if (conf.style)		createStyles(type, conf.style);
 	if (conf.content)	type.content = conf.content;
 	return type;
+}
+
+//Could also have the actions faceted and automatically call via before$ or after$
+function extendActions(proto: Actions, extension: Actions): Actions {
+	if (!proto) return extension;
+	let object = Object.create(proto || null);
+	for (let name in extension) {
+		object[name] = extension[name];
+		if (proto[name]) object[name]._super = proto[name];
+	}
+	return object;
 }
 
 let ele = document.createElement("style");
@@ -183,3 +211,40 @@ const CMDS = {
 export function icon(name: string) {
 	return `<i class="material-icons" data-cmd="${name}">${CMDS[name]}</i>`
 }
+// const monster1 = { eyeCount: 4 };
+
+// class StateChange implements Signal {
+// 	constructor(box: Box, property: string, oldValue: any) {
+
+// 	}
+// 	direction: "up";
+// 	subject: "stateChange";
+// 	from: Box;
+// 	property: string;
+// }
+// const EventProxy = {
+//   set(obj: bundle<any>, name: string, value: any) {
+// 	(obj.box.frame as Frame).sense({
+// 		direction: "up",
+// 		subject: "react",
+		
+// 	}, obj.box._ele)
+//     if ((prop === 'eyeCount') && ((value % 2) !== 0)) {
+//       console.log('Monsters must have an even number of eyes');
+//     } else {
+//       return Reflect.set(...arguments);
+//     }
+//   }
+// };
+
+// const proxy1 = new Proxy(monster1, handler1);
+
+// proxy1.eyeCount = 1;
+// // expected output: "Monsters must have an even number of eyes"
+
+// console.log(proxy1.eyeCount);
+// // expected output: 4
+
+// proxy1.eyeCount = 2;
+// console.log(proxy1.eyeCount);
+// // expected output: 2
