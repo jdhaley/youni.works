@@ -1,5 +1,6 @@
 import { Actions } from "./controller.js";
-import { bundle, EMPTY, extend } from "./util.js";
+import { unit } from "./model.js";
+import { bundle, EMPTY, extend, Sequence } from "./util.js";
 
 export interface Type<T> {
 	name: string;
@@ -21,30 +22,25 @@ export function start(owner: TypeOwner) {
 	owner.unknownType = owner.types[owner.conf.unknownType];
 	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
 }
-/*
-export interface Display {
-	kind?: string | string[];
-	options?: string | string[];
-	props?: bundle<any>;
-	header?: Display;
-	content: (conf: bundle<any>) => string | Box | Sequence<Display> | bundle<Display> | string | number | boolean | null;
-	footer?: Display;
-	actions?: Actions;
-}
-*/
-interface TypeConf {
-	type: string;
-	kind?: string | string[]
-	props: bundle<any>; //props?: bundle<any>
+export interface TypeConf {
+	type?: string;
+	extends?: TypeConf;
+
+	kind?: string;
+	props?: bundle<any>; //props?: bundle<any>
 	header?: TypeConf;
-	//content: (conf: bundle<any>) => string | Box | Sequence<Display> | bundle<Display> | string | number | boolean | null;
-	types: bundle<source>;
-	footer?: TypeConf
-	actions?: Actions
+	footer?: TypeConf;
+	actions?: Actions;
+	style?: bundle<any>;
+
+	types?: bundle<TypeConf>;
+	content?: unit | Sequence<TypeConf> | bundle<TypeConf> | ((conf: bundle<any>) => string);
+
+	prototype?: any;
 }
 
 type types = bundle<Type<unknown>>;
-type source = bundle<string | source> | string;
+//type source = bundle<TypeConf> | string;
 
 export class BaseType<T> implements Type<T> {
 	declare partOf: BaseType<T>;
@@ -87,7 +83,7 @@ function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type<un
 	return types;
 }
 
-function loadTypes(source: bundle<source>, base: types): types {
+function loadTypes(source: bundle<TypeConf>, base: types): types {
 	base = Object.create(base);
 	let types = Object.create(null);
 	for (let name in source) {
@@ -96,7 +92,7 @@ function loadTypes(source: bundle<source>, base: types): types {
 	return types
 }
 
-function getType(name: string, types: types, source: source): Type<unknown> {
+function getType(name: string, types: types, source: bundle<TypeConf>): Type<unknown> {
 	let type = types[name];
 	if (!type && source[name]) {
 		let value = source[name];
@@ -113,7 +109,7 @@ function getType(name: string, types: types, source: source): Type<unknown> {
 	return type;
 }
 
-function createType(name: string, conf: TypeConf, types: types, source: source) {
+function createType(name: string, conf: TypeConf, types: types, source: bundle<TypeConf>) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
 	let type = Object.create(supertype) as BaseType<unknown>;
 	type.start(name, conf)
@@ -129,7 +125,7 @@ function createType(name: string, conf: TypeConf, types: types, source: source) 
 	}
 	return type;
 
-	function getMember(owner: Type<unknown>, name: string, part: source) {
+	function getMember(owner: Type<unknown>, name: string, part: TypeConf) {
 		let member: Type<unknown>;
 		if (typeof part == "object") {
 			member = createType("", part as any, types, source);

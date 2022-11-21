@@ -42,6 +42,11 @@ export class BaseReceiver implements Receiver {
 			subject = "";
 		}
 	}
+	super(signal: Signal) {
+		let action = this.actions && this.actions[signal.subject];
+		action = action ? action["$super"] : null;
+		action && action.call(this, signal);
+	}
 }
 
 export class BaseController<T> extends BaseReceiver implements Receiver {

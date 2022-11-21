@@ -1,7 +1,7 @@
 import { BasePart, Owner, Receiver } from "../base/controller.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { ELE, NODE } from "../base/dom.js";
-import { Bag, EMPTY, Sequence } from "../base/util.js";
+import { Bag, bundle, EMPTY, Sequence } from "../base/util.js";
 import { Content } from "../base/model.js";
 
 export class ElementOwner extends Owner<ELE> {
@@ -142,6 +142,8 @@ export class ElementShape extends ElementContent implements Shape {
 }
 
 export class ElementBox extends ElementShape {
+	declare props: bundle<any>;
+
 	get view(): ELE {
 		return this._ele;
 	}

@@ -23,6 +23,7 @@ export default extend(null, {
 		tracking.x = event.x - area.x;
 		tracking.y = event.y - area.y;
 		tracking.type = this.zone(event.x, event.y) == "CC" ? "move" : "size";
+		this.size(this.area.width, this.area.height);
 	},
 	pointerup(event: UserEvent) {
 		(event.on as HTMLElement).releasePointerCapture(event.pointerId);

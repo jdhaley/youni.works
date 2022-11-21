@@ -26,7 +26,6 @@ function rangeEvent(event: UserEvent) {
     sense(event);
 }
 
-
 function sense(event: UserEvent) {
     let source = viewOf(event.range ? event.range.commonAncestorContainer : event.target);
     if (source) {
@@ -42,18 +41,18 @@ function sense(event: UserEvent) {
     }
 }
 
-export function viewOf(loc: NODE | RANGE): ELE {
+function viewOf(loc: NODE | RANGE): ELE {
  	for (let node  = nodeOf(loc); node; node = node.parentNode) {
 		if (node["$control"]) return node as ELE;
 	}
 }
 
-export function ownerOf(loc: NODE | RANGE): Frame  {
+function ownerOf(loc: NODE | RANGE): Frame  {
 	if (loc instanceof Document) return loc["$owner"];
 	return nodeOf(loc).ownerDocument["$owner"];
 }
 
-export function nodeOf(loc: NODE | RANGE): NODE {
+function nodeOf(loc: NODE | RANGE): NODE {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	return loc instanceof Node ? loc : null;
 }
