@@ -8,17 +8,6 @@ import { bundle, extend, Sequence } from "../../base/util.js"
 
 import { EBox } from "../../control/element.js"
 
-/*
-content:
-	UNIT - string | number | boolean | null;
-	RECORD - bundle<Display>
-	LIST - Sequence<Display>
-
-	(parent: ELE, conf: Display) => Box
-	Box
-	Type<Box>
-*/
-
 interface Box extends Shape {
 	header?: Box;
 	content: Iterable<Content>; //No parts when this is a unit view - use textContent or markupContent.

@@ -3,14 +3,11 @@ import { create, Display, ElementView, extendDisplay } from "./display.js";
 
 import controller from "../actions/frame.js";
 import shape from "../actions/shape.js";
-import { base } from "./base.js";
+
 import { base, dialog, formDialog } from "./base.js";
 
 new Frame(window, controller);
 
-let base = {
-	prototype: new ElementView(),
-}
 
 //We need to handle if a Display is extended outside of a create(). For now just
 //call the extendDisplay directly.
@@ -32,6 +29,7 @@ let taskParent = extendDisplay(base, {
 
 create(document.body, {
 	type: taskParent,
+	kind: "task",
 	header: {
 		content: "Task"
 	},
