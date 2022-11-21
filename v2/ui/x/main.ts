@@ -39,34 +39,46 @@ create(document.body, {
 			kind: "label",
 			content: () => "<b>ID</b>"
 		},
-		content: "0001"
+		content: "0001",
+		actions: {
+			click: () => console.log("clicked on id content")
+		}
 	},
 	description: {
 		header: {
 			kind: "label",
 			content: "Description"
 		},
-		content: "Simple record type display (table). click on it to do a dialog of the record. "
+		content: "Simple record type display (table). click on it to do a dialog of the record. ",
+		actions: {
+			click: () => console.log("clicked on description content")
+		}
 	},
 	dateCreated: {
 		header: {
 			kind: "label",
-			content: "Date Created"
+			content: "Date Created",
+			actions: {
+				click: () => console.log("clicked on date created header label")
+			}
 		},
-		content: new Date().toISOString()
+		content: new Date().toISOString(),
+		actions: {
+			click: () => console.log("clicked on date created content")
+		}
 	},
 	status: {
 		header: {
 			kind: "label",
 			content: "Status",
 			actions: {
-				click: () => console.log("clicked on status")
+				click: () => console.log("clicked on status header label")
 			}
 		}
 	}
 	},
 	actions: {
-		click: () => console.log("clicked on task header")
+		click: () => console.log("clicked within task context - parent object")
 	}
 });
 
