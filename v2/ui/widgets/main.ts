@@ -1,13 +1,39 @@
 import { Frame } from "../../control/frame.js";
 import controller from "../actions/frame.js";
 
-import { create, Display } from "./display.js";
+import { BoxType, create, EDisp } from "./display.js";
 import { base, dialog, formDialog, workbench } from "./base.js";
+import { start, TypeOwner } from "../../base/type.js";
+
+import contentTypes from "../conf/contentTypes.js";
+import viewTypes from "./types.js";
 
 const frame = new Frame(window, controller);
 
+let baseTypes = {
+	text: {
+		class: BoxType,
+		viewType: "text",
+		prototype: new EDisp(),
+	}
+}
+let owner: TypeOwner = {
+	conf: {
+		baseTypes: baseTypes,
+		contentTypes: contentTypes,
+		viewTypes: viewTypes,
+	
+		unknownType: "unknown",
+		defaultType: "task",
+	},
+	types: {},
+	unknownType: undefined
+};
+let loaded = start(owner);
+owner.types.dialog.create(document.body);
+
 create(document.body, {
-	type: dialog,
+	extends: dialog,
 	props: {
 		title: "Hello world!"
 	},
@@ -15,7 +41,7 @@ create(document.body, {
 });
 
 let person = {
-	type: formDialog,
+	extends: formDialog,
 	kind: "person dialog",
 	props: {
 		title: "Person"
@@ -80,14 +106,14 @@ let person = {
 };
 
 create(document.body, {
-	type: person,
+	extends: person,
 	kind: " flat  iron",
 	header: {
 		content: "New Person"
 	}
 });
 create(document.body, {
-	type: workbench
+	extends: workbench
 });
 
 frame.send("render", document.body);

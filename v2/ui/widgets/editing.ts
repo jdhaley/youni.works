@@ -52,7 +52,7 @@ export function define(conf: Display): EditorType {
 export class EditorType implements ETYPE<ELE> {
 	constructor(conf: Display, name?: string) {
 		if (!conf) this.conf = EMPTY.object;
-		if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf.type, conf);
+		if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf.extends, conf);
 		this.conf = conf;
 	}
 	owner: ECTX<ELE>;

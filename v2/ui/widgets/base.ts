@@ -11,13 +11,13 @@ const base = {
 };
 
 const dialog = {
-	type: base,
+	extends: base,
 	kind: "dialog",
 	props: {
 		title: "Dialog"
 	},
 	header: {
-		type: base,
+		extends: base,
 		kind: "caption",
 		header: {
 			content: () => icon("edit")
@@ -58,7 +58,7 @@ const dialog = {
 };
 
 const formDialog = {
-	type: dialog,
+	extends: dialog,
 	style: {
 		".label": `
 			color: steelblue;
@@ -75,6 +75,7 @@ const formDialog = {
 
 
 export const action = {
+	extends: base,
 	props: {
 		action: "",
 		icon: ""

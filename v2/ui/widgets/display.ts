@@ -5,6 +5,7 @@ import { bundle, extend, Sequence } from "../../base/util.js"
 import { ElementBox } from "../../control/element.js"
 import { Actions } from "../../base/controller.js";
 import { unit } from "../../base/model.js";
+import { BaseType } from "../../base/type.js";
 
 /*
 content:
@@ -30,7 +31,8 @@ export interface Contents extends Box, Iterable<Contents> {
 }
 
 export interface TypeConf {
-	type?: Display;
+	type?: unknown;
+	extends?: Display;
 
 	kind?: string;
 	props?: bundle<any>; //props?: bundle<any>
@@ -113,7 +115,7 @@ function setKinds(view: EDisp, kinds: string) {
 const PROTOTYPE = new EDisp();
 
 export function create(parent: ELE, conf?: Display, tag?: string) {
-	if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf.type, conf);
+	if (conf && Object.hasOwn(conf, "extends")) conf = extendDisplay(conf.extends, conf);
 //	if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf);
 
 	let view = Object.create(conf?.prototype || PROTOTYPE) as EDisp;
@@ -133,9 +135,21 @@ export function create(parent: ELE, conf?: Display, tag?: string) {
 	--prototype?: ElementView;
 
 */
+export class BoxType extends BaseType<Box> {
+	start(name: string, conf: Display): void {
+		super.start(name, conf);
+		this.conf = extendDisplay(conf)
+	}
+	create(parent: ELE): Box {
+		let view = Object.create(this.conf?.prototype || PROTOTYPE) as EDisp;
+		view.init(parent, this.conf);
+		return view;
+	}
+}
+
 export function extendDisplay(conf: Display, from?: Display): Display {
 	if (!conf) return;
-	let type =  extendDisplay(from ? from : conf.type);
+	let type =  extendDisplay(from ? from : conf.extends);
 	if (type == Object.getPrototypeOf(conf)) return conf;
 	type = Object.create(type || null);
 	if (conf.header)	type.header = type.header ? extendDisplay(conf.header, type.header) : conf.header;
