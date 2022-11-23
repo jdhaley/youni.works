@@ -2,7 +2,7 @@ import { model, value, Text } from "../base/model.js";
 import { Control, ControlType, Article, ArticleContext, Extent } from "../base/control.js";
 import { CommandBuffer } from "../base/command.js";
 import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../base/dom.js";
-import { bundle } from "../base/util.js";
+import { bundle, extend } from "../base/util.js";
 
 import { ElementBox, ElementOwner } from "./element.js";
 import { BaseType, start } from "../base/type.js";
@@ -75,12 +75,27 @@ export class ElementViewType extends BaseType<Control<ELE>> implements ControlTy
 		this.owner = owner;
 	}
 	declare types: bundle<ControlType<ELE>>
+	declare prototype: Control<ELE>;
 	declare owner: Article<ELE>;
 
 	get model(): model {
 		return this.owner.conf.contentTypes[this.conf.viewType];
 	}
 
+	start(name: string, conf: bundle<any>): void {
+		this.name = name;
+		if (conf) {
+			this.conf = extend(this.conf || null, conf);
+		}
+		if (conf.prototype) this.prototype = conf.prototype;
+
+		if (conf.proto) {
+			this.prototype = extend(this.prototype, conf.proto);
+		} else {
+			this.prototype = Object.create(this.prototype as any);
+		}
+		this.prototype["_type"] = this;
+	}
 	create(value: value, container?: any): ElementControl {
 		let view = Object.create(this.prototype) as ElementControl;
 		let node = this.owner.frame.createNode(this.conf.tagName || "div");

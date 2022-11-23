@@ -3,7 +3,6 @@ import { Actions } from "../../base/controller.js"
 import { ELE } from "../../base/dom.js"
 import { unit, value } from "../../base/model.js"
 import { Shape } from "../../base/shape.js"
-import { BaseType } from "../../base/type.js"
 import { bundle, extend, Sequence } from "../../base/util.js"
 
 import { ElementBox } from "../../control/element.js"
@@ -86,15 +85,6 @@ function setKinds(view: ElementView, kinds: string) {
 	if (kinds) for (let kind of kinds.split(" ")) if (kind) view.kind.add(kind);
 }
 
-export interface TypeConf {
-	class: typeof ElementViewType;
-	viewType: string,
-	prototype?: any,
-	container: boolean;
-	tagName: string;
-	shortcuts: bundle<string>;
-}
-
 export interface Display {
 	kind?: string; //space separated names.
 	props?: bundle<any>;
@@ -104,14 +94,6 @@ export interface Display {
 	actions?: Actions;
 	prototype?: ElementView;
 	type?: Display;
-}
-
-export class ElementViewType extends BaseType<Box> {
-	create(parent: ELE): Box {
-		let view = Object.create(this.prototype) as ElementView;
-		view.init(parent, this.conf as Display)
-		return view;
-	}
 }
 
 const PROTOTYPE = new ElementView();

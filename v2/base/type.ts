@@ -44,31 +44,17 @@ type types = bundle<Type<unknown>>;
 
 export class BaseType<T> implements Type<T> {
 	declare partOf: BaseType<T>;
+	declare types: bundle<Type<T>>;
 	declare name: string;
-	declare prototype: T;
 	declare conf: bundle<any>;
-
-	types: bundle<Type<T>> = EMPTY.object;
 
 	generalizes(type: Type<T>): boolean {
 		return type == this;
 	}
 	start(name: string, conf: bundle<any>): void {
-		this.name = name;
-		if (conf) {
-			this.conf = extend(this.conf || null, conf);
-		}
-		if (conf.prototype) this.prototype = conf.prototype;
-
-		if (conf.proto) {
-			this.prototype = extend(this.prototype, conf.proto);
-		} else {
-			this.prototype = Object.create(this.prototype as any);
-		}
-		this.prototype["_type"] = this;
 	}
 	create(...args: any[]): T {
-		return Object.create(this.prototype as any);
+		return undefined;
 	}
 }
 
@@ -112,16 +98,15 @@ function getType(name: string, types: types, source: bundle<TypeConf>): Type<unk
 function createType(name: string, conf: TypeConf, types: types, source: bundle<TypeConf>) {
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
 	let type = Object.create(supertype) as BaseType<unknown>;
+	type.types = Object.create(supertype.types || null);
 	type.start(name, conf)
 
 	if (name) {
 		type.name = name;
 		types[name] = type;
 	}
-	type.types = Object.create(supertype.types || null);
 	for (let name in conf.types) {
 		type.types[name] = getMember(type, name, conf.types[name]);
-
 	}
 	return type;
 

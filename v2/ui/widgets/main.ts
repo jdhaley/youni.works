@@ -30,6 +30,9 @@ let owner: TypeOwner = {
 	unknownType: undefined
 };
 let loaded = start(owner);
+
+//////////////////
+
 owner.types.dialog.create(document.body);
 
 create(document.body, {

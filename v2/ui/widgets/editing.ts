@@ -38,13 +38,6 @@ interface ViewBox extends Contents {
 }
 
 
-export class ElementViewType extends BaseType<Box> {
-	create(parent: ELE): Box {
-		let view = Object.create(this.prototype) as EDisp;
-		view.init(parent, this.conf as Display)
-		return view;
-	}
-}
 
 export function define(conf: Display): EditorType {
 	return new EditorType(conf);

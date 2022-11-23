@@ -137,7 +137,7 @@ export function create(parent: ELE, conf?: Display, tag?: string) {
 */
 export class BoxType extends BaseType<Box> {
 	start(name: string, conf: Display): void {
-		super.start(name, conf);
+		this.name = name;
 		this.conf = extendDisplay(conf)
 	}
 	create(parent: ELE): Box {
@@ -145,6 +145,16 @@ export class BoxType extends BaseType<Box> {
 		view.init(parent, this.conf);
 		return view;
 	}
+	// xstart(name: string, conf: bundle<any>): void {
+	// 	if (conf.prototype) this.prototype = conf.prototype;
+
+	// 	if (conf.proto) {
+	// 		this.prototype = extend(this.prototype, conf.proto);
+	// 	} else {
+	// 		this.prototype = Object.create(this.prototype as any);
+	// 	}
+	// 	this.prototype["_type"] = this;
+	// }
 }
 
 export function extendDisplay(conf: Display, from?: Display): Display {
