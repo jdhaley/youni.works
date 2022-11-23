@@ -1,6 +1,6 @@
 import { Signal } from "../../base/controller.js";
 import { UserEvent } from "../../control/frame.js";
-import { Box, Display, EDisp, icon } from "./display.js";
+import { Box, Display, EDisp, icon } from "../../control/box.js";
 
 import shape from "../actions/shape.js";
 

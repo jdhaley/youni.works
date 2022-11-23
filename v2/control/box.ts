@@ -1,11 +1,11 @@
-import { Shape } from "../../base/shape.js"
-import { ELE } from "../../base/dom.js"
-import { bundle, extend, Sequence } from "../../base/util.js"
+import { Shape } from "../base/shape.js";
+import { BaseType } from "../base/type.js";
+import { Actions } from "../base/controller.js";
+import { unit } from "../base/model.js";
+import { ELE } from "../base/dom.js";
+import { bundle, extend, Sequence } from "../base/util.js";
 
-import { ElementBox } from "../../control/element.js"
-import { Actions } from "../../base/controller.js";
-import { unit } from "../../base/model.js";
-import { BaseType } from "../../base/type.js";
+import { ElementBox } from "./element.js";
 
 /*
 content:

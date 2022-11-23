@@ -1,7 +1,7 @@
 import { Frame } from "../../control/frame.js";
 import controller from "../actions/frame.js";
 
-import { BoxType, create, EDisp } from "./display.js";
+import { BoxType, create, EDisp } from "../../control/box.js";
 import { base, dialog, formDialog, workbench } from "./base.js";
 import { start, TypeOwner } from "../../base/type.js";
 

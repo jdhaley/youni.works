@@ -1,4 +1,4 @@
-import { Box, Display, EDisp, icon } from "./display.js";
+import { Box, Display, EDisp, icon } from "../../control/box.js";
 
 import shape from "../actions/shape.js";
 import { UserEvent } from "../../control/frame.js";
