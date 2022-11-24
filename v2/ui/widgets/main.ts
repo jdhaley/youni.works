@@ -1,17 +1,18 @@
-import { Frame } from "../../control/frame.js";
-import controller from "../actions/frame.js";
-
-import { BoxType, create, EDisp } from "../../control/box.js";
-import { base, dialog, formDialog, workbench } from "./base.js";
 import { start, TypeOwner } from "../../base/type.js";
 
+import { Frame } from "../../control/frame.js";
+import { BoxType, create, EDisp } from "../../control/box.js";
+
+import { base, dialog, formDialog, workbench } from "./base.js";
+
 import contentTypes from "../conf/contentTypes.js";
+import controller from "../actions/frame.js";
 import viewTypes from "./types.js";
 
 const frame = new Frame(window, controller);
 
 let baseTypes = {
-	text: {
+	base: {
 		class: BoxType,
 		viewType: "text",
 		prototype: new EDisp(),

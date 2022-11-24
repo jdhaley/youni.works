@@ -1,5 +1,4 @@
-import { Type } from "./type";
-import { bundle, Instance, Sequence } from "./util";
+import { Instance, Sequence } from "./util";
 
 /*
 	A *value* is a model instance.
