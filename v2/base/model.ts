@@ -30,7 +30,7 @@ export interface Text {
 	textContent: string;
 }
 
-export interface Content extends Text, Instance {
+export interface Content extends Text, Instance, Iterable<Content> {
 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 }
 

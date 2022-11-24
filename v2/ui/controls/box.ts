@@ -1,11 +1,11 @@
-import { value, View } from "../../base/model.js";
+import { value } from "../../base/model.js";
 import { Box, ControlType } from "../../base/control.js";
 import { Actions } from "../../base/controller.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
 
 import { ElementControl } from "../../control/view.js";
-import { ElementBox } from "../../control/element.js";
+import { ElementBox } from "../../control/box.js";
 
 type editor = (this: Viewbox, commandName: string, range: RANGE, content?: value) => void;
 

@@ -4,9 +4,10 @@ import { CommandBuffer } from "../base/command.js";
 import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../base/dom.js";
 import { bundle, extend } from "../base/util.js";
 
-import { ElementBox, ElementOwner } from "./element.js";
+import { ElementOwner } from "./element.js";
 import { BaseType, start } from "../base/type.js";
 import { RemoteFileService } from "../base/remote.js";
+import { ElementBox } from "./box.js";
 
 export abstract class ElementControl extends ElementBox implements Control<ELE> {
 	declare _type: ControlType<ELE>;

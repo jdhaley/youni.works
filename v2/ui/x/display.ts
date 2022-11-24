@@ -4,8 +4,7 @@ import { ELE } from "../../base/dom.js"
 import { unit, value } from "../../base/model.js"
 import { Shape } from "../../base/shape.js"
 import { bundle, extend, Sequence } from "../../base/util.js"
-
-import { ElementBox } from "../../control/element.js"
+import { ElementBox } from "../../control/box.js"
 
 /*
 content:

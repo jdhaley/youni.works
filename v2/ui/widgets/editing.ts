@@ -1,11 +1,9 @@
 import { Extent } from "../../base/control";
 import { ELE } from "../../base/dom";
-import { value } from "../../base/model";
+import { Content, value } from "../../base/model";
 import { ECTL, ECTX, ETYPE } from "../../base/editing";
-import { Box, Contents, Display, EDisp, extendDisplay } from "../../control/box";
-import { bundle, EMPTY } from "../../base/util";
-import { BaseType, Type } from "../../base/type";
-import { Actions } from "../../base/controller";
+import { Box, Display, EDisp, extendDisplay } from "../../control/box";
+import { EMPTY } from "../../base/util";
 
 export class Editor extends EDisp implements ECTL<ELE> {
 	type: ETYPE<ELE>;
@@ -32,7 +30,7 @@ export class Editor extends EDisp implements ECTL<ELE> {
 
 
 
-interface ViewBox extends Contents {
+interface ViewBox extends Box, Content {
 	valueOf(filter?: unknown): value;
 	exec(commandName: string, extent: Extent<unknown>, replacement?: any): void;
 }

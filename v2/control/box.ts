@@ -1,11 +1,47 @@
 import { Shape } from "../base/shape.js";
-import { BaseType } from "../base/type.js";
+import { BaseType, TypeConf } from "../base/type.js";
 import { Actions } from "../base/controller.js";
-import { unit } from "../base/model.js";
+import { Content, unit } from "../base/model.js";
 import { ELE } from "../base/dom.js";
 import { bundle, extend, Sequence } from "../base/util.js";
+import { ElementShape } from "./element.js";
 
-import { ElementBox } from "./element.js";
+export type Display = TypeConf;
+
+export interface Box extends Shape {
+	props: bundle<any>;
+	header?: Box;
+	content: Content; //No parts when this is a unit view - use textContent or markupContent.
+	footer?: Box;
+}
+
+export class ElementBox extends ElementShape implements Box {
+	declare props: bundle<any>;
+
+	get view(): ELE {
+		return this._ele;
+	}
+	get isContainer(): boolean {
+		return false;
+	}
+	get header(): ElementBox {
+		for (let child of this._ele.children) {
+			if (child.nodeName == "HEADER") return child["$control"];
+		}
+	}
+	get footer(): ElementBox {
+		for (let child of this._ele.children) {
+			if (child.nodeName == "FOOTER") return child["$control"];
+		}
+	}
+	get content(): ElementBox {
+		if (!this.isContainer) return this;
+		for (let child of this._ele.children) {
+			if (child.classList.contains("content")) return child["$control"];
+		}
+		throw new Error("Missing content in container.");
+	}
+}
 
 /*
 content:
@@ -18,49 +54,7 @@ content:
 	Type<Box>
 */
 
-export interface Box extends Shape {
-	props: bundle<any>;
-	header?: Box;
-	content: Contents; //No parts when this is a unit view - use textContent or markupContent.
-	footer?: Box;
-}
-
-export interface Contents extends Box, Iterable<Contents> {
-	textContent: string;
-	markupContent: string;
-}
-
-export interface TypeConf {
-	type?: unknown;
-	extends?: Display;
-
-	kind?: string;
-	props?: bundle<any>; //props?: bundle<any>
-	header?: TypeConf;
-	footer?: TypeConf;
-	actions?: Actions;
-	style?: bundle<any>;
-
-	types?: bundle<TypeConf>;
-	content?: unit | Sequence<TypeConf> | bundle<TypeConf> | ((conf: bundle<any>) => string);
-
-	prototype?: any;
-}
-
-export type Display = TypeConf;
-	// /** space sepearted names */
-	// kind?: string;
-	// props?: bundle<any>;
-	// header?: Display;
-	// content?: unit | Sequence<Display> | bundle<Display> | ((conf: bundle<any>) => string);
-	// footer?: Display;
-	// actions?: Actions;
-
-	// prototype?: EDisp;
-	// style?: object;
-
-
-export class EDisp extends ElementBox implements Contents {
+export class EDisp extends ElementBox {
 	declare _container: boolean;
 	
 	get isContainer() {
@@ -137,6 +131,13 @@ export function create(parent: ELE, conf?: Display, tag?: string) {
 */
 export class BoxType extends BaseType<Box> {
 	start(name: string, conf: Display): void {
+		// 	if (conf.prototype) this.prototype = conf.prototype;
+		// 	if (conf.proto) {
+		// 		this.prototype = extend(this.prototype, conf.proto);
+		// 	} else {
+		// 		this.prototype = Object.create(this.prototype as any);
+		// 	}
+		// 	this.prototype["_type"] = this;
 		this.name = name;
 		this.conf = extendDisplay(conf)
 	}
@@ -145,16 +146,6 @@ export class BoxType extends BaseType<Box> {
 		view.init(parent, this.conf);
 		return view;
 	}
-	// xstart(name: string, conf: bundle<any>): void {
-	// 	if (conf.prototype) this.prototype = conf.prototype;
-
-	// 	if (conf.proto) {
-	// 		this.prototype = extend(this.prototype, conf.proto);
-	// 	} else {
-	// 		this.prototype = Object.create(this.prototype as any);
-	// 	}
-	// 	this.prototype["_type"] = this;
-	// }
 }
 
 export function extendDisplay(conf: Display, from?: Display): Display {

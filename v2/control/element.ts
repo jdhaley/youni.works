@@ -141,34 +141,6 @@ export class ElementShape extends ElementContent implements Shape {
 	}
 }
 
-export class ElementBox extends ElementShape {
-	declare props: bundle<any>;
-
-	get view(): ELE {
-		return this._ele;
-	}
-	get isContainer(): boolean {
-		return false;
-	}
-	get header(): ElementBox {
-		for (let child of this._ele.children) {
-			if (child.nodeName == "HEADER") return child["$control"];
-		}
-	}
-	get footer(): ElementBox {
-		for (let child of this._ele.children) {
-			if (child.nodeName == "FOOTER") return child["$control"];
-		}
-	}
-	get content(): ElementBox {
-		if (!this.isContainer) return this;
-		for (let child of this._ele.children) {
-			if (child.classList.contains("content")) return child["$control"];
-		}
-		throw new Error("Missing content in container.");
-	}
-}
-
 const DEFAULT_BORDER: Edges = {
 	top: 3,
 	right: 5,
