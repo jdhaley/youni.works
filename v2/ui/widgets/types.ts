@@ -1,6 +1,6 @@
 import { Signal } from "../../base/controller.js";
 import { UserEvent } from "../../control/frame.js";
-import { Box, Display, EDisp, icon } from "../../control/box.js";
+import { Box, Display, ElementDisplay, icon } from "../../control/box.js";
 
 import shape from "../actions/shape.js";
 
@@ -31,12 +31,12 @@ export default {
 				}				
 			},
 			actions: {
-				render: function (this: EDisp, event: UserEvent) {
-					this.content.textContent = (this.partOf as EDisp).props.title;
+				render: function (this: ElementDisplay, event: UserEvent) {
+					this.content.textContent = (this.partOf as ElementDisplay).props.title;
 				},
-				click: function (this: EDisp, event: UserEvent) {
+				click: function (this: ElementDisplay, event: UserEvent) {
 					if (event.target.getAttribute("data-cmd") == "edit") {
-						(this.partOf as EDisp).content.textContent = "click edit";
+						(this.partOf as ElementDisplay).content.textContent = "click edit";
 					}
 				}
 			}

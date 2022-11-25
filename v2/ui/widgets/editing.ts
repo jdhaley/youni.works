@@ -2,10 +2,10 @@ import { Extent } from "../../base/control";
 import { ELE } from "../../base/dom";
 import { Content, value } from "../../base/model";
 import { ECTL, ECTX, ETYPE } from "../../base/editing";
-import { Box, Display, EDisp, extendDisplay } from "../../control/box";
+import { Box, Display, ElementDisplay, extendDisplay } from "../../control/box";
 import { EMPTY } from "../../base/util";
 
-export class Editor extends EDisp implements ECTL<ELE> {
+export class Editor extends ElementDisplay implements ECTL<ELE> {
 	type: ETYPE<ELE>;
 
 	get id(): string {
@@ -51,7 +51,7 @@ export class EditorType implements ETYPE<ELE> {
 	model: string;
 	protected conf: Display;
 	box(parent: ELE, tag?: string): Box {
-		let view = Object.create(this.conf.prototype || PROTOTYPE) as EDisp;
+		let view = Object.create(this.conf.prototype || PROTOTYPE) as ElementDisplay;
 		view.init(parent, this.conf, tag);
 		return view;
 	}
@@ -59,4 +59,4 @@ export class EditorType implements ETYPE<ELE> {
 		return null;
 	}
 }
-const PROTOTYPE = new EDisp();
+const PROTOTYPE = new ElementDisplay();

@@ -5,11 +5,11 @@ import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../b
 import { bundle, extend } from "../base/util.js";
 
 import { ElementOwner } from "./element.js";
-import { BaseType, start } from "../base/type.js";
+import { start } from "../base/type.js";
 import { RemoteFileService } from "../base/remote.js";
-import { ElementBox } from "./box.js";
+import { BoxType, ElementDisplay } from "./box.js";
 
-export abstract class ElementControl extends ElementBox implements Control<ELE> {
+export abstract class ElementControl extends ElementDisplay implements Control<ELE> {
 	declare _type: ControlType<ELE>;
 
 	get type(): ControlType<ELE> {
@@ -70,7 +70,7 @@ export abstract class ElementControl extends ElementBox implements Control<ELE> 
 	}
 }
 
-export class ElementViewType extends BaseType<Control<ELE>> implements ControlType<ELE> {
+export class ElementViewType extends BoxType implements ControlType<ELE> {
 	constructor(owner: Article<ELE>) {
 		super();
 		this.owner = owner;
@@ -85,10 +85,12 @@ export class ElementViewType extends BaseType<Control<ELE>> implements ControlTy
 
 	start(name: string, conf: bundle<any>): void {
 		this.name = name;
+		//super.start(name, conf);
+		//We need to extend the conf for container, title, etc...
 		if (conf) {
 			this.conf = extend(this.conf || null, conf);
 		}
-		if (conf.prototype) this.prototype = conf.prototype;
+		if (this.conf.prototype) this.prototype = this.conf.prototype;
 
 		if (conf.proto) {
 			this.prototype = extend(this.prototype, conf.proto);

@@ -1,7 +1,7 @@
 import { Shape } from "../base/shape.js";
 import { BaseType, TypeConf } from "../base/type.js";
 import { Actions } from "../base/controller.js";
-import { Content, unit } from "../base/model.js";
+import { Content } from "../base/model.js";
 import { ELE } from "../base/dom.js";
 import { bundle, extend, Sequence } from "../base/util.js";
 import { ElementShape } from "./element.js";
@@ -54,7 +54,7 @@ content:
 	Type<Box>
 */
 
-export class EDisp extends ElementBox {
+export class ElementDisplay extends ElementBox {
 	declare _container: boolean;
 	
 	get isContainer() {
@@ -100,19 +100,19 @@ function createContainer(ele: ELE, conf: Display) {
 	content.kind.add("content");
 	if (conf.footer) create(ele, conf.footer, "footer");
 }
-function setKinds(view: EDisp, kinds: string) {
+function setKinds(view: ElementDisplay, kinds: string) {
 	//handles the case where multiple spaces separate the tokens.
 	if (kinds) for (let kind of kinds.split(" ")) if (kind) view.kind.add(kind);
 }
 
 
-const PROTOTYPE = new EDisp();
+const PROTOTYPE = new ElementDisplay();
 
 export function create(parent: ELE, conf?: Display, tag?: string) {
 	if (conf && Object.hasOwn(conf, "extends")) conf = extendDisplay(conf.extends, conf);
 //	if (conf && Object.hasOwn(conf, "type")) conf = extendDisplay(conf);
 
-	let view = Object.create(conf?.prototype || PROTOTYPE) as EDisp;
+	let view = Object.create(conf?.prototype || PROTOTYPE) as ElementDisplay;
 	view.init(parent, conf, tag);
 	return view;
 }
@@ -129,20 +129,13 @@ export function create(parent: ELE, conf?: Display, tag?: string) {
 	--prototype?: ElementView;
 
 */
-export class BoxType extends BaseType<Box> {
+export class BoxType extends BaseType<any> {
 	start(name: string, conf: Display): void {
-		// 	if (conf.prototype) this.prototype = conf.prototype;
-		// 	if (conf.proto) {
-		// 		this.prototype = extend(this.prototype, conf.proto);
-		// 	} else {
-		// 		this.prototype = Object.create(this.prototype as any);
-		// 	}
-		// 	this.prototype["_type"] = this;
 		this.name = name;
 		this.conf = extendDisplay(conf)
 	}
 	create(parent: ELE): Box {
-		let view = Object.create(this.conf?.prototype || PROTOTYPE) as EDisp;
+		let view = Object.create(this.conf?.prototype || PROTOTYPE) as ElementDisplay;
 		view.init(parent, this.conf);
 		return view;
 	}

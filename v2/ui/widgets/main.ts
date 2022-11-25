@@ -1,7 +1,7 @@
 import { start, TypeOwner } from "../../base/type.js";
 
 import { Frame } from "../../control/frame.js";
-import { BoxType, create, EDisp } from "../../control/box.js";
+import { BoxType, create, ElementDisplay } from "../../control/box.js";
 
 import { base, dialog, formDialog, workbench } from "./base.js";
 
@@ -15,7 +15,7 @@ let baseTypes = {
 	base: {
 		class: BoxType,
 		viewType: "text",
-		prototype: new EDisp(),
+		prototype: new ElementDisplay(),
 	}
 }
 let owner: TypeOwner = {
