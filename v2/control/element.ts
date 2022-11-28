@@ -1,8 +1,7 @@
 import { BaseReceiver, Owner, Receiver } from "../base/controller.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
-import { ELE, NODE } from "../base/dom.js";
-import { Bag, EMPTY, Sequence } from "../base/util.js";
-import { Content } from "../base/model.js";
+import { ELE } from "../base/dom.js";
+import { Bag, EMPTY } from "../base/util.js";
 
 export class ElementOwner extends Owner<ELE> {
 	getControlOf(node: ELE): Receiver {
@@ -50,35 +49,17 @@ class ElementController extends BaseReceiver {
 	}
 }
 
-export class ElementContent extends ElementController implements Content {
-	get kind(): Bag<string> {
-		return this.view.classList;
-	}
-	get viewContent(): Sequence<NODE> {
-		return this.view.childNodes;
-	}
-	get textContent() {
-		return this.view.textContent;
-	}
-	set textContent(text: string) {
-		this.view.textContent = text;
-	}
-	get markupContent() {
-		return this.view.innerHTML;
-	}
-	set markupContent(markup: string) {
-		this.view.innerHTML = markup;
-	}
-}
-
 interface SHAPE_ELE extends ELE {
 	getBoundingClientRect(): Area;
 	style: CSSStyleDeclaration;
 }
 
-export class ElementShape extends ElementContent implements Shape {
+export class ElementShape extends ElementController implements Shape {
 	declare view: SHAPE_ELE;
 
+	get kind(): Bag<string> {
+		return this.view.classList;
+	}
 	get area(): Area {
 		return this.view.getBoundingClientRect();
 	}

@@ -1,13 +1,13 @@
-import { model, value, Text } from "../base/model.js";
-import { Control, ControlType, Article, ArticleContext, Extent } from "../base/control.js";
 import { CommandBuffer } from "../base/command.js";
-import { DOCUMENT, ELE, NODE, RANGE, VIEW_ELE, bindViewEle, getView } from "../base/dom.js";
+import { Article, ArticleContext, Control, ControlType, Extent } from "../base/control.js";
+import { bindViewEle, DOCUMENT, ELE, getView, NODE, RANGE, VIEW_ELE } from "../base/dom.js";
+import { model, Text, value } from "../base/model.js";
 import { bundle, extend } from "../base/util.js";
-
-import { ElementOwner } from "./element.js";
-import { start } from "../base/type.js";
 import { RemoteFileService } from "../base/remote.js";
+
+import { start } from "../base/type.js";
 import { BoxType, ElementDisplay } from "./box.js";
+import { ElementOwner } from "./element.js";
 
 export abstract class ElementControl extends ElementDisplay implements Control<ELE> {
 	declare _type: ControlType<ELE>;

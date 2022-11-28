@@ -2,7 +2,7 @@ import { Shape } from "../base/shape.js";
 import { BaseType, TypeConf } from "../base/type.js";
 import { Actions } from "../base/controller.js";
 import { Content } from "../base/model.js";
-import { ELE } from "../base/dom.js";
+import { ELE, NODE } from "../base/dom.js";
 import { bundle, extend, Sequence } from "../base/util.js";
 import { ElementShape } from "./element.js";
 
@@ -15,7 +15,25 @@ export interface Box extends Shape {
 	footer?: Box;
 }
 
-export class ElementBox extends ElementShape implements Box {
+export class ElementContent extends ElementShape implements Content {
+	get viewContent(): Sequence<NODE> {
+		return this.view.childNodes;
+	}
+	get textContent() {
+		return this.view.textContent;
+	}
+	set textContent(text: string) {
+		this.view.textContent = text;
+	}
+	get markupContent() {
+		return this.view.innerHTML;
+	}
+	set markupContent(markup: string) {
+		this.view.innerHTML = markup;
+	}
+}
+
+export class ElementBox extends ElementContent implements Box {
 	declare props: bundle<any>;
 
 	get isContainer(): boolean {
