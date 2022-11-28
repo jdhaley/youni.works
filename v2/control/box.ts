@@ -18,25 +18,22 @@ export interface Box extends Shape {
 export class ElementBox extends ElementShape implements Box {
 	declare props: bundle<any>;
 
-	get view(): ELE {
-		return this._ele;
-	}
 	get isContainer(): boolean {
 		return false;
 	}
 	get header(): ElementBox {
-		for (let child of this._ele.children) {
+		for (let child of this.view.children) {
 			if (child.nodeName == "HEADER") return child["$control"];
 		}
 	}
 	get footer(): ElementBox {
-		for (let child of this._ele.children) {
+		for (let child of this.view.children) {
 			if (child.nodeName == "FOOTER") return child["$control"];
 		}
 	}
 	get content(): ElementBox {
 		if (!this.isContainer) return this;
-		for (let child of this._ele.children) {
+		for (let child of this.view.children) {
 			if (child.classList.contains("content")) return child["$control"];
 		}
 		throw new Error("Missing content in container.");
@@ -236,7 +233,7 @@ export function icon(name: string) {
 // 		direction: "up",
 // 		subject: "react",
 		
-// 	}, obj.box._ele)
+// 	}, obj.box.view)
 //     if ((prop === 'eyeCount') && ((value % 2) !== 0)) {
 //       console.log('Monsters must have an even number of eyes');
 //     } else {

@@ -1,6 +1,6 @@
 import { model, Text, typeOf, value, View } from "./model.js";
 import { Shape } from "./shape.js";
-import { Graph, Receiver, Signal } from "./controller.js";
+import { Receiver, Signal } from "./controller.js";
 import { Type, TypeOwner } from "./type.js";
 import { RemoteFileService } from "./remote.js";
 import { bundle } from "./util.js";
@@ -23,7 +23,7 @@ export interface Box<T> extends Shape, Control<T> {
 	footer?: View<T>;
 }
 
-export interface Article<T> extends ECTX<T>, TypeOwner, Receiver, Graph<T> {
+export interface Article<T> extends ECTX<T>, TypeOwner, Receiver {
 	conf: bundle<any>;
 	source: value;
 	view: T;

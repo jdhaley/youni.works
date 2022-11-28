@@ -33,16 +33,16 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 	}
 	
 	render(value: value, parent?: ElementControl): void {
-		if (parent) (parent.content.view as ELE).append(this._ele);
+		if (parent) (parent.content.view as ELE).append(this.view);
 		if (!this.view.id) {
 			if (value instanceof Element && value.id) {
-				this._ele.id = value.id;
+				this.view.id = value.id;
 			} else {
-				this._ele.id = "" + NEXT_ID++;
+				this.view.id = "" + NEXT_ID++;
 			}
 		}
 
-		this._ele.textContent = "";
+		this.view.textContent = "";
 		if (this.isContainer) {
 			this.createHeader();
 			this.createContent();
@@ -59,7 +59,7 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 	protected createHeader(model?: value) {
 		let ele = this.view.ownerDocument.createElement("header") as Element;
 		ele.textContent = this._type.conf.title || "";
-		this._ele.append(ele);
+		this.view.append(ele);
 		let content = new ElementBox();
 		content.control(ele as Element);
 	}
@@ -68,7 +68,7 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 		ele.classList.add("content");
 		let content = new ElementBox();
 		content.control(ele as Element);
-		this._ele.append(ele);
+		this.view.append(ele);
 	}
 	protected createFooter(model?: value) {
 	}

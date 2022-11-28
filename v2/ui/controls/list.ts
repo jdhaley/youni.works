@@ -44,7 +44,7 @@ export class ListBox extends Viewbox {
 	}
 	protected createFooter(model?: value) {
 		let footer = this.view.ownerDocument.createElement("footer") as Element;
-		this._ele.append(footer);
+		this.view.append(footer);
 	}
 }
 

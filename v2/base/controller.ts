@@ -11,19 +11,6 @@ export interface Receiver {
 	receive(signal: Signal): void;
 }
 
-export interface Part extends Receiver, Iterable<Part> {
-	partOf?: Part;
-}
-
-
-export interface Graph<T> {
-	getControlOf(node: T): Receiver;
-	getContainerOf(node: T): T;
-	getPartsOf(node: T): Iterable<T>;
-	send(msg: Signal | string, to: T): void;
-	sense(evt: Signal | string, on: T): void;
-}
-
 export interface Actions {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }
@@ -42,37 +29,14 @@ export class BaseReceiver implements Receiver {
 			subject = "";
 		}
 	}
-	super(signal: Signal) {
+	$super(signal: Signal) {
 		let action = this.actions && this.actions[signal.subject];
 		action = action ? action["_super"] : null;
 		action && action.call(this, signal);
 	}
 }
 
-export class BaseController<T> extends BaseReceiver implements Receiver {
-	constructor(actions: Actions) {
-		super();
-		this.actions = actions;
-	}
-	node: T;
-	
-	get owner(): Graph<T> {
-		return undefined;
-	}
-
-	protected control(node: T) {
-		if (node["$control"]) {
-			this.uncontrol(node);
-		}
-		this.node = node;
-		node["$control"] = this;
-	}
-	protected uncontrol(node: T) {
-		throw new Error("Node is already controlled.");
-	}
-}
-
-export abstract class Owner<T> extends BaseReceiver implements Graph<T> {
+export abstract class Owner<T> extends BaseReceiver {
 	abstract getControlOf(node: T): Receiver;
 	abstract getContainerOf(node: T): T;
 	abstract getPartsOf(node: T): Iterable<T>;
@@ -101,40 +65,6 @@ export abstract class Owner<T> extends BaseReceiver implements Graph<T> {
 	}
 }
 
-export abstract class BasePart extends BaseReceiver implements Part, Iterable<Part> {
-	get partOf(): Part {
-		return null;
-	}
-
-	send(signal: Signal | string) {
-		signal = validSignal("down", signal);
-		signal && Promise.resolve(signal).then(sig => sendTo(this, sig));
-		return;
-
-		function sendTo(on: Part, signal: Signal) {
-			if (!signal.subject) return;
-			signal["source"] = this;
-			on.receive(signal);	
-			if (on) for (let part of on) {
-				signal.from = on;
-				sendTo(part, signal);
-			}
-		}
-	}
-	sense(signal: Signal | string) {
-		signal = validSignal("up", signal);
-		for (let on = this as Part; on; on = on.partOf) {
-			if (!signal.subject) return;
-			signal["source"] = this;
-			signal.from = on;
-			on.receive(signal);
-		}
-	}
-
-	[Symbol.iterator] = function* parts() {
-	} as any;
-}
-
 function validSignal(direction: "up" | "down", signal: string | Signal): Signal {
 	if (!signal) return;
 	if (typeof signal == "string") return extend(null, {
@@ -144,3 +74,71 @@ function validSignal(direction: "up" | "down", signal: string | Signal): Signal 
 	if (signal.direction != direction) throw new Error("Invalid direction");
 	if (signal.subject) return signal;
 }
+
+// export interface Graph<T> {
+// 	getControlOf(node: T): Receiver;
+// 	getContainerOf(node: T): T;
+// 	getPartsOf(node: T): Iterable<T>;
+// 	send(msg: Signal | string, to: T): void;
+// 	sense(evt: Signal | string, on: T): void;
+// }
+
+// export class BaseController<T> extends BaseReceiver implements Receiver {
+// 	constructor(actions: Actions) {
+// 		super();
+// 		this.actions = actions;
+// 	}
+// 	node: T;
+	
+// 	get owner(): Graph<T> {
+// 		return undefined;
+// 	}
+
+// 	protected control(node: T) {
+// 		if (node["$control"]) {
+// 			this.uncontrol(node);
+// 		}
+// 		this.node = node;
+// 		node["$control"] = this;
+// 	}
+// 	protected uncontrol(node: T) {
+// 		throw new Error("Node is already controlled.");
+// 	}
+// }
+
+// export interface Part extends Receiver, Iterable<Part> {
+// 	partOf?: Part;
+// }
+// export abstract class BasePart extends BaseReceiver implements Part, Iterable<Part> {
+// 	get partOf(): Part {
+// 		return null;
+// 	}
+
+// 	send(signal: Signal | string) {
+// 		signal = validSignal("down", signal);
+// 		signal && Promise.resolve(signal).then(sig => sendTo(this, sig));
+// 		return;
+
+// 		function sendTo(on: Part, signal: Signal) {
+// 			if (!signal.subject) return;
+// 			signal["source"] = this;
+// 			on.receive(signal);	
+// 			if (on) for (let part of on) {
+// 				signal.from = on;
+// 				sendTo(part, signal);
+// 			}
+// 		}
+// 	}
+// 	sense(signal: Signal | string) {
+// 		signal = validSignal("up", signal);
+// 		for (let on = this as Part; on; on = on.partOf) {
+// 			if (!signal.subject) return;
+// 			signal["source"] = this;
+// 			signal.from = on;
+// 			on.receive(signal);
+// 		}
+// 	}
+
+// 	[Symbol.iterator] = function* parts() {
+// 	} as any;
+// }

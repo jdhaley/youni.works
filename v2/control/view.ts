@@ -18,11 +18,8 @@ export abstract class ElementControl extends ElementDisplay implements Control<E
 	get id() {
 		return this.view.id;
 	}
-	get view(): ELE {
-		return this._ele;
-	}
 	get partOf() {
-		for (let node = this._ele.parentNode as ELE; node; node = node.parentNode as ELE) {
+		for (let node = this.view.parentNode as ELE; node; node = node.parentNode as ELE) {
 			let control = node["$control"];
 			if (control) return control;
 			//Propagate events to the owner when this is a top-level view in the body.
@@ -47,7 +44,7 @@ export abstract class ElementControl extends ElementDisplay implements Control<E
 	abstract viewValue(data: value): void;
 
 	render(value: value, parent?: ElementControl): void {
-		if (parent) (parent.content.view as ELE).append(this._ele);
+		if (parent) (parent.content.view as ELE).append(this.view);
 		this.view.textContent = "";
 		this.viewValue(value as value);
 		this.kind.add("content");
