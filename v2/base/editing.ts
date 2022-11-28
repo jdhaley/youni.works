@@ -1,7 +1,8 @@
 import { CommandBuffer } from "./command";
 import { Extent } from "./control";
 import { Signal } from "./controller";
-import { Text, value, View } from "./model";
+import { value } from "./model";
+import { Txt, View } from "./view";
 
 export interface ECTL<T> {
 	readonly id: string;
@@ -24,10 +25,10 @@ export interface ETYPE<T> {
 }
 
 export interface ECTX<T> {
-	commands: CommandBuffer<Extent<Text>>;
-	selectionRange: Extent<Text>;
+	commands: CommandBuffer<Extent<Txt>>;
+	selectionRange: Extent<Txt>;
 	getControl(id: string): ECTL<T>;
-	extentFrom(startPath: string, endPath: string): Extent<Text>;
+	extentFrom(startPath: string, endPath: string): Extent<Txt>;
 	sense(signal: Signal | string, on: T): void;
 }
 /*

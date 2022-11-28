@@ -1,7 +1,8 @@
 import { CommandBuffer } from "../base/command.js";
 import { Article, ArticleContext, Control, ControlType, Extent } from "../base/control.js";
 import { bindViewEle, DOCUMENT, ELE, getView, NODE, RANGE, VIEW_ELE } from "../base/dom.js";
-import { model, Text, value } from "../base/model.js";
+import { model, value } from "../base/model.js";
+import { Txt } from "../base/view.js";
 import { bundle, extend } from "../base/util.js";
 import { RemoteFileService } from "../base/remote.js";
 
@@ -133,10 +134,10 @@ export abstract class ElementArticle extends ElementOwner implements Article<NOD
 	readonly service: RemoteFileService;
 	source: value;
 
-	get selectionRange(): Extent<Text> {
+	get selectionRange(): Extent<Txt> {
 		return this.frame.selectionRange;
 	}
-	set selectionRange(range: Extent<Text>) {
+	set selectionRange(range: Extent<Txt>) {
 		this.frame.selectionRange = range;
 	}
 	createView(tagName: string): ELE {

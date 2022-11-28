@@ -1,5 +1,5 @@
 import { ControlType, Control, Extent } from "./control.js";
-import { Text } from "./model.js";
+import { Txt } from "./view.js";
 import { Bag, Sequence } from "./util.js";
 
 export interface DOCUMENT {
@@ -98,7 +98,7 @@ export interface VIEW_ELE extends ELE {
 	$control?: Control<ELE>;
 }
 
-export function getView(loc: Text | RANGE): Control<NODE> {
+export function getView(loc: Txt | RANGE): Control<NODE> {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	for (let node = loc instanceof Node ? loc : null; node; node = node.parentNode) {
 		let e = ele(node) as VIEW_ELE;

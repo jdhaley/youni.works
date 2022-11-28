@@ -25,20 +25,6 @@ export interface item extends record {
 
 export interface date {
 }
-
-export interface Text {
-	textContent: string;
-}
-
-export interface Content extends Text, Instance, Iterable<Content> {
-	markupContent: string; //May be HTML, XML, or a simplification thereof.
-}
-
-export interface View<T> extends Content {
-	readonly viewContent: Sequence<Text>;
-	readonly view: T;
-}
-
 export function typeOf(value: any): string {
 	if (value?.valueOf) value = value.valueOf(value);
 	let type = typeof value;

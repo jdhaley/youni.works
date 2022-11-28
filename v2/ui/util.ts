@@ -1,11 +1,11 @@
 import { Article, Edits, ControlType, Box } from "../base/control.js";
 import { ele, ELE, NODE, RANGE, getView } from "../base/dom.js";
-import { Text } from "../base/model.js";
+import { Txt } from "../base/view.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
 
-export const getBox = getView as (node: Text | RANGE) => Box<ELE> ;
+export const getBox = getView as (node: Txt | RANGE) => Box<ELE> ;
 
 export function getHeader(view: Box<ELE>, node: NODE) {
 	while (node && node != view.view) {

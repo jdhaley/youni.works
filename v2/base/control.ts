@@ -1,10 +1,11 @@
-import { model, Text, typeOf, value, View } from "./model.js";
+import { model, typeOf, value } from "./model.js";
 import { Shape } from "./shape.js";
 import { Receiver, Signal } from "./controller.js";
 import { Type, TypeOwner } from "./type.js";
 import { RemoteFileService } from "./remote.js";
 import { bundle } from "./util.js";
 import { ECTL, ECTX, ETYPE } from "./editing.js";
+import { View, Txt } from "./view.js";
 
 export interface Control<T> extends ECTL<T> {
 	readonly type: ControlType<T>;
@@ -35,10 +36,10 @@ export interface Article<T> extends ECTX<T>, TypeOwner, Receiver {
 export interface ArticleContext<T> extends Receiver {
 	location: Location;
 	view: T;
-	selectionRange: Extent<Text>;
+	selectionRange: Extent<Txt>;
 
-	createNode(name: string): Text;
-	append(node: Text): void;
+	createNode(name: string): Txt;
+	append(node: Txt): void;
 }
 
 export interface Extent<T> {

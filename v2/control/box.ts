@@ -1,10 +1,10 @@
 import { Shape } from "../base/shape.js";
 import { BaseType, TypeConf } from "../base/type.js";
 import { Actions } from "../base/controller.js";
-import { Content } from "../base/model.js";
 import { ELE, NODE } from "../base/dom.js";
 import { bundle, extend, Sequence } from "../base/util.js";
 import { ElementShape } from "./element.js";
+import { Content } from "../base/view.js";
 
 export type Display = TypeConf;
 
