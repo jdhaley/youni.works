@@ -1,4 +1,3 @@
-import { value } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
 import { LevelCommand } from "../commands/level.js";
@@ -33,7 +32,7 @@ const COMMANDS = {
 	"Join": replace,
 }
 
-function replace(this: Editor, commandName: string, range: RANGE, content?: value): RANGE {
+function replace(this: Editor, commandName: string, range: RANGE, content?: unknown): RANGE {
 	let editor = getEditor(range);
 	if (editor.type.model != "list") {
 		editor = getEditor(editor.view.parentNode);

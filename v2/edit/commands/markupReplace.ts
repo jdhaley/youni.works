@@ -1,9 +1,14 @@
-import { value, item } from "../../base/model.js";
 import { ele, RANGE } from "../../base/dom.js";
 
 import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
 import { Editor } from "../../base/editor.js";
+
+interface item {
+	type$: string
+	content?: unknown,
+	level?: number,
+}
 
 export class MarkupReplace extends ListReplace {
 	protected getOuterRange(range: RANGE) {
@@ -20,7 +25,7 @@ export class MarkupReplace extends ListReplace {
 		}
 		return super.getOuterRange(range);
 	}
-	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
+	protected onStartContainer(range: RANGE, content: unknown, start: Editor): void {
 		let r = range.cloneRange();
 		r.setEnd(start.content, start.content.childNodes.length);
 		r.deleteContents();
@@ -62,7 +67,7 @@ export class MarkupReplace extends ListReplace {
 		// COMMENTED OUT
 		//}
 	}
-	protected onSingleContainer(range: RANGE, content: value, editor: Editor): void {
+	protected onSingleContainer(range: RANGE, content: unknown, editor: Editor): void {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		

@@ -1,19 +1,17 @@
-import { value } from "../../base/model.js";
 import { CHAR } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { Viewbox } from "./box.js";
 
-
 export class TextBox extends Viewbox {
 	viewType = "text";
-	viewValue(model: value): void {
+	viewValue(model: unknown): void {
 		this.content.textContent = model ? "" + model : "";
 	}
 	viewElement(ele: ELE) {
 		//even with plain text, always use HTML so that the marker is transferred to the view.
 		this.content.innerHTML = ele.innerHTML;
 	}
-	valueOf(range?: RANGE): value {
+	valueOf(range?: RANGE): unknown {
 		let model = "";
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let node of (this.content).childNodes) {

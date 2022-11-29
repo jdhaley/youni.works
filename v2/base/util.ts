@@ -1,11 +1,3 @@
-export const CHAR = Object.freeze(extend(null, {
-	NBSP: "\u00a0",
-	ZWSP: "\u200b",
-	STX: "\u0002",
-	ETX: "\u0003"
-}));
-
-
 export interface bundle<T> {
 	[key: string]: T
 }
@@ -38,6 +30,13 @@ export interface Extent<T> {
 	readonly endContainer: T;
     readonly endOffset: number;
 }
+
+export const CHAR = Object.freeze(extend(null, {
+	NBSP: "\u00a0",
+	ZWSP: "\u200b",
+	STX: "\u0002",
+	ETX: "\u0003"
+}));
 
 export const EMPTY = Object.freeze({
 	object: Object.freeze(Object.create(null)),

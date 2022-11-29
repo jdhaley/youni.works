@@ -1,7 +1,6 @@
 import { TypeContext } from "../../../simpleedit/type.js";
 import { Actions } from "./controller.js";
-import { unit } from "./model.js";
-import { bundle, EMPTY, extend, Sequence } from "./util.js";
+import { bundle } from "./util.js";
 
 export interface Type<T> {
 	name: string;

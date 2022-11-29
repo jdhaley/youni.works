@@ -1,10 +1,14 @@
-import { item } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
 import { TextBox } from "./text.js";
 import { getBox } from "../util.js";
-import { BoxType } from "../../base/display.js";
 import { IType } from "../../control/editor.js";
+
+interface item {
+	type$: string
+	content?: unknown,
+	level?: number,
+}
 
 export class LineBox extends TextBox {
 	demote() {

@@ -1,9 +1,15 @@
 import { Box, BoxType } from "../../base/display.js";
 import { ELE, RANGE } from "../../base/dom.js";
-import { value, record, item } from "../../base/model.js";
-import { EMPTY } from "../../base/util.js";
+import { bundle, EMPTY } from "../../base/util.js";
 
 import { RecordBox } from "./record.js";
+
+interface item {
+	type$: string
+	content?: unknown,
+	level?: number,
+	[key: string]: unknown;
+}
 
 export class RowBox extends RecordBox {
 	memberType = "cell";
@@ -38,7 +44,7 @@ export class RowBox extends RecordBox {
 		super.draw(content);
 		return this;
 	}
-	viewValue(model: value | ELE): void {
+	viewValue(model: unknown | ELE): void {
 		if (!model) return;
 		let row = model as item;
 		let types = this.type.types;
@@ -60,7 +66,7 @@ export class RowBox extends RecordBox {
 			this.content.append(child.view);
 		}
 	}
-	valueOf(range?: RANGE): value {
+	valueOf(range?: RANGE): unknown {
 		if (this.isHeader) return;
 		let row: item = {
 			type$: this.type.name,
@@ -81,7 +87,7 @@ export class RowBox extends RecordBox {
 }
 function getColumns(row: item) {
 	let columns: string[] = [];
-	for (let col in row.content as record) {
+	for (let col in row.content as bundle<unknown>) {
 		columns.push(col);
 	}
 	return columns;
@@ -101,7 +107,7 @@ function createType(type: BoxType, columns: string[]): BoxType {
 	return type;
 }
 
-function rowContent(model: record, content: ELE, range: RANGE): record {
+function rowContent(model: unknown, content: ELE, range: RANGE): unknown {
 	if (range && !range.intersectsNode(content)) return model;
 	
 	for (let child of content.childNodes) {

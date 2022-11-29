@@ -1,4 +1,3 @@
-import { value } from "../../base/model.js";
 import { Actions } from "../../base/controller.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
@@ -6,7 +5,7 @@ import { IEditor } from "../../control/editor.js";
 import { Box } from "../../base/display.js";
 import { BaseView } from "../../control/view.js";
 
-type editor = (this: Viewbox, commandName: string, range: RANGE, content?: value) => void;
+type editor = (this: Viewbox, commandName: string, range: RANGE, content?: unknown) => void;
 
 export abstract class Viewbox extends IEditor implements Box {
 	constructor(actions: Actions, editor: editor) {
@@ -23,11 +22,11 @@ export abstract class Viewbox extends IEditor implements Box {
 
 	abstract viewElement(content: ELE): void;
 
-	exec(commandName: string, range: RANGE, content?: value): void {
+	exec(commandName: string, range: RANGE, content?: unknown): void {
 		console.warn("exec() has not been configured.")
 	}
 	
-	draw(value: value): void {
+	draw(value: unknown): void {
 		if (!this.view.id) {
 			if (value instanceof Element && value.id) {
 				this.view.id = value.id;
@@ -47,24 +46,24 @@ export abstract class Viewbox extends IEditor implements Box {
 		if (ele(value)) {
 			this.viewElement(value as ELE);
 		} else {
-			this.viewValue(value as value);
+			this.viewValue(value as unknown);
 		}
 	}
-	protected createHeader(model?: value) {
+	protected createHeader(model?: unknown) {
 		let ele = this.view.ownerDocument.createElement("header") as Element;
 		ele.textContent = this.type.conf.title || "";
 		this.view.append(ele);
 		let content = new BaseView();
 		content.control(ele as Element);
 	}
-	protected createContent(model?: value) {
+	protected createContent(model?: unknown) {
 		let ele = this.view.ownerDocument.createElement("div") as Element;
 		ele.classList.add("content");
 		let content = new BaseView();
 		content.control(ele as Element);
 		this.view.append(ele);
 	}
-	protected createFooter(model?: value) {
+	protected createFooter(model?: unknown) {
 	}
 }
 

@@ -1,4 +1,3 @@
-import { value } from "../../base/model.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { xmlContent } from "../../transform/content.js";
 
@@ -10,7 +9,7 @@ export class RangeReplace extends Replace {
 	startId: string;
 	endId: string;
 
-	protected execReplace(range: RANGE, value: value) {
+	protected execReplace(range: RANGE, value: unknown) {
 		clearContent(range);
 		if (value) mergeContent(range, value);
 	}
@@ -80,7 +79,7 @@ export class RangeReplace extends Replace {
 	}
 }
 
-function mergeContent(range: RANGE, value: value) {
+function mergeContent(range: RANGE, value: unknown) {
 	let editor = getEditor(range);
 	let start = getChildEditor(editor, range.startContainer);
 	let end = getChildEditor(editor, range.endContainer);
