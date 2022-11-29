@@ -1,6 +1,7 @@
 import { Actions, Receiver } from "./controller.js";
 import { ELE } from "./dom.js";
 import { Article, Editor, EditorType } from "./editor.js";
+import { Shape } from "./shape.js";
 import { TypeConf } from "./type.js";
 import { bundle, extend } from "./util.js";
 import { View } from "./view.js";
@@ -14,7 +15,7 @@ export interface Display extends TypeConf {
 	shortcuts?: bundle<string>;
 }
 
-export interface Box extends Editor {
+export interface Box extends Shape, Editor {
 	type: BoxType;
 	header?: View;
 	footer?: View;
@@ -28,11 +29,10 @@ export interface BoxType extends EditorType {
 	conf: Display;
 }
 
-export interface BoxArticle extends Article, Receiver  {
+export interface BoxArticle extends Article, Receiver {
 	view: ELE;
 	types: bundle<BoxType>;
 }
-
 
 export function extendDisplay(type: Display, conf: Display): Display {
 	if (!conf) return;

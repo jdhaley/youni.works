@@ -2,7 +2,6 @@ import { BaseReceiver, Owner, Receiver } from "../base/controller.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { ELE } from "../base/dom.js";
 import { Bag, EMPTY } from "../base/util.js";
-import { Actions } from "../../../noted/v2/base/control.js";
 
 export class ElementOwner extends Owner<ELE> {
 	getControlOf(node: ELE): Receiver {

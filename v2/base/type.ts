@@ -1,4 +1,3 @@
-import { TypeContext } from "../../../simpleedit/type.js";
 import { Actions } from "./controller.js";
 import { bundle } from "./util.js";
 
@@ -10,11 +9,11 @@ export interface Type<T> {
 	create(...args: any[]): T;
 }
 
-export interface TypeOwner {
+export interface TypeContext {
 	types: bundle<Type<unknown>>;
 }
 
-export function start(owner: TypeOwner, baseTypes: bundle<any>, types: bundle<any>) {
+export function start(owner: TypeContext, baseTypes: bundle<any>, types: bundle<any>) {
 	let base = loadBaseTypes(owner, baseTypes);
 	owner.types = loadTypes(types, base);
 	console.info("Types:", owner.types);
@@ -25,8 +24,8 @@ export interface TypeConf {
 	types?: bundle<TypeConf | string>;
 	class?: typeof BaseType;
 	prototype?: object;
-	tagName?: string;
 	actions?: Actions;
+	tagName?: string;
 	title?: string;
 }
 
@@ -70,7 +69,7 @@ export class BaseType<T> implements Type<T> {
 	}
 }
 
-function loadBaseTypes(owner: TypeOwner, baseTypes: bundle<any>): bundle<Type<unknown>> {
+function loadBaseTypes(owner: TypeContext, baseTypes: bundle<any>): bundle<Type<unknown>> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
