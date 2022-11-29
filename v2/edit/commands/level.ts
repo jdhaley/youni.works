@@ -1,7 +1,8 @@
 import { EditCommand } from "./edit.js";
-import { Editor, getChildEditor, getEditor } from "../util.js";
+import { getChildEditor, getEditor } from "../util.js";
 import { ele, RANGE } from "../../base/dom.js";
 import { EMPTY } from "../../base/util.js";
+import { Editor } from "../../base/editor.js";
 
 export class LevelCommand extends EditCommand {
 	declare name: "Promote" | "Demote";

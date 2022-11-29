@@ -32,6 +32,13 @@ export interface Entity<T> extends Instance {
 	put(name: string, value?: T): void;
 }
 
+export interface Extent<T> {
+	readonly startContainer: T;
+    readonly startOffset: number;
+	readonly endContainer: T;
+    readonly endOffset: number;
+}
+
 export const EMPTY = Object.freeze({
 	object: Object.freeze(Object.create(null)),
 	array: Object.freeze([]) as any[],
@@ -44,6 +51,12 @@ export function extend(proto: Object, extension: Object) {
 		object[name] = extension[name];
 	}
 	return object;
+}
+
+export function implement(object: Object, extension: Object) {
+	for (let name in extension) {
+		object[name] = extension[name];
+	}
 }
 
 export function formatDate(date: Date) {

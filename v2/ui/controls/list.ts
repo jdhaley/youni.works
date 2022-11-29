@@ -10,9 +10,9 @@ export class ListBox extends Viewbox {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
 				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
-				type =  this.type.owner.unknownType as any;
+				type =  this.type.context.types["unknown"] as any;
 			}
-			type.create(item, this);
+			this.content.append(type.create(item).view);
 		}
 	}
 	viewElement(content: ELE) {
@@ -20,7 +20,7 @@ export class ListBox extends Viewbox {
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
-				childType.create(child, this);
+				this.content.append(childType.create(child).view);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}
@@ -28,8 +28,8 @@ export class ListBox extends Viewbox {
 	}
 	valueOf(range?: RANGE): list {
 		let model: value[];
-		if (range && !range.intersectsNode(this.content.view)) return;
-		for (let part of this.content.viewContent) {
+		if (range && !range.intersectsNode(this.content)) return;
+		for (let part of this.content.childNodes) {
 			let editor = getBox(part);
 			let value = editor?.valueOf(range);
 			if (value) {

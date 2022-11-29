@@ -1,29 +1,24 @@
 import { value } from "../../base/model.js";
-import { Box, ControlType } from "../../base/control.js";
 import { Actions } from "../../base/controller.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
-
-import { ElementControl } from "../../control/view.js";
-import { ElementBox } from "../../control/box.js";
+import { IEditor } from "../../control/editor.js";
+import { Box } from "../../base/display.js";
+import { BaseView } from "../../control/view.js";
 
 type editor = (this: Viewbox, commandName: string, range: RANGE, content?: value) => void;
 
-export abstract class Viewbox extends ElementControl implements Box<ELE> {
+export abstract class Viewbox extends IEditor implements Box {
 	constructor(actions: Actions, editor: editor) {
-		super();
-		this.actions = actions;
+		super(null, actions);
 		if (editor) this["exec"] = editor;
 	}
 
 	get isContainer(): boolean {
-		return this._type.conf.container;
-	}
-	get type(): ControlType<ELE> {
-		return this._type as ControlType<ELE>;
+		return this.conf["container"];
 	}
 	get shortcuts(): bundle<string> {
-		return this._type.conf.shortcuts;
+		return this.type.conf.shortcuts;
 	}
 
 	abstract viewElement(content: ELE): void;
@@ -32,8 +27,7 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 		console.warn("exec() has not been configured.")
 	}
 	
-	render(value: value, parent?: ElementControl): void {
-		if (parent) (parent.content.view as ELE).append(this.view);
+	draw(value: value): void {
 		if (!this.view.id) {
 			if (value instanceof Element && value.id) {
 				this.view.id = value.id;
@@ -48,7 +42,7 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 			this.createContent();
 			this.createFooter()
 		} else {
-			this.content.kind.add("content");
+			this.content.classList.add("content");
 		}
 		if (ele(value)) {
 			this.viewElement(value as ELE);
@@ -58,15 +52,15 @@ export abstract class Viewbox extends ElementControl implements Box<ELE> {
 	}
 	protected createHeader(model?: value) {
 		let ele = this.view.ownerDocument.createElement("header") as Element;
-		ele.textContent = this._type.conf.title || "";
+		ele.textContent = this.type.conf.title || "";
 		this.view.append(ele);
-		let content = new ElementBox();
+		let content = new BaseView();
 		content.control(ele as Element);
 	}
 	protected createContent(model?: value) {
 		let ele = this.view.ownerDocument.createElement("div") as Element;
 		ele.classList.add("content");
-		let content = new ElementBox();
+		let content = new BaseView();
 		content.control(ele as Element);
 		this.view.append(ele);
 	}

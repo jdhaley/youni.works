@@ -11,12 +11,12 @@ export class TextBox extends Viewbox {
 	}
 	viewElement(ele: ELE) {
 		//even with plain text, always use HTML so that the marker is transferred to the view.
-		this.content.markupContent = ele.innerHTML;
+		this.content.innerHTML = ele.innerHTML;
 	}
 	valueOf(range?: RANGE): value {
 		let model = "";
-		if (range && !range.intersectsNode(this.content.view)) return;
-		for (let node of (this.content.view as ELE).childNodes) {
+		if (range && !range.intersectsNode(this.content)) return;
+		for (let node of (this.content).childNodes) {
 			if (node == range?.startContainer && node == range?.endContainer) {
 				model += node.textContent.substring(range.startOffset, range.endOffset);
 			} else if (node == range?.startContainer) {

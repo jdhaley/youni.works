@@ -17,7 +17,7 @@ export class Frame extends Owner<ELE> {
 	}
 	#window: Window;
 
-	get node(): ELE {
+	get view(): ELE {
 		return this.#window.document.body;
 	}
 	get location() {
@@ -58,7 +58,7 @@ export class Frame extends Owner<ELE> {
 		return this.#window.document.createRange();
 	}
 	append(ele: ELE) {
-		this.node.append(ele);
+		this.view.append(ele);
 	}
 	getElementById(id: string) {
 		return this.#window.document.getElementById(id);

@@ -11,11 +11,11 @@ export default extend(editable, {
 		if (event.target == this.header) {
 			event.subject = "";
 			if (this.kind.contains("collapsed")) {
-				this.header.textContent = this._type.conf.title;
+				this.header.view.textContent = this.type.conf.title;
 				this.kind.remove("collapsed");
 			} else {
 				let title = this.get("title").content.textContent || "";
-				this.header.markupContent += ": " + `<b>${title}</b>`;
+				this.header.view.innerHTML += ": " + `<b>${title}</b>`;
 				this.kind.add("collapsed");
 			}
 		}

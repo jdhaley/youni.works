@@ -1,8 +1,9 @@
 import { value } from "../../base/model.js";
 import { RANGE } from "../../base/dom.js";
 
-import { Editor, clearContent, getChildEditor } from "../util.js";
+import { clearContent, getChildEditor } from "../util.js";
 import { RangeReplace } from "./rangeReplace.js";
+import { Editor } from "../../base/editor.js";
 
 export class ListReplace extends RangeReplace {
 	exec(range: RANGE, content: value): RANGE {
@@ -28,14 +29,14 @@ export class ListReplace extends RangeReplace {
 	}
 	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
-		r.setEnd(start.content.view, start.content.view.childNodes.length);
+		r.setEnd(start.content, start.content.childNodes.length);
 		clearContent(r);
 		this.merge(start, r, content, true);
 		range.setStartAfter(start.view);
 	}
 	protected onEndContainer(range: RANGE, content: value, end: Editor): void {
 		let r = range.cloneRange();
-		r.setStart(end.content.view, 0);
+		r.setStart(end.content, 0);
 		clearContent(r);
 		this.merge(end, r, content, false);
 		range.setEndBefore(end.view);
@@ -45,14 +46,14 @@ export class ListReplace extends RangeReplace {
 		range.deleteContents();
 		if (!value) return;
 		let editor = this.owner.getControl(this.viewId) as Editor;
-		let ctx = editor.content.view;
+		let ctx = editor.content;
 		//Ensure the range must be on the list conent. (It may be on a markup line).
 		while (range.commonAncestorContainer != ctx) {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
 		editor = editor.type.create(value) as Editor;
-		let contents = editor.content.viewContent;
+		let contents = editor.content.childNodes;
 		while (contents.length) {
 			range.insertNode(contents[0]); //this also removes the entry from the sequence.
 			range.collapse();

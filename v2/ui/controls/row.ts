@@ -1,6 +1,6 @@
-import { ELE, NODE, RANGE } from "../../base/dom.js";
+import { Box, BoxType } from "../../base/display.js";
+import { ELE, RANGE } from "../../base/dom.js";
 import { value, record, item } from "../../base/model.js";
-import { Box, Control, ControlType } from "../../base/control.js";
 import { EMPTY } from "../../base/util.js";
 
 import { RecordBox } from "./record.js";
@@ -24,18 +24,18 @@ export class RowBox extends RecordBox {
 	// 	if (header) return header["_type"];
 	// }
 
-	render(content: item): Control<NODE> {
+	draw(content: item): Box {
 		if (!this.rowHeader && !content.header) {
-			let item = createHeaderItem(this._type);
+			let item = createHeaderItem(this.type);
 			let hdr = this.type.create() as RowBox;
-			hdr.render(item);
+			hdr.draw(item);
 			this.view.before(hdr.view);
 		} else if (content.header) {
 			this.isHeader = true;
 		}
 
 		if (content.isHeader) this.isHeader = true;
-		super.render(content);
+		super.draw(content);
 		return this;
 	}
 	viewValue(model: value | ELE): void {
@@ -45,7 +45,7 @@ export class RowBox extends RecordBox {
 		let content = row.content || EMPTY.object;
 		for (let name in types) {
 			let value = content[name];
-			types[name].create(value, this);
+			this.content.append(types[name].create(value).view);
 		}
 	}
 	viewElement(content: ELE): void {
@@ -55,15 +55,16 @@ export class RowBox extends RecordBox {
 		}
 		for (let name in this.type.types) {
 			let type = this.type.types[name];
-			let child = type.create(idx[name], this) as Box<ELE>;
-			child.kind.add("field");
+			let child = type.create(idx[name]) as Box;
+			child.view.classList.add("field");
+			this.content.append(child.view);
 		}
 	}
 	valueOf(range?: RANGE): value {
 		if (this.isHeader) return;
 		let row: item = {
 			type$: this.type.name,
-			content: rowContent(null, this.content.view as ELE, range)
+			content: rowContent(null, this.content as ELE, range)
 		}
 		return row;
 	}
@@ -85,9 +86,9 @@ function getColumns(row: item) {
 	}
 	return columns;
 }
-function createType(type: ControlType<NODE>, columns: string[]): ControlType<NODE> {
+function createType(type: BoxType, columns: string[]): BoxType {
 	type.types = Object.create(null);
-	let column = type.owner.types.column;
+	let column = type.context.types.column;
 	for (let col of columns) {
 		let colType = Object.create(column);
 		colType.name = col;
@@ -104,7 +105,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	if (range && !range.intersectsNode(content)) return model;
 	
 	for (let child of content.childNodes) {
-		let viewer = child["$control"] as Box<ELE>;
+		let viewer = child["$control"] as Box;
 		let value = viewer.valueOf(range);
 		if (value) {
 			if (!model) model = Object.create(null);
@@ -114,7 +115,7 @@ function rowContent(model: record, content: ELE, range: RANGE): record {
 	return model;
 }
 
-function createHeaderItem(type: ControlType<NODE>): item {
+function createHeaderItem(type: BoxType): item {
 	let item = {
 		type$: type.name,
 		header: true, 

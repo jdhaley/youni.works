@@ -1,5 +1,4 @@
 import { extend } from "../../base/util.js";
-import { Box, Change } from "../../base/control.js";
 import { ELE, ele } from "../../base/dom.js";
 
 import { RowBox } from "../controls/row.js";
@@ -7,6 +6,8 @@ import { getBox, getHeader } from "../util.js";
 import { UserEvent } from "../../control/frame.js";
 
 import editable from "./editor.js";
+import { Change } from "../../control/editor.js";
+import { Box } from "../../base/display.js";
 
 export default extend(editable, {
 	dblclick(this: RowBox, event: UserEvent) {
@@ -14,11 +15,11 @@ export default extend(editable, {
 		if (event.target == this.header) {
 			event.subject = "";
 			if (this.kind.contains("collapsed")) {
-				this.header.textContent = this._type.conf.title;
+				this.header.view.textContent = this.type.conf.title;
 				this.kind.remove("collapsed");
 			} else {
 				let title = this.get("title").content.textContent || "";
-				this.header.markupContent += ": " + `<b>${title}</b>`;
+				this.header.view.innerHTML += ": " + `<b>${title}</b>`;
 				this.kind.add("collapsed");
 			}
 		}
@@ -50,8 +51,8 @@ export default extend(editable, {
 	}
 });
 
-function addCol(editor: RowBox, col: Box<ELE>) {
-	let contents = editor.content.viewContent;
+function addCol(editor: RowBox, col: Box) {
+	let contents = editor.content.childNodes;
 	for (let i = 0; i < contents.length; i++) {
 		if (contents[i] == col.view) {
 			addColumn(editor, i);
@@ -66,7 +67,7 @@ function addCol(editor: RowBox, col: Box<ELE>) {
 	}
 }
 function addColumn(row: RowBox, index: number) {
-	let column = getBox(row.content.viewContent[index]);
-	let newcol = column.type.create("") as Box<ELE>;
+	let column = getBox(row.content.childNodes[index]);
+	let newcol = column.type.create("") as Box;
 	ele(column.view).after(newcol.view);
 }

@@ -1,5 +1,5 @@
-import { Box } from "../../base/control.js";
-import { ELE, ele, NODE, RANGE } from "../../base/dom.js";
+import { Box } from "../../base/display.js";
+import { ele, NODE, RANGE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
 import { EditEvent, UserEvent } from "../../control/frame.js";
@@ -8,13 +8,13 @@ import { navigate, getClipboard } from "../util.js";
 import list from "./list.js";
 
 export default extend(list, {
-	paste(this: Box<ELE>, event: UserEvent) {
+	paste(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
 		this.exec("Paste", range, model);
 	},
-	insertText(this: Box<ELE>, event: EditEvent) {
+	insertText(this: Box, event: EditEvent) {
 		event.subject = "";
 		let model = {
 			"type$": "para",
@@ -22,7 +22,7 @@ export default extend(list, {
 		};
 		this.exec("Entry", event.range, [model]);
 	},
-	split(this: Box<ELE>, event: UserEvent) {
+	split(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = null;
@@ -37,7 +37,7 @@ export default extend(list, {
 			}];	
 		}
 		this.exec("Split", range, model);
-		range = this.type.owner.selectionRange as RANGE;
+		range = this.type.context.selectionRange as RANGE;
 		//If split happened at the start of the paragraph
 		//leave the caret there (on the empty paragraph).
 		if (range && !range.startContainer.textContent) {
@@ -45,12 +45,12 @@ export default extend(list, {
 			range.collapse();
 		}
 	},
-	join(this: Box<ELE>, event: UserEvent) {
+	join(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		this.exec("Join", range, "");
 	},
-	next(this: Box<ELE>, event: UserEvent) {
+	next(this: Box, event: UserEvent) {
 		event.subject = "";
 		if (event.altKey || event.ctrlKey) {
 			nav(event);
@@ -58,7 +58,7 @@ export default extend(list, {
 			this.exec("Demote", event.range);
 		}
 	},
-	previous(this: Box<ELE>, event: UserEvent) {
+	previous(this: Box, event: UserEvent) {
 		event.subject = "";
 		if (event.altKey || event.ctrlKey) {
 			nav(event, true);
@@ -66,7 +66,7 @@ export default extend(list, {
 			this.exec("Promote", event.range);
 		}
 	},
-	insert(this: Box<ELE>, event: UserEvent) {
+	insert(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) return;
@@ -82,12 +82,12 @@ export default extend(list, {
 	}
 });
 
-export function getChildBox(editor: Box<ELE>, node: NODE): Box<ELE> {
-	if (node == editor.content.view) return null;
-	while (node?.parentNode != editor.content.view) {
+export function getChildBox(editor: Box, node: NODE): Box {
+	if (node == editor.content) return null;
+	while (node?.parentNode != editor.content) {
 		node = node.parentNode;
 	}
-	if (ele(node) && node["$control"]) return node["$control"] as Box<ELE>;
+	if (ele(node) && node["$control"]) return node["$control"] as Box;
 }
 
 // function createItem(refNode: Editor): item {

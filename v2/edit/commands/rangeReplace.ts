@@ -2,8 +2,9 @@ import { value } from "../../base/model.js";
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { xmlContent } from "../../transform/content.js";
 
-import { Editor, unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
+import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
 import { Replace } from "./replace.js";
+import { Editor } from "../../base/editor.js";
 
 export class RangeReplace extends Replace {
 	startId: string;
@@ -20,7 +21,7 @@ export class RangeReplace extends Replace {
 		//passed range and should only be used within this method.
 		range = this.getOuterRange(range);
 		let view = getEditor(range);
-		captureRange(this, view.content.view as ELE, range.startOffset, range.endOffset);
+		captureRange(this, view.content, range.startOffset, range.endOffset);
 		this.before = xmlContent(view, range).innerHTML;
 	}
 	protected execAfter(range: RANGE): RANGE {
@@ -32,13 +33,13 @@ export class RangeReplace extends Replace {
 	protected getOuterRange(inner: RANGE) {
 		let editor = getEditor(inner);
 		let outer = inner.cloneRange();
-		outer.selectNodeContents(editor.content.view);
+		outer.selectNodeContents(editor.content);
 		let start = getChildEditor(editor, inner.startContainer);
 		if (start) outer.setStartBefore(start.view);
 		let end = getChildEditor(editor, inner.endContainer);
 		if (end) outer.setEndAfter(end.view);
 
-		let content = editor.content.view;
+		let content = editor.content;
 		if (!(outer.startContainer == content && outer.endContainer == content)) {
 			throw new Error("Invalid range for edit.");
 		}
@@ -48,7 +49,7 @@ export class RangeReplace extends Replace {
 		let editor = this.owner.getControl(this.viewId);
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 		let range = editor.view.ownerDocument.createRange();
-		range.selectNodeContents(editor.content.view);
+		range.selectNodeContents(editor.content);
 		if (this.startId) {
 			let start = this.owner.getControl(this.startId);
 			if (!start) throw new Error(`Start item.id '${this.startId}' not found.`);
@@ -68,7 +69,7 @@ export class RangeReplace extends Replace {
 		view = view.type.create(element) as Editor;
 		let range = this.getReplaceRange();
 		range.deleteContents();
-		let contents = view.content.viewContent;
+		let contents = view.content.childNodes;
 		while (contents.length) {
 			let node = contents[0];
 			range.insertNode(node);

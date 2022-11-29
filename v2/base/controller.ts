@@ -16,7 +16,11 @@ export interface Actions {
 }
 
 export class BaseReceiver implements Receiver {
+	constructor(actions?: Actions) {
+		if (actions) this.actions = actions;
+	}
 	declare actions: Actions;
+	
 	receive(signal: Signal)  {
 		let subject = signal?.subject;
 		while (subject) try {

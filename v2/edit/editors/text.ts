@@ -1,7 +1,8 @@
 import { ele, NODE, RANGE } from "../../base/dom.js";
 
-import { Editor, getEditor, mark, narrowRange, senseChange, unmark } from "../util.js";
+import { getEditor, mark, narrowRange, senseChange, unmark } from "../util.js";
 import { Replace } from "../commands/replace.js";
+import { Editor } from "../../base/editor.js";
 
 export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): void {
 	if (getEditor(range) != this) console.warn("Invalid edit range");
@@ -12,7 +13,7 @@ export default function	edit(this: Editor, commandName: string, range: RANGE, co
 	let r = range.cloneRange();
 	r = cmd.call(this, commandName, r, content);
 	r.collapse();
-	this.type.owner.selectionRange = r;
+	this.type.context.selectionRange = r;
 	senseChange(this, commandName);
 }
 
@@ -49,7 +50,7 @@ function doit(this: Editor, commandName: string, range: RANGE, text: string): RA
 	}
 
 	if (range.collapsed && node == lastEdit.node) {
-		let cmd = this.type.owner.commands.peek() as Replace;
+		let cmd = this.type.context.commands.peek() as Replace;
 		if (cmd?.name == commandName && editor?.id == cmd.viewId) {
 			let r = doAgain(cmd, range, text);
 			if (r) return r;		
@@ -71,7 +72,7 @@ function doit(this: Editor, commandName: string, range: RANGE, text: string): RA
 		lastEdit.node = null;
 	}
 
-	return new Replace(this.type.owner, commandName, editor.id).exec(range, text);
+	return new Replace(this.type.context, commandName, editor.id).exec(range, text);
 }
 
 function doAgain(cmd: Replace, range: RANGE, text: string) {
@@ -129,7 +130,7 @@ function eraseAgain(range: RANGE, cmd: Replace) {
 
 function endagain(range: RANGE, cmd: Replace) {
 	mark(range);
-	cmd.after = getEditor(range).content.markupContent || "";
+	cmd.after = getEditor(range).content.innerHTML || "";
 	unmark(range);
 	range.collapse();
 	return range;
@@ -146,7 +147,7 @@ function positionToText(range: RANGE) {
 	let hdr = inHeader(getEditor(range), range.startContainer);
 	narrowRange(range);
 	if (range.collapsed) {
-		let content = getEditor(range).content.view;
+		let content = getEditor(range).content;
 		if (content.childNodes.length != 1) {
 			//force single text node...
 			content.textContent = content.textContent;

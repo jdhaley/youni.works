@@ -2,6 +2,7 @@ import { BaseReceiver, Owner, Receiver } from "../base/controller.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { ELE } from "../base/dom.js";
 import { Bag, EMPTY } from "../base/util.js";
+import { Actions } from "../../../noted/v2/base/control.js";
 
 export class ElementOwner extends Owner<ELE> {
 	getControlOf(node: ELE): Receiver {
@@ -17,7 +18,7 @@ export class ElementOwner extends Owner<ELE> {
 	}
 }
 
-class ElementController extends BaseReceiver {
+class ElementController extends BaseReceiver {	
 	[Symbol.iterator] = function* parts() {
 		const nodes = this.view.childNodes;
 		for (let i = 0, len = nodes.length; i < len; i++) {
@@ -25,7 +26,6 @@ class ElementController extends BaseReceiver {
 			if (node["$control"]) yield node["$control"];
 		}
 	}
-
 	declare view: ELE;
 	
 	get partOf(): ElementController {

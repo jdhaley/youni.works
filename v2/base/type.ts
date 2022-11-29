@@ -1,3 +1,4 @@
+import { TypeContext } from "../../../simpleedit/type.js";
 import { Actions } from "./controller.js";
 import { unit } from "./model.js";
 import { bundle, EMPTY, extend, Sequence } from "./util.js";
@@ -11,38 +12,50 @@ export interface Type<T> {
 }
 
 export interface TypeOwner {
-	conf: bundle<any>;
 	types: bundle<Type<unknown>>;
-	unknownType: Type<unknown>;
 }
 
-export function start(owner: TypeOwner) {
-	let base = loadBaseTypes(owner, owner.conf.baseTypes);
-	owner.types = loadTypes(owner.conf.viewTypes, base);
-	owner.unknownType = owner.types[owner.conf.unknownType];
-	console.info("Types:", owner.types, "uknown type:", owner.unknownType);
+export function start(owner: TypeOwner, baseTypes: bundle<any>, types: bundle<any>) {
+	let base = loadBaseTypes(owner, baseTypes);
+	owner.types = loadTypes(types, base);
+	console.info("Types:", owner.types);
 }
+
 export interface TypeConf {
 	type?: string;
-	extends?: TypeConf;
-
-	kind?: string;
-	props?: bundle<any>; //props?: bundle<any>
-	header?: TypeConf;
-	footer?: TypeConf;
+	types?: bundle<TypeConf | string>;
+	class?: typeof BaseType;
+	prototype?: object;
+	tagName?: string;
 	actions?: Actions;
-	style?: bundle<any>;
-
-	types?: bundle<TypeConf>;
-	content?: unit | Sequence<TypeConf> | bundle<TypeConf> | ((conf: bundle<any>) => string);
-
-	prototype?: any;
+	title?: string;
 }
+
+// export interface TypeConf {
+// 	type?: string;
+// 	extends?: TypeConf;
+
+// 	kind?: string;
+// 	props?: bundle<any>; //props?: bundle<any>
+// 	header?: TypeConf;
+// 	footer?: TypeConf;
+// 	actions?: Actions;
+// 	style?: bundle<any>;
+
+// 	types?: bundle<TypeConf>;
+// 	content?: unit | Sequence<TypeConf> | bundle<TypeConf> | ((conf: bundle<any>) => string);
+
+// 	prototype?: any;
+// }
 
 type types = bundle<Type<unknown>>;
 //type source = bundle<TypeConf> | string;
 
 export class BaseType<T> implements Type<T> {
+	constructor(context: TypeContext) {
+		this.context = context;
+	}
+	readonly context: TypeContext;
 	declare partOf: BaseType<T>;
 	declare types: bundle<Type<T>>;
 	declare name: string;
@@ -110,7 +123,7 @@ function createType(name: string, conf: TypeConf, types: types, source: bundle<T
 	}
 	return type;
 
-	function getMember(owner: Type<unknown>, name: string, part: TypeConf) {
+	function getMember(owner: Type<unknown>, name: string, part: TypeConf | string) {
 		let member: Type<unknown>;
 		if (typeof part == "object") {
 			member = createType("", part as any, types, source);

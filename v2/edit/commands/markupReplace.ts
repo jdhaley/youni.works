@@ -1,8 +1,9 @@
 import { value, item } from "../../base/model.js";
 import { ele, RANGE } from "../../base/dom.js";
 
-import { Editor, getEditor, mark, unmark } from "../util.js";
+import { getEditor, mark, unmark } from "../util.js";
 import { ListReplace } from "./listReplace.js";
+import { Editor } from "../../base/editor.js";
 
 export class MarkupReplace extends ListReplace {
 	protected getOuterRange(range: RANGE) {
@@ -21,7 +22,7 @@ export class MarkupReplace extends ListReplace {
 	}
 	protected onStartContainer(range: RANGE, content: value, start: Editor): void {
 		let r = range.cloneRange();
-		r.setEnd(start.content.view, start.content.view.childNodes.length);
+		r.setEnd(start.content, start.content.childNodes.length);
 		r.deleteContents();
 		let startItem: item = start.valueOf() as any;
 		let items = content as item[];
@@ -65,7 +66,7 @@ export class MarkupReplace extends ListReplace {
 		//There's a lot going on here so remove the markers so they don't get in the way.
 		range = unmark(range);
 		
-		let ctx = editor.content.view;
+		let ctx = editor.content;
 		let r = range.cloneRange();
 		//Delete the range within the line.
 		r.deleteContents();

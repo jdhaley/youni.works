@@ -1,5 +1,4 @@
-import { Box } from "../../base/control.js";
-import { ELE } from "../../base/dom.js";
+import { Box } from "../../base/display.js";
 import { CHAR, extend } from "../../base/util.js";
 
 import { EditEvent, UserEvent } from "../../control/frame.js";
@@ -7,28 +6,28 @@ import { setClipboard } from "../util.js";
 import editable from "./editor.js";
 
 export default extend(editable, {
-	cut(this: Box<ELE>, event: UserEvent) {
+	cut(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) return;
 		setClipboard(range.cloneRange(), event.clipboardData);
 		this.exec("Cut", range);
 	},
-	paste(this: Box<ELE>, event: UserEvent) {
+	paste(this: Box, event: UserEvent) {
 		event.subject = "";
 		let text = event.clipboardData.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
 		this.exec("Paste", range, text);
 	},
-	replaceText(this: Box<ELE>, event: EditEvent) {
+	replaceText(this: Box, event: EditEvent) {
 		event.subject = "";
 		let text = event.dataTransfer.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to replace.
 		let range = event.range;
 		this.exec("Replace", range, text);
 	},
-	insertText(this: Box<ELE>, event: EditEvent) {
+	insertText(this: Box, event: EditEvent) {
 		event.subject = "";
 		let char = event.data;
 		let range = event.range;
@@ -59,13 +58,13 @@ export default extend(editable, {
 	deleteWordBackward(event: EditEvent) {
 		event.subject = "deleteWordForward";
 	},
-	erase(this: Box<ELE>, event: UserEvent) {
+	erase(this: Box, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) return;
 		this.exec("Erase", range, "");
 	},
-	delete(this: Box<ELE>, event: UserEvent) {
+	delete(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;

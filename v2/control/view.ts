@@ -1,192 +1,112 @@
-import { CommandBuffer } from "../base/command.js";
-import { Article, ArticleContext, Control, ControlType, Extent } from "../base/control.js";
-import { bindViewEle, DOCUMENT, ELE, getView, NODE, RANGE, VIEW_ELE } from "../base/dom.js";
-import { model, value } from "../base/model.js";
-import { Txt } from "../base/view.js";
-import { bundle, extend } from "../base/util.js";
-import { RemoteFileService } from "../base/remote.js";
+import { View, ViewType } from "../base/view.js";
+import { Display, extendDisplay } from "../base/display.js";
+import { BaseType, TypeConf } from "../base/type.js";
+import { Actions } from "../base/controller.js";
+import { ELE } from "../base/dom.js";
+import { bundle } from "../base/util.js";
 
-import { start } from "../base/type.js";
-import { BoxType, ElementDisplay } from "./box.js";
-import { ElementOwner } from "./element.js";
+import { ElementShape } from "./element.js";
 
-export abstract class ElementControl extends ElementDisplay implements Control<ELE> {
-	declare _type: ControlType<ELE>;
-
-	get type(): ControlType<ELE> {
-		return this._type;
+export class BaseView extends ElementShape implements View {
+	constructor(actions?: Actions) {
+		super(actions);
 	}
-	get id() {
-		return this.view.id;
+	declare type: VType;
+
+	get conf(): Display {
+		return this.type.conf;
 	}
-	get partOf() {
-		for (let node = this.view.parentNode as ELE; node; node = node.parentNode as ELE) {
-			let control = node["$control"];
-			if (control) return control;
-			//Propagate events to the owner when this is a top-level view in the body.
-			if (node == node.ownerDocument.body) return this.type.owner;
+	get isContainer(): boolean {
+		return this.type.header || this.type.footer ? true : false;
+	}
+	get content(): ELE {
+		if (this.isContainer) for (let child of this.view.children) {
+			if (child.classList.contains("content")) return child;
+		}
+		return this.view;
+	}
+	get header(): View {
+		if (this.isContainer) for (let child of this.view.children) {
+			if (child.nodeName == "HEADER") return child["$control"];
 		}
 	}
-	get level(): number {
-		return Number.parseInt(this.view.getAttribute("aria-level")) || 0;
+	get footer(): View {
+		if (this.isContainer) for (let child of this.view.children) {
+			if (child.nodeName == "FOOTER") return child["$control"];
+		}
 	}
-	set level(level: number) {
-		level = level || 0;
-		if (level < 1) {
-			this.view.removeAttribute("aria-level");
+
+	draw(value: unknown): void {
+		let content: ELE;
+		if (this.isContainer) {
+			if (this.type.header) this.view.append(this.type.header.create(value));
+			content = this.view.ownerDocument.createElement("div");
+			this.view.append(content);
+			if (this.type.footer) this.view.append(this.type.footer.create(value));	
 		} else {
-			this.view.setAttribute("aria-level", "" + (level <= 6 ? level : 6));
+			content = this.view;
 		}
+		content.classList.add("content");
 	}
-
-	abstract valueOf(range?: RANGE): value;
-	abstract exec(commandName: string, ...args: unknown[]): void;
-
-	abstract viewValue(data: value): void;
-
-	render(value: value, parent?: ElementControl): void {
-		if (parent) (parent.content.view as ELE).append(this.view);
-		this.view.textContent = "";
-		this.viewValue(value as value);
-		this.kind.add("content");
-	}
-	control(element: VIEW_ELE) {
-		super.control(element as Element);
-		element.setAttribute("data-item", this.type.name);
-	}
-	uncontrol(element: ELE): void {
-		super.uncontrol(element as Element);
-		element.removeAttribute("data-item");
-		delete element.id;
-	}
-	demote() {
-		let level = this.level;
-		if (level < 6) this.level = ++level;
-	}
-	promote() {
-		--this.level;
+	valueOf(filter?: unknown): unknown {
+		return undefined;
 	}
 }
 
-export class ElementViewType extends BoxType implements ControlType<ELE> {
-	constructor(owner: Article<ELE>) {
-		super();
-		this.owner = owner;
-	}
-	declare types: bundle<ControlType<ELE>>
-	declare prototype: Control<ELE>;
-	declare owner: Article<ELE>;
+interface ViewContext  {
+	types: bundle<VType>;
+	createElement(tagName: string): ELE;
+}
 
-	get model(): model {
-		return this.owner.conf.contentTypes[this.conf.viewType];
-	}
+export class VType /*extends LoadableType*/ extends BaseType<View> implements ViewType {
+	declare context: ViewContext;
+	declare partOf: VType;
+	declare name: string;
+	declare prototype: View;
+	declare types: bundle<ViewType>;
+	declare tagName: string;
+	declare conf: TypeConf;
+	declare header?: ViewType;
+	declare footer?: ViewType;
 
-	start(name: string, conf: bundle<any>): void {
+	create(value?: unknown): View {
+		let node = this.context.createElement(this.conf.tagName || "div");
+		let view = this.control(node);
+		view.draw(value);
+		return view;
+	}
+	control(node: ELE): View {
+		node.setAttribute("data-item", this.name);
+		let view = Object.create(this.prototype);
+		node["$control"] = view;
+		view.view = node;
+		return view;
+	}
+	start(name: string, conf: Display): void {
 		this.name = name;
-		//super.start(name, conf);
-		//We need to extend the conf for container, title, etc...
-		if (conf) {
-			this.conf = extend(this.conf || null, conf);
-		}
-		if (this.conf.prototype) this.prototype = this.conf.prototype;
+		this.conf = extendDisplay(this.conf, conf);
 
-		if (conf.proto) {
-			this.prototype = extend(this.prototype, conf.proto);
-		} else {
-			this.prototype = Object.create(this.prototype as any);
-		}
-		this.prototype["_type"] = this;
-	}
-	create(value: value, container?: any): ElementControl {
-		let view = Object.create(this.prototype) as ElementControl;
-		let node = this.owner.frame.createNode(this.conf.tagName || "div");
-		view.control(node as ELE);
-		view.render(value, container);
-		return view;
-	}
-	control(node: ELE): ElementControl {
-		let view = Object.create(this.prototype) as ElementControl;
-		view.control(node);
-		return view;
+		this.prototype = Object.create(this.conf.prototype);
+		this.prototype.type = this;
+		if (conf.header) this.header = this.context.types[conf.header] as ViewType;
+		if (conf.footer) this.footer = this.context.types[conf.footer] as ViewType;
 	}
 }
 
-export abstract class ElementArticle extends ElementOwner implements Article<NODE> {
-		/*
-		NOTE: the conf MUST have conf.viewTypes and conf.baseTypes
-		*/
-		constructor(frame: ArticleContext<NODE>, conf: bundle<any>) {
-		super();
-		this.frame = frame;
-		this.conf = conf;
-		this.actions = conf.actions;
-		this.commands = new CommandBuffer();
-		this.service = new RemoteFileService(this.frame.location.origin + conf.sources);
-		start(this);
-	}
-	frame: ArticleContext<NODE>;
-	view: ELE;
-	conf: bundle<any>;
-	types: bundle<ElementViewType>;
-	unknownType: ElementViewType;
-	defaultType: ElementViewType;
-	readonly commands: CommandBuffer<RANGE>;
-	readonly service: RemoteFileService;
-	source: value;
-
-	get selectionRange(): Extent<Txt> {
-		return this.frame.selectionRange;
-	}
-	set selectionRange(range: Extent<Txt>) {
-		this.frame.selectionRange = range;
-	}
-	createView(tagName: string): ELE {
-		return this.frame.createNode(tagName) as ELE;
-	}
-	
-	findNode(id: string): ELE {
-		return this.view.ownerDocument.getElementById(id);
-	}
-	getControl(id: string): Control<NODE> {
-		let ele = this.findNode(id) as VIEW_ELE;
-		if (!ele) throw new Error("Can't find view element.");
-		if (!ele.$control) {
-			console.warn("binding...");
-			bindViewEle(ele);
-			if (!ele.$control) {
-				console.error("Unable to bind missing control. Please collect info / analyze.");
-				debugger;
-			}
-		}
-		return ele.$control as Control<NODE>;
-	}
-	/** the Loc(ation) is: path + "/" + offset */
-	extentFrom(startLoc: string, endLoc: string): RANGE {
-		let doc = this.view.ownerDocument;
-		let range = doc.createRange();
-		let path = startLoc.split("/");
-		let node = getNode(doc, path);
-		if (node) {
-			let offset = Number.parseInt(path.at(-1));
-			range.setStart(node, offset);
-		}
-		path = endLoc.split("/");
-		node = getNode(doc, path);
-		if (node) {
-			let offset = Number.parseInt(path.at(-1));
-			range.setEnd(node, offset);
-		}
-		return range;
-	}
-}
-
-function getNode(doc: DOCUMENT, path: string[]) {
-	let view = getView(doc.getElementById(path[0])) as ElementControl;
-	if (!view) console.error("can't find view");
-	let node = view.content.view;
-	for (let i = 1; i < path.length - 1; i++) {
-		let index = Number.parseInt(path[i]);
-		node = node?.childNodes[index];
-	}
-	return node;
-}
+// export class ElementContent extends BaseView implements Content {
+// 	get viewContent(): Sequence<NODE> {
+// 		return this.view.childNodes;
+// 	}
+// 	get textContent() {
+// 		return this.view.textContent;
+// 	}
+// 	set textContent(text: string) {
+// 		this.view.textContent = text;
+// 	}
+// 	get markupContent() {
+// 		return this.view.innerHTML;
+// 	}
+// 	set markupContent(markup: string) {
+// 		this.view.innerHTML = markup;
+// 	}
+// }
