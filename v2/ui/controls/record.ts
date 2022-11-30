@@ -34,7 +34,8 @@ export class RecordBox extends Viewbox {
 	}
 	protected viewMember(name: string, value: any): Box {
 		let type = this.type.types[name];
-		let member = type.create(value) as Box
+		let member = type.create(value) as Box;
+		this.content.append(member.view);
 		member.view.classList.add(this.memberType);
 		return member;
 	}
