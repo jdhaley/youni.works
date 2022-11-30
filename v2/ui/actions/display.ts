@@ -25,7 +25,7 @@ export default extend(null, {
 			let model = (this.view["$control"] as any).valueOf();
 			console.log("Save: ", model);
 			this.service.save(this.view.getAttribute("data-file"), JSON.stringify(model, null, 2), this);
-			if (this.conf.recordCommands) {
+			if (this.recordCommands) {
 				let tc = {
 					source: this.source,
 					target: model,

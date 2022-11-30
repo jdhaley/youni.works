@@ -66,10 +66,6 @@ export class IType extends VType implements EditorType {
 	}
 }
 export class IArticle extends BaseReceiver implements Article {
-	conf: bundle<any>;
-	// unknownType: ElementViewType;
-	// defaultType: ElementViewType;
-	///////////////
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf.actions);
 		this.owner = frame;
@@ -80,6 +76,7 @@ export class IArticle extends BaseReceiver implements Article {
 	readonly owner: Frame
 	readonly commands: CommandBuffer<RANGE>;
 	readonly service: RemoteFileService;
+	declare recordCommands: boolean;
 	declare types: bundle<IType>;
 	declare source: unknown;
 	declare view: ELE;
