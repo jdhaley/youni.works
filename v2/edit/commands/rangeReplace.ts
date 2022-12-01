@@ -88,7 +88,8 @@ function mergeContent(range: RANGE, value: unknown) {
 		if (control?.type.model == "unit") {
 			let mvalue = value[control.type.name];
 			if (mvalue) {
-				member.children[1].textContent += mvalue;
+				//member.children[1].textContent += mvalue;
+				control.content.textContent += mvalue;
 			}
 		}
 		if (member == end.view) break;

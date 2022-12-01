@@ -40,14 +40,14 @@ export class IEditor extends BaseView implements Editor {
 	}
 	draw(value?: unknown): void {
 		super.draw(value);
-		if (!this.view.id) {
-			if (value instanceof Element && value.id) {
-				this.view.id = value.id;
-				this.viewElement(value as ELE);
-			} else {
-				this.view.id = "" + NEXT_ID++;
-				this.viewValue(value);
-			}
+		if (value instanceof Element) {
+			if (value.id) this.view.id = value.id;
+			let level = value.getAttribute("aria-level");
+			if (level) this.view.setAttribute("aria-level", level);
+			this.viewElement(value as ELE);
+		} else {
+			this.view.id = "" + NEXT_ID++;
+			this.viewValue(value);
 		}
 	}
 	viewValue(model: unknown): void {
