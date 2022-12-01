@@ -4,6 +4,8 @@ import { Edits } from "../base/editor.js";
 import { getView } from "../base/view.js";
 import { IArticle } from "../control/editor.js";
 import { fromHtml } from "../transform/fromHtml.js";
+import { section } from "../transform/item.js";
+import { toHtml } from "../transform/toHtml.js";
 
 export const getBox = getView as (node: NODE | RANGE) => Box ;
 
@@ -79,12 +81,11 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 		clipboard.setData("text/plain", model);
 		return;
 	}
-//TODO when refactoring the viewType was removed.
-	// if (control.type.conf.viewType == "markup") {
-	// 	let item = section(model as any);
-	// 	let article = toHtml(item);
-	// 	clipboard.setData("text/html", article.outerHTML);
-	// }
+	if (control.type.conf.viewType == "markup") {
+		let item = section(model as any);
+		let article = toHtml(item);
+		clipboard.setData("text/html", article.outerHTML);
+	}
 	if (!(model instanceof Array)) model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
 }

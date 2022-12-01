@@ -23,15 +23,28 @@ export class IEditor extends BaseView implements Editor {
 		if (editor) this["exec"] = editor;
 	}
 	declare type: IType;
-	level: number;
 
 	get id(): string {
 		return this.view.id;
 	}
-
-	demote(): void {
+	get level(): number {
+		return Number.parseInt(this.view.getAttribute("aria-level")) || 0;
 	}
-	promote(): void {
+	set level(level: number) {
+		level = level || 0;
+		if (level < 1) {
+			this.view.removeAttribute("aria-level");
+		} else {
+			this.view.setAttribute("aria-level", "" + (level <= 6 ? level : 6));
+		}
+	}
+
+	demote() {
+		let level = this.level;
+		if (level < 6) this.level = ++level;
+	}
+	promote() {
+		--this.level;
 	}
 	convert?(type: string): void {
 	}

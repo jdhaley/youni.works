@@ -7,6 +7,7 @@ import { bundle, extend } from "./util.js";
 import { View } from "./view.js";
 
 export interface Display extends TypeConf {
+	viewType?: string;
 	model?: "record" | "list" | "unit",
 	kind?: string;
 	header?: string;
