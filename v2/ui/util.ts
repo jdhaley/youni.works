@@ -29,7 +29,7 @@ interface NAVIGABLE_ELE extends ELE{
 export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
 	let editor = getBox(start);
 	while (editor) {
-		let toEle = isBack ? ele(editor.view).previousElementSibling : ele(editor.view).nextElementSibling;
+		let toEle = isBack ? editor.view.previousElementSibling : editor.view.nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next as NAVIGABLE_ELE;
@@ -45,16 +45,9 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 		case "unit":
 			break;
 		case "record":
+		case "list":
 			ele = isBack ? content.lastElementChild : content.firstElementChild;
 			if (ele) content = navigateInto(ele);
-			break;
-		case "list":
-			let item = isBack ? content.lastElementChild : content.firstElementChild;
-			if (item) {
-				content = navigateInto(item);
-			} else {
-				content = view.footer.view as ELE;
-			}
 			break;
 	}
 	return content;

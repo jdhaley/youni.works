@@ -1,11 +1,9 @@
 export default {
 	"Control+s": "save",
 	"Tab": "next",
-	"Alt+Tab": "next",
 	"Shift+Tab": "previous",
-	"Alt+Shift+Tab": "previous",
-	"Control+,": "previous",
-	"Control+.": "next",
+	"Control+[": "promote",
+	"Control+]": "demote",
 	"Control+z": "undo",
 	"Control+y": "redo",
 	"Control+a": "selectAll",

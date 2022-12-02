@@ -50,22 +50,6 @@ export default extend(list, {
 		let range = event.range;
 		this.exec("Join", range, "");
 	},
-	next(this: Box, event: UserEvent) {
-		event.subject = "";
-		if (event.altKey || event.ctrlKey) {
-			nav(event);
-		} else {
-			this.exec("Demote", event.range);
-		}
-	},
-	previous(this: Box, event: UserEvent) {
-		event.subject = "";
-		if (event.altKey || event.ctrlKey) {
-			nav(event, true);
-		} else {
-			this.exec("Promote", event.range);
-		}
-	},
 	insert(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
@@ -79,6 +63,14 @@ export default extend(list, {
 		range.setStartBefore(current.view);
 		range.collapse(true);
 		this.exec("Insert", range, [item]);
+	},
+	demote(this: Box, event: UserEvent) {
+		event.subject = "";
+		this.exec("Demote", event.range);
+	},
+	promote(this: Box, event: UserEvent) {
+		event.subject = "";
+		this.exec("Promote", event.range);
 	}
 });
 

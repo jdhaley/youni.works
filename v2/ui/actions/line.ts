@@ -42,12 +42,6 @@ export default extend(text, {
 		} else {
 			this.exec("Delete", range, "");
 		}
-	},
-	next() {
-		//propagate to the markup controller.
-	},
-	previous() {
-		//propagate to the markup controller.
-	},
+	}
 });
 
