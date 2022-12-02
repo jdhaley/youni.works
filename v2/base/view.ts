@@ -16,6 +16,8 @@ export interface View {
 
 export interface ViewType {
 	name: string;
+	model: string;
+
 	types: {
 		[key: string]: ViewType;
 	};

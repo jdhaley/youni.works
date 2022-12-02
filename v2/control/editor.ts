@@ -1,6 +1,7 @@
+import { CommandBuffer } from "../base/command.js";
 import { Actions, Signal, BaseReceiver } from "../base/controller.js";
 import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
-import { Article, Editor, EditorType, CommandBuffer } from "../base/editor.js";
+import { Article, Editor, EditorType } from "../base/editor.js";
 import { RemoteFileService } from "../base/remote.js";
 import { start } from "../base/type.js";
 import { bundle, implement } from "../base/util.js";

@@ -2,7 +2,8 @@ import { ELE, RANGE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
 import { Type } from "../../base/type.js";
-import { CommandBuffer, Editor } from "../../base/editor.js";
+import { Editor } from "../../base/editor.js";
+import { CommandBuffer } from "../../base/command.js";
 
 import { UserEvent } from "../../control/frame.js";
 import { Change, IArticle } from "../../control/editor.js";

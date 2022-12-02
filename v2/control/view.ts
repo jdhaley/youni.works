@@ -69,6 +69,10 @@ export class VType /*extends LoadableType*/ extends BaseType<View> implements Vi
 	declare header?: ViewType;
 	declare footer?: ViewType;
 
+	get model(): string {
+		return "";
+	}
+	
 	create(value?: unknown): View {
 		let node = this.context.createElement(this.conf.tagName || "div");
 		let view = this.control(node);

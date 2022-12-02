@@ -1,10 +1,10 @@
+import { CommandBuffer } from "./command.js";
 import { Actions, Receiver } from "./controller.js";
-import { ELE } from "./dom.js";
-import { Article, Editor, EditorType } from "./editor.js";
+import { ELE, RANGE } from "./dom.js";
 import { Shape } from "./shape.js";
 import { TypeConf } from "./type.js";
 import { bundle, extend } from "./util.js";
-import { View } from "./view.js";
+import { View, ViewType } from "./view.js";
 
 export interface Display extends TypeConf {
 	viewType?: string;
@@ -16,23 +16,27 @@ export interface Display extends TypeConf {
 	shortcuts?: bundle<string>;
 }
 
-export interface Box extends Shape, Editor {
+export interface Box extends Shape, View {
 	type: BoxType;
 	header?: View;
 	footer?: View;
+
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
 
 	/** for Records */
 	//get(member: string): Box;
 }
 
-export interface BoxType extends EditorType {
+export interface BoxType extends ViewType {
 	context: BoxArticle;
 	conf: Display;
 }
 
-export interface BoxArticle extends Article, Receiver {
+export interface BoxArticle extends Receiver {
 	view: ELE;
 	types: bundle<BoxType>;
+	selectionRange: RANGE;
+	commands: CommandBuffer<RANGE>;
 }
 
 export function extendDisplay(type: Display, conf: Display): Display {

@@ -1,5 +1,6 @@
+import { Command } from "../../base/command.js";
 import { RANGE } from "../../base/dom.js";
-import { Article, Edit, Command } from "../../base/editor.js";
+import { Article, Edit } from "../../base/editor.js";
 
 export abstract class EditCommand extends Command<RANGE> implements Edit {
 	constructor(owner: Article, name: string, viewId: string) {
