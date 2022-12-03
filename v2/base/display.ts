@@ -5,6 +5,11 @@ import { TypeConf } from "./type.js";
 import { bundle, extend } from "./util.js";
 import { ELE } from "./dom.js";
 
+// export interface Content extends Instance, Iterable<Content> {
+// 	textContent: string;
+// 	markupContent: string; //May be HTML, XML, or a simplification thereof.
+// }
+
 interface ViewConf extends TypeConf {
 	prototype?: object;
 	actions?: Actions;
@@ -40,10 +45,8 @@ export interface BoxType extends ViewType {
 }
 
 export interface BoxContext extends Article, Receiver {
-	//Required by viewers:
 	types: bundle<BoxType>;
 	view: ELE;
-	createElement(name: string): ELE;
 }
 
 export function extendDisplay(type: Display, conf: Display): Display {
