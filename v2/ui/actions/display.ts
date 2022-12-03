@@ -4,7 +4,7 @@ import { extend } from "../../base/util.js";
 import { CommandBuffer } from "../../base/command.js";
 
 import { UserEvent } from "../../control/frame.js";
-import { Change, IArticle, IType } from "../../control/editor.js";
+import { Change, IArticle, IType } from "../../control/box.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {

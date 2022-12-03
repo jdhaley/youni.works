@@ -1,9 +1,10 @@
 import { Display } from "../base/display.js";
 import { ELE } from "../base/dom.js";
-import { start, TypeConf } from "../base/type.js";
+import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import {IArticle, IEditor, IType} from "../control/editor.js";
+import { IArticle, IType } from "../control/box.js";
+import { IEditor } from "../control/editor.js";
 import { Frame } from "../control/frame.js";
 
 import { list } from "../control/viewers/list.js";

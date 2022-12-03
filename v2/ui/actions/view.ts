@@ -1,7 +1,6 @@
 import { Box } from "../../base/display.js";
-import { ELE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
-import { Change } from "../../control/editor.js";
+import { Change } from "../../control/box.js";
 
 import { UserEvent } from "../../control/frame.js";
 import { getBox, navigate, setClipboard } from "../util.js";

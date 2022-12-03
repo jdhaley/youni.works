@@ -1,8 +1,9 @@
 import { Box } from "../base/display.js";
-import { ele, ELE, NODE, RANGE } from "../base/dom.js";
+import { ELE, NODE, RANGE } from "../base/dom.js";
 import { Edits } from "../base/editor.js";
 import { getView } from "../base/view.js";
-import { IArticle } from "../control/editor.js";
+
+import { IArticle } from "../control/box.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";

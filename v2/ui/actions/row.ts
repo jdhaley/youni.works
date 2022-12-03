@@ -1,13 +1,13 @@
+import { Box } from "../../base/display.js";
 import { extend } from "../../base/util.js";
-import { ELE, ele } from "../../base/dom.js";
+import { ele } from "../../base/dom.js";
 
+import { Change } from "../../control/box.js";
 import { RowBox } from "../controls/row.js";
-import { getBox, getHeader } from "../util.js";
 import { UserEvent } from "../../control/frame.js";
+import { getBox, getHeader } from "../util.js";
 
 import editable from "./editor.js";
-import { Change } from "../../control/editor.js";
-import { Box } from "../../base/display.js";
 
 export default extend(editable, {
 	dblclick(this: RowBox, event: UserEvent) {

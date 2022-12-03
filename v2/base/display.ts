@@ -1,10 +1,9 @@
-import { View, ViewType } from "./view.js";
+import { Article, View, ViewType } from "./view.js";
 import { Shape } from "./shape.js";
-import { CommandBuffer } from "./command.js";
 import { Actions, Receiver } from "./controller.js";
 import { TypeConf } from "./type.js";
 import { bundle, extend } from "./util.js";
-import { ELE, RANGE } from "./dom.js";
+import { ELE } from "./dom.js";
 
 interface ViewConf extends TypeConf {
 	prototype?: object;
@@ -31,8 +30,6 @@ export interface Box extends Shape, View {
 	header?: View;
 	footer?: View;
 
-	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
-
 	/** for Records */
 	//get(member: string): Box;
 }
@@ -42,11 +39,10 @@ export interface BoxType extends ViewType {
 	conf: Display;
 }
 
-export interface BoxContext extends Receiver {
-	view: ELE;
+export interface BoxContext extends Article, Receiver {
+	//Required by viewers:
 	types: bundle<BoxType>;
-	commands: CommandBuffer<RANGE>;
-	selectionRange: RANGE;
+	view: ELE;
 	createElement(name: string): ELE;
 }
 

@@ -17,8 +17,8 @@ export class LevelCommand extends EditCommand {
 		return range;
 	}
 	protected do(way: "Promote" | "Demote") {
-		let start = this.owner.getControl(this.startId);
-		let end = this.owner.getControl(this.endId);
+		let start = this.owner.getControl(this.startId) as Editor;
+		let end = this.owner.getControl(this.endId) as Editor;
 		if (start == end) {
 			way == "Promote" ? start.promote() : start.demote();
 		} else {

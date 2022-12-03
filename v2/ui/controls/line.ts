@@ -1,8 +1,9 @@
 import { ELE, RANGE } from "../../base/dom.js";
 
+import { IType } from "../../control/box.js";
+
 import { TextBox } from "./text.js";
 import { getBox } from "../util.js";
-import { IType } from "../../control/editor.js";
 
 interface item {
 	type$: string

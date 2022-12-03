@@ -1,3 +1,4 @@
+import { CommandBuffer } from "./command.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
@@ -13,15 +14,25 @@ export interface View {
 
 	draw(data?: unknown): void;
 	valueOf(range?: RANGE): unknown;
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
 }
 
 export interface ViewType {
+	context: Article;
 	name: string;
 	model: string;
 	types: bundle<ViewType>;
 	
 	create(value?: unknown): View;
 	control(node: ELE): View;
+}
+
+export interface Article  {
+	commands: CommandBuffer<RANGE>;
+	selectionRange: RANGE;
+	getControl(id: string): View;
+	extentFrom(startPath: string, endPath: string): RANGE;
+	senseChange(editor: View, commandName: string): void;
 }
 
 export interface VIEW_ELE extends ELE {

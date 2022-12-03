@@ -1,5 +1,7 @@
 import { bundle } from "../../base/util.js";
 
+import { IType } from "../../control/box.js";
+
 import { TextBox } from "../controls/text.js";
 import { RecordBox } from "../controls/record.js";
 import { ListBox } from "../controls/list.js";
@@ -11,10 +13,6 @@ import edit from "./edit.js";
 import actions from "./actions.js";
 import shortcuts from "./shortcuts.js";
 
-import { IType } from "../../control/editor.js";
-
-
-import { TypeConf } from "../../base/type.js";
 const conf: bundle<any> = {
 	text: {
 		class: IType,
