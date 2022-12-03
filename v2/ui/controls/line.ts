@@ -1,9 +1,15 @@
-import { item } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
-import { ElementViewType } from "../../control/view.js";
+import { IType } from "../../control/box.js";
+
 import { TextBox } from "./text.js";
 import { getBox } from "../util.js";
+
+interface item {
+	type$: string
+	content?: unknown,
+	level?: number,
+}
 
 export class LineBox extends TextBox {
 	demote() {
@@ -45,20 +51,20 @@ export class LineBox extends TextBox {
 	convert(name: string) {
 		let toType = this.type.partOf?.types[name];
 		if (toType) {
-			this._type = toType as ElementViewType;
+			this.type = toType as IType;
 			this.view.setAttribute("data-item", toType.name);
 		}
 	}
 	viewValue(content: item): void {
-		this.content.markupContent = (content ? "" + content.content : "");
+		this.content.innerHTML = (content ? "" + content.content : "");
 		this.level = content.level;	
 	}
 	viewEle(content: ELE): void {
-		this.content.markupContent = content.innerHTML;
+		this.content.innerHTML = content.innerHTML;
 		this.level = Number.parseInt(content.getAttribute("level"));
 	}
 	valueOf(range?: RANGE): item {
-		if (range && !range.intersectsNode(this.content.view)) return;
+		if (range && !range.intersectsNode(this.content)) return;
 		let content = super.valueOf(range);
 		let item: item = {
 			type$: this.view.getAttribute("data-item"),

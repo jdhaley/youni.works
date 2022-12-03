@@ -1,36 +1,34 @@
-import { Sequence } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
+import { View, getView } from "../../base/view.js";
 
-import { getBox } from "../util.js";
-import { Viewbox } from "./box.js";
-
-export class ListBox extends Viewbox {
-	viewValue(model: Sequence<unknown>): void {
-		if (model && model[Symbol.iterator]) for (let item of model) {
+export const list = {
+	viewValue(this: View, model: unknown): void {
+		if (model && model[Symbol.iterator]) for (let item of (model as Iterable<unknown>)) {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
-				console.warn(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
-				type =  this.type.context.types["unknown"] as any;
+				throw new Error(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
 			}
-			this.content.append(type.create(item).view);
+			let view = type.create(item);
+			this.view.append(view.view);
 		}
-	}
-	viewElement(content: ELE) {
+	},
+	viewElement(this: View, content: ELE): void {
 		if (!content) return;
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
-				this.content.append(childType.create(child).view);
+				let view = childType.create(child);
+				this.view.append(view.view);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}
 		}
-	}
-	valueOf(range?: RANGE): unknown {
+	},
+	valueOf(this: View, range?: RANGE): unknown {
 		let model: unknown[];
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let part of this.content.childNodes) {
-			let editor = getBox(part);
+			let editor = getView(part);
 			let value = editor?.valueOf(range);
 			if (value) {
 				if (!model) {
@@ -42,13 +40,9 @@ export class ListBox extends Viewbox {
 		}
 		return model;
 	}
-	protected createFooter(model?: unknown) {
-		let footer = this.view.ownerDocument.createElement("footer") as Element;
-		this.view.append(footer);
-	}
 }
 
-export function viewTypeOf(value: any): string {
+function viewTypeOf(value: any): string {
 	let type = typeOf(value);
 	switch (type) {
 		case "string":
@@ -61,8 +55,7 @@ export function viewTypeOf(value: any): string {
 	}
 	return type; //"list" or value.type$
 }
-
-export function typeOf(value: any): string {
+function typeOf(value: any): string {
 	if (value?.valueOf) value = value.valueOf(value);
 	let type = typeof value;
 	switch (type) {

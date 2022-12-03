@@ -7,7 +7,8 @@ export class Replace extends EditCommand {
 	after: string;
 
 	exec(range: RANGE, content: any): RANGE {
-		if (this.owner.conf.recordCommands) {
+		//TODO temporary - flag check removed to reduce the footprint of Article for the editing.
+		if (true /*this.owner.conf.recordCommands*/) {
 			this.range = {
 				start: getPath(range.startContainer) + "/" + range.startOffset,
 				end: getPath(range.endContainer) + "/" + range.endOffset
@@ -44,7 +45,7 @@ export class Replace extends EditCommand {
 		mark(range);
 		let content = getEditor(range)?.content;
 		if (!content) return;
-		this.before = content.markupContent;	
+		this.before = content.innerHTML;	
 	}
 	protected execReplace(range: RANGE, text: string) {
 		range.deleteContents();
@@ -55,17 +56,17 @@ export class Replace extends EditCommand {
 	}
 	protected execAfter(range: RANGE): RANGE {
 		let content = getEditor(range)?.content;
-		this.after = content.markupContent;
+		this.after = content.innerHTML;
 		return unmark(range);	
 	}
 	protected doReplace(markup: string) {
 		let editor = this.owner.getControl(this.viewId);
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 
-		editor.content.markupContent = markup;
+		editor.content.innerHTML = markup;
 
 		let range = editor.view.ownerDocument.createRange();
-		range.selectNode(editor.content.view);
+		range.selectNode(editor.content);
 		return unmark(range);
 	}
 }

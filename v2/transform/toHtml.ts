@@ -1,5 +1,5 @@
-import { record } from "../base/model.js";
 import { ELE } from "../base/dom.js";
+import { bundle } from "../base/util.js";
 import { Part } from "./item.js";
 
 export function toHtml(item: Part) {
@@ -34,7 +34,7 @@ function transformItem(parent: ELE, item: Part) {
 			thead.append(col);
 			col.textContent = name;
 		}
-		for (let row of item.content as record[]) {
+		for (let row of item.content as bundle<unknown>[]) {
 			let trow = doc.createElement("tr");
 			ele.append(trow);
 			for (let name in row.content as object) {

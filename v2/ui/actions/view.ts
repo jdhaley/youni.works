@@ -1,21 +1,21 @@
-import { Box, Change } from "../../base/control.js";
-import { ELE } from "../../base/dom.js";
+import { Box } from "../../base/display.js";
 import { extend } from "../../base/util.js";
+import { Change } from "../../control/box.js";
 
 import { UserEvent } from "../../control/frame.js";
 import { getBox, navigate, setClipboard } from "../util.js";
 
 export default extend(null, {
-	keydown(this: Box<ELE>, event: UserEvent) {
+	keydown(this: Box, event: UserEvent) {
 		event.shortcut = getShortcut(event);
 		event.subject = this.type.conf.shortcuts[event.shortcut] || "keydown";
        // console.log(event.shortcut, event.subject);
 	},
-	save(this: Box<ELE>, event: UserEvent) {
-		this.type.owner.receive(event);
+	save(this: Box, event: UserEvent) {
+		this.type.context.receive(event);
 		event.subject = "";
 	},
-	copy(this: Box<ELE>, event: UserEvent) {
+	copy(this: Box, event: UserEvent) {
 		event.subject = "";
 		setClipboard(event.range, event.clipboardData);
 	},
@@ -35,17 +35,19 @@ export default extend(null, {
 			prev.scrollIntoView({block: "center"});
 		}
 	},
-	undo(this: Box<ELE>, event: UserEvent) {
+	undo(this: Box, event: UserEvent) {
 		event.subject = "";
-		this.type.owner.setExtent(this.type.owner.commands.undo(), false);
-		this.type.owner.receive(new Change("undo"));
+		let range = this.type.context.commands.undo();
+		if (range) this.type.context.selectionRange = range;
+		this.type.context.receive(new Change("undo"));
 	},
-	redo(this: Box<ELE>, event: UserEvent) {
+	redo(this: Box, event: UserEvent) {
 		event.subject = "";
-		this.type.owner.setExtent(this.type.owner.commands.redo(), false);
-		this.type.owner.receive(new Change("redo"));
+		let range = this.type.context.commands.redo();
+		if (range) this.type.context.selectionRange = range;
+		this.type.context.receive(new Change("redo"));
 	},
-	selectionchange(this: Box<ELE>, event: UserEvent) {
+	selectionchange(this: Box, event: UserEvent) {
 		event.subject = "";
 		let eles = [];
 		for (let ele of this.view.ownerDocument.getElementsByClassName("active")) {
@@ -53,18 +55,18 @@ export default extend(null, {
 		}
 	 	for (let ele of eles) ele.classList.remove("active");
 		let range = event.range;
-		for (let node of this.content.view.childNodes) {
+		for (let node of this.content.childNodes) {
 			let editor = getBox(node);
-			if (range.intersectsNode(editor.content.view)) {
-				editor.content.kind.add("active");
+			if (range.intersectsNode(editor.content)) {
+				editor.content.classList.add("active");
 			}
 		}
 	},
-	change(this: Box<ELE>, signal: Change) {
+	change(this: Box, signal: Change) {
 		if (signal.direction == "up") {
 			//console.log(signal.direction, this.type.name, signal.commandName);
-			if (this.view == this.type.owner.view) {
-				this.type.owner.receive(signal);
+			if (this.view == this.type.context.view) {
+				this.type.context.receive(signal);
 			}
 		} else {
 			//console.log("down");

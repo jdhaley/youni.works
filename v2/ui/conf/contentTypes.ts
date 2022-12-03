@@ -1,5 +1,6 @@
-import { model } from "../../base/model";
 import { bundle } from "../../base/util";
+
+type model = "unit" | "list" | "record";
 
 export default {
 	// "widget": "unit",

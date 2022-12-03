@@ -1,6 +1,4 @@
-import { ControlType, Control, Extent } from "./control.js";
-import { Text } from "./model.js";
-import { Bag, Sequence } from "./util.js";
+import { Bag, Sequence, Extent } from "./util.js";
 
 export interface DOCUMENT {
 	readonly body: ELE;
@@ -90,40 +88,5 @@ export function getNodeIndex(parent: NODE, node: NODE): number {
 		if (parent.childNodes[i] == node) {
 			return i;
 		}
-	}
-}
-///////////////////// View Support //////////////////////////
-
-export interface VIEW_ELE extends ELE {
-	$control?: Control<ELE>;
-}
-
-export function getView(loc: Text | RANGE): Control<NODE> {
-	if (loc instanceof Range) loc = loc.commonAncestorContainer;
-	for (let node = loc instanceof Node ? loc : null; node; node = node.parentNode) {
-		let e = ele(node) as VIEW_ELE;
-		if (e?.$control?.type instanceof ControlType) {
-			return e.$control;
-		}
-	}
-}
-
-export function bindViewEle(node: VIEW_ELE) {
-	let view = node["$control"] as Control<NODE>;
-	if (view) return;
-	view = getView(node.parentNode) as Control<NODE>;
-	let name = node.getAttribute("data-item");
-	if (view && name) {
-		console.log("binding.");
-		let type = view.type.types[name] as ControlType<NODE>;
-		if (type) {
-			view = type.control(node);
-		} else {
-			console.warn(`Bind failed: Type "${name}" not found in "${view.type.name}"`);
-			return;
-		}
-	}
-	for (let child of view.content.contents) {
-		if (ele(child)) bindViewEle(child as ELE);
 	}
 }

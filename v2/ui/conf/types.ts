@@ -1,29 +1,22 @@
 import { bundle } from "../../base/util.js";
 
+import { IType } from "../../control/box.js";
+
 import { TextBox } from "../controls/text.js";
 import { RecordBox } from "../controls/record.js";
 import { ListBox } from "../controls/list.js";
 import { LineBox } from "../controls/line.js";
 import { RowBox } from "../controls/row.js";
 
-import { ElementViewType } from "../../control/view.js";
 
 import edit from "./edit.js";
 import actions from "./actions.js";
 import shortcuts from "./shortcuts.js";
 
-export interface TypeConf {
-	class: typeof ElementViewType;
-	viewType: string,
-	prototype?: any,
-	container: boolean;
-	tagName: string;
-	shortcuts: bundle<string>;
-}
-
-const conf: bundle<TypeConf> = {
+const conf: bundle<any> = {
 	text: {
-		class: ElementViewType,
+		class: IType,
+		model: "unit",
 		viewType: "text",
 		prototype: new TextBox(actions.text, edit.text),
 		container: true,
@@ -31,7 +24,8 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	record: {
-		class: ElementViewType,
+		class: IType,
+		model: "record",
 		viewType: "form",
 		prototype: new RecordBox(actions.record, edit.record),
 		container: true,
@@ -39,7 +33,8 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	list: {
-		class: ElementViewType,
+		class: IType,
+		model: "list",
 		viewType: "list",
 		prototype: new ListBox(actions.list, edit.list),
 		container: true,
@@ -47,7 +42,8 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: ElementViewType,
+		class: IType,
+		model: "list",
 		viewType: "markup",
 		prototype: new ListBox(actions.markup, edit.markup),
 		container: true,
@@ -55,7 +51,8 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	line: {
-		class: ElementViewType,
+		class: IType,
+		model: "unit",
 		viewType: "line",
 		prototype: new LineBox(actions.line, edit.text),
 		container: false,
@@ -63,7 +60,8 @@ const conf: bundle<TypeConf> = {
 		shortcuts: shortcuts
 	},
 	row: {
-		class: ElementViewType,
+		class: IType,
+		model: "record",
 		viewType: "row",
 		prototype: new RowBox(actions.row, edit.record),
 		container: false,

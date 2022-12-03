@@ -32,4 +32,3 @@ export class CommandBuffer<T> {
 		return this.#command;
 	}
 }
-

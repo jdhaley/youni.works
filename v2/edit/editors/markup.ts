@@ -1,9 +1,9 @@
-import { value } from "../../base/model.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
 import { LevelCommand } from "../commands/level.js";
 import { MarkupReplace } from "../commands/markupReplace.js";
-import { Editor, getChildEditor, getEditor, senseChange } from "../util.js";
+import { getChildEditor, getEditor, senseChange } from "../util.js";
+import { Editor } from "../../base/editor.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, content: string): void {
 	if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
@@ -12,7 +12,8 @@ export default function edit(this: Editor, commandName: string, range: RANGE, co
 
 	let r = range.cloneRange();
 	r = cmd.call(this, commandName, r, content);
-	this.type.owner.setExtent(r, true);
+	r.collapse();
+	this.type.context.selectionRange = r;
 
 	senseChange(this, commandName);
 }
@@ -31,18 +32,18 @@ const COMMANDS = {
 	"Join": replace,
 }
 
-function replace(this: Editor, commandName: string, range: RANGE, content?: value): RANGE {
+function replace(this: Editor, commandName: string, range: RANGE, content?: unknown): RANGE {
 	let editor = getEditor(range);
 	if (editor.type.model != "list") {
 		editor = getEditor(editor.view.parentNode);
 	}
 	if (editor != this) console.warn("Invalid edit range.", editor);
 
-	return new MarkupReplace(this.type.owner, commandName, editor.id).exec(range, content);
+	return new MarkupReplace(this.type.context, commandName, editor.id).exec(range, content);
 }
 
 function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
-	if (!this.content.contents.length) return;
+	if (!this.content.childNodes.length) return;
 	let start = getChildEditor(this, range.startContainer);
 	let end = getChildEditor(this, range.endContainer);
 	//If a range of items, check that there are no headings
@@ -54,5 +55,5 @@ function level(this: Editor, name: "Promote" | "Demote", range: RANGE): RANGE {
 		}
 		if (item.id == end.id) break;
 	}
-	return new LevelCommand(this.type.owner, name, this.id).exec(range);
+	return new LevelCommand(this.type.context, name, this.id).exec(range);
 }

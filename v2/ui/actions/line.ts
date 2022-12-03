@@ -1,4 +1,4 @@
-import { Box } from "../../base/control.js";
+import { Box } from "../../base/display.js";
 import { ELE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
@@ -8,7 +8,7 @@ import { getClipboard } from "../util.js";
 import text from "./text.js";
 
 export default extend(text, {
-	paste(this: Box<ELE>, event: UserEvent) {
+	paste(this: Box, event: UserEvent) {
 		let x = getClipboard(event.clipboardData);
 		if (x instanceof Array) return;
 		event.subject = "";
@@ -17,7 +17,7 @@ export default extend(text, {
 		let range = event.range;
 		this.exec("Paste", range, text);
 	},
-	erase(this: Box<ELE>, event: UserEvent) {
+	erase(this: Box, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) {
@@ -30,7 +30,7 @@ export default extend(text, {
 			this.exec("Erase", range, "");
 		}
 	},
-	delete(this: Box<ELE>, event: UserEvent) {
+	delete(this: Box, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) {
@@ -42,12 +42,6 @@ export default extend(text, {
 		} else {
 			this.exec("Delete", range, "");
 		}
-	},
-	next() {
-		//propagate to the markup controller.
-	},
-	previous() {
-		//propagate to the markup controller.
-	},
+	}
 });
 

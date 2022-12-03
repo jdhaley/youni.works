@@ -1,19 +1,14 @@
-import { Control, Change } from "../base/control.js";
-import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getView, bindViewEle, getNodeIndex } from "../base/dom.js";
-
-export interface Editor extends Control<ELE> {
-	id: string;
-	/** @deprecated */
-	convert?(type: string): void;
-}
+import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getNodeIndex } from "../base/dom.js";
+import { Editor } from "../base/editor.js";
+import { getView, bindViewEle } from "../base/view.js";
 
 const getEditor = getView as (node: NODE | RANGE) => Editor ;
 
 export { getEditor, bindViewEle }
 
 export function getChildEditor(editor: Editor, node: NODE): Editor {
-	if (node == editor.content.view) return null;
-	while (node?.parentNode != editor.content.view) {
+	if (node == editor.content) return null;
+	while (node?.parentNode != editor.content) {
 		node = node.parentNode;
 	}
 	if (ele(node) && node["$control"]) return node["$control"] as Editor;
@@ -23,7 +18,7 @@ export function getPath(node: NODE): string {
 	let view = getEditor(node);
 	let path = "";
 	while (node) {
-		if (node == view.content.view) {
+		if (node == view.content) {
 			return view.id + path;
 		}
 		path = "/" + getNodeIndex(node.parentNode, node) + path;
@@ -38,7 +33,7 @@ export function narrowRange(range: RANGE) {
 
 	let start = range.startContainer;
 	let end = range.endContainer;
-	let content = getEditor(range).content.view;
+	let content = getEditor(range).content;
 	if (inHeader(editor, start)) {;
 		range.setStart(content, 0);
 	}
@@ -140,7 +135,7 @@ export function clearContent(range: RANGE) {
 				if (enclosedInRange(editor.view, range)) (editor.view as any).remove();	
 			}
 		} else if (node.nodeType == Node.TEXT_NODE) {
-			if (editor && node.parentElement == editor.content.view) {
+			if (editor && node.parentElement == editor.content) {
 				if (node == range.startContainer) {
 					node.textContent = node.textContent.substring(0, range.startOffset);
 				} else if (node == range.endContainer) {
@@ -180,5 +175,5 @@ export function rangeIterator(range: RANGE) {
 }
 
 export function senseChange(editor: Editor, commandName: string) {
-	editor.type.owner.sense(new Change(commandName, editor), editor.view);
+	editor.type.context.senseChange(editor, commandName);
 }
