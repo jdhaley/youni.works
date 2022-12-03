@@ -1,18 +1,16 @@
 import { ELE, RANGE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
-import { Type } from "../../base/type.js";
-import { Editor } from "../../base/editor.js";
 import { CommandBuffer } from "../../base/command.js";
 
 import { UserEvent } from "../../control/frame.js";
-import { Change, IArticle } from "../../control/editor.js";
+import { Change, IArticle, IType } from "../../control/editor.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, this.source);
-		this.view = (type.create(this.source)).view as ELE;
+		this.view = type.create(this.source).view as ELE;
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.owner.append(this.view);
@@ -44,7 +42,7 @@ export default extend(null, {
 	}
 });
 
-function getType(article: IArticle, path: string, data: any): Type<Editor> {
+function getType(article: IArticle, path: string, data: any): IType {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";

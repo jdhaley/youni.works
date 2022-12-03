@@ -58,7 +58,7 @@ let baseTypes: bundle<Display> = {
 	}
 }
 
-let types: bundle<TypeConf> = {
+let types: bundle<Display> = {
 	task: {
 		type: "record",
 		title: "Task",

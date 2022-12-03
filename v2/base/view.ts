@@ -1,4 +1,5 @@
 import { ele, ELE, NODE, RANGE } from "./dom.js";
+import { bundle } from "./util.js";
 
 // export interface Content extends Instance, Iterable<Content> {
 // 	textContent: string;
@@ -17,10 +18,8 @@ export interface View {
 export interface ViewType {
 	name: string;
 	model: string;
-
-	types: {
-		[key: string]: ViewType;
-	};
+	types: bundle<ViewType>;
+	
 	create(value?: unknown): View;
 	control(node: ELE): View;
 }

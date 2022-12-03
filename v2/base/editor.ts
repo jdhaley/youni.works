@@ -17,7 +17,6 @@ export interface Editor extends View {
 
 export interface EditorType extends ViewType {
 	context: Article;
-	model: string;
 }
 
 export interface Article  {
@@ -26,21 +25,7 @@ export interface Article  {
 	getControl(id: string): Editor;
 	extentFrom(startPath: string, endPath: string): RANGE;
 	senseChange(editor: Editor, commandName: string): void;
-
-	// createElement(tagName: string): ELE;
-	// types: bundle<ViewType>;
 }
-
-export interface Edit {
-	name: string;
-	viewId: string;
-	range: {
-		start: string;
-		end: string;
-	}
-	value: unknown;
-}
-
 
 export interface Edits {
 	type: string;

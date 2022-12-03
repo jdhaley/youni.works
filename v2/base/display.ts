@@ -1,14 +1,24 @@
+import { View, ViewType } from "./view.js";
+import { Shape } from "./shape.js";
 import { CommandBuffer } from "./command.js";
 import { Actions, Receiver } from "./controller.js";
-import { ELE, RANGE } from "./dom.js";
-import { Shape } from "./shape.js";
 import { TypeConf } from "./type.js";
 import { bundle, extend } from "./util.js";
-import { View, ViewType } from "./view.js";
+import { ELE, RANGE } from "./dom.js";
 
-export interface Display extends TypeConf {
+interface ViewConf extends TypeConf {
+	prototype?: object;
+	actions?: Actions;
+	tagName?: string;
+
+	title?: string;
+	model?: "record" | "list" | "unit";
+}
+
+export interface Display extends ViewConf {
+	types?: bundle<Display | string>;
+
 	viewType?: string;
-	model?: "record" | "list" | "unit",
 	kind?: string;
 	header?: string;
 	footer?: string;
@@ -28,15 +38,16 @@ export interface Box extends Shape, View {
 }
 
 export interface BoxType extends ViewType {
-	context: BoxArticle;
+	context: BoxContext;
 	conf: Display;
 }
 
-export interface BoxArticle extends Receiver {
+export interface BoxContext extends Receiver {
 	view: ELE;
 	types: bundle<BoxType>;
-	selectionRange: RANGE;
 	commands: CommandBuffer<RANGE>;
+	selectionRange: RANGE;
+	createElement(name: string): ELE;
 }
 
 export function extendDisplay(type: Display, conf: Display): Display {

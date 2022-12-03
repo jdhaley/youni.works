@@ -1,4 +1,3 @@
-import { Actions } from "./controller.js";
 import { bundle } from "./util.js";
 
 export interface Type<T> {
@@ -13,41 +12,19 @@ export interface TypeContext {
 	types: bundle<Type<unknown>>;
 }
 
+export interface TypeConf {
+	type?: string;
+	types?: bundle<TypeConf | string>;
+	class?: typeof BaseType;
+}
+
 export function start(owner: TypeContext, baseTypes: bundle<any>, types: bundle<any>) {
 	let base = loadBaseTypes(owner, baseTypes);
 	owner.types = loadTypes(types, base);
 	console.info("Types:", owner.types);
 }
 
-export interface TypeConf {
-	type?: string;
-	types?: bundle<TypeConf | string>;
-	class?: typeof BaseType;
-	prototype?: object;
-	actions?: Actions;
-	tagName?: string;
-	title?: string;
-}
-
-// export interface TypeConf {
-// 	type?: string;
-// 	extends?: TypeConf;
-
-// 	kind?: string;
-// 	props?: bundle<any>; //props?: bundle<any>
-// 	header?: TypeConf;
-// 	footer?: TypeConf;
-// 	actions?: Actions;
-// 	style?: bundle<any>;
-
-// 	types?: bundle<TypeConf>;
-// 	content?: unit | Sequence<TypeConf> | bundle<TypeConf> | ((conf: bundle<any>) => string);
-
-// 	prototype?: any;
-// }
-
 type types = bundle<Type<unknown>>;
-//type source = bundle<TypeConf> | string;
 
 export class BaseType<T> implements Type<T> {
 	constructor(context: TypeContext) {
@@ -57,7 +34,7 @@ export class BaseType<T> implements Type<T> {
 	declare partOf: BaseType<T>;
 	declare types: bundle<Type<T>>;
 	declare name: string;
-	declare conf: bundle<any>;
+	declare conf: TypeConf;
 
 	generalizes(type: Type<T>): boolean {
 		return type == this;
@@ -69,11 +46,11 @@ export class BaseType<T> implements Type<T> {
 	}
 }
 
-function loadBaseTypes(owner: TypeContext, baseTypes: bundle<any>): bundle<Type<unknown>> {
+function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<Type<unknown>> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
-		let type = new conf.class(owner) as BaseType<unknown>;
+		let type = new conf.class(owner);
 		types[name] = type;
 		type.start(name, conf);
 	}

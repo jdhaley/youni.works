@@ -1,21 +1,17 @@
-import { View, ViewType } from "../base/view.js";
-import { Display, extendDisplay } from "../base/display.js";
-import { BaseType, TypeConf } from "../base/type.js";
+import { Box, BoxContext, BoxType, Display, extendDisplay } from "../base/display.js";
+import { BaseType } from "../base/type.js";
 import { Actions } from "../base/controller.js";
-import { ELE } from "../base/dom.js";
+import { ELE, RANGE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
 
 import { ElementShape } from "./element.js";
 
-export class BaseView extends ElementShape implements View {
+export class IBox extends ElementShape implements Box {
 	constructor(actions?: Actions) {
 		super(actions);
 	}
 	declare type: VType;
 
-	get conf(): Display {
-		return this.type.conf;
-	}
 	get isContainer(): boolean {
 		return this.type.header || this.type.footer ? true : false;
 	}
@@ -25,12 +21,12 @@ export class BaseView extends ElementShape implements View {
 		}
 		return this.view;
 	}
-	get header(): View {
+	get header(): Box {
 		if (this.isContainer) for (let child of this.view.children) {
 			if (child.nodeName == "HEADER") return child["$control"];
 		}
 	}
-	get footer(): View {
+	get footer(): Box {
 		if (this.isContainer) for (let child of this.view.children) {
 			if (child.nodeName == "FOOTER") return child["$control"];
 		}
@@ -51,35 +47,34 @@ export class BaseView extends ElementShape implements View {
 	valueOf(filter?: unknown): unknown {
 		return undefined;
 	}
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
+		throw new Error("Method not implemented.");
+	}
 }
 
-interface ViewContext  {
-	types: bundle<VType>;
-	createElement(tagName: string): ELE;
-}
-
-export class VType /*extends LoadableType*/ extends BaseType<View> implements ViewType {
-	declare context: ViewContext;
+export class VType /*extends LoadableType*/ extends BaseType<Box> implements BoxType {
+	declare context: BoxContext;
 	declare partOf: VType;
-	declare name: string;
-	declare prototype: View;
-	declare types: bundle<ViewType>;
-	declare tagName: string;
-	declare conf: TypeConf;
-	declare header?: ViewType;
-	declare footer?: ViewType;
+	declare types: bundle<VType>;
+	declare conf: Display;
+	declare prototype: Box;
+	declare header?: VType;
+	declare footer?: VType;
 
 	get model(): string {
-		return "";
+		return this.conf.model;
 	}
-	
-	create(value?: unknown): View {
-		let node = this.context.createElement(this.conf.tagName || "div");
+	get tagName(): string {
+		return this.conf.tagName;
+	}
+
+	create(value?: unknown): Box {
+		let node = this.context.createElement(this.tagName || "div");
 		let view = this.control(node);
 		view.draw(value);
 		return view;
 	}
-	control(node: ELE): View {
+	control(node: ELE): Box {
 		node.setAttribute("data-item", this.name);
 		let view = Object.create(this.prototype);
 		node["$control"] = view;
@@ -92,8 +87,8 @@ export class VType /*extends LoadableType*/ extends BaseType<View> implements Vi
 
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
-		if (conf.header) this.header = this.context.types[conf.header] as ViewType;
-		if (conf.footer) this.footer = this.context.types[conf.footer] as ViewType;
+		if (conf.header) this.header = this.context.types[conf.header] as VType;
+		if (conf.footer) this.footer = this.context.types[conf.footer] as VType;
 	}
 }
 

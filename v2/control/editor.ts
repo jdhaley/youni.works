@@ -7,7 +7,7 @@ import { start } from "../base/type.js";
 import { bundle, implement } from "../base/util.js";
 import { bindViewEle, getView, VIEW_ELE } from "../base/view.js";
 import { Frame } from "./frame.js";
-import { BaseView, VType } from "./view.js";
+import { IBox, VType } from "./box.js";
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 
@@ -17,7 +17,7 @@ interface Viewer {
 	valueOf(filter?: unknown): unknown
 }
 
-export class IEditor extends BaseView implements Editor {
+export class IEditor extends IBox implements Editor {
 	constructor(viewer?: Viewer, actions?: Actions, editor?: editor) {
 		super(actions);
 		if (viewer) implement(this, viewer);
@@ -73,7 +73,6 @@ let NEXT_ID = 1;
 
 export class IType extends VType implements EditorType {
 	declare context: IArticle;
-	declare conf: bundle<any>;
 	
 	get model(): string {
 		return this.conf.model;
