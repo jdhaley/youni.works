@@ -13,8 +13,8 @@ interface Viewer {
 }
 
 export class IEditor extends IBox implements Editor {
-	constructor(viewer?: Viewer, actions?: Actions, editor?: editor) {
-		super(actions);
+	constructor(viewer?: Viewer, editor?: editor) {
+		super();
 		if (viewer) implement(this, viewer);
 		if (editor) this["exec"] = editor;
 	}

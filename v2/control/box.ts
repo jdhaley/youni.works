@@ -1,4 +1,4 @@
-import { Box, BoxType, Display, extendDisplay } from "../base/display.js";
+import { Box, BoxType, Display } from "../base/display.js";
 import { Article, bindViewEle, getView, View, VIEW_ELE } from "../base/view.js";
 import { BaseType, start } from "../base/type.js";
 import { Actions, BaseReceiver, Signal } from "../base/controller.js";
@@ -9,6 +9,7 @@ import { bundle } from "../base/util.js";
 
 import { ElementShape } from "./element.js";
 import { Frame } from "./frame.js";
+import { extendDisplay } from "./display.js";
 
 export class IBox extends ElementShape implements Box {
 	constructor(actions?: Actions) {
@@ -16,6 +17,9 @@ export class IBox extends ElementShape implements Box {
 	}
 	declare type: IType;
 
+	get partOf(): IBox {
+		return super.partOf as IBox;
+	}
 	get isContainer(): boolean {
 		return this.type.header || this.type.footer ? true : false;
 	}
@@ -39,14 +43,14 @@ export class IBox extends ElementShape implements Box {
 	draw(value: unknown): void {
 		let content: ELE;
 		if (this.isContainer) {
-			if (this.type.header) this.view.append(this.type.header.create(value));
+			if (this.type.header) this.view.append(this.type.header.create(value).view);
 			content = this.view.ownerDocument.createElement("div");
 			this.view.append(content);
-			if (this.type.footer) this.view.append(this.type.footer.create(value));	
+			if (this.type.footer) this.view.append(this.type.footer.create(value).view);	
 		} else {
 			content = this.view;
 		}
-		content.classList.add("content");
+		if (this.view.nodeName == "DIV") content.classList.add("content");
 	}
 	valueOf(filter?: unknown): unknown {
 		return undefined;
@@ -60,10 +64,10 @@ export class IType /*extends LoadableType*/ extends BaseType<Box> implements Box
 	declare context: IArticle;
 	declare partOf: IType;
 	declare types: bundle<IType>;
-	declare conf: Display;
-	declare prototype: Box;
+	declare prototype: IBox;
 	declare header?: IType;
 	declare footer?: IType;
+	declare conf: Display;
 
 	get model(): string {
 		return this.conf.model;
@@ -83,10 +87,12 @@ export class IType /*extends LoadableType*/ extends BaseType<Box> implements Box
 	}
 	start(name: string, conf: Display): void {
 		this.name = name;
-		this.conf = extendDisplay(this.conf, conf);
-
+		conf = extendDisplay(this, conf);
+		console.debug(name, conf);
+		this.conf = conf;
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
+		if (conf.actions) this.prototype.actions = conf.actions;
 		if (conf.header) this.header = this.context.types[conf.header] as IType;
 		if (conf.footer) this.footer = this.context.types[conf.footer] as IType;
 	}
@@ -96,6 +102,7 @@ export class IArticle extends BaseReceiver implements Article {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf.actions);
 		this.owner = frame;
+		this.types = Object.create(null);
 		this.commands = new CommandBuffer();
 		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
 		start(this, conf.baseTypes, conf.viewTypes);

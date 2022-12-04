@@ -9,7 +9,8 @@ type editor = (this: Viewbox, commandName: string, range: RANGE, content?: unkno
 
 export abstract class Viewbox extends IEditor implements Box {
 	constructor(actions: Actions, editor: editor) {
-		super(null, actions);
+		super(null);
+		this.actions = actions;
 		if (editor) this["exec"] = editor;
 	}
 

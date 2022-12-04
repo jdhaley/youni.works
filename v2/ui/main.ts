@@ -1,4 +1,5 @@
-import { Display } from "../base/display.js";
+import { Signal } from "../base/controller.js";
+import { Box, Display } from "../base/display.js";
 import { ELE } from "../base/dom.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
@@ -38,21 +39,24 @@ const shortcuts = {
 let baseTypes: bundle<Display> = {
 	record: {
 		class: IType as any,
-		prototype: new IEditor(record, actions.record, edit.record),
+		prototype: new IEditor(record, edit.record),
+		actions: actions.record,
 		tagName: "div",
 		model: "record",
 		shortcuts: shortcuts,
 	},
 	list: {
 		class: IType as any,
-		prototype: new IEditor(list, actions.list, edit.list),
+		prototype: new IEditor(list, edit.list),
+		actions: actions.list,
 		tagName: "div",
 		model: "list",
 		shortcuts: shortcuts
 	},
 	text: {
 		class: IType as any,
-		prototype: new IEditor(text, actions.text, edit.text),
+		prototype: new IEditor(text, edit.text),
+		actions: actions.text,
 		tagName: "div",
 		model: "unit",
 		shortcuts: shortcuts
@@ -60,25 +64,66 @@ let baseTypes: bundle<Display> = {
 }
 
 let types: bundle<Display> = {
+	field: {
+		type: "unit",
+		style: {
+			".field": {
+				padding: "2px"
+			},
+			".field>.content": {
+				border: "1px solid gainsboro"
+			}
+		}
+	},
+	caption: {
+		type: "text",
+		tagName: "header",
+		actions: {
+			view(this: Box, signal: Signal) {
+				this.content.textContent = this.partOf.type.conf.title;
+			}
+		}
+	},
+	/*
+dsp development: design responsibility questions: today: in progress
+td teller: michael hoy meeting: done
+td teller: odyssey architecture notes: in progress
+td teller: feature spreadsheet iteration: done
+ibm admin: reset password: done
+ibm admin: update hours: postponed
+*/
 	task: {
 		type: "record",
 		title: "Task",
 		types: {
+			activity: {
+				type: "text",
+				header: "caption",
+				title: "Activity",
+				style: {
+					this: {
+						flex_width: "20%"
+					}
+				}
+			},
 			title: {
 				type: "text",
+				header: "caption",
 				title: "Title",
 			},
-			owner: {
+			status: {
 				type: "text",
-				title: "Owner"
+				header: "caption",
+				title: "Status"
 			},
-			tasks: {
-				type: "list",
-				title: "Sub Tasks",
-				types: {
-					task: "task"
-				}
-			}
+			// tasks: {
+			// 	type: "list",
+			// 	header: "caption",
+			// 	title: "Sub Tasks",
+			// 	types: {
+			// 		task: "task"
+			// 	}
+			// }
 		}
 	}
 }
@@ -96,3 +141,5 @@ article.types.task.control(document.body as ELE).draw({
 	title: "Get things working",
 	owner: "John",
 });
+frame.send("view", frame.view);
+frame.view.setAttribute("contenteditable", "true");

@@ -20,7 +20,7 @@ export interface TypeConf {
 
 export function start(owner: TypeContext, baseTypes: bundle<any>, types: bundle<any>) {
 	let base = loadBaseTypes(owner, baseTypes);
-	owner.types = loadTypes(types, base);
+	owner.types = loadTypes(owner.types, types, base);
 	console.info("Types:", owner.types);
 }
 
@@ -50,6 +50,7 @@ function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
+		conf["name"] = name;
 		let type = new conf.class(owner);
 		types[name] = type;
 		type.start(name, conf);
@@ -57,9 +58,8 @@ function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<
 	return types;
 }
 
-function loadTypes(source: bundle<TypeConf>, base: types): types {
+function loadTypes(types: types, source: bundle<TypeConf>, base: types): types {
 	base = Object.create(base);
-	let types = Object.create(null);
 	for (let name in source) {
 		types[name] = getType(name, base, source);
 	}
@@ -87,7 +87,6 @@ function createType(name: string, conf: TypeConf, types: types, source: bundle<T
 	let supertype = conf.type ? getType(conf.type, types, source) : null;
 	let type = Object.create(supertype) as BaseType<unknown>;
 	type.types = Object.create(supertype.types || null);
-	type.start(name, conf)
 
 	if (name) {
 		type.name = name;
@@ -96,11 +95,14 @@ function createType(name: string, conf: TypeConf, types: types, source: bundle<T
 	for (let name in conf.types) {
 		type.types[name] = getMember(type, name, conf.types[name]);
 	}
+
+	type.start(name, conf)
 	return type;
 
 	function getMember(owner: Type<unknown>, name: string, part: TypeConf | string) {
 		let member: Type<unknown>;
 		if (typeof part == "object") {
+			part["name"] = name;
 			member = createType("", part as any, types, source);
 		} else {
 			member = getType(part, types, source);
