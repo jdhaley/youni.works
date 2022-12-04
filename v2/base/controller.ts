@@ -47,15 +47,9 @@ export abstract class Owner<T> extends BaseReceiver {
 	
 	send(msg: Signal | string, to: T) {
 		msg = validSignal("down", msg);
-		if (!msg.subject) return;
-		msg.on = to;
-		let control = this.getControlOf(to);
-		control?.receive(msg);
-		let parts = this.getPartsOf(to) || EMPTY.array;
-		for (let part of parts) {
-			msg.from = to;
-			this.send(msg, part);
-		}
+		if (!msg) return;
+		msg["source"] = to;
+ 		Promise.resolve(msg).then(sig => sendTo(this, sig, to));
 	}
 	sense(evt: Signal | string, on: T) {
 		evt = validSignal("up", evt);
@@ -66,6 +60,18 @@ export abstract class Owner<T> extends BaseReceiver {
 			evt.from = on;
 			on = this.getContainerOf(on);
 		}
+	}
+}
+
+function sendTo<T>(owner: Owner<T>, msg: Signal, to: T) {
+	if (!msg.subject) return;
+	msg.on = to;
+	let control = owner.getControlOf(to);
+	control?.receive(msg);
+	let parts = owner.getPartsOf(to) || EMPTY.array;
+	for (let part of parts) {
+		msg.from = to;
+		owner.send(msg, part);
 	}
 }
 
