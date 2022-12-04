@@ -6,7 +6,7 @@ import { bundle } from "../base/util.js";
 
 import { IArticle, IBox, IType } from "../control/box.js";
 import { IEditor } from "../control/editor.js";
-import { Frame } from "../control/frame.js";
+import { Frame, UserEvent } from "../control/frame.js";
 
 import { list } from "../control/viewers/list.js";
 import { record } from "../control/viewers/record.js";
@@ -16,6 +16,8 @@ import controller from "./actions/frame.js";
 
 import actions from "./conf/actions.js";
 import edit from "./conf/edit.js";
+
+import shape from "./actions/shape.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -103,14 +105,20 @@ let types: bundle<Display> = {
 	},
 	tasks: {
 		type: "list",
+		header: "caption",
 		types: {
 			task: "task"
 		},
 		style: {
 			this: {
-				display: "block"
+				border_radius: "3px",
+				border: "1px solid lightsteelblue",
+			},
+			content: {
+				display: "block",
 			}
-		}
+		},
+		actions: shape
 	},
 	task: {
 		type: "record",
@@ -160,6 +168,68 @@ let types: bundle<Display> = {
 				display: "flex"
 			}
 		}
+	},
+	dialog: {
+		type: "widget",
+		kind: "dialog",
+		title: "Dialog",
+		header: "caption",
+		style: {
+			".dialog>.content": {
+				padding: "4px",
+				border: "0 solid gainsboro",
+				border_width: "0 1px 1px 1px"
+			}		
+		},
+		actions: shape
+	},
+	caption:  {
+		type: "widget",
+		header: "widget",
+		types: {
+			x: "widget"
+		},
+		tagName: "header",
+		style: {
+			this: {
+				display: "flex",
+				flex_direction: "row-reverse",
+				background_color: "lightsteelblue",
+				color: "white",
+				padding: "3px 6px 3px 6px"
+			},
+			content: {
+				flex: 1
+			}				
+		},
+		actions: {
+			view: function (this: Box, event: UserEvent) {
+				this.content.textContent = "Dialog"; //this.partOf.type.conf.title;
+			},
+			click: function (this: Box, event: UserEvent) {
+				if (event.target.getAttribute("data-cmd") == "edit") {
+					this.partOf.content.textContent = "click edit";
+				}
+			}
+		}
+	},
+	taskDialog:{
+		type: "dialog",
+		types: {
+			tasks: "tasks"
+		},
+		style: {
+			".label": `
+				color: steelblue;
+			`,
+			".dialog>.content": `
+				display: flex;
+				flex-direction: row;
+			`,
+			".dialog>.content>*": `
+				flex: 1;
+			`
+		}
 	}
 }
 
@@ -172,7 +242,7 @@ let article = new IArticle(frame, {
 
 start(article, baseTypes, types);
 
-article.types.tasks.control(document.body as ELE).draw([
+let tasks = article.types.tasks.create([
 		/*
 dsp development: design responsibility questions: today: in progress
 td teller: michael hoy meeting: done
@@ -206,5 +276,6 @@ ibm admin: update hours: postponed
 		status: "postponed",
 	},
 ]);
+frame.view.append(tasks.view);
 frame.send("view", frame.view);
 frame.view.setAttribute("contenteditable", "true");

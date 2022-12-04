@@ -9,7 +9,7 @@ export const list = {
 				throw new Error(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
 			}
 			let view = type.create(item);
-			this.view.append(view.view);
+			this.content.append(view.view);
 		}
 	},
 	viewElement(this: View, content: ELE): void {
@@ -18,7 +18,7 @@ export const list = {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
 				let view = childType.create(child);
-				this.view.append(view.view);
+				this.content.append(view.view);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}
