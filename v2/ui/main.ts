@@ -4,7 +4,7 @@ import { ELE } from "../base/dom.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import { IArticle, IType } from "../control/box.js";
+import { IArticle, IBox, IType } from "../control/box.js";
 import { IEditor } from "../control/editor.js";
 import { Frame } from "../control/frame.js";
 
@@ -60,70 +60,105 @@ let baseTypes: bundle<Display> = {
 		tagName: "div",
 		model: "unit",
 		shortcuts: shortcuts
+	},
+	widget: {
+		class: IType as any,
+		prototype: new IBox(),
+		tagName: "div",
 	}
 }
 
 let types: bundle<Display> = {
-	field: {
+	styles: {
 		type: "unit",
 		style: {
 			".field": {
 				padding: "2px"
 			},
 			".field>.content": {
-				border: "1px solid gainsboro"
+				border: "1px solid gainsboro",
+				border_radius: "3px",
+				padding: "2px",
+				min_height: "21px"
+			},
+			body: {
+				display: "block"
 			}
 		}
 	},
-	caption: {
-		type: "text",
+	label: {
+		type: "widget",
 		tagName: "header",
 		actions: {
 			view(this: Box, signal: Signal) {
 				this.content.textContent = this.partOf.type.conf.title;
 			}
+		},
+		style: {
+			this: {
+				font_size: "10pt",
+				color: "gray"
+			}
 		}
 	},
-	/*
-dsp development: design responsibility questions: today: in progress
-td teller: michael hoy meeting: done
-td teller: odyssey architecture notes: in progress
-td teller: feature spreadsheet iteration: done
-ibm admin: reset password: done
-ibm admin: update hours: postponed
-*/
+	tasks: {
+		type: "list",
+		types: {
+			task: "task"
+		},
+		style: {
+			this: {
+				display: "block"
+			}
+		}
+	},
 	task: {
 		type: "record",
 		title: "Task",
 		types: {
 			activity: {
 				type: "text",
-				header: "caption",
+				header: "label",
 				title: "Activity",
 				style: {
 					this: {
-						flex_width: "20%"
+						flex: "1 1 25%"
 					}
 				}
 			},
 			title: {
 				type: "text",
-				header: "caption",
+				header: "label",
 				title: "Title",
+				style: {
+					this: {
+						flex: "1 1 60%"
+					}
+				}
 			},
 			status: {
 				type: "text",
-				header: "caption",
-				title: "Status"
+				header: "label",
+				title: "Status",
+				style: {
+					this: {
+						flex: "1 1 15%"
+					}
+				}
 			},
 			// tasks: {
 			// 	type: "list",
-			// 	header: "caption",
+			// 	header: "label",
 			// 	title: "Sub Tasks",
 			// 	types: {
 			// 		task: "task"
 			// 	}
 			// }
+		},
+		style: {
+			this: {
+				display: "flex"
+			}
 		}
 	}
 }
@@ -137,9 +172,39 @@ let article = new IArticle(frame, {
 
 start(article, baseTypes, types);
 
-article.types.task.control(document.body as ELE).draw({
-	title: "Get things working",
-	owner: "John",
-});
+article.types.tasks.control(document.body as ELE).draw([
+		/*
+dsp development: design responsibility questions: today: in progress
+td teller: michael hoy meeting: done
+td teller: odyssey architecture notes: in progress
+td teller: feature spreadsheet iteration: done
+ibm admin: reset password: done
+ibm admin: update hours: postponed
+*/
+	{
+		type$: "task",
+		activity: "dsp dev",
+		title: "get things working",
+		status: "in progress",
+	},
+	{
+		type$: "task",
+		activity: "td teller",
+		title: "m. hoy meeting",
+		status: "done",
+	},
+	{
+		type$: "task",
+		activity: "td teller",
+		title: "spreadsheet iteration",
+		status: "done",
+	},
+	{
+		type$: "task",
+		activity: "ibm admin",
+		title: "update hours",
+		status: "postponed",
+	},
+]);
 frame.send("view", frame.view);
 frame.view.setAttribute("contenteditable", "true");

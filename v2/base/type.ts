@@ -89,6 +89,7 @@ function createType(name: string, conf: TypeConf, types: types, source: bundle<T
 	type.types = Object.create(supertype.types || null);
 
 	if (name) {
+		conf["name"] = name;
 		type.name = name;
 		types[name] = type;
 	}

@@ -36,12 +36,14 @@ function createStyles(display: Display, conf: object) {
 	let styles = Object.create(display.style || null);
 	for (let name in conf) {
 		let rule = conf[name];
+		if (typeof rule == "object") {
+			//if (styles[name]) rule = extend(styles[name], rule);
+			styles[name] = rule;
+		}
 		if (name == "this") {
 			name = `[data-item=${display["name"]}]`
-		}
-		if (typeof rule == "object") {
-			if (styles[name]) rule = extend(styles[name], rule);
-			styles[name] = rule;
+		} else if (name == "content") {
+			name = `[data-item=${display["name"]}]>.content`
 		}
 		createRule(name, rule);
 	}
