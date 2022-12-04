@@ -7,16 +7,17 @@ export class Replace extends EditCommand {
 	after: string;
 
 	exec(range: RANGE, content: any): RANGE {
-		//TODO temporary - flag check removed to reduce the footprint of Article for the editing.
-		if (true /*this.owner.conf.recordCommands*/) {
-			this.range = {
-				start: getPath(range.startContainer) + "/" + range.startOffset,
-				end: getPath(range.endContainer) + "/" + range.endOffset
-			}
-			let rx = this.owner.extentFrom(this.range["start"], this.range["end"]);
-			console.log("RANGES", range, rx);
-			this.value = content;	
-		}
+		/* TODO add back in. Note there is a bug when the range starts or ends in a heading!*/
+		// //TODO temporary - flag check removed to reduce the footprint of Article for the editing.
+		// if (true /*this.owner.conf.recordCommands*/) {
+		// 	this.range = {
+		// 		start: getPath(range.startContainer) + "/" + range.startOffset,
+		// 		end: getPath(range.endContainer) + "/" + range.endOffset
+		// 	}
+		// 	let rx = this.owner.extentFrom(this.range["start"], this.range["end"]);
+		// 	console.log("RANGES", range, rx);
+		// 	this.value = content;	
+		// }
 		this.execBefore(range);
 		this.execReplace(range, content);
 		range = this.execAfter(range);

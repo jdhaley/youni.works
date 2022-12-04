@@ -1,6 +1,5 @@
 import { Signal } from "../base/controller.js";
 import { Box, Display } from "../base/display.js";
-import { ELE } from "../base/dom.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
@@ -118,7 +117,7 @@ let types: bundle<Display> = {
 				display: "block",
 			}
 		},
-		actions: shape
+		//actions: shape
 	},
 	task: {
 		type: "record",

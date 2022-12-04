@@ -2,6 +2,17 @@ import { CommandBuffer } from "./command.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
+interface XVIEW {
+	type: XTYPE;
+	view: ELE;
+	draw(data?: unknown): void;
+}
+
+interface XTYPE {
+	create(value?: unknown): XVIEW;
+	control(node: ELE): XVIEW;
+}
+
 export interface View {
 	type: ViewType;
 	view: ELE;
@@ -38,7 +49,7 @@ export function getView(loc: NODE | RANGE): View {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	for (let node = loc instanceof Node ? loc : null; node; node = node.parentNode) {
 		let e = ele(node) as VIEW_ELE;
-		if (e?.$control?.type /*instanceof ControlType*/) {
+		if (e?.$control && e.$control["id"]/*instanceof ControlType*/) {
 			return e.$control;
 		}
 	}

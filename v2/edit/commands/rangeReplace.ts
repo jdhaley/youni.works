@@ -4,6 +4,7 @@ import { xmlContent } from "../../transform/content.js";
 import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
 import { Replace } from "./replace.js";
 import { Editor } from "../../base/editor.js";
+import { ViewType } from "../../base/view.js";
 
 export class RangeReplace extends Replace {
 	startId: string;
@@ -62,21 +63,27 @@ export class RangeReplace extends Replace {
 		return range;
 	}
 	protected doReplace(markup: string) {
-		let element = document.implementation.createDocument(null, "root").documentElement as ELE;
-		element.innerHTML = markup;
 		let view = this.owner.getControl(this.viewId) as Editor;
-		view = view.type.create(element) as Editor;
 		let range = this.getReplaceRange();
 		range.deleteContents();
-		let contents = view.content.childNodes;
-		while (contents.length) {
-			let node = contents[0];
-			range.insertNode(node);
+		let nodes = createViewNodes(view.type, markup);
+		while (nodes.length) {
+			let ele = nodes[0];
+			range.insertNode(ele);
 			range.collapse();
-			if (ele(node)) bindViewEle(node as ELE);
+			bindViewEle(ele);
 		}
+		//Make sure the view event is sent to the newly created nodes:
+		//TODO need to add send method to Article interface.
+		(this.owner as any).owner.send("view", view.view);
 		return unmark(range);
 	}
+}
+
+const XELE = document.implementation.createDocument(null, "root").documentElement;
+function createViewNodes(type: ViewType, markup: string) {
+	XELE.innerHTML = markup;
+	return type.create(XELE).content.children;
 }
 
 function mergeContent(range: RANGE, value: unknown) {
