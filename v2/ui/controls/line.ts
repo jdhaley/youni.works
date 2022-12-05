@@ -1,7 +1,5 @@
 import { ELE, RANGE } from "../../base/dom.js";
 
-import { IType } from "../../control/box.js";
-
 import { TextBox } from "./text.js";
 import { getBox } from "../util.js";
 
@@ -51,7 +49,7 @@ export class LineBox extends TextBox {
 	convert(name: string) {
 		let toType = this.type.partOf?.types[name];
 		if (toType) {
-			this.type = toType as IType;
+			this.type = toType as any;
 			this.view.setAttribute("data-item", toType.name);
 		}
 	}

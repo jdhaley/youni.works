@@ -3,8 +3,8 @@ import { xmlContent } from "../../transform/content.js";
 
 import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
 import { Replace } from "./replace.js";
-import { Editor } from "../../base/editor.js";
-import { ContentView, ContextType } from "../../base/view.js";
+import { Editor, EditorType } from "../../base/editor.js";
+import { ContentView } from "../../base/display.js";
 
 export class RangeReplace extends Replace {
 	startId: string;
@@ -46,7 +46,7 @@ export class RangeReplace extends Replace {
 		return outer;
 	}	
 	protected getReplaceRange() {
-		let editor = this.owner.getControl(this.viewId);
+		let editor = this.owner.getControl(this.viewId) as Editor;
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 		let range = editor.view.ownerDocument.createRange();
 		range.selectNodeContents(editor.content);
@@ -81,7 +81,7 @@ export class RangeReplace extends Replace {
 }
 
 const XELE = document.implementation.createDocument(null, "root").documentElement;
-function createViewNodes(type: ContextType, markup: string) {
+function createViewNodes(type: EditorType, markup: string) {
 	XELE.innerHTML = markup;
 	//TODO contentedit refactoring - editor won't have content attribute.
 	return (type.create(XELE) as ContentView).content.children;

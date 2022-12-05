@@ -1,33 +1,34 @@
-import { Box } from "../../base/display.js";
+import { Editor } from "../../base/editor.js";
 import { CHAR, extend } from "../../base/util.js";
 
 import { EditEvent, UserEvent } from "../../control/frame.js";
-import { setClipboard } from "../util.js";
-import editable from "./editor.js";
+import { setClipboard } from "../../control/clipboard.js";
 
-export default extend(editable, {
-	cut(this: Box, event: UserEvent) {
+import editor from "./editor.js";
+
+export default extend(editor, {
+	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) return;
 		setClipboard(range.cloneRange(), event.clipboardData);
 		this.exec("Cut", range);
 	},
-	paste(this: Box, event: UserEvent) {
+	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let text = event.clipboardData.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to paste.
 		let range = event.range;
 		this.exec("Paste", range, text);
 	},
-	replaceText(this: Box, event: EditEvent) {
+	replaceText(this: Editor, event: EditEvent) {
 		event.subject = "";
 		let text = event.dataTransfer.getData("text/plain");
 		if (!text) return; //Don't proceed & clear the range when there is nothing to replace.
 		let range = event.range;
 		this.exec("Replace", range, text);
 	},
-	insertText(this: Box, event: EditEvent) {
+	insertText(this: Editor, event: EditEvent) {
 		event.subject = "";
 		let char = event.data;
 		let range = event.range;
@@ -58,13 +59,13 @@ export default extend(editable, {
 	deleteWordBackward(event: EditEvent) {
 		event.subject = "deleteWordForward";
 	},
-	erase(this: Box, event: UserEvent) {
+	erase(this: Editor, event: UserEvent) {
 		event.subject = ""
 		let range = event.range;
 		if (range.collapsed && !range.startOffset) return;
 		this.exec("Erase", range, "");
 	},
-	delete(this: Box, event: UserEvent) {
+	delete(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed && range.startOffset == range.startContainer.textContent.length) return;

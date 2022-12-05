@@ -1,6 +1,7 @@
+import { ContentView } from "../../base/display.js";
 import { ELE, NODE, RANGE, ele } from "../../base/dom.js";
 import { Editor } from "../../base/editor.js";
-import { ContentView, getView } from "../../base/view.js";
+import { getView } from "../../base/view.js";
 
 export const record = {
 	//memberType = "field";

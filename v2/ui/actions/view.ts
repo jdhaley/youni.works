@@ -1,9 +1,10 @@
 import { Box } from "../../base/display.js";
 import { extend } from "../../base/util.js";
-import { Change } from "../../control/box.js";
+import { setClipboard } from "../../control/clipboard.js";
+import { Change } from "../../control/editor.js";
 
 import { UserEvent } from "../../control/frame.js";
-import { getBox, navigate, setClipboard } from "../util.js";
+import { getBox, navigate } from "../util.js";
 
 export default extend(null, {
 	keydown(this: Box, event: UserEvent) {
@@ -36,16 +37,14 @@ export default extend(null, {
 		}
 	},
 	undo(this: Box, event: UserEvent) {
-		event.subject = "";
-		let range = this.type.context.commands.undo();
-		if (range) this.type.context.selectionRange = range;
-		this.type.context.receive(new Change("undo"));
+		if (this.view == this.type.context.view) {
+			this.type.context.receive(event);
+		}
 	},
 	redo(this: Box, event: UserEvent) {
-		event.subject = "";
-		let range = this.type.context.commands.redo();
-		if (range) this.type.context.selectionRange = range;
-		this.type.context.receive(new Change("redo"));
+		if (this.view == this.type.context.view) {
+			this.type.context.receive(event);
+		}
 	},
 	selectionchange(this: Box, event: UserEvent) {
 		event.subject = "";

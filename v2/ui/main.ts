@@ -3,8 +3,8 @@ import { Box, Display } from "../base/display.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import { IArticle, IBox, IType } from "../control/box.js";
-import { IEditor } from "../control/editor.js";
+import { IBox, BType } from "../control/box.js";
+import { IArticle } from "../control/editor.js";
 import { Frame, UserEvent } from "../control/frame.js";
 
 import { list } from "../control/viewers/list.js";
@@ -17,6 +17,7 @@ import actions from "./conf/actions.js";
 import edit from "./conf/edit.js";
 
 import shape from "./actions/shape.js";
+import { IEditor } from "../control/editor.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -39,7 +40,7 @@ const shortcuts = {
 
 let baseTypes: bundle<Display> = {
 	record: {
-		class: IType as any,
+		class: BType as any,
 		prototype: new IEditor(record, edit.record),
 		actions: actions.record,
 		tagName: "div",
@@ -47,7 +48,7 @@ let baseTypes: bundle<Display> = {
 		shortcuts: shortcuts,
 	},
 	list: {
-		class: IType as any,
+		class: BType as any,
 		prototype: new IEditor(list, edit.list),
 		actions: actions.list,
 		tagName: "div",
@@ -55,7 +56,7 @@ let baseTypes: bundle<Display> = {
 		shortcuts: shortcuts
 	},
 	text: {
-		class: IType as any,
+		class: BType as any,
 		prototype: new IEditor(text, edit.text),
 		actions: actions.text,
 		tagName: "div",
@@ -63,7 +64,7 @@ let baseTypes: bundle<Display> = {
 		shortcuts: shortcuts
 	},
 	widget: {
-		class: IType as any,
+		class: BType as any,
 		prototype: new IBox(),
 		tagName: "div",
 	}

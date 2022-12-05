@@ -1,4 +1,3 @@
-import { CommandBuffer } from "./command.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
@@ -13,29 +12,6 @@ export interface ViewType {
 	types: bundle<ViewType>;
 	create(value?: unknown): View;
 	control(node: ELE): View;
-}
-
-export interface ContentView extends View {
-	type: ContextType;
-	//compatibility 
-	content: ELE;
-}
-
-export interface ContextType extends ViewType {
-	context: Article;
-	name: string;
-	model: string;
-	types: bundle<ContextType>;
-
-	control(node: ELE): ContentView;
-}
-
-export interface Article  {
-	commands: CommandBuffer<RANGE>;
-	selectionRange: RANGE;
-	getControl(id: string): ContentView;
-	extentFrom(startPath: string, endPath: string): RANGE;
-	senseChange(editor: ContentView, commandName: string): void;
 }
 
 export interface VIEW_ELE extends ELE {

@@ -1,5 +1,6 @@
+import { ContentView } from "../../base/display.js";
 import { ELE, RANGE } from "../../base/dom.js";
-import { ContentView, getView } from "../../base/view.js";
+import { getView } from "../../base/view.js";
 import { Editor } from "../neweditor.js";
 
 export const list = {

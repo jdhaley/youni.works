@@ -1,12 +1,6 @@
 import { Box } from "../base/display.js";
 import { ELE, NODE, RANGE } from "../base/dom.js";
-import { Edits } from "../base/editor.js";
 import { getView } from "../base/view.js";
-
-import { IArticle } from "../control/box.js";
-import { fromHtml } from "../transform/fromHtml.js";
-import { section } from "../transform/item.js";
-import { toHtml } from "../transform/toHtml.js";
 
 export const getBox = getView as (node: NODE | RANGE) => Box ;
 
@@ -52,46 +46,4 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 			break;
 	}
 	return content;
-}
-
-export function getClipboard(clipboard: DataTransfer) {
-	let data = clipboard.getData("application/json");
-	if (data) return JSON.parse(data);
-	data = clipboard.getData("text/html");
-	if (data) {
-		let div = document.createElement("div");
-		div.innerHTML = data;
-		console.log("HTML: ", div);
-		return fromHtml(div) as any;
-	}
-	return clipboard.getData("text/plain");
-}
-
-export function setClipboard(range: RANGE, clipboard: DataTransfer) {
-	let control = getBox(range);
-	let model = control?.valueOf(range);
-	if (!model) return;
-	if (typeof model == "string") {
-		clipboard.setData("text/plain", model);
-		return;
-	}
-	if (control.type.conf.viewType == "markup") {
-		let item = section(model as any);
-		let article = toHtml(item);
-		clipboard.setData("text/html", article.outerHTML);
-	}
-	if (!(model instanceof Array)) model = [model];
-	clipboard.setData("application/json", JSON.stringify(model || null));
-}
-
-export function play(article: IArticle, edits: Edits) {
-	let type = article.types[edits.type];
-	let view = type.create(edits.source);
-	article.view = view.view;
-	this.frame.append(this.node);
-	for (let edit of edits.edits) {
-		let editor = this.getControl(edit.viewId) as Box;
-		let range = this.extentFrom(edit.range.start, edit.range.end);
-		editor.exec(edit.name, range, edit.value);
-	}
 }

@@ -2,9 +2,9 @@ import { Box } from "../../base/display.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
-import { EditEvent, UserEvent } from "../../control/frame.js";
-import { getFooter, getHeader } from "../util.js";
-import editable from "./editor.js";
+import { UserEvent } from "../../control/frame.js";
+import { getHeader } from "../util.js";
+import editable from "../../edit/actions/editor.js";
 
 export default extend(editable, {
 	dblclick(this: Box, event: UserEvent) {
@@ -18,19 +18,21 @@ export default extend(editable, {
 			}
 		}
 	},
-	insertText(this: Box, event: EditEvent) {
-		if (getFooter(this, event.range.commonAncestorContainer)) {
-			event.subject = "";
-			let model = {
-				"title": event.data,
-				"type$": "task"
-			}
-			event.range.selectNodeContents(this.content);
-			event.range.collapse();
-			this.exec("Insert", event.range, [model]);
-			goToTask(event.on, this.type.context.selectionRange as RANGE);
-		}
-	}
+	// TODO this should be redeveloped.
+
+	// insertText(this: Box, event: EditEvent) {
+	// 	if (getFooter(this, event.range.commonAncestorContainer)) {
+	// 		event.subject = "";
+	// 		let model = {
+	// 			"title": event.data,
+	// 			"type$": "task"
+	// 		}
+	// 		event.range.selectNodeContents(this.content);
+	// 		event.range.collapse();
+	// 		this.exec("Insert", event.range, [model]);
+	// 		//goToTask(event.on, this.type.context.selectionRange as RANGE);
+	// 	}
+	// }
 });
 
 function goToTask(view: ELE, range: RANGE) {

@@ -94,7 +94,7 @@ function getColumns(row: item) {
 }
 function createType(type: BoxType, columns: string[]): BoxType {
 	type.types = Object.create(null);
-	let column = type.context.types.column;
+	let column = (type as any).context.types.column;
 	for (let col of columns) {
 		let colType = Object.create(column);
 		colType.name = col;

@@ -1,11 +1,14 @@
-import { RANGE, NODE, ELE } from "../../base/dom.js";
+import { Editor } from "../../base/editor.js";
+import { RANGE, NODE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
-import { getBox, getClipboard, setClipboard } from "../util.js";
+import { getEditor } from "../util.js";
 
-import view from "./view.js";
 import { EditEvent, UserEvent } from "../../control/frame.js";
-import { Box } from "../../base/display.js";
+import { getClipboard, setClipboard } from "../../control/clipboard.js";
+
+//TODO remove this dependency.
+import view from "../../ui/actions/view.js";
 
 const EDIT_MAPPING = {
 	"insertText": "insertText",
@@ -22,7 +25,7 @@ export default extend(view, {
 		event.subject =  subject || event.inputType;
 		if (!subject) console.log(event.inputType);
 	},
-	cut(this: Box, event: UserEvent) {
+	cut(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (range.collapsed) {
@@ -31,7 +34,7 @@ export default extend(view, {
 		setClipboard(range.cloneRange(), event.clipboardData);
 		this.exec("Cut", range);
 	},
-	paste(this: Box, event: UserEvent) {
+	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
@@ -42,18 +45,18 @@ export default extend(view, {
 				console.warn("Not insertable range");
 				return;
 			}
-			target = getBox(range);
+			target = getEditor(range);
 		} 
 		target.exec("Paste", range, model);
 	},
-	delete(this: Box, event: UserEvent) {
+	delete(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
 			this.exec("Delete", range);
 		}
 	},
-	erase(this: Box, event: UserEvent) {
+	erase(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) {
@@ -67,7 +70,7 @@ export default extend(view, {
  */
 function getInsertableRange(range: RANGE) {
 	range = range.cloneRange();
-	let view = getBox(range);
+	let view = getEditor(range);
 	while (view) {
 		if (view?.type.model == "list") {
 			return range;
@@ -78,7 +81,7 @@ function getInsertableRange(range: RANGE) {
 
 		range.setStartBefore(view.view);
 		range.collapse(true);
-		view = getBox(range);
+		view = getEditor(range);
 	}
 }
 

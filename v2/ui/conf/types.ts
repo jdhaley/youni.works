@@ -1,6 +1,6 @@
 import { bundle } from "../../base/util.js";
 
-import { IType } from "../../control/box.js";
+import { BType } from "../../control/box.js";
 
 import { TextBox } from "../controls/text.js";
 import { RecordBox } from "../controls/record.js";
@@ -15,7 +15,7 @@ import shortcuts from "./shortcuts.js";
 
 const conf: bundle<any> = {
 	text: {
-		class: IType,
+		class: BType,
 		model: "unit",
 		viewType: "text",
 		prototype: new TextBox(actions.text, edit.text),
@@ -24,7 +24,7 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	record: {
-		class: IType,
+		class: BType,
 		model: "record",
 		viewType: "form",
 		prototype: new RecordBox(actions.record, edit.record),
@@ -33,7 +33,7 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	list: {
-		class: IType,
+		class: BType,
 		model: "list",
 		viewType: "list",
 		prototype: new ListBox(actions.list, edit.list),
@@ -42,7 +42,7 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: IType,
+		class: BType,
 		model: "list",
 		viewType: "markup",
 		prototype: new ListBox(actions.markup, edit.markup),
@@ -51,7 +51,7 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	line: {
-		class: IType,
+		class: BType,
 		model: "unit",
 		viewType: "line",
 		prototype: new LineBox(actions.line, edit.text),
@@ -60,7 +60,7 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	row: {
-		class: IType,
+		class: BType,
 		model: "record",
 		viewType: "row",
 		prototype: new RowBox(actions.row, edit.record),

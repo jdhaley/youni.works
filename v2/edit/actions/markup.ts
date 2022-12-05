@@ -1,20 +1,20 @@
-import { Box } from "../../base/display.js";
+import { Editor } from "../../base/editor.js";
 import { ele, NODE, RANGE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
 import { EditEvent, UserEvent } from "../../control/frame.js";
-import { navigate, getClipboard } from "../util.js";
+import { getClipboard } from "../../control/clipboard.js";
 
-import list from "./list.js";
+import editor from "./editor.js";
 
-export default extend(list, {
-	paste(this: Box, event: UserEvent) {
+export default extend(editor, {
+	paste(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = getClipboard(event.clipboardData);
 		this.exec("Paste", range, model);
 	},
-	insertText(this: Box, event: EditEvent) {
+	insertText(this: Editor, event: EditEvent) {
 		event.subject = "";
 		let model = {
 			"type$": "para",
@@ -22,7 +22,7 @@ export default extend(list, {
 		};
 		this.exec("Entry", event.range, [model]);
 	},
-	split(this: Box, event: UserEvent) {
+	split(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		let model = null;
@@ -45,16 +45,16 @@ export default extend(list, {
 			range.collapse();
 		}
 	},
-	join(this: Box, event: UserEvent) {
+	join(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		this.exec("Join", range, "");
 	},
-	insert(this: Box, event: UserEvent) {
+	insert(this: Editor, event: UserEvent) {
 		event.subject = "";
 		let range = event.range;
 		if (!range.collapsed) return;
-		let current = getChildBox(this, range.commonAncestorContainer);
+		let current = getChildEditor(this, range.commonAncestorContainer);
 		if (!current) return;
 		//let item = createItem(current);
 		let item = {
@@ -64,30 +64,30 @@ export default extend(list, {
 		range.collapse(true);
 		this.exec("Insert", range, [item]);
 	},
-	demote(this: Box, event: UserEvent) {
+	demote(this: Editor, event: UserEvent) {
 		event.subject = "";
 		this.exec("Demote", event.range);
 	},
-	promote(this: Box, event: UserEvent) {
+	promote(this: Editor, event: UserEvent) {
 		event.subject = "";
 		this.exec("Promote", event.range);
 	}
 });
 
-export function getChildBox(editor: Box, node: NODE): Box {
+export function getChildEditor(editor: Editor, node: NODE): Editor {
 	if (node == editor.content) return null;
 	while (node?.parentNode != editor.content) {
 		node = node.parentNode;
 	}
-	if (ele(node) && node["$control"]) return node["$control"] as Box;
+	if (ele(node) && node["$control"]) return node["$control"] as Editor;
 }
 
 // function createItem(refNode: Editor): item {
 // 	let item: item;
-// 	if (!(refNode instanceof RowBox)) {
+// 	if (!(refNode instanceof RowEditor)) {
 // 		refNode = getView(refNode.node.previousElementSibling);
 // 	}
-// 	if (refNode instanceof RowBox) {
+// 	if (refNode instanceof RowEditor) {
 // 		item = {
 // 			type$: "row",
 // 			columns: refNode.columns,
@@ -109,10 +109,10 @@ export function getChildBox(editor: Box, node: NODE): Box {
 // 	return item;
 // }
 
-function nav(event: UserEvent, isPrevious?: boolean) {
-	let item = navigate(event.range, isPrevious);
-	if (item) {
-		event.range.selectNodeContents(item);
-		item.scrollIntoView({block: "center"});
-	}
-}
+// function nav(event: UserEvent, isPrevious?: boolean) {
+// 	let item = navigate(event.range, isPrevious);
+// 	if (item) {
+// 		event.range.selectNodeContents(item);
+// 		item.scrollIntoView({block: "center"});
+// 	}
+// }

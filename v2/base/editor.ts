@@ -1,7 +1,27 @@
-import { RANGE } from "./dom.js";
-import { ContentView } from "./view.js";
+import { CommandBuffer } from "./command.js";
+import { Receiver } from "./controller.js";
+import { ELE, RANGE } from "./dom.js";
+import { View, ViewType } from "./view.js";
 
-export interface Editor extends ContentView {
+export interface ViewContext extends Receiver {
+	view: ELE;
+	commands: CommandBuffer<RANGE>;
+	selectionRange: RANGE;
+}
+
+export interface Article extends ViewContext {
+	getControl(id: string): Editor;
+	extentFrom(startPath: string, endPath: string): RANGE;
+	senseChange(editor: Editor, commandName: string): void;
+}
+
+export interface EditorType extends ViewType {
+	context: Article;
+	model: string;
+}
+
+export interface Editor extends View {
+	type: EditorType;
 	id: string;
 	level: number;
 
@@ -9,8 +29,10 @@ export interface Editor extends ContentView {
 	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
 
 	/** @deprecated */
+
 	convert?(type: string): void;
 
+	content: ELE;
 	demote(): void;
 	promote(): void;
 }

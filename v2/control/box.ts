@@ -1,10 +1,8 @@
-import { Box, BoxType, Display } from "../base/display.js";
-import { Article, bindViewEle, getView, ContentView, VIEW_ELE } from "../base/view.js";
+import { Box, BoxType, Display, ViewContext } from "../base/display.js";
 import { BaseType, start } from "../base/type.js";
-import { Actions, BaseReceiver, Signal } from "../base/controller.js";
+import { Actions, BaseReceiver } from "../base/controller.js";
 import { CommandBuffer } from "../base/command.js";
-import { RemoteFileService } from "../base/remote.js";
-import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
+import { ELE, RANGE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
 
 import { ElementShape } from "./element.js";
@@ -15,7 +13,7 @@ export class IBox extends ElementShape implements Box {
 	constructor(actions?: Actions) {
 		super(actions);
 	}
-	declare type: IType;
+	declare type: BType;
 
 	get partOf(): IBox {
 		return super.partOf as IBox;
@@ -60,13 +58,13 @@ export class IBox extends ElementShape implements Box {
 	}
 }
 
-export class IType /*extends LoadableType*/ extends BaseType<Box> implements BoxType {
-	declare context: IArticle;
-	declare partOf: IType;
-	declare types: bundle<IType>;
+export class BType /*extends LoadableType*/ extends BaseType<Box> implements BoxType {
+	declare context: IContext;
+	declare partOf: BType;
+	declare types: bundle<BType>;
 	declare prototype: IBox;
-	declare header?: IType;
-	declare footer?: IType;
+	declare header?: BType;
+	declare footer?: BType;
 	declare conf: Display;
 
 	get model(): string {
@@ -93,28 +91,25 @@ export class IType /*extends LoadableType*/ extends BaseType<Box> implements Box
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
 		if (conf.actions) this.prototype.actions = conf.actions;
-		if (conf.header) this.header = this.context.types[conf.header] as IType;
-		if (conf.footer) this.footer = this.context.types[conf.footer] as IType;
+		if (conf.header) this.header = this.context.types[conf.header] as BType;
+		if (conf.footer) this.footer = this.context.types[conf.footer] as BType;
 	}
 }
 
-export class IArticle extends BaseReceiver implements Article {
+export class IContext extends BaseReceiver implements ViewContext {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf.actions);
 		this.owner = frame;
 		this.types = Object.create(null);
 		this.commands = new CommandBuffer();
-		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
 		start(this, conf.baseTypes, conf.viewTypes);
 	}
 	readonly owner: Frame
 	readonly commands: CommandBuffer<RANGE>;
-	readonly service: RemoteFileService;
-	declare recordCommands: boolean;
-	declare types: bundle<IType>;
-	declare source: unknown;
+
+	declare types: bundle<BType>;
 	declare view: ELE;
-	
+
 	get selectionRange(): RANGE {
 		return this.owner.selectionRange;
 	}
@@ -122,73 +117,9 @@ export class IArticle extends BaseReceiver implements Article {
 		this.owner.selectionRange = range;
 	}
 
-	senseChange(editor: ContentView, commandName: string): void {
-		this.owner.sense(new Change(commandName, editor), editor.view);
-	}
 	createElement(tagName: string): ELE {
 		return this.owner.createElement(tagName);
 	}
-	findNode(id: string): ELE {
-		return this.owner.view.ownerDocument.getElementById(id);
-	}
-	getControl(id: string): ContentView {
-		let ele = this.findNode(id) as VIEW_ELE;
-		if (!ele) throw new Error("Can't find view element.");
-		if (!ele.$control) {
-			console.warn("binding...");
-			bindViewEle(ele);
-			if (!ele.$control) {
-				console.error("Unable to bind missing control. Please collect info / analyze.");
-				debugger;
-			}
-		}
-		return ele.$control as ContentView;
-	}
-	/** the Loc(ation) is: path + "/" + offset */
-	extentFrom(startLoc: string, endLoc: string): RANGE {
-		let doc = this.owner.view.ownerDocument;
-		let range = doc.createRange();
-		let path = startLoc.split("/");
-		let node = getNode(doc, path);
-		if (node) {
-			let offset = Number.parseInt(path.at(-1));
-			range.setStart(node, offset);
-		}
-		path = endLoc.split("/");
-		node = getNode(doc, path);
-		if (node) {
-			let offset = Number.parseInt(path.at(-1));
-			range.setEnd(node, offset);
-		}
-		return range;
-	}
-}
-
-function getNode(doc: DOCUMENT, path: string[]) {
-	let view = getView(doc.getElementById(path[0])) as Box;
-	if (!view) console.error("can't find view");
-	let node = view.content;
-	for (let i = 1; i < path.length - 1; i++) {
-		let index = Number.parseInt(path[i]);
-		node = node?.childNodes[index];
-	}
-	return node;
-}
-
-export class Change implements Signal {
-	constructor(command: string, view?: ContentView) {
-		this.direction = view ? "up" : "down";
-		this.subject = "change";
-		this.from = view;
-		this.source = view;
-		this.commandName = command;
-	}
-	direction: "up" | "down";
-	source: ContentView;
-	from: ContentView;
-	on: ContentView;
-	subject: string;
-	commandName: string;
 }
 
 // export class ElementContent extends BaseView implements Content {

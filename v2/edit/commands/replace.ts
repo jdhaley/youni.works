@@ -1,5 +1,6 @@
 import { RANGE } from "../../base/dom.js";
-import { getEditor, getPath, mark, unmark } from "../util.js";
+import { Editor } from "../../base/editor.js";
+import { getEditor, mark, unmark } from "../util.js";
 import { EditCommand } from "./edit.js";
 
 export class Replace extends EditCommand {
@@ -61,7 +62,7 @@ export class Replace extends EditCommand {
 		return unmark(range);	
 	}
 	protected doReplace(markup: string) {
-		let editor = this.owner.getControl(this.viewId);
+		let editor = this.owner.getControl(this.viewId) as Editor;
 		if (!editor) throw new Error(`View "${this.viewId}" not found.`);
 
 		editor.content.innerHTML = markup;

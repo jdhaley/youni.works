@@ -1,16 +1,17 @@
-import { ELE, RANGE } from "../../base/dom.js";
+import { ViewType } from "../../base/view.js";
+import { RANGE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
 import { CommandBuffer } from "../../base/command.js";
 
 import { UserEvent } from "../../control/frame.js";
-import { Change, IArticle, IType } from "../../control/box.js";
+import { Change, IArticle } from "../../control/editor.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, this.source);
-		this.view = type.create(this.source).view as ELE;
+		this.view = type.create(this.source).view;
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.owner.append(this.view);
@@ -39,10 +40,22 @@ export default extend(null, {
 		// signal.direction = "down";
 		// this.send(signal, this.node);
 		this.owner.receive(signal);
+	},
+	undo(this: IArticle, event: UserEvent) {
+		event.subject = "";
+		let range = this.commands.undo();
+		if (range) this.selectionRange = range;
+		this.receive(new Change("undo"));
+	},
+	redo(this: IArticle, event: UserEvent) {
+		event.subject = "";
+		let range = this.commands.redo();
+		if (range) this.selectionRange = range;
+		this.receive(new Change("redo"));
 	}
 });
 
-function getType(article: IArticle, path: string, data: any): IType {
+function getType(article: IArticle, path: string, data: any): ViewType {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";

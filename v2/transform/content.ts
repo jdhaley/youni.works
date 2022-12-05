@@ -1,5 +1,6 @@
+import { ContentView } from "../base/display.js";
 import { ele, ELE, NODE, RANGE } from "../base/dom.js";
-import { getView, ContentView } from "../base/view.js";
+import { getView } from "../base/view.js";
 
 export function xmlContent(view: ContentView, range: RANGE, out?: ELE): ELE {
 	if (range && !range.intersectsNode(view.content)) return;

@@ -1,9 +1,9 @@
 import { Display } from "../base/display.js";
 import { Actions } from "../base/controller.js";
 import { extend } from "../base/util.js";
-import { ContextType } from "../base/view.js";
+import { ViewType } from "../base/view.js";
 
-export function extendDisplay(type: ContextType, conf: Display): Display {
+export function extendDisplay(type: ViewType, conf: Display): Display {
 	if (!conf) return;
 	let source: Display = type["conf"];
 	let disp: Display = extend(source, conf);

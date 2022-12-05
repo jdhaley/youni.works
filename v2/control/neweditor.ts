@@ -13,7 +13,6 @@ import { Frame } from "./frame.js";
 type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 
 export interface Editor extends View {
-	type: EditorType;
 	id: string;	
 	level: number;
 
@@ -25,23 +24,6 @@ export interface Editor extends View {
 	convert?(type: string): void;
 	demote(): void;
 	promote(): void;
-}
-
-export interface EditorType extends ViewType {
-	context: Article;
-	name: string;
-	model: string;
-	
-	create(value?: unknown): Editor;
-	control(node: ELE): Editor;
-}
-
-export interface Article  {
-	commands: CommandBuffer<RANGE>;
-	selectionRange: RANGE;
-	getControl(id: string): Editor;
-	extentFrom(startPath: string, endPath: string): RANGE;
-	senseChange(editor: Editor, commandName: string): void;
 }
 
 interface Viewer {
@@ -107,7 +89,7 @@ export class IEditor extends ElementShape implements Editor {
 let NEXT_ID = 1;
 
 
-export class EType /*extends LoadableType*/ extends BaseType<Editor> implements EditorType {
+export class EType /*extends LoadableType*/ extends BaseType<Editor> implements ViewType {
 	declare context: EArticle;
 	declare partOf: EType;
 	declare types: bundle<EType>;
@@ -145,7 +127,7 @@ export class EType /*extends LoadableType*/ extends BaseType<Editor> implements 
 	}
 }
 
-export class EArticle extends BaseReceiver implements Article {
+export class EArticle extends BaseReceiver  {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf.actions);
 		this.owner = frame;
