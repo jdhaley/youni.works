@@ -24,13 +24,14 @@ export class RecordBox extends Viewbox {
 		}
 	}
 	viewElement(content: ELE): void {
-		let idx = {};
+		// let idx = {};
 		for (let member of content.children) {
-			idx[member.nodeName] = member;
+			this.viewMember(member.nodeName, member);
+			//idx[member.nodeName] = member;
 		}
-		for (let name in this.type.types) {
-			this.viewMember(name, idx[name]);
-		}
+		// for (let name in this.type.types) {
+		// 	this.viewMember(name, idx[name]);
+		// }
 	}
 	protected viewMember(name: string, value: any): Box {
 		let type = this.type.types[name];

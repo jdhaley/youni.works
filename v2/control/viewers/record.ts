@@ -20,13 +20,20 @@ export const record = {
 		}
 	},
 	viewElement(this: View, content: ELE): void {
-		let idx = {};
+		/*
+			viewElement is called via a replace command. Because the range may only include a
+			subset of the fields, we no longer create the entire record - only those in the command.
+		*/
+
+	//	let idx = {};
+		console.log("record elements...")
 		for (let member of content.children) {
-			idx[member.nodeName] = member;
+			viewMember(this, member.nodeName, member);
+	//		idx[member.nodeName] = member;
 		}
-		for (let name in this.type.types) {
-			viewMember(this, name, idx[name]);
-		}
+		// for (let name in this.type.types) {
+		// 	viewMember(this, name, idx[name]);
+		// }
 	},
 	valueOf(this: View, range?: RANGE): unknown {
 		let model = recordContent(null, this.content as ELE, range);
