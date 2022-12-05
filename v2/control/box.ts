@@ -1,6 +1,6 @@
 import { Box, BoxType, Display } from "../base/display.js";
 import { BaseType, start } from "../base/type.js";
-import { Actions, BaseReceiver } from "../base/controller.js";
+import { Actions, BaseReceiver, Controller } from "../base/controller.js";
 import { CommandBuffer } from "../base/command.js";
 import { ELE, RANGE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
@@ -8,7 +8,6 @@ import { bundle } from "../base/util.js";
 import { ElementShape } from "./element.js";
 import { Frame } from "./frame.js";
 import { extendDisplay } from "./display.js";
-import { ViewContext } from "../base/view.js";
 
 export class IBox extends ElementShape implements Box {
 	constructor(actions?: Actions) {
@@ -97,7 +96,7 @@ export class BType /*extends LoadableType*/ extends BaseType<Box> implements Box
 	}
 }
 
-export class IContext extends BaseReceiver implements ViewContext {
+export class IContext extends BaseReceiver implements Controller<ELE> {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super(conf.actions);
 		this.owner = frame;

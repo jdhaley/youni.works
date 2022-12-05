@@ -3,13 +3,13 @@ import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
 import { Article, Editor, EditorType } from "../base/editor.js";
 import { RemoteFileService } from "../base/remote.js";
 import { bundle, implement } from "../base/util.js";
-import { bindViewEle, getView, View, VIEW_ELE } from "../base/view.js";
+import { bindViewEle, getView, Viewer, VIEW_ELE } from "../base/view.js";
 import { IContext, IBox, BType } from "./box.js";
 import { Frame } from "./frame.js";
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 
-interface Viewer {
+interface Drawable {
 	viewValue(model: unknown): void;
 	viewElement(model: ELE): void;
 	valueOf(filter?: unknown): unknown
@@ -19,7 +19,7 @@ class IType extends BType implements EditorType {
 	declare context: IArticle;
 }
 export class IEditor extends IBox implements Editor {
-	constructor(viewer?: Viewer, editor?: editor) {
+	constructor(viewer?: Drawable, editor?: editor) {
 		super();
 		if (viewer) implement(this, viewer);
 		if (editor) this["exec"] = editor;
@@ -82,7 +82,7 @@ export class IArticle extends IContext implements Article {
 	declare source: unknown;
 	declare view: ELE;
 	
-	senseChange(editor: View, commandName: string): void {
+	senseChange(editor: Viewer, commandName: string): void {
 		this.owner.sense(new Change(commandName, editor), editor.view);
 	}
 	createElement(tagName: string): ELE {
@@ -136,7 +136,7 @@ function getNode(doc: DOCUMENT, path: string[]) {
 }
 
 export class Change implements Signal {
-	constructor(command: string, view?: View) {
+	constructor(command: string, view?: Viewer) {
 		this.direction = view ? "up" : "down";
 		this.subject = "change";
 		this.from = view;
@@ -144,9 +144,9 @@ export class Change implements Signal {
 		this.commandName = command;
 	}
 	direction: "up" | "down";
-	source: View;
-	from: View;
-	on: View;
+	source: Viewer;
+	from: Viewer;
+	on: Viewer;
 	subject: string;
 	commandName: string;
 }

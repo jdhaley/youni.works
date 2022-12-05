@@ -1,4 +1,4 @@
-import { BaseReceiver, Owner, Receiver } from "../base/controller.js";
+import { BaseReceiver, Controller, Owner, Receiver } from "../base/controller.js";
 import { Arc, Area, Edges, Shape, Zone } from "../base/shape.js";
 import { ELE } from "../base/dom.js";
 import { Bag, EMPTY } from "../base/util.js";
@@ -17,7 +17,7 @@ export class ElementOwner extends Owner<ELE> {
 	}
 }
 
-class ElementController extends BaseReceiver {	
+class ElementController extends BaseReceiver implements Controller<ELE> {	
 	[Symbol.iterator] = function* parts() {
 		const nodes = this.view.childNodes;
 		for (let i = 0, len = nodes.length; i < len; i++) {

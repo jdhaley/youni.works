@@ -11,6 +11,10 @@ export interface Receiver {
 	receive(signal: Signal): void;
 }
 
+export interface Controller<T> extends Receiver {
+	view: T;
+}
+
 export interface Actions {
 	[key: string]: (this: Receiver, signal: Signal) => void;
 }

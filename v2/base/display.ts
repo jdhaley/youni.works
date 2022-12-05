@@ -1,4 +1,4 @@
-import { View, ViewType } from "./view.js";
+import { Viewer, ViewType } from "./view.js";
 import { Shape } from "./shape.js";
 import { Actions, Receiver } from "./controller.js";
 import { TypeConf } from "./type.js";
@@ -10,11 +10,12 @@ import { ELE, RANGE } from "./dom.js";
 // 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 // }
 
-export interface ContentView extends View {
+//TODO remove
+export interface ContentView extends Viewer {
 	content: ELE;
 }
 
-export interface Box extends Shape, View, Receiver {
+export interface Box extends Shape, Viewer {
 	type: BoxType;
 	partOf?: Box;
 	header?: Box;
@@ -22,10 +23,6 @@ export interface Box extends Shape, View, Receiver {
 	content: ELE;
 	
 	valueOf(range?: RANGE): unknown;
-	// exec(commandName: string, extent: RANGE, replacement?: unknown): void;
-
-	/** for Records */
-	//get(member: string): Box;
 }
 
 export interface BoxType extends ViewType {

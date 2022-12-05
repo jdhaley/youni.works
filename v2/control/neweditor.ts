@@ -5,14 +5,14 @@ import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
 import { RemoteFileService } from "../base/remote.js";
 import { BaseType, start } from "../base/type.js";
 import { bundle, implement } from "../base/util.js";
-import { bindViewEle, getView, View, ViewType, VIEW_ELE } from "../base/view.js";
+import { bindViewEle, getView, Viewer, ViewType, VIEW_ELE } from "../base/view.js";
 import { extendDisplay } from "./display.js";
 import { ElementShape } from "./element.js";
 import { Frame } from "./frame.js";
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 
-export interface Editor extends View {
+export interface Editor extends Viewer {
 	id: string;	
 	level: number;
 
@@ -26,14 +26,14 @@ export interface Editor extends View {
 	promote(): void;
 }
 
-interface Viewer {
+interface Drawer {
 	viewValue(model: unknown): void;
 	viewElement(model: ELE): void;
 	valueOf(filter?: unknown): unknown
 }
 
 export class IEditor extends ElementShape implements Editor {
-	constructor(viewer?: Viewer, editor?: editor) {
+	constructor(viewer?: Drawer, editor?: editor) {
 		super();
 		if (viewer) implement(this, viewer);
 		if (editor) this["exec"] = editor;

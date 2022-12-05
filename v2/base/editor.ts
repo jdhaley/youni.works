@@ -1,8 +1,9 @@
-import { View, ViewContext, ViewType } from "./view.js";
+import { Viewer, ViewType } from "./view.js";
 import { CommandBuffer } from "./command.js";
 import { ELE, RANGE } from "./dom.js";
+import { Controller } from "./controller.js";
 
-export interface Article extends ViewContext {
+export interface Article extends Controller<ELE> {
 	commands: CommandBuffer<RANGE>;
 	selectionRange: RANGE;
 	getControl(id: string): Editor;
@@ -15,7 +16,7 @@ export interface EditorType extends ViewType {
 	model: string;
 }
 
-export interface Editor extends View {
+export interface Editor extends Viewer {
 	type: EditorType;
 	id: string;
 	level: number;

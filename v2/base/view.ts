@@ -1,30 +1,25 @@
-import { Receiver } from "./controller.js";
+import { Controller } from "./controller.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
-// Consider making this the superclass for View.
-export interface ViewContext extends Receiver {
-	view: ELE;
-}
-
-export interface View extends ViewContext {
+export interface Viewer extends Controller<ELE> {
 	type: ViewType;
 	draw(data?: unknown): void;
 }
 
 export interface ViewType {
-	context: ViewContext;
+	context: Controller<ELE>;
 	name: string;
 	types: bundle<ViewType>;
-	create(value?: unknown): View;
-	control(node: ELE): View;
+	create(value?: unknown): Viewer;
+	control(node: ELE): Viewer;
 }
 
 export interface VIEW_ELE extends ELE {
-	$control?: View;
+	$control?: Viewer;
 }
 
-export function getView(loc: NODE | RANGE): View {
+export function getView(loc: NODE | RANGE): Viewer {
 	if (loc instanceof Range) loc = loc.commonAncestorContainer;
 	for (let node = loc instanceof Node ? loc : null; node; node = node.parentNode) {
 		let e = ele(node) as VIEW_ELE;
