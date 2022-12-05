@@ -4,17 +4,11 @@ import { Actions, Receiver } from "./controller.js";
 import { TypeConf } from "./type.js";
 import { bundle } from "./util.js";
 import { ELE, RANGE } from "./dom.js";
-import { CommandBuffer } from "./command.js";
 
 // export interface Content extends Instance, Iterable<Content> {
 // 	textContent: string;
 // 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 // }
-
-// Consider making this the superclass for View.
-export interface ViewContext extends Receiver {
-	view: ELE;
-}
 
 export interface ContentView extends View {
 	content: ELE;
@@ -35,7 +29,6 @@ export interface Box extends Shape, View, Receiver {
 }
 
 export interface BoxType extends ViewType {
-	context: ViewContext;
 	conf: Display;
 
 	//TODO remove?

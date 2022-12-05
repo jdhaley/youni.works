@@ -1,13 +1,19 @@
+import { Receiver } from "./controller.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
-export interface View {
+// Consider making this the superclass for View.
+export interface ViewContext extends Receiver {
 	view: ELE;
+}
+
+export interface View extends ViewContext {
 	type: ViewType;
 	draw(data?: unknown): void;
 }
 
 export interface ViewType {
+	context: ViewContext;
 	name: string;
 	types: bundle<ViewType>;
 	create(value?: unknown): View;

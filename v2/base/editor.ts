@@ -1,15 +1,10 @@
+import { View, ViewContext, ViewType } from "./view.js";
 import { CommandBuffer } from "./command.js";
-import { Receiver } from "./controller.js";
 import { ELE, RANGE } from "./dom.js";
-import { View, ViewType } from "./view.js";
-
-export interface ViewContext extends Receiver {
-	view: ELE;
-	commands: CommandBuffer<RANGE>;
-	selectionRange: RANGE;
-}
 
 export interface Article extends ViewContext {
+	commands: CommandBuffer<RANGE>;
+	selectionRange: RANGE;
 	getControl(id: string): Editor;
 	extentFrom(startPath: string, endPath: string): RANGE;
 	senseChange(editor: Editor, commandName: string): void;

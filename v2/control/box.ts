@@ -1,4 +1,4 @@
-import { Box, BoxType, Display, ViewContext } from "../base/display.js";
+import { Box, BoxType, Display } from "../base/display.js";
 import { BaseType, start } from "../base/type.js";
 import { Actions, BaseReceiver } from "../base/controller.js";
 import { CommandBuffer } from "../base/command.js";
@@ -8,6 +8,7 @@ import { bundle } from "../base/util.js";
 import { ElementShape } from "./element.js";
 import { Frame } from "./frame.js";
 import { extendDisplay } from "./display.js";
+import { ViewContext } from "../base/view.js";
 
 export class IBox extends ElementShape implements Box {
 	constructor(actions?: Actions) {
