@@ -1,14 +1,18 @@
-import { View } from "./view.js";
+import { RANGE } from "./dom.js";
+import { ContentView } from "./view.js";
 
-export interface Editor extends View {
+export interface Editor extends ContentView {
 	id: string;
-	
 	level: number;
-	demote(): void;
-	promote(): void;
+
+	valueOf(range?: RANGE): unknown;
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
 
 	/** @deprecated */
 	convert?(type: string): void;
+
+	demote(): void;
+	promote(): void;
 }
 
 export interface Edits {

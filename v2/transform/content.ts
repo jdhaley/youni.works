@@ -1,7 +1,7 @@
 import { ele, ELE, NODE, RANGE } from "../base/dom.js";
-import { getView, View } from "../base/view.js";
+import { getView, ContentView } from "../base/view.js";
 
-export function xmlContent(view: View, range: RANGE, out?: ELE): ELE {
+export function xmlContent(view: ContentView, range: RANGE, out?: ELE): ELE {
 	if (range && !range.intersectsNode(view.content)) return;
 	let item: ELE;
 	if (!out) {
@@ -18,11 +18,11 @@ export function xmlContent(view: View, range: RANGE, out?: ELE): ELE {
 	return item;
 }
 
-function content(view: View, range: RANGE, out: ELE) {
+function content(view: ContentView, range: RANGE, out: ELE) {
 	for (let node of view.content.childNodes) {
 		if (range && !range.intersectsNode(node as NODE))
 			continue;
-		let childView = getView(node);
+		let childView = getView(node) as ContentView;
 		if (childView && childView != view) {
 			xmlContent(childView, range, out);
 		} else if (ele(node)) {

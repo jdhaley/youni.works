@@ -1,12 +1,13 @@
 import { ELE, NODE, RANGE, ele } from "../../base/dom.js";
-import { View, getView } from "../../base/view.js";
+import { Editor } from "../../base/editor.js";
+import { ContentView, getView } from "../../base/view.js";
 
 export const record = {
 	//memberType = "field";
 
-	get(this: View, name: string): View {
+	get(this: ContentView, name: string): ContentView {
 		for (let node of this.content.childNodes) {
-			let view = getView(node);
+			let view = getView(node) as ContentView;
 			if (name == view?.type.name) return view;
 		}
 	},
@@ -14,12 +15,12 @@ export const record = {
 	// get title(): string {
 	// 	return this.get("title").content.textContent;
 	// }
-	viewValue(this: View, model: unknown): void {
+	viewValue(this: ContentView, model: unknown): void {
 		for (let name in this.type.types) {
 			viewMember(this, name, model ? model[name] : undefined);
 		}
 	},
-	viewElement(this: View, content: ELE): void {
+	viewElement(this: ContentView, content: ELE): void {
 		/*
 			viewElement is called via a replace command. Because the range may only include a
 			subset of the fields, we no longer create the entire record - only those in the command.
@@ -35,7 +36,7 @@ export const record = {
 		// 	viewMember(this, name, idx[name]);
 		// }
 	},
-	valueOf(this: View, range?: RANGE): unknown {
+	valueOf(this: ContentView, range?: RANGE): unknown {
 		let model = recordContent(null, this.content as ELE, range);
 		if (model) {
 			model["type$"] = this.type.name;
@@ -44,12 +45,14 @@ export const record = {
 	}
 }
 
-function viewMember(editor: View, name: string, value: any): View {
+function viewMember(editor: ContentView, name: string, value: any): ContentView {
 	let type = editor.type.types[name];
 	let member = type.create(value);
 	member.view.classList.add("field");
 	editor.view.append(member.view);
-	return member;
+
+	//TODO contentedit refactoring - remove cast once refactoring complete
+	return member as ContentView;
 }
 
 function recordContent(model: Object, view: NODE, range: RANGE): Object {
@@ -57,7 +60,7 @@ function recordContent(model: Object, view: NODE, range: RANGE): Object {
 	
 	for (let child of view.childNodes) {
 		if (ele(child)?.classList.contains("field")) {
-			let viewer = child["$control"] as View;
+			let viewer = child["$control"] as Editor;
 			let value = viewer.valueOf(range);
 			if (value) {
 				if (!model) model = Object.create(null);

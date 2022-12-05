@@ -1,9 +1,9 @@
-import { Article, View, ViewType } from "./view.js";
+import { Article, ContentView, ContextType, View } from "./view.js";
 import { Shape } from "./shape.js";
 import { Actions, Receiver } from "./controller.js";
 import { TypeConf } from "./type.js";
 import { bundle, extend } from "./util.js";
-import { ELE } from "./dom.js";
+import { ELE, RANGE } from "./dom.js";
 
 // export interface Content extends Instance, Iterable<Content> {
 // 	textContent: string;
@@ -36,11 +36,15 @@ export interface Box extends Shape, View, Receiver {
 	header?: Box;
 	footer?: Box;
 
+	content: ELE;
+	valueOf(range?: RANGE): unknown;
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
+
 	/** for Records */
 	//get(member: string): Box;
 }
 
-export interface BoxType extends ViewType {
+export interface BoxType extends ContextType {
 	context: BoxContext;
 	conf: Display;
 }

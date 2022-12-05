@@ -1,10 +1,11 @@
-import { BoxType, Display } from "../base/display.js";
+import { Display } from "../base/display.js";
 import { Actions } from "../base/controller.js";
 import { extend } from "../base/util.js";
+import { ContextType } from "../base/view.js";
 
-export function extendDisplay(type: BoxType, conf: Display): Display {
+export function extendDisplay(type: ContextType, conf: Display): Display {
 	if (!conf) return;
-	let source: Display = type.conf;
+	let source: Display = type["conf"];
 	let disp: Display = extend(source, conf);
 	if (conf.actions)	disp.actions = extendActions(source?.actions, conf.actions);
 	if (conf.style)		createStyles(disp, conf.style);

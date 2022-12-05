@@ -1,17 +1,17 @@
 import { CHAR } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
-import { View } from "../../base/view";
+import { ContentView } from "../../base/view";
 
 export const text = {
 	//viewType = "text";
-	viewValue(this: View, model: undefined): void {
+	viewValue(this: ContentView, model: undefined): void {
 		this.content.textContent = model ? "" + model : "";
 	},
-	viewElement(this: View, ele: ELE) {
+	viewElement(this: ContentView, ele: ELE) {
 		//even with plain text, always use HTML so that the marker is transferred to the view.
 		this.content.innerHTML = ele.innerHTML;
 	},
-	valueOf(this: View, range?: RANGE): unknown {
+	valueOf(this: ContentView, range?: RANGE): unknown {
 		let model = "";
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let node of (this.content as ELE).childNodes) {

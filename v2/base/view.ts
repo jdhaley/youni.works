@@ -2,43 +2,40 @@ import { CommandBuffer } from "./command.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
-interface XVIEW {
-	type: XTYPE;
-	view: ELE;
-	draw(data?: unknown): void;
-}
-
-interface XTYPE {
-	create(value?: unknown): XVIEW;
-	control(node: ELE): XVIEW;
-}
-
 export interface View {
-	type: ViewType;
 	view: ELE;
-	content: ELE;
-
+	type: ViewType;
 	draw(data?: unknown): void;
-	valueOf(range?: RANGE): unknown;
-	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
 }
 
 export interface ViewType {
+	name: string;
+	types: bundle<ViewType>;
+	create(value?: unknown): View;
+	control(node: ELE): View;
+}
+
+export interface ContentView extends View {
+	type: ContextType;
+	//compatibility 
+	content: ELE;
+}
+
+export interface ContextType extends ViewType {
 	context: Article;
 	name: string;
 	model: string;
-	types: bundle<ViewType>;
-	
-	create(value?: unknown): View;
-	control(node: ELE): View;
+	types: bundle<ContextType>;
+
+	control(node: ELE): ContentView;
 }
 
 export interface Article  {
 	commands: CommandBuffer<RANGE>;
 	selectionRange: RANGE;
-	getControl(id: string): View;
+	getControl(id: string): ContentView;
 	extentFrom(startPath: string, endPath: string): RANGE;
-	senseChange(editor: View, commandName: string): void;
+	senseChange(editor: ContentView, commandName: string): void;
 }
 
 export interface VIEW_ELE extends ELE {
@@ -70,7 +67,7 @@ export function bindViewEle(node: VIEW_ELE) {
 			return;
 		}
 	}
-	for (let child of view.content.childNodes) {
+	for (let child of view.view.childNodes) {
 		if (ele(child)) bindViewEle(child as ELE);
 	}
 }

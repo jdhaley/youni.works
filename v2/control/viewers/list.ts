@@ -1,8 +1,9 @@
 import { ELE, RANGE } from "../../base/dom.js";
-import { View, getView } from "../../base/view.js";
+import { ContentView, getView } from "../../base/view.js";
+import { Editor } from "../neweditor.js";
 
 export const list = {
-	viewValue(this: View, model: unknown): void {
+	viewValue(this: ContentView, model: unknown): void {
 		if (model && model[Symbol.iterator]) for (let item of (model as Iterable<unknown>)) {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
@@ -12,7 +13,7 @@ export const list = {
 			this.content.append(view.view);
 		}
 	},
-	viewElement(this: View, content: ELE): void {
+	viewElement(this: ContentView, content: ELE): void {
 		if (!content) return;
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
@@ -24,11 +25,12 @@ export const list = {
 			}
 		}
 	},
-	valueOf(this: View, range?: RANGE): unknown {
+	valueOf(this: ContentView, range?: RANGE): unknown {
 		let model: unknown[];
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let part of this.content.childNodes) {
-			let editor = getView(part);
+			//TODO contentedit refactoring - remove casts.
+			let editor = getView(part) as any as Editor;
 			let value = editor?.valueOf(range);
 			if (value) {
 				if (!model) {
