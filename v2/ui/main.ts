@@ -3,8 +3,8 @@ import { Box, Display } from "../base/display.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import { IBox, BType } from "../control/box.js";
-import { IArticle } from "../control/editor.js";
+import { BType } from "../control/box.js";
+import { IEditor, IArticle } from "../control/editor.js";
 import { Frame, UserEvent } from "../control/frame.js";
 
 import { list } from "../control/viewers/list.js";
@@ -17,7 +17,7 @@ import actions from "./conf/actions.js";
 import edit from "./conf/edit.js";
 
 import shape from "./actions/shape.js";
-import { IEditor } from "../control/editor.js";
+import { IBox } from "../control/newbox.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -91,42 +91,48 @@ let types: bundle<Display> = {
 	label: {
 		type: "widget",
 		tagName: "header",
+		kind: "label",
 		actions: {
 			view(this: Box, signal: Signal) {
-				this.content.textContent = this.partOf.type.conf.title;
+				this.view.textContent = this.partOf.type.conf.title;
 			}
 		},
 		style: {
-			this: {
+			".label": {
 				font_size: "10pt",
 				color: "gray"
 			}
 		}
 	},
+	field: {
+		type: "widget",
+		types: {
+			header: "label",
+			content: "text"
+		}
+	},
 	tasks: {
 		type: "list",
-		header: "caption",
 		types: {
 			task: "task"
 		},
-		style: {
-			this: {
-				border_radius: "3px",
-				border: "1px solid lightsteelblue",
-			},
-			content: {
-				display: "block",
-			}
-		},
-		//actions: shape
+		// style: {
+		// 	this: {
+		// 		border_radius: "3px",
+		// 		border: "1px solid lightsteelblue",
+		// 	},
+		// 	content: {
+		// 		display: "block",
+		// 	}
+		// },
+		// //actions: shape
 	},
 	task: {
 		type: "record",
 		title: "Task",
 		types: {
 			activity: {
-				type: "text",
-				header: "label",
+				type: "field",
 				title: "Activity",
 				style: {
 					this: {
@@ -135,8 +141,7 @@ let types: bundle<Display> = {
 				}
 			},
 			title: {
-				type: "text",
-				header: "label",
+				type: "field",
 				title: "Title",
 				style: {
 					this: {
@@ -145,8 +150,7 @@ let types: bundle<Display> = {
 				}
 			},
 			status: {
-				type: "text",
-				header: "label",
+				type: "field",
 				title: "Status",
 				style: {
 					this: {
@@ -173,7 +177,10 @@ let types: bundle<Display> = {
 		type: "widget",
 		kind: "dialog",
 		title: "Dialog",
-		header: "caption",
+		types: {
+			header: "caption",
+			content: "text"
+		},
 		style: {
 			".dialog>.content": {
 				padding: "4px",
@@ -185,9 +192,8 @@ let types: bundle<Display> = {
 	},
 	caption:  {
 		type: "widget",
-		header: "widget",
 		types: {
-			x: "widget"
+			content: "text",
 		},
 		tagName: "header",
 		style: {
@@ -203,12 +209,12 @@ let types: bundle<Display> = {
 			}				
 		},
 		actions: {
-			view: function (this: Box, event: UserEvent) {
-				this.content.textContent = "Dialog"; //this.partOf.type.conf.title;
+			view: function (this: IBox, event: UserEvent) {
+				this.content.view.textContent = "Dialog"; //this.partOf.type.conf.title;
 			},
-			click: function (this: Box, event: UserEvent) {
+			click: function (this: IBox, event: UserEvent) {
 				if (event.target.getAttribute("data-cmd") == "edit") {
-					this.partOf.content.textContent = "click edit";
+					this.partOf.content.view.textContent = "click edit";
 				}
 			}
 		}
@@ -216,7 +222,7 @@ let types: bundle<Display> = {
 	taskDialog:{
 		type: "dialog",
 		types: {
-			tasks: "tasks"
+			content: "tasks"
 		},
 		style: {
 			".label": `
@@ -242,7 +248,8 @@ let article = new IArticle(frame, {
 
 start(article, baseTypes, types);
 
-let tasks = article.types.tasks.create([
+//let dialogue = article.types.taskDialog.create()
+let tasks = article.types.taskDialog.create([
 		/*
 dsp development: design responsibility questions: today: in progress
 td teller: michael hoy meeting: done

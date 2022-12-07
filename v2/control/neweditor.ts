@@ -1,14 +1,14 @@
 import { CommandBuffer } from "../base/command.js";
 import { BaseReceiver, Signal } from "../base/controller.js";
-import { Display } from "../base/display.js";
 import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
 import { RemoteFileService } from "../base/remote.js";
-import { BaseType, start } from "../base/type.js";
+import { start } from "../base/type.js";
 import { bundle, implement } from "../base/util.js";
-import { bindViewEle, getView, Viewer, ViewType, VIEW_ELE } from "../base/view.js";
-import { extendDisplay } from "./display.js";
-import { ElementShape } from "./element.js";
+import { bindViewEle, getView, Viewer, VIEW_ELE } from "../base/view.js";
+
+import { ElementController } from "./element.js";
 import { Frame } from "./frame.js";
+import { VType } from "./view.js";
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 
@@ -32,17 +32,14 @@ interface Drawer {
 	valueOf(filter?: unknown): unknown
 }
 
-export class IEditor extends ElementShape implements Editor {
+export class IEditor extends ElementController implements Editor {
 	constructor(viewer?: Drawer, editor?: editor) {
 		super();
 		if (viewer) implement(this, viewer);
-		if (editor) this["exec"] = editor;
+		if (editor) this.exec = editor;
 	}
 	type: EType;
 
-	get content(): ELE {
-		return this.view;
-	}
 	get id(): string {
 		return this.view.id;
 	}
@@ -67,9 +64,6 @@ export class IEditor extends ElementShape implements Editor {
 	}
 	convert?(type: string): void {
 	}
-	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
-		throw new Error("Method not implemented.");
-	}
 	draw(value?: unknown): void {
 		if (value instanceof Element) {
 			if (value.id) this.view.id = value.id;
@@ -81,6 +75,9 @@ export class IEditor extends ElementShape implements Editor {
 			this.viewValue(value);
 		}
 	}
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
+		throw new Error("Method not implemented.");
+	}
 	viewValue(model: unknown): void {
 	}
 	viewElement(content: ELE): void {
@@ -88,42 +85,10 @@ export class IEditor extends ElementShape implements Editor {
 }
 let NEXT_ID = 1;
 
-
-export class EType /*extends LoadableType*/ extends BaseType<Editor> implements ViewType {
+export class EType extends VType {
 	declare context: EArticle;
-	declare partOf: EType;
-	declare types: bundle<EType>;
-	declare prototype: IEditor;
-	declare header?: EType;
-	declare footer?: EType;
-	declare conf: Display;
-
 	get model(): string {
 		return this.conf.model;
-	}
-	create(value?: unknown): Editor {
-		let node = this.context.createElement(this.conf.tagName || "div");
-		let view = this.control(node);
-		view.draw(value);
-		return view;
-	}
-	control(node: ELE): Editor {
-		node.setAttribute("data-item", this.name);
-		let view = Object.create(this.prototype);
-		node["$control"] = view;
-		view.view = node;
-		return view;
-	}
-	start(name: string, conf: Display): void {
-		this.name = name;
-		conf = extendDisplay(this as any, conf);
-		console.debug(name, conf);
-		this.conf = conf;
-		this.prototype = Object.create(this.conf.prototype);
-		this.prototype.type = this;
-		if (conf.actions) this.prototype.actions = conf.actions;
-		if (conf.header) this.header = this.context.types[conf.header] as EType;
-		if (conf.footer) this.footer = this.context.types[conf.footer] as EType;
 	}
 }
 

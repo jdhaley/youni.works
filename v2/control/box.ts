@@ -77,6 +77,7 @@ export class BType /*extends LoadableType*/ extends BaseType<Box> implements Box
 		return view;
 	}
 	control(node: ELE): IBox {
+		if (this.conf.kind) node.setAttribute("class", this.conf.kind)
 		node.setAttribute("data-item", this.name);
 		let view = Object.create(this.prototype);
 		node["$control"] = view;

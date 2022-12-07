@@ -36,9 +36,7 @@ function navigateInto(ele: ELE, isBack?: boolean) {
 	let view = getBox(ele);
 	if (!view) return;
 	let content = view.content;
-	switch (view.type.model) {
-		case "unit":
-			break;
+	switch (view.type.conf.model) {
 		case "record":
 		case "list":
 			ele = isBack ? content.lastElementChild : content.firstElementChild;

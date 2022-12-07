@@ -27,17 +27,9 @@ export interface Box extends Shape, Viewer {
 
 export interface BoxType extends ViewType {
 	conf: Display;
-
-	//TODO remove?
-	model: string;
 }
 
-// export interface BoxContext extends Article, Receiver {
-// 	types: bundle<BoxType>;
-// 	view: ELE;
-// }
-
-interface ViewConf extends TypeConf {
+export interface ViewConf extends TypeConf {
 	prototype?: object;
 	actions?: Actions;
 	tagName?: string;
