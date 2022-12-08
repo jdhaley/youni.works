@@ -1,3 +1,4 @@
+import { CommandBuffer } from "./command.js";
 import { Controller } from "./controller.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
@@ -7,10 +8,20 @@ export interface Viewer extends Controller<ELE> {
 	draw(data?: unknown): void;
 }
 
+export interface Article extends Controller<ELE> {
+	commands: CommandBuffer<RANGE>;
+	selectionRange: RANGE;
+	getControl(id: string): Viewer;
+	extentFrom(startPath: string, endPath: string): RANGE;
+	senseChange(viewer: Viewer, commandName: string): void;
+}
+
 export interface ViewType {
 	context: Controller<ELE>;
 	name: string;
 	types: bundle<ViewType>;
+	conf: bundle<any>;
+
 	create(value?: unknown): Viewer;
 	control(node: ELE): Viewer;
 }

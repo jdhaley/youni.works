@@ -1,12 +1,10 @@
 import { RANGE } from "../base/dom.js";
-import { Editor, Edits } from "../base/editor.js";
 import { getView } from "../base/view.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
-import { BType } from "./box.js";
-import { IArticle } from "./editor.js";
-
+import { BType } from "../control/box.js";
+import { Editor } from "../base/editor.js";
 
 export function getClipboard(clipboard: DataTransfer) {
 	let data = clipboard.getData("application/json");
@@ -37,16 +35,4 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 	}
 	if (!(model instanceof Array)) model = [model];
 	clipboard.setData("application/json", JSON.stringify(model || null));
-}
-
-export function play(article: IArticle, edits: Edits) {
-	let type = article.types[edits.type];
-	let view = type.create(edits.source);
-	article.view = view.view;
-	this.frame.append(this.node);
-	for (let edit of edits.edits) {
-		let editor = this.getControl(edit.viewId) as Editor;
-		let range = this.extentFrom(edit.range.start, edit.range.end);
-		editor.exec(edit.name, range, edit.value);
-	}
 }

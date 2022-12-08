@@ -4,8 +4,8 @@ import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";
 import { CommandBuffer } from "../../base/command.js";
 
-import { UserEvent } from "../../control/frame.js";
-import { Change, IArticle } from "../../control/editor.js";
+import { UserEvent } from "../frame.js";
+import { Change, IArticle } from "../article.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {

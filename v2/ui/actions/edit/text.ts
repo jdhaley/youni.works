@@ -1,8 +1,8 @@
-import { Editor } from "../../base/editor.js";
-import { CHAR, extend } from "../../base/util.js";
+import { Editor } from "../../../base/editor.js";
+import { CHAR, extend } from "../../../base/util.js";
 
-import { EditEvent, UserEvent } from "../../control/frame.js";
-import { setClipboard } from "../../control/clipboard.js";
+import { EditEvent, UserEvent } from "../../frame.js";
+import { setClipboard } from "../../clipboard.js";
 
 import editor from "./editor.js";
 

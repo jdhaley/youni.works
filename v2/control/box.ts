@@ -1,23 +1,66 @@
+import { Viewer, ViewType, Article } from "../base/view.js";
+import { Controller } from "../base/controller.js";
 import { Box, BoxType, Display } from "../base/display.js";
-import { BaseType, start } from "../base/type.js";
-import { Actions, BaseReceiver, Controller } from "../base/controller.js";
-import { CommandBuffer } from "../base/command.js";
 import { ELE, RANGE } from "../base/dom.js";
+import { BaseType, TypeContext } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import { ElementShape } from "./element.js";
-import { Frame } from "./frame.js";
 import { extendDisplay } from "./display.js";
+import { ElementShape } from "./element.js";
 
-export class IBox extends ElementShape implements Box {
-	constructor(actions?: Actions) {
-		super(actions);
+export class IView extends ElementShape implements Viewer {
+	declare type: ViewType;
+
+	get partOf(): Viewer {
+		return super.partOf as Viewer;
 	}
+
+	draw(value: unknown): void {
+	}
+	valueOf(filter?: unknown): unknown {
+		return undefined;
+	}
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
+		throw new Error("Method not implemented.");
+	}
+}
+
+export class TBox extends IView implements Box {
+	declare type: BType;
+	get isContainer(): boolean {
+		return true;
+	}
+	get content(): ELE {
+		return this.body.view;
+	}
+
+	get header(): Box {
+		for (let child of this.view.children) {
+			if (child.getAttribute("data-item") == "header") return child["$control"];
+		}
+	}
+	get body(): Box {
+		for (let child of this.view.children) {
+			if (child.getAttribute("data-item") == "body") return child["$control"];
+		}
+	}
+	get footer(): Box {
+		for (let child of this.view.children) {
+			if (child.getAttribute("data-item") == "footer") return child["$control"];
+		}
+	}
+
+	draw(value: unknown): void {
+		if (this.type.header) this.view.append(this.type.header.create(value).view);
+		this.view.append(this.type.body.create(value).view);
+		if (this.type.footer) this.view.append(this.type.footer.create(value).view);
+		this.content.classList.add("content");
+	}
+}
+
+export class IBox extends IView implements Box {
 	declare type: BType;
 
-	get partOf(): IBox {
-		return super.partOf as IBox;
-	}
 	get isContainer(): boolean {
 		return this.type.header || this.type.footer ? true : false;
 	}
@@ -32,6 +75,11 @@ export class IBox extends ElementShape implements Box {
 			if (child.nodeName == "HEADER") return child["$control"];
 		}
 	}
+	get body(): Box {
+		if (this.isContainer) for (let child of this.view.children) {
+			if (child.nodeName == "DIV") return child["$control"];
+		}
+	}
 	get footer(): Box {
 		if (this.isContainer) for (let child of this.view.children) {
 			if (child.nodeName == "FOOTER") return child["$control"];
@@ -42,7 +90,7 @@ export class IBox extends ElementShape implements Box {
 		let content: ELE;
 		if (this.isContainer) {
 			if (this.type.header) this.view.append(this.type.header.create(value).view);
-			content = this.view.ownerDocument.createElement("div");
+			content = this.type.body.create(value).view;
 			this.view.append(content);
 			if (this.type.footer) this.view.append(this.type.footer.create(value).view);	
 		} else {
@@ -50,23 +98,28 @@ export class IBox extends ElementShape implements Box {
 		}
 		if (this.view.nodeName == "DIV") content.classList.add("content");
 	}
-	valueOf(filter?: unknown): unknown {
-		return undefined;
-	}
-	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
-		throw new Error("Method not implemented.");
-	}
+}
+
+interface BoxContext extends Controller<ELE>, TypeContext, Article {
+	createElement(name: string): ELE;
 }
 
 export class BType /*extends LoadableType*/ extends BaseType<Box> implements BoxType {
-	declare context: IContext;
+	declare context: BoxContext;
 	declare partOf: BType;
 	declare types: bundle<BType>;
 	declare prototype: IBox;
-	declare header?: BType;
-	declare footer?: BType;
 	declare conf: Display;
 
+	get header(): BType {
+		return this.types?.header;
+	}
+	get body(): BType {
+		return this.types?.body;
+	}
+	get footer(): BType {
+		return this.types?.footer;
+	}
 	get model(): string {
 		return this.conf.model;
 	}
@@ -92,34 +145,6 @@ export class BType /*extends LoadableType*/ extends BaseType<Box> implements Box
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
 		if (conf.actions) this.prototype.actions = conf.actions;
-		if (conf.header) this.header = this.context.types[conf.header] as BType;
-		if (conf.footer) this.footer = this.context.types[conf.footer] as BType;
-	}
-}
-
-export class IContext extends BaseReceiver implements Controller<ELE> {
-	constructor(frame: Frame, conf: bundle<any>) {
-		super(conf.actions);
-		this.owner = frame;
-		this.types = Object.create(null);
-		this.commands = new CommandBuffer();
-		start(this, conf.baseTypes, conf.viewTypes);
-	}
-	readonly owner: Frame
-	readonly commands: CommandBuffer<RANGE>;
-
-	declare types: bundle<BType>;
-	declare view: ELE;
-
-	get selectionRange(): RANGE {
-		return this.owner.selectionRange;
-	}
-	set selectionRange(range: RANGE) {
-		this.owner.selectionRange = range;
-	}
-
-	createElement(tagName: string): ELE {
-		return this.owner.createElement(tagName);
 	}
 }
 

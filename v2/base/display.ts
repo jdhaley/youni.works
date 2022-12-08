@@ -17,7 +17,7 @@ export interface ContentView extends Viewer {
 
 export interface Box extends Shape, Viewer {
 	type: BoxType;
-	partOf?: Box;
+	partOf?: Viewer;
 	header?: Box;
 	footer?: Box;
 	content: ELE;

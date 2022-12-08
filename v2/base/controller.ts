@@ -3,8 +3,8 @@ import { EMPTY, extend} from "./util.js";
 export interface Signal {
 	readonly direction: "up" | "down"
 	subject: string;
-	from?: any;
-	on?: any;
+	from?: unknown;
+	on?: unknown;
 }
 
 export interface Receiver {
@@ -12,6 +12,7 @@ export interface Receiver {
 }
 
 export interface Controller<T> extends Receiver {
+	actions: Actions;
 	view: T;
 }
 

@@ -1,15 +1,5 @@
-import { Viewer, ViewType } from "./view.js";
-import { CommandBuffer } from "./command.js";
+import { Article, Viewer, ViewType } from "./view.js";
 import { ELE, RANGE } from "./dom.js";
-import { Controller } from "./controller.js";
-
-export interface Article extends Controller<ELE> {
-	commands: CommandBuffer<RANGE>;
-	selectionRange: RANGE;
-	getControl(id: string): Editor;
-	extentFrom(startPath: string, endPath: string): RANGE;
-	senseChange(editor: Editor, commandName: string): void;
-}
 
 export interface EditorType extends ViewType {
 	context: Article;

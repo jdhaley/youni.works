@@ -1,14 +1,14 @@
-import { Editor } from "../../base/editor.js";
-import { RANGE, NODE } from "../../base/dom.js";
-import { extend } from "../../base/util.js";
+import { Editor } from "../../../base/editor.js";
+import { RANGE, NODE } from "../../../base/dom.js";
+import { extend } from "../../../base/util.js";
 
-import { getEditor } from "../util.js";
+import { getEditor } from "../../../edit/util.js";
 
-import { EditEvent, UserEvent } from "../../control/frame.js";
-import { getClipboard, setClipboard } from "../../control/clipboard.js";
+import { EditEvent, UserEvent } from "../../frame.js";
+import { getClipboard, setClipboard } from "../../clipboard.js";
 
 //TODO remove this dependency.
-import view from "../../ui/actions/view.js";
+import view from "../view.js";
 
 const EDIT_MAPPING = {
 	"insertText": "insertText",

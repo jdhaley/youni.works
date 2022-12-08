@@ -27,7 +27,7 @@ export class ElementController extends BaseReceiver implements Controller<ELE> {
 	}
 	declare view: ELE;
 	
-	get partOf(): ElementController {
+	get partOf(): Controller<ELE> {
 		for (let node = this.view.parentNode as ELE; node; node = node.parentNode as ELE) {
 			let control = node["$control"];
 			if (control) return control;

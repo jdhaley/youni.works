@@ -1,9 +1,9 @@
 import { Box } from "../../base/display.js";
 import { extend } from "../../base/util.js";
-import { setClipboard } from "../../control/clipboard.js";
-import { Change } from "../../control/editor.js";
+import { setClipboard } from "../clipboard.js";
+import { Change } from "../article.js";
 
-import { UserEvent } from "../../control/frame.js";
+import { UserEvent } from "../frame.js";
 import { getBox, navigate } from "../util.js";
 
 export default extend(null, {

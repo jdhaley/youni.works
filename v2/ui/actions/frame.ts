@@ -1,7 +1,7 @@
 import { Actions } from "../../base/controller.js";
 import { ELE, NODE, RANGE } from "../../base/dom.js";
 
-import { Frame, UserEvent } from "../../control/frame.js";
+import { Frame, UserEvent } from "../frame.js";
 
 export default {
     pointerdown: sense,    

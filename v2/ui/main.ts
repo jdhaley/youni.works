@@ -3,9 +3,9 @@ import { Box, Display } from "../base/display.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import { BType } from "../control/box.js";
-import { IEditor, IArticle } from "../control/editor.js";
-import { Frame, UserEvent } from "../control/frame.js";
+import { BType, IBox, IView } from "../control/box.js";
+import { IEditor } from "../control/editor.js";
+import { Frame, UserEvent } from "./frame.js";
 
 import { list } from "../control/viewers/list.js";
 import { record } from "../control/viewers/record.js";
@@ -17,7 +17,7 @@ import actions from "./conf/actions.js";
 import edit from "./conf/edit.js";
 
 import shape from "./actions/shape.js";
-import { IBox } from "../control/newbox.js";
+import { IArticle } from "./article.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -65,6 +65,11 @@ let baseTypes: bundle<Display> = {
 	},
 	widget: {
 		class: BType as any,
+		prototype: new IView(),
+		tagName: "div",
+	},
+	box: {
+		class: BType as any,
 		prototype: new IBox(),
 		tagName: "div",
 	}
@@ -90,7 +95,6 @@ let types: bundle<Display> = {
 	},
 	label: {
 		type: "widget",
-		tagName: "header",
 		kind: "label",
 		actions: {
 			view(this: Box, signal: Signal) {
@@ -105,10 +109,10 @@ let types: bundle<Display> = {
 		}
 	},
 	field: {
-		type: "widget",
+		type: "box",
 		types: {
 			header: "label",
-			content: "text"
+			body: "text"
 		}
 	},
 	tasks: {
@@ -116,16 +120,16 @@ let types: bundle<Display> = {
 		types: {
 			task: "task"
 		},
-		// style: {
-		// 	this: {
-		// 		border_radius: "3px",
-		// 		border: "1px solid lightsteelblue",
-		// 	},
-		// 	content: {
-		// 		display: "block",
-		// 	}
-		// },
-		// //actions: shape
+		style: {
+			this: {
+				border_radius: "3px",
+				border: "1px solid lightsteelblue",
+			},
+			".dialog>.content": {
+				display: "block",
+			}
+		},
+		//actions: shape
 	},
 	task: {
 		type: "record",
@@ -169,17 +173,18 @@ let types: bundle<Display> = {
 		},
 		style: {
 			this: {
-				display: "flex"
+				display: "flex",
+				flex_direction: "row"
 			}
 		}
 	},
 	dialog: {
-		type: "widget",
+		type: "box",
 		kind: "dialog",
 		title: "Dialog",
 		types: {
 			header: "caption",
-			content: "text"
+			body: "text"
 		},
 		style: {
 			".dialog>.content": {
@@ -191,11 +196,11 @@ let types: bundle<Display> = {
 		actions: shape
 	},
 	caption:  {
-		type: "widget",
+		type: "box",
 		types: {
-			content: "text",
+			header: "widget",
+			body: "label",
 		},
-		tagName: "header",
 		style: {
 			this: {
 				display: "flex",
@@ -210,11 +215,11 @@ let types: bundle<Display> = {
 		},
 		actions: {
 			view: function (this: IBox, event: UserEvent) {
-				this.content.view.textContent = "Dialog"; //this.partOf.type.conf.title;
+				this.body.view.textContent = "Dialog"; //this.partOf.type.conf.title;
 			},
 			click: function (this: IBox, event: UserEvent) {
 				if (event.target.getAttribute("data-cmd") == "edit") {
-					this.partOf.content.view.textContent = "click edit";
+					(this.partOf as Box).content.textContent = "click edit";
 				}
 			}
 		}
@@ -222,7 +227,7 @@ let types: bundle<Display> = {
 	taskDialog:{
 		type: "dialog",
 		types: {
-			content: "tasks"
+			body: "tasks"
 		},
 		style: {
 			".label": `
