@@ -1,4 +1,4 @@
-import { DisplayConf, Box, BoxType, Display } from "./display.js";
+import { Display, DisplayConf, Box, BoxType, DisplayType } from "./display.js";
 import { Signal } from "../base/controller.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
@@ -17,6 +17,7 @@ import edit from "./conf/edit.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";
+import { VType } from "../control/view.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -39,7 +40,7 @@ const shortcuts = {
 
 let baseTypes: bundle<DisplayConf> = {
 	record: {
-		class: BoxType as any,
+		class: VType as any,
 		prototype: new IEditor(record, edit.record),
 		actions: actions.record,
 		tagName: "div",
@@ -47,7 +48,7 @@ let baseTypes: bundle<DisplayConf> = {
 		shortcuts: shortcuts,
 	},
 	list: {
-		class: BoxType as any,
+		class: VType as any,
 		prototype: new IEditor(list, edit.list),
 		actions: actions.list,
 		tagName: "div",
@@ -55,15 +56,15 @@ let baseTypes: bundle<DisplayConf> = {
 		shortcuts: shortcuts
 	},
 	text: {
-		class: BoxType as any,
+		class: VType as any,
 		prototype: new IEditor(text, edit.text),
 		actions: actions.text,
 		tagName: "div",
 		model: "unit",
 		shortcuts: shortcuts
 	},
-	widget: {
-		class: BoxType as any,
+	display: {
+		class: DisplayType as any,
 		prototype: new Display(),
 		tagName: "div",
 	},
@@ -76,7 +77,7 @@ let baseTypes: bundle<DisplayConf> = {
 
 let types: bundle<DisplayConf> = {
 	styles: {
-		type: "unit",
+		type: "display",
 		style: {
 			".field": {
 				padding: "2px"
@@ -93,7 +94,7 @@ let types: bundle<DisplayConf> = {
 		}
 	},
 	label: {
-		type: "widget",
+		type: "display",
 		kind: "label",
 		actions: {
 			view(this: Box, signal: Signal) {
@@ -197,7 +198,7 @@ let types: bundle<DisplayConf> = {
 	caption:  {
 		type: "box",
 		types: {
-			header: "widget",
+			header: "display",
 			body: "label",
 		},
 		style: {

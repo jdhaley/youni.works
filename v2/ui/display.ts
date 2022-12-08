@@ -1,10 +1,8 @@
 import { Actions } from "../base/controller.js";
-import { ELE, RANGE } from "../base/dom.js";
+import { ELE } from "../base/dom.js";
 import { bundle, extend } from "../base/util.js";
 
 import { View, VType } from "../control/view.js";
-import { Shape } from "../base/shape.js";
-import { Viewer } from "../base/view.js";
 import { TypeConf } from "../base/type.js";
 
 export interface ViewConf extends TypeConf {
@@ -21,8 +19,8 @@ export interface DisplayConf extends ViewConf {
 
 	viewType?: string;
 	kind?: string;
-	header?: string;
-	footer?: string;
+//	header?: string;
+//	footer?: string;
 	style?: bundle<any>;
 	shortcuts?: bundle<string>;
 }
@@ -64,11 +62,15 @@ export class Box extends Display {
 export class DisplayType extends VType {
 	declare conf: DisplayConf;
 	start(name: string, conf: DisplayConf): void {
-		super.start(name, extendDisplay(this, conf));
+		super.start(name, conf);
+		if (conf.style)	createStyles(this.conf, conf.style);
 	}
 }
 
 export class BoxType extends DisplayType {
+	get model(): string {
+		return this.conf.model;
+	}
 	get header(): VType {
 		return this.types?.header;
 	}
@@ -78,36 +80,21 @@ export class BoxType extends DisplayType {
 	get footer(): VType {
 		return this.types?.footer;
 	}
+}
+
+export class LegacyType extends DisplayType {
 	get model(): string {
 		return this.conf.model;
 	}
-}
 
-export function extendDisplay(type: DisplayType, conf: DisplayConf): DisplayConf {
-	if (!conf) return;
-	let source: DisplayConf = type["conf"];
-	let disp: DisplayConf = extend(source, conf);
-	if (conf.actions)	disp.actions = extendActions(source?.actions, conf.actions);
-	if (conf.style)		createStyles(disp, conf.style);
-
-	// if (conf.kind)		disp.kind = /*type.kind ? type.kind + " " + conf.kind :*/ conf.kind;
-	// if (conf.props)		disp.props = extend(disp.props, conf.props);
-	// if (conf.content)	disp.content = conf.content;
-	return disp;
-}
-
-//Could also have the actions faceted and automatically call via before$ or after$
-function extendActions(proto: Actions, extension: Actions): Actions {
-	console.log("actions:", proto, extension)
-	if (!proto) return extension;
-	let object = Object.create(proto || null);
-	for (let name in extension) {
-		object[name] = extension[name];
-		if (proto[name]) object[name]._super = proto[name];
+	start(name: string, conf: bundle<any>): void {
+		this.name = name;
+		this.conf = this.conf ? extend(this.conf, conf) : conf;
+		this.prototype = Object.create(this.conf.prototype);
+		this.prototype.type = this;
+		if (conf?.actions) this.prototype.actions = conf.actions;
 	}
-	return object;
 }
-
 let ele = document.createElement("style");
 document.head.appendChild(ele);
 

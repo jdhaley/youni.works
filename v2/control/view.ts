@@ -1,8 +1,8 @@
 import { Article, Viewer, ViewType } from "../base/view.js";
 import { BaseType, TypeContext } from "../base/type.js";
-import { Controller } from "../base/controller.js";
+import { Actions, Controller } from "../base/controller.js";
 import { ELE, RANGE } from "../base/dom.js";
-import { bundle } from "../base/util.js";
+import { bundle, EMPTY, extend } from "../base/util.js";
 
 import { ElementShape } from "./element.js";
 
@@ -50,10 +50,25 @@ export class VType extends BaseType<Viewer> implements ViewType {
 	}
 	start(name: string, conf: bundle<any>): void {
 		this.name = name;
-		this.conf = conf;
-		this.prototype = Object.create(conf.prototype);
+		this.extendConf(conf);
+		if (conf.actions) this.extendActions(conf.actions);
+		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
-		if (conf?.actions) this.prototype.actions = conf.actions;
+		this.prototype.actions = this.conf.actions || EMPTY.object;
+	}
+	protected extendConf(conf: bundle<any>) {
+		this.conf = this.conf ? extend(this.conf, conf) : conf;
+	}
+	protected extendActions(actions: Actions) {
+		if (!this.conf.actions) return;
+		this.conf.actions = Object.create(this.conf.actions);
+		for (let name in actions) {
+			let ext = actions[name] as any;
+			let proto = this.conf.actions[name];
+			//Could also have the actions faceted and automatically call via before$ or after$
+			if (proto) ext._super = proto;
+			this.conf.actions[name] = ext;
+		}
 	}
 }
 
