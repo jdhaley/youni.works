@@ -1,8 +1,8 @@
 import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 
-import { Viewbox } from "./box.js";
+import { Box } from "../display.js";
+import { Viewbox } from "./editbox.js";
 import { getBox } from "../util.js";
-import { Box } from "../../base/display.js";
 
 export class RecordBox extends Viewbox {
 	memberType = "field";

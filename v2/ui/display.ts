@@ -1,29 +1,38 @@
 import { Actions } from "../base/controller.js";
-import { Box, BoxType, Display } from "../base/display.js";
-import { ELE } from "../base/dom.js";
-import { extend } from "../base/util.js";
+import { ELE, RANGE } from "../base/dom.js";
+import { bundle, extend } from "../base/util.js";
 
-import { View, VType } from "./view.js";
+import { View, VType } from "../control/view.js";
+import { Shape } from "../base/shape.js";
+import { Viewer } from "../base/view.js";
+import { TypeConf } from "../base/type.js";
 
-export class Widget extends View {
-	declare type: WidgetType;
+export interface ViewConf extends TypeConf {
+	prototype?: object;
+	actions?: Actions;
+	tagName?: string;
+
+	title?: string;
+	model?: "record" | "list" | "unit";
 }
 
-export class WidgetType extends VType {
-	declare conf: Display;
-	start(name: string, conf: Display): void {
-		super.start(name, extendDisplay(this, conf));
-	}
+export interface DisplayConf extends ViewConf {
+	types?: bundle<DisplayConf | string>;
+
+	viewType?: string;
+	kind?: string;
+	header?: string;
+	footer?: string;
+	style?: bundle<any>;
+	shortcuts?: bundle<string>;
 }
 
-export class TBox extends View implements Box {
-	declare type: BType;
-	get isContainer(): boolean {
-		return true;
-	}
-	get content(): ELE {
-		return this.body.view;
-	}
+export class Display extends View {
+	declare type: DisplayType;
+}
+
+export class Box extends Display {
+	declare type: BoxType;
 
 	get header(): Box {
 		for (let child of this.view.children) {
@@ -40,59 +49,26 @@ export class TBox extends View implements Box {
 			if (child.getAttribute("data-item") == "footer") return child["$control"];
 		}
 	}
-
+	/** @deprecated */
+	get content(): ELE {
+		return this.body.view;
+	}
 	draw(value: unknown): void {
 		if (this.type.header) this.view.append(this.type.header.create(value).view);
 		this.view.append(this.type.body.create(value).view);
 		if (this.type.footer) this.view.append(this.type.footer.create(value).view);
-		this.content.classList.add("content");
+		this.body.view.classList.add("content");
 	}
 }
 
-export class IBox extends View implements Box {
-	declare type: BType;
-
-	get isContainer(): boolean {
-		return this.type.header || this.type.footer ? true : false;
-	}
-	get content(): ELE {
-		if (this.isContainer) for (let child of this.view.children) {
-			if (child.classList.contains("content")) return child;
-		}
-		return this.view;
-	}
-	get header(): Box {
-		if (this.isContainer) for (let child of this.view.children) {
-			if (child.nodeName == "HEADER") return child["$control"];
-		}
-	}
-	get body(): Box {
-		if (this.isContainer) for (let child of this.view.children) {
-			if (child.nodeName == "DIV") return child["$control"];
-		}
-	}
-	get footer(): Box {
-		if (this.isContainer) for (let child of this.view.children) {
-			if (child.nodeName == "FOOTER") return child["$control"];
-		}
-	}
-
-	draw(value: unknown): void {
-		let content: ELE;
-		if (this.isContainer) {
-			if (this.type.header) this.view.append(this.type.header.create(value).view);
-			content = this.type.body.create(value).view;
-			this.view.append(content);
-			if (this.type.footer) this.view.append(this.type.footer.create(value).view);	
-		} else {
-			content = this.view;
-		}
-		if (this.view.nodeName == "DIV") content.classList.add("content");
+export class DisplayType extends VType {
+	declare conf: DisplayConf;
+	start(name: string, conf: DisplayConf): void {
+		super.start(name, extendDisplay(this, conf));
 	}
 }
 
-
-export class BType extends WidgetType implements BoxType {
+export class BoxType extends DisplayType {
 	get header(): VType {
 		return this.types?.header;
 	}
@@ -107,11 +83,10 @@ export class BType extends WidgetType implements BoxType {
 	}
 }
 
-
-export function extendDisplay(type: WidgetType, conf: Display): Display {
+export function extendDisplay(type: DisplayType, conf: DisplayConf): DisplayConf {
 	if (!conf) return;
-	let source: Display = type["conf"];
-	let disp: Display = extend(source, conf);
+	let source: DisplayConf = type["conf"];
+	let disp: DisplayConf = extend(source, conf);
 	if (conf.actions)	disp.actions = extendActions(source?.actions, conf.actions);
 	if (conf.style)		createStyles(disp, conf.style);
 
@@ -138,7 +113,7 @@ document.head.appendChild(ele);
 
 let STYLES = ele.sheet;
 
-function createStyles(display: Display, conf: object) {
+function createStyles(display: DisplayConf, conf: object) {
 	let styles = Object.create(display.style || null);
 	for (let name in conf) {
 		let rule = conf[name];

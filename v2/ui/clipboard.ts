@@ -3,7 +3,7 @@ import { getView } from "../base/view.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";
-import { BType } from "../control/box.js";
+import { BoxType } from "./display.js";
 import { Editor } from "../base/editor.js";
 
 export function getClipboard(clipboard: DataTransfer) {
@@ -28,7 +28,7 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 		return;
 	}
 	//viewType is a Box/Display attribute, not an Editor thing.
-	if ((control.type as any as BType).conf.viewType == "markup") {
+	if ((control.type as any as BoxType).conf.viewType == "markup") {
 		let item = section(model as any);
 		let article = toHtml(item);
 		clipboard.setData("text/html", article.outerHTML);

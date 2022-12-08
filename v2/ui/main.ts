@@ -1,9 +1,8 @@
+import { DisplayConf, Box, BoxType, Display } from "./display.js";
 import { Signal } from "../base/controller.js";
-import { Box, Display } from "../base/display.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import { BType, IBox, Widget } from "../control/box.js";
 import { IEditor } from "../control/editor.js";
 import { Frame, UserEvent } from "./frame.js";
 
@@ -38,9 +37,9 @@ const shortcuts = {
 	// "Control+/": "test"
 }
 
-let baseTypes: bundle<Display> = {
+let baseTypes: bundle<DisplayConf> = {
 	record: {
-		class: BType as any,
+		class: BoxType as any,
 		prototype: new IEditor(record, edit.record),
 		actions: actions.record,
 		tagName: "div",
@@ -48,7 +47,7 @@ let baseTypes: bundle<Display> = {
 		shortcuts: shortcuts,
 	},
 	list: {
-		class: BType as any,
+		class: BoxType as any,
 		prototype: new IEditor(list, edit.list),
 		actions: actions.list,
 		tagName: "div",
@@ -56,7 +55,7 @@ let baseTypes: bundle<Display> = {
 		shortcuts: shortcuts
 	},
 	text: {
-		class: BType as any,
+		class: BoxType as any,
 		prototype: new IEditor(text, edit.text),
 		actions: actions.text,
 		tagName: "div",
@@ -64,18 +63,18 @@ let baseTypes: bundle<Display> = {
 		shortcuts: shortcuts
 	},
 	widget: {
-		class: BType as any,
-		prototype: new Widget(),
+		class: BoxType as any,
+		prototype: new Display(),
 		tagName: "div",
 	},
 	box: {
-		class: BType as any,
-		prototype: new IBox(),
+		class: BoxType as any,
+		prototype: new Box(),
 		tagName: "div",
 	}
 }
 
-let types: bundle<Display> = {
+let types: bundle<DisplayConf> = {
 	styles: {
 		type: "unit",
 		style: {
@@ -193,7 +192,7 @@ let types: bundle<Display> = {
 				border_width: "0 1px 1px 1px"
 			}		
 		},
-		actions: shape
+		//actions: shape
 	},
 	caption:  {
 		type: "box",
@@ -214,10 +213,10 @@ let types: bundle<Display> = {
 			}				
 		},
 		actions: {
-			view: function (this: IBox, event: UserEvent) {
+			view: function (this: Box, event: UserEvent) {
 				this.body.view.textContent = "Dialog"; //this.partOf.type.conf.title;
 			},
-			click: function (this: IBox, event: UserEvent) {
+			click: function (this: Box, event: UserEvent) {
 				if (event.target.getAttribute("data-cmd") == "edit") {
 					(this.partOf as Box).content.textContent = "click edit";
 				}

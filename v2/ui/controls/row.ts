@@ -1,7 +1,7 @@
-import { Box, BoxType } from "../../base/display.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { bundle, EMPTY } from "../../base/util.js";
 
+import { Box, DisplayType } from "../display.js";
 import { RecordBox } from "./record.js";
 
 interface item {
@@ -92,7 +92,7 @@ function getColumns(row: item) {
 	}
 	return columns;
 }
-function createType(type: BoxType, columns: string[]): BoxType {
+function createType(type: DisplayType, columns: string[]): DisplayType {
 	type.types = Object.create(null);
 	let column = (type as any).context.types.column;
 	for (let col of columns) {
@@ -121,7 +121,7 @@ function rowContent(model: unknown, content: ELE, range: RANGE): unknown {
 	return model;
 }
 
-function createHeaderItem(type: BoxType): item {
+function createHeaderItem(type: DisplayType): item {
 	let item = {
 		type$: type.name,
 		header: true, 

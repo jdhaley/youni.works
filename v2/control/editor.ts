@@ -1,7 +1,7 @@
 import { ELE, RANGE } from "../base/dom.js";
-import { Editor } from "../base/editor.js";
+import { Editor, EditorType } from "../base/editor.js";
 import { implement } from "../base/util.js";
-import { IBox } from "./box.js";
+import { View } from "./view.js";
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 
@@ -11,13 +11,17 @@ interface Drawable {
 	valueOf(filter?: unknown): unknown
 }
 
-export class IEditor extends IBox implements Editor {
+export class IEditor extends View implements Editor {
 	constructor(viewer?: Drawable, editor?: editor) {
 		super();
 		if (viewer) implement(this, viewer);
 		if (editor) this["exec"] = editor;
 	}
-
+	declare type: EditorType;
+	
+	get content() {
+		return this.view;
+	}
 	get id(): string {
 		return this.view.id;
 	}
@@ -46,7 +50,7 @@ export class IEditor extends IBox implements Editor {
 		throw new Error("Method not implemented.");
 	}
 	draw(value?: unknown): void {
-		super.draw(value);
+	//	super.draw(value);
 		if (value instanceof Element) {
 			if (value.id) this.view.id = value.id;
 			let level = value.getAttribute("aria-level");

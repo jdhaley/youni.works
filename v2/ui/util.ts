@@ -1,4 +1,4 @@
-import { Box } from "../base/display.js";
+import { Box } from "./display.js";
 import { ELE, NODE, RANGE } from "../base/dom.js";
 import { getView } from "../base/view.js";
 
@@ -27,7 +27,7 @@ export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
 		let toEle = isBack ? editor.view.previousElementSibling : editor.view.nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
-			if (next) return next as NAVIGABLE_ELE;
+			if (next) return next as any;
 		}
 		editor = getBox(editor.view.parentNode);
 	}

@@ -1,4 +1,4 @@
-import { Box } from "../../base/display.js";
+import { Box } from "../display.js";
 import { extend } from "../../base/util.js";
 import { ele } from "../../base/dom.js";
 
