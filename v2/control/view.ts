@@ -1,23 +1,34 @@
-import { Viewer, ViewType } from "../base/view.js";
-import { BaseType, start, TypeContext } from "../base/type.js";
-import { BaseReceiver, Controller } from "../base/controller.js";
-import { ELE } from "../base/dom.js";
+import { Article, Viewer, ViewType } from "../base/view.js";
+import { BaseType, TypeContext } from "../base/type.js";
+import { Controller } from "../base/controller.js";
+import { ELE, RANGE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
 
 import { ElementShape } from "./element.js";
 
-export class IView extends ElementShape implements Viewer {
-	constructor() {
-		super();
+export class View extends ElementShape implements Viewer {
+	declare type: ViewType;
+
+	get partOf(): Viewer {
+		return super.partOf as Viewer;
 	}
-	declare type: VType;
 
 	draw(value: unknown): void {
 	}
+	valueOf(filter?: unknown): unknown {
+		return undefined;
+	}
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
+		throw new Error("Method not implemented.");
+	}
+}
+
+interface ViewContext extends Controller<ELE>, TypeContext, Article {
+	createElement(name: string): ELE;
 }
 
 export class VType extends BaseType<Viewer> implements ViewType {
-	declare context: VContext;
+	declare context: ViewContext;
 	declare partOf: VType;
 	declare types: bundle<VType>;
 	declare prototype: Viewer;
@@ -29,7 +40,8 @@ export class VType extends BaseType<Viewer> implements ViewType {
 		view.draw(value);
 		return view;
 	}
-	control(node: ELE): IView {
+	control(node: ELE): View {
+		if (this.conf.kind) node.setAttribute("class", this.conf.kind)
 		node.setAttribute("data-item", this.name);
 		let view = Object.create(this.prototype);
 		node["$control"] = view;
@@ -41,21 +53,7 @@ export class VType extends BaseType<Viewer> implements ViewType {
 		this.conf = conf;
 		this.prototype = Object.create(conf.prototype);
 		this.prototype.type = this;
-		//if (conf.actions) this.prototype.actions = conf.actions;
-	}
-}
-
-export class VContext extends BaseReceiver implements TypeContext, Controller<ELE> {
-	constructor(conf: bundle<any>) {
-		super(conf.actions);
-		this.types = Object.create(null);
-		start(this, conf.baseTypes, conf.viewTypes);
-	}
-	declare types: bundle<ViewType>;
-	declare view: ELE;
-
-	createElement(tagName: string): ELE {
-		return this.view.ownerDocument.createElement(tagName);
+		if (conf?.actions) this.prototype.actions = conf.actions;
 	}
 }
 

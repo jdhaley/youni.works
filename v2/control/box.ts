@@ -1,31 +1,22 @@
-import { Viewer, ViewType, Article } from "../base/view.js";
-import { Controller } from "../base/controller.js";
+import { Actions } from "../base/controller.js";
 import { Box, BoxType, Display } from "../base/display.js";
-import { ELE, RANGE } from "../base/dom.js";
-import { BaseType, TypeContext } from "../base/type.js";
-import { bundle } from "../base/util.js";
+import { ELE } from "../base/dom.js";
+import { extend } from "../base/util.js";
 
-import { extendDisplay } from "./display.js";
-import { ElementShape } from "./element.js";
+import { View, VType } from "./view.js";
 
-export class IView extends ElementShape implements Viewer {
-	declare type: ViewType;
+export class Widget extends View {
+	declare type: WidgetType;
+}
 
-	get partOf(): Viewer {
-		return super.partOf as Viewer;
-	}
-
-	draw(value: unknown): void {
-	}
-	valueOf(filter?: unknown): unknown {
-		return undefined;
-	}
-	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
-		throw new Error("Method not implemented.");
+export class WidgetType extends VType {
+	declare conf: Display;
+	start(name: string, conf: Display): void {
+		super.start(name, extendDisplay(this, conf));
 	}
 }
 
-export class TBox extends IView implements Box {
+export class TBox extends View implements Box {
 	declare type: BType;
 	get isContainer(): boolean {
 		return true;
@@ -58,7 +49,7 @@ export class TBox extends IView implements Box {
 	}
 }
 
-export class IBox extends IView implements Box {
+export class IBox extends View implements Box {
 	declare type: BType;
 
 	get isContainer(): boolean {
@@ -100,68 +91,80 @@ export class IBox extends IView implements Box {
 	}
 }
 
-interface BoxContext extends Controller<ELE>, TypeContext, Article {
-	createElement(name: string): ELE;
-}
 
-export class BType /*extends LoadableType*/ extends BaseType<Box> implements BoxType {
-	declare context: BoxContext;
-	declare partOf: BType;
-	declare types: bundle<BType>;
-	declare prototype: IBox;
-	declare conf: Display;
-
-	get header(): BType {
+export class BType extends WidgetType implements BoxType {
+	get header(): VType {
 		return this.types?.header;
 	}
-	get body(): BType {
+	get body(): VType {
 		return this.types?.body;
 	}
-	get footer(): BType {
+	get footer(): VType {
 		return this.types?.footer;
 	}
 	get model(): string {
 		return this.conf.model;
 	}
-	create(value?: unknown): Box {
-		let node = this.context.createElement(this.conf.tagName || "div");
-		let view = this.control(node);
-		view.draw(value);
-		return view;
-	}
-	control(node: ELE): IBox {
-		if (this.conf.kind) node.setAttribute("class", this.conf.kind)
-		node.setAttribute("data-item", this.name);
-		let view = Object.create(this.prototype);
-		node["$control"] = view;
-		view.view = node;
-		return view;
-	}
-	start(name: string, conf: Display): void {
-		this.name = name;
-		conf = extendDisplay(this, conf);
-		console.debug(name, conf);
-		this.conf = conf;
-		this.prototype = Object.create(this.conf.prototype);
-		this.prototype.type = this;
-		if (conf.actions) this.prototype.actions = conf.actions;
-	}
 }
 
-// export class ElementContent extends BaseView implements Content {
-// 	get viewContent(): Sequence<NODE> {
-// 		return this.view.childNodes;
-// 	}
-// 	get textContent() {
-// 		return this.view.textContent;
-// 	}
-// 	set textContent(text: string) {
-// 		this.view.textContent = text;
-// 	}
-// 	get markupContent() {
-// 		return this.view.innerHTML;
-// 	}
-// 	set markupContent(markup: string) {
-// 		this.view.innerHTML = markup;
-// 	}
-// }
+
+export function extendDisplay(type: WidgetType, conf: Display): Display {
+	if (!conf) return;
+	let source: Display = type["conf"];
+	let disp: Display = extend(source, conf);
+	if (conf.actions)	disp.actions = extendActions(source?.actions, conf.actions);
+	if (conf.style)		createStyles(disp, conf.style);
+
+	// if (conf.kind)		disp.kind = /*type.kind ? type.kind + " " + conf.kind :*/ conf.kind;
+	// if (conf.props)		disp.props = extend(disp.props, conf.props);
+	// if (conf.content)	disp.content = conf.content;
+	return disp;
+}
+
+//Could also have the actions faceted and automatically call via before$ or after$
+function extendActions(proto: Actions, extension: Actions): Actions {
+	console.log("actions:", proto, extension)
+	if (!proto) return extension;
+	let object = Object.create(proto || null);
+	for (let name in extension) {
+		object[name] = extension[name];
+		if (proto[name]) object[name]._super = proto[name];
+	}
+	return object;
+}
+
+let ele = document.createElement("style");
+document.head.appendChild(ele);
+
+let STYLES = ele.sheet;
+
+function createStyles(display: Display, conf: object) {
+	let styles = Object.create(display.style || null);
+	for (let name in conf) {
+		let rule = conf[name];
+		if (typeof rule == "object") {
+			//if (styles[name]) rule = extend(styles[name], rule);
+			styles[name] = rule;
+		}
+		if (name == "this") {
+			name = `[data-item=${display["name"]}]`
+		} else if (name == "content") {
+			name = `[data-item=${display["name"]}]>.content`
+		}
+		createRule(name, rule);
+	}
+	display.style = styles;
+}
+function createRule(selector: string, object: object | string) {
+	let out = selector + " {";
+	if (typeof object == "string") {
+		out += object;
+	} else if (object) for (let name in object) {
+		out += name.replace("_", "-") + ":" + object[name] + ";"
+	}
+	out += "}";
+	console.log(out);
+	let index = STYLES.insertRule(out);
+	console.log(STYLES.cssRules[index]);
+	return STYLES.cssRules[index];
+}

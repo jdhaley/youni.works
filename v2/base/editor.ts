@@ -15,9 +15,7 @@ export interface Editor extends Viewer {
 	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
 
 	/** @deprecated */
-
 	convert?(type: string): void;
-
 	content: ELE;
 	demote(): void;
 	promote(): void;

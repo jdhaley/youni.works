@@ -3,9 +3,18 @@ import { Controller } from "./controller.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
+// export interface Content extends Instance, Iterable<Content> {
+// 	textContent: string;
+// 	markupContent: string; //May be HTML, XML, or a simplification thereof.
+// }
+
 export interface Viewer extends Controller<ELE> {
 	type: ViewType;
 	draw(data?: unknown): void;
+}
+//TODO remove
+export interface ContentView extends Viewer {
+	content: ELE;
 }
 
 export interface Article extends Controller<ELE> {

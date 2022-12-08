@@ -3,25 +3,30 @@ import { Editor, Edits } from "../base/editor.js";
 import { CommandBuffer } from "../base/command.js";
 import { BaseReceiver, Controller, Signal } from "../base/controller.js";
 import { RemoteFileService } from "../base/remote.js";
-import { start } from "../base/type.js";
+import { start, TypeContext } from "../base/type.js";
 import { bundle } from "../base/util.js";
 import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
 
 import { Frame } from "./frame.js";
 
-export class IContext extends BaseReceiver implements Controller<ELE> {
+export class IArticle extends BaseReceiver implements TypeContext, Article {
 	constructor(frame: Frame, conf: bundle<any>) {
-		super(conf.actions);
+		super();
 		this.owner = frame;
 		this.types = Object.create(null);
 		this.commands = new CommandBuffer();
+		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
+		this.actions = conf.actions;
 		start(this, conf.baseTypes, conf.viewTypes);
 	}
 	readonly owner: Frame
+	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<RANGE>;
 
 	declare types: bundle<ViewType>;
 	declare view: ELE;
+	declare recordCommands: boolean;
+	declare source: unknown;
 
 	get selectionRange(): RANGE {
 		return this.owner.selectionRange;
@@ -30,21 +35,6 @@ export class IContext extends BaseReceiver implements Controller<ELE> {
 		this.owner.selectionRange = range;
 	}
 
-	createElement(tagName: string): ELE {
-		return this.owner.createElement(tagName);
-	}
-}
-
-export class IArticle extends IContext implements Article {
-	constructor(frame: Frame, conf: bundle<any>) {
-		super(frame, conf);
-		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
-	}
-	readonly service: RemoteFileService;
-	declare recordCommands: boolean;
-	declare source: unknown;
-	declare view: ELE;
-	
 	senseChange(editor: Viewer, commandName: string): void {
 		this.owner.sense(new Change(commandName, editor), editor.view);
 	}

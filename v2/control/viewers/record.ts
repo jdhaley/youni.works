@@ -1,4 +1,4 @@
-import { ContentView } from "../../base/display.js";
+import { ContentView } from "../../base/view.js";
 import { ELE, NODE, RANGE, ele } from "../../base/dom.js";
 import { Editor } from "../../base/editor.js";
 import { getView } from "../../base/view.js";

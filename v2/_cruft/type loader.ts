@@ -1,4 +1,4 @@
-import { bundle } from "./util.js";
+import { bundle } from "../base/util.js";
 
 export interface Type<T> {
 	name: string;

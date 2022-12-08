@@ -3,7 +3,7 @@ import { Box, Display } from "../base/display.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import { BType, IBox, IView } from "../control/box.js";
+import { BType, IBox, Widget } from "../control/box.js";
 import { IEditor } from "../control/editor.js";
 import { Frame, UserEvent } from "./frame.js";
 
@@ -65,7 +65,7 @@ let baseTypes: bundle<Display> = {
 	},
 	widget: {
 		class: BType as any,
-		prototype: new IView(),
+		prototype: new Widget(),
 		tagName: "div",
 	},
 	box: {

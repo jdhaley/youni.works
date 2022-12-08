@@ -1,19 +1,9 @@
 import { Viewer, ViewType } from "./view.js";
 import { Shape } from "./shape.js";
-import { Actions, Receiver } from "./controller.js";
+import { Actions } from "./controller.js";
 import { TypeConf } from "./type.js";
 import { bundle } from "./util.js";
 import { ELE, RANGE } from "./dom.js";
-
-// export interface Content extends Instance, Iterable<Content> {
-// 	textContent: string;
-// 	markupContent: string; //May be HTML, XML, or a simplification thereof.
-// }
-
-//TODO remove
-export interface ContentView extends Viewer {
-	content: ELE;
-}
 
 export interface Box extends Shape, Viewer {
 	type: BoxType;
