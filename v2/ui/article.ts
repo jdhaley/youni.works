@@ -1,7 +1,7 @@
 import { Viewer, ViewType, Article, VIEW_ELE, bindViewEle, getView } from "../base/view.js";
 import { Editor, Edits } from "../base/editor.js";
 import { CommandBuffer } from "../base/command.js";
-import { BaseReceiver, Controller, Signal } from "../base/controller.js";
+import { BaseReceiver, Signal } from "../base/controller.js";
 import { RemoteFileService } from "../base/remote.js";
 import { start, TypeContext } from "../base/type.js";
 import { bundle } from "../base/util.js";
