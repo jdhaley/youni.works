@@ -13,7 +13,7 @@ import { text } from "../control/viewers/textViewer.js";
 import controller from "./actions/frame.js";
 
 import actions from "./conf/actions.js";
-import edit from "./conf/edit.js";
+import edit from "./conf/editorConf.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";

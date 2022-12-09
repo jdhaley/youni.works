@@ -9,7 +9,7 @@ import { LineBox } from "../controls/line.js";
 import { RowBox } from "../controls/row.js";
 
 
-import edit from "./edit.js";
+import edit from "./editorConf.js";
 import actions from "./actions.js";
 import shortcuts from "./shortcuts.js";
 
