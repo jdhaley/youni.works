@@ -16,7 +16,6 @@ import edit from "./conf/editorConf.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";
-import { DisplayType } from "../control/viewControl.js";
 
 const shortcuts = {
 	"Control+s": "save",
