@@ -1,6 +1,5 @@
 import { Display, DisplayConf, Box, BoxType, DisplayType } from "./display.js";
 import { Signal } from "../base/controller.js";
-import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
 import { IEditor } from "../control/editorControl.js";
@@ -17,7 +16,7 @@ import edit from "./conf/editorConf.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";
-import { VType } from "../control/viewControl.js";
+import { DisplayType } from "../control/viewControl.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -40,7 +39,7 @@ const shortcuts = {
 
 let baseTypes: bundle<DisplayConf> = {
 	record: {
-		class: VType as any,
+		class: DisplayType as any,
 		prototype: new IEditor(record, edit.record),
 		actions: actions.record,
 		tagName: "div",
@@ -48,7 +47,7 @@ let baseTypes: bundle<DisplayConf> = {
 		shortcuts: shortcuts,
 	},
 	list: {
-		class: VType as any,
+		class: DisplayType as any,
 		prototype: new IEditor(list, edit.list),
 		actions: actions.list,
 		tagName: "div",
@@ -56,7 +55,7 @@ let baseTypes: bundle<DisplayConf> = {
 		shortcuts: shortcuts
 	},
 	text: {
-		class: VType as any,
+		class: DisplayType as any,
 		prototype: new IEditor(text, edit.text),
 		actions: actions.text,
 		tagName: "div",
@@ -78,7 +77,7 @@ let baseTypes: bundle<DisplayConf> = {
 let types: bundle<DisplayConf> = {
 	styles: {
 		type: "display",
-		style: {
+		styles: {
 			".field": {
 				padding: "2px"
 			},
@@ -101,7 +100,7 @@ let types: bundle<DisplayConf> = {
 				this.view.textContent = this.partOf.type.conf.title;
 			}
 		},
-		style: {
+		styles: {
 			".label": {
 				font_size: "10pt",
 				color: "gray"
@@ -120,7 +119,7 @@ let types: bundle<DisplayConf> = {
 		types: {
 			task: "task"
 		},
-		style: {
+		styles: {
 			this: {
 				border_radius: "3px",
 				border: "1px solid lightsteelblue",
@@ -138,7 +137,7 @@ let types: bundle<DisplayConf> = {
 			activity: {
 				type: "field",
 				title: "Activity",
-				style: {
+				styles: {
 					this: {
 						flex: "1 1 25%"
 					}
@@ -147,7 +146,7 @@ let types: bundle<DisplayConf> = {
 			title: {
 				type: "field",
 				title: "Title",
-				style: {
+				styles: {
 					this: {
 						flex: "1 1 60%"
 					}
@@ -156,7 +155,7 @@ let types: bundle<DisplayConf> = {
 			status: {
 				type: "field",
 				title: "Status",
-				style: {
+				styles: {
 					this: {
 						flex: "1 1 15%"
 					}
@@ -171,7 +170,7 @@ let types: bundle<DisplayConf> = {
 			// 	}
 			// }
 		},
-		style: {
+		styles: {
 			this: {
 				display: "flex",
 				flex_direction: "row"
@@ -186,7 +185,7 @@ let types: bundle<DisplayConf> = {
 			header: "caption",
 			body: "text"
 		},
-		style: {
+		styles: {
 			".dialog>.content": {
 				padding: "4px",
 				border: "0 solid gainsboro",
@@ -201,7 +200,7 @@ let types: bundle<DisplayConf> = {
 			header: "display",
 			body: "label",
 		},
-		style: {
+		styles: {
 			this: {
 				display: "flex",
 				flex_direction: "row-reverse",
@@ -229,7 +228,7 @@ let types: bundle<DisplayConf> = {
 		types: {
 			body: "tasks"
 		},
-		style: {
+		styles: {
 			".label": `
 				color: steelblue;
 			`,
@@ -250,8 +249,6 @@ let article = new IArticle(frame, {
 	viewTypes: types,
 	sources: "/journal",
 });
-
-start(article, baseTypes, types);
 
 //let dialogue = article.types.taskDialog.create()
 let tasks = article.types.taskDialog.create([

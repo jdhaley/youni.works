@@ -4,6 +4,7 @@ import { bundle, extend } from "../base/util.js";
 
 import { View, VType } from "../control/viewControl.js";
 import { TypeConf } from "../base/type.js";
+import { createStyles } from "./style.js";
 
 export interface ViewConf extends TypeConf {
 	prototype?: object;
@@ -19,7 +20,7 @@ export interface DisplayConf extends ViewConf {
 
 	viewType?: string;
 	kind?: string;
-	style?: bundle<any>;
+	styles?: bundle<any>;
 	shortcuts?: bundle<string>;
 }
 
@@ -45,23 +46,25 @@ export class Box extends Display {
 			if (child.getAttribute("data-item") == "footer") return child["$control"];
 		}
 	}
-	/** @deprecated */
-	get content(): ELE {
-		return this.body.view;
-	}c
+
 	draw(value: unknown): void {
 		if (this.type.header) this.view.append(this.type.header.create(value).view);
 		this.view.append(this.type.body.create(value).view);
 		if (this.type.footer) this.view.append(this.type.footer.create(value).view);
 		this.body.view.classList.add("content");
 	}
+
+	/** @deprecated */
+	get content(): ELE {
+		return this.body.view;
+	}
 }
 
 export class DisplayType extends VType {
 	declare conf: DisplayConf;
-	start(name: string, conf: DisplayConf): void {
+	start(name: string, conf?: DisplayConf): void {
 		super.start(name, conf);
-		if (conf.style)	createStyles(this.conf, conf.style);
+		if (conf?.styles) this.conf.styles = createStyles(this, conf.styles);
 	}
 }
 
@@ -90,41 +93,8 @@ export class LegacyType extends DisplayType {
 		this.conf = this.conf ? extend(this.conf, conf) : conf;
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
+		if (conf?.styles) this.conf.styles = createStyles(this, conf.styles);
 		if (conf?.actions) this.prototype.actions = conf.actions;
 	}
 }
-let ele = document.createElement("style");
-document.head.appendChild(ele);
 
-let STYLES = ele.sheet;
-
-function createStyles(display: DisplayConf, conf: object) {
-	let styles = Object.create(display.style || null);
-	for (let name in conf) {
-		let rule = conf[name];
-		if (typeof rule == "object") {
-			//if (styles[name]) rule = extend(styles[name], rule);
-			styles[name] = rule;
-		}
-		if (name == "this") {
-			name = `[data-item=${display["name"]}]`
-		} else if (name == "content") {
-			name = `[data-item=${display["name"]}]>.content`
-		}
-		createRule(name, rule);
-	}
-	display.style = styles;
-}
-function createRule(selector: string, object: object | string) {
-	let out = selector + " {";
-	if (typeof object == "string") {
-		out += object;
-	} else if (object) for (let name in object) {
-		out += name.replace("_", "-") + ":" + object[name] + ";"
-	}
-	out += "}";
-	console.log(out);
-	let index = STYLES.insertRule(out);
-	console.log(STYLES.cssRules[index]);
-	return STYLES.cssRules[index];
-}

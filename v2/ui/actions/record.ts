@@ -8,15 +8,15 @@ import { getHeader } from "../uiUtil.js";
 export default extend(editable, {
 	dblclick(this: RecordBox, event: UserEvent) {
 		event.subject = "";
-		if (event.target == this.header) {
+		if (event.target == this.header.view) {
 			event.subject = "";
-			if (this.kind.contains("collapsed")) {
+			if (this.view.classList.contains("collapsed")) {
 				this.header.view.textContent = this.type.conf.title;
-				this.kind.remove("collapsed");
+				this.view.classList.remove("collapsed");
 			} else {
 				let title = this.get("title").content.textContent || "";
 				this.header.view.innerHTML += ": " + `<b>${title}</b>`;
-				this.kind.add("collapsed");
+				this.view.classList.add("collapsed");
 			}
 		}
 	},

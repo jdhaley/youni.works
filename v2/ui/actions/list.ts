@@ -3,14 +3,13 @@ import { ELE, RANGE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
 import { UserEvent } from "../frame.js";
-import { getHeader } from "../uiUtil.js";
 import editable from "./edit/editor.js";
 
 export default extend(editable, {
 	dblclick(this: Box, event: UserEvent) {
-		let header = getHeader(this, event.target as Node);
-		if (header) {
+		if (event.target == this.header.view) {
 			event.subject = "";
+			this.type.context.selectionRange.collapse();
 			if (this.view.classList.contains("collapsed")) {
 				this.view.classList.remove("collapsed");
 			} else {

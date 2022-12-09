@@ -1,9 +1,8 @@
-import { bundle } from "./util.js";
+import { bundle } from "../base/util.js";
 
 export interface Type<T> {
 	name: string;
 	partOf?: Type<T>;
-	conf: bundle<any>;
 	types: bundle<Type<T>>;
 
 	create(...args: any[]): T;
@@ -17,6 +16,7 @@ export interface TypeConf {
 	type?: string;
 	types?: bundle<TypeConf | string>;
 	class?: typeof BaseType;
+	name?: string;
 }
 
 export function start(owner: TypeContext, baseTypes: bundle<any>, types: bundle<any>) {
@@ -40,14 +40,74 @@ export class BaseType<T> implements Type<T> {
 	generalizes(type: Type<T>): boolean {
 		return type == this;
 	}
-	start(name: string, conf: bundle<any>): void {
+	start(name: string, conf?: bundle<any>): void {
 	}
 	create(...args: any[]): T {
 		return undefined;
 	}
+	extend(conf: TypeConf, loader: Loader) {
+		this.types = Object.create(this.types || null);
+		for (let name in conf.types) {
+			let memberConf = conf.types[name];
+			let member: BaseType<unknown>;
+			if (typeof memberConf == "object") {
+				memberConf.name = name;
+				member = loader.load(memberConf);
+				member.partOf = this;
+			} else {
+				member = loader.get(memberConf);
+				member = Object.create(member);
+				member.partOf = this;
+				member.start(name);
+			}
+			this.types[name] = member as any;
+		}
+		if (!conf.name) console.error("No conf name", conf);
+		this.start(conf.name, conf)
+	}
+}
+class Loader {
+	constructor(types: bundle<BaseType<unknown>>, source: bundle<TypeConf>) {
+		this.#types = types;
+		this.#source = source;
+	}
+	#source: bundle<TypeConf>;
+	#types: bundle<BaseType<unknown>>;
+
+	load(value: TypeConf): BaseType<unknown> {
+		console.log("loading", value.name);
+		let type = this.get(value.type);
+		if (type) {
+			type = Object.create(type);
+			this.#types[value.type] = type;
+			type.extend(value, this);
+		}
+		console.log("loaded", value.name);
+		return type;
+	}
+	get(name: string): BaseType<unknown> {
+		let type = this.#types[name];
+		if (!type && this.#source[name]) {
+			this.#source[name].name = name;
+			type = this.load(this.#source[name]);
+			this.#types[name] = type;
+		}
+	//	console.log("get", name, type.name);
+		return type;
+	}
 }
 
-function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<Type<unknown>> {
+export function start2(owner: TypeContext, baseTypes: bundle<any>, source: bundle<any>) {
+	let base = loadBaseTypes(owner, baseTypes);
+	let loader = new Loader(base, source);
+	owner.types = Object.create(null);
+	for (let name in source) {
+		owner.types[name] = loader.get(name);
+	}
+	console.log(owner.types);
+}
+
+function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<BaseType<unknown>> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
@@ -115,3 +175,4 @@ function createType(name: string, conf: TypeConf, types: types, source: bundle<T
 		return member;
 	}
 }
+

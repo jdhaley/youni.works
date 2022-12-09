@@ -48,10 +48,12 @@ export class VType extends BaseType<Viewer> implements ViewType {
 		view.view = node;
 		return view;
 	}
-	start(name: string, conf: bundle<any>): void {
+	start(name: string, conf?: bundle<any>): void {
 		this.name = name;
-		this.extendConf(conf);
-		if (conf.actions) this.extendActions(conf.actions);
+		if (conf) {
+			this.extendConf(conf);
+			if (conf.actions) this.extendActions(conf.actions);
+		}
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
 		this.prototype.actions = this.conf.actions || EMPTY.object;
