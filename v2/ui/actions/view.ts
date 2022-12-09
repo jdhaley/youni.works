@@ -4,7 +4,7 @@ import { setClipboard } from "../clipboard.js";
 import { Change } from "../article.js";
 import { Box } from "../display.js";
 import { UserEvent } from "../frame.js";
-import { getBox, navigate } from "../util.js";
+import { getBox, navigate } from "../uiUtil.js";
 
 export default extend(null, {
 	keydown(this: Box, event: UserEvent) {

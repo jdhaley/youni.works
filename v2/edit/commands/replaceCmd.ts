@@ -1,7 +1,7 @@
 import { RANGE } from "../../base/dom.js";
 import { Editor } from "../../base/editor.js";
-import { getEditor, mark, unmark } from "../util.js";
-import { EditCommand } from "./edit.js";
+import { getEditor, mark, unmark } from "../editUtil.js";
+import { EditCommand } from "./editCmd.js";
 
 export class Replace extends EditCommand {
 	before: string;

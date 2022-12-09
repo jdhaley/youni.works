@@ -1,5 +1,5 @@
 import { Actions } from "../base/controller.js";
-import { ElementShape } from "../control/element.js";
+import { ElementShape } from "../control/eleControl.js";
 import { Viewer, ViewType } from "../base/view.js";
 import { NODE, RANGE } from "../base/dom.js";
 import { bundle } from "../base/util.js";

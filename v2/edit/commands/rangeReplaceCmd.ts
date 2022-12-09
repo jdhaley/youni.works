@@ -1,8 +1,8 @@
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { xmlContent } from "../../transform/content.js";
 
-import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../util.js";
-import { Replace } from "./replace.js";
+import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../editUtil.js";
+import { Replace } from "./replaceCmd.js";
 import { Editor, EditorType } from "../../base/editor.js";
 
 export class RangeReplace extends Replace {

@@ -1,7 +1,7 @@
 import { RANGE } from "../../base/dom.js";
 
-import { clearContent, getChildEditor } from "../util.js";
-import { RangeReplace } from "./rangeReplace.js";
+import { clearContent, getChildEditor } from "../editUtil.js";
+import { RangeReplace } from "./rangeReplaceCmd.js";
 import { Editor } from "../../base/editor.js";
 
 export class ListReplace extends RangeReplace {

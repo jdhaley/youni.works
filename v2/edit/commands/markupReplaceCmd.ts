@@ -1,8 +1,8 @@
 import { Editor } from "../../base/editor.js";
 import { ele, RANGE } from "../../base/dom.js";
 
-import { getEditor, mark, unmark } from "../util.js";
-import { ListReplace } from "./listReplace.js";
+import { getEditor, mark, unmark } from "../editUtil.js";
+import { ListReplace } from "./listReplaceCmd.js";
 
 interface item {
 	type$: string

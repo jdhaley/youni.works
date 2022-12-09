@@ -3,7 +3,7 @@ import { RecordBox } from "../controls/record.js";
 import { UserEvent } from "../frame";
 import editable from "./edit/editor.js";
 
-import { getHeader } from "../util.js";
+import { getHeader } from "../uiUtil.js";
 
 export default extend(editable, {
 	dblclick(this: RecordBox, event: UserEvent) {

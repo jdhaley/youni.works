@@ -6,9 +6,9 @@ import { start } from "../base/type.js";
 import { bundle, implement } from "../base/util.js";
 import { bindViewEle, getView, Viewer, VIEW_ELE } from "../base/view.js";
 
-import { ElementController } from "../control/element.js";
+import { ElementController } from "../control/eleControl.js";
 import { Frame } from "../ui/frame.js";
-import { VType } from "../control/view.js";
+import { VType } from "../control/viewControl.js";
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 

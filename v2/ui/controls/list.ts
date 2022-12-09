@@ -1,7 +1,7 @@
 import { Sequence } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
-import { getBox } from "../util.js";
+import { getBox } from "../uiUtil.js";
 import { Viewbox } from "./editbox.js";
 
 export class ListBox extends Viewbox {

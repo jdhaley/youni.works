@@ -1,8 +1,8 @@
 import { ELE, RANGE } from "../../base/dom.js";
 
-import { LevelCommand } from "../commands/level.js";
-import { MarkupReplace } from "../commands/markupReplace.js";
-import { getChildEditor, getEditor, senseChange } from "../util.js";
+import { LevelCommand } from "../commands/levelCmd.js";
+import { MarkupReplace } from "../commands/markupReplaceCmd.js";
+import { getChildEditor, getEditor, senseChange } from "../editUtil.js";
 import { Editor } from "../../base/editor.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, content: string): void {

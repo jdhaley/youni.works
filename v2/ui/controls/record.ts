@@ -2,7 +2,7 @@ import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 
 import { Box } from "../display.js";
 import { Viewbox } from "./editbox.js";
-import { getBox } from "../util.js";
+import { getBox } from "../uiUtil.js";
 
 export class RecordBox extends Viewbox {
 	memberType = "field";

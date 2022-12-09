@@ -3,12 +3,12 @@ import { Signal } from "../base/controller.js";
 import { start } from "../base/type.js";
 import { bundle } from "../base/util.js";
 
-import { IEditor } from "../control/editor.js";
+import { IEditor } from "../control/editorControl.js";
 import { Frame, UserEvent } from "./frame.js";
 
-import { list } from "../control/viewers/list.js";
-import { record } from "../control/viewers/record.js";
-import { text } from "../control/viewers/text.js";
+import { list } from "../control/viewers/listViewer.js";
+import { record } from "../control/viewers/recordViewer.js";
+import { text } from "../control/viewers/textViewer.js";
 
 import controller from "./actions/frame.js";
 
@@ -17,7 +17,7 @@ import edit from "./conf/edit.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";
-import { VType } from "../control/view.js";
+import { VType } from "../control/viewControl.js";
 
 const shortcuts = {
 	"Control+s": "save",

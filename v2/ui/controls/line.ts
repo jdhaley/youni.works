@@ -1,7 +1,7 @@
 import { ELE, RANGE } from "../../base/dom.js";
 
 import { TextBox } from "./text.js";
-import { getBox } from "../util.js";
+import { getBox } from "../uiUtil.js";
 
 interface item {
 	type$: string

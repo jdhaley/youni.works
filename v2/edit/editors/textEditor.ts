@@ -1,7 +1,7 @@
 import { ele, NODE, RANGE } from "../../base/dom.js";
 
-import { getEditor, mark, narrowRange, senseChange, unmark } from "../util.js";
-import { Replace } from "../commands/replace.js";
+import { getEditor, mark, narrowRange, senseChange, unmark } from "../editUtil.js";
+import { Replace } from "../commands/replaceCmd.js";
 import { Editor } from "../../base/editor.js";
 
 export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): void {

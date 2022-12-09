@@ -1,7 +1,7 @@
 import { RANGE } from "../../base/dom.js";
 
-import { getEditor, senseChange } from "../util.js";
-import { RangeReplace } from "../commands/rangeReplace.js";
+import { getEditor, senseChange } from "../editUtil.js";
+import { RangeReplace } from "../commands/rangeReplaceCmd.js";
 import { Editor } from "../../base/editor.js";
 
 export default function edit(this: Editor, commandName: string, range: RANGE, record: unknown): void {

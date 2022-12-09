@@ -2,7 +2,7 @@ import { Editor } from "../../../base/editor.js";
 import { RANGE, NODE } from "../../../base/dom.js";
 import { extend } from "../../../base/util.js";
 
-import { getEditor } from "../../../edit/util.js";
+import { getEditor } from "../../../edit/editUtil.js";
 
 import { EditEvent, UserEvent } from "../../frame.js";
 import { getClipboard, setClipboard } from "../../clipboard.js";

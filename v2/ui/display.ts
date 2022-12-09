@@ -2,7 +2,7 @@ import { Actions } from "../base/controller.js";
 import { ELE } from "../base/dom.js";
 import { bundle, extend } from "../base/util.js";
 
-import { View, VType } from "../control/view.js";
+import { View, VType } from "../control/viewControl.js";
 import { TypeConf } from "../base/type.js";
 
 export interface ViewConf extends TypeConf {
@@ -19,8 +19,6 @@ export interface DisplayConf extends ViewConf {
 
 	viewType?: string;
 	kind?: string;
-//	header?: string;
-//	footer?: string;
 	style?: bundle<any>;
 	shortcuts?: bundle<string>;
 }
@@ -50,7 +48,7 @@ export class Box extends Display {
 	/** @deprecated */
 	get content(): ELE {
 		return this.body.view;
-	}
+	}c
 	draw(value: unknown): void {
 		if (this.type.header) this.view.append(this.type.header.create(value).view);
 		this.view.append(this.type.body.create(value).view);

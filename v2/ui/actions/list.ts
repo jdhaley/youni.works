@@ -3,7 +3,7 @@ import { ELE, RANGE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
 
 import { UserEvent } from "../frame.js";
-import { getHeader } from "../util.js";
+import { getHeader } from "../uiUtil.js";
 import editable from "./edit/editor.js";
 
 export default extend(editable, {

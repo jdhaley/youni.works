@@ -1,5 +1,5 @@
-import { EditCommand } from "./edit.js";
-import { getChildEditor, getEditor } from "../util.js";
+import { EditCommand } from "./editCmd.js";
+import { getChildEditor, getEditor } from "../editUtil.js";
 import { ele, RANGE } from "../../base/dom.js";
 import { EMPTY } from "../../base/util.js";
 import { Editor } from "../../base/editor.js";

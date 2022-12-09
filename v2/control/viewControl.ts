@@ -4,7 +4,7 @@ import { Actions, Controller } from "../base/controller.js";
 import { ELE, RANGE } from "../base/dom.js";
 import { bundle, EMPTY, extend } from "../base/util.js";
 
-import { ElementShape } from "./element.js";
+import { ElementShape } from "./eleControl.js";
 
 export class View extends ElementShape implements Viewer {
 	declare type: ViewType;
