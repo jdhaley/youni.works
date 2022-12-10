@@ -1,15 +1,12 @@
 import { Actions } from "../../base/controller.js";
-import { ele, ELE, RANGE } from "../../base/dom.js";
-import { Editor } from "../../base/editor.js";
+import { ele, ELE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
-import { IEditor } from "../../control/editorControl.js";
+import { Drawable, editor, IEditor } from "../../control/editorControl.js";
 import { View } from "../../control/viewControl.js";
 import { Box } from "../display.js";
 
-type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
-
-export abstract class Viewbox extends IEditor {
-	constructor(actions: Actions, editor: editor) {
+export class Viewbox extends IEditor {
+	constructor(viewer: Drawable, actions: Actions, editor: editor) {
 		super(null);
 		this.actions = actions;
 		if (editor) this["exec"] = editor;
@@ -20,12 +17,6 @@ export abstract class Viewbox extends IEditor {
 	}
 	get shortcuts(): bundle<string> {
 		return this.type.conf.shortcuts;
-	}
-
-	abstract viewElement(content: ELE): void;
-
-	exec(commandName: string, range: RANGE, content?: unknown): void {
-		console.warn("exec() has not been configured.")
 	}
 	
 	get content(): ELE {

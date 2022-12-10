@@ -1,3 +1,4 @@
+import { Actions } from "../../base/controller.js";
 import { Sequence } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
@@ -5,7 +6,13 @@ import { getContentView } from "../uiUtil.js";
 import { Viewbox } from "./editbox.js";
 import { Editor } from "../../base/editor.js";
 
+import { list } from "../../control/viewers/listViewer.js";
+import { editor } from "../../control/editorControl.js";
+
 export class ListBox extends Viewbox {
+	constructor(actions: Actions, editor: editor) {
+		super(list, actions, editor)
+	}
 	viewValue(model: Sequence<unknown>): void {
 		if (model && model[Symbol.iterator]) for (let item of model) {
 			let type = this.type.types[viewTypeOf(item)];

@@ -2,7 +2,14 @@ import { CHAR } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { Viewbox } from "./editbox.js";
 
+import { text } from "../../control/viewers/textViewer.js";
+import { Actions } from "../../base/controller.js";
+import { editor } from "../../control/editorControl.js";
+
 export class TextBox extends Viewbox {
+	constructor(actions: Actions, editor: editor) {
+		super(text, actions, editor)
+	}
 	viewType = "text";
 	viewValue(model: unknown): void {
 		this.content.textContent = model ? "" + model : "";

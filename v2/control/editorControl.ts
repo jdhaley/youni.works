@@ -3,9 +3,9 @@ import { Editor, EditorType } from "../base/editor.js";
 import { implement } from "../base/util.js";
 import { View } from "./viewControl.js";
 
-type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
+export type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 
-interface Drawable {
+export interface Drawable {
 	viewValue(model: unknown): void;
 	viewElement(model: ELE): void;
 	valueOf(filter?: unknown): unknown

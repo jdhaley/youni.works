@@ -3,9 +3,16 @@ import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 import { Box } from "../display.js";
 import { Viewbox } from "./editbox.js";
 import { getContentView } from "../uiUtil.js";
-import { ContentView, Viewer } from "../../base/view.js";
+import { ContentView } from "../../base/view.js";
+
+import { record } from "../../control/viewers/recordViewer.js";
+import { Actions } from "../../base/controller.js";
+import { editor } from "../../control/editorControl.js";
 
 export class RecordBox extends Viewbox {
+	constructor(actions: Actions, editor: editor) {
+		super(record, actions, editor)
+	}
 	memberType = "field";
 
 	get(name: string): ContentView {
