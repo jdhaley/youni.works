@@ -4,11 +4,12 @@ import { ele } from "../../base/dom.js";
 
 import { RowBox } from "../controls/row.js";
 import { UserEvent } from "../frame.js";
-import { getBox, getHeader } from "../uiUtil.js";
+import { getContentView, getHeader } from "../uiUtil.js";
 
 import editable from "./edit/editor.js";
 
 import { Change } from "../article.js";
+import { Viewer } from "../../base/view.js";
 
 export default extend(editable, {
 	dblclick(this: RowBox, event: UserEvent) {
@@ -47,19 +48,19 @@ export default extend(editable, {
 		if (!range.collapsed) return;
 		if (this instanceof RowBox && this == this.rowHeader) {
 				event.subject = "";
-				addCol(this, getBox(range));
+				addCol(this, getContentView(range));
 		}
 	}
 });
 
-function addCol(editor: RowBox, col: Box) {
+function addCol(editor: RowBox, col: Viewer) {
 	let contents = editor.content.childNodes;
 	for (let i = 0; i < contents.length; i++) {
 		if (contents[i] == col.view) {
 			addColumn(editor, i);
 			editor.type; //trigger the new type.
 			for (let row = editor.view.nextElementSibling; row; row = row.nextElementSibling) {
-				let type = getBox(row);
+				let type = getContentView(row);
 				if (type instanceof RowBox) {
 					addColumn(type, i);
 				}
@@ -68,7 +69,7 @@ function addCol(editor: RowBox, col: Box) {
 	}
 }
 function addColumn(row: RowBox, index: number) {
-	let column = getBox(row.content.childNodes[index]);
+	let column = getContentView(row.content.childNodes[index]);
 	let newcol = column.type.create("") as Box;
 	ele(column.view).after(newcol.view);
 }

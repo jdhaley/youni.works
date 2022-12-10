@@ -2,14 +2,15 @@ import { ele, ELE, NODE, RANGE } from "../../base/dom.js";
 
 import { Box } from "../display.js";
 import { Viewbox } from "./editbox.js";
-import { getBox } from "../uiUtil.js";
+import { getContentView } from "../uiUtil.js";
+import { ContentView, Viewer } from "../../base/view.js";
 
 export class RecordBox extends Viewbox {
 	memberType = "field";
 
-	get(name: string): Box {
+	get(name: string): ContentView {
 		for (let node of this.content.childNodes) {
-			let view = getBox(node);
+			let view = getContentView(node);
 			if (name == view?.type.name) return view;
 		}
 	}

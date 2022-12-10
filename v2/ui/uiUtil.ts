@@ -1,10 +1,10 @@
 import { Box } from "./display.js";
 import { ELE, NODE, RANGE } from "../base/dom.js";
-import { getView } from "../base/view.js";
+import { ContentView, getView, Viewer } from "../base/view.js";
 
-export const getBox = getView as (node: NODE | RANGE) => Box ;
+export const getContentView = getView as (node: NODE | RANGE) => ContentView ;
 
-export function getHeader(view: Box, node: NODE) {
+export function getHeader(view: Viewer, node: NODE) {
 	while (node && node != view.view) {
 		if (node.nodeName == "HEADER" && node.parentNode == view.view) return node as ELE;
 		node = node.parentNode;
@@ -22,18 +22,18 @@ interface NAVIGABLE_ELE extends ELE{
 	scrollIntoView(arg: any): void;
 }
 export function navigate(start: NODE | RANGE, isBack?: boolean): NAVIGABLE_ELE {
-	let editor = getBox(start);
+	let editor = getContentView(start);
 	while (editor) {
 		let toEle = isBack ? editor.view.previousElementSibling : editor.view.nextElementSibling;
 		if (toEle) {
 			let next = navigateInto(toEle, isBack);
 			if (next) return next as any;
 		}
-		editor = getBox(editor.view.parentNode);
+		editor = getContentView(editor.view.parentNode);
 	}
 }
 function navigateInto(ele: ELE, isBack?: boolean) {
-	let view = getBox(ele);
+	let view = getContentView(ele);
 	if (!view) return;
 	let content = view.content;
 	switch (view.type.conf.model) {

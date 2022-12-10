@@ -1,7 +1,7 @@
 import { ELE, RANGE } from "../../base/dom.js";
 
 import { TextBox } from "./text.js";
-import { getBox } from "../uiUtil.js";
+import { getContentView } from "../uiUtil.js";
 
 interface item {
 	type$: string
@@ -41,7 +41,7 @@ export class LineBox extends TextBox {
 	getSection(): LineBox {
 		let node = this.view.previousElementSibling;
 		while (node) {
-			let editor = getBox(node);
+			let editor = getContentView(node);
 			if (editor.type.name == "heading") return editor as LineBox;
 			node = node.previousElementSibling;
 		}

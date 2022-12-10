@@ -1,5 +1,6 @@
 import { ELE, RANGE } from "../../base/dom.js";
 import { bundle, EMPTY } from "../../base/util.js";
+import { ViewType } from "../../base/view.js";
 
 import { Box, DisplayType } from "../display.js";
 import { RecordBox } from "./record.js";
@@ -30,7 +31,7 @@ export class RowBox extends RecordBox {
 	// 	if (header) return header["_type"];
 	// }
 
-	draw(content: item): Box {
+	draw(content: item) {
 		if (!this.rowHeader && !content.header) {
 			let item = createHeaderItem(this.type);
 			let hdr = this.type.create() as RowBox;
@@ -42,7 +43,6 @@ export class RowBox extends RecordBox {
 
 		if (content.isHeader) this.isHeader = true;
 		super.draw(content);
-		return this;
 	}
 	viewValue(model: unknown | ELE): void {
 		if (!model) return;
@@ -121,7 +121,7 @@ function rowContent(model: unknown, content: ELE, range: RANGE): unknown {
 	return model;
 }
 
-function createHeaderItem(type: DisplayType): item {
+function createHeaderItem(type: ViewType): item {
 	let item = {
 		type$: type.name,
 		header: true, 

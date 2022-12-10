@@ -7,7 +7,7 @@ export interface Type {
 	conf: bundle<any>;
 }
 
-export class BaseType<T> implements Type {
+export class BaseType implements Type {
 	constructor(context: TypeContext) {
 		this.context = context;
 	}
@@ -33,14 +33,14 @@ export interface TypeConf {
 }
 
 export class Loader {
-	constructor(types: bundle<BaseType<unknown>>, source: bundle<TypeConf>) {
+	constructor(types: bundle<BaseType>, source: bundle<TypeConf>) {
 		this.#types = types;
 		this.#source = source;
 	}
 	#source: bundle<TypeConf>;
-	#types: bundle<BaseType<unknown>>;
+	#types: bundle<BaseType>;
 
-	get(name: string): BaseType<unknown> {
+	get(name: string): BaseType {
 		let type = this.#types[name];
 		if (!type && this.#source[name]) {
 			let source = this.#source[name];
@@ -58,7 +58,7 @@ export class Loader {
 
 export function start(owner: TypeContext, baseTypes: bundle<any>, source: bundle<any>) {
 	let base = loadBaseTypes(owner, baseTypes);
-	let loader = new Loader(base as bundle<BaseType<unknown>>, source);
+	let loader = new Loader(base as bundle<BaseType>, source);
 	owner.types = Object.create(null);
 	for (let name in source) {
 		owner.types[name] = loader.get(name);

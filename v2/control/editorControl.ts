@@ -19,7 +19,7 @@ export class IEditor extends View implements Editor {
 	}
 	declare type: EditorType;
 	
-	get content() {
+	get content(): ELE {
 		return this.view;
 	}
 	get id(): string {

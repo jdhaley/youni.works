@@ -1,8 +1,9 @@
 import { Sequence } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
 
-import { getBox } from "../uiUtil.js";
+import { getContentView } from "../uiUtil.js";
 import { Viewbox } from "./editbox.js";
+import { Editor } from "../../base/editor.js";
 
 export class ListBox extends Viewbox {
 	viewValue(model: Sequence<unknown>): void {
@@ -30,7 +31,7 @@ export class ListBox extends Viewbox {
 		let model: unknown[];
 		if (range && !range.intersectsNode(this.content)) return;
 		for (let part of this.content.childNodes) {
-			let editor = getBox(part);
+			let editor = getContentView(part) as Editor;
 			let value = editor?.valueOf(range);
 			if (value) {
 				if (!model) {

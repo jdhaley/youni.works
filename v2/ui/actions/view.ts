@@ -4,7 +4,7 @@ import { setClipboard } from "../clipboard.js";
 import { Change } from "../article.js";
 import { Box } from "../display.js";
 import { UserEvent } from "../frame.js";
-import { getBox, navigate } from "../uiUtil.js";
+import { getContentView, navigate } from "../uiUtil.js";
 
 export default extend(null, {
 	keydown(this: Box, event: UserEvent) {
@@ -55,7 +55,7 @@ export default extend(null, {
 	 	for (let ele of eles) ele.classList.remove("active");
 		let range = event.range;
 		for (let node of this.content.childNodes) {
-			let editor = getBox(node);
+			let editor = getContentView(node);
 			if (range.intersectsNode(editor.content)) {
 				editor.content.classList.add("active");
 			}

@@ -27,7 +27,7 @@ interface ViewContext extends Controller<ELE>, TypeContext, Article {
 	createElement(name: string): ELE;
 }
 
-export class VType extends BaseType<Viewer> implements ViewType {
+export class VType extends BaseType implements ViewType {
 	declare context: ViewContext;
 	declare partOf: VType;
 	declare types: bundle<VType>;
@@ -63,12 +63,12 @@ export class VType extends BaseType<Viewer> implements ViewType {
 		this.types = Object.create(this.types || null);
 		for (let name in conf.types) {
 			let memberConf = conf.types[name];
-			let member: BaseType<unknown>;
+			let member: VType;
 			if (typeof memberConf == "string") {
 				memberConf = { type: memberConf };
 			}
 			memberConf.name = name;
-			member = loader.get(memberConf.type);
+			member = loader.get(memberConf.type) as VType;
 			if (!member) {
 				throw new Error(`Can find type "${memberConf.type}" loading "${this.name}.${name}"`);
 			}
