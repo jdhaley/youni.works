@@ -2,13 +2,13 @@ import { CommandBuffer } from "../base/command.js";
 import { BaseReceiver, Signal } from "../base/controller.js";
 import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
 import { RemoteFileService } from "../base/remote.js";
-import { start } from "../base/type.js";
 import { bundle, implement } from "../base/util.js";
 import { bindViewEle, getView, Viewer, VIEW_ELE } from "../base/view.js";
 
 import { ElementController } from "../control/eleControl.js";
 import { Frame } from "../ui/frame.js";
 import { VType } from "../control/viewControl.js";
+import { start } from "../base/type.js";
 
 type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 

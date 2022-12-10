@@ -154,6 +154,7 @@ export abstract class Viewbox extends IEditor {
 	protected createHeader(model?: unknown) {
 		let ele = this.view.ownerDocument.createElement("header") as Element;
 		ele.textContent = this.type.conf.title || "";
+		//if (!ele.textContent) debugger;
 		this.view.append(ele);
 		let content = new IBox();
 		content.control(ele as Element);

@@ -1,12 +1,23 @@
+import { Actions } from "./controller.js";
 import { bundle } from "./util.js";
 
 export interface Type<T> {
 	name: string;
 	partOf?: Type<T>;
 	conf: bundle<any>;
-	types: bundle<Type<T>>;
+}
 
-	create(...args: any[]): T;
+export class BaseType<T> implements Type<T> {
+	constructor(context: TypeContext) {
+		this.context = context;
+	}
+	readonly context: TypeContext;
+	declare name: string;
+	declare partOf: Type<T>;
+	declare conf: TypeConf;
+
+	start(conf: TypeConf, loader?: Loader) {
+	}
 }
 
 export interface TypeContext {
@@ -14,104 +25,55 @@ export interface TypeContext {
 }
 
 export interface TypeConf {
+	name?: string;
 	type?: string;
 	types?: bundle<TypeConf | string>;
 	class?: typeof BaseType;
+	actions?: Actions;
 }
 
-export function start(owner: TypeContext, baseTypes: bundle<any>, types: bundle<any>) {
+export class Loader {
+	constructor(types: bundle<BaseType<unknown>>, source: bundle<TypeConf>) {
+		this.#types = types;
+		this.#source = source;
+	}
+	#source: bundle<TypeConf>;
+	#types: bundle<BaseType<unknown>>;
+
+	get(name: string): BaseType<unknown> {
+		let type = this.#types[name];
+		if (!type && this.#source[name]) {
+			let source = this.#source[name];
+			if (typeof source == "string") return this.get(source);
+			source.name = name;
+			type = this.get(source.type);
+			if (!type) throw new Error(`Type "${source.type}" not found loading: ${JSON.stringify(source)}`);
+			type = Object.create(type);
+			this.#types[name] = type;
+			type.start(source, this);
+		}
+		return type;
+	}
+}
+
+export function start(owner: TypeContext, baseTypes: bundle<any>, source: bundle<any>) {
 	let base = loadBaseTypes(owner, baseTypes);
-	owner.types = loadTypes(owner.types, types, base);
-	console.info("Types:", owner.types);
-}
-
-type types = bundle<Type<unknown>>;
-
-export class BaseType<T> implements Type<T> {
-	constructor(context: TypeContext) {
-		this.context = context;
+	let loader = new Loader(base as bundle<BaseType<unknown>>, source);
+	owner.types = Object.create(null);
+	for (let name in source) {
+		owner.types[name] = loader.get(name);
 	}
-	readonly context: TypeContext;
-	declare partOf: BaseType<T>;
-	declare types: bundle<Type<T>>;
-	declare name: string;
-	declare conf: TypeConf;
-
-	generalizes(type: Type<T>): boolean {
-		return type == this;
-	}
-	start(name: string, conf: bundle<any>): void {
-	}
-	create(...args: any[]): T {
-		return undefined;
-	}
+	console.log(owner.types);
 }
 
 function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<Type<unknown>> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];
-		conf["name"] = name;
+		conf.name = name;
 		let type = new conf.class(owner);
 		types[name] = type;
-		type.start(name, conf);
+		type.start(conf);
 	}
 	return types;
-}
-
-function loadTypes(types: types, source: bundle<TypeConf>, base: types): types {
-	base = Object.create(base);
-	for (let name in source) {
-		types[name] = getType(name, base, source);
-	}
-	return types
-}
-
-function getType(name: string, types: types, source: bundle<TypeConf>): Type<unknown> {
-	let type = types[name];
-	if (!type && source[name]) {
-		let value = source[name];
-		if (typeof value == "object") {
-			type = createType(name, value, types, source);
-		} else {
-			type = getType(value, types, source);
-		}
-	} else if (!type) {
-		console.warn(`Type "${name}" is not defined.`);
-		type = types.text;
-	}
-	types[name] = type;
-	return type;
-}
-
-function createType(name: string, conf: TypeConf, types: types, source: bundle<TypeConf>) {
-	let supertype = conf.type ? getType(conf.type, types, source) : null;
-	let type = Object.create(supertype) as BaseType<unknown>;
-	type.types = Object.create(supertype.types || null);
-
-	if (name) {
-		conf["name"] = name;
-		type.name = name;
-		types[name] = type;
-	}
-	for (let name in conf.types) {
-		type.types[name] = getMember(type, name, conf.types[name]);
-	}
-
-	type.start(name, conf)
-	return type;
-
-	function getMember(owner: Type<unknown>, name: string, part: TypeConf | string) {
-		let member: Type<unknown>;
-		if (typeof part == "object") {
-			part["name"] = name;
-			member = createType("", part as any, types, source);
-		} else {
-			member = getType(part, types, source);
-			member = Object.create(member);
-		}
-		member.name = name;
-		member.partOf = owner;
-		return member;
-	}
 }

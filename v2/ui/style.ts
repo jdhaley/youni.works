@@ -42,8 +42,12 @@ function createRule(selector: string, object: object | string) {
 }
 
 function selectorOf(type: Type<unknown>): string {
+	let selector = "";
 	let partOf = type.partOf;
-	let selector = partOf ? selectorOf(partOf) + ">" : "";
-	selector += `[data-item="${type.conf["name"]}"]`;
+	if (partOf) {
+		selector = selectorOf(partOf) + ">";
+		if (partOf.conf["container"] != false) selector += ".content>";
+	}
+	selector += `[data-item="${type.name}"]`;
 	return selector;
 }

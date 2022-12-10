@@ -1,5 +1,5 @@
 import { Article, Viewer, ViewType } from "../base/view.js";
-import { BaseType, TypeContext } from "../base/type.js";
+import { BaseType, Loader, TypeConf, TypeContext } from "../base/type.js";
 import { Actions, Controller } from "../base/controller.js";
 import { ELE, RANGE } from "../base/dom.js";
 import { bundle, EMPTY, extend } from "../base/util.js";
@@ -48,15 +48,35 @@ export class VType extends BaseType<Viewer> implements ViewType {
 		view.view = node;
 		return view;
 	}
-	start(name: string, conf?: bundle<any>): void {
-		this.name = name;
-		if (conf) {
-			this.extendConf(conf);
-			if (conf.actions) this.extendActions(conf.actions);
-		}
+	start(conf: TypeConf, loader?: Loader) {
+		if (!conf.name) console.warn("No conf name", conf);
+		this.name = conf.name;
+		this.extendConf(conf);
+		if (conf.actions) this.extendActions(conf.actions);
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
 		this.prototype.actions = this.conf.actions || EMPTY.object;
+		this.loadTypes(conf, loader);
+	}
+
+	protected loadTypes(conf: TypeConf, loader: Loader) {
+		this.types = Object.create(this.types || null);
+		for (let name in conf.types) {
+			let memberConf = conf.types[name];
+			let member: BaseType<unknown>;
+			if (typeof memberConf == "string") {
+				memberConf = { type: memberConf };
+			}
+			memberConf.name = name;
+			member = loader.get(memberConf.type);
+			if (!member) {
+				throw new Error(`Can find type "${memberConf.type}" loading "${this.name}.${name}"`);
+			}
+			member = Object.create(member);
+			this.types[name] = member as any;
+			member.partOf = this;
+			member.start(memberConf, loader);
+		}
 	}
 	protected extendConf(conf: bundle<any>) {
 		this.conf = this.conf ? extend(this.conf, conf) : conf;

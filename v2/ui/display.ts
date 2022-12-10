@@ -3,7 +3,7 @@ import { ELE } from "../base/dom.js";
 import { bundle, extend } from "../base/util.js";
 
 import { View, VType } from "../control/viewControl.js";
-import { TypeConf } from "../base/type.js";
+import { Loader, TypeConf } from "../base/type.js";
 import { createStyles } from "./style.js";
 
 export interface ViewConf extends TypeConf {
@@ -62,8 +62,8 @@ export class Box extends Display {
 
 export class DisplayType extends VType {
 	declare conf: DisplayConf;
-	start(name: string, conf?: DisplayConf): void {
-		super.start(name, conf);
+	start(conf: DisplayConf, loader: Loader): void {
+		super.start(conf, loader);
 		if (conf?.styles) this.conf.styles = createStyles(this, conf.styles);
 	}
 }
@@ -88,9 +88,10 @@ export class LegacyType extends DisplayType {
 		return this.conf.model;
 	}
 
-	start(name: string, conf: bundle<any>): void {
-		this.name = name;
+	start(conf: bundle<any>, loader: Loader): void {
+		this.name = conf.name;
 		this.conf = this.conf ? extend(this.conf, conf) : conf;
+		this.loadTypes(conf, loader);
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
 		if (conf?.styles) this.conf.styles = createStyles(this, conf.styles);
