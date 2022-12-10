@@ -1,6 +1,7 @@
 import { Actions } from "../../base/controller.js";
-import { ele, ELE } from "../../base/dom.js";
+import { ELE } from "../../base/dom.js";
 import { bundle } from "../../base/util.js";
+
 import { Drawable, editor, IEditor } from "../../control/editorControl.js";
 import { View } from "../../control/viewControl.js";
 import { Box } from "../display.js";
@@ -37,27 +38,15 @@ export class Viewbox extends IEditor {
 	}
 
 	draw(value: unknown): void {
-		if (!this.view.id) {
-			if (value instanceof Element && value.id) {
-				this.view.id = value.id;
-			} else {
-				this.view.id = "" + NEXT_ID++;
-			}
-		}
-
 		this.view.textContent = "";
 		if (this.isContainer) {
 			this.createHeader();
 			this.createContent();
-			this.createFooter()
+			this.createFooter();
 		} else {
 			this.content.classList.add("content");
 		}
-		if (ele(value)) {
-			this.viewElement(value as ELE);
-		} else {
-			this.viewValue(value as unknown);
-		}
+		super.draw(value);
 	}
 	protected createHeader(model?: unknown) {
 		let ele = this.view.ownerDocument.createElement("header") as Element;
