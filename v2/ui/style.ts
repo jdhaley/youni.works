@@ -32,7 +32,7 @@ function createRule(selector: string, object: object | string) {
 	if (typeof object == "string") {
 		out += object;
 	} else if (object) for (let name in object) {
-		out += "\t" + name.replace("_", "-") + ": " + object[name] + ";\n"
+		out += "\t" + name.replace(/_/g, "-") + ": " + object[name] + ";\n"
 	}
 	out += "}";
 	//console.log(out);
