@@ -1,5 +1,6 @@
 import { CommandBuffer } from "./command.js";
 import { Controller } from "./controller.js";
+import { Type} from "./type.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
@@ -25,11 +26,9 @@ export interface Article extends Controller<ELE> {
 	senseChange(viewer: Viewer, commandName: string): void;
 }
 
-export interface ViewType {
+export interface ViewType extends Type {
 	context: Controller<ELE>;
-	name: string;
 	types: bundle<ViewType>;
-	conf: bundle<any>;
 
 	create(value?: unknown): Viewer;
 	control(node: ELE): Viewer;

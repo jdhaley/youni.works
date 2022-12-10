@@ -1,19 +1,19 @@
 import { Actions } from "./controller.js";
 import { bundle } from "./util.js";
 
-export interface Type<T> {
+export interface Type {
 	name: string;
-	partOf?: Type<T>;
+	partOf?: Type;
 	conf: bundle<any>;
 }
 
-export class BaseType<T> implements Type<T> {
+export class BaseType<T> implements Type {
 	constructor(context: TypeContext) {
 		this.context = context;
 	}
 	readonly context: TypeContext;
 	declare name: string;
-	declare partOf: Type<T>;
+	declare partOf: Type;
 	declare conf: TypeConf;
 
 	start(conf: TypeConf, loader?: Loader) {
@@ -21,7 +21,7 @@ export class BaseType<T> implements Type<T> {
 }
 
 export interface TypeContext {
-	types: bundle<Type<unknown>>;
+	types: bundle<Type>;
 }
 
 export interface TypeConf {
@@ -66,7 +66,7 @@ export function start(owner: TypeContext, baseTypes: bundle<any>, source: bundle
 	console.log(owner.types);
 }
 
-function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<Type<unknown>> {
+function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<Type> {
 	let types = Object.create(null);
 	for (let name in baseTypes) {
 		let conf = baseTypes[name];

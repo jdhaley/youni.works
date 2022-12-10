@@ -6,7 +6,7 @@ document.head.appendChild(ele);
 
 let STYLES = ele.sheet;
 
-export function createStyles(type: Type<unknown>, conf: object): object {
+export function createStyles(type: Type, conf: object): object {
 	//Extend the bundle of rules.
 	let styles = Object.create(type.conf.style || null);
 	for (let name in conf) {
@@ -41,7 +41,7 @@ function createRule(selector: string, object: object | string) {
 	return STYLES.cssRules[index];
 }
 
-function selectorOf(type: Type<unknown>): string {
+function selectorOf(type: Type): string {
 	let selector = "";
 	let partOf = type.partOf;
 	if (partOf) {
