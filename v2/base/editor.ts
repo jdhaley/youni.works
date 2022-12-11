@@ -37,3 +37,9 @@ export interface Edit {
 	}
 	value: unknown;
 }
+
+export interface item {
+	type$: string
+	content?: unknown,
+	level?: number,
+}

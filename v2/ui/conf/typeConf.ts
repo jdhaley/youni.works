@@ -1,24 +1,23 @@
 import { bundle } from "../../base/util.js";
 
-import { LegacyType } from "../display.js";
-
-import { TextBox } from "../controls/text.js";
-import { RecordBox } from "../controls/record.js";
-import { ListBox } from "../controls/list.js";
-import { LineBox } from "../controls/line.js";
-import { RowBox } from "../controls/row.js";
+import { LegacyType, Viewbox } from "../legacy.js";
 
 
 import edit from "./editorConf.js";
 import actions from "./actions.js";
 import shortcuts from "./shortcuts.js";
 
+import { text } from "../../control/viewers/textViewer.js";
+import { record } from "../../control/viewers/recordViewer.js";
+import { list } from "../../control/viewers/listViewer.js";
+import { line } from "../../control/viewers/lineViewer.js";
+
 const conf: bundle<any> = {
 	text: {
 		class: LegacyType,
 		model: "unit",
 		viewType: "text",
-		prototype: new TextBox(actions.text, edit.text),
+		prototype: new Viewbox(text, actions.text, edit.text),
 		container: true,
 		tagName: "ui-text",
 		shortcuts: shortcuts
@@ -27,7 +26,7 @@ const conf: bundle<any> = {
 		class: LegacyType,
 		model: "record",
 		viewType: "form",
-		prototype: new RecordBox(actions.record, edit.record),
+		prototype: new Viewbox(record, actions.record, edit.record),
 		container: true,
 		tagName: "ui-record",
 		shortcuts: shortcuts
@@ -36,7 +35,7 @@ const conf: bundle<any> = {
 		class: LegacyType,
 		model: "list",
 		viewType: "list",
-		prototype: new ListBox(actions.list, edit.list),
+		prototype: new Viewbox(list, actions.list, edit.list),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -45,7 +44,7 @@ const conf: bundle<any> = {
 		class: LegacyType,
 		model: "list",
 		viewType: "markup",
-		prototype: new ListBox(actions.markup, edit.markup),
+		prototype: new Viewbox(list, actions.markup, edit.markup),
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -54,19 +53,19 @@ const conf: bundle<any> = {
 		class: LegacyType,
 		model: "unit",
 		viewType: "line",
-		prototype: new LineBox(actions.line, edit.text),
+		prototype: new Viewbox(line, actions.line, edit.text),
 		container: false,
 		tagName: "p",
 		shortcuts: shortcuts
 	},
-	row: {
-		class: LegacyType,
-		model: "record",
-		viewType: "row",
-		prototype: new RowBox(actions.row, edit.record),
-		container: false,
-		tagName: "ui-row",
-		shortcuts: shortcuts
-	}
+	// row: {
+	// 	class: LegacyType,
+	// 	model: "record",
+	// 	viewType: "row",
+	// 	prototype: new RowBox(actions.row, edit.record),
+	// 	container: false,
+	// 	tagName: "ui-row",
+	// 	shortcuts: shortcuts
+	// }
 }
 export default conf;

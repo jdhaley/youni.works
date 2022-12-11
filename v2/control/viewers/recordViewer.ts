@@ -4,18 +4,8 @@ import { Editor } from "../../base/editor.js";
 import { getView } from "../../base/view.js";
 
 export const record = {
-	//memberType = "field";
+	memberType: "field",
 
-	get(this: ContentView, name: string): ContentView {
-		for (let node of this.content.childNodes) {
-			let view = getView(node) as ContentView;
-			if (name == view?.type.name) return view;
-		}
-	},
-
-	// get title(): string {
-	// 	return this.get("title").content.textContent;
-	// }
 	viewValue(this: ContentView, model: unknown): void {
 		for (let name in this.type.types) {
 			viewMember(this, name, model ? model[name] : undefined);
@@ -50,7 +40,7 @@ function viewMember(editor: ContentView, name: string, value: any): ContentView 
 	let type = editor.type.types[name];
 	let member = type.create(value);
 	member.view.classList.add("field");
-	editor.view.append(member.view);
+	editor.content.append(member.view);
 
 	//TODO contentedit refactoring - remove cast once refactoring complete
 	return member as ContentView;

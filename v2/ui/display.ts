@@ -1,10 +1,12 @@
 import { Actions } from "../base/controller.js";
 import { ELE } from "../base/dom.js";
-import { bundle, extend } from "../base/util.js";
+import { bundle } from "../base/util.js";
 
 import { View, VType } from "../control/viewControl.js";
 import { Loader, TypeConf } from "../base/type.js";
 import { createStyles } from "./style.js";
+import { getContentView } from "./uiUtil.js";
+import { ContentView } from "../base/view.js";
 
 export interface ViewConf extends TypeConf {
 	prototype?: object;
@@ -54,6 +56,13 @@ export class Box extends Display {
 		this.body.view.classList.add("content");
 	}
 
+	get(name: string): ContentView {
+		for (let node of this.content.childNodes) {
+			let view = getContentView(node);
+			if (name == view?.type.name) return view;
+		}
+	}
+
 	/** @deprecated */
 	get content(): ELE {
 		return this.body.view;
@@ -82,20 +91,3 @@ export class BoxType extends DisplayType {
 		return this.types?.footer;
 	}
 }
-
-export class LegacyType extends DisplayType {
-	get model(): string {
-		return this.conf.model;
-	}
-
-	start(conf: bundle<any>, loader: Loader): void {
-		this.name = conf.name;
-		this.conf = this.conf ? extend(this.conf, conf) : conf;
-		this.loadTypes(conf, loader);
-		this.prototype = Object.create(this.conf.prototype);
-		this.prototype.type = this;
-		if (conf?.styles) this.conf.styles = createStyles(this, conf.styles);
-		if (conf?.actions) this.prototype.actions = conf.actions;
-	}
-}
-
