@@ -1,4 +1,4 @@
-import { bundle } from "./util.js";
+import { bundle, EMPTY } from "./util.js";
 
 export interface Type {
 	name: string;
@@ -57,23 +57,24 @@ export class Loader {
 }
 
 export function start(owner: TypeContext, baseTypes: bundle<any>, source: bundle<any>) {
-	let base = loadBaseTypes(owner, baseTypes);
-	let loader = new Loader(base as bundle<BaseType>, source);
+	let base = Object.create(null);
+	for (let name in baseTypes) {
+		let conf = baseTypes[name];
+		conf.name = name;
+		let type = new conf.class(owner);
+		base[name] = type;
+	}
+	let loader = new Loader(base, EMPTY.object);
+	for (let name in base) {
+		base[name].start(baseTypes[name], loader);
+	}
+//	return base;
+
+//	let base = loadBaseTypes(owner, baseTypes, loader);
+	loader = new Loader(base as bundle<BaseType>, source);
 	owner.types = Object.create(null);
 	for (let name in source) {
 		owner.types[name] = loader.get(name);
 	}
 	console.log(owner.types);
-}
-
-function loadBaseTypes(owner: TypeContext, baseTypes: bundle<TypeConf>): bundle<Type> {
-	let types = Object.create(null);
-	for (let name in baseTypes) {
-		let conf = baseTypes[name];
-		conf.name = name;
-		let type = new conf.class(owner);
-		types[name] = type;
-		type.start(conf);
-	}
-	return types;
 }
