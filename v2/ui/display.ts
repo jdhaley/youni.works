@@ -1,11 +1,11 @@
 import { ELE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
 
-import { View, ViewConf, VType } from "../control/viewControl.js";
+import { View, ViewConf, VType } from "../control/view.js";
 import { Loader } from "../base/type.js";
 import { extendStyles } from "./style.js";
 import { getContentView } from "./uiUtil.js";
-import { ContentView } from "../base/view.js";
+import { ContentView } from "../base/viewer.js";
 import { IEditor } from "../control/editorControl.js";
 
 export interface DisplayConf extends ViewConf {

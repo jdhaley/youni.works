@@ -1,6 +1,6 @@
 import { ELE, RANGE } from "../../base/dom.js";
 import { Editor } from "../../base/editor.js";
-import { getView, Part } from "../../base/view.js";
+import { getView, Part } from "../../base/viewer.js";
 
 import { text } from "./textViewer.js";
 

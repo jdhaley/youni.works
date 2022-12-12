@@ -1,6 +1,6 @@
 import { ELE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
-import { Part, PartTree } from "../base/view.js";
+import { Part, PartTree } from "../base/viewer.js";
 
 export function toHtml(item: Part) {
 	let doc = document.implementation.createHTMLDocument();

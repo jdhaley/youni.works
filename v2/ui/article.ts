@@ -1,4 +1,4 @@
-import { Viewer, ViewType, Article, VIEW_ELE, bindViewEle, getView } from "../base/view.js";
+import { Viewer, ViewType, Article, VIEW_ELE, bindViewEle, getView } from "../base/viewer.js";
 import { Editor, Edits } from "../base/editor.js";
 import { CommandBuffer } from "../base/command.js";
 import { BaseReceiver, Signal } from "../base/controller.js";

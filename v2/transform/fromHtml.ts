@@ -1,6 +1,6 @@
 import { bundle } from "../base/util.js";
 import { ELE, NODE } from "../base/dom.js";
-import { Part } from "../base/view.js";
+import { Part } from "../base/viewer.js";
 
 export function fromHtml(source: Node): Part[] {
 	let items = [];

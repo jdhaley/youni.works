@@ -1,7 +1,7 @@
 import { ELE, RANGE } from "../base/dom.js";
 import { Editor, EditorType } from "../base/editor.js";
 import { implement } from "../base/util.js";
-import { View } from "./viewControl.js";
+import { View } from "./view.js";
 
 export type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
 

@@ -1,6 +1,6 @@
 import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getNodeIndex } from "../base/dom.js";
 import { Editor } from "../base/editor.js";
-import { getView, bindViewEle } from "../base/view.js";
+import { getView, bindViewEle } from "../base/viewer.js";
 
 const getEditor = getView as (node: NODE | RANGE) => Editor ;
 

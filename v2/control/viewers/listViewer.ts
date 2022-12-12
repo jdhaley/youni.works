@@ -1,7 +1,7 @@
-import { ContentView } from "../../base/view.js";
+import { ContentView } from "../../base/viewer.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { Editor } from "../../base/editor.js";
-import { getView } from "../../base/view.js";
+import { getView } from "../../base/viewer.js";
 
 export const list = {
 	viewValue(this: ContentView, model: unknown): void {

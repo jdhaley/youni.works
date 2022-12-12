@@ -1,4 +1,4 @@
-import { Part, PartTree } from "../base/view";
+import { Part, PartTree } from "../base/viewer";
 
 export function section(items: Part[]): PartTree {
 	let sections = [];

@@ -1,4 +1,4 @@
-import { Article, Viewer, ViewType } from "../base/view.js";
+import { Article, Viewer, ViewType } from "../base/viewer.js";
 import { BaseType, Loader, TypeContext } from "../base/type.js";
 import { Actions, Controller } from "../base/controller.js";
 import { ELE, RANGE } from "../base/dom.js";

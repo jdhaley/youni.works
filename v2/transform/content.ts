@@ -1,4 +1,4 @@
-import { ContentView, getView } from "../base/view.js";
+import { ContentView, getView } from "../base/viewer.js";
 import { ele, ELE, NODE, RANGE } from "../base/dom.js";
 
 export function xmlContent(view: ContentView, range: RANGE, out?: ELE): ELE {

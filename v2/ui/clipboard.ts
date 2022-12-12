@@ -1,5 +1,5 @@
 import { RANGE } from "../base/dom.js";
-import { getView, Part } from "../base/view.js";
+import { getView, Part } from "../base/viewer.js";
 import { fromHtml } from "../transform/fromHtml.js";
 import { section } from "../transform/item.js";
 import { toHtml } from "../transform/toHtml.js";

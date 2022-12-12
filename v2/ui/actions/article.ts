@@ -1,4 +1,4 @@
-import { ViewType } from "../../base/view.js";
+import { ViewType } from "../../base/viewer.js";
 import { RANGE } from "../../base/dom.js";
 import { Response } from "../../base/message.js";
 import { extend } from "../../base/util.js";

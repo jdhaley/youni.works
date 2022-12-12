@@ -1,4 +1,4 @@
-import { Article, Viewer, ViewType } from "./view.js";
+import { Article, Viewer, ViewType } from "./viewer.js";
 import { ELE, RANGE } from "./dom.js";
 
 export interface EditorType extends ViewType {

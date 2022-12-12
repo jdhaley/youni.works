@@ -1,6 +1,6 @@
 import { CHAR } from "../../base/util.js";
 import { ELE, RANGE } from "../../base/dom.js";
-import { ContentView } from "../../base/view.js";
+import { ContentView } from "../../base/viewer.js";
 
 export const text = {
 	//viewType = "text";

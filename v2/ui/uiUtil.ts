@@ -1,6 +1,6 @@
 import { Box } from "./display.js";
 import { ELE, NODE, RANGE } from "../base/dom.js";
-import { ContentView, getView, Viewer } from "../base/view.js";
+import { ContentView, getView, Viewer } from "../base/viewer.js";
 
 export const getContentView = getView as (node: NODE | RANGE) => ContentView ;
 

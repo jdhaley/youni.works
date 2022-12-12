@@ -1,10 +1,10 @@
 import { ELE } from "../base/dom.js";
 import { Loader } from "../base/type.js";
 import { bundle } from "../base/util.js";
-import { ContentView } from "../base/view.js";
+import { ContentView } from "../base/viewer.js";
 
 import { Drawable, editor, IEditor } from "../control/editorControl.js";
-import { View, VType } from "../control/viewControl.js";
+import { View, VType } from "../control/view.js";
 import { Box, DisplayConf, DisplayType } from "./display.js";
 import { getContentView } from "./uiUtil.js";
 
