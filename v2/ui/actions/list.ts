@@ -1,6 +1,6 @@
-import { Box } from "../display.js";
 import { ELE, RANGE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
+import { Box } from "../display.js";
 
 import { UserEvent } from "../frame.js";
 import editable from "./edit/editor.js";

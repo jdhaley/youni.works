@@ -4,6 +4,7 @@ import { xmlContent } from "../../transform/content.js";
 import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../editUtil.js";
 import { Replace } from "./replaceCmd.js";
 import { Editor, EditorType } from "../../base/editor.js";
+import { ContentView } from "../../base/viewer.js";
 
 export class RangeReplace extends Replace {
 	startId: string;
@@ -83,7 +84,9 @@ const XELE = document.implementation.createDocument(null, "root").documentElemen
 function createViewNodes(type: EditorType, markup: string) {
 	XELE.innerHTML = markup;
 	//TODO contentedit refactoring - editor won't have content attribute.
-	return (type.create(XELE) as Editor).content.children;
+	let viewer = type.create() as ContentView;
+	viewer.draw(XELE);
+	return viewer.content.children;
 }
 
 function mergeContent(range: RANGE, value: unknown) {

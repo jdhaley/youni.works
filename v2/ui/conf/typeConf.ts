@@ -1,7 +1,6 @@
 import { bundle } from "../../base/util.js";
 
-import { Display, DisplayType } from "../display.js";
-import { BoxType2, Viewbox } from "../legacy.js";
+import { Caption, DisplayType, BoxType, Box } from "../display.js";
 
 import edit from "./editorConf.js";
 import actions from "./actions.js";
@@ -11,68 +10,73 @@ import { text } from "../../control/viewers/textViewer.js";
 import { record } from "../../control/viewers/recordViewer.js";
 import { list } from "../../control/viewers/listViewer.js";
 import { line } from "../../control/viewers/lineViewer.js";
+import { View, VType } from "../../control/view.js";
 
 const conf: bundle<any> = {
+	body: {
+		class: VType,
+		prototype: new View()
+	},
 	caption: {
 		class: DisplayType,
-		prototype: new Display(),
+		prototype: new Caption(),
 		tagName: "header",
-		actions: {
-			view() {
-				this.view.textContent = this.partOf.type.title;
-			}
-		}
 	},
 	text: {
-		class: BoxType2,
+		class: BoxType,
 		header: "caption",
+		body: "body",
 		model: "unit",
 		viewType: "text",
-		prototype: new Viewbox(text, edit.text),
+		prototype: new Box(text, edit.text),
 		actions: actions.text,
 		container: true,
 		tagName: "ui-text",
 		shortcuts: shortcuts
 	},
 	record: {
-		class: BoxType2,
+		class: BoxType,
 		header: "caption",
+		body: "body",
 		model: "record",
 		viewType: "form",
-		prototype: new Viewbox(record, edit.record),
+		prototype: new Box(record, edit.record),
 		actions: actions.record, 
 		container: true,
 		tagName: "ui-record",
 		shortcuts: shortcuts
 	},
 	list: {
-		class: BoxType2,
+		class: BoxType,
 		header: "caption",
+		body: "body",
 		model: "list",
 		viewType: "list",
-		prototype: new Viewbox(list, edit.list),
+		prototype: new Box(list, edit.list),
 		actions: actions.list,
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: BoxType2,
+		class: BoxType,
 		header: "caption",
+		body: "body",
 		model: "list",
 		viewType: "markup",
-		prototype: new Viewbox(list, edit.markup),
+		prototype: new Box(list, edit.markup),
 		actions: actions.markup,
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	line: {
-		class: BoxType2,
+		class: BoxType,
 		header: "caption",
+		body: "body",
 		model: "unit",
 		viewType: "line",
-		prototype: new Viewbox(line, edit.text),
+		prototype: new Box(line, edit.text),
 		actions: actions.line,
 		container: false,
 		tagName: "p",

@@ -38,10 +38,10 @@ export const record = {
 
 function viewMember(editor: ContentView, name: string, value: any): ContentView {
 	let type = editor.type.types[name];
-	let member = type.create(value);
+	let member = type.create();
 	member.view.classList.add("field");
 	editor.content.append(member.view);
-
+	member.draw(value);
 	//TODO contentedit refactoring - remove cast once refactoring complete
 	return member as ContentView;
 }

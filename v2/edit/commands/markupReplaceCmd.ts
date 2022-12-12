@@ -90,8 +90,9 @@ export class MarkupReplace extends ListReplace {
 			model.level = 0;
 		}
 		//Create the end line and add it after the command line.
-		let end = editor.type.create(model) as Editor;
+		let end = editor.type.create() as Editor;
 		ele(editor.view).after(end.view);
+		end.draw(model);
 		//We can now set the new range now that we have the end line.
 		range.setEnd(end.view, 0);
 		mark(range);

@@ -10,8 +10,9 @@ export const list = {
 			if (!type) {
 				throw new Error(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
 			}
-			let view = type.create(item);
+			let view = type.create();
 			this.content.append(view.view);
+			view.draw(item);
 		}
 	},
 	viewElement(this: ContentView, content: ELE): void {
@@ -19,8 +20,9 @@ export const list = {
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
-				let view = childType.create(child);
+				let view = childType.create();
 				this.content.append(view.view);
+				view.draw(child);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}

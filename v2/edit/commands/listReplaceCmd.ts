@@ -1,4 +1,4 @@
-import { RANGE } from "../../base/dom.js";
+import { ELE, RANGE } from "../../base/dom.js";
 
 import { clearContent, getChildEditor } from "../editUtil.js";
 import { RangeReplace } from "./rangeReplaceCmd.js";
@@ -51,8 +51,8 @@ export class ListReplace extends RangeReplace {
 			range.setStartBefore(range.commonAncestorContainer);
 			range.collapse(true);
 		}
-		editor = editor.type.create(value) as Editor;
-		let contents = editor.content.childNodes;
+		//
+		let contents = createContent(editor, value);
 		while (contents.length) {
 			range.insertNode(contents[0]); //this also removes the entry from the sequence.
 			range.collapse();
@@ -64,4 +64,13 @@ export class ListReplace extends RangeReplace {
 	protected merge(view: Editor, range: RANGE, content: any, isStart: boolean) {
 		//overridden for markup
 	}
+}
+
+function createContent(editor: Editor, value: unknown) {
+	let view = editor.view.parentNode as ELE;
+	editor = editor.type.create() as Editor;
+	view.append(editor);
+	editor.draw(value);
+	editor.view.remove();
+	return editor.content.childNodes;
 }

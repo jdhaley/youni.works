@@ -28,6 +28,25 @@ export class View extends ElementShape implements Viewer {
 		return subject || "keydown"
 	}
 }
+export interface Drawable {
+	viewValue(model: unknown): void;
+	viewElement(model: ELE): void;
+	valueOf(filter?: unknown): unknown
+}
+
+export class Drawer extends View {
+	constructor(viewer?: Drawable) {
+		super();
+		if (viewer) implement(this, viewer);
+	}
+
+	draw(value?: unknown): void {
+		this.viewValue(value);
+	}
+	
+	protected viewValue(model: unknown): void {
+	}
+}
 
 interface ViewContext extends Controller<ELE>, TypeContext, Article {
 	createElement(name: string): ELE;
@@ -72,10 +91,9 @@ export class VType extends BaseType implements ViewType {
 		return this.conf.title || "";
 	}
 
-	create(value?: unknown): Viewer {
+	create(): Viewer {
 		let node = this.context.createElement(this.conf.tagName || "div");
 		let view = this.control(node);
-		view.draw(value);
 		return view;
 	}
 	control(node: ELE): View {

@@ -1,10 +1,10 @@
 import { Actions } from "../../base/controller.js";
-import { Viewbox } from "../../ui/legacy.js";
+import { Box } from "../../ui/display.js";
 import { editor } from "../../control/editorControl.js";
 
 import { line } from "../../control/viewers/lineViewer.js";
 
-export class LineBox extends Viewbox {
+export class LineBox extends Box {
 	constructor(actions: Actions, editor: editor) {
 		super(line, editor)
 	}

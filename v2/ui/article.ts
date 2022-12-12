@@ -107,7 +107,8 @@ export class Change implements Signal {
 
 export function play(article: IArticle, edits: Edits) {
 	let type = article.types[edits.type];
-	let view = type.create(edits.source);
+	let view = type.create();
+	view.draw(edits.source);
 	article.view = view.view;
 	this.frame.append(this.node);
 	for (let edit of edits.edits) {

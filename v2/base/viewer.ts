@@ -33,7 +33,7 @@ export interface ViewType extends Type {
 	partOf: ViewType;
 	types: bundle<ViewType>;
 
-	create(value?: unknown): Viewer;
+	create(): Viewer;
 	control(node: ELE): Viewer;
 }
 

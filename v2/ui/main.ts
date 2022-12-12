@@ -1,4 +1,4 @@
-import { Display, DisplayConf, Box, BoxType, DisplayType } from "./display.js";
+import { Display, DisplayConf, Box, BoxType, DisplayType, NewBox } from "./display.js";
 import { Actions, Signal } from "../base/controller.js";
 import { bundle, EMPTY } from "../base/util.js";
 
@@ -72,7 +72,7 @@ let baseTypes: bundle<BaseConf> = {
 	},
 	box: {
 		class: BoxType as any,
-		prototype: new Box(),
+		prototype: new NewBox(),
 		actions: EMPTY.object,
 		tagName: "div",
 		model: "",
@@ -219,7 +219,7 @@ let types: bundle<DisplayConf> = {
 			}				
 		},
 		actions: {
-			view: function (this: Box, event: UserEvent) {
+			view: function (this: NewBox, event: UserEvent) {
 				this.body.view.textContent = "Dialog"; //this.partOf.type.conf.title;
 			},
 			click: function (this: Box, event: UserEvent) {
@@ -256,16 +256,7 @@ let article = new IArticle(frame, {
 	sources: "/journal",
 });
 
-//let dialogue = article.types.taskDialog.create()
-let tasks = article.types.taskDialog.create([
-		/*
-dsp development: design responsibility questions: today: in progress
-td teller: michael hoy meeting: done
-td teller: odyssey architecture notes: in progress
-td teller: feature spreadsheet iteration: done
-ibm admin: reset password: done
-ibm admin: update hours: postponed
-*/
+let value = [
 	{
 		type$: "task",
 		activity: "dsp dev",
@@ -289,8 +280,11 @@ ibm admin: update hours: postponed
 		activity: "ibm admin",
 		title: "update hours",
 		status: "postponed",
-	},
-]);
+	}
+];
+//let dialogue = article.types.taskDialog.create()
+let tasks = article.types.taskDialog.create();
 frame.view.append(tasks.view);
+tasks.draw(value);
 frame.send("view", frame.view);
 frame.view.setAttribute("contenteditable", "true");

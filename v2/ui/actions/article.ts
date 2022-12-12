@@ -11,10 +11,12 @@ export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : JSON.parse(res.body);
 		let type = getType(this, res.req.to, this.source);
-		this.view = type.create(this.source).view;
+		let viewer = type.create();
+		this.view = viewer.view;
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.owner.append(this.view);
+		viewer.draw(this.source);
 		this.owner.send("view", this.view);
 	},
 	save(this: IArticle, signal: UserEvent | Response<string>) {

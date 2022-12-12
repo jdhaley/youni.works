@@ -1,15 +1,9 @@
 import { Actions } from "../../base/controller.js";
-import { Sequence } from "../../base/util.js";
-import { ELE, RANGE } from "../../base/dom.js";
-
-import { getContentView } from "../../ui/uiUtil.js";
-import { Viewbox } from "../../ui/legacy.js";
-import { Editor } from "../../base/editor.js";
-
+import { Box } from "../../ui/display.js";
 import { list } from "../../control/viewers/listViewer.js";
 import { editor } from "../../control/editorControl.js";
 
-export class ListBox extends Viewbox {
+export class ListBox extends Box {
 	constructor(actions: Actions, editor: editor) {
 		super(list, editor)
 	}
