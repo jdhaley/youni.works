@@ -30,7 +30,6 @@ const conf: bundle<any> = {
 		viewType: "text",
 		prototype: new Box(text, edit.text),
 		actions: actions.text,
-		container: true,
 		tagName: "ui-text",
 		shortcuts: shortcuts
 	},
@@ -42,7 +41,6 @@ const conf: bundle<any> = {
 		viewType: "form",
 		prototype: new Box(record, edit.record),
 		actions: actions.record, 
-		container: true,
 		tagName: "ui-record",
 		shortcuts: shortcuts
 	},
@@ -54,7 +52,6 @@ const conf: bundle<any> = {
 		viewType: "list",
 		prototype: new Box(list, edit.list),
 		actions: actions.list,
-		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
@@ -66,19 +63,16 @@ const conf: bundle<any> = {
 		viewType: "markup",
 		prototype: new Box(list, edit.markup),
 		actions: actions.markup,
-		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	line: {
 		class: BoxType,
-		header: "caption",
-		body: "body",
+		body: null,
 		model: "unit",
 		viewType: "line",
 		prototype: new Box(line, edit.text),
 		actions: actions.line,
-		container: false,
 		tagName: "p",
 		shortcuts: shortcuts
 	}

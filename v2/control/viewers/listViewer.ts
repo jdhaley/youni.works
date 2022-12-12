@@ -34,6 +34,12 @@ export const list = {
 		for (let part of this.content.childNodes) {
 			//TODO contentedit refactoring - remove casts.
 			let editor = getView(part) as any as Editor;
+
+			//The part isn't an editable part...
+			if (editor == this) {
+				console.warn("Invalid part", part);
+				continue;
+			}
 			let value = editor?.valueOf(range);
 			if (value) {
 				if (!model) {

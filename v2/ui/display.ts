@@ -47,27 +47,28 @@ export class Box extends IEditor {
 	}
 	declare type: BoxType;
 
-	get content(): ELE {
-		return this.isContainer ? this.body.view : this.view;
-	}
 	get isContainer(): boolean {
 		return this.type.body ? true: false;
 	}
+	get content(): ELE {
+		return this.isContainer ? this.body.view : this.view;
+	}
 	get header(): Box {
-		for (let child of this.view.children) {
+		if (this.isContainer) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "header") return child["$control"];
 		}
 	}
 	get body(): Box {
-		for (let child of this.view.children) {
+		if (this.isContainer) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "body") return child["$control"];
 		}
 	}
 	get footer(): Box {
-		for (let child of this.view.children) {
+		if (this.isContainer) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "footer") return child["$control"];
 		}
 	}
+
 	get(name: string): ContentView {
 		for (let node of this.content.childNodes) {
 			let view = getContentView(node);
@@ -76,7 +77,7 @@ export class Box extends IEditor {
 	}
 	draw(value: unknown): void {
 		this.view.textContent = "";
-		if (this.type.header) {
+		if (this.isContainer && this.type.header) {
 			let header = this.type.header.create();
 			this.view.append(header.view);
 			header.draw(value);
@@ -89,7 +90,7 @@ export class Box extends IEditor {
 		} else {
 			this.view.classList.add("content");
 		}
-		if (this.type.footer) {
+		if (this.isContainer && this.type.footer) {
 			let footer = this.type.footer.create()
 			this.view.append(footer.view);
 			footer.draw(value);
