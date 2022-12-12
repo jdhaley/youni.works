@@ -5,8 +5,8 @@ import { bundle, extend } from "../base/util.js";
 import { ContentView } from "../base/view.js";
 
 import { Drawable, editor, IEditor } from "../control/editorControl.js";
-import { View } from "../control/viewControl.js";
-import { Box, DisplayType } from "./display.js";
+import { View, ViewConf } from "../control/viewControl.js";
+import { Box, DisplayConf, DisplayType } from "./display.js";
 import { createStyles } from "./style.js";
 import { getContentView } from "./uiUtil.js";
 
@@ -77,11 +77,7 @@ export class Viewbox extends IEditor {
 }
 
 export class LegacyType extends DisplayType {
-	get model(): string {
-		return this.conf.model;
-	}
-
-	start(conf: bundle<any>, loader: Loader): void {
+	start(conf: DisplayConf, loader: Loader): void {
 		this.name = conf.name;
 		this.conf = this.conf ? extend(this.conf, conf) : conf;
 		this.loadTypes(conf, loader);

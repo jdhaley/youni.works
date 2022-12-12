@@ -1,6 +1,6 @@
 import { Display, DisplayConf, Box, BoxType, DisplayType } from "./display.js";
-import { Signal } from "../base/controller.js";
-import { bundle } from "../base/util.js";
+import { Actions, Signal } from "../base/controller.js";
+import { bundle, EMPTY } from "../base/util.js";
 
 import { IEditor } from "../control/editorControl.js";
 import { Frame, UserEvent } from "./frame.js";
@@ -16,6 +16,7 @@ import edit from "./conf/editorConf.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";
+import { BaseConf, View, VType } from "../control/viewControl.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -36,7 +37,7 @@ const shortcuts = {
 	// "Control+/": "test"
 }
 
-let baseTypes: bundle<DisplayConf> = {
+let baseTypes: bundle<BaseConf> = {
 	record: {
 		class: DisplayType as any,
 		prototype: new IEditor(record, edit.record),
@@ -64,12 +65,18 @@ let baseTypes: bundle<DisplayConf> = {
 	display: {
 		class: DisplayType as any,
 		prototype: new Display(),
+		actions: EMPTY.object,
 		tagName: "div",
+		model: "",
+		shortcuts: shortcuts
 	},
 	box: {
 		class: BoxType as any,
 		prototype: new Box(),
+		actions: EMPTY.object,
 		tagName: "div",
+		model: "",
+		shortcuts: shortcuts
 	}
 }
 

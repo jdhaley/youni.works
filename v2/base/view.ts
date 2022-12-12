@@ -12,6 +12,7 @@ import { bundle } from "./util.js";
 export interface Viewer extends Controller<ELE> {
 	type: ViewType;
 	draw(data?: unknown): void;
+//	valueOf(range?: RANGE, contentType?: string): unknown;
 }
 //TODO remove
 export interface ContentView extends Viewer {
@@ -33,6 +34,18 @@ export interface ViewType extends Type {
 
 	create(value?: unknown): Viewer;
 	control(node: ELE): Viewer;
+}
+
+export interface Part {
+	_part: true;
+	type$: string;
+	content?: unknown;
+	level?: number;
+}
+
+export interface PartTree extends Part {
+	items?: Part[];
+	sections?: Part[];
 }
 
 export interface VIEW_ELE extends ELE {

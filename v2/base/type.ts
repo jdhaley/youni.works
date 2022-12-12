@@ -1,4 +1,3 @@
-import { Actions } from "./controller.js";
 import { bundle } from "./util.js";
 
 export interface Type {
@@ -14,9 +13,9 @@ export class BaseType implements Type {
 	readonly context: TypeContext;
 	declare name: string;
 	declare partOf: Type;
-	declare conf: TypeConf;
+	declare conf: bundle<any>;
 
-	start(conf: TypeConf, loader?: Loader) {
+	start(conf: bundle<any>, loader?: Loader) {
 	}
 }
 
@@ -24,12 +23,10 @@ export interface TypeContext {
 	types: bundle<Type>;
 }
 
-export interface TypeConf {
-	name?: string;
-	type?: string;
-	types?: bundle<TypeConf | string>;
-	class?: typeof BaseType;
-	actions?: Actions;
+interface TypeConf {
+	name: string;
+	type: string;
+	class: typeof BaseType;
 }
 
 export class Loader {

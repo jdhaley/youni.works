@@ -3,7 +3,7 @@ import { ElementShape } from "../control/eleControl.js";
 import { Viewer, ViewType } from "../base/view.js";
 import { NODE, RANGE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
-import { ViewConf } from "../ui/display.js";
+import { ViewConf } from "../control/viewControl.js";
 
 export interface XDisplay extends ViewConf {
 	types?: {

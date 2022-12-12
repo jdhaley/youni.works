@@ -1,6 +1,6 @@
 import { ELE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
-import { Part } from "./item.js";
+import { Part, PartTree } from "../base/view.js";
 
 export function toHtml(item: Part) {
 	let doc = document.implementation.createHTMLDocument();
@@ -9,12 +9,12 @@ export function toHtml(item: Part) {
 	return ele;
 }
 
-function htmlSection(ele: ELE, item: Part) {
+function htmlSection(ele: ELE, item: PartTree) {
 	if (item.items) for (let x of item.items) transformItem(ele, x);
 	if (item.sections) for (let x of item.sections) transformItem(ele, x);
 }
 
-function transformItem(parent: ELE, item: Part) {
+function transformItem(parent: ELE, item: PartTree) {
 	let doc = parent.ownerDocument;
 	let ele: ELE;
 	if (item.type$ == "heading") {

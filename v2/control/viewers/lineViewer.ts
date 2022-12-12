@@ -1,6 +1,6 @@
 import { ELE, RANGE } from "../../base/dom.js";
-import { Editor, item } from "../../base/editor.js";
-import { getView } from "../../base/view.js";
+import { Editor } from "../../base/editor.js";
+import { getView, Part } from "../../base/view.js";
 
 import { text } from "./textViewer.js";
 
@@ -48,7 +48,7 @@ export const line = {
 			this.view.setAttribute("data-item", toType.name);
 		}
 	},
-	viewValue(content: item): void {
+	viewValue(content: Part): void {
 		this.content.innerHTML = (content ? "" + content.content : "");
 		this.level = content.level;	
 	},
@@ -56,10 +56,11 @@ export const line = {
 		this.content.innerHTML = content.innerHTML;
 		this.level = Number.parseInt(content.getAttribute("level"));
 	},
-	valueOf(range?: RANGE): item {
+	valueOf(range?: RANGE): Part {
 		if (range && !range.intersectsNode(this.content)) return;
 		let content = text.valueOf.call(this, range);
-		let item: item = {
+		let item: Part = {
+			_part: true,
 			type$: this.view.getAttribute("data-item"),
 			content: content,
 		}

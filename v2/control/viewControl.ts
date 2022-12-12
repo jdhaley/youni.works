@@ -1,5 +1,5 @@
 import { Article, Viewer, ViewType } from "../base/view.js";
-import { BaseType, Loader, TypeConf, TypeContext } from "../base/type.js";
+import { BaseType, Loader, TypeContext } from "../base/type.js";
 import { Actions, Controller } from "../base/controller.js";
 import { ELE, RANGE } from "../base/dom.js";
 import { bundle, EMPTY, extend } from "../base/util.js";
@@ -21,10 +21,40 @@ export class View extends ElementShape implements Viewer {
 	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
 		throw new Error("Method not implemented.");
 	}
+	getSubject(shortcut: string) {
+		let shortcuts = this.type.conf["shortcuts"];
+		let subject: string;
+		if (shortcuts) subject = shortcuts[shortcut];
+		return subject || "keydown"
+	}
 }
 
 interface ViewContext extends Controller<ELE>, TypeContext, Article {
 	createElement(name: string): ELE;
+}
+export interface ViewConf {
+	type: string;
+	types?: bundle<ViewConf | string>;
+	actions?: Actions;
+	tagName?: string;
+
+	/** Added through type loading */
+	name?: string;
+	/** Should only be specified for a base type */
+	class?: VType;
+	/** Should only be specified for a base type */
+	prototype?: Viewer;
+	/** Should only be specified for a base type */
+	model?: "record" | "list" | "unit";
+}
+
+export interface BaseConf {
+	class: VType;
+	prototype: View;
+	actions: Actions,
+	tagName: string,
+	model: string,
+	shortcuts: bundle<string>
 }
 
 export class VType extends BaseType implements ViewType {
@@ -32,7 +62,7 @@ export class VType extends BaseType implements ViewType {
 	declare partOf: VType;
 	declare types: bundle<VType>;
 	declare prototype: Viewer;
-	declare conf: bundle<any>;
+	declare conf: ViewConf;
 
 	create(value?: unknown): Viewer {
 		let node = this.context.createElement(this.conf.tagName || "div");
@@ -41,14 +71,13 @@ export class VType extends BaseType implements ViewType {
 		return view;
 	}
 	control(node: ELE): View {
-		if (this.conf.kind) node.setAttribute("class", this.conf.kind)
 		node.setAttribute("data-item", this.name);
 		let view = Object.create(this.prototype);
 		node["$control"] = view;
 		view.view = node;
 		return view;
 	}
-	start(conf: TypeConf, loader?: Loader) {
+	start(conf: ViewConf, loader?: Loader) {
 		if (!conf.name) console.warn("No conf name", conf);
 		this.name = conf.name;
 		this.extendConf(conf);
@@ -59,13 +88,17 @@ export class VType extends BaseType implements ViewType {
 		this.loadTypes(conf, loader);
 	}
 
-	protected loadTypes(conf: TypeConf, loader: Loader) {
+	protected loadTypes(conf: ViewConf, loader: Loader) {
 		this.types = Object.create(this.types || null);
 		for (let name in conf.types) {
-			let memberConf = conf.types[name];
+			let memberConf: ViewConf;
 			let member: VType;
-			if (typeof memberConf == "string") {
-				memberConf = { type: memberConf };
+			if (typeof conf.types[name] == "string") {
+				memberConf = {
+					type: conf.types[name] as string
+				} as ViewConf;
+			} else {
+				memberConf = conf.types[name] as ViewConf;
 			}
 			memberConf.name = name;
 			member = loader.get(memberConf.type) as VType;

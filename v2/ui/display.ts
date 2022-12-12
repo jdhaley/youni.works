@@ -1,29 +1,20 @@
-import { Actions } from "../base/controller.js";
 import { ELE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
 
-import { View, VType } from "../control/viewControl.js";
-import { Loader, TypeConf } from "../base/type.js";
+import { View, ViewConf, VType } from "../control/viewControl.js";
+import { Loader } from "../base/type.js";
 import { createStyles } from "./style.js";
 import { getContentView } from "./uiUtil.js";
 import { ContentView } from "../base/view.js";
 
-export interface ViewConf extends TypeConf {
-	prototype?: object;
-	actions?: Actions;
-	tagName?: string;
-
-	title?: string;
-	model?: "record" | "list" | "unit";
-}
-
 export interface DisplayConf extends ViewConf {
 	types?: bundle<DisplayConf | string>;
-
-	viewType?: string;
+	shortcuts?: bundle<string>;
 	kind?: string;
 	styles?: bundle<any>;
-	shortcuts?: bundle<string>;
+	title?: string;
+	// viewType?: string;
+
 }
 
 export class Display extends View {
@@ -71,16 +62,21 @@ export class Box extends Display {
 
 export class DisplayType extends VType {
 	declare conf: DisplayConf;
+
+	get title(): string {
+		return this.conf.title || "";
+	}
+	control(node: ELE): Display {
+		if (this.conf.kind) node.setAttribute("class", this.conf.kind);
+		return super.control(node) as Display;
+	}
 	start(conf: DisplayConf, loader: Loader): void {
 		super.start(conf, loader);
-		if (conf?.styles) this.conf.styles = createStyles(this, conf.styles);
+		if (conf.styles) this.conf.styles = createStyles(this, conf.styles);
 	}
 }
 
 export class BoxType extends DisplayType {
-	get model(): string {
-		return this.conf.model;
-	}
 	get header(): VType {
 		return this.types?.header;
 	}

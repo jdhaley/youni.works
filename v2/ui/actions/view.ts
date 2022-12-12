@@ -9,7 +9,7 @@ import { getContentView, navigate } from "../uiUtil.js";
 export default extend(null, {
 	keydown(this: Box, event: UserEvent) {
 		event.shortcut = getShortcut(event);
-		event.subject = this.type.conf.shortcuts[event.shortcut] || "keydown";
+		event.subject = this.getSubject(event.shortcut);
        // console.log(event.shortcut, event.subject);
 	},
 	save(this: Box, event: UserEvent) {

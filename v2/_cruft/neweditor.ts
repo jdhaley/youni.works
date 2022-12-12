@@ -88,7 +88,7 @@ let NEXT_ID = 1;
 export class EType extends VType {
 	declare context: EArticle;
 	get model(): string {
-		return this.conf.model;
+		return this.conf["model"];
 	}
 }
 

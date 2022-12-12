@@ -1,22 +1,6 @@
-export interface Part  {
-	type$: string,
-	content?: unknown,
-	level?: number,
-	items?: Part[],
-	sections?: Part[]
-}
+import { Part, PartTree } from "../base/view";
 
-// interface Part {
-// 	type: Type;
-// 	content: content;
-// 	parts: Iterable<Part>;
-// 	partOf?: Part;
-// 	///////////////////////
-// 	at?: bundle<Part>
-// 	append?(part: Part): void;
-// }
-
-export function section(items: Part[]): Part {
+export function section(items: Part[]): PartTree {
 	let sections = [];
 	if (items[0].type$ != "heading") {
 		sections.push({
@@ -26,7 +10,7 @@ export function section(items: Part[]): Part {
 		});
 	}
 	for (let i = 0; i < items.length; i++) {
-		let current = items[i];
+		let current = items[i] as PartTree
 		if (current.type$ == "heading") {
 			current.sections = [];
 			current.items = [];
@@ -35,7 +19,8 @@ export function section(items: Part[]): Part {
 			sections.at(-1).items.push(current);
 		}
 	}
-	let root: Part = {
+	let root: PartTree = {
+		_part: true as true,
 		type$: "article",
 		content: "",
 		sections: []
@@ -45,7 +30,7 @@ export function section(items: Part[]): Part {
 	return root;
 }
 
-function groupSections(section: Part, sections: Part[], start: number): number {
+function groupSections(section: PartTree, sections: PartTree[], start: number): number {
 	let items = section.items;
 	section.items = [];
 	groupItems(section, items, 0);
@@ -59,7 +44,7 @@ function groupSections(section: Part, sections: Part[], start: number): number {
 		}
 	}
 }
-function groupItems(item: Part, items: Part[], start: number): number {
+function groupItems(item: PartTree, items: Part[], start: number): number {
 	if (!items) return start;
 	if (!item.items) item.items = [];
 	while (start < items.length) {
@@ -74,7 +59,7 @@ function groupItems(item: Part, items: Part[], start: number): number {
 		}
 	}
 }
-function groupParas(item: Part, items: Part[], start: number): number {
+function groupParas(item: PartTree, items: Part[], start: number): number {
 	let p = items[start];
 	if (p?.type$ != "para") return start;
 	while (start < items.length) {
@@ -87,13 +72,14 @@ function groupParas(item: Part, items: Part[], start: number): number {
 		}
 	}
 }
-function groupRows(item: Part, items: Part[], start: number): number {
+function groupRows(item: PartTree, items: Part[], start: number): number {
 	let header = items[start++];
 	let columns = "";
 	for (let name in header.content as object) {
 		columns += name + " ";
 	}
 	let table = {
+		_part: true as true,
 		type$: "table",
 		columns: columns.substring(0, columns.length - 1),
 		content: []

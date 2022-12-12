@@ -1,7 +1,3 @@
-import { RANGE } from "../../base/dom.js";
-
-import { getContentView } from "../../ui/uiUtil.js";
-import { item } from "../../base/editor.js";
 import { Actions } from "../../base/controller.js";
 import { Viewbox } from "../../ui/legacy.js";
 import { editor } from "../../control/editorControl.js";

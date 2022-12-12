@@ -1,6 +1,6 @@
 import { bundle } from "../base/util.js";
 import { ELE, NODE } from "../base/dom.js";
-import { Part } from "./item.js";
+import { Part } from "../base/view.js";
 
 export function fromHtml(source: Node): Part[] {
 	let items = [];
@@ -27,6 +27,7 @@ const methods: bundle<transform> = {
 	},
 	section(source: Node, target: Part[]) {
 		let item = {
+			_part: true as true,
 			type$: "heading",
 			level: Number.parseInt(source.nodeName.substring(1)),
 			content: source.textContent
@@ -58,6 +59,7 @@ const methods: bundle<transform> = {
 		//DONE OFFICE
 
 		let item = {
+			_part: true as true,
 			type$: "para",
 			content: "",
 			level: level,
