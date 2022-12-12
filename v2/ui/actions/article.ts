@@ -15,6 +15,7 @@ export default extend(null, {
 		this.view.setAttribute("data-file", res.req.to);
 		this.view.setAttribute("contentEditable", "true");	
 		this.owner.append(this.view);
+		this.owner.send("view", this.view);
 	},
 	save(this: IArticle, signal: UserEvent | Response<string>) {
 		signal.subject = "";
