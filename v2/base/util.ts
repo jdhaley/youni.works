@@ -56,6 +56,7 @@ export function implement(object: Object, extension: Object) {
 	for (let name in extension) {
 		object[name] = extension[name];
 	}
+	return object;
 }
 
 export function formatDate(date: Date) {

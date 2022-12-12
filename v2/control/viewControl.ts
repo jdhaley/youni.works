@@ -2,7 +2,7 @@ import { Article, Viewer, ViewType } from "../base/view.js";
 import { BaseType, Loader, TypeContext } from "../base/type.js";
 import { Actions, Controller } from "../base/controller.js";
 import { ELE, RANGE } from "../base/dom.js";
-import { bundle, EMPTY, extend } from "../base/util.js";
+import { bundle, extend, implement } from "../base/util.js";
 
 import { ElementShape } from "./eleControl.js";
 
@@ -99,21 +99,11 @@ export class VType extends BaseType implements ViewType {
 	}
 
 	protected extendTypes(types: bundle<ViewConf | string>, loader: Loader) {
-		this.types = Object.create(this.types || null);
+		//Use implement rather than extend so the types is "flat" as this may be import for record member iteration.
+		this.types = implement(Object.create(null), this.types || null) as bundle<VType>;
 		for (let name in types) {
-			let memberConf: ViewConf;
-			if (typeof types[name] == "string") {
-				memberConf = { type: types[name] as string } as ViewConf;
-			} else {
-				memberConf = types[name] as ViewConf;
-			}
-			memberConf.name = name;
-			let member = loader.get(memberConf.type) as VType;
-			if (!member) throw new Error(`Can find type "${memberConf.type}" loading "${this.name}.${name}"`);
-			member = Object.create(member);
-			this.types[name] = member as any;
-			member.partOf = this;
-			member.start(memberConf, loader);
+			let member = this.extendType(name, types[name], loader);
+			this.types[name] = member;
 		}
 	}
 	protected extendActions(base: Actions, ext: Actions) {
@@ -130,6 +120,23 @@ export class VType extends BaseType implements ViewType {
 			if (proto) action._super = proto;
 			this.conf.actions[name] = action;
 		}
+	}
+	protected extendType(name: string, conf: ViewConf | string, loader: Loader) {
+		let memberConf: ViewConf;
+		if (typeof conf == "string") {
+			memberConf = { type: conf as string } as ViewConf;
+		} else {
+			memberConf = conf as ViewConf;
+		}
+		memberConf.name = name;
+
+		let member = loader.get(memberConf.type) as VType;
+		if (!member) throw new Error(`Can find type "${memberConf.type}" loading "${this.name}.${name}"`);
+		member = Object.create(member);
+		console.log(this, member);
+		member.partOf = this;
+		member.start(memberConf, loader);
+		return member;
 	}
 }
 
