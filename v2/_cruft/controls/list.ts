@@ -11,7 +11,7 @@ import { editor } from "../../control/editorControl.js";
 
 export class ListBox extends Viewbox {
 	constructor(actions: Actions, editor: editor) {
-		super(list, actions, editor)
+		super(list, editor)
 	}
 	protected createFooter(model?: unknown) {
 		let footer = this.view.ownerDocument.createElement("footer") as Element;

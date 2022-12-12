@@ -6,7 +6,7 @@ import { line } from "../../control/viewers/lineViewer.js";
 
 export class LineBox extends Viewbox {
 	constructor(actions: Actions, editor: editor) {
-		super(line, actions, editor)
+		super(line, editor)
 	}
 	// demote() {
 	// 	let level = this.level;

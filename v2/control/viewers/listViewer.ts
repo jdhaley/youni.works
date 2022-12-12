@@ -42,6 +42,10 @@ export const list = {
 			}
 		}
 		return model;
+	},
+	createFooter(model?: unknown) {
+		let footer = this.view.ownerDocument.createElement("footer") as Element;
+		this.view.append(footer);
 	}
 }
 

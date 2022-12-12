@@ -37,6 +37,7 @@ export interface ViewConf {
 	types?: bundle<ViewConf | string>;
 	actions?: Actions;
 	tagName?: string;
+	title?: string;
 
 	/** Added through type loading */
 	name?: string;
@@ -64,6 +65,13 @@ export class VType extends BaseType implements ViewType {
 	declare prototype: Viewer;
 	declare conf: ViewConf;
 
+	get model() {
+		return this.conf.model;
+	}
+	get title(): string {
+		return this.conf.title || "";
+	}
+
 	create(value?: unknown): Viewer {
 		let node = this.context.createElement(this.conf.tagName || "div");
 		let view = this.control(node);
@@ -79,50 +87,48 @@ export class VType extends BaseType implements ViewType {
 	}
 	start(conf: ViewConf, loader?: Loader) {
 		if (!conf.name) console.warn("No conf name", conf);
-		this.name = conf.name;
-		this.extendConf(conf);
-		if (conf.actions) this.extendActions(conf.actions);
+		let actions = this.conf?.actions || null;
+		this.conf = this.conf ? extend(this.conf, conf) : conf;
+
+		this.extendActions(actions, conf.actions);
+		if (conf.types) this.extendTypes(conf.types, loader);
+
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
-		this.prototype.actions = this.conf.actions || EMPTY.object;
-		this.loadTypes(conf, loader);
+		this.prototype.actions = this.conf.actions;
 	}
 
-	protected loadTypes(conf: ViewConf, loader: Loader) {
+	protected extendTypes(types: bundle<ViewConf | string>, loader: Loader) {
 		this.types = Object.create(this.types || null);
-		for (let name in conf.types) {
+		for (let name in types) {
 			let memberConf: ViewConf;
-			let member: VType;
-			if (typeof conf.types[name] == "string") {
-				memberConf = {
-					type: conf.types[name] as string
-				} as ViewConf;
+			if (typeof types[name] == "string") {
+				memberConf = { type: types[name] as string } as ViewConf;
 			} else {
-				memberConf = conf.types[name] as ViewConf;
+				memberConf = types[name] as ViewConf;
 			}
 			memberConf.name = name;
-			member = loader.get(memberConf.type) as VType;
-			if (!member) {
-				throw new Error(`Can find type "${memberConf.type}" loading "${this.name}.${name}"`);
-			}
+			let member = loader.get(memberConf.type) as VType;
+			if (!member) throw new Error(`Can find type "${memberConf.type}" loading "${this.name}.${name}"`);
 			member = Object.create(member);
 			this.types[name] = member as any;
 			member.partOf = this;
 			member.start(memberConf, loader);
 		}
 	}
-	protected extendConf(conf: bundle<any>) {
-		this.conf = this.conf ? extend(this.conf, conf) : conf;
-	}
-	protected extendActions(actions: Actions) {
-		if (!this.conf.actions) return;
-		this.conf.actions = Object.create(this.conf.actions);
-		for (let name in actions) {
-			let ext = actions[name] as any;
+	protected extendActions(base: Actions, ext: Actions) {
+		if (!base) {
+			this.conf.actions = ext || null;
+			return;
+		}
+		if (!ext) return;
+		this.conf.actions = Object.create(base);
+		if (ext) for (let name in ext) {
+			let action = ext[name] as any;
 			let proto = this.conf.actions[name];
 			//Could also have the actions faceted and automatically call via before$ or after$
-			if (proto) ext._super = proto;
-			this.conf.actions[name] = ext;
+			if (proto) action._super = proto;
+			this.conf.actions[name] = action;
 		}
 	}
 }

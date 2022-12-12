@@ -17,7 +17,7 @@
 // 		if (event.target == this.header) {
 // 			event.subject = "";
 // 			if (this.kind.contains("collapsed")) {
-// 				this.header.view.textContent = this.type.conf.title;
+// 				this.header.view.textContent = this.type.title;
 // 				this.kind.remove("collapsed");
 // 			} else {
 // 				let title = this.get("title").content.textContent || "";

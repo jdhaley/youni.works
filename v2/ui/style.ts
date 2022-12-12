@@ -6,11 +6,11 @@ document.head.appendChild(ele);
 
 let STYLES = ele.sheet;
 
-export function createStyles(type: Type, conf: object): object {
+export function extendStyles(type: Type, styles: object, ext: object): object {
 	//Extend the bundle of rules.
-	let styles = Object.create(type.conf.style || null);
-	for (let name in conf) {
-		let rule = conf[name];
+	styles = Object.create(styles || null);
+	if (ext) for (let name in ext) {
+		let rule = ext[name];
 		if (typeof rule == "object") {
 			//Extend the individual rule properties.
 			if (styles[name]) rule = extend(styles[name], rule);

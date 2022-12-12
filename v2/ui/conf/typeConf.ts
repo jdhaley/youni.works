@@ -1,7 +1,7 @@
 import { bundle } from "../../base/util.js";
 
-import { LegacyType, Viewbox } from "../legacy.js";
-
+import { DisplayType } from "../display.js";
+import { Viewbox } from "../legacy.js";
 
 import edit from "./editorConf.js";
 import actions from "./actions.js";
@@ -14,52 +14,57 @@ import { line } from "../../control/viewers/lineViewer.js";
 
 const conf: bundle<any> = {
 	text: {
-		class: LegacyType,
+		class: DisplayType,
 		model: "unit",
 		viewType: "text",
-		prototype: new Viewbox(text, actions.text, edit.text),
+		prototype: new Viewbox(text, edit.text),
+		actions: actions.text,
 		container: true,
 		tagName: "ui-text",
 		shortcuts: shortcuts
 	},
 	record: {
-		class: LegacyType,
+		class: DisplayType,
 		model: "record",
 		viewType: "form",
-		prototype: new Viewbox(record, actions.record, edit.record),
+		prototype: new Viewbox(record, edit.record),
+		actions: actions.record, 
 		container: true,
 		tagName: "ui-record",
 		shortcuts: shortcuts
 	},
 	list: {
-		class: LegacyType,
+		class: DisplayType,
 		model: "list",
 		viewType: "list",
-		prototype: new Viewbox(list, actions.list, edit.list),
+		prototype: new Viewbox(list, edit.list),
+		actions: actions.list,
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: LegacyType,
+		class: DisplayType,
 		model: "list",
 		viewType: "markup",
-		prototype: new Viewbox(list, actions.markup, edit.markup),
+		prototype: new Viewbox(list, edit.markup),
+		actions: actions.markup,
 		container: true,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	line: {
-		class: LegacyType,
+		class: DisplayType,
 		model: "unit",
 		viewType: "line",
-		prototype: new Viewbox(line, actions.line, edit.text),
+		prototype: new Viewbox(line, edit.text),
+		actions: actions.line,
 		container: false,
 		tagName: "p",
 		shortcuts: shortcuts
 	},
 	// row: {
-	// 	class: LegacyType,
+	// 	class: DisplayType,
 	// 	model: "record",
 	// 	viewType: "row",
 	// 	prototype: new RowBox(actions.row, edit.record),

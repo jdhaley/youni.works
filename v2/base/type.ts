@@ -11,10 +11,13 @@ export class BaseType implements Type {
 		this.context = context;
 	}
 	readonly context: TypeContext;
-	declare name: string;
 	declare partOf: Type;
 	declare conf: bundle<any>;
 
+	get name() {
+		return this.conf.name;
+	}
+	
 	start(conf: bundle<any>, loader?: Loader) {
 	}
 }

@@ -3,7 +3,7 @@ import { bundle } from "../base/util.js";
 
 import { View, ViewConf, VType } from "../control/viewControl.js";
 import { Loader } from "../base/type.js";
-import { createStyles } from "./style.js";
+import { extendStyles } from "./style.js";
 import { getContentView } from "./uiUtil.js";
 import { ContentView } from "../base/view.js";
 
@@ -12,9 +12,7 @@ export interface DisplayConf extends ViewConf {
 	shortcuts?: bundle<string>;
 	kind?: string;
 	styles?: bundle<any>;
-	title?: string;
 	// viewType?: string;
-
 }
 
 export class Display extends View {
@@ -63,16 +61,14 @@ export class Box extends Display {
 export class DisplayType extends VType {
 	declare conf: DisplayConf;
 
-	get title(): string {
-		return this.conf.title || "";
-	}
 	control(node: ELE): Display {
 		if (this.conf.kind) node.setAttribute("class", this.conf.kind);
 		return super.control(node) as Display;
 	}
 	start(conf: DisplayConf, loader: Loader): void {
+		let styles = this.conf?.styles;
 		super.start(conf, loader);
-		if (conf.styles) this.conf.styles = createStyles(this, conf.styles);
+		this.conf.styles = extendStyles(this, styles, conf.styles);
 	}
 }
 

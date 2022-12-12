@@ -1,19 +1,15 @@
-import { Actions } from "../base/controller.js";
 import { ELE } from "../base/dom.js";
-import { Loader } from "../base/type.js";
-import { bundle, extend } from "../base/util.js";
+import { bundle } from "../base/util.js";
 import { ContentView } from "../base/view.js";
 
 import { Drawable, editor, IEditor } from "../control/editorControl.js";
-import { View, ViewConf } from "../control/viewControl.js";
-import { Box, DisplayConf, DisplayType } from "./display.js";
-import { createStyles } from "./style.js";
+import { View } from "../control/viewControl.js";
+import { Box, DisplayType } from "./display.js";
 import { getContentView } from "./uiUtil.js";
 
 export class Viewbox extends IEditor {
-	constructor(viewer: Drawable, actions: Actions, editor: editor) {
+	constructor(viewer: Drawable, editor: editor) {
 		super(viewer);
-		this.actions = actions;
 		if (editor) this["exec"] = editor;
 	}
 
@@ -59,7 +55,7 @@ export class Viewbox extends IEditor {
 	}
 	protected createHeader(model?: unknown) {
 		let ele = this.view.ownerDocument.createElement("header") as Element;
-		ele.textContent = this.type.conf.title || "";
+		ele.textContent = this.type.title;
 		//if (!ele.textContent) debugger;
 		this.view.append(ele);
 		let content = new View();
@@ -73,17 +69,5 @@ export class Viewbox extends IEditor {
 		this.view.append(ele);
 	}
 	protected createFooter(model?: unknown) {
-	}
-}
-
-export class LegacyType extends DisplayType {
-	start(conf: DisplayConf, loader: Loader): void {
-		this.name = conf.name;
-		this.conf = this.conf ? extend(this.conf, conf) : conf;
-		this.loadTypes(conf, loader);
-		this.prototype = Object.create(this.conf.prototype);
-		this.prototype.type = this;
-		if (conf?.styles) this.conf.styles = createStyles(this, conf.styles);
-		if (conf?.actions) this.prototype.actions = conf.actions;
 	}
 }

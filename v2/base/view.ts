@@ -28,6 +28,7 @@ export interface Article extends Controller<ELE>, TypeContext {
 }
 
 export interface ViewType extends Type {
+	title: string;
 	context: Controller<ELE>;
 	partOf: ViewType;
 	types: bundle<ViewType>;
