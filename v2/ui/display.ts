@@ -6,6 +6,7 @@ import { Loader } from "../base/type.js";
 import { extendStyles } from "./style.js";
 import { getContentView } from "./uiUtil.js";
 import { ContentView } from "../base/view.js";
+import { IEditor } from "../control/editorControl.js";
 
 export interface DisplayConf extends ViewConf {
 	types?: bundle<DisplayConf | string>;
@@ -13,10 +14,17 @@ export interface DisplayConf extends ViewConf {
 	kind?: string;
 	styles?: bundle<any>;
 	// viewType?: string;
+
+	header?: DisplayConf;
+	footer?: DisplayConf;
 }
 
 export class Display extends View {
 	declare type: DisplayType;
+}
+
+export class DisplayEditor extends IEditor {
+
 }
 
 export class Box extends Display {

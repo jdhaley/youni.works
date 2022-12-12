@@ -1,20 +1,33 @@
 import { ELE } from "../base/dom.js";
+import { Loader } from "../base/type.js";
 import { bundle } from "../base/util.js";
 import { ContentView } from "../base/view.js";
 
 import { Drawable, editor, IEditor } from "../control/editorControl.js";
-import { View } from "../control/viewControl.js";
-import { Box, DisplayType } from "./display.js";
+import { View, VType } from "../control/viewControl.js";
+import { Box, DisplayConf, DisplayType } from "./display.js";
 import { getContentView } from "./uiUtil.js";
+
+export class BoxType2 extends DisplayType {
+	header?: VType;
+	footer?: VType;
+	start(conf: DisplayConf, loader: Loader) {
+		super.start(conf, loader);
+		if (conf.header) this.header = this.extendType("header", conf.header, loader);
+		if (conf.footer) this.footer = this.extendType("footer", conf.footer, loader);
+	}
+}
 
 export class Viewbox extends IEditor {
 	constructor(viewer: Drawable, editor: editor) {
 		super(viewer);
 		if (editor) this["exec"] = editor;
 	}
+	declare type: BoxType2;
 
 	get isContainer(): boolean {
-		return this.type.conf["container"];
+		return this.type.header || this.type.footer ? true: false;
+		//return this.type.conf["container"];
 	}
 	get shortcuts(): bundle<string> {
 		return this.type.conf.shortcuts;
@@ -45,21 +58,13 @@ export class Viewbox extends IEditor {
 	draw(value: unknown): void {
 		this.view.textContent = "";
 		if (this.isContainer) {
-			this.createHeader();
+			if (this.type.header) this.view.append(this.type.header.create(value).view);
 			this.createContent();
-			this.createFooter();
+			if (this.type.footer) this.view.append(this.type.footer.create(value).view);	
 		} else {
-			this.content.classList.add("content");
+			this.view.classList.add("content");
 		}
 		super.draw(value);
-	}
-	protected createHeader(model?: unknown) {
-		let ele = this.view.ownerDocument.createElement("header") as Element;
-		ele.textContent = this.type.title;
-		//if (!ele.textContent) debugger;
-		this.view.append(ele);
-		let content = new View();
-		content.control(ele as Element);
 	}
 	protected createContent(model?: unknown) {
 		let ele = this.view.ownerDocument.createElement("div") as Element;
@@ -67,7 +72,5 @@ export class Viewbox extends IEditor {
 		let content = new View();
 		content.control(ele as Element);
 		this.view.append(ele);
-	}
-	protected createFooter(model?: unknown) {
 	}
 }

@@ -1,7 +1,7 @@
 import { bundle } from "../../base/util.js";
 
-import { DisplayType } from "../display.js";
-import { Viewbox } from "../legacy.js";
+import { Display, DisplayType } from "../display.js";
+import { BoxType2, Viewbox } from "../legacy.js";
 
 import edit from "./editorConf.js";
 import actions from "./actions.js";
@@ -13,8 +13,19 @@ import { list } from "../../control/viewers/listViewer.js";
 import { line } from "../../control/viewers/lineViewer.js";
 
 const conf: bundle<any> = {
-	text: {
+	caption: {
 		class: DisplayType,
+		prototype: new Display(),
+		tagName: "header",
+		actions: {
+			view() {
+				this.view.textContent = this.partOf.type.title;
+			}
+		}
+	},
+	text: {
+		class: BoxType2,
+		header: "caption",
 		model: "unit",
 		viewType: "text",
 		prototype: new Viewbox(text, edit.text),
@@ -24,7 +35,8 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	record: {
-		class: DisplayType,
+		class: BoxType2,
+		header: "caption",
 		model: "record",
 		viewType: "form",
 		prototype: new Viewbox(record, edit.record),
@@ -34,7 +46,8 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	list: {
-		class: DisplayType,
+		class: BoxType2,
+		header: "caption",
 		model: "list",
 		viewType: "list",
 		prototype: new Viewbox(list, edit.list),
@@ -44,7 +57,8 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: DisplayType,
+		class: BoxType2,
+		header: "caption",
 		model: "list",
 		viewType: "markup",
 		prototype: new Viewbox(list, edit.markup),
@@ -54,7 +68,8 @@ const conf: bundle<any> = {
 		shortcuts: shortcuts
 	},
 	line: {
-		class: DisplayType,
+		class: BoxType2,
+		header: "caption",
 		model: "unit",
 		viewType: "line",
 		prototype: new Viewbox(line, edit.text),
@@ -62,7 +77,7 @@ const conf: bundle<any> = {
 		container: false,
 		tagName: "p",
 		shortcuts: shortcuts
-	},
+	}
 	// row: {
 	// 	class: DisplayType,
 	// 	model: "record",
