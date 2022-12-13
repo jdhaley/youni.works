@@ -34,14 +34,14 @@ export class ElementController extends BaseReceiver implements Controller<ELE> {
 		}
 	}
 
-	control(node: Element) {
+	control(node: ELE) {
 		if (node["$control"]) {
 			this.uncontrol(node);
 		}
 		node["$control"] = this;
 		this.view = node;
 	}
-	uncontrol(node: Element) {
+	uncontrol(node: ELE) {
 		if (node["$control"]) {
 			throw new Error("Node is already controlled.");
 		}

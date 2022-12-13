@@ -1,5 +1,5 @@
 import { Display, DisplayConf, Box, BoxType, DisplayType, NewBox } from "./display.js";
-import { Actions, Signal } from "../base/controller.js";
+import { Signal } from "../base/controller.js";
 import { bundle, EMPTY } from "../base/util.js";
 
 import { IEditor } from "../control/editorControl.js";

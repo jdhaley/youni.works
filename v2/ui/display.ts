@@ -102,6 +102,7 @@ export class BoxType extends DisplayType {
 	header?: VType;
 	body?: VType;
 	footer?: VType;
+	
 	start(conf: DisplayConf, loader: Loader) {
 		super.start(conf, loader);
 		this.body = this.conf.body ? this.extendType("body", this.conf.body, loader) : null;

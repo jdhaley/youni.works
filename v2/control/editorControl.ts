@@ -44,7 +44,7 @@ export class IEditor extends Drawer implements Editor {
 	draw(value?: unknown): void {
 		if (value instanceof Element) {
 			if (value.id) this.view.id = value.id;
-			let level = value.getAttribute("aria-level");
+			let level = value.getAttribute("level");
 			if (level) this.view.setAttribute("aria-level", level);
 			this.viewElement(value as ELE);
 		} else {
@@ -55,4 +55,28 @@ export class IEditor extends Drawer implements Editor {
 	viewElement(content: ELE): void {
 	}
 }
+
 let NEXT_ID = 1;
+
+//Can't have a single viewElement now because draw() is overridden in Box to create headers, etc.
+//if we separate draw into structure creation and viewing it would be possible.
+function viewElement(editor: Editor, content: ELE): void {
+	if (!content) return;
+	if (content.id) editor.view.id = content.id;
+	let level = content.getAttribute("level");
+	if (level) editor.view.setAttribute("aria-level", level);
+
+	if (editor.type.model == "unit") {
+		editor.view.innerHTML = content.innerHTML;
+	} else for (let ele of content.children) {
+		let type = editor.type.types[ele.nodeName];
+		if (type) {
+			let view = type.create() as IEditor;
+			if (editor.type.model == "record") view.view.classList.add("field");
+			editor.content.append(view.view);
+			viewElement(view, ele);
+		} else {
+			if (!ele.id.endsWith("-marker")) console.warn("Unknown type: ", ele.nodeName);
+		}
+	}
+}
