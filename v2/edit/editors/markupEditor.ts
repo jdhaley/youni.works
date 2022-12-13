@@ -4,18 +4,22 @@ import { LevelCommand } from "../commands/levelCmd.js";
 import { MarkupReplace } from "../commands/markupReplaceCmd.js";
 import { getChildEditor, getEditor, senseChange } from "../editUtil.js";
 import { Editor } from "../../base/editor.js";
+import { listEd } from "./listEditor.js";
 
-export default function edit(this: Editor, commandName: string, range: RANGE, content: string): void {
-	if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
-	let cmd = COMMANDS[commandName];
-	if (!cmd) throw new Error("Unrecognized command");
+export const markupEd = {
+	exec(this: Editor, commandName: string, range: RANGE, content: string): void {
+		if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
+		let cmd = COMMANDS[commandName];
+		if (!cmd) throw new Error("Unrecognized command");
 
-	let r = range.cloneRange();
-	r = cmd.call(this, commandName, r, content);
-	r.collapse();
-	this.type.context.selectionRange = r;
+		let r = range.cloneRange();
+		r = cmd.call(this, commandName, r, content);
+		r.collapse();
+		this.type.context.selectionRange = r;
 
-	senseChange(this, commandName);
+		senseChange(this, commandName);
+	},
+	valueOf: listEd.valueOf
 }
 
 const COMMANDS = {

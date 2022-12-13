@@ -1,22 +1,43 @@
-import { ele, NODE, RANGE } from "../../base/dom.js";
+import { ELE, ele, NODE, RANGE } from "../../base/dom.js";
 
 import { getEditor, mark, narrowRange, senseChange, unmark } from "../editUtil.js";
 import { Replace } from "../commands/replaceCmd.js";
 import { Editor } from "../../base/editor.js";
+import { CHAR } from "../../base/util.js";
 
-export default function	edit(this: Editor, commandName: string, range: RANGE, content: string): void {
-	if (getEditor(range) != this) console.warn("Invalid edit range");
-	positionToText(range);
-	let cmd = COMMANDS[commandName];
-	if (!cmd) throw new Error("Unrecognized command");
+export const textEd = {
+	exec(this: Editor, commandName: string, range: RANGE, content: string): void {
+		if (getEditor(range) != this) console.warn("Invalid edit range");
+		positionToText(range);
+		let cmd = COMMANDS[commandName];
+		if (!cmd) throw new Error("Unrecognized command");
 
-	let r = range.cloneRange();
-	r = cmd.call(this, commandName, r, content);
-	r.collapse();
-	this.type.context.selectionRange = r;
-	senseChange(this, commandName);
+		let r = range.cloneRange();
+		r = cmd.call(this, commandName, r, content);
+		r.collapse();
+		this.type.context.selectionRange = r;
+		senseChange(this, commandName);
+	},
+	valueOf(this: Editor, range?: RANGE): unknown {
+		let model = "";
+		if (range && !range.intersectsNode(this.content)) return;
+		for (let node of (this.content as ELE).childNodes) {
+			if (node == range?.startContainer && node == range?.endContainer) {
+				model += node.textContent.substring(range.startOffset, range.endOffset);
+			} else if (node == range?.startContainer) {
+				model += node.textContent.substring(range.startOffset);
+			} else if (node == range?.endContainer) {
+				model += node.textContent.substring(0, range.endOffset);
+			} else {
+				model += node.textContent;
+			}
+		}
+		model = model.replace(CHAR.ZWSP, "");
+		model = model.replace(CHAR.NBSP, " ");
+		model = model.trim();
+		return model;			
+	}
 }
-
 const COMMANDS = {
 	"Cut": doit,
 	"Paste": doit,

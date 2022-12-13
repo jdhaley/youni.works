@@ -6,15 +6,17 @@ export interface EditorType extends ViewType {
 	model: string;
 }
 
-export interface Editor extends Viewer {
+export interface Editable {
+	valueOf(range?: RANGE): unknown;
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
+}
+
+export interface Editor extends Viewer, Editable {
 	type: EditorType;
 	id: string;
 	level: number;
 
-	valueOf(range?: RANGE): unknown;
-	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
-
-	/** @deprecated */
+	/* The following are all deprecated */
 	convert?(type: string): void;
 	content: ELE;
 	demote(): void;

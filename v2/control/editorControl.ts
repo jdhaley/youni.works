@@ -1,18 +1,15 @@
 import { ELE, RANGE } from "../base/dom.js";
-import { Editor, EditorType } from "../base/editor.js";
-import { Drawable, Drawer } from "./view.js";
+import { Editable, Editor } from "../base/editor.js";
+import { implement } from "../base/util.js";
+import { Box, Drawable } from "./view.js";
 
-export type editor = (this: Editor, commandName: string, range: RANGE, content?: unknown) => void;
-
-export class IEditor extends Drawer implements Editor {
-	constructor(viewer?: Drawable, editor?: editor) {
+export class EditBox extends Box implements Editor {
+	constructor(viewer?: Drawable, editor?: Editable) {
 		super(viewer);
-		if (editor) this["exec"] = editor;
+		if (editor) implement(this, editor);
 	}
-	declare type: EditorType;
-	
 	get content(): ELE {
-		return this.view;
+		return this.body ? this.body.view : this.view;
 	}
 	get id(): string {
 		return this.view.id;
@@ -29,6 +26,26 @@ export class IEditor extends Drawer implements Editor {
 		}
 	}
 
+	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
+		throw new Error("Method not implemented.");
+	}
+	valueOf(filter?: unknown): unknown {
+		return undefined;
+	}
+	draw(value?: unknown): void {
+		if (value instanceof Element) {
+			if (value.id) this.view.id = value.id;
+			let level = value.getAttribute("level");
+			if (level) this.view.setAttribute("aria-level", level);
+		} else {
+			this.view.id = "" + NEXT_ID++;
+		}
+		super.draw(value);
+	}
+
+	/*
+		The following are all deprecated
+	*/
 	demote() {
 		let level = this.level;
 		if (level < 6) this.level = ++level;
@@ -37,22 +54,6 @@ export class IEditor extends Drawer implements Editor {
 		--this.level;
 	}
 	convert?(type: string): void {
-	}
-	exec(commandName: string, extent: RANGE, replacement?: unknown): void {
-		throw new Error("Method not implemented.");
-	}
-	draw(value?: unknown): void {
-		if (value instanceof Element) {
-			if (value.id) this.view.id = value.id;
-			let level = value.getAttribute("level");
-			if (level) this.view.setAttribute("aria-level", level);
-			this.viewElement(value as ELE);
-		} else {
-			this.view.id = "" + NEXT_ID++;
-			this.viewValue(value);
-		}
-	}
-	viewElement(content: ELE): void {
 	}
 }
 
@@ -71,7 +72,7 @@ function viewElement(editor: Editor, content: ELE): void {
 	} else for (let ele of content.children) {
 		let type = editor.type.types[ele.nodeName];
 		if (type) {
-			let view = type.create() as IEditor;
+			let view = type.create() as EditBox;
 			if (editor.type.model == "record") view.view.classList.add("field");
 			editor.content.append(view.view);
 			viewElement(view, ele);

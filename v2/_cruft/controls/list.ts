@@ -1,17 +1,3 @@
-import { Actions } from "../../base/controller.js";
-import { Box } from "../../ui/display.js";
-import { list } from "../../control/viewers/listViewer.js";
-import { editor } from "../../control/editorControl.js";
-
-export class ListBox extends Box {
-	constructor(actions: Actions, editor: editor) {
-		super(list, editor)
-	}
-	protected createFooter(model?: unknown) {
-		let footer = this.view.ownerDocument.createElement("footer") as Element;
-		this.view.append(footer);
-	}
-}
 
 	// viewValue(model: Sequence<unknown>): void {
 	// 	if (model && model[Symbol.iterator]) for (let item of model) {

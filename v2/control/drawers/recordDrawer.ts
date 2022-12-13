@@ -1,16 +1,15 @@
 import { ContentView } from "../../base/viewer.js";
-import { ELE, NODE, RANGE, ele } from "../../base/dom.js";
-import { Editor } from "../../base/editor.js";
+import { ELE } from "../../base/dom.js";
 
-export const record = {
+export const recordDrawer = {
 	memberType: "field",
 
-	viewValue(this: ContentView, model: unknown): void {
+	drawValue(this: ContentView, model: unknown): void {
 		for (let name in this.type.types) {
 			viewMember(this, name, model ? model[name] : undefined);
 		}
 	},
-	viewElement(this: ContentView, content: ELE): void {
+	drawElement(this: ContentView, content: ELE): void {
 		/*
 			viewElement is called via a replace command. Because the range may only include a
 			subset of the fields, we no longer create the entire record - only those in the command.
@@ -26,13 +25,6 @@ export const record = {
 		// 	viewMember(this, name, idx[name]);
 		// }
 	},
-	valueOf(this: ContentView, range?: RANGE): unknown {
-		let model = recordContent(null, this.content as ELE, range);
-		if (model) {
-			model["type$"] = this.type.name;
-		}
-		return model;
-	}
 }
 
 function viewMember(editor: ContentView, name: string, value: any): ContentView {
@@ -43,22 +35,4 @@ function viewMember(editor: ContentView, name: string, value: any): ContentView 
 	member.draw(value);
 	//TODO contentedit refactoring - remove cast once refactoring complete
 	return member as ContentView;
-}
-
-function recordContent(model: Object, view: NODE, range: RANGE): Object {
-	if (range && !range.intersectsNode(view)) return model;
-	
-	for (let child of view.childNodes) {
-		if (ele(child)?.classList.contains("field")) {
-			let viewer = child["$control"] as Editor;
-			let value = viewer.valueOf(range);
-			if (value) {
-				if (!model) model = Object.create(null);
-				model[viewer.type.name] = value;
-			}
-		} else {
-			model = recordContent(model, child, range);
-		}
-	}
-	return model;
 }

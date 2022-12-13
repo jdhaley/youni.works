@@ -1,16 +1,21 @@
 import { bundle } from "../../base/util.js";
 
-import { Caption, DisplayType, BoxType, Box } from "../display.js";
+import { View, Caption, VType } from "../../control/view.js";
+import { Display, DisplayType } from "../display.js";
 
-import edit from "./editorConf.js";
 import actions from "./actions.js";
 import shortcuts from "./shortcuts.js";
 
-import { text } from "../../control/viewers/textViewer.js";
-import { record } from "../../control/viewers/recordViewer.js";
-import { list } from "../../control/viewers/listViewer.js";
-import { line } from "../../control/viewers/lineViewer.js";
-import { View, VType } from "../../control/view.js";
+import { textDrawer } from "../../control/drawers/textDrawer.js";
+import { recordDrawer } from "../../control/drawers/recordDrawer.js";
+import { listDrawer } from "../../control/drawers/listDrawer.js";
+import { lineDrawer } from "../../control/drawers/lineDrawer.js";
+
+import { textEd } from "../../edit/editors/textEditor.js";
+import { recordEd } from "../../edit/editors/recordEditor.js";
+import { listEd } from "../../edit/editors/listEditor.js";
+import { markupEd } from "../../edit/editors/markupEditor.js";
+import { lineEd } from "../../edit/editors/lineEditor.js";
 
 const conf: bundle<any> = {
 	body: {
@@ -18,60 +23,60 @@ const conf: bundle<any> = {
 		prototype: new View()
 	},
 	caption: {
-		class: DisplayType,
+		class: VType,
 		prototype: new Caption(),
 		tagName: "header",
 	},
 	text: {
-		class: BoxType,
+		class: DisplayType,
 		header: "caption",
 		body: "body",
 		model: "unit",
 		viewType: "text",
-		prototype: new Box(text, edit.text),
+		prototype: new Display(textDrawer, textEd),
 		actions: actions.text,
 		tagName: "ui-text",
 		shortcuts: shortcuts
 	},
 	record: {
-		class: BoxType,
+		class: DisplayType,
 		header: "caption",
 		body: "body",
 		model: "record",
 		viewType: "form",
-		prototype: new Box(record, edit.record),
+		prototype: new Display(recordDrawer, recordEd),
 		actions: actions.record, 
 		tagName: "ui-record",
 		shortcuts: shortcuts
 	},
 	list: {
-		class: BoxType,
+		class: DisplayType,
 		header: "caption",
 		body: "body",
 		model: "list",
 		viewType: "list",
-		prototype: new Box(list, edit.list),
+		prototype: new Display(listDrawer, listEd),
 		actions: actions.list,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	markup: {
-		class: BoxType,
+		class: DisplayType,
 		header: "caption",
 		body: "body",
 		model: "list",
 		viewType: "markup",
-		prototype: new Box(list, edit.markup),
+		prototype: new Display(listDrawer, markupEd),
 		actions: actions.markup,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	line: {
-		class: BoxType,
+		class: DisplayType,
 		body: null,
 		model: "unit",
 		viewType: "line",
-		prototype: new Box(line, edit.text),
+		prototype: new Display(lineDrawer, lineEd),
 		actions: actions.line,
 		tagName: "p",
 		shortcuts: shortcuts

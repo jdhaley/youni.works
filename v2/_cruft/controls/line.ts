@@ -1,13 +1,5 @@
-import { Actions } from "../../base/controller.js";
-import { Box } from "../../ui/display.js";
-import { editor } from "../../control/editorControl.js";
 
-import { line } from "../../control/viewers/lineViewer.js";
-
-export class LineBox extends Box {
-	constructor(actions: Actions, editor: editor) {
-		super(line, editor)
-	}
+//export class LineBox extends Box {
 	// demote() {
 	// 	let level = this.level;
 	// 	if (this.type.name == "heading") {
@@ -70,4 +62,4 @@ export class LineBox extends Box {
 	// 	if (level) item.level = level;
 	// 	return item;
 	// }
-}
+//}

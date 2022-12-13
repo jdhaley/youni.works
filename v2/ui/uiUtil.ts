@@ -1,4 +1,3 @@
-import { Box } from "./display.js";
 import { ELE, NODE, RANGE } from "../base/dom.js";
 import { ContentView, getView, Viewer } from "../base/viewer.js";
 
@@ -11,7 +10,7 @@ export function getHeader(view: Viewer, node: NODE) {
 	}
 }
 
-export function getFooter(view: Box, node: NODE) {
+export function getFooter(view: Viewer, node: NODE) {
 	while (node && node != view.view) {
 		if (node.nodeName == "FOOTER" && node.parentNode == view.view) return node as ELE;
 		node = node.parentNode;

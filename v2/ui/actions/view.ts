@@ -1,22 +1,22 @@
 import { extend } from "../../base/util.js";
 
+import { Display } from "../display.js";
 import { setClipboard } from "../clipboard.js";
 import { Change } from "../article.js";
-import { Box } from "../display.js";
 import { UserEvent } from "../frame.js";
 import { getContentView, navigate } from "../uiUtil.js";
 
 export default extend(null, {
-	keydown(this: Box, event: UserEvent) {
+	keydown(this: Display, event: UserEvent) {
 		event.shortcut = getShortcut(event);
-		event.subject = this.getSubject(event.shortcut);
+		event.subject = getSubject(this, event.shortcut);
        // console.log(event.shortcut, event.subject);
 	},
-	save(this: Box, event: UserEvent) {
+	save(this: Display, event: UserEvent) {
 		this.type.context.receive(event);
 		event.subject = "";
 	},
-	copy(this: Box, event: UserEvent) {
+	copy(this: Display, event: UserEvent) {
 		event.subject = "";
 		setClipboard(event.range, event.clipboardData);
 	},
@@ -36,17 +36,17 @@ export default extend(null, {
 			prev.scrollIntoView({block: "center"});
 		}
 	},
-	undo(this: Box, event: UserEvent) {
+	undo(this: Display, event: UserEvent) {
 		if (this.view == this.type.context.view) {
 			this.type.context.receive(event);
 		}
 	},
-	redo(this: Box, event: UserEvent) {
+	redo(this: Display, event: UserEvent) {
 		if (this.view == this.type.context.view) {
 			this.type.context.receive(event);
 		}
 	},
-	selectionchange(this: Box, event: UserEvent) {
+	selectionchange(this: Display, event: UserEvent) {
 		event.subject = "";
 		let eles = [];
 		for (let ele of this.view.ownerDocument.getElementsByClassName("active")) {
@@ -61,7 +61,7 @@ export default extend(null, {
 			}
 		}
 	},
-	change(this: Box, signal: Change) {
+	change(this: Display, signal: Change) {
 		if (signal.direction == "up") {
 			//console.log(signal.direction, this.type.name, signal.commandName);
 			if (this.view == this.type.context.view) {
@@ -92,6 +92,13 @@ export default extend(null, {
 });
 
 let UNDONE = false;
+
+function getSubject(display: Display, shortcut: string) {
+	let shortcuts = display.type.conf["shortcuts"];
+	let subject: string;
+	if (shortcuts) subject = shortcuts[shortcut];
+	return subject || "keydown"
+}
 
 function  getShortcut(event: UserEvent) {
     let mod = getModifiers(event);
