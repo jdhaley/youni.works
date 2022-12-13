@@ -69,7 +69,7 @@ export class ListReplace extends RangeReplace {
 function createContent(editor: Editor, value: unknown) {
 	let view = editor.view.parentNode as ELE;
 	editor = editor.type.create() as Editor;
-	view.append(editor);
+	view.append(editor.view);
 	editor.draw(value);
 	editor.view.remove();
 	return editor.content.childNodes;
