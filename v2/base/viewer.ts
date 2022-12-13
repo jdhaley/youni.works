@@ -4,27 +4,9 @@ import { Type, TypeContext} from "./type.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
-// export interface Content extends Instance, Iterable<Content> {
-// 	textContent: string;
-// 	markupContent: string; //May be HTML, XML, or a simplification thereof.
-// }
-
 export interface Viewer extends Controller<ELE> {
 	type: ViewType;
 	draw(data?: unknown): void;
-//	valueOf(range?: RANGE, contentType?: string): unknown;
-}
-//TODO remove
-export interface ContentView extends Viewer {
-	content: ELE;
-}
-
-export interface Article extends Controller<ELE>, TypeContext {
-	commands: CommandBuffer<RANGE>;
-	selectionRange: RANGE;
-	getControl(id: string): Viewer;
-	extentFrom(startPath: string, endPath: string): RANGE;
-	senseChange(viewer: Viewer, commandName: string): void;
 }
 
 export interface ViewType extends Type {
@@ -37,16 +19,28 @@ export interface ViewType extends Type {
 	control(node: ELE): Viewer;
 }
 
-export interface Part {
-	_part: true;
-	type$: string;
-	content?: unknown;
-	level?: number;
+export interface Article extends Controller<ELE> {
+	commands: CommandBuffer<RANGE>;
+	selectionRange: RANGE;
+	getControl(id: string): Viewer;
+	extentFrom(startPath: string, endPath: string): RANGE;
+	senseChange(viewer: Viewer, commandName: string): void;
 }
 
-export interface PartTree extends Part {
-	items?: Part[];
-	sections?: Part[];
+export class Part {
+	constructor(type: Type | string, content: unknown, level?: number) {
+		this.type$ = typeof type == "string" ? type : type.name;
+		this.content = content;
+		if (level) this.level = level;
+	}
+	type$: string;
+	content: unknown;
+	declare level?: number;
+}
+
+export class PartTree extends Part {
+	declare items?: Part[];
+	declare sections?: Part[];
 }
 
 export interface VIEW_ELE extends ELE {
@@ -82,3 +76,14 @@ export function bindViewEle(node: VIEW_ELE) {
 		if (ele(child)) bindViewEle(child as ELE);
 	}
 }
+
+// export interface Content extends Instance, Iterable<Content> {
+// 	textContent: string;
+// 	markupContent: string; //May be HTML, XML, or a simplification thereof.
+// }
+
+//TODO remove
+export interface ContentView extends Viewer {
+	content: ELE;
+}
+

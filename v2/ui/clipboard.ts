@@ -26,7 +26,7 @@ export function setClipboard(range: RANGE, clipboard: DataTransfer) {
 		clipboard.setData("text/plain", model);
 		return;
 	}
-	if (model[0]?._part === true) {
+	if (model[0] instanceof Part) {
 		let item = section(model as Part[]);
 		let article = toHtml(item);
 		clipboard.setData("text/html", article.outerHTML);

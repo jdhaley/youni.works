@@ -1,4 +1,4 @@
-import { Part, PartTree } from "../base/viewer";
+import { Part, PartTree } from "../base/viewer.js";
 
 export function section(items: Part[]): PartTree {
 	let sections = [];
@@ -19,12 +19,7 @@ export function section(items: Part[]): PartTree {
 			sections.at(-1).items.push(current);
 		}
 	}
-	let root: PartTree = {
-		_part: true as true,
-		type$: "article",
-		content: "",
-		sections: []
-	}
+	let root: PartTree = new PartTree("article", "");
 	groupSections(root, sections, 0);
 	console.log("section: ", root);
 	return root;
@@ -37,6 +32,7 @@ function groupSections(section: PartTree, sections: PartTree[], start: number): 
 	while (start < sections.length) {
 		let sub = sections[start];
 		if (sub.level > (section.level || 0)) {
+			if (!section.sections) section.sections = [];
 			section.sections.push(sub);
 			start = groupSections(sub, sections, ++start);
 		} else {
@@ -78,16 +74,13 @@ function groupRows(item: PartTree, items: Part[], start: number): number {
 	for (let name in header.content as object) {
 		columns += name + " ";
 	}
-	let table = {
-		_part: true as true,
-		type$: "table",
-		columns: columns.substring(0, columns.length - 1),
-		content: []
-	}
+	let content = [];
+	let table = new Part("table", content);
+	table["columns"] = columns.substring(0, columns.length - 1);
 	item.items.push(table);
 	while (start < items.length) {
 		if (items[start].type$ != "row") return start;
-		table.content.push(items[start++]);
+		content.push(items[start++]);
 	}
 	return start;
 }

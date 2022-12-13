@@ -26,12 +26,7 @@ const methods: bundle<transform> = {
 		return methods.transform(source, target, (level || 0) + 1);
 	},
 	section(source: Node, target: Part[]) {
-		let item = {
-			_part: true as true,
-			type$: "heading",
-			level: Number.parseInt(source.nodeName.substring(1)),
-			content: source.textContent
-		}
+		let item = new Part("heading", source.textContent, Number.parseInt(source.nodeName.substring(1)));
 		target.push(item)
 	},
 	line(source: Node, target: Part[], level: number) {
@@ -58,12 +53,7 @@ const methods: bundle<transform> = {
 			// }
 		//DONE OFFICE
 
-		let item = {
-			_part: true as true,
-			type$: "para",
-			content: "",
-			level: level,
-		}
+		let item = new Part("para", "", level);
 		target.push(item);
 		methods.transform(source, target, level);
 	},

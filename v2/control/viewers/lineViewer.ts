@@ -59,11 +59,7 @@ export const line = {
 	valueOf(range?: RANGE): Part {
 		if (range && !range.intersectsNode(this.content)) return;
 		let content = text.valueOf.call(this, range);
-		let item: Part = {
-			_part: true,
-			type$: this.view.getAttribute("data-item"),
-			content: content,
-		}
+		let item = new Part(this.type.name, content);
 		let level = Number.parseInt(this.view.getAttribute("aria-level"));
 		if (level) item.level = level;
 		return item;
