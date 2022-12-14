@@ -3,7 +3,7 @@ import { Loader } from "../base/type.js";
 import { implement } from "../base/util.js";
 import { getView, Viewer } from "../base/viewer.js";
 import { ElementShape } from "./eleControl.js";
-import { ViewConf, VType } from "./view.js";
+import { ViewConf, VType } from "./viewType.js";
 
 export interface Drawable {
 	drawValue(model: unknown): void;

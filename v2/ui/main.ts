@@ -1,4 +1,4 @@
-import { Display, DisplayConf } from "./display.js";
+import { DisplayConf } from "./display.js";
 import { Signal } from "../base/controller.js";
 import { bundle } from "../base/util.js";
 
@@ -6,10 +6,10 @@ import { Frame, UserEvent } from "./frame.js";
 
 import controller from "./actions/frame.js";
 import baseTypes from "./conf/typeConf.js";
-import actions from "./conf/actions.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";
+import { Box } from "../control/box.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -57,7 +57,7 @@ const shortcuts = {
 // 	},
 // 	display: {
 // 		class: DisplayType as any,
-// 		prototype: new Display(),
+// 		prototype: new Box(),
 // 		actions: EMPTY.object,
 // 		tagName: "div",
 // 		model: "",
@@ -95,8 +95,8 @@ let types: bundle<DisplayConf> = {
 		type: "display",
 		kind: "label",
 		actions: {
-			view(this: Display, signal: Signal) {
-				this.view.textContent = (this.partOf as Display).type.conf.title;
+			view(this: Box, signal: Signal) {
+				this.view.textContent = (this.partOf as Box).type.conf.title;
 			}
 		},
 		styles: {
@@ -207,12 +207,12 @@ let types: bundle<DisplayConf> = {
 			}				
 		},
 		actions: {
-			view: function (this: Display, event: UserEvent) {
+			view: function (this: Box, event: UserEvent) {
 				this.body.view.textContent = "Dialog"; //this.partOf.type.conf.title;
 			},
-			click: function (this: Display, event: UserEvent) {
+			click: function (this: Box, event: UserEvent) {
 				if (event.target.getAttribute("data-cmd") == "edit") {
-					(this.partOf as Display).body.view.textContent = "click edit";
+					(this.partOf as Box).body.view.textContent = "click edit";
 				}
 			}
 		}
@@ -238,7 +238,7 @@ let types: bundle<DisplayConf> = {
 let frame = new Frame(window, controller);
 let article = new IArticle(frame, {
 	baseTypes: baseTypes,
-	viewTypes: types,
+	articleTypes: types,
 	sources: "/journal",
 });
 

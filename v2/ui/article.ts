@@ -17,7 +17,7 @@ export class IArticle extends BaseReceiver implements TypeContext, Controller<EL
 		this.commands = new CommandBuffer();
 		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
 		this.actions = conf.actions;
-		start(this, conf.baseTypes, conf.viewTypes);
+		start(this, conf.baseTypes, conf.articleTypes);
 	}
 	readonly owner: Frame
 	readonly service: RemoteFileService;

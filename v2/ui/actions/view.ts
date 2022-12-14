@@ -1,22 +1,22 @@
 import { extend } from "../../base/util.js";
 
-import { Display } from "../display.js";
 import { setClipboard } from "../clipboard.js";
 import { Change } from "../article.js";
 import { UserEvent } from "../frame.js";
 import { getContentView, navigate } from "../uiUtil.js";
+import { Box } from "../../control/box.js";
 
 export default extend(null, {
-	keydown(this: Display, event: UserEvent) {
+	keydown(this: Box, event: UserEvent) {
 		event.shortcut = getShortcut(event);
 		event.subject = getSubject(this, event.shortcut);
        // console.log(event.shortcut, event.subject);
 	},
-	save(this: Display, event: UserEvent) {
+	save(this: Box, event: UserEvent) {
 		this.type.context.receive(event);
 		event.subject = "";
 	},
-	copy(this: Display, event: UserEvent) {
+	copy(this: Box, event: UserEvent) {
 		event.subject = "";
 		setClipboard(event.range, event.clipboardData);
 	},
@@ -36,17 +36,17 @@ export default extend(null, {
 			prev.scrollIntoView({block: "center"});
 		}
 	},
-	undo(this: Display, event: UserEvent) {
+	undo(this: Box, event: UserEvent) {
 		if (this.view == this.type.context.view) {
 			this.type.context.receive(event);
 		}
 	},
-	redo(this: Display, event: UserEvent) {
+	redo(this: Box, event: UserEvent) {
 		if (this.view == this.type.context.view) {
 			this.type.context.receive(event);
 		}
 	},
-	selectionchange(this: Display, event: UserEvent) {
+	selectionchange(this: Box, event: UserEvent) {
 		event.subject = "";
 		let eles = [];
 		for (let ele of this.view.ownerDocument.getElementsByClassName("active")) {
@@ -61,7 +61,7 @@ export default extend(null, {
 			}
 		}
 	},
-	change(this: Display, signal: Change) {
+	change(this: Box, signal: Change) {
 		if (signal.direction == "up") {
 			//console.log(signal.direction, this.type.name, signal.commandName);
 			if (this.view == this.type.context.view) {
@@ -93,7 +93,7 @@ export default extend(null, {
 
 let UNDONE = false;
 
-function getSubject(display: Display, shortcut: string) {
+function getSubject(display: Box, shortcut: string) {
 	let shortcuts = display.type.conf["shortcuts"];
 	let subject: string;
 	if (shortcuts) subject = shortcuts[shortcut];

@@ -1,6 +1,8 @@
 import { bundle } from "../../base/util.js";
 
-import { Display, Caption, DisplayType } from "../display.js";
+import { Box } from "../../control/box.js";
+import { EditBox } from "../../control/editBox.js";
+import { Caption, DisplayType } from "../display.js";
 
 import actions from "./actions.js";
 import shortcuts from "./shortcuts.js";
@@ -15,12 +17,11 @@ import { recordEd } from "../../edit/editors/recordEditor.js";
 import { listEd } from "../../edit/editors/listEditor.js";
 import { markupEd } from "../../edit/editors/markupEditor.js";
 import { lineEd } from "../../edit/editors/lineEditor.js";
-import { EditBox } from "../../control/editorControl.js";
 
 const conf: bundle<any> = {
 	display: {
 		class: DisplayType,
-		prototype: new Display(),
+		prototype: new Box(),
 		actions: actions.view,
 		shortcuts: shortcuts
 	},
@@ -32,62 +33,56 @@ const conf: bundle<any> = {
 	},
 	panel: {
 		class: DisplayType,
-		prototype: new Display(),
+		prototype: new Box(),
 		type: "display",
 		header: "caption",
 		body: "display"
 	},
-
 	text: {
 		class: DisplayType,
+		prototype: new EditBox(textDrawer, textEd),
+		model: "unit",
 		header: "caption",
 		body: "display",
-		model: "unit",
-		viewType: "text",
-		prototype: new EditBox(textDrawer, textEd),
 		actions: actions.text,
 		tagName: "ui-text",
 		shortcuts: shortcuts
 	},
 	record: {
 		class: DisplayType,
+		prototype: new EditBox(recordDrawer, recordEd),
+		model: "record",
 		header: "caption",
 		body: "display",
-		model: "record",
-		viewType: "form",
-		prototype: new EditBox(recordDrawer, recordEd),
 		actions: actions.record, 
 		tagName: "ui-record",
 		shortcuts: shortcuts
 	},
 	list: {
 		class: DisplayType,
+		prototype: new EditBox(listDrawer, listEd),
+		model: "list",
 		header: "caption",
 		body: "display",
-		model: "list",
-		viewType: "list",
-		prototype: new EditBox(listDrawer, listEd),
 		actions: actions.list,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	markup: {
 		class: DisplayType,
+		prototype: new EditBox(listDrawer, markupEd),
+		model: "list",
 		header: "caption",
 		body: "display",
-		model: "list",
-		viewType: "markup",
-		prototype: new EditBox(listDrawer, markupEd),
 		actions: actions.markup,
 		tagName: "ui-list",
 		shortcuts: shortcuts
 	},
 	line: {
 		class: DisplayType,
-		body: null,
-		model: "unit",
-		viewType: "line",
 		prototype: new EditBox(lineDrawer, lineEd),
+		model: "unit",
+		body: null,
 		actions: actions.line,
 		tagName: "p",
 		shortcuts: shortcuts
@@ -95,7 +90,6 @@ const conf: bundle<any> = {
 	// row: {
 	// 	class: DisplayType,
 	// 	model: "record",
-	// 	viewType: "row",
 	// 	prototype: new RowBox(actions.row, edit.record),
 	// 	container: false,
 	// 	tagName: "ui-row",

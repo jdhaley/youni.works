@@ -21,7 +21,7 @@ export interface ViewConf {
 	class?: VType;
 	/** Should only be specified for a base type */
 	prototype?: Viewer;
-	/** Should only be specified for a base type */
+	/** Should only be specified for an editor type */
 	model?: "record" | "list" | "unit";
 }
 

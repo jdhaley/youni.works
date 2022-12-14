@@ -5,10 +5,7 @@ import { Loader } from "../base/type.js";
 import { extendStyles } from "./style.js";
 import { Box, BoxConf, BoxType } from "../control/box.js";
 
-export class Display extends Box {
-}
-
-export class Caption extends Display {
+export class Caption extends Box {
 	draw() {
 		let partOf = this.partOf as Box;
 		if (partOf) {
@@ -35,5 +32,4 @@ export interface DisplayConf extends BoxConf {
 	shortcuts?: bundle<string>;
 	kind?: string;
 	styles?: bundle<any>;
-	// viewType?: string;
 }
