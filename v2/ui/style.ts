@@ -27,7 +27,6 @@ export function extendStyles(type: Type, styles: object, ext: object): object {
 }
 
 function createRule(selector: string, object: object | string) {
-	console.log("style: " + selector);
 	let out = selector + " {\n";
 	if (typeof object == "string") {
 		out += object;
@@ -35,9 +34,7 @@ function createRule(selector: string, object: object | string) {
 		out += "\t" + name.replace(/_/g, "-") + ": " + object[name] + ";\n"
 	}
 	out += "}";
-	//console.log(out);
 	let index = STYLES.insertRule(out);
-	//console.log(selector, STYLES.cssRules[index]);
 	return STYLES.cssRules[index];
 }
 

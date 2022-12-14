@@ -12,7 +12,6 @@ export function getClipboard(clipboard: DataTransfer) {
 	if (data) {
 		let div = document.createElement("div");
 		div.innerHTML = data;
-		console.log("HTML: ", div);
 		return fromHtml(div) as any;
 	}
 	return clipboard.getData("text/plain");

@@ -13,7 +13,6 @@ export class LevelCommand extends EditCommand {
 		this.startId = getChildEditor(editor, range.startContainer)?.id;
 		this.endId = getChildEditor(editor, range.endContainer)?.id;
 		this.do(this.name);
-		console.log(this);
 		return range;
 	}
 	protected do(way: "Promote" | "Demote") {

@@ -28,7 +28,6 @@ function createAction(service: any, conf: bundle<any>, path: string, endpoint: a
 	switch (typeof endpoint) {
 		case "string":
 			action = conf.engine.static(endpoint);
-			console.log(path + ":", JSON.stringify(endpoint));
 			break;
 		// case "object":
 		// 	action = conf.engine.Router();
@@ -41,7 +40,6 @@ function createAction(service: any, conf: bundle<any>, path: string, endpoint: a
 				res.context = conf;
 				return endpoint(res);
 			}
-			console.log(path, endpoint.name);
 			break;
 	}
 	service.use(path, action);

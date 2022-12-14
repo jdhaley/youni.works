@@ -1,12 +1,12 @@
 import { ELE, RANGE } from "../../base/dom.js";
 import { extend } from "../../base/util.js";
-import { Box } from "../../control/view.js";
+import { Display } from "../display.js";
 
 import { UserEvent } from "../frame.js";
 import editable from "./edit/editor.js";
 
 export default extend(editable, {
-	dblclick(this: Box, event: UserEvent) {
+	dblclick(this: Display, event: UserEvent) {
 		if (event.target == this.header.view) {
 			event.subject = "";
 			this.type.context.selectionRange.collapse();

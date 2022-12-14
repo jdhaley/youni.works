@@ -22,7 +22,6 @@ export class Replace extends EditCommand {
 		this.execBefore(range);
 		this.execReplace(range, content);
 		range = this.execAfter(range);
-		console.log(this);
 		return range;
 	}
 	undo() {

@@ -1,6 +1,6 @@
 import { bundle } from "../../base/util.js";
 
-import { View, Caption, VType } from "../../control/view.js";
+import { View, Caption } from "../../control/view.js";
 import { Display, DisplayType } from "../display.js";
 
 import actions from "./actions.js";
@@ -19,11 +19,11 @@ import { lineEd } from "../../edit/editors/lineEditor.js";
 
 const conf: bundle<any> = {
 	body: {
-		class: VType,
+		class: DisplayType,
 		prototype: new View()
 	},
 	caption: {
-		class: VType,
+		class: DisplayType,
 		prototype: new Caption(),
 		tagName: "header",
 	},

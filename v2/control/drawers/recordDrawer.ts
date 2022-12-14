@@ -16,7 +16,6 @@ export const recordDrawer = {
 		*/
 
 	//	let idx = {};
-		console.log("record elements...")
 		for (let member of content.children) {
 			viewMember(this, member.nodeName, member);
 	//		idx[member.nodeName] = member;

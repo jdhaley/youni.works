@@ -21,7 +21,6 @@ export function section(items: Part[]): PartTree {
 	}
 	let root: PartTree = new PartTree("article", "");
 	groupSections(root, sections, 0);
-	console.log("section: ", root);
 	return root;
 }
 

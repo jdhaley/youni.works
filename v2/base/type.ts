@@ -68,9 +68,6 @@ export function start(owner: TypeContext, baseTypes: bundle<any>, source: bundle
 	for (let name in base) {
 		base[name].start(baseTypes[name], loader);
 	}
-//	return base;
-
-//	let base = loadBaseTypes(owner, baseTypes, loader);
 	loader = new Loader(base as bundle<BaseType>, source);
 	owner.types = Object.create(null);
 	for (let name in source) {

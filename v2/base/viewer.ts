@@ -77,13 +77,31 @@ export function bindViewEle(node: VIEW_ELE) {
 	}
 }
 
+//TODO remove
+export interface ContentView extends Viewer {
+	content: ELE;
+}
+
 // export interface Content extends Instance, Iterable<Content> {
 // 	textContent: string;
 // 	markupContent: string; //May be HTML, XML, or a simplification thereof.
 // }
 
-//TODO remove
-export interface ContentView extends Viewer {
-	content: ELE;
-}
+// export class ContentView extends View implements Content {
+// 	get viewContent(): Sequence<NODE> {
+// 		return this.view.childNodes;
+// 	}
+// 	get textContent() {
+// 		return this.view.textContent;
+// 	}
+// 	set textContent(text: string) {
+// 		this.view.textContent = text;
+// 	}
+// 	get markupContent() {
+// 		return this.view.innerHTML;
+// 	}
+// 	set markupContent(markup: string) {
+// 		this.view.innerHTML = markup;
+// 	}
+// }
 
