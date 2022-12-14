@@ -1,6 +1,6 @@
-import { Display, DisplayConf, DisplayType } from "./display.js";
+import { Display, DisplayConf } from "./display.js";
 import { Signal } from "../base/controller.js";
-import { bundle, EMPTY } from "../base/util.js";
+import { bundle } from "../base/util.js";
 
 import { Frame, UserEvent } from "./frame.js";
 
@@ -10,7 +10,6 @@ import actions from "./conf/actions.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";
-import { BaseConf } from "../control/view.js";
 
 const shortcuts = {
 	"Control+s": "save",
@@ -213,7 +212,7 @@ let types: bundle<DisplayConf> = {
 			},
 			click: function (this: Display, event: UserEvent) {
 				if (event.target.getAttribute("data-cmd") == "edit") {
-					(this.partOf as Display).content.textContent = "click edit";
+					(this.partOf as Display).body.view.textContent = "click edit";
 				}
 			}
 		}

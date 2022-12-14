@@ -54,7 +54,7 @@ export default extend(null, {
 		}
 	 	for (let ele of eles) ele.classList.remove("active");
 		let range = event.range;
-		for (let node of this.content.childNodes) {
+		for (let node of this.body.view.childNodes) {
 			let editor = getContentView(node);
 			if (range.intersectsNode(editor.content)) {
 				editor.content.classList.add("active");

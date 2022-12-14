@@ -1,7 +1,6 @@
 import { bundle } from "../../base/util.js";
 
-import { View, Caption } from "../../control/view.js";
-import { Display, DisplayType } from "../display.js";
+import { Display, Caption, DisplayType } from "../display.js";
 
 import actions from "./actions.js";
 import shortcuts from "./shortcuts.js";
@@ -16,23 +15,20 @@ import { recordEd } from "../../edit/editors/recordEditor.js";
 import { listEd } from "../../edit/editors/listEditor.js";
 import { markupEd } from "../../edit/editors/markupEditor.js";
 import { lineEd } from "../../edit/editors/lineEditor.js";
+import { EditBox } from "../../control/editorControl.js";
 
 const conf: bundle<any> = {
-	body: {
-		class: DisplayType,
-		prototype: new View()
-	},
-	caption: {
-		class: DisplayType,
-		prototype: new Caption(),
-		tagName: "header",
-	},
 	display: {
 		class: DisplayType,
 		prototype: new Display(),
-		body: "",
 		actions: actions.view,
 		shortcuts: shortcuts
+	},
+	caption: {
+		class: DisplayType,
+		type: "display",
+		prototype: new Caption(),
+		tagName: "header",
 	},
 	panel: {
 		class: DisplayType,
@@ -41,13 +37,14 @@ const conf: bundle<any> = {
 		header: "caption",
 		body: "display"
 	},
+
 	text: {
 		class: DisplayType,
 		header: "caption",
-		body: "body",
+		body: "display",
 		model: "unit",
 		viewType: "text",
-		prototype: new Display(textDrawer, textEd),
+		prototype: new EditBox(textDrawer, textEd),
 		actions: actions.text,
 		tagName: "ui-text",
 		shortcuts: shortcuts
@@ -55,10 +52,10 @@ const conf: bundle<any> = {
 	record: {
 		class: DisplayType,
 		header: "caption",
-		body: "body",
+		body: "display",
 		model: "record",
 		viewType: "form",
-		prototype: new Display(recordDrawer, recordEd),
+		prototype: new EditBox(recordDrawer, recordEd),
 		actions: actions.record, 
 		tagName: "ui-record",
 		shortcuts: shortcuts
@@ -66,10 +63,10 @@ const conf: bundle<any> = {
 	list: {
 		class: DisplayType,
 		header: "caption",
-		body: "body",
+		body: "display",
 		model: "list",
 		viewType: "list",
-		prototype: new Display(listDrawer, listEd),
+		prototype: new EditBox(listDrawer, listEd),
 		actions: actions.list,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -77,10 +74,10 @@ const conf: bundle<any> = {
 	markup: {
 		class: DisplayType,
 		header: "caption",
-		body: "body",
+		body: "display",
 		model: "list",
 		viewType: "markup",
-		prototype: new Display(listDrawer, markupEd),
+		prototype: new EditBox(listDrawer, markupEd),
 		actions: actions.markup,
 		tagName: "ui-list",
 		shortcuts: shortcuts
@@ -90,7 +87,7 @@ const conf: bundle<any> = {
 		body: null,
 		model: "unit",
 		viewType: "line",
-		prototype: new Display(lineDrawer, lineEd),
+		prototype: new EditBox(lineDrawer, lineEd),
 		actions: actions.line,
 		tagName: "p",
 		shortcuts: shortcuts

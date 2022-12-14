@@ -1,11 +1,6 @@
 import { Article, Viewer, ViewType } from "./viewer.js";
 import { ELE, RANGE } from "./dom.js";
 
-export interface EditorType extends ViewType {
-	context: Article;
-	model: string;
-}
-
 export interface Editable {
 	valueOf(range?: RANGE): unknown;
 	exec(commandName: string, extent: RANGE, replacement?: unknown): void;
@@ -21,6 +16,11 @@ export interface Editor extends Viewer, Editable {
 	content: ELE;
 	demote(): void;
 	promote(): void;
+}
+
+export interface EditorType extends ViewType {
+	context: Article;
+	model: string;
 }
 
 export interface Edits {

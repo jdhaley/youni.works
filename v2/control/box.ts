@@ -30,7 +30,7 @@ export class Box extends View {
 	}
 
 	get(name: string): Viewer {
-		for (let node of this.view.childNodes) {
+		for (let node of this.body.view.childNodes) {
 			let view = getView(node);
 			if (name == view?.type.name) return view;
 		}

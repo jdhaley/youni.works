@@ -5,7 +5,7 @@ import { Box } from "./box.js";
 import { Drawable } from "./view.js";
 
 export class EditBox extends Box implements Editor {
-	constructor(viewer?: Drawable, editor?: Editable) {
+	constructor(viewer: Drawable, editor: Editable) {
 		super(viewer);
 		if (editor) implement(this, editor);
 	}

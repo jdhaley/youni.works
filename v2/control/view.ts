@@ -13,15 +13,6 @@ export class View extends ElementShape implements Viewer {
 	}
 }
 
-export class Caption extends View {
-	draw() {
-		let partOf = this.partOf as Viewer;
-		if (partOf) {
-			this.view.textContent = "" + partOf.type.title;	
-		}
-	}
-}
-
 export interface Drawable {
 	drawValue(model: unknown): void;
 	drawElement(model: ELE): void;

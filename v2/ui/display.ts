@@ -3,11 +3,18 @@ import { bundle } from "../base/util.js";
 
 import { Loader } from "../base/type.js";
 import { extendStyles } from "./style.js";
-import { EditBox } from "../control/editorControl.js";
-import { BoxConf, BoxType } from "../control/box.js";
+import { Box, BoxConf, BoxType } from "../control/box.js";
 
-export class Display extends EditBox {
-	declare type: DisplayType;
+export class Display extends Box {
+}
+
+export class Caption extends Display {
+	draw() {
+		let partOf = this.partOf as Box;
+		if (partOf) {
+			this.view.textContent = "" + partOf.type.title;	
+		}
+	}
 }
 
 export class DisplayType extends BoxType {
