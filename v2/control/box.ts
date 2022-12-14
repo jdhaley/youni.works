@@ -82,7 +82,7 @@ export class BoxType extends VType {
 }
 
 export interface BoxConf extends ViewConf {
-	header?: BoxConf;
-	body?: ViewConf;
-	footer?: BoxConf;
+	header?: BoxConf | string;
+	body?: ViewConf | string;
+	footer?: BoxConf | string;
 }

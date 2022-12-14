@@ -27,6 +27,20 @@ const conf: bundle<any> = {
 		prototype: new Caption(),
 		tagName: "header",
 	},
+	display: {
+		class: DisplayType,
+		prototype: new Display(),
+		body: "",
+		actions: actions.view,
+		shortcuts: shortcuts
+	},
+	panel: {
+		class: DisplayType,
+		prototype: new Display(),
+		type: "display",
+		header: "caption",
+		body: "display"
+	},
 	text: {
 		class: DisplayType,
 		header: "caption",

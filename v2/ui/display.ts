@@ -1,11 +1,10 @@
 import { ELE } from "../base/dom.js";
 import { bundle } from "../base/util.js";
 
-import { ViewConf } from "../control/view.js";
 import { Loader } from "../base/type.js";
 import { extendStyles } from "./style.js";
 import { EditBox } from "../control/editorControl.js";
-import { BoxType } from "../control/box.js";
+import { BoxConf, BoxType } from "../control/box.js";
 
 export class Display extends EditBox {
 	declare type: DisplayType;
@@ -24,14 +23,10 @@ export class DisplayType extends BoxType {
 		this.conf.styles = extendStyles(this, styles, conf.styles);
 	}
 }
-export interface DisplayConf extends ViewConf {
+export interface DisplayConf extends BoxConf {
 	types?: bundle<DisplayConf | string>;
 	shortcuts?: bundle<string>;
 	kind?: string;
 	styles?: bundle<any>;
 	// viewType?: string;
-
-	header?: DisplayConf;
-	body?: DisplayConf;
-	footer?: DisplayConf;
 }
