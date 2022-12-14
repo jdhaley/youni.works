@@ -1,7 +1,7 @@
 import { Viewer, ViewType, Article, VIEW_ELE, bindViewEle, getView } from "../base/viewer.js";
 import { Editor, Edits } from "../base/editor.js";
 import { CommandBuffer } from "../base/command.js";
-import { BaseReceiver, Signal } from "../base/controller.js";
+import { BaseReceiver, Controller, Signal } from "../base/controller.js";
 import { RemoteFileService } from "../base/remote.js";
 import { start, TypeContext } from "../base/type.js";
 import { bundle } from "../base/util.js";
@@ -9,7 +9,7 @@ import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
 
 import { Frame } from "./frame.js";
 
-export class IArticle extends BaseReceiver implements TypeContext, Article {
+export class IArticle extends BaseReceiver implements TypeContext, Controller<ELE>, Article {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.owner = frame;

@@ -1,8 +1,7 @@
 import { ELE, RANGE } from "../base/dom.js";
 import { Editable, Editor } from "../base/editor.js";
 import { implement } from "../base/util.js";
-import { Box } from "./box.js";
-import { Drawable } from "./view.js";
+import { Box, Drawable } from "./box.js";
 
 export class EditBox extends Box implements Editor {
 	constructor(viewer: Drawable, editor: Editable) {

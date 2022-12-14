@@ -1,6 +1,6 @@
 import { CommandBuffer } from "./command.js";
 import { Controller } from "./controller.js";
-import { Type, TypeContext} from "./type.js";
+import { Type } from "./type.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 

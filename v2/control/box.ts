@@ -2,28 +2,34 @@ import { ELE } from "../base/dom.js";
 import { Loader } from "../base/type.js";
 import { implement } from "../base/util.js";
 import { getView, Viewer } from "../base/viewer.js";
-import { Drawable, View, ViewConf, VType } from "./view.js";
+import { ElementShape } from "./eleControl.js";
+import { ViewConf, VType } from "./view.js";
 
-export class Box extends View {
+export interface Drawable {
+	drawValue(model: unknown): void;
+	drawElement(model: ELE): void;
+}
+
+export class Box extends ElementShape implements Viewer {
 	constructor(viewer?: Drawable) {
 		super();
 		if (viewer) implement(this, viewer);
 	}
 	declare type: BoxType;
 
-	get header(): View {
+	get header(): Viewer {
 		if (this.type.header) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "header") return child["$control"];
 		}
 	}
-	get body(): View {
+	get body(): Viewer {
 		if (this.type.body) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "body") return child["$control"];
 		} else {
 			return this;
 		}
 	}
-	get footer(): View {
+	get footer(): Viewer {
 		if (this.type.footer) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "footer") return child["$control"];
 		}

@@ -4,20 +4,6 @@ import { Actions, Controller } from "../base/controller.js";
 import { ELE } from "../base/dom.js";
 import { bundle, extend, implement } from "../base/util.js";
 
-import { ElementShape } from "./eleControl.js";
-
-export class View extends ElementShape implements Viewer {
-	declare type: ViewType;
-
-	draw(value: unknown): void {
-	}
-}
-
-export interface Drawable {
-	drawValue(model: unknown): void;
-	drawElement(model: ELE): void;
-}
-
 interface ViewContext extends Controller<ELE>, TypeContext, Article {
 	createElement(name: string): ELE;
 }
@@ -39,9 +25,9 @@ export interface ViewConf {
 	model?: "record" | "list" | "unit";
 }
 
-export interface BaseConf {
+interface BaseConf {
 	class: VType;
-	prototype: View;
+	prototype: Viewer;
 	actions: Actions,
 	tagName: string,
 	model: string,
@@ -67,7 +53,7 @@ export class VType extends BaseType implements ViewType {
 		let view = this.control(node);
 		return view;
 	}
-	control(node: ELE): View {
+	control(node: ELE): Viewer {
 		node.setAttribute("data-item", this.name);
 		let view = Object.create(this.prototype);
 		node["$control"] = view;
