@@ -21,17 +21,6 @@ export interface ViewConf {
 	class?: VType;
 	/** Should only be specified for a base type */
 	prototype?: Viewer;
-	/** Should only be specified for an editor type */
-	model?: "record" | "list" | "unit";
-}
-
-interface BaseConf {
-	class: VType;
-	prototype: Viewer;
-	actions: Actions,
-	tagName: string,
-	model: string,
-	shortcuts: bundle<string>
 }
 
 export class VType extends BaseType implements ViewType {
@@ -41,9 +30,6 @@ export class VType extends BaseType implements ViewType {
 	declare prototype: Viewer;
 	declare conf: ViewConf;
 
-	get model() {
-		return this.conf.model;
-	}
 	get title(): string {
 		return this.conf.title || "";
 	}
@@ -63,11 +49,21 @@ export class VType extends BaseType implements ViewType {
 	start(conf: ViewConf, loader?: Loader) {
 		if (!conf.name) console.warn("No conf name", conf);
 		let actions = this.conf?.actions || null;
+
+		//Make sure the conf's type is loaded and get the extended conf.
+		// if (conf.type) {
+		// 	let sup = loader.get(conf.type);
+		// 	if (sup) conf = extend(sup.conf, conf);
+		// }
 		this.conf = this.conf ? extend(this.conf, conf) : conf;
 
 		this.extendActions(actions, conf.actions);
 		if (conf.types) this.extendTypes(conf.types, loader);
 
+		this.extendPrototype(conf);
+	}
+
+	protected extendPrototype(conf: ViewConf) {
 		this.prototype = Object.create(this.conf.prototype);
 		this.prototype.type = this;
 		this.prototype.actions = this.conf.actions;

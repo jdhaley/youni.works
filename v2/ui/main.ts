@@ -5,7 +5,7 @@ import { bundle } from "../base/util.js";
 import { Frame, UserEvent } from "./frame.js";
 
 import controller from "./actions/frame.js";
-import baseTypes from "./conf/typeConf.js";
+import baseTypes from "./conf/baseTypes.js";
 
 import shape from "./actions/shape.js";
 import { IArticle } from "./article.js";

@@ -4,10 +4,6 @@ import { implement } from "../base/util.js";
 import { Box, Drawable } from "./box.js";
 
 export class EditBox extends Box implements Editor {
-	constructor(viewer: Drawable, editor: Editable) {
-		super(viewer);
-		if (editor) implement(this, editor);
-	}
 	get content(): ELE {
 		return this.body ? this.body.view : this.view;
 	}

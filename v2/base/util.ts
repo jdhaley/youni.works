@@ -52,9 +52,11 @@ export function extend(proto: Object, extension: Object) {
 	return object;
 }
 
-export function implement(object: Object, extension: Object) {
-	for (let name in extension) {
-		object[name] = extension[name];
+export function implement(object: Object, ...extensions: Object[]) {
+	for (let extension of extensions) {
+		for (let name in extension) {
+			object[name] = extension[name];
+		}	
 	}
 	return object;
 }
