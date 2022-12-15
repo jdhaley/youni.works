@@ -2,7 +2,7 @@ import { bundle } from "../../base/util.js";
 
 import { Box } from "../../control/box.js";
 import { EditBox } from "../../control/editBox.js";
-import { Caption, DisplayType } from "../display.js";
+import { Label, DisplayType } from "../display.js";
 
 import shortcuts from "./shortcuts.js";
 import viewActions from "../actions/view.js";
@@ -19,13 +19,14 @@ const conf: bundle<any> = {
 		class: DisplayType,
 		prototype: new EditBox,
 		actions: editorActions,
-		shortcuts: shortcuts
+		shortcuts: shortcuts,
 	},
-	caption: {
+	label: {
 		class: DisplayType,
-		prototype: new Caption(),
+		prototype: new Label(),
 		type: "display",
 		tagName: "header",
+		kind: "label",
 		shortcuts: shortcuts
 	}
 }

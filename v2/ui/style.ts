@@ -34,6 +34,7 @@ function createRule(selector: string, object: object | string) {
 		out += "\t" + name.replace(/_/g, "-") + ": " + object[name] + ";\n"
 	}
 	out += "}";
+	console.log(selector, out);
 	let index = STYLES.insertRule(out);
 	return STYLES.cssRules[index];
 }

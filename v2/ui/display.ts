@@ -5,7 +5,14 @@ import { Loader } from "../base/type.js";
 import { extendStyles } from "./style.js";
 import { Box, BoxConf, BoxType } from "../control/box.js";
 
-export class Caption extends Box {
+export interface Display extends BoxConf {
+	types?: bundle<Display | string>;
+	shortcuts?: bundle<string>;
+	kind?: string;
+	styles?: bundle<any>;
+}
+
+export class Label extends Box {
 	draw() {
 		let partOf = this.partOf as Box;
 		if (partOf) {
@@ -15,21 +22,15 @@ export class Caption extends Box {
 }
 
 export class DisplayType extends BoxType {
-	declare conf: DisplayConf;
+	declare conf: Display;
 
 	control(node: ELE) {
 		if (this.conf.kind) node.setAttribute("class", this.conf.kind);
 		return super.control(node);
 	}
-	start(conf: DisplayConf, loader: Loader): void {
+	start(conf: Display, loader: Loader): void {
 		let styles = this.conf?.styles;
 		super.start(conf, loader);
 		this.conf.styles = extendStyles(this, styles, conf.styles);
 	}
-}
-export interface DisplayConf extends BoxConf {
-	types?: bundle<DisplayConf | string>;
-	shortcuts?: bundle<string>;
-	kind?: string;
-	styles?: bundle<any>;
 }

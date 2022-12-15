@@ -1,5 +1,5 @@
 import { bundle } from "../../base/util.js";
-import { BoxConf } from "../../control/box.js";
+import { Display } from "../display.js";
 
 import { textDrawer } from "../../control/drawers/textDrawer.js";
 import { recordDrawer } from "../../control/drawers/recordDrawer.js";
@@ -18,23 +18,28 @@ import list from "../actions/list.js";
 import markup from "../actions/edit/markup.js";
 import line from "../actions/edit/line.js";
 
-const editors: bundle<BoxConf> = {
+const editors: bundle<Display> = {
 	editbox: {
 		type: "editor",
-		header: "caption",
+		header: "label",
 		body: "display",		
+		kind: "editor"
 	},
 	unit: {
 		type: "editbox",
 		model: "unit",
-		tagName: "ui-unit"
+		tagName: "ui-unit",
+		kind: "editor unit"
+
 	},
 	text: {
-		type: "unit",
+		type: "editbox",
+		model: "unit",
 		drawer: textDrawer,
 		editor: textEd,
 		actions: text,
-		tagName: "ui-text"
+		tagName: "ui-text",
+		kind: "editor text"
 	},
 	record: {
 		type: "editbox",
@@ -42,7 +47,8 @@ const editors: bundle<BoxConf> = {
 		drawer: recordDrawer,
 		editor: recordEd,
 		actions: record, 
-		tagName: "ui-record"
+		tagName: "ui-record",
+		kind: "editor record"
 	},
 	list: {
 		type: "editbox",
@@ -51,11 +57,13 @@ const editors: bundle<BoxConf> = {
 		editor: listEd,
 		actions: list,
 		tagName: "ui-list",
+		kind: "editor list"
 	},
 	markup: {
 		type: "list",
 		editor: markupEd,
 		actions: markup,
+		kind: "editor markup"
 	},
 	line: {
 		type: "text",
@@ -63,7 +71,8 @@ const editors: bundle<BoxConf> = {
 		drawer: lineDrawer,
 		editor: lineEd,
 		actions: line,
-		tagName: "p"
+		tagName: "p",
+		kind: "editor line"
 	}
 	// row: {
 	// 	class: DisplayType,

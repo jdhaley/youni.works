@@ -1,10 +1,11 @@
-import { bundle } from "../../base/util";
-import { DisplayConf } from "../display";
+import { bundle } from "../../base/util.js";
+import { Label, Display, DisplayType } from "../display.js";
+import shortcuts from "./shortcuts.js";
 
-const conf: bundle<DisplayConf> = {
+const conf: bundle<Display> = {
 	panel: {
 		type: "display",
-		header: "caption",
+		header: "label",
 		body: "display"
 	}
 }
