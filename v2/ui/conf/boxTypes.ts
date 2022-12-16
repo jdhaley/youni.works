@@ -1,6 +1,5 @@
 import { bundle } from "../../base/util.js";
-import { Label, Display, DisplayType } from "../display.js";
-import shortcuts from "./shortcuts.js";
+import { Display } from "../display.js";
 
 const conf: bundle<Display> = {
 	panel: {

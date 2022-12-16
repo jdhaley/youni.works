@@ -23,14 +23,17 @@ const editors: bundle<Display> = {
 		type: "editor",
 		header: "label",
 		body: "display",		
-		kind: "editor"
+		kinds: {
+			editor: ""
+		}
 	},
 	unit: {
 		type: "editbox",
 		model: "unit",
 		tagName: "ui-unit",
-		kind: "editor unit"
-
+		kinds: {
+			unit: ""
+		}
 	},
 	text: {
 		type: "editbox",
@@ -39,7 +42,9 @@ const editors: bundle<Display> = {
 		editor: textEd,
 		actions: text,
 		tagName: "ui-text",
-		kind: "editor text"
+		kinds: {
+			text: ""
+		}
 	},
 	record: {
 		type: "editbox",
@@ -48,7 +53,9 @@ const editors: bundle<Display> = {
 		editor: recordEd,
 		actions: record, 
 		tagName: "ui-record",
-		kind: "editor record"
+		kinds: {
+			record: ""
+		}
 	},
 	list: {
 		type: "editbox",
@@ -57,13 +64,17 @@ const editors: bundle<Display> = {
 		editor: listEd,
 		actions: list,
 		tagName: "ui-list",
-		kind: "editor list"
+		kinds: {
+			list: ""
+		}
 	},
 	markup: {
 		type: "list",
 		editor: markupEd,
 		actions: markup,
-		kind: "editor markup"
+		kinds: {
+			markup: ""
+		}
 	},
 	line: {
 		type: "text",
@@ -72,7 +83,9 @@ const editors: bundle<Display> = {
 		editor: lineEd,
 		actions: line,
 		tagName: "p",
-		kind: "editor line"
+		kinds: {
+			line: ""
+		}
 	}
 	// row: {
 	// 	class: DisplayType,

@@ -26,7 +26,9 @@ const conf: bundle<any> = {
 		prototype: new Label(),
 		type: "display",
 		tagName: "header",
-		kind: "label",
+		style: {
+			color: "green",
+		},
 		shortcuts: shortcuts
 	}
 }

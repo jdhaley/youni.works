@@ -27,7 +27,7 @@ export default {
 	xlabel: {
 		type: "display",
 		styles: {
-			".record>.label": {
+			".field>.label": {
 				font_size: "10pt",
 				color: "gray"
 			}
@@ -35,36 +35,42 @@ export default {
 	},
 	dialog: {
 		type: "panel",
-		header: "caption",
-		kind: "dialog",
 		title: "Dialog",
+		header: "dialogCaption",
 		styles: {
-			".dialog>.content": {
+			".label": `
+				color: steelblue;
+			`,
+			".dialog>.content": `
+				display: flex;
+				flex-direction: row;
 				padding: "4px",
 				border: "0 solid gainsboro",
 				border_width: "0 1px 1px 1px"
-			}		
+			`,
+			".dialog>.content>*": `
+				flex: 1;
+			`
 		}
 	},
-	caption:  {
+	dialogCaption:  {
 		type: "panel",
 		header: "display",
-		body: "label",
-		styles: {
-			this: {
-				display: "flex",
-				flex_direction: "row-reverse",
-				background_color: "lightsteelblue",
-				color: "white",
-				padding: "3px 6px 3px 6px"
-			},
-			content: {
-				flex: 1
-			}				
+		body: {
+			type: "label",
+			style: {
+				color: "inherit"
+			}
+		},
+		style: {
+			display: "flex",
+			background_color: "lightsteelblue",
+			color: "white",
+			padding: "3px 6px 3px 6px"
 		},
 		actions: extend(shape, {
 			view: function (this: Box, event: UserEvent) {
-				this.body.view.textContent = "Dialog"; //this.partOf.type.conf.title;
+				this.body.view.textContent = this.partOf.body.type.conf.title;
 			},
 			click: function (this: Box, event: UserEvent) {
 				if (event.target.getAttribute("data-cmd") == "edit") {
@@ -76,17 +82,5 @@ export default {
 	taskDialog:{
 		type: "dialog",
 		body: "tasks",
-		styles: {
-			".label": `
-				color: steelblue;
-			`,
-			".dialog>.content": `
-				display: flex;
-				flex-direction: row;
-			`,
-			".dialog>.content>*": `
-				flex: 1;
-			`
-		}
 	}
 }

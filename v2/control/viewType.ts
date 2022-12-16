@@ -15,6 +15,7 @@ export interface ViewConf {
 	tagName?: string;
 	title?: string;
 
+	isRef?: boolean;
 	/** Added through type loading */
 	name?: string;
 	/** Should only be specified for a base type */
@@ -32,6 +33,9 @@ export class VType extends BaseType implements ViewType {
 
 	get title(): string {
 		return this.conf.title || "";
+	}
+	get typePath(): string {
+		return (this.partOf ? this.partOf.typePath + "-" : "") + this.name;
 	}
 
 	create(): Viewer {
@@ -95,7 +99,10 @@ export class VType extends BaseType implements ViewType {
 	protected extendType(name: string, conf: ViewConf | string, loader: Loader) {
 		let memberConf: ViewConf;
 		if (typeof conf == "string") {
-			memberConf = { type: conf as string } as ViewConf;
+			memberConf = { 
+				type: conf as string,
+				isRef: true
+		 } as ViewConf;
 		} else {
 			memberConf = conf as ViewConf;
 		}

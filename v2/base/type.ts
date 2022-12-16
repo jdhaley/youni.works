@@ -9,10 +9,11 @@ export interface Type {
 export class BaseType implements Type {
 	constructor(context: TypeContext) {
 		this.context = context;
+		this.conf = EMPTY.object;
 	}
+	readonly conf: bundle<any>;
 	readonly context: TypeContext;
 	declare partOf: Type;
-	declare conf: bundle<any>;
 
 	get name() {
 		return this.conf.name;

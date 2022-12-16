@@ -15,27 +15,30 @@ export interface Drawable {
 export class Box extends ElementShape implements Viewer {
 	declare type: BoxType;
 
-	get header(): Viewer {
+	get partOf(): Box {
+		return super.partOf as Box;
+	}
+	get header(): Box {
 		if (this.type.header) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "header") return child["$control"];
 		}
 	}
-	get body(): Viewer {
+	get body(): Box {
 		if (this.type.body) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "body") return child["$control"];
 		} else {
 			return this;
 		}
 	}
-	get footer(): Viewer {
+	get footer(): Box {
 		if (this.type.footer) for (let child of this.view.children) {
 			if (child.getAttribute("data-item") == "footer") return child["$control"];
 		}
 	}
 
-	get(name: string): Viewer {
+	get(name: string): Box {
 		for (let node of this.body.view.childNodes) {
-			let view = getView(node);
+			let view = getView(node) as Box;
 			if (name == view?.type.name) return view;
 		}
 	}
