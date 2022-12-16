@@ -59,7 +59,8 @@ export default {
 		body: {
 			type: "label",
 			style: {
-				color: "inherit"
+				color: "inherit",
+				font_size: "normal"
 			}
 		},
 		style: {

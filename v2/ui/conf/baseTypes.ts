@@ -27,7 +27,8 @@ const conf: bundle<any> = {
 		type: "display",
 		tagName: "header",
 		style: {
-			color: "green",
+			color: "darkgray",
+			font_size: "smaller"
 		},
 		shortcuts: shortcuts
 	}
