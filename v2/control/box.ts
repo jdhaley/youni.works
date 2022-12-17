@@ -51,12 +51,9 @@ export class Box extends ElementShape implements Viewer {
 		}
 		if (this.type.body) {
 			let body = this.type.body.create();
-			body.view.classList.add("content");
 			this.view.append(body.view);
 			body.draw(value);
-		} else {
-			this.view.classList.add("content");
-		}
+		} 
 		if (this.type.body && this.type.footer) {
 			let footer = this.type.footer.create()
 			this.view.append(footer.view);

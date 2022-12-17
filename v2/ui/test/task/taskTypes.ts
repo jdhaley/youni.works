@@ -18,36 +18,29 @@ export default {
 	},
 	task: {
 		type: "record",
-		header: "", //instead of no body, clear the header for now... style selectors need upgrade.
+		body: "",
 		title: "Task",
 		types: {
 			activity: {
 				type: "text",
 				title: "Activity",
-				styles: {
-					this: {
-						flex: "1 1 25%"
-					}
+				style: {
+					flex: "1 1 25%"
 				}
 			},
 			title: {
 				type: "text",
 				title: "Title",
-				styles: {
-					this: {
-						flex: "1 1 60%"
-					}
+				style: {
+					flex: "1 1 60%"
 				}
 			},
 			status: {
 				type: "text",
 				title: "Status",
-				styles: {
-					this: {
-						flex: "1 1 15%"
-					}
-				}
-			},
+				style: {
+					flex: "1 1 15%"				}
+				},
 			// tasks: {
 			// 	type: "list",
 			// 	header: "label",

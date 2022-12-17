@@ -5,7 +5,7 @@ import { Box, Drawable } from "./box.js";
 
 export class EditBox extends Box implements Editor {
 	get content(): ELE {
-		return this.body ? this.body.view : this.view;
+		return this.type.body ? this.body.view : this.view;
 	}
 	get id(): string {
 		return this.view.id;
@@ -37,6 +37,7 @@ export class EditBox extends Box implements Editor {
 			this.view.id = "" + NEXT_ID++;
 		}
 		super.draw(value);
+		this.content.classList.add("content");
 	}
 
 	/*
