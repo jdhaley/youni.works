@@ -7,12 +7,13 @@ let person = {
 let gen = new TemplateGenerator();
 
 gen.add({
-	a: "This is ${this.b(a.name)}.",
-}, "a", "person");
+	main: "This is ${this.str(arg.name)}.",
+}, "arg", "person");
 gen.add ({
-	b: "${a}"
-}, "a", "string");
+	main: "xxx",
+	str: "${arg}"
+}, "arg", "string");
 
 let templates = gen.generateTemplates();
 console.log(templates);
-console.log(templates.a(person))
+console.log(templates.main(person))

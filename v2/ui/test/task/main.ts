@@ -13,7 +13,7 @@ import articleTypes from "./taskTypes.js";
 import devt from "./uiTypes.js";
 
 import value from "./tasks.js";
-
+import "../../../tpl/test.js";
 implement(articleTypes, devt, boxTypes, editorTypes);
 
 let frame = new Frame(window, controller);
