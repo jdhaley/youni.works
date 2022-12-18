@@ -1,4 +1,4 @@
-import { Viewer, ViewType, Article, VIEW_ELE, bindViewEle, getView } from "../base/viewer.js";
+import { Viewer, ViewType, Article, VIEW_ELE /*, bindViewEle*/, getView } from "../base/viewer.js";
 import { Editor, Edits } from "../base/editor.js";
 import { CommandBuffer } from "../base/command.js";
 import { BaseReceiver, Controller, Signal } from "../base/controller.js";
@@ -47,14 +47,14 @@ export class IArticle extends BaseReceiver implements TypeContext, Controller<EL
 	getControl(id: string): Editor {
 		let ele = this.findNode(id) as VIEW_ELE;
 		if (!ele) throw new Error("Can't find view element.");
-		if (!ele.$control) {
-			console.warn("binding...");
-			bindViewEle(ele);
-			if (!ele.$control) {
-				console.error("Unable to bind missing control. Please collect info / analyze.");
-				debugger;
-			}
-		}
+		// if (!ele.$control) {
+		// 	console.warn("binding...");
+		// 	bindViewEle(ele);
+		// 	if (!ele.$control) {
+		// 		console.error("Unable to bind missing control. Please collect info / analyze.");
+		// 		debugger;
+		// 	}
+		// }
 		return ele.$control as Editor;
 	}
 	/** the Loc(ation) is: path + "/" + offset */

@@ -36,20 +36,15 @@ export default {
 	dialog: {
 		type: "panel",
 		title: "Dialog",
+		tagName: "ui-dialog",
 		header: "dialogCaption",
 		styles: {
-			".label": `
-				color: steelblue;
-			`,
-			".dialog>.content": `
+			"ui-dialog>.content": `
 				display: flex;
-				flex-direction: row;
-				padding: "4px",
-				border: "0 solid gainsboro",
-				border_width: "0 1px 1px 1px"
-			`,
-			".dialog>.content>*": `
-				flex: 1;
+				flex-direction: column;
+				padding: 4px;
+				border: 0 solid gainsboro;
+				border-width: 0 1px 1px 1px;
 			`
 		}
 	},

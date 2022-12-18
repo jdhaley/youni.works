@@ -44,7 +44,6 @@ export class VType extends BaseType implements ViewType {
 		return view;
 	}
 	control(node: ELE): Viewer {
-		node.setAttribute("data-item", this.name);
 		let view = Object.create(this.prototype);
 		node["$control"] = view;
 		view.view = node;

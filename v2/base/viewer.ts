@@ -57,25 +57,25 @@ export function getView(loc: NODE | RANGE): Viewer {
 	}
 }
 
-export function bindViewEle(node: VIEW_ELE) {
-	let view = node["$control"];
-	if (view) return;
-	view = getView(node.parentNode);
-	let name = node.getAttribute("data-item");
-	if (view && name) {
-		console.log("binding.");
-		let type = view.type.types[name];
-		if (type) {
-			view = type.control(node);
-		} else {
-			console.warn(`Bind failed: Type "${name}" not found in "${view.type.name}"`);
-			return;
-		}
-	}
-	for (let child of view.view.childNodes) {
-		if (ele(child)) bindViewEle(child as ELE);
-	}
-}
+// export function bindViewEle(node: VIEW_ELE) {
+// 	let view = node["$control"];
+// 	if (view) return;
+// 	view = getView(node.parentNode);
+// 	let name = node.getAttribute("data-item");
+// 	if (view && name) {
+// 		console.log("binding.");
+// 		let type = view.type.types[name];
+// 		if (type) {
+// 			view = type.control(node);
+// 		} else {
+// 			console.warn(`Bind failed: Type "${name}" not found in "${view.type.name}"`);
+// 			return;
+// 		}
+// 	}
+// 	for (let child of view.view.childNodes) {
+// 		if (ele(child)) bindViewEle(child as ELE);
+// 	}
+// }
 
 //TODO remove
 export interface ContentView extends Viewer {

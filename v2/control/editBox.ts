@@ -1,7 +1,6 @@
 import { ELE, RANGE } from "../base/dom.js";
-import { Editable, Editor } from "../base/editor.js";
-import { implement } from "../base/util.js";
-import { Box, Drawable } from "./box.js";
+import { Editor } from "../base/editor.js";
+import { Box } from "./box.js";
 
 export class EditBox extends Box implements Editor {
 	get content(): ELE {
@@ -29,6 +28,7 @@ export class EditBox extends Box implements Editor {
 		return undefined;
 	}
 	draw(value?: unknown): void {
+		this.view.setAttribute("data-item", this.type.name);
 		if (value instanceof Element) {
 			if (value.id) this.view.id = value.id;
 			let level = value.getAttribute("level");

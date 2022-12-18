@@ -14,50 +14,38 @@ export interface Drawable {
 
 export class Box extends ElementShape implements Viewer {
 	declare type: BoxType;
+	declare header: Box;
+	declare body: Box;
+	declare footer: Box;
 
 	get partOf(): Box {
 		return super.partOf as Box;
-	}
-	get header(): Box {
-		if (this.type.header) for (let child of this.view.children) {
-			if (child.getAttribute("data-item") == "header") return child["$control"];
-		}
-	}
-	get body(): Box {
-		if (this.type.body) for (let child of this.view.children) {
-			if (child.getAttribute("data-item") == "body") return child["$control"];
-		} else {
-			return this;
-		}
-	}
-	get footer(): Box {
-		if (this.type.footer) for (let child of this.view.children) {
-			if (child.getAttribute("data-item") == "footer") return child["$control"];
-		}
 	}
 
 	get(name: string): Box {
 		for (let node of this.body.view.childNodes) {
 			let view = getView(node) as Box;
-			if (name == view?.type.name) return view;
+			if (view != this && name == view?.type.name) return view;
 		}
 	}
 	draw(value: unknown): void {
 		this.view.textContent = "";
 		if (this.type.body && this.type.header) {
-			let header = this.type.header.create();
-			this.view.append(header.view);
-			header.draw(value);
+			this.header = this.type.header.create() as Box;
+			this.view.append(this.header.view);
+			this.header.draw(value);
 		}
 		if (this.type.body) {
-			let body = this.type.body.create();
-			this.view.append(body.view);
-			body.draw(value);
-		} 
+			this.body = this.type.body.create() as Box;
+			this.view.append(this.body.view);
+			this.body.draw(value);
+		} else {
+			this.body = this;
+		}
 		if (this.type.body && this.type.footer) {
-			let footer = this.type.footer.create()
-			this.view.append(footer.view);
-			footer.draw(value);
+			this.footer = this.type.footer.create() as Box;
+			this.view.append(this.footer.view);
+			this.footer.draw(value);
 		}
 		if (value instanceof Element) {
 			this.drawElement(value);

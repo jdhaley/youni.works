@@ -1,7 +1,7 @@
 import { ele, ELE, RANGE } from "../../base/dom.js";
 import { xmlContent } from "../../transform/content.js";
 
-import { unmark, bindViewEle, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../editUtil.js";
+import { unmark /*, bindViewEle*/, narrowRange, mark, getEditor, getChildEditor, clearContent } from "../editUtil.js";
 import { Replace } from "./replaceCmd.js";
 import { Editor, EditorType } from "../../base/editor.js";
 import { ContentView } from "../../base/viewer.js";
@@ -71,7 +71,7 @@ export class RangeReplace extends Replace {
 			let ele = nodes[0];
 			range.insertNode(ele);
 			range.collapse();
-			bindViewEle(ele);
+			//bindViewEle(ele);
 		}
 		//Make sure the view event is sent to the newly created nodes:
 		//TODO need to add send method to Article interface.

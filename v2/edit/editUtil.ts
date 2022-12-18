@@ -1,10 +1,10 @@
 import { ele, ELE, END_TO_END, RANGE, START_TO_START, NODE, getNodeIndex } from "../base/dom.js";
 import { Editor } from "../base/editor.js";
-import { getView, bindViewEle } from "../base/viewer.js";
+import { getView, /*bindViewEle*/ } from "../base/viewer.js";
 
 const getEditor = getView as (node: NODE | RANGE) => Editor ;
 
-export { getEditor, bindViewEle }
+export { getEditor /*, bindViewEle*/ }
 
 export function getChildEditor(editor: Editor, node: NODE): Editor {
 	if (node == editor.content) return null;
