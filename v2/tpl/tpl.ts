@@ -28,6 +28,17 @@ export class TemplateGenerator {
 	protected processTemplate(template: string) {
 		return template.replace(/`/g, "\\`");
 	}
+	generateCode() {
+		console.log(this.#templates);
+		let out = "export default {\n";
+		for (let name in this.#templates) {
+			out += this.generateTemplate(name, true) + ",\n";
+		} 
+		out = out.substring(0, out.length - 2);
+		out += "\n}\n";
+		console.log(out);
+		return out;
+	}
 	generateTemplates() {
 		console.log(this.#templates);
 		let out = "return {\n";
