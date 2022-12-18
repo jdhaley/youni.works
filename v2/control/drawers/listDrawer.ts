@@ -1,8 +1,11 @@
 import { ContentView } from "../../base/viewer.js";
 import { ELE } from "../../base/dom.js";
+import { Box } from "../box.js";
+import { DisplayType } from "../../ui/display.js";
 
 export const listDrawer = {
 	drawValue(this: ContentView, model: unknown): void {
+		if (this.type.conf.tableType) drawTable.call(this);
 		if (model && model[Symbol.iterator]) for (let item of (model as Iterable<unknown>)) {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
@@ -63,4 +66,21 @@ function typeOf(value: any): string {
 			if (value[Symbol.iterator]) return "list";
 	}
 	return "unknown";
+}
+
+function drawTable(this: Box) {
+	this.view.classList.add("table");
+	if (this.header) drawTableHeader.call(this);
+}
+function drawTableHeader(this: Box) {
+	this.header.view.classList.add("tableHeader");
+	let type = this.type.types[this.type.conf["tableType"]];
+	for (let name in type.types) {
+		let colType = type.types[name] as DisplayType;
+		let col = this.type.context.createElement("div");
+		let flex = colType.conf.style?.flex;
+		if (flex) (col as HTMLElement).style.flex = flex;
+		col.textContent = colType.title;
+		this.header.view.append(col);
+	}
 }

@@ -13,7 +13,11 @@ const conf: bundle<any> = {
 		class: DisplayType,
 		prototype: new Box(),
 		actions: viewActions,
-		shortcuts: shortcuts
+		shortcuts: shortcuts,
+		style: {
+			//ensures custom Elements have block rather than span.
+			display: "block"
+		}
 	},
 	editor: {
 		class: DisplayType,

@@ -2,19 +2,9 @@ export default {
 	tasks: {
 		type: "list",
 		title: "Tasks",
-		body: "",
 		types: {
 			task: "task"
-		},
-		styles: {
-			this: {
-				border_radius: "3px",
-				border: "1px solid lightsteelblue",
-			},
-			".dialog>.content": {
-				display: "block",
-			}
-		},
+		}
 	},
 	task: {
 		type: "record",
@@ -23,6 +13,7 @@ export default {
 		types: {
 			activity: {
 				type: "text",
+				body: "",
 				title: "Activity",
 				style: {
 					flex: "1 1 25%"
@@ -30,6 +21,7 @@ export default {
 			},
 			title: {
 				type: "text",
+				body: "",
 				title: "Title",
 				style: {
 					flex: "1 1 60%"
@@ -37,6 +29,7 @@ export default {
 			},
 			status: {
 				type: "text",
+				body: "",
 				title: "Status",
 				style: {
 					flex: "1 1 15%"				}

@@ -45,6 +45,11 @@ export default {
 			},
 			body: {
 				display: "block"
+			},
+			".tableHeader": {
+				display: "flex",
+				color: "steelblue",
+				font_weight: "lighter"
 			}
 		}
 	},
@@ -62,8 +67,9 @@ export default {
 		title: "Dialog",
 		tagName: "ui-dialog",
 		header: "dialogCaption",
+		actions: shape,
 		styles: {
-			"ui-dialog>.content": `
+			"ui-dialog>ui-dialog-body": `
 				display: flex;
 				flex-direction: column;
 				padding: 4px;
@@ -89,26 +95,19 @@ export default {
 			color: "white",
 			padding: "3px 6px 3px 6px"
 		},
-		actions: extend(shape, {
+		actions: {
 			view: function (this: Box, event: UserEvent) {
 				this.body.view.textContent = this.partOf.body.type.conf.title;
-			},
-			click: function (this: Box, event: UserEvent) {
-				if (event.target.getAttribute("data-cmd") == "edit") {
-					(this.partOf as Box).body.view.textContent = "click edit";
-				}
 			}
-		})
+		}
 	},
 	taskDialog:{
 		type: "dialog",
-		body: "tasks",
-	},
-	// table: {
-	// 	type: "panel",
-	// 	tagName: "ui-table",
-	// 	header: {
-	// 		class: TableHeader
-	// 	}
-	// }
+		body: {
+			type: "tasks",
+			header: "display",
+			body: "display",
+			tableType: "task"
+		}
+	}
 }
