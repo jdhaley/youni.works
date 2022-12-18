@@ -5,6 +5,30 @@ import { Box } from "../../../control/box.js";
 import { UserEvent } from "../../frame.js";
 
 import shape from "../../actions/shape.js";
+import { Display, DisplayType } from "../../display.js";
+import { Loader } from "../../../base/type.js";
+
+
+// interface TableConf {
+// 	contentType: string,
+// 	header: {
+// 		style?: object
+// 	}
+// }
+// class TableHeader extends Box {
+
+// }
+// class Table extends Box {
+// 	draw(value: unknown) {
+// 		this.header = this.type.header.create() as Box;
+// 		this.view.append(this.header.view);
+// 		this.header.draw(value);
+
+// 		this.header = 
+// 		let type = this.body.type;
+// 		for (let name in type.types)
+// 	}
+// }
 
 export default {
 	styles: {
@@ -50,9 +74,10 @@ export default {
 	},
 	dialogCaption:  {
 		type: "panel",
-		header: "display",
+		tagName: "ui-dialog-caption",
+		header: "label",
 		body: {
-			type: "label",
+			type: "display",
 			style: {
 				color: "inherit",
 				font_size: "normal"
@@ -78,5 +103,12 @@ export default {
 	taskDialog:{
 		type: "dialog",
 		body: "tasks",
-	}
+	},
+	// table: {
+	// 	type: "panel",
+	// 	tagName: "ui-table",
+	// 	header: {
+	// 		class: TableHeader
+	// 	}
+	// }
 }
