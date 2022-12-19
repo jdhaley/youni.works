@@ -1,12 +1,24 @@
-import { defaultFactory } from "./factory.js"
+import { Box } from "../../../control/box.js";
+import { compile, TYPE } from "./compiler.js"
 
 const test = {
+	instance: {
+		type$: "",
+		prototype$: new Box(),
+		get$type() {
+			return this[TYPE]
+		}
+	},
 	rocketCup: {
 		type$: "cup rocket",
-		crazy: true
+		size: -1,
+		crazy: true,
+		object: {
+			type$: "instance"
+		}
 	},
 	cup: {
-		type$: "rocketCup", //doesn't error on cross-reference cycles!
+		type$: "instance",
 		type: "coffee",
 		material: "clay",
 		size: 23,
@@ -22,5 +34,8 @@ const test = {
 	}
 }
 
-console.log(defaultFactory(test, "test"));
-console.log(defaultFactory(test.cup));
+let target = compile(test, "test") as any;
+let out = "";
+for (let name in target.rocketCup) out += name + " ";
+console.log(out); 	//type material size target maker crazy 
+console.log(Object.create(target.rocketCup));

@@ -1,74 +1,113 @@
-// import { Descriptor } from "./facets";
+import { base, facet } from "./facets.js";
 
-// type Mixin = bundle<Descriptor>;
+export const TYPE = Symbol("type");
+export type factory = (source: source, name?: string) => object;
 
-// interface bundle<T> {
-// 	[key: string | symbol]: T
-// }
-// interface Source {
-// 	type$?: string;
-// 	[key: string]: unknown;
-// }
+export function createCompiler(facets: bundle<facet>): factory {
+	let factory = new Factory(facets);
+	return factory.compile.bind(factory);
+}
 
-// class Compiler {
-// 	#source: bundle<Source | string>;
-// 	#target: bundle<Mixin>;
+interface bundle<T> {
+	[key: string | symbol]: T
+}
 
-// 	compile(source: bundle<Source>): bundle<Mixin> {
-// 		let compiler: Compiler = Object.create(this);
-// 		compiler.#source = source;
-// 		compiler.#target = Object.create(null);
-	
-// 		for (let decl in source) {
-// 			let name = decl.substring(0, decl.indexOf("$"));
-// 			let object = Object.create(null);
-// 			object._status_ = "NEW";
-// 			compiler.#target[name] = object
-// 		}
-// 		let target = Object.create(null);
-// 		for (let decl in source) {
-// 			let prop = decl.substring(0, decl.indexOf("$"));
-// 			target[prop] = compiler.get(prop)
-// 		}
-// 		return target;
-// 	}
+const TARGET = Symbol("target");
+const NAME = Symbol.toStringTag;
 
-// 	get(name: string): Mixin {
-// 		let mixin = this.#target[name] as any;
-// 		if (!mixin) throw new Error(`get("${name}"): not found`)
-// 		if (mixin._status_ == "COMPILING") throw new Error(`get("${name}"): circular reference`)
-// 		if (mixin._status_ == "NEW") {
-// 			mixin["status"] = "COMPILING";
-// 			let source = this.#source[name];
-// 			if (typeof source == "string") {
-// 				if (source == name) throw new Error(`get("${name}"): self-reference`)
-// 				return this.get(source);
-// 			}
-// 			source.name = name;
-// 			mixin = Object.create(null);
-// 			this.#target[name] = mixin;
-// 			if (source.type$) try {
-// 				this.#implement(mixin, source.type$);
-// 			} catch (e) {
-// 				throw new Error(`get("${name}"): ${e.message}`)
-// 			}
-// 			delete mixin._status_;
-// 		}
-// 		return mixin;
-// 	}
+const SCOPE = Symbol("scope");
+const TYPE_PROP = "type$";
 
-// 	#implement(target: Mixin, typeNames: string) {
-// 		let types = typeNames.split(" ");
-// 		for (let i = types.length; i; i--) {
-// 			let typeName = types[i - 1];
-// 			if (typeName) { //handle multiple spaces
-// 				try {
-// 					let mixin = this.get(typeName);
-// 					for (let key in mixin) target[key] = mixin[key];
-// 				} catch (e) {	
-// 					throw new Error(`implement("${typeNames}"): on "${typeName}": ${e.messasge}`);
-// 				}
-// 			}
-// 		}
-// 	}
-// }
+type source = bundle<any>;
+
+class Factory  {
+	constructor(facets: bundle<facet>) {
+		this.#facets = facets;
+	}
+	#facets: bundle<facet>;
+
+	compile(source: source, name?: string) {
+		let target = Object.create(source.prototype$ || null);
+		let type = Object.create(null);
+		target[TYPE] = type;
+
+		target[NAME] = "<" + name + ">";
+		source[TARGET] = target;
+		let self = this.#compileType(type, source);
+		for (let name in self) self[name].define(target);
+		target[NAME] = name + "Type";
+		
+		return target;
+	}
+	#compileType(type: object, source: source) {
+		let self = Object.create(null);
+		type[TYPE] = self;
+
+		let typeNames = source[TYPE_PROP];
+		let types = typeNames?.split(" ") || [];
+		let sups = [];
+
+		for (let typeName of types) {
+			if (typeName) { //handle multiple spaces
+				try {
+					let mixin = this.#forName(source, typeName);
+					if (!mixin) throw new Error("not found.")
+					let sup =  mixin[TYPE];
+					type[typeName] = sup;
+					sups.push(sup);
+					let supSelf = sup[TYPE];
+					for (let member in supSelf) {
+						if (self[member] === undefined) self[member] = supSelf[member];
+					}
+				} catch (e) {	
+					throw new Error(`implement "${typeNames}": on "${typeName}": ${e.message}`);
+				}
+			}
+		}
+		
+		for (let decl in source) {
+			if (!decl.endsWith("$")) {
+				let desc = this.createDescriptor(decl, source);
+				self[desc.name] = desc;
+			}
+		}
+		return self;
+	}
+	createDescriptor(decl: string, scope: any) {
+		let [name, facet] = this.parseDeclaration(decl);
+		let expr = scope[decl];
+		if (typeof expr == "object" && Object.hasOwn(expr, TYPE_PROP)) {
+			expr[NAME] = name;
+			expr[SCOPE] = scope;
+			expr = this.#forName(expr as source, name);
+		}
+		return facet(name, expr);
+	}
+	parseDeclaration(decl: string): [property: string, facet: facet] {
+		let index = decl.indexOf("$");
+		let facetName = "";
+		if (index) facetName = decl.substring(0, index);
+		let ffn = this.#facets.var;
+		if (facetName) {
+			ffn = this.#facets[facetName];
+			if (!ffn) throw new Error(`Facet "${facetName}" is not defined.`);	
+		}
+		return [decl.substring(index + 1), ffn];
+	}
+	#forName(source: source, name: string) {
+		for (let scope = source; scope; scope = scope[SCOPE] as source) {
+			let value = scope[name];
+			if (value) {
+				if (value[TARGET]) return value[TARGET];
+				if (Object.hasOwn(value, "type$")) {
+					value[SCOPE] = scope;
+					return this.compile(value, name);
+				}
+				return value;
+			}
+			if (scope[SCOPE] == source) throw new Error("cycle detected.");
+		}
+	}
+}
+
+export const compile = createCompiler(base);
