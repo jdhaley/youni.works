@@ -27,19 +27,23 @@ class Factory  {
 	#facets: bundle<facet>;
 
 	compile(source: source, name?: string) {
+		let type = this.#compileType(source);
+
 		let target = Object.create(source.prototype$ || null);
-		let type = Object.create(null);
 		target[TYPE] = type;
-
-		target[NAME] = "<" + name + ">";
-		source[TARGET] = target;
-		let self = this.#compileType(type, source);
+		let self = type[TYPE];
 		for (let name in self) self[name].define(target);
-		target[NAME] = name + "Type";
 
+		//Set the name after extension. Any object without a name is being processed.
+		if (name.at(0) == name.at(0).toUpperCase()) {
+			target[NAME] = name + "Type";
+		}
 		return target;
 	}
-	#compileType(type: object, source: source) {
+	#compileType(source: source) {
+		let type = Object.create(null);
+		source[TYPE] = type;
+
 		let self = Object.create(null);
 		type[TYPE] = self;
 
@@ -71,7 +75,7 @@ class Factory  {
 				self[desc.name] = desc;
 			}
 		}
-		return self;
+		return type;
 	}
 	createDescriptor(decl: string, scope: any) {
 		let [name, facet] = this.parseDeclaration(decl);
