@@ -28,3 +28,5 @@ frame.view.append(tasks.view);
 tasks.draw(value);
 frame.send("view", frame.view);
 frame.view.setAttribute("contenteditable", "true");
+
+import "./test.js";
