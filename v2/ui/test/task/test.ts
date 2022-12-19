@@ -1,8 +1,9 @@
 import { Box } from "../../../control/box.js";
-import { compile, TYPE } from "./compiler.js"
+import { TYPE } from "./compiler.js"
+import { process } from "./type.js";
 
 const test = {
-	instance: {
+	Instance: {
 		type$: "",
 		prototype$: new Box(),
 		get$type() {
@@ -10,15 +11,15 @@ const test = {
 		}
 	},
 	rocketCup: {
-		type$: "cup rocket",
+		type$: "Cup rocket",
 		size: -1,
 		crazy: true,
 		object: {
-			type$: "instance"
+			type$: "Instance"
 		}
 	},
-	cup: {
-		type$: "instance",
+	Cup: {
+		type$: "Instance",
 		type: "coffee",
 		material: "clay",
 		size: 23,
@@ -34,8 +35,8 @@ const test = {
 	}
 }
 
-let target = compile(test, "test") as any;
-let out = "";
-for (let name in target.rocketCup) out += name + " ";
-console.log(out); 	//type material size target maker crazy 
-console.log(Object.create(target.rocketCup));
+let target = process(test, "test") as any;
+// let out = "";
+// for (let name in target.rocketCup) out += name + " ";
+console.log(target); 	//type material size target maker crazy 
+//console.log(Object.create(target.rocketCup));

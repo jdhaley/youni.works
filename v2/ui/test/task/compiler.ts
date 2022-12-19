@@ -36,7 +36,7 @@ class Factory  {
 		let self = this.#compileType(type, source);
 		for (let name in self) self[name].define(target);
 		target[NAME] = name + "Type";
-		
+
 		return target;
 	}
 	#compileType(type: object, source: source) {
@@ -81,7 +81,7 @@ class Factory  {
 			expr[SCOPE] = scope;
 			expr = this.#forName(expr as source, name);
 		}
-		return facet(name, expr);
+		return facet(name, expr, facet.name);
 	}
 	parseDeclaration(decl: string): [property: string, facet: facet] {
 		let index = decl.indexOf("$");

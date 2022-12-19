@@ -66,7 +66,7 @@ class Factory  {
 			expr[SCOPE] = scope;
 			expr = this.createInstance(expr as source, name);
 		}
-		facet(name, expr).define(target);
+		facet(name, expr, facet.name).define(target);
 	}
 	parseDeclaration(decl: string): [property: string, facet: facet] {
 		let index = decl.indexOf("$");
