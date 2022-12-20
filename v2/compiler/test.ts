@@ -1,6 +1,6 @@
-import { Box } from "../../../control/box.js";
-import { TYPE } from "./compiler.js"
-import { process } from "./type.js";
+import { Box } from "../control/box.js";
+import { TYPE, createCompiler } from "./compiler.js"
+import { base } from "./facets.js";
 
 const test = {
 	Instance: {
@@ -35,7 +35,8 @@ const test = {
 	}
 }
 
-let target = process(test, "test") as any;
+const compile = createCompiler(base);
+let target = compile(test, "test") as any;
 // let out = "";
 // for (let name in target.rocketCup) out += name + " ";
 console.log(target); 	//type material size target maker crazy 

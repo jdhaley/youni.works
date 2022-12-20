@@ -1,4 +1,5 @@
-import { base, facet } from "./facets.js";
+import { facet } from "../compiler/compiler.js";
+import { base } from "../compiler/facets.js";
 
 export type factory = (source: source, name?: string) => object;
 
@@ -17,7 +18,6 @@ const TYPE = Symbol("type");
 const TYPE_PROP = "type$";
 
 type source = bundle<unknown>;
-
 
 class Factory  {
 	constructor(facets: bundle<facet>, prototype?: object) {
@@ -66,7 +66,7 @@ class Factory  {
 			expr[SCOPE] = scope;
 			expr = this.createInstance(expr as source, name);
 		}
-		facet(name, expr, facet.name).define(target);
+//		facet(name, expr, facet.name).define(target);
 	}
 	parseDeclaration(decl: string): [property: string, facet: facet] {
 		let index = decl.indexOf("$");

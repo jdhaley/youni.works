@@ -29,4 +29,4 @@ tasks.draw(value);
 frame.send("view", frame.view);
 frame.view.setAttribute("contenteditable", "true");
 
-import "./test.js";
+import "../../../compiler/test.js";
