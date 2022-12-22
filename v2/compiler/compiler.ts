@@ -7,6 +7,7 @@ export class Type {
 	constructor(source: source, name: string) {
 		source[TYPE] = this;
 		this[NAME] = "Type";
+		this.id = NEXT_ID++;
 		this.name = name;
 		this.definedIn = source[SCOPE] ? source[SCOPE][TYPE].prototype : null;
 		this.descriptors = Object.create(null);
@@ -18,8 +19,10 @@ export class Type {
 		if (name.at(0) == name.at(0).toUpperCase()) {
 			this.prototype[Symbol.toStringTag] = name;
 		}
+		Object.freeze(this);
 	}
 	definedIn?: object;
+	id: number;
 	name: string;
 	prototype: object;
 	descriptors: bundle<Descriptor>;
@@ -37,6 +40,7 @@ export class Type {
 		return object;
 	}
 }
+let NEXT_ID = 1;
 
 export interface Declaration {
 	facet: string;
