@@ -88,8 +88,8 @@ export interface BoxConf extends ViewConf {
 	body?: ViewConf | string;
 	footer?: BoxConf | string;
 
-		/** Should only be specified for an editor type */
-		model?: "record" | "list" | "unit";
+	/** Should only be specified for an editor type */
+	model?: "record" | "list" | "unit";
 
 	drawer?: Drawable;
 	editor?: Editable;

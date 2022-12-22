@@ -53,11 +53,6 @@ export class VType extends BaseType implements ViewType {
 		if (!conf.name) console.warn("No conf name", conf);
 		let actions = this.conf?.actions || null;
 
-		//Make sure the conf's type is loaded and get the extended conf.
-		// if (conf.type) {
-		// 	let sup = loader.get(conf.type);
-		// 	if (sup) conf = extend(sup.conf, conf);
-		// }
 		this.conf = this.conf ? extend(this.conf, conf) : conf;
 
 		this.extendActions(actions, conf.actions);
@@ -101,7 +96,7 @@ export class VType extends BaseType implements ViewType {
 			memberConf = { 
 				type: conf as string,
 				isRef: true
-		 } as ViewConf;
+			} as ViewConf;
 		} else {
 			memberConf = conf as ViewConf;
 		}
