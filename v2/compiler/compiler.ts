@@ -19,7 +19,6 @@ export class Type {
 		if (name.at(0) == name.at(0).toUpperCase()) {
 			this.prototype[Symbol.toStringTag] = name;
 		}
-		Object.freeze(this);
 	}
 	definedIn?: object;
 	id: number;
