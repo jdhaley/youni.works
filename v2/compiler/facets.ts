@@ -24,18 +24,9 @@ export const base: bundle<facet> = {
 		this.define = function(object) {
 			return Reflect.defineProperty(object, this.name, this);
 		}
-		return this;
 	},
-	require(this: Descriptor) {
-		this.define = function(object: object) {
-			//implement something like this:
-			// if (!object[this.name]) {
-			// 	console.warn("Require missing " + this.name);
-			// }
-			return true;
-		}
-	},
-	//supports re-definition of a property via a "set once" mechanism. May be required for more complex types.
+	//supports re-definition of a property via a "set once" mechanism.
+	//May be required for frozen prototypes.
 	oncevar(this: Descriptor) {
 		this.configurable = true;
 		this.enumerable = true;
@@ -112,21 +103,15 @@ export const base: bundle<facet> = {
 			return Reflect.defineProperty(object, this.name, this);
 		}
 	},
+	/** 
+	 * Extends a prototype's object property and the declared object.
+
+	 */
 	extend(this: Descriptor) {
 		if (typeof this.expr != "object") console.error("extend facet requires an object or array expression.");
 		this.define = function(object) {
 			let ext = Object.create(object[this.name] || null);
-			// if (this.expr[Symbol.iterator]) {
-			// 	for (let value of this.expr) {
-			// 		if (value && value.name) {
-			// 			ext[value.name] = value;
-			// 		}
-			// 		else {
-			// 			console.warn("Array extend element does not contain a name property. Igonoring.");
-			// 		}
-			// 	}
-			// }
-			for (let name in this.expr as object) {
+			for (let name in this.expr) {
 				let expr = this.expr[name];
 				if (typeof expr == "function" && !expr.$super && typeof ext[name] == "function") {
 					expr.$super = ext[name];
@@ -138,6 +123,8 @@ export const base: bundle<facet> = {
 			});
 		}
 	}
+}
+
 	// type(this: Descriptor) {
 	// 	let this = new Descriptor(name, expr, facetName);
 	// 	if (typeof this.expr != "string") {
@@ -170,4 +157,3 @@ export const base: bundle<facet> = {
 	// 		return Reflect.defineProperty(object, this.symbol, this);
 	// 	}
 	// }
-}

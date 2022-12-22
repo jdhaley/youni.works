@@ -1,5 +1,5 @@
 export const TYPE = Symbol("type");
-export type factory = (source: source, name?: string) => object;
+export type compile = (source: source, name?: string) => object;
 
 export type facet = (descriptor: Descriptor) => void;
 
@@ -67,7 +67,7 @@ export class Descriptor implements Declaration {
 }
 export type fn = (args: any) => unknown;
 
-export function createCompiler(facets: bundle<facet>): factory {
+export function createCompiler(facets: bundle<facet>): compile {
 	let factory = new Compiler(facets);
 	return factory.compile.bind(factory);
 }

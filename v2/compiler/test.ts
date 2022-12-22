@@ -1,11 +1,15 @@
-import { Box } from "../control/box.js";
 import { TYPE, createCompiler } from "./compiler.js"
 import { base } from "./facets.js";
+import { Loader } from "./loader.js";
 
+class Instance {
+	x: 0;
+	y: 0;
+}
 const test = {
 	Instance: {
 		type$: "",
-		prototype$: new Box(),
+		prototype$: new Instance(),
 		get$type() {
 			return this[TYPE]
 		}
@@ -34,7 +38,20 @@ const test = {
 		}
 	}
 }
+const load = {
+	use$testTask: "/journal/test.task.json",
+	use$viewer: "/dsp/youni.works/base/viewer.js",
+	task: {
+		type$: "",
+		get$something() {
+			return this.tasks;
+		}
+	},
+	a: 10,
+	b: "test"
+}
 
+new Loader(base).compile(load, "mystuff");
 const compile = createCompiler(base);
 let target = compile(test, "test") as any;
 // let out = "";
