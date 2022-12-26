@@ -41,7 +41,7 @@ export class BaseReceiver implements Receiver {
 	$super(signal: Signal) {
 		let action = this.actions && this.actions[signal.subject];
 		action = action ? action["_super"] : null;
-		action && action.call(this, signal);
+		action?.call(this, signal);
 	}
 }
 
@@ -76,7 +76,7 @@ function sendTo<T>(owner: Owner<T>, msg: Signal, to: T) {
 	let parts = owner.getPartsOf(to) || EMPTY.array;
 	for (let part of parts) {
 		msg.from = to;
-		owner.send(msg, part);
+		sendTo(owner, msg, part);
 	}
 }
 
