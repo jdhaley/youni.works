@@ -4,6 +4,7 @@ import { getEditor, mark, narrowRange, senseChange, unmark } from "../editUtil.j
 import { Replace } from "../commands/replaceCmd.js";
 import { Editor } from "../../base/editor.js";
 import { CHAR } from "../../base/util.js";
+import { Box } from "../../control/box.js";
 
 export const textEd = {
 	exec(this: Editor, commandName: string, range: RANGE, content: string): void {
@@ -36,6 +37,13 @@ export const textEd = {
 		model = model.replace(CHAR.NBSP, " ");
 		model = model.trim();
 		return model;			
+	},
+	redraw(this: Box, content: ELE) {
+		this.box(content.id);
+		let level = content.getAttribute("level");
+		if (level) this.view.setAttribute("aria-level", level);
+		//even though this a plain text editor, always use HTML so that the marker is transferred to the view.
+		this.body.view.innerHTML = content.innerHTML;
 	}
 }
 const COMMANDS = {

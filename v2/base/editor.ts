@@ -11,6 +11,7 @@ export interface Editor extends Viewer, Editable {
 	id: string;
 	level: number;
 
+	redraw(ele: ELE): void;
 	/* The following are all deprecated */
 	convert?(type: string): void;
 	content: ELE;

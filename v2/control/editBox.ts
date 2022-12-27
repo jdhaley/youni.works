@@ -32,7 +32,8 @@ export class EditBox extends Box implements Editor {
 		this.view.setAttribute("data-item", this.type.name);
 		this.content.classList.add("content");
 	}
-
+	redraw(ele: ELE): void {
+	}
 	/*
 		The following are all deprecated
 	*/

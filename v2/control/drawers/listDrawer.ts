@@ -17,22 +17,6 @@ export const listDrawer = {
 			view.draw(item);
 		}
 	},
-	drawElement(this: Box, content: ELE): void {
-		this.box(content.id);
-		let level = content.getAttribute("level");
-		if (level) this.view.setAttribute("aria-level", level);
-		if (!content) return;
-		for (let child of content.children) {
-			let childType = this.type.types[child.nodeName];
-			if (childType) {
-				let view = childType.create() as Box;
-				this.body.view.append(view.view);
-				view.drawElement(child);
-			} else if (!child.id.endsWith("-marker")) {
-				console.warn("Unknown type: ", child.nodeName);
-			}
-		}
-	},
 	createFooter(model?: unknown) {
 		let footer = this.view.ownerDocument.createElement("footer") as Element;
 		this.view.append(footer);

@@ -1,5 +1,6 @@
-import { RANGE } from "../../base/dom.js";
+import { ELE, RANGE } from "../../base/dom.js";
 import { Editor } from "../../base/editor.js";
+import { Box } from "../../control/box.js";
 
 import { ListReplace } from "../commands/listReplaceCmd.js";
 import { getEditor, senseChange } from "../editUtil.js";
@@ -35,4 +36,20 @@ export const listEd = {
 		}
 		return model;
 	},
+	redraw(this: Box, content: ELE): void {
+		this.box(content.id);
+		let level = content.getAttribute("level");
+		if (level) this.view.setAttribute("aria-level", level);
+		if (!content) return;
+		for (let child of content.children) {
+			let childType = this.type.types[child.nodeName];
+			if (childType) {
+				let view = childType.create() as Editor;
+				this.body.view.append(view.view);
+				view.redraw(child);
+			} else if (!child.id.endsWith("-marker")) {
+				console.warn("Unknown type: ", child.nodeName);
+			}
+		}
+	}
 }

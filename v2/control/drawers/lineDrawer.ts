@@ -6,12 +6,5 @@ export const lineDrawer = {
 		this.box();
 		this.content.innerHTML = (content ? "" + content.content : "");
 		this.level = content.level;	
-	},
-	drawElement(content: ELE): void {
-		this.box(content.id);
-		let level = content.getAttribute("level");
-		if (level) this.view.setAttribute("aria-level", level);
-		this.content.innerHTML = content.innerHTML;
-		this.level = Number.parseInt(content.getAttribute("level"));
-	},
+	}
 }

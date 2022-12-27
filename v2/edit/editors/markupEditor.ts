@@ -5,8 +5,10 @@ import { MarkupReplace } from "../commands/markupReplaceCmd.js";
 import { getChildEditor, getEditor, senseChange } from "../editUtil.js";
 import { Editor } from "../../base/editor.js";
 import { listEd } from "./listEditor.js";
+import _package from "../../../../vm/ts/devt/package.js";
+import { extend } from "../../base/util.js";
 
-export const markupEd = {
+export const markupEd = extend(listEd, {
 	exec(this: Editor, commandName: string, range: RANGE, content: string): void {
 		if (getEditor(range) != this) console.warn("fix this check"); //"Invalid edit range"
 		let cmd = COMMANDS[commandName];
@@ -18,9 +20,8 @@ export const markupEd = {
 		this.type.context.selectionRange = r;
 
 		senseChange(this, commandName);
-	},
-	valueOf: listEd.valueOf
-}
+	}
+});
 
 const COMMANDS = {
 	"Cut": replace,

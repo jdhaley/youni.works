@@ -85,9 +85,9 @@ const XELE = document.implementation.createDocument(null, "root").documentElemen
 function createViewNodes(type: EditorType, markup: string) {
 	XELE.innerHTML = markup;
 	//TODO contentedit refactoring - editor won't have content attribute.
-	let viewer = type.create() as Box;
-	viewer.drawElement(XELE);
-	return viewer.body.view.children;
+	let viewer = type.create() as Editor;
+	viewer.redraw(XELE);
+	return viewer.content.children;
 }
 
 function mergeContent(range: RANGE, value: unknown) {

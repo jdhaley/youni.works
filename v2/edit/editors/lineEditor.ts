@@ -1,12 +1,12 @@
-import { RANGE } from "../../base/dom.js";
+import { ELE, RANGE } from "../../base/dom.js";
 import { Editor } from "../../base/editor.js";
+import { extend } from "../../base/util.js";
 import { Part } from "../../base/viewer.js";
 
 import { getEditor } from "../editUtil.js";
 import { textEd } from "./textEditor.js";
 
-export const lineEd = {
-	exec: textEd.exec,
+export const lineEd = extend(textEd, {
 	valueOf(range?: RANGE): Part {
 		if (range && !range.intersectsNode(this.content)) return;
 		let content = textEd.valueOf.call(this, range);
@@ -14,7 +14,14 @@ export const lineEd = {
 		let level = Number.parseInt(this.view.getAttribute("aria-level"));
 		if (level) item.level = level;
 		return item;
-	},	
+	},
+	redraw(content: ELE): void {
+		this.box(content.id);
+		let level = content.getAttribute("level");
+		if (level) this.view.setAttribute("aria-level", level);
+		this.content.innerHTML = content.innerHTML;
+		this.level = Number.parseInt(content.getAttribute("level"));
+	},
 	demote() {
 		let level = this.level;
 		if (this.type.name == "heading") {
@@ -58,4 +65,4 @@ export const lineEd = {
 			this.view.setAttribute("data-item", toType.name);
 		}
 	}
-}
+});

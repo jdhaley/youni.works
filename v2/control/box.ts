@@ -1,5 +1,4 @@
 import { Actions } from "../base/controller.js";
-import { ELE } from "../base/dom.js";
 import { Editable } from "../base/editor.js";
 import { Loader } from "../base/type.js";
 import { bundle, implement } from "../base/util.js";
@@ -9,7 +8,6 @@ import { ViewConf, VType } from "./viewType.js";
 
 export interface Drawable {
 	draw(model: unknown): void;
-	drawElement(model: ELE): void;
 }
 
 export class Box extends ElementShape implements Viewer {
@@ -50,8 +48,6 @@ export class Box extends ElementShape implements Viewer {
 	}
 	draw(value: unknown): void {
 	}
-	drawElement(model: ELE): void {
-	}
 }
 let NEXT_ID = 1;
 
@@ -77,6 +73,13 @@ export class BoxType extends VType {
 		if (conf.drawer) implement(this.prototype, conf.drawer);
 		if (conf.editor) implement(this.prototype, conf.editor);	
 	}
+	createMember(editor: Box, name: string): Box {
+		let type = this.types[name];
+		let member = type.create() as Box;
+		member.view.classList.add("field");
+		editor.body.view.append(member.view);
+		return member;
+	}	
 }
 
 export interface BoxConf extends ViewConf {
