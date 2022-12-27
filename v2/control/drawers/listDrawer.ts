@@ -4,7 +4,7 @@ import { Box } from "../box.js";
 import { DisplayType } from "../../ui/display.js";
 
 export const listDrawer = {
-	drawValue(this: Box, model: unknown): void {
+	draw(this: Box, model: unknown): void {
 		this.box();
 		if (this.type.conf["tableType"]) drawTable.call(this);
 		if (model && model[Symbol.iterator]) for (let item of (model as Iterable<unknown>)) {
@@ -18,14 +18,16 @@ export const listDrawer = {
 		}
 	},
 	drawElement(this: Box, content: ELE): void {
-		this.box();
+		this.box(content.id);
+		let level = content.getAttribute("level");
+		if (level) this.view.setAttribute("aria-level", level);
 		if (!content) return;
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
-				let view = childType.create();
+				let view = childType.create() as Box;
 				this.body.view.append(view.view);
-				view.draw(child);
+				view.drawElement(child);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
 			}

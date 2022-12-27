@@ -5,14 +5,17 @@ import { Box } from "../box.js";
 export const recordDrawer = {
 	memberType: "field",
 
-	drawValue(this: Box, model: unknown): void {
+	draw(this: Box, model: unknown): void {
 		this.box();
 		for (let name in this.type.types) {
-			viewMember(this, name, model ? model[name] : undefined);
+			let box = createMember(this, name, model ? model[name] : undefined);
+			box.draw(model[name]);
 		}
 	},
 	drawElement(this: Box, content: ELE): void {
-		this.box();
+		this.box(content.id);
+		let level = content.getAttribute("level");
+		if (level) this.view.setAttribute("aria-level", level);
 		/*
 			viewElement is called via a replace command. Because the range may only include a
 			subset of the fields, we no longer create the entire record - only those in the command.
@@ -20,7 +23,8 @@ export const recordDrawer = {
 
 	//	let idx = {};
 		for (let member of content.children) {
-			viewMember(this, member.nodeName, member);
+			let box = createMember(this, member.nodeName, member);
+			box.drawElement(member);
 	//		idx[member.nodeName] = member;
 		}
 		// for (let name in this.type.types) {
@@ -29,12 +33,10 @@ export const recordDrawer = {
 	},
 }
 
-function viewMember(editor: Box, name: string, value: any): ContentView {
+function createMember(editor: Box, name: string, value: any): Box {
 	let type = editor.type.types[name];
-	let member = type.create();
+	let member = type.create() as Box;
 	member.view.classList.add("field");
 	editor.body.view.append(member.view);
-	member.draw(value);
-	//TODO contentedit refactoring - remove cast once refactoring complete
-	return member as ContentView;
+	return member;
 }

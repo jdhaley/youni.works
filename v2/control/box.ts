@@ -8,7 +8,7 @@ import { ElementShape } from "./eleControl.js";
 import { ViewConf, VType } from "./viewType.js";
 
 export interface Drawable {
-	drawValue(model: unknown): void;
+	draw(model: unknown): void;
 	drawElement(model: ELE): void;
 }
 
@@ -28,38 +28,32 @@ export class Box extends ElementShape implements Viewer {
 			if (view != this && name == view?.type.name) return view;
 		}
 	}
-	box() {
+	box(id?: string) {
+		this.body = this;
+		this.view.id = id || "" + NEXT_ID++;
 		this.view.textContent = "";
-		if (this.type.body && this.type.header) {
+		if (!this.type.body) return;
+		
+		if (this.type.header) {
 			this.header = this.type.header.create() as Box;
 			this.view.append(this.header.view);
 			this.header.box();
 		}
-		if (this.type.body) {
-			this.body = this.type.body.create() as Box;
-			this.view.append(this.body.view);
-			this.body.box();
-		} else {
-			this.body = this;
-		}
-		if (this.type.body && this.type.footer) {
+		this.body = this.type.body.create() as Box;
+		this.view.append(this.body.view);
+		this.body.box();
+		if (this.type.footer) {
 			this.footer = this.type.footer.create() as Box;
 			this.view.append(this.footer.view);
 			this.footer.box();
 		}
 	}
 	draw(value: unknown): void {
-		if (value instanceof Element) {
-			this.drawElement(value);
-		} else {
-			this.drawValue(value);
-		}
-	}
-	drawValue(model: unknown): void {
 	}
 	drawElement(model: ELE): void {
 	}
 }
+let NEXT_ID = 1;
 
 export class BoxType extends VType {
 	declare conf: BoxConf;

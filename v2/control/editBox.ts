@@ -27,16 +27,9 @@ export class EditBox extends Box implements Editor {
 	valueOf(filter?: unknown): unknown {
 		return undefined;
 	}
-	draw(value?: unknown): void {
+	box(id?: string): void {
+		super.box(id);
 		this.view.setAttribute("data-item", this.type.name);
-		if (value instanceof Element) {
-			if (value.id) this.view.id = value.id;
-			let level = value.getAttribute("level");
-			if (level) this.view.setAttribute("aria-level", level);
-		} else {
-			this.view.id = "" + NEXT_ID++;
-		}
-		super.draw(value);
 		this.content.classList.add("content");
 	}
 
@@ -53,8 +46,6 @@ export class EditBox extends Box implements Editor {
 	convert?(type: string): void {
 	}
 }
-
-let NEXT_ID = 1;
 
 //Can't have a single viewElement now because draw() is overridden in Box to create headers, etc.
 //if we separate draw into structure creation and viewing it would be possible.
