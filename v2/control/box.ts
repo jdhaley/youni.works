@@ -28,25 +28,28 @@ export class Box extends ElementShape implements Viewer {
 			if (view != this && name == view?.type.name) return view;
 		}
 	}
-	draw(value: unknown): void {
+	box() {
 		this.view.textContent = "";
 		if (this.type.body && this.type.header) {
 			this.header = this.type.header.create() as Box;
 			this.view.append(this.header.view);
-			this.header.draw(value);
+			this.header.box();
 		}
 		if (this.type.body) {
 			this.body = this.type.body.create() as Box;
 			this.view.append(this.body.view);
-			this.body.draw(value);
+			this.body.box();
 		} else {
 			this.body = this;
 		}
 		if (this.type.body && this.type.footer) {
 			this.footer = this.type.footer.create() as Box;
 			this.view.append(this.footer.view);
-			this.footer.draw(value);
+			this.footer.box();
 		}
+	}
+	draw(value: unknown): void {
+		this.box();
 		if (value instanceof Element) {
 			this.drawElement(value);
 		} else {

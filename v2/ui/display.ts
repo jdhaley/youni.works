@@ -15,7 +15,7 @@ export interface Display extends BoxConf {
 }
 
 export class Label extends Box {
-	draw() {
+	box() {
 		let partOf = this.partOf as Box;
 		if (partOf) {
 			this.view.textContent = "" + partOf.type.title;	
