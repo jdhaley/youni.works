@@ -1,12 +1,15 @@
 import { ELE } from "../../base/dom.js";
 import { ContentView } from "../../base/viewer.js";
+import { Box } from "../box.js";
 
 export const textDrawer = {
-	drawValue(this: ContentView, model: undefined): void {
-		this.content.textContent = model ? "" + model : "";
+	drawValue(this: Box, model: undefined): void {
+		this.box();
+		this.body.view.textContent = model ? "" + model : "";
 	},
-	drawElement(this: ContentView, ele: ELE) {
+	drawElement(this: Box, ele: ELE) {
+		this.box();
 		//even with plain text, always use HTML so that the marker is transferred to the view.
-		this.content.innerHTML = ele.innerHTML;
+		this.body.view.innerHTML = ele.innerHTML;
 	}
 }

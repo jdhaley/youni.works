@@ -49,16 +49,15 @@ export class Box extends ElementShape implements Viewer {
 		}
 	}
 	draw(value: unknown): void {
-		this.box();
 		if (value instanceof Element) {
 			this.drawElement(value);
 		} else {
 			this.drawValue(value);
 		}
 	}
-	protected drawValue(model: unknown): void {
+	drawValue(model: unknown): void {
 	}
-	protected drawElement(model: ELE): void {
+	drawElement(model: ELE): void {
 	}
 }
 

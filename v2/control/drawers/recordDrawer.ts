@@ -1,15 +1,18 @@
 import { ContentView } from "../../base/viewer.js";
 import { ELE } from "../../base/dom.js";
+import { Box } from "../box.js";
 
 export const recordDrawer = {
 	memberType: "field",
 
-	drawValue(this: ContentView, model: unknown): void {
+	drawValue(this: Box, model: unknown): void {
+		this.box();
 		for (let name in this.type.types) {
 			viewMember(this, name, model ? model[name] : undefined);
 		}
 	},
-	drawElement(this: ContentView, content: ELE): void {
+	drawElement(this: Box, content: ELE): void {
+		this.box();
 		/*
 			viewElement is called via a replace command. Because the range may only include a
 			subset of the fields, we no longer create the entire record - only those in the command.
@@ -26,11 +29,11 @@ export const recordDrawer = {
 	},
 }
 
-function viewMember(editor: ContentView, name: string, value: any): ContentView {
+function viewMember(editor: Box, name: string, value: any): ContentView {
 	let type = editor.type.types[name];
 	let member = type.create();
 	member.view.classList.add("field");
-	editor.content.append(member.view);
+	editor.body.view.append(member.view);
 	member.draw(value);
 	//TODO contentedit refactoring - remove cast once refactoring complete
 	return member as ContentView;

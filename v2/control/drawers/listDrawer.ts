@@ -4,25 +4,27 @@ import { Box } from "../box.js";
 import { DisplayType } from "../../ui/display.js";
 
 export const listDrawer = {
-	drawValue(this: ContentView, model: unknown): void {
-		if (this.type.conf.tableType) drawTable.call(this);
+	drawValue(this: Box, model: unknown): void {
+		this.box();
+		if (this.type.conf["tableType"]) drawTable.call(this);
 		if (model && model[Symbol.iterator]) for (let item of (model as Iterable<unknown>)) {
 			let type = this.type.types[viewTypeOf(item)];
 			if (!type) {
 				throw new Error(`Type "${viewTypeOf(item)}" not defined for this content. Using "unknown" type.`);
 			}
 			let view = type.create();
-			this.content.append(view.view);
+			this.body.view.append(view.view);
 			view.draw(item);
 		}
 	},
-	drawElement(this: ContentView, content: ELE): void {
+	drawElement(this: Box, content: ELE): void {
+		this.box();
 		if (!content) return;
 		for (let child of content.children) {
 			let childType = this.type.types[child.nodeName];
 			if (childType) {
 				let view = childType.create();
-				this.content.append(view.view);
+				this.body.view.append(view.view);
 				view.draw(child);
 			} else if (!child.id.endsWith("-marker")) {
 				console.warn("Unknown type: ", child.nodeName);
