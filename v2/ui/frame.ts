@@ -1,8 +1,8 @@
-import { Signal, Actions, Owner, Receiver } from "../base/controller.js";
+import { Signal, Actions, Owner, Receiver, Controller } from "../base/controller.js";
 import { ELE, RANGE } from "../base/dom";
 import { EMPTY } from "../base/util.js";
 
-export class Frame extends Owner<ELE> {
+export class Frame extends Owner<ELE> implements Controller<ELE> {
 	constructor(window: Window, actions: Actions) {
 		super();
 		window.document.body.textContent = "";

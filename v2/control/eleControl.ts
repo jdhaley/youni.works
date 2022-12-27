@@ -33,19 +33,6 @@ export class ElementController extends BaseReceiver implements Controller<ELE> {
 			if (control) return control;
 		}
 	}
-
-	control(node: ELE) {
-		if (node["$control"]) {
-			this.uncontrol(node);
-		}
-		node["$control"] = this;
-		this.view = node;
-	}
-	uncontrol(node: ELE) {
-		if (node["$control"]) {
-			throw new Error("Node is already controlled.");
-		}
-	}
 }
 
 interface SHAPE_ELE extends ELE {
