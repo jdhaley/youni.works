@@ -5,6 +5,7 @@ import { unmark /*, bindViewEle*/, narrowRange, mark, getEditor, getChildEditor,
 import { Replace } from "./replaceCmd.js";
 import { Editor, EditorType } from "../../base/editor.js";
 import { ContentView } from "../../base/viewer.js";
+import { Box } from "../../control/box.js";
 
 export class RangeReplace extends Replace {
 	startId: string;
@@ -84,9 +85,9 @@ const XELE = document.implementation.createDocument(null, "root").documentElemen
 function createViewNodes(type: EditorType, markup: string) {
 	XELE.innerHTML = markup;
 	//TODO contentedit refactoring - editor won't have content attribute.
-	let viewer = type.create() as ContentView;
-	viewer.draw(XELE);
-	return viewer.content.children;
+	let viewer = type.create() as Box;
+	viewer.drawElement(XELE);
+	return viewer.body.view.children;
 }
 
 function mergeContent(range: RANGE, value: unknown) {
