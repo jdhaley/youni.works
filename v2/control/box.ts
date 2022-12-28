@@ -67,9 +67,7 @@ export class BoxType extends VType {
 		this.footer = this.conf.footer ? this.extendType("footer", this.conf.footer, loader) : null;
 	}
 	protected extendPrototype(conf: BoxConf): void {
-		this.prototype = Object.create(this.prototype || this.conf.prototype);
-		this.prototype.type = this;
-		this.prototype.actions = this.conf.actions;
+		super.extendPrototype(conf);
 		if (conf.drawer) implement(this.prototype, conf.drawer);
 		if (conf.editor) implement(this.prototype, conf.editor);	
 	}

@@ -62,7 +62,9 @@ export class VType extends BaseType implements ViewType {
 	}
 
 	protected extendPrototype(conf: ViewConf) {
-		this.prototype = Object.create(this.conf.prototype);
+		let prototype = this.prototype;
+		if (Object.hasOwn(conf, "prototype")) prototype = conf.prototype;
+		this.prototype = Object.create(prototype);
 		this.prototype.type = this;
 		this.prototype.actions = this.conf.actions;
 	}
