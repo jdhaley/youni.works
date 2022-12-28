@@ -6,11 +6,13 @@ import { CommandBuffer } from "../../base/command.js";
 
 import { UserEvent } from "../frame.js";
 import { Change, IArticle } from "../article.js";
+import { BaseType, Type } from "../../base/type.js";
+import { VType } from "../../control/viewType.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : JSON.parse(res.body);
-		let type = getType(this, res.req.to, this.source);
+		let type = getType(this, res.req.to, this.source) as VType;
 		let viewer = type.create();
 		this.view = viewer.view;
 		this.view.setAttribute("data-file", res.req.to);
@@ -58,7 +60,7 @@ export default extend(null, {
 	}
 });
 
-function getType(article: IArticle, path: string, data: any): ViewType {
+function getType(article: IArticle, path: string, data: any): Type {
 	path = path.substring(path.lastIndexOf("/") + 1);
 	if (path.endsWith(".json")) path = path.substring(0, path.length - 5);
 	let typeName = path.indexOf (".") > 0 ? path.substring(path.lastIndexOf(".") + 1) : "";
