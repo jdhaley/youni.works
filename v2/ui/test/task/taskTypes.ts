@@ -1,4 +1,8 @@
 export default {
+	taskTable: {
+		type: "tasks",
+		tableType: "task"
+	},
 	tasks: {
 		type: "list",
 		title: "Tasks",

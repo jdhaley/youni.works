@@ -8,25 +8,23 @@ import controller from "../../actions/frame.js";
 import baseTypes from "../../conf/baseTypes.js";
 import editorTypes from "../../conf/editorTypes.js";
 import boxTypes from "../../conf/boxTypes.js";
-
 import articleTypes from "./taskTypes.js";
 import devt from "./uiTypes.js";
 
-import value from "./tasks.js";
+import tasks from "./tasks.js";
 import "../../../tpl/test.js";
-implement(articleTypes, devt, boxTypes, editorTypes);
 
 let frame = new Frame(window, controller);
 let article = new IArticle(frame, {
-	baseTypes: baseTypes,
-	articleTypes: articleTypes,
+	types: implement(null, articleTypes, devt, boxTypes, editorTypes, baseTypes),
 	sources: "/journal",
 });
 
-let tasks = article.types.taskDialog.create();
-frame.view.append(tasks.view);
-tasks.draw(value);
-frame.send("view", frame.view);
+let dialog = article.forName("dialog").create() as Dialog;
+frame.view.append(dialog.view);
+dialog.draw(tasks, "taskTable");
+//frame.send("view", frame.view);
 frame.view.setAttribute("contenteditable", "true");
 
 import "../../../compiler/test.js";
+import { Dialog } from "../../display.js";

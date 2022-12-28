@@ -1,10 +1,11 @@
 import { Article, Viewer, ViewType } from "../base/viewer.js";
-import { BaseType, Loader, TypeContext } from "../base/type.js";
+import { BaseType, TypeContext } from "../base/type.js";
 import { Actions, Controller } from "../base/controller.js";
 import { ELE } from "../base/dom.js";
 import { bundle, extend, implement } from "../base/util.js";
 
 interface ViewContext extends Controller<ELE>, TypeContext, Article {
+	forName(name: string): VType;
 	createElement(name: string): ELE;
 }
 
@@ -49,14 +50,14 @@ export class VType extends BaseType implements ViewType {
 		view.view = node;
 		return view;
 	}
-	start(conf: ViewConf, loader?: Loader) {
+	start(conf: ViewConf) {
 		if (!conf.name) console.warn("No conf name", conf);
 		let actions = this.conf?.actions || null;
 
 		this.conf = this.conf ? extend(this.conf, conf) : conf;
 
 		this.extendActions(actions, conf.actions);
-		if (conf.types) this.extendTypes(conf.types, loader);
+		if (conf.types) this.extendTypes(conf.types);
 
 		this.extendPrototype(conf);
 	}
@@ -69,11 +70,11 @@ export class VType extends BaseType implements ViewType {
 		this.prototype.actions = this.conf.actions;
 	}
 
-	protected extendTypes(types: bundle<ViewConf | string>, loader: Loader) {
+	protected extendTypes(types: bundle<ViewConf | string>) {
 		//Use implement rather than extend so the types is "flat" as this may be import for record member iteration.
 		this.types = implement(Object.create(null), this.types || null) as bundle<VType>;
 		for (let name in types) {
-			let member = this.extendType(name, types[name], loader);
+			let member = this.extendType(name, types[name]);
 			this.types[name] = member;
 		}
 	}
@@ -92,7 +93,7 @@ export class VType extends BaseType implements ViewType {
 			this.conf.actions[name] = action;
 		}
 	}
-	protected extendType(name: string, conf: ViewConf | string, loader: Loader) {
+	protected extendType(name: string, conf: ViewConf | string) {
 		let memberConf: ViewConf;
 		if (typeof conf == "string") {
 			memberConf = { 
@@ -104,11 +105,11 @@ export class VType extends BaseType implements ViewType {
 		}
 		memberConf.name = name;
 
-		let member = loader.get(memberConf.type) as VType;
+		let member = this.context.forName(memberConf.type);
 		if (!member) throw new Error(`Can find type "${memberConf.type}" loading "${this.name}.${name}"`);
 		member = Object.create(member);
 		member.partOf = this;
-		member.start(memberConf, loader);
+		member.start(memberConf);
 		return member;
 	}
 }

@@ -53,6 +53,7 @@ export function extend(proto: Object, extension: Object) {
 }
 
 export function implement(object: Object, ...extensions: Object[]) {
+	if (object === null) object = Object.create(null);
 	for (let extension of extensions) {
 		for (let name in extension) {
 			object[name] = extension[name];

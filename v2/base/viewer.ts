@@ -1,6 +1,6 @@
 import { CommandBuffer } from "./command.js";
 import { Controller } from "./controller.js";
-import { Type } from "./type.js";
+import { Type, TypeContext } from "./type.js";
 import { ele, ELE, NODE, RANGE } from "./dom.js";
 import { bundle } from "./util.js";
 
@@ -19,7 +19,7 @@ export interface ViewType extends Type {
 	control(node: ELE): Viewer;
 }
 
-export interface Article extends Controller<ELE> {
+export interface Article extends Controller<ELE>, TypeContext {
 	commands: CommandBuffer<RANGE>;
 	selectionRange: RANGE;
 	getControl(id: string): Viewer;

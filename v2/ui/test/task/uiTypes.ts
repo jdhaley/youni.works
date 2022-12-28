@@ -1,13 +1,9 @@
-import { Signal } from "../../../base/controller.js";
-import { extend } from "../../../base/util.js";
 import { Box } from "../../../control/box.js";
 
 import { UserEvent } from "../../frame.js";
 
 import shape from "../../actions/shape.js";
-import { Display, DisplayType } from "../../display.js";
-import { Loader } from "../../../base/type.js";
-
+import { Dialog } from "../../display.js";
 
 // interface TableConf {
 // 	contentType: string,
@@ -63,20 +59,22 @@ export default {
 		}
 	},
 	dialog: {
-		type: "panel",
+		type: "display",
+		prototype: new Dialog(),
 		title: "Dialog",
 		tagName: "ui-dialog",
 		header: "dialogCaption",
-		actions: shape,
-		styles: {
-			"ui-dialog>ui-dialog-body": `
-				display: flex;
-				flex-direction: column;
-				padding: 4px;
-				border: 0 solid gainsboro;
-				border-width: 0 1px 1px 1px;
-			`
-		}
+		body: {
+			type: "display",
+			style: {
+				display: "flex",
+				flex_direction: "column",
+				padding: "4px",
+				border: "0 solid gainsboro",
+				border_width: "0 1px 1px 1px"
+			}
+		},
+	//	actions: shape,
 	},
 	dialogCaption:  {
 		type: "panel",
@@ -99,15 +97,6 @@ export default {
 			view: function (this: Box, event: UserEvent) {
 				this.body.view.textContent = this.partOf.body.type.conf.title;
 			}
-		}
-	},
-	taskDialog:{
-		type: "dialog",
-		body: {
-			type: "tasks",
-			header: "display",
-			body: "display",
-			tableType: "task"
 		}
 	}
 }

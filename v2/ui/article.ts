@@ -3,27 +3,29 @@ import { Editor, Edits } from "../base/editor.js";
 import { CommandBuffer } from "../base/command.js";
 import { BaseReceiver, Controller, Signal } from "../base/controller.js";
 import { RemoteFileService } from "../base/remote.js";
-import { start, TypeContext } from "../base/type.js";
+import { TypeContext } from "../base/type.js";
 import { bundle } from "../base/util.js";
 import { DOCUMENT, ELE, RANGE } from "../base/dom.js";
 
 import { Frame } from "./frame.js";
+import { VType } from "../control/viewType.js";
 
 export class IArticle extends BaseReceiver implements TypeContext, Controller<ELE>, Article {
 	constructor(frame: Frame, conf: bundle<any>) {
 		super();
 		this.owner = frame;
-		this.types = Object.create(null);
 		this.commands = new CommandBuffer();
 		this.service = new RemoteFileService(this.owner.location.origin + conf.sources);
 		this.actions = conf.actions;
-		start(this, conf.baseTypes, conf.articleTypes);
+		this.#types = Object.create(null);
+		this.#sourceTypes = conf.types;
 	}
+	#types: bundle<VType>;
+	#sourceTypes: bundle<string | object>;
 	readonly owner: Frame
 	readonly service: RemoteFileService;
 	readonly commands: CommandBuffer<RANGE>;
 
-	declare types: bundle<ViewType>;
 	declare view: ELE;
 	declare recordCommands: boolean;
 	declare source: unknown;
@@ -75,6 +77,30 @@ export class IArticle extends BaseReceiver implements TypeContext, Controller<EL
 		}
 		return range;
 	}
+	forName(name: string): VType {
+		let type = this.#types[name];
+		if (!type && this.#sourceTypes[name]) {
+			let source = this.#sourceTypes[name] as TypeConf;
+			if (typeof source == "string") return this.forName(source);
+			source.name = name;
+			if (!source.type) {
+				if (!source.class) throw new Error(`Type "${name}" has no type or class property.`);
+				type = new source.class(this);
+			} else {
+				type = this.forName(source.type);
+				if (!type) throw new Error(`Type "${source.type}" not found loading: ${JSON.stringify(source)}`);
+				type = Object.create(type);
+			}
+			this.#types[name] = type;
+			type.start(source as any);
+		}
+		return type;
+	}
+}
+interface TypeConf {
+	name: string;
+	type: string;
+	class: typeof VType;
 }
 
 function getNode(doc: DOCUMENT, path: string[]) {
@@ -106,7 +132,7 @@ export class Change implements Signal {
 
 
 export function play(article: IArticle, edits: Edits) {
-	let type = article.types[edits.type];
+	let type = article.forName(edits.type);
 	let view = type.create();
 	view.draw(edits.source);
 	article.view = view.view;

@@ -65,7 +65,7 @@ function getType(article: IArticle, path: string, data: any): ViewType {
 	if (!typeName && data && typeof data == "object" && data.type$) {
 		typeName = data.type$;
 	}
-	return article.types[typeName] || article.types["default"] as any;
+	return article.forName(typeName) || article.forName("default");
 }
 
 function serializeCommands(history: CommandBuffer<RANGE>) {

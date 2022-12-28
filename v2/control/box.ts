@@ -1,6 +1,5 @@
 import { Actions } from "../base/controller.js";
 import { Editable } from "../base/editor.js";
-import { Loader } from "../base/type.js";
 import { bundle, implement } from "../base/util.js";
 import { getView, Viewer } from "../base/viewer.js";
 import { ElementShape } from "./eleControl.js";
@@ -60,11 +59,11 @@ export class BoxType extends VType {
 	get model() {
 		return this.conf.model;
 	}
-	start(conf: BoxConf, loader: Loader) {
-		super.start(conf, loader);
-		this.body = this.conf.body ? this.extendType("body", this.conf.body, loader) : null;
-		this.header = this.conf.header ? this.extendType("header", this.conf.header, loader) : null;
-		this.footer = this.conf.footer ? this.extendType("footer", this.conf.footer, loader) : null;
+	start(conf: BoxConf) {
+		super.start(conf);
+		this.body = this.conf.body ? this.extendType("body", this.conf.body) : null;
+		this.header = this.conf.header ? this.extendType("header", this.conf.header) : null;
+		this.footer = this.conf.footer ? this.extendType("footer", this.conf.footer) : null;
 	}
 	protected extendPrototype(conf: BoxConf): void {
 		super.extendPrototype(conf);
