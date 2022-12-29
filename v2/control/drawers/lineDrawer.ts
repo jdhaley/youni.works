@@ -1,4 +1,3 @@
-import { ELE } from "../../base/dom.js";
 import { Part } from "../../base/viewer.js";
 
 export const lineDrawer = {

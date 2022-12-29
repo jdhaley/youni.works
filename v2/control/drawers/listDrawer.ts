@@ -1,5 +1,3 @@
-import { ContentView } from "../../base/viewer.js";
-import { ELE } from "../../base/dom.js";
 import { Box } from "../box.js";
 import { DisplayType } from "../../ui/display.js";
 
@@ -61,7 +59,9 @@ function drawTable(this: Box) {
 	if (this.header) drawTableHeader.call(this);
 }
 function drawTableHeader(this: Box) {
+	this.header.view.textContent = "";
 	this.header.view.classList.add("tableHeader");
+	this.header.setStyle("display", "flex");
 	let type = this.type.types[this.type.conf["tableType"]];
 	for (let name in type.types) {
 		let colType = type.types[name] as DisplayType;
