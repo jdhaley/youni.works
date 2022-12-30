@@ -12,7 +12,6 @@ import articleTypes from "./taskTypes.js";
 import devt from "./uiTypes.js";
 
 import tasks from "./tasks.js";
-import "../../../tpl/test.js";
 
 let frame = new Frame(window, controller);
 let article = new IArticle(frame, {
@@ -27,4 +26,12 @@ dialog.draw(tasks, "taskTable");
 frame.view.setAttribute("contenteditable", "true");
 
 import "../../../compiler/test.js";
+//import "../../../tpl/test.js";
+import { fromCsv } from "../../../transform/fromCSV.js";
+let data = `Design,Variety,Other
+1,1,green
+1,true,"black
+and ""blue"""`;
+console.log("xxxx", fromCsv(data));
+
 import { Dialog } from "../../display.js";
