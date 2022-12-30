@@ -6,7 +6,10 @@ export function fromCsv(data: string) {
 		let object = Object.create(null);
 		lines[i] = object;
 		for (let col = 0; col < header.length; col++) {
-			object[header[col]] = line[col];
+			if (line[col] !== undefined) object[header[col]] = line[col];
+		}
+		for (let col = header.length; col < line.length; col++) {
+			object["$" + col] = line[col];
 		}
 	}
 	return lines;
@@ -73,5 +76,6 @@ function parseField(data: string, start: number, end: number): unknown {
 	if (!isNaN(value)) return value;
 	if (data == "true") return true;
 	if (data == "false") return false;
-	return data;
+	if (data == "null") return null;
+	return data || undefined;
 }

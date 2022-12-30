@@ -30,6 +30,7 @@ import "../../../compiler/test.js";
 import { fromCsv } from "../../../transform/fromCSV.js";
 let data = `Design,Variety,Other
 1,1,green
+1,,purple,x,y
 1,true,"black
 and ""blue"""`;
 console.log("xxxx", fromCsv(data));
