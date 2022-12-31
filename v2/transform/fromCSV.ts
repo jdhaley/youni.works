@@ -72,10 +72,10 @@ function parseQuotedField(line: unknown[], data: string, index: number): number 
 
 function parseField(data: string, start: number, end: number): unknown {
 	data = data.substring(start, end);
-	let value = Number.parseFloat(data);
-	if (!isNaN(value)) return value;
+	if (data === "") return undefined;
+	if (Number(data)) return Number(data);
 	if (data == "true") return true;
 	if (data == "false") return false;
 	if (data == "null") return null;
-	return data || undefined;
+	return data;
 }
