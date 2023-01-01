@@ -1,17 +1,19 @@
-import { CommandBuffer } from "../../../base/command.js";
 import { Response } from "../../../base/message.js";
 import { Type } from "../../../base/type.js";
 import { extend } from "../../../base/util.js";
 import { fromCsv } from "../../../transform/fromCSV.js";
 import { Change, IArticle } from "../../article.js";
 import { UserEvent } from "../../frame.js";
-import { process, StampData } from "./stamp.js";
+import { albumize } from "./album.js";
+import { StampData, processStampData } from "./processData.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : fromCsv(res.body);
 		console.log(this.source);
-		process(this.source as StampData[]);
+		let issues = processStampData(this.source as StampData[]);
+		console.log(issues);
+		albumize(issues);
 		// let type = getType(this, res.req.to, this.source) as VType;
 		// let viewer = type.create();
 		// this.view = viewer.view;
