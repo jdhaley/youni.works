@@ -52,11 +52,6 @@ function doVariety(item: Variety, ele: Element) {
 	let line = addTo(ele, "", "title");
 	if (!item.partOf) line.textContent = item.date.substring(0, 4) + ". ";
 	if (item.subject) line.textContent += item.subject;
-	let diffs = diff(item.partOf, item);
-	if (diffs) {
-		line = (addTo(ele, "", "diff"));
-		line.textContent += diffs
-	}
 	doBox(item, ele);
 }
 
@@ -68,6 +63,11 @@ function doBox(item: Variety, ele: Element) {
 	line.textContent = item.denom;
 	line = addTo(box, "", "colors");
 	line.textContent = item.colors.replace(/\//g, ", ");
+	let diffs = diff(item.partOf, item);
+	if (diffs) {
+		line = (addTo(box, "", "diff"));
+		line.textContent += diffs
+	}
 	line = addTo(box, "", "id");
 	line.textContent = "#" + item.id;
 }
