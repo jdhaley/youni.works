@@ -4,13 +4,13 @@ export function fromCsv(data: string) {
 	for (let i = 0; i < lines.length; i++) {
 		let line = lines[i];
 		let object = Object.create(null);
-		lines[i] = object;
 		for (let col = 0; col < header.length; col++) {
 			if (line[col] !== undefined) object[header[col]] = line[col];
 		}
 		for (let col = header.length; col < line.length; col++) {
-			object["$" + col] = line[col];
+			if (line[col] !== undefined) object["$" + col] = line[col];
 		}
+		lines[i] = object; 
 	}
 	return lines;
 }
@@ -21,8 +21,8 @@ export function parseCsv(data: string): unknown[][] {
 	let index = 0;
 	while (index < length) {
 		let line = [];
-		lines.push(line);
 		index = parseLine(line, data, index);
+		lines.push(line);
 	}
 	return lines;
 }
