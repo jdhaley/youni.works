@@ -1,5 +1,7 @@
 import { bundle } from "../../../base/util";
 
+export const diffs = ["purpose", "method", "paper", "tagging", "separation", "other"];
+	
 export interface Design {
 	purpose: "Air" | "Charity" | "Due" | "Tax" | string;
 	subject: string;
@@ -9,10 +11,13 @@ export interface Design {
 	shape: "triangle" | "diamond" | "ellipse" | string;
 	rotation: 1 | 2 | 3;
 }
+
 export interface Media {
-	paper: string;
-	tagging:string;
-	wmk: string;
+	/** Paper type, paper color, etc. */
+	paper: "Wove" | "Granite" | string;
+	/** Watermark, Phosphor, Printed Control Numbers on Back, etc. */
+	tagging: string;
+	/** Perf value, Imperf, Die Cut, Roulette, etc. */
 	separation: string;
 }
 
@@ -20,6 +25,11 @@ export interface Issue extends Design, Media {
 	id: string;
 	partOf?: Issue;
 	date: string;
+	other: string;
+	refs: string;
+}
+
+export interface Set extends Issue {
 	varieties?: bundle<Variety>;
 	minorIssues?:  bundle<Issue>;
 }
@@ -28,10 +38,8 @@ export interface Variety extends Issue {
 	denom: string;
 	colors: string; //falsy color is "multicolored"
 	overprint: string;
-	other: string;
 	mint: rating;
 	used: rating;
-	refs: string;
 }
 
 /**
