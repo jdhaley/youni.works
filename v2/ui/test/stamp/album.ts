@@ -10,6 +10,7 @@ export function albumize(issues: bundle<Issue>) {
 	title.textContent = "Canada";
 	let content = addTo(ele, "", "pageBody");
 	for (let id in issues) {
+		console.log("Issue: ", id);
 		let issue = issues[id];
 		if (issue["denom"]) {
 			doVariety(issue as Variety, content);
@@ -48,7 +49,7 @@ function doIssue(item: Set, ele: Element) {
 function doVariety(item: Variety, ele: Element) {
 	ele = addTo(ele, "", "variety");
 	ele.classList.add(width(item));
-	let line = addTo(ele);
+	let line = addTo(ele, "", "title");
 	if (!item.partOf) line.textContent = item.date.substring(0, 4) + ". ";
 	if (item.subject) line.textContent += item.subject;
 	let diffs = diff(item.partOf, item);

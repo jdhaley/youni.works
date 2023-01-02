@@ -1,4 +1,4 @@
-import { bundle, EMPTY, extend } from "../../../base/util.js";
+import { bundle, extend } from "../../../base/util.js";
 import { Issue, Set, Variety } from "./stamp.js";
 
 export interface StampData {

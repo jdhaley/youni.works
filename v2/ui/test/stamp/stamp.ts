@@ -36,7 +36,7 @@ export interface Set extends Issue {
 
 export interface Variety extends Issue {
 	denom: string;
-	colors: string; //falsy color is "multicolored"
+	colors: string; //unspecified color is "multicolored"
 	overprint: string;
 	mint: rating;
 	used: rating;
