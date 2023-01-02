@@ -6,12 +6,15 @@ const BOXES = Object.create(null);
 
 export function albumize(issues: bundle<Issue>) {
 	let ele = addTo(document.body, "", "page");
+	let title = addTo(ele, "", "pageTitle");
+	title.textContent = "Canada";
+	let content = addTo(ele, "", "pageBody");
 	for (let id in issues) {
 		let issue = issues[id];
 		if (issue["denom"]) {
-			doVariety(issue as Variety, ele);
+			doVariety(issue as Variety, content);
 		} else {
-			doSet(issue, ele);
+			doSet(issue, content);
 		}
 	}
 }
@@ -21,22 +24,23 @@ function doSet(issue: Set, ele: Element) {
 	let title = addTo(ele, "", "title");
 	title.textContent = years(issue) + ". " + issue.subject;
 	let issues = addTo(ele, "", "issues");
-	doIssue(issue, issue.varieties, issues);
+	doIssue(issue, issues);
 	for (let minor in issue.minorIssues) {
-		doIssue(issue.minorIssues[minor], issue.varieties, issues);
+		doIssue(issue.minorIssues[minor], issues);
 	}
 }
-function doIssue(item: Set, varieties: bundle<Variety>, ele: Element) {
+function doIssue(item: Set, ele: Element) {
 	let issue = addTo(ele);
+	let varieties = item.varieties;
 	if (item.partOf) {
-		let title = addTo(issue, "", "title");
+		varieties = (item.partOf as Set).varieties;
+		let title = addTo(issue, "", "diff");
 		title.textContent = diff(item.partOf, item);
 		issue = addTo(issue);
 	}
 	issue.className = "issue";
 	let vars = addTo(issue, "", "varieties");
 	for (let id in item.varieties) {
-		console.log("variety diff:", diff(item, varieties[id]));
 		let variety = varieties[id]
 		if (variety.partOf == item) doVariety(varieties[id], vars);
 	}
@@ -45,8 +49,13 @@ function doVariety(item: Variety, ele: Element) {
 	ele = addTo(ele, "", "variety");
 	ele.classList.add(width(item));
 	let line = addTo(ele);
-	if (!item.partOf) line.textContent += item.date.substring(0, 4) + ". ";
+	if (!item.partOf) line.textContent = item.date.substring(0, 4) + ". ";
 	if (item.subject) line.textContent += item.subject;
+	let diffs = diff(item.partOf, item);
+	if (diffs) {
+		line = (addTo(ele, "", "diff"));
+		line.textContent += diffs
+	}
 	doBox(item, ele);
 }
 
