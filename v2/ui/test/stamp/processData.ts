@@ -1,4 +1,4 @@
-import { bundle, extend } from "../../../base/util.js";
+import { bundle, EMPTY, extend } from "../../../base/util.js";
 import { Issue, Set, Variety } from "./stamp.js";
 
 export interface StampData {
@@ -8,10 +8,12 @@ export interface StampData {
 	denom: string;
 }
 
-export function processStampData(data: StampData[]): bundle<Issue> {
+export function processIssues(data: StampData[]): bundle<Issue> {
 	let issues: bundle<Issue> = Object.create(null);
 	let set: Set;
 	for (let item of data) {
+		//Ignore empty objects parsed from CSV
+		if (!Object.keys(item).length) continue;
 		item.date = item.date ? "" + item.date : "";
 		if (item.denom) {
 			if (item.design) {
@@ -24,13 +26,13 @@ export function processStampData(data: StampData[]): bundle<Issue> {
 				processVariety(set, item.variety, item);
 			}
 		} else {
-			set = processDesign(set, item);
+			set = processSet(set, item);
 			if (set && !set.partOf) issues[set.id] = set;
 		}
 	}
 	return issues;
 }
-function processDesign(design: Set, data: StampData): Issue {
+function processSet(design: Set, data: StampData): Issue {
 	let set: Set;
 	if (Number(data.design)) {
 		set = toIssue(data);

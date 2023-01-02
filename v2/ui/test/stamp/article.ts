@@ -5,13 +5,13 @@ import { fromCsv } from "../../../transform/fromCSV.js";
 import { Change, IArticle } from "../../article.js";
 import { UserEvent } from "../../frame.js";
 import { albumize } from "./album.js";
-import { StampData, processStampData } from "./processData.js";
+import { StampData, processIssues } from "./processData.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : fromCsv(res.body);
 		console.log(this.source);
-		let issues = processStampData(this.source as StampData[]);
+		let issues = processIssues(this.source as StampData[]);
 		console.log(issues);
 		albumize(issues);
 		// let type = getType(this, res.req.to, this.source) as VType;
