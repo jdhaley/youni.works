@@ -6,9 +6,9 @@ const BOXES = Object.create(null);
 
 export function albumize(issues: bundle<Issue>) {
 	let ele = addTo(document.body, "", "page");
-	let title = addTo(ele, "", "pageTitle");
+	let title = addTo(ele, "", "title");
 	title.textContent = "Canada";
-	let content = addTo(ele, "", "pageBody");
+	let content = addTo(ele, "", "body");
 	for (let id in issues) {
 		let issue = issues[id];
 		if (issue["denom"]) {

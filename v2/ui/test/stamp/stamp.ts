@@ -3,7 +3,6 @@ import { bundle } from "../../../base/util";
 export const diffs = ["purpose", "method", "paper", "tagging", "separation", "otherDesignAttrs", "otherMediaAttrs"];
 	
 export interface Design {
-	purpose: "Air" | "Charity" | "Due" | "Tax" | string;
 	subject: string;
 	method: "Engr" | "Typo" | "Litho" | "Photo" | string;
 	width: number;
@@ -26,7 +25,9 @@ export interface Media {
 export interface Issue extends Design, Media {
 	id: string;
 	partOf?: Issue;
+	purpose: "Air" | "Charity" | "Due" | "Tax" | string;
 	date: string;
+	crossReference: string;
 }
 
 export interface Set extends Issue {
@@ -40,7 +41,6 @@ export interface Variety extends Issue {
 	overprint: string;
 	mint: rating;
 	used: rating;
-	crossReference: string;
 }
 
 /**
