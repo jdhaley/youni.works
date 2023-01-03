@@ -20,14 +20,14 @@ export function processIssues(data: StampData[]): bundle<Issue> {
 				if (item.variety) console.warn("Singleton variety should not have a variety value.");
 				//A row with both a denom & design number is a singleton variety
 				let issue = toIssue(item);
-				issues[issue.id] = issue;
+				issues["#" + issue.id] = issue;
 				set = null;
 			} else {
 				processVariety(set, item.variety, item);
 			}
 		} else {
 			set = processSet(set, item);
-			if (set && !set.partOf) issues[set.id] = set;
+			if (set && !set.partOf) issues["#" + set.id] = set;
 		}
 	}
 	return issues;
@@ -67,6 +67,6 @@ function processVariety(design: Set, vno: string, item: StampData) {
 function toIssue(data: StampData): Issue {
 	let date = "" + (Number.parseInt(("" + data.date).substring(0, 4)) - 1800);
 	let design =  "" + (("" + data.design).length == 1 ? "0" : "") + data.design;
-	data["id"] = "" + date + design + (data.variety || "");
+	data["id"] = date + design + (data.variety || "");
 	return data as any as Issue;
 }

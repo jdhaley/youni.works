@@ -10,7 +10,6 @@ export function albumize(issues: bundle<Issue>) {
 	title.textContent = "Canada";
 	let content = addTo(ele, "", "pageBody");
 	for (let id in issues) {
-		console.log("Issue: ", id);
 		let issue = issues[id];
 		if (issue["denom"]) {
 			doVariety(issue as Variety, content);
