@@ -1,6 +1,6 @@
 import { bundle } from "../../../base/util";
 
-export const diffs = ["purpose", "method", "paper", "tagging", "separation", "other"];
+export const diffs = ["purpose", "method", "paper", "tagging", "separation", "otherDesignAttrs", "otherMediaAttrs"];
 	
 export interface Design {
 	purpose: "Air" | "Charity" | "Due" | "Tax" | string;
@@ -10,6 +10,7 @@ export interface Design {
 	height: number;
 	shape: "triangle" | "diamond" | "ellipse" | string;
 	rotation: 1 | 2 | 3;
+	otherDesignAttrs: string;
 }
 
 export interface Media {
@@ -19,14 +20,13 @@ export interface Media {
 	tagging: string;
 	/** Perf value, Imperf, Die Cut, Roulette, etc. */
 	separation: string;
+	otherMediaAttrs: string;
 }
 
 export interface Issue extends Design, Media {
 	id: string;
 	partOf?: Issue;
 	date: string;
-	other: string;
-	refs: string;
 }
 
 export interface Set extends Issue {
@@ -40,6 +40,7 @@ export interface Variety extends Issue {
 	overprint: string;
 	mint: rating;
 	used: rating;
+	crossReference: string;
 }
 
 /**
