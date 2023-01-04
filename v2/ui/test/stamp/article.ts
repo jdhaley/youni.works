@@ -10,8 +10,12 @@ import { StampData, processIssues } from "./processData.js";
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
 		this.source = res.statusCode == 404 ? [] : fromCsv(res.body);
-		console.log(this.source);
-		let issues = processIssues(this.source as StampData[]);
+		let name = res.req.to;
+		name = name.substring(name.lastIndexOf("/") + 1);
+		name = name.substring(0, name.lastIndexOf("."));
+		let region = name.substring(0, name.indexOf("-"));
+		let era = name.substring(name.indexOf("-") + 1);
+		let issues = processIssues(region, era, this.source as StampData[]);
 		console.log(issues);
 		albumize(issues);
 		// let type = getType(this, res.req.to, this.source) as VType;

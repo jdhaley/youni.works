@@ -24,7 +24,6 @@ export interface Media {
 
 export interface Issue extends Design, Media {
 	id: string;
-	partOf?: Issue;
 	purpose: "Air" | "Charity" | "Due" | "Tax" | string;
 	date: string;
 	crossReference: string;
@@ -32,10 +31,10 @@ export interface Issue extends Design, Media {
 
 export interface Set extends Issue {
 	varieties?: bundle<Variety>;
-	minorIssues?:  bundle<Issue>;
 }
 
 export interface Variety extends Issue {
+	partOf?: Set;
 	denom: string;
 	colors: string; //unspecified color is "multicolored"
 	overprint: string;
