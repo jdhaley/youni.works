@@ -14,38 +14,57 @@ export function albumize(issues: bundle<Issue>) {
 		if (issue["denom"]) {
 			doVariety(issue as Variety, content);
 		} else {
-			doSet(issue, content);
+			doSet(issue as Set, content);
 		}
 	}
 }
 
-function doSet(set: Set, ele: Element) {
-	ele = addTo(ele, "", "set");
+function doSet(set: Set, ctx: Element) {
+	let ele = addTo(ctx, "", "major set issue");
 	let title = addTo(ele, "", "title");
 	title.textContent = years(set) + ". " + set.subject;
 	let vars = addTo(ele, "", "varieties");
 	for (let id in set.varieties) {
-		doVariety(set.varieties[id], vars);
+		let variety = set.varieties[id];
+		if (!variety.minor) doVariety(set.varieties[id], vars);
+	}
+	doMinors(set, ctx);
+}
+function doMinors(set: Set, ele: Element) {
+	let sets = {
+	}
+	for (let id in set.varieties) {
+		let variety = set.varieties[id];
+		if (variety.minor) {
+			let key = diff(set, variety);
+			if (!sets[key]) sets[key] = [];
+			sets[key].push(variety);
+		}
+	}
+	for (let key in sets) {
+		let minors = addTo(ele, "", "minor set issue");
+		let title = addTo(minors, "", "title");
+		if (key) title.textContent = "… " + key;
+		let issues = addTo(minors, "", "varieties");
+		for (let v of sets[key]) {
+			doVariety(v, issues);
+		}
 	}
 }
-// function doIssue(item: Set, ele: Element) {
-// 	let issue = addTo(ele);
-// 	let varieties = item.varieties;
-// 	if (item.partOf) {
-// 		varieties = (item.partOf as Set).varieties;
-// 		let title = addTo(issue, "", "diff");
-// 		title.textContent = diff(item.partOf, item);
-// 		issue = addTo(issue);
-// 	}
-// 	issue.className = "issue";
-// 	let vars = addTo(issue, "", "varieties");
-// 	for (let id in item.varieties) {
-// 		let variety = varieties[id]
-// 		if (variety.partOf == item) doVariety(varieties[id], vars);
-// 	}
-// }
+function diff(major: Issue, minor: Issue) {
+	let diff = "";
+	for (let name in minor) {
+		if (diffs.indexOf(name) >= 0 && minor[name] != major[name]) {
+			if (diff) diff += ", ";
+			diff += minor[name];
+		}
+	}
+	return diff;
+}
+
 function doVariety(item: Variety, ele: Element) {
 	ele = addTo(ele, "", "variety");
+	if (!item.partOf) ele.classList.add("issue");
 	ele.classList.add(width(item));
 	let line = addTo(ele, "", "title");
 	if (!item.partOf) line.textContent = item.date.substring(0, 4) + ". ";
@@ -68,16 +87,6 @@ function doBox(item: Variety, ele: Element) {
 	}
 	line = addTo(box, "", "id");
 	line.textContent = "#" + item.id;
-}
-function diff(major: Issue, minor: Issue) {
-	let diff = "";
-	for (let name in minor) {
-		if (diffs.indexOf(name) >= 0 && minor[name] != major[name]) {
-			if (diff) diff += ", ";
-			diff += minor[name];
-		}
-	}
-	return diff;
 }
 function years(set: Set) {
 	let startYear = Number(set.date.substring(0, 4));

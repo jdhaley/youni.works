@@ -9,15 +9,22 @@ export interface StampData {
 	denom: string;
 }
 
-export function processIssues(region: string, era: string, data: StampData[]): bundle<Issue> {
+function filterEmpty<T>(it: Iterable<T>): Iterable<T> {
+	return  {
+		*[Symbol.iterator]() {
+			for (let current of it) {
+				if (Object.keys(current).length) yield current;
+			}
+		}
+	}
+}
+
+export function processIssues(region: string, era: string, data: Iterable<StampData>): bundle<Issue> {
 	let issues: bundle<Issue> = Object.create(null);
 	let current: Issue;
-	for (let item of data) {
-		//Ignore empty objects parsed from CSV
-		if (!Object.keys(item).length) continue;
+	for (let item of filterEmpty(data)) {
 		if (typeof item.date == "number") item.date = "" + item.date;
 		if (item.issue) {
-			if (item.variety || item.minor) console.warn("An Issue should not have a variety or minor value.");
 			current = toIssue(era, item);
 			if (!item.denom) (current as Set).varieties = Object.create(null);
 			issues[region + current.id] = current;			
@@ -32,7 +39,10 @@ export function processIssues(region: string, era: string, data: StampData[]): b
 	return issues;
 }
 function processMinor(variety: Variety, item: StampData) {
-	if (!variety) console.warn("No variety for minor");
+	if (!variety) {
+		console.warn("No variety for minor");
+		return;
+	}
 	let set = variety.partOf;
 	if (!set) console.warn("A minor cannot be specified for a singleton variety... convert to a set.");
 	let minor = extend(variety, item) as Variety;
@@ -52,9 +62,8 @@ function processVariety(set: Set, item: StampData): Variety {
 	return variety;
 }
 function toIssue(era: string, data: StampData): Issue {
+	if (data.variety || data.minor) console.warn("An Issue should not have a variety or minor value.");
 	let id =  era + (data.issue < 10 ? "0" : "") + data.issue;
-	if (data.variety) id += data.variety;
-	if (data.minor) id += data.minor;
 	data["id"] = id;
 	return data as any as Issue;
 }

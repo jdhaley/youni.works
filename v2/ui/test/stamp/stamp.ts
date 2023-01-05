@@ -1,15 +1,17 @@
 import { bundle } from "../../../base/util";
 
-export const diffs = ["purpose", "method", "paper", "tagging", "separation", "otherDesignAttrs", "otherMediaAttrs"];
-	
+export const diffs = ["purpose", "method", "paper", "tagging", "separation", "other"];
+
+export interface Shape {
+	width: number;
+	height: number;
+	shape?: "triangle" | "diamond" | "ellipse" | string;
+}
+
 export interface Design {
 	subject: string;
 	method: "Engr" | "Typo" | "Litho" | "Photo" | string;
-	width: number;
-	height: number;
-	shape: "triangle" | "diamond" | "ellipse" | string;
 	rotation: 1 | 2 | 3;
-	otherDesignAttrs: string;
 }
 
 export interface Media {
@@ -19,27 +21,30 @@ export interface Media {
 	tagging: string;
 	/** Perf value, Imperf, Die Cut, Roulette, etc. */
 	separation: string;
-	otherMediaAttrs: string;
 }
 
-export interface Issue extends Design, Media {
+export interface Issue extends Shape, Design, Media {
 	id: string;
 	purpose: "Air" | "Charity" | "Due" | "Tax" | string;
 	date: string;
+	/** Both within this and other numbering systems. Each system requires a defined prefix. */
 	crossReference: string;
+	other: string;
 }
 
 export interface Set extends Issue {
-	varieties?: bundle<Variety>;
+	varieties: bundle<Variety>;
 }
 
 export interface Variety extends Issue {
 	partOf?: Set;
+	minor?: string;
 	denom: string;
-	colors: string; //unspecified color is "multicolored"
-	overprint: string;
-	mint: rating;
-	used: rating;
+	/** unspecified color is "multicolored" */
+	colors?: string;
+	overprint?: string;
+	mint?: rating;
+	used?: rating;
 }
 
 /**
@@ -49,9 +54,9 @@ export interface Variety extends Issue {
  * 		blank - not rated.
  * 		0 - Common variety, no specific value.
  * 		1 - Under 2.00
- * 		2 - Under 20.00
- * 		3 - Under 100.00
- * 		4 - Under 1000.00
- * 		5 - Over 1000.00
+ * 		2 - 2.00 up to 20.00
+ * 		3 - 20.00 up to 200.00
+ * 		4 - 200.00 up to 2000.00
+ * 		5 - Over 2000.00
 */
 export type rating = 0 | 1 | 2 | 3 | 4 | 5;
