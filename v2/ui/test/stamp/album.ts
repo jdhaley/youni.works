@@ -1,6 +1,6 @@
 import { bundle } from "../../../base/util.js";
 import { createRule } from "../../style.js";
-import { diffs, Issue, Set, Variety } from "./stamp.js";
+import { Issue, Set, Variety } from "./stamp.js";
 
 const BOXES = Object.create(null);
 
@@ -24,42 +24,31 @@ function doSet(set: Set, ctx: Element) {
 	let title = addTo(ele, "", "title");
 	title.textContent = years(set) + ". " + set.subject;
 	let vars = addTo(ele, "", "varieties");
-	for (let id in set.varieties) {
-		let variety = set.varieties[id];
-		if (!variety.minor) doVariety(set.varieties[id], vars);
-	}
-	doMinors(set, ctx);
-}
-function doMinors(set: Set, ele: Element) {
-	let sets = {
+	let diffs = {
 	}
 	for (let id in set.varieties) {
 		let variety = set.varieties[id];
+		let diff = variety.diff;
 		if (variety.minor) {
-			let key = diff(set, variety);
-			if (!sets[key]) sets[key] = [];
-			sets[key].push(variety);
+			if (!diffs[diff]) diffs[diff] = [];
+			diffs[diff].push(variety);
+		} else {
+			doVariety(set.varieties[id], vars);
 		}
 	}
-	for (let key in sets) {
+	doMinors(diffs, ctx);
+}
+
+function doMinors(diffs: bundle<Variety[]>, ele: Element) {
+	for (let key in diffs) {
 		let minors = addTo(ele, "", "minor set issue");
 		let title = addTo(minors, "", "title");
 		if (key) title.textContent = "… " + key;
 		let issues = addTo(minors, "", "varieties");
-		for (let v of sets[key]) {
+		for (let v of diffs[key]) {
 			doVariety(v, issues);
 		}
 	}
-}
-function diff(major: Issue, minor: Issue) {
-	let diff = "";
-	for (let name in minor) {
-		if (diffs.indexOf(name) >= 0 && minor[name] != major[name]) {
-			if (diff) diff += ", ";
-			diff += minor[name];
-		}
-	}
-	return diff;
 }
 
 function doVariety(item: Variety, ele: Element) {
@@ -80,11 +69,11 @@ function doBox(item: Variety, ele: Element) {
 	line.textContent = item.denom;
 	line = addTo(box, "", "colors");
 	line.textContent = item.colors.replace(/\//g, ", ");
-	let diffs = diff(item.partOf, item);
-	if (diffs) {
-		line = (addTo(box, "", "diff"));
-		line.textContent += diffs
-	}
+	// let diffs = diff(item.partOf, item);
+	// if (diffs) {
+	// 	line = (addTo(box, "", "diff"));
+	// 	line.textContent += diffs
+	// }
 	line = addTo(box, "", "id");
 	line.textContent = "#" + item.id;
 }

@@ -43,6 +43,7 @@ export interface Variety extends Issue {
 	/** unspecified color is "multicolored" */
 	colors?: string;
 	overprint?: string;
+	diff?: string;
 	mint?: rating;
 	used?: rating;
 }
