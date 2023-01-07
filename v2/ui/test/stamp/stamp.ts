@@ -30,6 +30,7 @@ export interface Issue extends Shape, Design, Media {
 	/** Both within this and other numbering systems. Each system requires a defined prefix. */
 	crossReference: string;
 	other: string;
+	br?: string;
 }
 
 export interface Set extends Issue {

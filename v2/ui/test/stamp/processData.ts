@@ -48,7 +48,8 @@ function processVariety(set: Set, item: StampData): Variety {
 	variety.id = set.id + item.variety;
 	variety.partOf = set;
 	variety.diff = diff(variety, set);
-	if (!Object.hasOwn(item, "subject")) variety.subject = "";
+	if (variety.subject && !Object.hasOwn(item, "subject")) variety.subject = "";
+	if (variety.br && !Object.hasOwn(item, "br")) variety.br = "";
 	set.varieties["#" + variety.id] = variety;
 	return variety;
 }
