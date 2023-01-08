@@ -132,7 +132,7 @@ function width(issue: Issue) {
 	return key;
 }
 function height(issue: Issue) {
-	let height = issue.rotation == 1 ? issue.width || 22 : issue.height || 25;
+	let height = issue.rotation == 1 ? issue.width || 21 : issue.height || 25;
 	let key = "H" + height;
 	if (!BOXES[key]) {
 		BOXES[key] = {
