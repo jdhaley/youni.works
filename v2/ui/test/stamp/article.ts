@@ -5,7 +5,9 @@ import { fromCsv } from "../../../transform/fromCSV.js";
 import { Change, IArticle } from "../../article.js";
 import { UserEvent } from "../../frame.js";
 
-import { Box, processBoxes, albumize as display } from "../box/album.js";
+import { layout as display } from "../box/layout.js";
+import { Box } from "../box/model.js";
+import { process } from "../box/process.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
@@ -18,7 +20,7 @@ export default extend(null, {
 		// 	era: name.substring(name.indexOf("-") + 1),
 		// 	pageTitle: "Canada"
 		// }
-		let issues = processBoxes(name, this.source as Box[]);
+		let issues = process(name, this.source as Box[]);
 		console.log(issues);
 		display(issues);
 		// let type = getType(this, res.req.to, this.source) as VType;
