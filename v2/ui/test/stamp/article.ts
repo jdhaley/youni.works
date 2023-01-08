@@ -5,7 +5,7 @@ import { fromCsv } from "../../../transform/fromCSV.js";
 import { Change, IArticle } from "../../article.js";
 import { UserEvent } from "../../frame.js";
 
-import { Issue, processIssues, albumize } from "./album.js";
+import { Box, processBoxes, albumize as display } from "../box/album.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
@@ -13,11 +13,14 @@ export default extend(null, {
 		let name = res.req.to;
 		name = name.substring(name.lastIndexOf("/") + 1);
 		name = name.substring(0, name.lastIndexOf("."));
-		let region = name.substring(0, name.indexOf("-"));
-		let era = name.substring(name.indexOf("-") + 1);
-		let issues = processIssues(region, era, this.source as Issue[]);
+		// let ctx = {
+		// 	region: name.substring(0, name.indexOf("-")),
+		// 	era: name.substring(name.indexOf("-") + 1),
+		// 	pageTitle: "Canada"
+		// }
+		let issues = processBoxes(name, this.source as Box[]);
 		console.log(issues);
-		albumize("Canada", issues);
+		display(issues);
 		// let type = getType(this, res.req.to, this.source) as VType;
 		// let viewer = type.create();
 		// this.view = viewer.view;

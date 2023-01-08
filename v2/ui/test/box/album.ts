@@ -1,12 +1,12 @@
-import { bundle, extend } from "../../../base/util.js";
+import { extend } from "../../../base/util.js";
 import { createRule } from "../../style.js";
 
-export interface Issue {
+export interface Box {
 	type: string;
 	opt: string | number;
-	caption: string;
+	title: string;
 	header: string;
-	body: string;
+	body: unknown;
 	footer: string;
 	width: number;
 	height: number;
@@ -14,7 +14,7 @@ export interface Issue {
 	shape: string;
 	///
 	id: string;
-	issues?: Issue[];
+	boxes?: Box[];
 }
 
 function filterEmpty<T>(it: Iterable<T>): Iterable<T> {
@@ -27,29 +27,29 @@ function filterEmpty<T>(it: Iterable<T>): Iterable<T> {
 	}
 }
 
-export function processIssues(region: string, era: string, data: Iterable<Issue>): Issue[] {
-	let issues: Issue[] = [];
-	let current: Issue;
+export function processBoxes(ctxId: string, data: Iterable<Box>): Box[] {
+	let issues: Box[] = [];
+	let current: Box;
 	for (let item of filterEmpty(data)) {
 		switch (item.type) {
-			case "i":
-				toIssue(issues, era, item);
+			case "s":
+				toIssue(issues, ctxId, item);
 				current = null;
 				break;
-			case "s":
-				toIssue(issues, era, item);
-				item.issues = [];
+			case "g":
+				toIssue(issues, ctxId, item);
+				item.boxes = [];
 				current = item;
 				break;
-			case "v":
-				processVariety(current, item);
+			case "c":
+				processChild(current, item);
 				break;
 			case "r":
-				toIssue(issues, era, item);
-				item.issues = [];
+				toIssue(issues, ctxId, item);
+				item.boxes = [];
 				processRun(item);
 				break;
-			case "b":
+			case "p":
 				issues.push(item);
 				break;
 		}
@@ -60,7 +60,7 @@ export function processIssues(region: string, era: string, data: Iterable<Issue>
 let nextIssue = 1;
 let nextVariety = 1;
 
-function toIssue(issues: Issue[], era: string, data: Issue) {
+function toIssue(issues: Box[], era: string, data: Box) {
 	let id =  era + (nextIssue < 10 ? "0" : "") + nextIssue;
 	data["id"] = id;
 	issues.push(data);
@@ -68,44 +68,35 @@ function toIssue(issues: Issue[], era: string, data: Issue) {
 	nextVariety = 1;
 }
 
-function processVariety(set: Issue, item: Issue) {
-	if (!set || !set.issues) {
+function processChild(set: Box, item: Box) {
+	if (!set || !set.boxes) {
 		console.warn("No current Set for variety.");
 		return;
 	}
-	let variety = extend(set, item) as Issue;
+	let variety = extend(set, item) as Box;
 	variety.id = set.id + nextVariety++;
-	if (variety.caption && !Object.hasOwn(item, "caption")) variety.caption = "";
-	set.issues["#" + variety.id] = variety;
+	if (variety.title && !Object.hasOwn(item, "caption")) variety.title = "";
+	set.boxes["#" + variety.id] = variety;
 }
 
-function processRun(run: Issue) {
+function processRun(run: Box) {
 	for (let i = 0; i < run.opt; i++) {
-		let variety = Object.create(run) as Issue;
+		let variety = Object.create(run) as Box;
 		variety.id = run.id + (i + 1);
 		//Supress the caption from the run prototype
-		if (variety.caption) variety.caption = "";
-		run.issues["#" + variety.id] = variety;	
+		if (variety.title) variety.title = "";
+		run.boxes["#" + variety.id] = variety;	
 	}
 }
 
 //////////
 
-const BOXES = Object.create(null);
-
-export function createPage(title: string): Element {
-	let page = addTo(document.body, "", "page");
-	let caption = addTo(page, "", "title");
-	caption.textContent = title;
-	return addTo(page, "", "body");
-}
-
-export function albumize(region: string, issues: Issue[]) {
-	let page = createPage(region);
+export function albumize(issues: Box[]) {
+	let page: Element;
 	for (let issue of issues) {
-		if (issue.type == "b") {
-			page = createPage(region);
-		} else if (issue.type == "i") {
+		if (issue.type == "p") {
+			page = paginate(issue);
+		} else if (issue.type == "s") {
 			doVariety(issue, page);
 		} else {
 			doSet(issue, page);
@@ -113,39 +104,42 @@ export function albumize(region: string, issues: Issue[]) {
 	}
 }
 
-function doSet(issue: Issue, page: Element) {
+function doSet(issue: Box, page: Element) {
 	let set = addTo(page, "", "set issue");
 	let title = addTo(set, "", "title");
-	title.textContent = issue.caption || "";
+	title.textContent = issue.title || "";
 	let issues = addTo(set, "", "varieties");
-	for (let id in issue.issues) {
-		let variety = issue.issues[id];
+	for (let id in issue.boxes) {
+		let variety = issue.boxes[id];
 		doVariety(variety, issues);
 	}
 }
-function doVariety(item: Issue, ctx: Element) {
+function doVariety(item: Box, ctx: Element) {
 	let variety = addTo(ctx, "", "variety");
 	if (item.type == "i") variety.classList.add("issue");
 	variety.classList.add(width(item));
-	if (item.caption) {
+	if (item.title) {
 		let line = addTo(variety, "", "title");
-		line.textContent = item.caption	;
+		line.textContent = item.title	;
 	}
 	doBox(item, variety);
 }
 
-function doBox(item: Issue, ele: Element) {
+function doBox(item: Box, ele: Element) {
 	let box = addTo(ele, "", "box");
 	box.classList.add(width(item));
 	box.classList.add(height(item));
 	let line = addTo(box, "", "header");
 	line.textContent = item.header;
 	line = addTo(box, "", "body");
-	line.textContent = item.body;
+	line.textContent = item.body ? "" + item.body : "";
 	line = addTo(box, "", "footer");
 	line.textContent = item.footer;
 }
-function width(issue: Issue) {
+
+const BOXES = Object.create(null);
+
+function width(issue: Box) {
 	let width = issue.rotation == 1 ? issue.height || 25 : issue.width || 21;
 	let key = "W" + width;
 	if (!BOXES[key]) {
@@ -156,7 +150,7 @@ function width(issue: Issue) {
 	}
 	return key;
 }
-function height(issue: Issue) {
+function height(issue: Box) {
 	let height = issue.rotation == 1 ? issue.width || 21 : issue.height || 25;
 	let key = "H" + height;
 	if (!BOXES[key]) {
@@ -167,9 +161,17 @@ function height(issue: Issue) {
 	}
 	return key;
 }
+
 function addTo(ele: Element, name?: string, className?: string) {
 	let child = ele.ownerDocument.createElement(name || "div");
 	if (className) child.className = className;
 	ele.append(child);
 	return child;
+}
+
+export function paginate(item: Box): Element {
+	let page = addTo(document.body, "", "page");
+	let caption = addTo(page, "", "title");
+	caption.textContent = item.title;
+	return addTo(page, "", "body");
 }
