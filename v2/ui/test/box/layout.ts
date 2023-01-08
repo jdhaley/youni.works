@@ -4,11 +4,9 @@ import { Box } from "./model.js";
 export function layout(items: Box[]) {
 	let page: Element;
 	for (let item of items) {
-		if (item.type == "p") {
+		if (!item.level) {
 			page = paginate(item);
-		} else if (item.type == "s" && !item.qty) {
-			doItem(item, page);
-		} else {
+		}  else {
 			doGroup(item, page);
 		}
 	}
@@ -26,7 +24,7 @@ function doGroup(box: Box, page: Element) {
 }
 function doItem(box: Box, ctx: Element) {
 	let item = addTo(ctx, "", "item");
-	if (box.type == "s") item.classList.add("top");
+	if (box.level == "s") item.classList.add("top");
 	item.classList.add(width(box));
 	if (box.title) {
 		let line = addTo(item, "", "title");

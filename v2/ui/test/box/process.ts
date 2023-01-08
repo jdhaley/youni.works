@@ -10,31 +10,37 @@ function filterEmpty<T>(it: Iterable<T>): Iterable<T> {
 		}
 	}
 }
-
+/*
+ctxId - region/era - replace with page property.
+*/
+function doLevel(ctxId: string, items: Box[], item: Box, current: Box): Box {
+	let level = Number(item.level);
+	if (level > 1) {
+		while (Number(current.level) >= level) {
+			current = current.partOf;
+		}
+		if (!current.boxes) current.boxes = Object.create(null);
+		current = processChild(current, item);
+	} else {
+		current = item;
+		id(items, ctxId, item);
+		if (item.qty) {
+			item.boxes = Object.create(null);
+			processQty(item);
+			current = null;
+		}
+	}
+	return current;
+}
 export function process(ctxId: string, data: Iterable<Box>): Box[] {
 	let items: Box[] = [];
 	let current: Box;
 	for (let item of filterEmpty(data)) {
-		switch (item.type) {
-			case "s":
-				id(items, ctxId, item);
-				if (item.qty) {
-					item.boxes = [];
-					processQty(item);	
-				}
-				current = null;
-				break;
-			case "g":
-				id(items, ctxId, item);
-				item.boxes = [];
-				current = item;
-				break;
-			case "c":
-				processChild(current, item);
-				break;
-			case "p":
-				items.push(item);
-				break;
+		if (Number(item.level)) {
+			current = doLevel(ctxId, items, item, current);
+			continue;
+		} else {
+			items.push(item);
 		}
 	}
 	return items;
@@ -59,7 +65,9 @@ function processChild(group: Box, item: Box) {
 	item = extend(group, item) as Box;
 	item.id = group.id + nextVariety++;
 	if (item.title && !Object.hasOwn(item, "title")) item.title = "";
+	item.partOf = group;
 	group.boxes["#" + item.id] = item;
+	return item;
 }
 
 function processQty(run: Box) {

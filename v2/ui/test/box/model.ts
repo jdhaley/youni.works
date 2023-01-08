@@ -1,5 +1,5 @@
 export interface Box {
-	type: string;
+	level: string;
 	title: string;
 	header: string;
 	body: unknown;
@@ -12,4 +12,5 @@ export interface Box {
 	qty: string | number;
 	id: string;
 	boxes?: Box[];
+	partOf: Box;
 }
