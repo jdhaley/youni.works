@@ -1,38 +1,38 @@
 import { createRule } from "../../style.js";
 import { Box } from "./model.js";
 
-export function layout(issues: Box[]) {
+export function layout(items: Box[]) {
 	let page: Element;
-	for (let issue of issues) {
-		if (issue.type == "p") {
-			page = paginate(issue);
-		} else if (issue.type == "s" && !issue.qty) {
-			doVariety(issue, page);
+	for (let item of items) {
+		if (item.type == "p") {
+			page = paginate(item);
+		} else if (item.type == "s" && !item.qty) {
+			doItem(item, page);
 		} else {
-			doSet(issue, page);
+			doGroup(item, page);
 		}
 	}
 }
 
-function doSet(issue: Box, page: Element) {
-	let set = addTo(page, "", "group top");
-	let title = addTo(set, "", "title");
-	title.textContent = issue.title || "";
-	let issues = addTo(set, "", "body");
-	for (let id in issue.boxes) {
-		let variety = issue.boxes[id];
-		doVariety(variety, issues);
+function doGroup(box: Box, page: Element) {
+	let group = addTo(page, "", "group top");
+	let title = addTo(group, "", "title");
+	title.textContent = box.title || "";
+	let body = addTo(group, "", "body");
+	for (let id in box.boxes) {
+		let item = box.boxes[id];
+		doItem(item, body);
 	}
 }
-function doVariety(item: Box, ctx: Element) {
-	let variety = addTo(ctx, "", "item");
-	if (item.type == "s") variety.classList.add("top");
-	variety.classList.add(width(item));
-	if (item.title) {
-		let line = addTo(variety, "", "title");
-		line.textContent = item.title	;
+function doItem(box: Box, ctx: Element) {
+	let item = addTo(ctx, "", "item");
+	if (box.type == "s") item.classList.add("top");
+	item.classList.add(width(box));
+	if (box.title) {
+		let line = addTo(item, "", "title");
+		line.textContent = box.title	;
 	}
-	doBox(item, variety);
+	doBox(box, item);
 }
 
 function doBox(item: Box, ele: Element) {

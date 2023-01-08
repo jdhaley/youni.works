@@ -12,12 +12,12 @@ function filterEmpty<T>(it: Iterable<T>): Iterable<T> {
 }
 
 export function process(ctxId: string, data: Iterable<Box>): Box[] {
-	let issues: Box[] = [];
+	let items: Box[] = [];
 	let current: Box;
 	for (let item of filterEmpty(data)) {
 		switch (item.type) {
 			case "s":
-				id(issues, ctxId, item);
+				id(items, ctxId, item);
 				if (item.qty) {
 					item.boxes = [];
 					processQty(item);	
@@ -25,7 +25,7 @@ export function process(ctxId: string, data: Iterable<Box>): Box[] {
 				current = null;
 				break;
 			case "g":
-				id(issues, ctxId, item);
+				id(items, ctxId, item);
 				item.boxes = [];
 				current = item;
 				break;
@@ -33,41 +33,41 @@ export function process(ctxId: string, data: Iterable<Box>): Box[] {
 				processChild(current, item);
 				break;
 			case "p":
-				issues.push(item);
+				items.push(item);
 				break;
 		}
 	}
-	return issues;
+	return items;
 }
 
 let nextIssue = 1;
 let nextVariety = 1;
 
-function id(issues: Box[], era: string, data: Box) {
+function id(items: Box[], era: string, data: Box) {
 	let id =  era + (nextIssue < 10 ? "0" : "") + nextIssue;
 	data["id"] = id;
-	issues.push(data);
+	items.push(data);
 	nextIssue++;
 	nextVariety = 1;
 }
 
-function processChild(set: Box, item: Box) {
-	if (!set || !set.boxes) {
-		console.warn("No current Set for variety.");
+function processChild(group: Box, item: Box) {
+	if (!group || !group.boxes) {
+		console.warn("No current group for child item.");
 		return;
 	}
-	let variety = extend(set, item) as Box;
-	variety.id = set.id + nextVariety++;
-	if (variety.title && !Object.hasOwn(item, "title")) variety.title = "";
-	set.boxes["#" + variety.id] = variety;
+	item = extend(group, item) as Box;
+	item.id = group.id + nextVariety++;
+	if (item.title && !Object.hasOwn(item, "title")) item.title = "";
+	group.boxes["#" + item.id] = item;
 }
 
 function processQty(run: Box) {
 	for (let i = 0; i < run.qty; i++) {
-		let variety = Object.create(run) as Box;
-		variety.id = run.id + (i + 1);
+		let item = Object.create(run) as Box;
+		item.id = run.id + (i + 1);
 		//Supress the caption from the run prototype
-		if (variety.title) variety.title = "";
-		run.boxes["#" + variety.id] = variety;	
+		if (item.title) item.title = "";
+		run.boxes["#" + item.id] = item;
 	}
 }
