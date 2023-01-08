@@ -4,8 +4,8 @@ import { extend } from "../../../base/util.js";
 import { fromCsv } from "../../../transform/fromCSV.js";
 import { Change, IArticle } from "../../article.js";
 import { UserEvent } from "../../frame.js";
-import { albumize } from "./album.js";
-import { StampData, processIssues } from "./processData.js";
+
+import { Issue, processIssues, albumize } from "./album.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
@@ -15,9 +15,9 @@ export default extend(null, {
 		name = name.substring(0, name.lastIndexOf("."));
 		let region = name.substring(0, name.indexOf("-"));
 		let era = name.substring(name.indexOf("-") + 1);
-		let issues = processIssues(region, era, this.source as StampData[]);
+		let issues = processIssues(region, era, this.source as Issue[]);
 		console.log(issues);
-		albumize(issues);
+		albumize("Canada", issues);
 		// let type = getType(this, res.req.to, this.source) as VType;
 		// let viewer = type.create();
 		// this.view = viewer.view;

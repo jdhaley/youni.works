@@ -1,125 +1,150 @@
-import { bundle } from "../../../base/util.js";
+import { bundle, extend } from "../../../base/util.js";
 import { createRule } from "../../style.js";
-import { Issue, Set, Variety } from "./stamp.js";
+
+export interface Issue {
+	type: string;
+	opt: string | number;
+	caption: string;
+	header: string;
+	body: string;
+	footer: string;
+	width: number;
+	height: number;
+	rotation: number;
+	shape: string;
+	///
+	id: string;
+	issues?: Issue[];
+}
+
+function filterEmpty<T>(it: Iterable<T>): Iterable<T> {
+	return  {
+		*[Symbol.iterator]() {
+			for (let current of it) {
+				if (Object.keys(current).length) yield current;
+			}
+		}
+	}
+}
+
+export function processIssues(region: string, era: string, data: Iterable<Issue>): Issue[] {
+	let issues: Issue[] = [];
+	let current: Issue;
+	for (let item of filterEmpty(data)) {
+		switch (item.type) {
+			case "i":
+				toIssue(issues, era, item);
+				current = null;
+				break;
+			case "s":
+				toIssue(issues, era, item);
+				item.issues = [];
+				current = item;
+				break;
+			case "v":
+				processVariety(current, item);
+				break;
+			case "r":
+				toIssue(issues, era, item);
+				item.issues = [];
+				processRun(item);
+				break;
+			case "b":
+				issues.push(item);
+				break;
+		}
+	}
+	return issues;
+}
+
+let nextIssue = 1;
+let nextVariety = 1;
+
+function toIssue(issues: Issue[], era: string, data: Issue) {
+	let id =  era + (nextIssue < 10 ? "0" : "") + nextIssue;
+	data["id"] = id;
+	issues.push(data);
+	nextIssue++;
+	nextVariety = 1;
+}
+
+function processVariety(set: Issue, item: Issue) {
+	if (!set || !set.issues) {
+		console.warn("No current Set for variety.");
+		return;
+	}
+	let variety = extend(set, item) as Issue;
+	variety.id = set.id + nextVariety++;
+	if (variety.caption && !Object.hasOwn(item, "caption")) variety.caption = "";
+	set.issues["#" + variety.id] = variety;
+}
+
+function processRun(run: Issue) {
+	for (let i = 0; i < run.opt; i++) {
+		let variety = Object.create(run) as Issue;
+		variety.id = run.id + (i + 1);
+		//Supress the caption from the run prototype
+		if (variety.caption) variety.caption = "";
+		run.issues["#" + variety.id] = variety;	
+	}
+}
+
+//////////
 
 const BOXES = Object.create(null);
 
+export function createPage(title: string): Element {
+	let page = addTo(document.body, "", "page");
+	let caption = addTo(page, "", "title");
+	caption.textContent = title;
+	return addTo(page, "", "body");
+}
 
-export function albumize(issues: bundle<Issue>) {
-	let ele = addTo(document.body, "", "page");
-	let title = addTo(ele, "", "title");
-	title.textContent = "Canada";
-	let ctx = addTo(ele, "", "body") as Element;
-	for (let id in issues) {
-		let issue = issues[id];
-		if (issue.br) ctx = newPage(ctx);
-		if (issue["denom"]) {
-			doVariety(issue as Variety, ctx);
+export function albumize(region: string, issues: Issue[]) {
+	let page = createPage(region);
+	for (let issue of issues) {
+		if (issue.type == "b") {
+			page = createPage(region);
+		} else if (issue.type == "i") {
+			doVariety(issue, page);
 		} else {
-			doSet(issue as Set, ctx);
+			doSet(issue, page);
 		}
 	}
 }
 
-function doSet(set: Set, page: Element) {
-	// let ele = addTo(page, "", "major set issue");
-	// let title = addTo(ele, "", "title");
-	// title.textContent = years(set) + ". " + set.subject;
-	// let vars = addTo(ele, "", "varieties");
-	let diffs = {
-	}
-	let issues: Element;
-	let text = years(set) + ". " + set.subject;
-	for (let id in set.varieties) {
-		let variety = set.varieties[id];
-		if (!issues || variety.br) {
-			let set = addTo(page, "", "major set issue");
-			let title = addTo(set, "", "title");
-			title.textContent = text;
-			text = "…";
-			issues = addTo(set, "", "varieties");
-		}
-
-		let diff = variety.diff;
-		if (variety.minor) {
-			if (!diffs[diff]) diffs[diff] = [];
-			diffs[diff].push(variety);
-		} else {
-			doVariety(set.varieties[id], issues);
-		}
-	}
-	doMinors(diffs, page);
-}
-
-function doMinors(diffs: bundle<Variety[]>, page: Element) {
-	for (let key in diffs) {
-		let issues: Element;
-		for (let v of diffs[key]) {
-			if (!issues || v.br) {
-				let set = addTo(page, "", "minor set issue");
-				let title = addTo(set, "", "title");
-				if (key) title.textContent = "… " + key;
-				issues = addTo(set, "", "varieties");
-			}
-			doVariety(v, issues);
-		}
+function doSet(issue: Issue, page: Element) {
+	let set = addTo(page, "", "set issue");
+	let title = addTo(set, "", "title");
+	title.textContent = issue.caption || "";
+	let issues = addTo(set, "", "varieties");
+	for (let id in issue.issues) {
+		let variety = issue.issues[id];
+		doVariety(variety, issues);
 	}
 }
-
-function doVariety(item: Variety, ctx: Element) {
-	// console.log(ctx);
-	// if (item.br == "l") {
-	// 	ctx = newCtx(ctx);
-	// } else if (item.br == "p") {
-	// 	ctx = newPage(ctx);
-	// }
-
+function doVariety(item: Issue, ctx: Element) {
 	let variety = addTo(ctx, "", "variety");
-	if (!item.partOf) variety.classList.add("issue");
+	if (item.type == "i") variety.classList.add("issue");
 	variety.classList.add(width(item));
-	let line = addTo(variety, "", "title");
-	if (!item.partOf) line.textContent = item.date.substring(0, 4) + ". ";
-	if (item.subject) line.textContent += item.subject;
+	if (item.caption) {
+		let line = addTo(variety, "", "title");
+		line.textContent = item.caption	;
+	}
 	doBox(item, variety);
 }
 
-function doBox(item: Variety, ele: Element) {
+function doBox(item: Issue, ele: Element) {
 	let box = addTo(ele, "", "box");
 	box.classList.add(width(item));
 	box.classList.add(height(item));
-	let line = addTo(box, "", "denom");
-	line.textContent = item.denom;
-	line = addTo(box, "", "colors");
-	line.textContent = item.colors.replace(/\//g, ", ");
-	// let diffs = diff(item.partOf, item);
-	// if (diffs) {
-	// 	line = (addTo(box, "", "diff"));
-	// 	line.textContent += diffs
-	// }
-	line = addTo(box, "", "id");
-	line.textContent = "#" + item.id;
+	let line = addTo(box, "", "header");
+	line.textContent = item.header;
+	line = addTo(box, "", "body");
+	line.textContent = item.body;
+	line = addTo(box, "", "footer");
+	line.textContent = item.footer;
 }
-function years(set: Set) {
-	let startYear = Number(set.date.substring(0, 4));
-	let endYear = startYear;
-	for (let id in set.varieties) {
-		let date = set.varieties[id].date;
-		let yr = Number(date.substring(0, 4)) || 0;
-		if (yr > endYear) endYear = yr;
-	}
-	let years = "" + startYear;
-	if (startYear != endYear) {
-		years += "–";
-		let end = "" + endYear;
-		if (years.substring(0, 2) != end.substring(0, 2)) {
-			years += end;
-		} else {
-			years += end.substring(2);
-		}
-	}
-	return years;
-}
-
 function width(issue: Issue) {
 	let width = issue.rotation == 1 ? issue.height || 25 : issue.width || 21;
 	let key = "W" + width;
@@ -142,35 +167,6 @@ function height(issue: Issue) {
 	}
 	return key;
 }
-
-function get(ele: Element, className: string) {
-	while (ele) {
-		if (ele.classList.contains(className)) return ele;
-		ele = ele.parentElement;
-	}
-}
-
-function newCtx(ctx: Element) {
-	let body  = get(ctx, "set").parentElement;
-	ctx = addTo(body, "", "set");
-	let title = addTo(ctx, "", "title");
-	title.innerHTML = "&nbsp;";
-	return addTo(ctx, "", "varieties");
-}
-
-function newPage(ctx: Element) {
-	let page = get(ctx, "page");
-	let title = page.firstChild.cloneNode(true) as Element;
-	page = addTo(page.parentElement, "", "page");
-	page.append(title);
-	let body = addTo(page, "", "body");
-	return body;
-	// let set = addTo(body, "", "set");
-	// title = addTo(set, "", "title");
-	// title.innerHTML = "&nbsp;";
-	// return addTo(set, "", "varieties");
-}
-
 function addTo(ele: Element, name?: string, className?: string) {
 	let child = ele.ownerDocument.createElement(name || "div");
 	if (className) child.className = className;
