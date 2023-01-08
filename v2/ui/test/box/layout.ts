@@ -4,10 +4,9 @@ import { Box } from "./model.js";
 export function layout(items: Box[]) {
 	let page: Element;
 	for (let item of items) {
-		if (!item.level) {
-			page = paginate(item);
-		}  else {
-			doGroup(item, page);
+		page = paginate(item);
+		for (let top of item.parts) {
+			doGroup(top, page);
 		}
 	}
 }
@@ -17,14 +16,17 @@ function doGroup(box: Box, page: Element) {
 	let title = addTo(group, "", "title");
 	title.textContent = box.title || "";
 	let body = addTo(group, "", "body");
-	for (let id in box.boxes) {
-		let item = box.boxes[id];
-		doItem(item, body);
+	for (let item of box.parts) {
+		if (item.parts.length) {
+			doGroup(item, body);
+		} else {
+			doItem(item, body);;
+		}
 	}
 }
 function doItem(box: Box, ctx: Element) {
 	let item = addTo(ctx, "", "item");
-	if (box.level == "s") item.classList.add("top");
+	if (box.level == 1) item.classList.add("top");
 	item.classList.add(width(box));
 	if (box.title) {
 		let line = addTo(item, "", "title");

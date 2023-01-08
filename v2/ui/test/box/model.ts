@@ -1,5 +1,7 @@
 export interface Box {
-	level: string;
+	partOf: Box;
+	parts?: Box[];
+	level: number;
 	title: string;
 	header: string;
 	body: unknown;
@@ -11,6 +13,4 @@ export interface Box {
 	///
 	qty: string | number;
 	id: string;
-	boxes?: Box[];
-	partOf: Box;
 }
