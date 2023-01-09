@@ -18,7 +18,7 @@ function doGroup(box: Box, page: Element) {
 	let group = addTo(page, "ui-group");
 	if (box.level == 1) group.classList.add("top");
 	let title = addTo(group, "ui-header");
-	title.textContent = box.title || "";
+	title.textContent = box.caption || "";
 	let body = addTo(group, "ui-body");
 	for (let i = 0; i < box.qty; i++) {
 		doBox(box, body);
@@ -35,9 +35,9 @@ function doItem(box: Box, ctx: Element) {
 	let item = addTo(ctx, "ui-item");
 	if (box.level == 1) item.classList.add("top");
 	item.classList.add(width(box));
-	if (box.title) {
+	if (box.caption) {
 		let line = addTo(item, "ui-header");
-		line.textContent = box.title	;
+		line.textContent = box.caption	;
 	}
 	doBox(box, item);
 }
@@ -89,7 +89,7 @@ function addTo(ele: Element, name?: string, className?: string) {
 export function paginate(item: Box): Element {
 	let page = addTo(document.body, "ui-page");
 	let caption = addTo(page, "ui-header");
-	caption.textContent = item.title;
+	caption.textContent = item.caption;
 	return addTo(page, "ui-body");
 }
 
@@ -126,7 +126,7 @@ function doLevel(item: Box, current: Box): Box {
 		current = current.partOf;
 	}
 	item = extend(current, item) as Box;
-	if (item.title && !Object.hasOwn(item, "title")) item.title = "";
+	if (item.caption && !Object.hasOwn(item, "title")) item.caption = "";
 	item.partOf = current;
 	current.parts.push(item);
 
