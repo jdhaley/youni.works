@@ -22,7 +22,12 @@ export function parseCsv(data: string): unknown[][] {
 	while (index < length) {
 		let line = [];
 		index = parseLine(line, data, index);
-		lines.push(line);
+		for (let col of line) {
+			if (col !== undefined) {
+				lines.push(line);
+				break;
+			}
+		}
 	}
 	return lines;
 }

@@ -7,7 +7,6 @@ import { UserEvent } from "../../frame.js";
 
 import { layout as display } from "../box/layout.js";
 import { Box } from "../box/model.js";
-import { process } from "../box/process.js";
 
 export default extend(null, {
 	open(this: IArticle, res: Response<string>) {
@@ -20,9 +19,7 @@ export default extend(null, {
 		// 	era: name.substring(name.indexOf("-") + 1),
 		// 	pageTitle: "Canada"
 		// }
-		let issues = process(name, this.source as Box[]);
-		console.log(issues);
-		display(issues);
+		display(this.source as Box[]);
 		// let type = getType(this, res.req.to, this.source) as VType;
 		// let viewer = type.create();
 		// this.view = viewer.view;

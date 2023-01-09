@@ -1,16 +1,15 @@
 export interface Box {
+	level: number;
 	partOf: Box;
 	parts?: Box[];
-	level: number;
 	title: string;
-	header: string;
+
+	header: unknown;
 	body: unknown;
-	footer: string;
+	footer: unknown;
 	width: number;
 	height: number;
 	rotation: number;
 	shape: string;
-	///
 	qty: string | number;
-	id: string;
 }
