@@ -15,10 +15,11 @@ export function layout(items: Iterable<Box>) {
 }
 
 function doGroup(box: Box, page: Element) {
-	let group = addTo(page, "", "group top");
-	let title = addTo(group, "", "title");
+	let group = addTo(page, "ui-group");
+	if (box.level == 1) group.classList.add("top");
+	let title = addTo(group, "ui-header");
 	title.textContent = box.title || "";
-	let body = addTo(group, "", "body");
+	let body = addTo(group, "ui-body");
 	for (let i = 0; i < box.qty; i++) {
 		doBox(box, body);
 	}
@@ -31,25 +32,25 @@ function doGroup(box: Box, page: Element) {
 	}
 }
 function doItem(box: Box, ctx: Element) {
-	let item = addTo(ctx, "", "item");
+	let item = addTo(ctx, "ui-item");
 	if (box.level == 1) item.classList.add("top");
 	item.classList.add(width(box));
 	if (box.title) {
-		let line = addTo(item, "", "title");
+		let line = addTo(item, "ui-header");
 		line.textContent = box.title	;
 	}
 	doBox(box, item);
 }
 
 function doBox(item: Box, ele: Element) {
-	let box = addTo(ele, "", "box");
+	let box = addTo(ele, "ui-box");
 	box.classList.add(width(item));
 	box.classList.add(height(item));
-	let line = addTo(box, "", "header");
+	let line = addTo(box, "ui-header");
 	if (item.header) line.textContent = "" + item.header;
-	line = addTo(box, "", "body");
+	line = addTo(box, "ui-body");
 	if (item.body) line.textContent = "" + item.body;
-	line = addTo(box, "", "footer");
+	line = addTo(box, "ui-footer");
 	if (item.footer) line.textContent = "" + item.footer;
 }
 
@@ -86,13 +87,11 @@ function addTo(ele: Element, name?: string, className?: string) {
 }
 
 export function paginate(item: Box): Element {
-	let page = addTo(document.body, "", "page");
-	let caption = addTo(page, "", "title");
+	let page = addTo(document.body, "ui-page");
+	let caption = addTo(page, "ui-header");
 	caption.textContent = item.title;
-	return addTo(page, "", "body");
+	return addTo(page, "ui-body");
 }
-
-
 
 let nextIssue = 1;
 let nextVariety = 1;
