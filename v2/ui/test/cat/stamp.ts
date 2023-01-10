@@ -34,7 +34,7 @@ export interface Issue extends Shape, Design, Media {
 }
 
 export interface Set extends Issue {
-	varieties: bundle<Variety>;
+	varieties: Variety[];
 }
 
 export interface Variety extends Issue {

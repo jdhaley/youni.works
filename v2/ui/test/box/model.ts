@@ -1,11 +1,3 @@
-// interface Part {
-// 	level: number;
-// 	partOf: Box;
-// 	caption: string;
-// }
-// interface Group extends Part {
-// 	parts?: Box[];
-// }
 export interface Box {
 	level: number;
 	partOf: Box;

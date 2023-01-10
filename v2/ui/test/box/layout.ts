@@ -3,7 +3,7 @@ import { createRule } from "../../style.js";
 import { Box } from "./model.js";
 
 export function layout(items: Iterable<Box>) {
-	items = process(items);
+	//items = process(items);
 	console.debug(items);
 	let page: Element;
 	for (let item of items) {
